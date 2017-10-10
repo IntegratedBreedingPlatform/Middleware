@@ -1,7 +1,10 @@
 
 package org.generationcp.middleware.domain.gms.search;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.manager.Operation;
@@ -27,12 +30,17 @@ public class GermplasmSearchParameter {
 
 	private final Map<String, Boolean> sortState;
 
+	private final Map<String, Integer> attributeTypesMap;
+
+	private List<String> addedColumnsPropertyIds = new LinkedList<>();
+
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation) {
 		this.searchKeyword = searchKeyword;
 		this.operation = operation;
 		this.sortState = new LinkedHashMap<>();
 		this.startingRow = 0;
 		this.numberOfEntries = Integer.MAX_VALUE;
+		this.attributeTypesMap = new HashMap<>();
 	}
 
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation, final boolean includeParents,
@@ -109,6 +117,18 @@ public class GermplasmSearchParameter {
 
 	public Map<String, Boolean> getSortState() {
 		return this.sortState;
+	}
+
+	public Map<String, Integer> getAttributeTypesMap() {
+		return attributeTypesMap;
+	}
+
+	public void setAddedColumnsPropertyIds(final List<String> addedColumnsPropertyIds) {
+		this.addedColumnsPropertyIds = addedColumnsPropertyIds;
+	}
+
+	public List<String> getAddedColumnsPropertyIds() {
+		return this.addedColumnsPropertyIds;
 	}
 
 	/**

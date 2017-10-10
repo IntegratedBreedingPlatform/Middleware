@@ -60,20 +60,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
-	public static final String STOCK_IDS = "stockIDs";
-	public static final String AVAIL_LOTS = "availableLots";
-	public static final String AVAIL_BALANCE = "availableBalance";
-	public static final String METHOD_NAME = "methodName";
-	public static final String LOCATION_NAME = "locationName";
-	public static final String METHOD_ABBREVIATION = "methodAbbreviation";
-	public static final String METHOD_NUMBER = "methodNumber";
-	public static final String METHOD_GROUP = "methodGroup";
-	public static final String PREFERRED_NAME = "preferredName";
-	public static final String PREFERRED_ID = "preferredId";
-	public static final String FEMALE_PARENT_ID = "femaleParentPreferredId";
-	public static final String FEMALE_PARENT_PREFERRED_NAME = "femaleParentPreferredName";
-	public static final String MALE_PARENT_ID = "maleParentPreferredId";
-	public static final String MALE_PARENT_PREFERRED_NAME = "maleParentPreferredName";
+
+
+	public static final String STOCK_IDS = "STOCKID";
+	public static final String AVAIL_LOTS = "LOTS";
+	public static final String AVAIL_BALANCE = "AVAILABLE";
+	public static final String METHOD_NAME = "METHOD NAME";
+	public static final String LOCATION_NAME = "LOCATIONS";
+	public static final String METHOD_ABBREVIATION = "METHOD ABBREV";
+	public static final String METHOD_NUMBER = "METHOD NUMBER";
+	public static final String METHOD_GROUP = "METHOD GROUP";
+	public static final String PREFERRED_NAME = "PREFERRED NAME";
+	public static final String PREFERRED_ID = "PREFERRED ID";
+	public static final String FEMALE_PARENT_ID = "CROSS-FEMALE GID";
+	public static final String FEMALE_PARENT_PREFERRED_NAME = "CROSS-FEMALE PREFERRED NAME";
+	public static final String MALE_PARENT_ID = "CROSS-MALE GID";
+	public static final String MALE_PARENT_PREFERRED_NAME = "CROSS-MALE PREFERRED NAME";
+	public static final String GERMPLASM_DATE = "GERMPLASM DATE";
 
 	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
 	// Old search query had the same hardcoded limit of 5000 anyway so this is not changing existing logic as such. Applies to both
@@ -861,6 +864,121 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+
+	protected String createGermplasmSearchQueryString(final GermplasmSearchParameter germplasmSearchParameter) {
+
+		final StringBuilder mainQuery = new StringBuilder();
+
+		mainQuery.append(createSelectClauseForGermplasmSearch(germplasmSearchParameter.getAddedColumnsPropertyIds()));
+		mainQuery.append(createFromClauseForGermplasmSearch(germplasmSearchParameter.getAddedColumnsPropertyIds()));
+		mainQuery.append("WHERE g.gid IN (:gids) GROUP BY g.gid");
+		mainQuery.append(this.addSortingColumns(germplasmSearchParameter.getSortState()));
+
+		return mainQuery.toString();
+
+	}
+
+	protected String createFromClauseForGermplasmSearch(final List<String> addedColumnsPropertyIds) {
+
+
+		Map<String, String> fromClauseColumnsMap = new HashMap<>();
+
+		fromClauseColumnsMap.put(PREFERRED_NAME, "LEFT JOIN `names` nameOfGermplasm \n"
+				+ "              ON g.gid = nameOfGermplasm.gid \n"
+				+ "                 AND nameOfGermplasm.nstat = 1 \n");
+		fromClauseColumnsMap.put(PREFERRED_ID, "LEFT JOIN `names` preferredIdOfGermplasm \n"
+				+ "              ON g.gid = preferredIdOfGermplasm.gid \n"
+				+ "                 AND preferredIdOfGermplasm.nstat = 8 \n");
+		fromClauseColumnsMap.put(FEMALE_PARENT_PREFERRED_NAME, "LEFT JOIN `names` nameOfFemaleParent \n"
+				+ "              ON g.gpid1 = nameOfFemaleParent.gid \n"
+				+ "                 AND nameOfFemaleParent.nstat = 1 \n");
+		fromClauseColumnsMap.put(MALE_PARENT_PREFERRED_NAME, "LEFT JOIN `names` nameOfMaleParent \n"
+				+ "              ON g.gpid2 = nameOfMaleParent.gid \n"
+				+ "                 AND nameOfMaleParent.nstat = 1 \n");
+
+		StringBuilder fromClause = new StringBuilder();
+		fromClause.append("FROM   germplsm g \n"
+				+ "       LEFT JOIN ims_lot gl \n"
+				+ "              ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n"
+				+ "       LEFT JOIN ims_transaction gt \n"
+				+ "              ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n"
+				+ "       LEFT JOIN methods m \n"
+				+ "              ON m.mid = g.methn \n"
+				+ "       LEFT JOIN location l \n"
+				+ "              ON l.locid = g.glocn \n"
+				+ "       LEFT JOIN `names` allNames  \n"
+				+ "              ON g.gid = allNames.gid \n");
+
+
+		for (String propertyId : addedColumnsPropertyIds) {
+			if (fromClauseColumnsMap.containsKey(propertyId)) {
+				fromClause.append(fromClauseColumnsMap.get(propertyId));
+			}
+		}
+
+		return fromClause.toString();
+
+
+
+	}
+
+	protected String createSelectClauseForGermplasmSearch(final List<String> addedColumnsPropertyIds) {
+
+		Map<String, String> selectClauseColumnsMap = new HashMap<>();
+
+		selectClauseColumnsMap.put(METHOD_ABBREVIATION, String.format("m.mcode AS `{0}` \n", METHOD_ABBREVIATION));
+		selectClauseColumnsMap.put(METHOD_NUMBER, String.format("m.mid AS `{0}` \n", METHOD_NUMBER));
+		selectClauseColumnsMap.put(METHOD_GROUP, String.format("m.mgrp AS `{0}` \n", METHOD_GROUP));
+		selectClauseColumnsMap.put(PREFERRED_ID, String.format("preferredIdOfGermplasm.nval AS `{0}` \n", PREFERRED_ID));
+		selectClauseColumnsMap.put(PREFERRED_NAME, String.format("nameOfGermplasm.nval AS `{0}` \n", PREFERRED_NAME));
+		selectClauseColumnsMap.put(GERMPLASM_DATE, String.format("g.date AS `{0}` \n", GERMPLASM_DATE));
+		selectClauseColumnsMap.put(FEMALE_PARENT_ID, String.format("       CASE \n"
+				+ "         WHEN g.gnpgs >= 2 \n"
+				+ "              AND g.gpid1 IS NOT NULL \n"
+				+ "              AND g.gpid1 <> 0 THEN g.gpid1 \n"
+				+ "         ELSE '-' \n"
+				+ "       END                         AS `{0}` \n",FEMALE_PARENT_ID));
+		selectClauseColumnsMap.put(FEMALE_PARENT_PREFERRED_NAME, String.format("       CASE \n"
+				+ "         WHEN g.gnpgs >= 2 \n"
+				+ "              AND g.gpid1 IS NOT NULL \n"
+				+ "              AND g.gpid1 <> 0 THEN nameOfFemaleParent.nval \n"
+				+ "         ELSE '-' \n"
+				+ "       END                         AS `{0}` \n", FEMALE_PARENT_PREFERRED_NAME));
+		selectClauseColumnsMap.put(MALE_PARENT_ID, String.format("        CASE \n"
+				+ "         WHEN g.gnpgs >= 2 \n"
+				+ "              AND g.gpid2 IS NOT NULL \n"
+				+ "              AND g.gpid2 <> 0 THEN g.gpid2 \n"
+				+ "         ELSE '-' \n"
+				+ "       END                         AS `{0}` \n", MALE_PARENT_ID));
+		selectClauseColumnsMap.put(MALE_PARENT_PREFERRED_NAME, String.format("       CASE \n"
+				+ "         WHEN g.gnpgs >= 2 \n"
+				+ "              AND g.gpid2 IS NOT NULL \n"
+				+ "              AND g.gpid2 <> 0 THEN nameOfMaleParent.nval \n"
+				+ "         ELSE '-' \n"
+				+ "       END                         AS `{0}` \n", MALE_PARENT_PREFERRED_NAME));
+
+
+		StringBuilder selectClause = new StringBuilder();
+		selectClause.append("SELECT g.*, \n"
+				+ " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
+				+ "                                   AS names,"
+				+ "       Group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR \n"
+				+ "       ', ') \n" + "                                   AS `" + STOCK_IDS +"`, \n"
+				+ "       Count(DISTINCT gt.lotid)    AS `" + AVAIL_LOTS +"`, \n"
+				+ "       Sum(gt.trnqty)              AS `" + AVAIL_BALANCE + "`, \n"
+				+ "       m.mname                     AS `"+ METHOD_NAME +"`, \n"
+				+ "       l.lname                     AS `" + LOCATION_NAME + "` \n");
+
+		for (String propertyId : addedColumnsPropertyIds) {
+			if (selectClauseColumnsMap.containsKey(propertyId)) {
+				selectClause.append(",");
+				selectClause.append(selectClauseColumnsMap.get(propertyId));
+			}
+		}
+
+		return selectClause.toString();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter)  {
 
@@ -881,97 +999,27 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				return new ArrayList<>(germplasmSearchResult);
 			}
 
-			final StringBuilder queryString = new StringBuilder();
-			queryString
-					.append("SELECT g.*, \n"
-							+ " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
-							+ "                                   AS names,"
-							+ "       Group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR \n"
-							+ "       ', ') \n" + "                                   AS stockIDs, \n"
-							+ "       Count(DISTINCT gt.lotid)    AS availableLots, \n"
-							+ "       Sum(gt.trnqty)              AS availableBalance, \n"
-							+ "       m.mname                     AS methodName, \n"
-							+ "       l.lname                     AS locationName, \n"
-							+ "       m.mcode                     AS methodAbbreviation, \n"
-							+ "       m.mid                       AS methodNumber, \n"
-							+ "       m.mgrp                      AS methodGroup, \n"
-							+ "       nameOfGermplasm.nval        AS preferredName, \n"
-							+ "       preferredIdOfGermplasm.nval AS preferredID, \n"
-							+ "       CASE \n"
-							+ "         WHEN g.gnpgs >= 2 \n"
-							+ "              AND g.gpid1 IS NOT NULL \n"
-							+ "              AND g.gpid1 <> 0 THEN g.gpid1 \n"
-							+ "         ELSE '-' \n"
-							+ "       END                         AS femaleParentPreferredId,\n"
-							+ "       CASE \n"
-							+ "         WHEN g.gnpgs >= 2 \n"
-							+ "              AND g.gpid1 IS NOT NULL \n"
-							+ "              AND g.gpid1 <> 0 THEN nameOfFemaleParent.nval \n"
-							+ "         ELSE '-' \n"
-							+ "       END                         AS femaleParentPreferredName,\n"
-							+ "        CASE \n"
-							+ "         WHEN g.gnpgs >= 2 \n"
-							+ "              AND g.gpid2 IS NOT NULL \n"
-							+ "              AND g.gpid2 <> 0 THEN g.gpid2 \n"
-							+ "         ELSE '-' \n"
-							+ "       END                         AS maleParentPreferredId,\n"
-							+ "       CASE \n"
-							+ "         WHEN g.gnpgs >= 2 \n"
-							+ "              AND g.gpid2 IS NOT NULL \n"
-							+ "              AND g.gpid2 <> 0 THEN nameOfMaleParent.nval \n"
-							+ "         ELSE '-' \n"
-							+ "       END                         AS maleParentPreferredName \n"
-							+ "FROM   germplsm g \n"
-							+ "       LEFT JOIN ims_lot gl \n"
-							+ "              ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n"
-							+ "       LEFT JOIN ims_transaction gt \n"
-							+ "              ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n"
-							+ "       LEFT JOIN methods m \n"
-							+ "              ON m.mid = g.methn \n"
-							+ "       LEFT JOIN location l \n"
-							+ "              ON l.locid = g.glocn \n"
-							+ "       LEFT JOIN `names` allNames  \n"
-							+ "              ON g.gid = allNames.gid \n"
-							+ "       LEFT JOIN `names` nameOfGermplasm \n"
-							+ "              ON g.gid = nameOfGermplasm.gid \n"
-							+ "                 AND nameOfGermplasm.nstat = 1 \n"
-							+ "       LEFT JOIN `names` preferredIdOfGermplasm \n"
-							+ "              ON g.gid = preferredIdOfGermplasm.gid \n"
-							+ "                 AND preferredIdOfGermplasm.nstat = 8 \n"
-							+ "       LEFT JOIN `names` nameOfFemaleParent \n"
-							+ "              ON g.gpid1 = nameOfFemaleParent.gid \n"
-							+ "                 AND nameOfFemaleParent.nstat = 1 \n"
-							+ "       LEFT JOIN `names` nameOfMaleParent \n"
-							+ "              ON g.gpid2 = nameOfMaleParent.gid \n"
-							+ "                 AND nameOfMaleParent.nstat = 1 \n"
-							+ "WHERE g.gid IN (:gids) GROUP BY g.gid");
+			final SQLQuery query = this.getSession().createSQLQuery(createGermplasmSearchQueryString(germplasmSearchParameter));
 
+			System.out.println(query.getQueryString());
 
-
-			queryString.append(this.addSortingColumns(germplasmSearchParameter.getSortState()));
-
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gidSearchResult);
 			query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
+			query.addScalar(GermplasmDAO.NAMES);
 			query.addScalar(GermplasmDAO.STOCK_IDS);
 			query.addScalar(GermplasmDAO.AVAIL_LOTS);
 			query.addScalar(GermplasmDAO.AVAIL_BALANCE);
 			query.addScalar(GermplasmDAO.METHOD_NAME);
 			query.addScalar(GermplasmDAO.LOCATION_NAME);
-			query.addScalar(GermplasmDAO.METHOD_ABBREVIATION);
-			query.addScalar(GermplasmDAO.METHOD_NUMBER);
-			query.addScalar(GermplasmDAO.METHOD_GROUP);
-			query.addScalar(GermplasmDAO.PREFERRED_NAME);
-			query.addScalar(GermplasmDAO.PREFERRED_ID);
-			query.addScalar(GermplasmDAO.FEMALE_PARENT_ID);
-			query.addScalar(GermplasmDAO.FEMALE_PARENT_PREFERRED_NAME);
-			query.addScalar(GermplasmDAO.MALE_PARENT_ID);
-			query.addScalar(GermplasmDAO.MALE_PARENT_PREFERRED_NAME);
-			query.addScalar(GermplasmDAO.NAMES);
+
+			for (String propertyId : germplasmSearchParameter.getAddedColumnsPropertyIds()) {
+				query.addScalar(propertyId);
+			}
+
 			query.setFirstResult(startingRow);
 			query.setMaxResults(noOfEntries);
 
-			germplasmSearchResult.addAll(this.getSearchForGermplasmsResult(query.list()));
+			germplasmSearchResult.addAll(this.getSearchForGermplasmsResult(query.list(), germplasmSearchParameter.getAddedColumnsPropertyIds()));
 			return new ArrayList<>(germplasmSearchResult);
 
 		} catch (final HibernateException e) {
@@ -1001,36 +1049,47 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return sortingQueryStr;
 	}
 
-	private List<Germplasm> getSearchForGermplasmsResult(final List<Object[]> result) {
+	private List<Germplasm> getSearchForGermplasmsResult(final List<Object[]> result, final List<String> addedColumnsPropertyIds) {
 		final List<Germplasm> germplasms = new ArrayList<>();
 		if (result != null) {
 			for (final Object[] row : result) {
-				germplasms.add(this.mapToGermplasm(row));
+				germplasms.add(this.mapToGermplasm(row, addedColumnsPropertyIds));
 			}
 		}
 		return germplasms;
 	}
 
-	private Germplasm mapToGermplasm(final Object[] row) {
+	private Germplasm mapToGermplasm(final Object[] row, final List<String> addedColumnsPropertyIds) {
 		final Germplasm germplasm = (Germplasm) row[0];
 		final GermplasmInventory inventoryInfo = new GermplasmInventory(germplasm.getGid());
-		inventoryInfo.setStockIDs((String) row[1]);
-		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
-		inventoryInfo.setTotalAvailableBalance(row[3] != null ? (Double) row[3] : 0d);
+		germplasm.setGermplasmNamesString(row[1] != null ? String.valueOf(row[1]) : "");
+		inventoryInfo.setStockIDs((String) row[2]);
+		inventoryInfo.setActualInventoryLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
+		inventoryInfo.setTotalAvailableBalance(row[4] != null ? (Double) row[4] : 0d);
 		germplasm.setInventoryInfo(inventoryInfo);
-		germplasm.setMethodName(row[4] != null ? String.valueOf(row[4]) : "");
-		germplasm.setLocationName(row[5] != null ? String.valueOf(row[5]) : "");
-		germplasm.setMethodCode(row[6] != null ? String.valueOf(row[6]) : "");
-		germplasm.setMethodNumber(row[7] != null ? String.valueOf(row[7]) : "");
-		germplasm.setMethodGroup(row[8] != null ? String.valueOf(row[8]) : "");
-		germplasm.setGermplasmPeferredName(row[9] != null ? String.valueOf(row[9]) : "");
-		germplasm.setGermplasmPeferredId(row[10] != null ? String.valueOf(row[10]) : "");
-		germplasm.setFemaleParentPreferredID(row[11] != null ?  String.valueOf(row[11]) : "");
-		germplasm.setFemaleParentPreferredName(row[12] != null ? String.valueOf(row[12]) : "");
-		germplasm.setMaleParentPreferredID(row[13] != null ? String.valueOf(row[13]) : "");
-		germplasm.setMaleParentPreferredName(row[14] != null ? String.valueOf(row[14]) : "");
-		germplasm.setGermplasmNamesString(row[15] != null ? String.valueOf(row[15]) : "");
+		germplasm.setMethodName(row[5] != null ? String.valueOf(row[5]) : "");
+		germplasm.setLocationName(row[6] != null ? String.valueOf(row[6]) : "");
+
+		germplasm.setGermplasmDate(getValueOfAddedColumns(GERMPLASM_DATE, row, addedColumnsPropertyIds));
+		germplasm.setMethodCode(getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds));
+		germplasm.setMethodNumber(getValueOfAddedColumns(METHOD_NUMBER, row, addedColumnsPropertyIds));
+		germplasm.setMethodGroup(getValueOfAddedColumns(METHOD_GROUP, row, addedColumnsPropertyIds));
+		germplasm.setGermplasmPeferredName(getValueOfAddedColumns(PREFERRED_NAME, row, addedColumnsPropertyIds));
+		germplasm.setGermplasmPeferredId(getValueOfAddedColumns(PREFERRED_ID, row, addedColumnsPropertyIds));
+		germplasm.setFemaleParentPreferredID(getValueOfAddedColumns(FEMALE_PARENT_ID, row, addedColumnsPropertyIds));
+		germplasm.setFemaleParentPreferredName(getValueOfAddedColumns(FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
+		germplasm.setMaleParentPreferredID(getValueOfAddedColumns(MALE_PARENT_ID, row, addedColumnsPropertyIds));
+		germplasm.setMaleParentPreferredName(getValueOfAddedColumns(MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
+
 		return germplasm;
+	}
+
+	protected String getValueOfAddedColumns(String propertyId, final Object[] row, final List<String> addedColumnsPropertyIds) {
+
+		int addedColumnIndex = (addedColumnsPropertyIds.indexOf(propertyId) + 6);
+
+		return row[addedColumnIndex] != null ? String.valueOf(row[addedColumnIndex]) : "";
+
 	}
 
 	public Map<Integer, Integer> getGermplasmDatesByGids(final List<Integer> gids) {

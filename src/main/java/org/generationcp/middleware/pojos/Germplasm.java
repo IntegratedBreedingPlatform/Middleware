@@ -450,6 +450,12 @@ public class Germplasm implements Serializable {
 	@Transient
 	private String germplasmNamesString = null;
 
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String germplasmDate = null;
+
 	public Germplasm() {
 		super();
 		this.deleted = false;
@@ -851,5 +857,14 @@ public class Germplasm implements Serializable {
 
 	public void setGermplasmNamesString(final String germplasmNamesString) {
 		this.germplasmNamesString = germplasmNamesString;
+	}
+
+
+	public String getGermplasmDate() {
+		return germplasmDate;
+	}
+
+	public void setGermplasmDate(final String germplasmDate) {
+		this.germplasmDate = germplasmDate;
 	}
 }
