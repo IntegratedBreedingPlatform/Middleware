@@ -157,6 +157,9 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setStudyName(studyName);
 		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
 		samplesDetailsDto.setGid(gid);
+		samplesDetailsDto.setSampleName(sample.getSampleName());
+		samplesDetailsDto.setDesignation(stock.getName());
+		samplesDetailsDto.setPlantNo(sample.getPlant().getPlantNumber());
 
 		fillPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
 		fillProjectProperties(sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(),
@@ -212,7 +215,7 @@ public class SampleServiceImpl implements SampleService {
 		final List<Sample> samples = this.sampleDao.getBySampleListId(sampleListId);
 		final List<SampleDetailsDTO> result = new ArrayList<>();
 		for (Sample sample : samples) {
-			result.add(getSampleDetailsDTO(sample));
+			result.add(this.getSampleDetailsDTO(sample));
 		}
 
 		return result;
