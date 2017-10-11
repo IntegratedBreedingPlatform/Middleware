@@ -1082,6 +1082,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return germplasms;
 	}
 
+	@Override
+	public Set<Integer> retrieveGidsOfSearchGermplasmResult(final GermplasmSearchParameter germplasmSearchParameter) {
+		return this.getGermplasmSearchDao().retrieveGIDSearchResults(germplasmSearchParameter);
+	}
+
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
 	 *
@@ -1093,9 +1098,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 * @return
 	 */
 	@Override
-	public Integer countSearchForGermplasm(final String q, final Operation o, final boolean includeParents, final boolean withInventoryOnly,
-			final boolean includeMGMembers) {
-		return this.getGermplasmSearchDao().countSearchForGermplasms(q, o, includeParents, withInventoryOnly, includeMGMembers);
+	public Integer countSearchForGermplasm(final GermplasmSearchParameter germplasmSearchParameter) {
+		return this.getGermplasmSearchDao().countSearchForGermplasms(germplasmSearchParameter);
 	}
 
 	@Override

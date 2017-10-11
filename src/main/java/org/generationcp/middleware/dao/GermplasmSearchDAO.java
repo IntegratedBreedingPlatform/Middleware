@@ -67,17 +67,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) {
 
 		// actual searching here
-		final String q = germplasmSearchParameter.getSearchKeyword().trim();
-		final Operation o = germplasmSearchParameter.getOperation();
-		final boolean includeParents = germplasmSearchParameter.isIncludeParents();
-		final boolean withInventoryOnly = germplasmSearchParameter.isWithInventoryOnly();
-		final boolean includeMGMembers = germplasmSearchParameter.isIncludeMGMembers();
+
 		final Integer startingRow = germplasmSearchParameter.getStartingRow();
 		final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
 
 		try {
 			final Set<Germplasm> germplasmSearchResult = new LinkedHashSet<>();
-			final Set<Integer> gidSearchResult = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
+			final Set<Integer> gidSearchResult = this.retrieveGIDSearchResults(germplasmSearchParameter);
 			// return an empty germplasm list when there is no GID search results returned
 			if (gidSearchResult.isEmpty()) {
 				return new ArrayList<>(germplasmSearchResult);
@@ -110,15 +106,20 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			return new ArrayList<>(germplasmSearchResult);
 
 		} catch (final HibernateException e) {
-			String message = "Error with searchForGermplasms(" + q + ") " + e.getMessage();
+			String message = "Error with searchForGermplasms(" + germplasmSearchParameter.getSearchKeyword() + ") " + e.getMessage();
 			GermplasmSearchDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private Set<Integer> retrieveGIDSearchResults(final String q, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly, final boolean includeMGMembers) {
+	public Set<Integer> retrieveGIDSearchResults(final GermplasmSearchParameter germplasmSearchParameter) {
+
+		final String q = germplasmSearchParameter.getSearchKeyword().trim();
+		final Operation o = germplasmSearchParameter.getOperation();
+		final boolean includeParents = germplasmSearchParameter.isIncludeParents();
+		final boolean withInventoryOnly = germplasmSearchParameter.isWithInventoryOnly();
+		final boolean includeMGMembers = germplasmSearchParameter.isIncludeMGMembers();
 
 		// return empty search results when keyword is blank or an empty string
 		if ("".equals(q)) {
@@ -173,14 +174,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public Integer countSearchForGermplasms(final String q, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly, final boolean includeMGMembers) {
+	public Integer countSearchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) {
 
 		final Monitor countSearchForGermplasms = MonitorFactory.start("Method Started : countSearchForGermplasms ");
 
 		Integer searchResultsCount = 0;
 
-		final Set<Integer> gidSearchResults = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
+		final Set<Integer> gidSearchResults = this.retrieveGIDSearchResults(germplasmSearchParameter);
 
 		searchResultsCount = gidSearchResults.size();
 
