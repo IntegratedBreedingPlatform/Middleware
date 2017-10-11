@@ -31,7 +31,8 @@ public enum GermplasmSortableColumn {
 	MALE_PARENT_PREFERRED_NAME("CROSS-MALE PREFERRED NAME", GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME),
 	GID("GID", GermplasmSearchDAO.GID),
 	GERMPLASM_DATE("GERMPLASM DATE", GermplasmSearchDAO.GERMPLASM_DATE),
-	GROUP_ID("GROUP ID", GermplasmSearchDAO.GROUP_ID);
+	GROUP_ID("GROUP ID", GermplasmSearchDAO.GROUP_ID),
+	NAMES("NAMES", GermplasmSearchDAO.NAMES);
 
 	// The corresponding column name in the germplasm search table
 	String tableColumnName;

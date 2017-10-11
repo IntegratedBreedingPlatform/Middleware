@@ -44,7 +44,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
 
-	private static final String NAMES = "names";
+	public static final String NAMES = "NAMES";
 	public static final String GID = "GID";
 	public static final String GROUP_ID = "GROUP ID";
 	public static final String STOCK_IDS = "STOCKID";
@@ -374,7 +374,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 		StringBuilder selectClause = new StringBuilder();
 		selectClause.append("SELECT g.*, \n" + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
-				+ "                                   AS names,"
+				+ "                                   AS `" + NAMES + "`, \n"
 				+ "       Group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR \n" + "       ', ') \n"
 				+ "                                   AS `" + STOCK_IDS + "`, \n"
 				+ "       g.gid                     AS `" + GID + "`, \n"
