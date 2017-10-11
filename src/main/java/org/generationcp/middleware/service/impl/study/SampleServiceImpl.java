@@ -24,10 +24,12 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,7 +40,7 @@ import java.util.List;
 public class SampleServiceImpl implements SampleService {
 
 	private static final String S = "S";
-
+	private static final SimpleDateFormat DATE_FORMAT = Util.getSimpleDateFormat(Util.FRONTEND_DATE_FORMAT_3);
 	private final SampleDao sampleDao;
 	private final ExperimentDao experimentDao;
 	private final PlantDao plantDao;
@@ -160,6 +162,9 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setSampleName(sample.getSampleName());
 		samplesDetailsDto.setDesignation(stock.getName());
 		samplesDetailsDto.setPlantNo(sample.getPlant().getPlantNumber());
+		if (sample.getSamplingDate() != null) {
+			samplesDetailsDto.setDisplayDate(DATE_FORMAT.format(sample.getSamplingDate()));
+		}
 
 		fillPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
 		fillProjectProperties(sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(),

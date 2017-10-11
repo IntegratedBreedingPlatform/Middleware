@@ -33,7 +33,7 @@ public class SampleDetailsDTO implements Serializable {
 	private String sampleName;
 	private String designation;
 	private Integer plantNo;
-
+	private String displayDate;
 
 	public SampleDetailsDTO() {
 
@@ -235,5 +235,13 @@ public class SampleDetailsDTO implements Serializable {
 
 	public Integer getPlantNo() {
 		return plantNo;
+	}
+
+	public void setDisplayDate(final String displayDate) {
+		this.displayDate = displayDate;
+	}
+
+	public String getDisplayDate() {
+		return displayDate;
 	}
 }
