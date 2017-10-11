@@ -323,7 +323,7 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public List getSampleLists(final Integer trialId) {
+	public List<SampleListDTO> getSampleLists(final Integer trialId) {
 		return this.sampleListDao.getSampleLists(trialId);
 	}
 

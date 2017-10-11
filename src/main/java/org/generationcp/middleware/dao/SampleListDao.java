@@ -2,14 +2,17 @@
 package org.generationcp.middleware.dao;
 
 import com.google.common.base.Preconditions;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +59,14 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		}
 	}
 
-	public List getSampleLists(final Integer trialId) {
+	public List<SampleListDTO> getSampleLists(final Integer trialId) {
+
 		Criteria criteria = this.getSession().createCriteria(SampleList.class);
+
+		ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(Projections.distinct(Projections.property("id")), "listId");
+		projectionList.add(Projections.property("listName"), "listName");
+
 		criteria.createAlias("samples", "samples", CriteriaSpecification.INNER_JOIN)
 			.createAlias("samples.plant", "plant", CriteriaSpecification.INNER_JOIN)
 			.createAlias("plant.experiment", "experiment", CriteriaSpecification.INNER_JOIN)
@@ -65,6 +74,9 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			.createAlias("project.relatedTos", "relatedTos", CriteriaSpecification.INNER_JOIN)
 			.createAlias("relatedTos.objectProject", "objectProject", CriteriaSpecification.INNER_JOIN)
 			.add(Restrictions.eq("objectProject.projectId", trialId))
+			.setProjection(projectionList)
+			.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class))
+			;
 		;
 
 		return criteria.list();

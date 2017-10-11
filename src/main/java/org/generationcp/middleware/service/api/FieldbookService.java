@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
@@ -995,7 +996,7 @@ public interface FieldbookService {
 	 */
 	boolean hasSamples(Integer studyId);
 
-	List<SampleList> getSampleLists(final Integer trialId);
+	List<SampleListDTO> getSampleLists(final Integer trialId);
 
 	SampleList getSampleList(Integer sampleListId);
 
