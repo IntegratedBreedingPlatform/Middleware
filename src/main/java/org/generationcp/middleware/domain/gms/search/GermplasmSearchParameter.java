@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang.NullArgumentException;
 import org.generationcp.middleware.manager.Operation;
 
@@ -32,7 +33,7 @@ public class GermplasmSearchParameter {
 
 	private final Map<String, Boolean> sortState;
 
-	private final Map<String, Integer> attributeTypesMap;
+	private Map<String, Integer> attributeTypesMap;
 
 	private List<String> addedColumnsPropertyIds = new LinkedList<>();
 
@@ -122,7 +123,11 @@ public class GermplasmSearchParameter {
 	}
 
 	public Map<String, Integer> getAttributeTypesMap() {
-		return attributeTypesMap;
+		return ImmutableMap.copyOf(attributeTypesMap);
+	}
+
+	public void setAttributeTypesMap(final Map<String, Integer> attributeTypesMap) {
+		this.attributeTypesMap = attributeTypesMap;
 	}
 
 	public void setAddedColumnsPropertyIds(final List<String> addedColumnsPropertyIds) {

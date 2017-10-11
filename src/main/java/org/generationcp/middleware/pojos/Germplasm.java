@@ -13,7 +13,9 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -37,6 +39,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -456,6 +460,14 @@ public class Germplasm implements Serializable {
 	@Transient
 	private String germplasmDate = null;
 
+	/**
+	 *
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private Map<String, String> attributeTypesValueMap = new HashMap<>();
+
+
 	public Germplasm() {
 		super();
 		this.deleted = false;
@@ -866,5 +878,16 @@ public class Germplasm implements Serializable {
 
 	public void setGermplasmDate(final String germplasmDate) {
 		this.germplasmDate = germplasmDate;
+	}
+
+	public Map<String, String> getAttributeTypesValueMap() {
+		return ImmutableMap.copyOf(attributeTypesValueMap);
+	}
+
+	public void setAttributeTypesValueMap(final Map<String, String> attributeTypesValueMap) {
+		if (attributeTypesValueMap == null) {
+			throw new NullArgumentException("attributeTypesValueMap must not be null");
+		}
+		this.attributeTypesValueMap = attributeTypesValueMap;
 	}
 }
