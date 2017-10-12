@@ -25,6 +25,9 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		return this.getBySampleListName(ROOT_FOLDER);
 	}
 
+	public SampleList getParentSampleFolder(Integer id) {
+		return this.getById(id);
+	}
 	/**
 	 * Find a SampleList given the parent folder ID and the sample list name
 	 * @param sampleListName
