@@ -11,6 +11,7 @@
 package org.generationcp.middleware.dao.oms;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
@@ -28,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +71,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		this.initializeGermplasms();
+		this.createTestGermplasmForSorting();
 	}
 
 	@Test
@@ -172,36 +175,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
 				results.size());
 		this.assertPossibleGermplasmFields(results);
-	}
-
-	@Test
-	public void testSearchForGermplasmsSortAcending() throws Exception {
-
-		final GermplasmSearchParameter searchParameter =
-				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, true);
-		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GID}, new boolean[] {true});
-
-		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
-		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
-				results.size());
-
-		Assert.assertTrue(results.get(0).getGid() < results.get(1).getGid());
-
-	}
-
-	@Test
-	public void testSearchForGermplasmsSortDescending() throws Exception {
-
-		final GermplasmSearchParameter searchParameter =
-				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, true);
-		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GID}, new boolean[] {false});
-
-		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
-		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
-				results.size());
-
-		Assert.assertTrue(results.get(0).getGid() > results.get(1).getGid());
-
 	}
 
 	@Test
@@ -330,6 +303,830 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testSearchForGermplasmsPreferredIdSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.PREFERRED_ID);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.PREFERRED_ID}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmPeferredId());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+	}
+
+	@Test
+	public void testSearchForGermplasmsPreferredIdSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.PREFERRED_ID);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.PREFERRED_ID}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmPeferredId());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+	}
+
+	@Test
+	public void testSearchForGermplasmsPreferredNameSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.PREFERRED_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.PREFERRED_NAME}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmPeferredName());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsPreferredNameSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.PREFERRED_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.PREFERRED_NAME}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmPeferredName());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGermplasmDateSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.GERMPLASM_DATE);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GERMPLASM_DATE}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmDate());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGermplasmDateSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.GERMPLASM_DATE);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GERMPLASM_DATE}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmDate());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGermplasmLocationSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.LOCATION_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.LOCATION_NAME}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getLocationName());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGermplasmLocationSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.LOCATION_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.LOCATION_NAME}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getLocationName());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodNameSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_NAME}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodName());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodNameSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_NAME}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodName());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodAbbreviationSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_ABBREVIATION);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_ABBREVIATION}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodCode());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodAbbreviationSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_ABBREVIATION);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_ABBREVIATION}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodCode());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodNumberSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_NUMBER);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_NUMBER}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodNumber());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodNumberSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_NUMBER);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_NUMBER}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodNumber());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodGroupSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_GROUP);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_GROUP}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodGroup());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMethodGroupSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.METHOD_GROUP);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.METHOD_GROUP}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMethodGroup());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsFemaleGidSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.FEMALE_PARENT_ID);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.FEMALE_PARENT_ID}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getFemaleParentPreferredID());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsFemaleGidSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.FEMALE_PARENT_ID);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.FEMALE_PARENT_ID}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getFemaleParentPreferredID());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsFemalePreferredNameSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getFemaleParentPreferredName());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsFemalePreferredNameSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getFemaleParentPreferredName());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMaleGidSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.MALE_PARENT_ID);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.MALE_PARENT_ID}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMaleParentPreferredID());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMaleGidSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.MALE_PARENT_ID);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.MALE_PARENT_ID}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMaleParentPreferredID());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMalePreferredNameSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMaleParentPreferredName());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsMalePreferredNameSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMaleParentPreferredName());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsAttributeTypeeSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(NOTE_ATTRIBUTE);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setAttributeTypesMap(this.attributeTypeMap);
+		searchParameter.setSortState(new Object[] {NOTE_ATTRIBUTE}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getAttributeTypesValueMap().get(NOTE_ATTRIBUTE));
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsAttributeTypeSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(NOTE_ATTRIBUTE);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setAttributeTypesMap(this.attributeTypeMap);
+		searchParameter.setSortState(new Object[] {NOTE_ATTRIBUTE}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getAttributeTypesValueMap().get(NOTE_ATTRIBUTE));
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsNamesSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.NAMES}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmNamesString());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsNamesSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.NAMES}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGermplasmNamesString());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGIDSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GID}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Integer> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGid());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGIDSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GID}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Integer> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getGid());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGroupIdSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GROUP_ID}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Integer> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMgid());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsGroupIdSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.GROUP_ID}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Integer> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getMgid());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsLotSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.AVAIL_LOTS}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Integer> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getInventoryInfo().getActualInventoryLotCount());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsLotSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.AVAIL_LOTS}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Integer> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getInventoryInfo().getActualInventoryLotCount());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsBalanceSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.AVAIL_BALANCE}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Double> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getInventoryInfo().getTotalAvailableBalance());
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsBalanceSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+
+		searchParameter.setSortState(new Object[] {GermplasmSearchDAO.AVAIL_BALANCE}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<Double> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getInventoryInfo().getTotalAvailableBalance());
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
 	private void initializeGermplasms() {
 
 		final Germplasm fParent =
@@ -373,6 +1170,55 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				.createGermplasm(germplasmDate, femaleParentGID, maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
 						"MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
+	}
+
+	private List<Integer> createTestGermplasmForSorting() {
+
+		final List<Integer> testGermplasmGIDs = new ArrayList<>();
+		final Integer tempGermplasmDate = 20150101;
+
+		for (int counter = 1; counter <= 5; counter++) {
+
+			final Germplasm fParent = GermplasmTestDataInitializer
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+			final Integer tempFemaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
+
+			final Germplasm mParent = GermplasmTestDataInitializer
+					.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName" + counter, "LocationName" + counter);
+			final Integer tempMaleParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
+
+			final Germplasm germplasm = GermplasmTestDataInitializer
+					.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1, counter, counter, 1, 1,
+							"MethodName", "LocationName");
+
+			// Create Germplasm and add Preferred Name
+			germplasm.getPreferredName().setNval("GermplasmForSorting" + counter);
+			final Integer tempGermplasmGid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+			testGermplasmGIDs.add(tempGermplasmGid);
+
+			// Add Preferred Id, nstat = 8 means the name is preferred Id
+			final Name tempPreferredId =
+					GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Preferred Id of " + tempGermplasmGid);
+			tempPreferredId.setNstat(8);
+			this.germplasmDataDM.addGermplasmName(tempPreferredId);
+
+			// Add NOTE attribute
+			final UserDefinedField attributeField = userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
+			attributeTypeMap.put(attributeField.getFcode(), attributeField.getFldno());
+
+			final Attribute attribute = new Attribute();
+			attribute.setGermplasmId(tempGermplasmGid);
+			attribute.setTypeId(attributeField.getFldno());
+			attribute.setAval("Attribute of " + tempGermplasmGid);
+			attribute.setUserId(0);
+			attribute.setAdate(tempGermplasmDate);
+
+			this.germplasmDataDM.addGermplasmAttribute(attribute);
+
+		}
+
+		return testGermplasmGIDs;
+
 	}
 
 	private GermplasmSearchParameter createSearchParam(final String searchKeyword, final Operation operation, final boolean includeParents,
