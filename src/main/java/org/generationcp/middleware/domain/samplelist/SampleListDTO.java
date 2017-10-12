@@ -37,6 +37,12 @@ public class SampleListDTO implements Serializable {
 
 	private String cropName;
 
+	private Integer parentId;
+
+	private String listName;
+
+	private Date createdDate;
+
 	public String getCropName() {
 		return this.cropName;
 	}
@@ -137,5 +143,29 @@ public class SampleListDTO implements Serializable {
 	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
+	}
+
+	public String getListName() {
+		return listName;
+	}
+
+	public void setListName(String listName) {
+		this.listName = listName;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 }
