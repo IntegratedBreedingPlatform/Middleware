@@ -481,9 +481,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 	protected String getValueOfAddedColumns(String propertyId, final Object[] row, final List<String> addedColumnsPropertyIds) {
 
-		int addedColumnIndex = (addedColumnsPropertyIds.indexOf(propertyId) + 9);
+		if (addedColumnsPropertyIds.contains(propertyId)) {
+			int addedColumnIndex = (addedColumnsPropertyIds.indexOf(propertyId) + 9);
 
-		return row[addedColumnIndex] != null ? String.valueOf(row[addedColumnIndex]) : "";
+			return row[addedColumnIndex] != null ? String.valueOf(row[addedColumnIndex]) : "";
+		} else {
+			return null;
+		}
+
 
 	}
 
