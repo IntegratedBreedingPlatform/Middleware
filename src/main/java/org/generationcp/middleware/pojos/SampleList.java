@@ -23,6 +23,7 @@ public class SampleList implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 6160350425863896876L;
+	private static final String FOLDER_TYPE = "FOLDER";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -163,5 +164,9 @@ public class SampleList implements Serializable {
 	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
+
+	public boolean isFolder() {
+		return this.getType() != null && this.getType().equals(SampleList.FOLDER_TYPE) ? true : false;
 	}
 }
