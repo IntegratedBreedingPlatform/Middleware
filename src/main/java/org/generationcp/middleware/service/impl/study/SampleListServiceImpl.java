@@ -8,7 +8,6 @@ import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -21,7 +20,6 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -83,21 +81,31 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
+		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
+		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
+
+
 
 		try {
-			final Study study = this.studyService.getStudy(sampleListDTO.getStudyId());
-			Preconditions.checkNotNull(study, "The study must not be null");
 			final SampleList sampleList = new SampleList();
 			User takenBy = null;
-			Date createdDate = new Date();
-			sampleList.setCreatedDate(createdDate);
+			sampleList.setCreatedDate(sampleListDTO.getCreatedDate());
 			User user = this.userDao.getUserByUserName(sampleListDTO.getCreatedBy());
 			sampleList.setCreatedBy(user);
 			sampleList.setDescription(sampleListDTO.getDescription());
-			sampleList.setListName(study.getName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
+			sampleList.setListName(sampleListDTO.getListName());
 			sampleList.setNotes(sampleListDTO.getNotes());
 			sampleList.setType(SampleListType.SAMPLE_LIST);
-			final SampleList parent = this.sampleListDao.getRootSampleList();
+			final SampleList parent;
+
+			if (sampleListDTO.getParentId() == null || sampleListDTO.getParentId().equals(0)) {
+				parent = this.sampleListDao.getRootSampleList();
+			} else {
+				parent = this.sampleListDao.getParentSampleFolder(sampleListDTO.getParentId());
+			}
+
+			Preconditions.checkState(parent.isFolder(), "The parent id must not be a list");
+
 			sampleList.setHierarchy(parent);
 
 			final List<ObservationDto> observationDtos = this.studyMeasurements
@@ -126,7 +134,7 @@ public class SampleListServiceImpl implements SampleListService {
 					count++;
 					final Sample sample = this.sampleService
 						.buildSample(sampleListDTO.getCropName(), cropPrefix, count, observationDto.getDesignation(),
-							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user, createdDate, takenBy);
+							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
 			}
