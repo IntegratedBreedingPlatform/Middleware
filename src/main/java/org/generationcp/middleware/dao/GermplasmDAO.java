@@ -1,30 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * <p>
+ * <p/>
  * Generation Challenge Programme (GCP)
- * <p>
- * <p>
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.ObjectUtils;
-import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
-import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
-import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -42,8 +28,15 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -51,16 +44,14 @@ import com.jamonapi.MonitorFactory;
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
-
 	private static final String GRPLCE = "grplce";
 	private static final String DELETED = "deleted";
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
 
-
 	@Override
-	public Germplasm getById(final Integer gid, final boolean lock)  {
+	public Germplasm getById(final Integer gid, final boolean lock) {
 		return this.getById(gid);
 	}
 
@@ -156,7 +147,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public long countMatchGermplasmInList(Set<Integer> gids) {
+	public long countMatchGermplasmInList(final Set<Integer> gids) {
 
 		if (gids == null || gids.isEmpty()) {
 			return 0;
@@ -483,7 +474,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return 0;
 	}
 
-	public long countGroupRelatives(final Integer gid)  {
+	public long countGroupRelatives(final Integer gid) {
 		try {
 			if (gid != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.COUNT_GROUP_RELATIVES);
@@ -499,7 +490,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return 0;
 	}
 
-	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows)  {
+	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows) {
 		final List<Germplasm> toreturn = new ArrayList<>();
 		try {
 			if (gid != null) {
@@ -527,7 +518,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return toreturn;
 	}
 
-	public List<Germplasm> getChildren(final Integer gid, final char methodType)  {
+	public List<Germplasm> getChildren(final Integer gid, final char methodType) {
 		final List<Germplasm> toreturn = new ArrayList<>();
 		try {
 			final String queryString = methodType == 'D' ? Germplasm.GET_DERIVATIVE_CHILDREN : Germplasm.GET_MAINTENANCE_CHILDREN;
@@ -583,7 +574,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			generativeChildrenCriteria.add(Restrictions.ge("gnpgs", 2));
 			// = Record is unchanged
 			generativeChildrenCriteria.add(Restrictions.eq(GRPLCE, 0));
-			 // = Record is not deleted or replaced.
+			// = Record is not deleted or replaced.
 			generativeChildrenCriteria.add(Restrictions.eq(DELETED, Boolean.FALSE));
 
 			children.addAll(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
@@ -618,7 +609,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("mgid", mgid));
 			// = Record is unchanged
 			criteria.add(Restrictions.eq(GRPLCE, 0));
-			 // = Record is not deleted or replaced.
+			// = Record is not deleted or replaced.
 			criteria.add(Restrictions.eq(DELETED, Boolean.FALSE));
 
 			@SuppressWarnings("unchecked") final List<Germplasm> groupMembers = criteria.getExecutableCriteria(this.getSession()).list();
@@ -703,7 +694,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public String getNextSequenceNumberForCrossName(final String prefix)  {
+	public String getNextSequenceNumberForCrossName(final String prefix) {
 		String nextInSequence = "1";
 
 		try {
@@ -740,7 +731,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByLocationId(final String name, final int locationID)  {
+	public List<Germplasm> getByLocationId(final String name, final int locationID) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE ");
@@ -755,14 +746,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getByLocationId(name=" + name + ", locationID=" + locationID + QUERY_FROM_GERMPLASM + e.getMessage();
+			final String message =
+					"Error with getByLocationId(name=" + name + ", locationID=" + locationID + QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	public Germplasm getByGIDWithMethodType(final Integer gid)  {
+	public Germplasm getByGIDWithMethodType(final Integer gid) {
 		try {
 			if (gid != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_METHOD_TYPE);
@@ -790,7 +782,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByGIDRange(final int startGID, final int endGID)  {
+	public List<Germplasm> getByGIDRange(final int startGID, final int endGID) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
@@ -805,14 +797,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + QUERY_FROM_GERMPLASM + e.getMessage();
+			final String message =
+					"Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByGIDList(final List<Integer> gids)  {
+	public List<Germplasm> getByGIDList(final List<Integer> gids) {
 
 		if (gids.isEmpty()) {
 			return new ArrayList<>();
@@ -934,7 +927,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return germplasms;
 	}
 
-	public Germplasm getByLGid(final Integer lgid)  {
+	public Germplasm getByLGid(final Integer lgid) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND lgid=:lgid LIMIT 1");
@@ -952,26 +945,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-  	@SuppressWarnings("unchecked")
-	public Map<Integer, String[]> getParentsInfoByGIDList (List<Integer> gidList) {
-	  try {
-		Map<Integer, String[]> pedigreeMap = new HashMap<>();
-		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PREFERRED_NAME_AND_PARENT_FOR_A_GID_LIST);
-		query.setParameterList("gidList", gidList);
-		query.addScalar("gid");
-		query.addScalar("pedigree");
-		query.addScalar("nval");
+	@SuppressWarnings("unchecked")
+	public Map<Integer, String[]> getParentsInfoByGIDList(final List<Integer> gidList) {
+		try {
+			final Map<Integer, String[]> pedigreeMap = new HashMap<>();
+			final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PREFERRED_NAME_AND_PARENT_FOR_A_GID_LIST);
+			query.setParameterList("gidList", gidList);
+			query.addScalar("gid");
+			query.addScalar("pedigree");
+			query.addScalar("nval");
 
-		List<Object[]> results = query.list();
-		for (Object[] result : results) {
-		  pedigreeMap.put((Integer) result[0], new String[] {(String) result[1],(String) result[2]});
+			final List<Object[]> results = query.list();
+			for (final Object[] result : results) {
+				pedigreeMap.put((Integer) result[0], new String[] {(String) result[1], (String) result[2]});
+			}
+			return pedigreeMap;
+		} catch (final HibernateException e) {
+			final String message = "Error with getPedigreeByGIDList(GIDS=" + gidList + ") : " + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return pedigreeMap;
-	  } catch (final HibernateException e) {
-		String message = "Error with getPedigreeByGIDList(GIDS=" + gidList + ") : " + e.getMessage();
-		GermplasmDAO.LOG.error(message, e);
-		throw new MiddlewareQueryException(message, e);
-	  }
 	}
 
 	public void deleteGermplasms(final List<Integer> gids) {
@@ -985,7 +978,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.executeUpdate();
 
 		} catch (final HibernateException e) {
-			String message = "Error with deleteGermplasms(GIDS=" + gids + ")  " + e.getMessage();
+			final String message = "Error with deleteGermplasms(GIDS=" + gids + ")  " + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -998,10 +991,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * @
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Set<Integer>> getGermplasmOffspringByGIDs(List<Integer> gids) {
+	public Map<Integer, Set<Integer>> getGermplasmOffspringByGIDs(final List<Integer> gids) {
 
 		if (gids != null && !gids.isEmpty()) {
-			Map<Integer, Set<Integer>> resultMap = new HashMap<>();
+			final Map<Integer, Set<Integer>> resultMap = new HashMap<>();
 
 			final Query query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_OFFSPRING_BY_GID);
 			query.setParameterList("gids", gids);
@@ -1011,28 +1004,27 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			 * - gid
 			 * - CSV of parents of the gid (gpid1, gpid2 or progntrs.pid)
 			 */
-			List<Object[]> results = query.list();
+			final List<Object[]> results = query.list();
 
 			// Transform to Map of gid -> list of offspring
-			for (Object[] result : results) {
-				String[] parentsStr = ObjectUtils.toString(result[1]).split(",");
-				Set<Integer> parents = new HashSet<>();
+			for (final Object[] result : results) {
+				final String[] parentsStr = ObjectUtils.toString(result[1]).split(",");
+				final Set<Integer> parents = new HashSet<>();
 
-				for (String parentStr : parentsStr) {
+				for (final String parentStr : parentsStr) {
 					try {
 						parents.add(Integer.parseInt(parentStr));
-					} catch (NumberFormatException e) {
+					} catch (final NumberFormatException e) {
 						GermplasmDAO.LOG.warn("Could not cast " + parentStr);
 					}
 				}
 
-				Integer offspring = (Integer) result[0];
+				final Integer offspring = (Integer) result[0];
 
-				for (Integer parent : parents) {
+				for (final Integer parent : parents) {
 					if (!resultMap.containsKey(parent) && gids.contains(parent)) {
 						resultMap.put(parent, new HashSet<Integer>());
-					}
-					else if (gids.contains(parent)) {
+					} else if (gids.contains(parent)) {
 						resultMap.get(parent).add(offspring);
 					}
 				}

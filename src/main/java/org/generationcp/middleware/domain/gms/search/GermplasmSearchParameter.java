@@ -1,5 +1,8 @@
-
 package org.generationcp.middleware.domain.gms.search;
+
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang.NullArgumentException;
+import org.generationcp.middleware.manager.Operation;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,10 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang.NullArgumentException;
-import org.generationcp.middleware.manager.Operation;
 
 /*
  * this class stores the parameters used in germplasm search
@@ -143,7 +142,7 @@ public class GermplasmSearchParameter {
 
 	/**
 	 * Setup sort states if any (for sorting the germplasm query results)
-	 * 
+	 *
 	 * @param sortPropertyIds
 	 * @param sortStates
 	 */

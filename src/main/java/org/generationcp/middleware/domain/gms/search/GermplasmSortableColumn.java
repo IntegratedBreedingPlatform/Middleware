@@ -1,7 +1,5 @@
-
 package org.generationcp.middleware.domain.gms.search;
 
-import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 
 import java.util.EnumSet;

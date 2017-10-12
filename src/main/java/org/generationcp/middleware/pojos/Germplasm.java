@@ -1,21 +1,24 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang.NullArgumentException;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -38,16 +41,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang.NullArgumentException;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.domain.inventory.GermplasmInventory;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Type;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * POJO for germplsm table.
@@ -84,11 +82,10 @@ import org.hibernate.annotations.Type;
 				query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name")
 
 })
-@NamedNativeQueries({
-		@NamedNativeQuery(name = "getGermplasmDescendants",
-				query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-						+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND  g.deleted = 0  and g.grplce = 0",
-				resultClass = Germplasm.class),
+@NamedNativeQueries({@NamedNativeQuery(name = "getGermplasmDescendants",
+		query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+				+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND  g.deleted = 0  and g.grplce = 0",
+		resultClass = Germplasm.class),
 
 		@NamedNativeQuery(name = "getGermplasmByPrefName",
 				query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid " + "AND n.nstat = 1 " + "WHERE n.nval = :name",
@@ -105,8 +102,7 @@ import org.hibernate.annotations.Type;
 				resultClass = Germplasm.class),
 
 		@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
-				+ "and p.gid = :gid and p.pno = :pno and  g.deleted = 0  and g.grplce = 0", resultClass = Germplasm.class)}
-)
+				+ "and p.gid = :gid and p.pno = :pno and  g.deleted = 0  and g.grplce = 0", resultClass = Germplasm.class)})
 @Entity
 @Table(name = "germplsm")
 // JAXB Element Tags for JSON output
@@ -159,9 +155,10 @@ public class Germplasm implements Serializable {
 
 	public static final String COUNT_MANAGEMENT_NEIGHBORS =
 			"SELECT COUNT(g.gid) " + "FROM germplsm g " + "WHERE g.mgid = :gid AND  g.deleted = 0  and g.grplce = 0";
-	public static final String GET_GROUP_RELATIVES = "SELECT {g.*}, {n.*} "
-			+ "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " + "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 "
-			+ "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid " + "AND g.gpid1 != 0 AND  g.deleted = 0  AND g.grplce = 0";
+	public static final String GET_GROUP_RELATIVES =
+			"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
+					+ "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " + "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid "
+					+ "AND g.gpid1 != 0 AND  g.deleted = 0  AND g.grplce = 0";
 	public static final String COUNT_GROUP_RELATIVES =
 			"SELECT COUNT(g.gid) " + "FROM germplsm g " + "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 "
 					+ "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid " + "AND g.gpid1 != 0 AND  g.deleted = 0  AND g.grplce = 0";
@@ -193,11 +190,12 @@ public class Germplasm implements Serializable {
 
 	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
 			"SELECT CONVERT(LTRIM(REPLACE(UPPER(nval), :prefix, '')), SIGNED)+1 AS next_number " + "FROM names "
-					+ "INNER JOIN germplsm ON names.gid = germplsm.gid "
-					+ "WHERE names.nval like :prefixLike AND germplsm.deleted = 0 " + "ORDER BY next_number DESC LIMIT 1";
+					+ "INNER JOIN germplsm ON names.gid = germplsm.gid " + "WHERE names.nval like :prefixLike AND germplsm.deleted = 0 "
+					+ "ORDER BY next_number DESC LIMIT 1";
 
-	public static final String GET_BY_GID_WITH_METHOD_TYPE = "SELECT {g.*}, {m.*} "
-			+ "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid " + "WHERE g.gid = :gid AND  g.deleted = 0  AND g.grplce = 0";
+	public static final String GET_BY_GID_WITH_METHOD_TYPE =
+			"SELECT {g.*}, {m.*} " + "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid "
+					+ "WHERE g.gid = :gid AND  g.deleted = 0  AND g.grplce = 0";
 
 	/**
 	 * Used in germplasm data manager searchForGermplasm
@@ -215,39 +213,35 @@ public class Germplasm implements Serializable {
 
 	public static final String GET_GERMPLASM_DATES_BY_GIDS = "SELECT gid, gdate " + "FROM germplsm " + "WHERE gid IN (:gids)";
 	public static final String GET_METHOD_IDS_BY_GIDS = "SELECT gid, methn " + "FROM germplsm " + "WHERE gid IN (:gids)";
-	public static final String GET_PARENT_NAMES_BY_STUDY_ID = "select N.gid, N.ntype, N.nval, N.nid, N.nstat" + " from names N"
-			+ " inner join (" + "	select distinct G.gpid1 gid" + "	from listnms LNAMES" + "	inner join listdata_project LDATAPROJ on"
-			+ "	LNAMES.listid = LDATAPROJ.list_id" + "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
-			+ "	G.gnpgs >= 0" + "	where LNAMES.projectid = :projId" +
+	public static final String GET_PARENT_NAMES_BY_STUDY_ID =
+			"select N.gid, N.ntype, N.nval, N.nid, N.nstat" + " from names N" + " inner join (" + "	select distinct G.gpid1 gid"
+					+ "	from listnms LNAMES" + "	inner join listdata_project LDATAPROJ on" + "	LNAMES.listid = LDATAPROJ.list_id"
+					+ "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs >= 0"
+					+ "	where LNAMES.projectid = :projId" +
 
-	"    union" +
+					"    union" +
 
-	"	select distinct G.gpid2" + "	from listnms LNAMES" + "	inner join listdata_project LDATAPROJ on"
-			+ "	LNAMES.listid = LDATAPROJ.list_id" + "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
-			+ "	G.gnpgs >= 0" + "	where LNAMES.projectid = :projId" + " ) T on " + " N.gid = T.gid";
+					"	select distinct G.gpid2" + "	from listnms LNAMES" + "	inner join listdata_project LDATAPROJ on"
+					+ "	LNAMES.listid = LDATAPROJ.list_id" + "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
+					+ "	G.gnpgs >= 0" + "	where LNAMES.projectid = :projId" + " ) T on " + " N.gid = T.gid";
 
-	public static final String GET_KNOWN_PARENT_GIDS_BY_STUDY_ID = "select distinct G.gid, G.gpid1, G.gpid2, G.grplce from listnms LNAMES"
-			+ " inner join listdata_project LDATAPROJ on" + "	LNAMES.listid = LDATAPROJ.list_id" + " inner join germplsm G on"
-			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs > 0 AND (G.gpid1 > 0 or G.gpid2 > 0)" + " where LNAMES.projectid = :projId";
+	public static final String GET_KNOWN_PARENT_GIDS_BY_STUDY_ID =
+			"select distinct G.gid, G.gpid1, G.gpid2, G.grplce from listnms LNAMES" + " inner join listdata_project LDATAPROJ on"
+					+ "	LNAMES.listid = LDATAPROJ.list_id" + " inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
+					+ "	G.gnpgs > 0 AND (G.gpid1 > 0 or G.gpid2 > 0)" + " where LNAMES.projectid = :projId";
 
 	public static final String GET_PREFERRED_NAME_AND_PARENT_FOR_A_GID_LIST = "select g.gid as gid, ld.grpname as pedigree, "
 			+ " (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval" + "  from germplsm g "
 			+ " inner join listdata ld on (g.gid = ld.gid) " + "where g.gid in (:gidList) " + "group by g.gid";
 
-	public static final String GET_GERMPLASM_OFFSPRING_BY_GID = " SELECT DISTINCT \n"
-		+ "   g.gid, \n"
-		+ "   CONCAT_WS(',', \n"
-		+ "     if(g.gpid1 != 0, g.gpid1, NULL), \n"
-		+ "     if(g.gpid2 != 0, g.gpid2, NULL), \n"
-		+ "     ifnull(p.pid, NULL)) AS parents \n"
-		+ " FROM germplsm g \n"
-		+ "   LEFT JOIN progntrs p ON g.gid = p.gid \n"
-		+ "   LEFT JOIN listdata ld ON g.gid = ld.gid \n"
-		+ "   LEFT JOIN listnms l ON ld.listid = l.listid \n"
-		+ " WHERE (g.gpid1 in (:gids) OR g.gpid2 in (:gids) OR p.pid in (:gids)) \n"
-		+ "   AND g.deleted = 0 \n"
-		+ "   AND g.grplce = 0 \n"
-		+ "   AND ( l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " OR l.liststatus IS NULL)";
+	public static final String GET_GERMPLASM_OFFSPRING_BY_GID =
+			" SELECT DISTINCT \n" + "   g.gid, \n" + "   CONCAT_WS(',', \n" + "     if(g.gpid1 != 0, g.gpid1, NULL), \n"
+					+ "     if(g.gpid2 != 0, g.gpid2, NULL), \n" + "     ifnull(p.pid, NULL)) AS parents \n" + " FROM germplsm g \n"
+					+ "   LEFT JOIN progntrs p ON g.gid = p.gid \n" + "   LEFT JOIN listdata ld ON g.gid = ld.gid \n"
+					+ "   LEFT JOIN listnms l ON ld.listid = l.listid \n"
+					+ " WHERE (g.gpid1 in (:gids) OR g.gpid2 in (:gids) OR p.pid in (:gids)) \n" + "   AND g.deleted = 0 \n"
+					+ "   AND g.grplce = 0 \n" + "   AND ( l.liststatus != " + GermplasmListDAO.STATUS_DELETED
+					+ " OR l.liststatus IS NULL)";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -378,10 +372,10 @@ public class Germplasm implements Serializable {
 	private String accessionName = null;
 
 	/**
-	* This variable is populated when the user tries to search germplasm list.
-	* Previously, germplasm list is loaded and revisit the DB for each germplasm for getting method name.
-	* This problem is removed by introducing this variable.
-	*/
+	 * This variable is populated when the user tries to search germplasm list.
+	 * Previously, germplasm list is loaded and revisit the DB for each germplasm for getting method name.
+	 * This problem is removed by introducing this variable.
+	 */
 	@Transient
 	private String methodName = null;
 
@@ -392,7 +386,6 @@ public class Germplasm implements Serializable {
 	 */
 	@Transient
 	private String locationName = null;
-
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
@@ -466,7 +459,6 @@ public class Germplasm implements Serializable {
 	 */
 	@Transient
 	private Map<String, String> attributeTypesValueMap = new HashMap<>();
-
 
 	public Germplasm() {
 		super();
@@ -619,9 +611,9 @@ public class Germplasm implements Serializable {
 	}
 
 	public Name getPreferredName() {
-		if(this.preferredName == null) {
+		if (this.preferredName == null) {
 			for (final Name name : this.getNames()) {
-				if(name.getNstat() != null && name.getNstat().equals(new Integer(1))) {
+				if (name.getNstat() != null && name.getNstat().equals(new Integer(1))) {
 					this.preferredName = name;
 				}
 			}
@@ -653,7 +645,7 @@ public class Germplasm implements Serializable {
 		return methodName;
 	}
 
-	public void setMethodName(String methodName) {
+	public void setMethodName(final String methodName) {
 		this.methodName = methodName;
 	}
 
@@ -661,7 +653,7 @@ public class Germplasm implements Serializable {
 		return locationName;
 	}
 
-	public void setLocationName(String locationName) {
+	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
 	}
 
@@ -787,7 +779,7 @@ public class Germplasm implements Serializable {
 		return deleted;
 	}
 
-	public void setDeleted(Boolean deleted) {
+	public void setDeleted(final Boolean deleted) {
 		this.deleted = deleted;
 	}
 
@@ -870,7 +862,6 @@ public class Germplasm implements Serializable {
 	public void setGermplasmNamesString(final String germplasmNamesString) {
 		this.germplasmNamesString = germplasmNamesString;
 	}
-
 
 	public String getGermplasmDate() {
 		return germplasmDate;
