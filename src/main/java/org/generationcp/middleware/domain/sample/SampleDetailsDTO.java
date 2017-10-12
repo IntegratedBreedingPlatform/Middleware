@@ -4,13 +4,16 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.util.Util;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class SampleDetailsDTO implements Serializable {
 
 	private static final long serialVersionUID = -4175016670661637734L;
+	private SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.FRONTEND_DATE_FORMAT_3);
 
 	private Integer studyDbId;
 	private Integer locationDbId;
@@ -34,16 +37,34 @@ public class SampleDetailsDTO implements Serializable {
 	private String designation;
 	private Integer plantNo;
 	private String displayDate;
+	private String entryNumber;
+	private String plotNumber;
 
 	public SampleDetailsDTO() {
 
 	}
 
-	public SampleDetailsDTO(final Integer studyDbId, final String plotId, final String plantBusinessKey, final String SampleBusinessKey) {
+	public SampleDetailsDTO(final Integer studyDbId, final String plotId, final String plantBusinessKey, final String sampleBusinessKey) {
 		this.setStudyDbId(studyDbId);
 		this.setPlotId(plotId);
 		this.setPlantBusinessKey(plantBusinessKey);
-		this.setSampleBusinessKey(SampleBusinessKey);
+		this.setSampleBusinessKey(sampleBusinessKey);
+	}
+
+	public String getPlotNumber() {
+		return plotNumber;
+	}
+
+	public void setPlotNumber(final String plotNumber) {
+		this.plotNumber = plotNumber;
+	}
+
+	public String getEntryNumber() {
+		return entryNumber;
+	}
+
+	public void setEntryNumber(final String entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	public Integer getStudyDbId() {
@@ -100,6 +121,9 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setSampleDate(final Date sampleDate) {
 		this.sampleDate = sampleDate;
+		if (sampleDate != null) {
+			this.displayDate = dateFormat.format(sampleDate);
+		}
 	}
 
 	public String getSampleType() {

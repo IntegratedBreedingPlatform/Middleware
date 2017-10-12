@@ -27,14 +27,11 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -306,7 +303,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 		if (folder.getHierarchy() == null)
 			throw new Exception("Root folder can not be deleted");
-		if (folder.getChildren() != null && folder.getChildren().size() > 0)
+		if (folder.getChildren() != null && !folder.getChildren().isEmpty())
 			throw new Exception("Folder to delete can not have children");
 		this.sampleListDao.makeTransient(folder);
 	}
@@ -334,7 +331,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
-		return this.sampleService.getSamples(sampleListId);
+		return this.sampleListDao.getSampleDetailsDTO(sampleListId);
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
