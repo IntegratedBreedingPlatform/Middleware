@@ -111,7 +111,10 @@ public class SampleServiceImpl implements SampleService {
 				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
 			}
 			dto.setSamplingDate(sample.getSamplingDate());
-			dto.setSampleList(sample.getSampleList().getListName());
+			SampleList sampleList = sample.getSampleList();
+			if (sampleList != null) {
+				dto.setSampleList(sampleList.getListName());
+			}
 			Plant plant = sample.getPlant();
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
