@@ -522,7 +522,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 			return row[addedColumnIndex] != null ? String.valueOf(row[addedColumnIndex]) : "";
 		} else {
-			return null;
+			return "";
 		}
 
 	}

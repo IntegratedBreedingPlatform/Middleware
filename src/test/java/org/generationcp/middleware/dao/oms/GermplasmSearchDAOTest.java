@@ -11,6 +11,7 @@
 package org.generationcp.middleware.dao.oms;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
@@ -409,58 +410,63 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			Assert.assertEquals("Result germplasm should contain Preferred ID", this.preferredId.getNval(),
 					germplasm.getGermplasmPeferredId());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Preferred ID", germplasm.getGermplasmPeferredId());
+			Assert.assertTrue("Result germplasm should not contain Preferred ID", StringUtils.isEmpty(germplasm.getGermplasmPeferredId()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.PREFERRED_NAME)) {
 			Assert.assertEquals("Result germplasm should contain Preferred Name", this.preferredName.getNval(),
 					germplasm.getGermplasmPeferredName());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Preferred Name", germplasm.getGermplasmPeferredName());
+			Assert.assertTrue("Result germplasm should not contain Preferred Name",
+					StringUtils.isEmpty(germplasm.getGermplasmPeferredName()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.GERMPLASM_DATE)) {
 			Assert.assertEquals("Result germplasm should contain Germplasm Date", String.valueOf(this.germplasmDate),
 					germplasm.getGermplasmDate());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Germplasm Date", germplasm.getGermplasmDate());
+			Assert.assertTrue("Result germplasm should not contain Germplasm Date", StringUtils.isEmpty(germplasm.getGermplasmDate()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.METHOD_ABBREVIATION)) {
 			Assert.assertEquals("Result germplasm should contain Method Abbreviation", "UGM", germplasm.getMethodCode());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Method Abbreviation", germplasm.getMethodCode());
+			Assert.assertTrue("Result germplasm should not contain Method Abbreviation", StringUtils.isEmpty(germplasm.getMethodCode()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.METHOD_NUMBER)) {
 			Assert.assertEquals("Result germplasm should contain Method Number", Integer.valueOf(1), germplasm.getMethodId());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Method Number", germplasm.getMethodCode());
+			Assert.assertTrue("Result germplasm should not contain Method Number", StringUtils.isEmpty(germplasm.getMethodCode()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.METHOD_GROUP)) {
 			Assert.assertEquals("Result germplasm should contain Method Group", "G", germplasm.getMethodGroup());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Method Group", germplasm.getMethodGroup());
+			Assert.assertTrue("Result germplasm should not contain Method Group", StringUtils.isEmpty(germplasm.getMethodGroup()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.FEMALE_PARENT_ID)) {
 			Assert.assertEquals("Result germplasm should contain Female Parent ID", String.valueOf(femaleParentGID),
 					germplasm.getFemaleParentPreferredID());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Female Parent ID", germplasm.getFemaleParentPreferredID());
+			Assert.assertTrue("Result germplasm should not contain Female Parent ID",
+					StringUtils.isEmpty(germplasm.getFemaleParentPreferredID()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME)) {
 			Assert.assertEquals("Result germplasm should contain Female Parent Preferred Name", femaleParentPreferredName.getNval(),
 					germplasm.getFemaleParentPreferredName());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Female Parent Preferred Name", germplasm.getFemaleParentPreferredName());
+			Assert.assertTrue("Result germplasm should not contain Female Parent Preferred Name",
+					StringUtils.isEmpty(germplasm.getFemaleParentPreferredName()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.MALE_PARENT_ID)) {
 			Assert.assertEquals("Result germplasm should contain Male Parent ID", String.valueOf(maleParentGID),
 					germplasm.getMaleParentPreferredID());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Male Parent ID", germplasm.getMaleParentPreferredID());
+			Assert.assertTrue("Result germplasm should not contain Male Parent ID",
+					StringUtils.isEmpty(germplasm.getMaleParentPreferredID()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME)) {
 			Assert.assertEquals("Result germplasm should contain Male Parent Preferred Name", maleParentPreferredName.getNval(),
 					germplasm.getMaleParentPreferredName());
 		} else {
-			Assert.assertNull("Result germplasm should not contain Male Parent Preferred Name", germplasm.getMaleParentPreferredName());
+			Assert.assertTrue("Result germplasm should not contain Male Parent Preferred Name",
+					StringUtils.isEmpty(germplasm.getMaleParentPreferredName()));
 		}
 		if (propertyIds.contains(NOTE_ATTRIBUTE)) {
 			Assert.assertEquals("Result germplasm should contain Note", this.attributeValue,
