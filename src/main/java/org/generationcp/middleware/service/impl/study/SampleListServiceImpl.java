@@ -14,6 +14,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -308,6 +309,33 @@ public class SampleListServiceImpl implements SampleListService {
 		this.sampleListDao.makeTransient(folder);
 	}
 
+	@Override
+	public List<SampleList> getAllTopLevelLists(final String programUUID) {
+		return this.getSampleListDao().getAllTopLevelLists(programUUID);
+	}
+
+	@Override
+	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID,
+		final int batchSize) {
+		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
+	}
+
+	@Override
+	public Map<Integer, GermplasmFolderMetadata> getFolderMetadata(List<SampleList> sampleLists) {
+		final List<Integer> folderIdsToRetrieveFolderCount = getFolderIdsFromSampleList(sampleLists);
+		return this.getSampleListDao().getSampleFolderMetadata(folderIdsToRetrieveFolderCount);
+	}
+
+	private List<Integer> getFolderIdsFromSampleList(List<SampleList> listIds) {
+		final List<Integer> folderIdsToRetrieveFolderCount = new ArrayList<>();
+		for (final SampleList parentList : listIds) {
+			if(parentList.isFolder()) {
+				folderIdsToRetrieveFolderCount.add(parentList.getId());
+			}
+		}
+		return folderIdsToRetrieveFolderCount;
+	}
+
 	protected boolean isDescendant(SampleList list, SampleList of) {
 		if (of.getHierarchy() == null) {
 			return false;
@@ -341,5 +369,37 @@ public class SampleListServiceImpl implements SampleListService {
 
 	public  void setSampleDao(final SampleDao sampleDao) {
 		this.sampleDao = sampleDao;
+	}
+
+	public SampleListDao getSampleListDao() {
+		return sampleListDao;
+	}
+
+	public UserDAO getUserDao() {
+		return userDao;
+	}
+
+	public SampleDao getSampleDao() {
+		return sampleDao;
+	}
+
+	public StudyMeasurements getStudyMeasurements() {
+		return studyMeasurements;
+	}
+
+	public PlantDao getPlantDao() {
+		return plantDao;
+	}
+
+	public SampleService getSampleService() {
+		return sampleService;
+	}
+
+	public StudyDataManager getStudyService() {
+		return studyService;
+	}
+
+	public WorkbenchDataManager getWorkbenchDataManager() {
+		return workbenchDataManager;
 	}
 }
