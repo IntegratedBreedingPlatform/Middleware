@@ -56,6 +56,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
@@ -66,6 +67,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -169,6 +171,21 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		return queryResults.isEmpty() ? false : true;
+	}
+
+	@Override
+	public List<SampleList> getAllSampleTopLevelLists(final String programUUID) {
+		return this.getSampleListService().getAllTopLevelLists(programUUID);
+	}
+
+	@Override
+	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
+		return this.getSampleListService().getSampleListByParentFolderIdBatched(parentId,programUUID,batchSize);
+	}
+
+	@Override
+	public Map<Integer, GermplasmFolderMetadata> getSampleFolderMetadata(final List<SampleList> sampleLists) {
+		return this.getSampleListService().getFolderMetadata(sampleLists);
 	}
 
 	@Override
