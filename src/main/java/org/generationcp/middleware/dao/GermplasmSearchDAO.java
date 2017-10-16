@@ -571,7 +571,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 		if (!addedColumnsPropertyIds.isEmpty()) {
 			final SQLQuery query =
-					this.getSession().createSQLQuery("SELECT fcode, fldno from udflds where ftype = 'ATTRIBUTE' and fcode IN (:fcodeList)");
+					this.getSession().createSQLQuery("SELECT fcode, fldno from udflds where ftable = 'ATRIBUTS' and fcode IN (:fcodeList)");
 			query.setParameterList("fcodeList", addedColumnsPropertyIds);
 			final List<Object[]> results = query.list();
 
