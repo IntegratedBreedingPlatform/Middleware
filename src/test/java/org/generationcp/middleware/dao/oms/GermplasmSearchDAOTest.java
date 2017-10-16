@@ -199,7 +199,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		// Add Attributes column (NOTE attribute)
 		propertyIds.add(NOTE_ATTRIBUTE);
-		searchParameter.setAttributeTypesMap(this.attributeTypeMap);
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
@@ -291,7 +290,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final List<String> propertyIds = new LinkedList<>();
 
 		propertyIds.add(NOTE_ATTRIBUTE);
-		searchParameter.setAttributeTypesMap(this.attributeTypeMap);
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
 		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
@@ -887,7 +885,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		propertyIds.add(NOTE_ATTRIBUTE);
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
-		searchParameter.setAttributeTypesMap(this.attributeTypeMap);
 		searchParameter.setSortState(new Object[] {NOTE_ATTRIBUTE}, new boolean[] {true});
 
 		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
@@ -912,7 +909,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		propertyIds.add(NOTE_ATTRIBUTE);
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
-		searchParameter.setAttributeTypesMap(this.attributeTypeMap);
 		searchParameter.setSortState(new Object[] {NOTE_ATTRIBUTE}, new boolean[] {false});
 
 		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);

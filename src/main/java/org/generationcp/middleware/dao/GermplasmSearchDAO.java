@@ -68,6 +68,24 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	private static final int LOT_INDEX = 5;
 	private static final int AVAIL_BALANCE_INDEX = 6;
 
+	private static final List<String> KNOWN_ADDABLE_COLUMN_PROPERTY_IDS = new ArrayList<>();
+
+	static {
+
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(PREFERRED_ID);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(PREFERRED_NAME);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(GERMPLASM_DATE);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(LOCATION_NAME);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_NAME);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_NUMBER);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_ABBREVIATION);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_GROUP);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(FEMALE_PARENT_ID);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(FEMALE_PARENT_PREFERRED_NAME);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(MALE_PARENT_ID);
+		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(MALE_PARENT_PREFERRED_NAME);
+
+	}
 
 	private static final Map<String, String> selectClauseColumnsMap = new HashMap<>();
 
@@ -116,13 +134,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 	}
 
-
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) {
 
 		// actual searching here
 
 		final Integer startingRow = germplasmSearchParameter.getStartingRow();
 		final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
+		final Map<String, Integer> attributeTypesMap = this.getAttributeTypesMap(germplasmSearchParameter.getAddedColumnsPropertyIds());
 
 		try {
 			final Set<Germplasm> germplasmSearchResult = new LinkedHashSet<>();
@@ -132,7 +150,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				return new ArrayList<>(germplasmSearchResult);
 			}
 
-			final SQLQuery query = this.getSession().createSQLQuery(createGermplasmSearchQueryString(germplasmSearchParameter));
+			final SQLQuery query =
+					this.getSession().createSQLQuery(createGermplasmSearchQueryString(germplasmSearchParameter, attributeTypesMap));
 
 			Debug.println(query.getQueryString());
 
@@ -155,8 +174,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			query.setMaxResults(noOfEntries);
 
 			germplasmSearchResult.addAll(this
-					.convertObjectToGermplasmList(query.list(), germplasmSearchParameter.getAddedColumnsPropertyIds(),
-							germplasmSearchParameter.getAttributeTypesMap()));
+					.convertObjectToGermplasmList(query.list(), germplasmSearchParameter.getAddedColumnsPropertyIds(), attributeTypesMap));
 			return new ArrayList<>(germplasmSearchResult);
 
 		} catch (final HibernateException e) {
@@ -350,16 +368,15 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	protected String createGermplasmSearchQueryString(final GermplasmSearchParameter germplasmSearchParameter) {
+	protected String createGermplasmSearchQueryString(final GermplasmSearchParameter germplasmSearchParameter,
+			final Map<String, Integer> attributeTypesMap) {
 
 		final StringBuilder mainQuery = new StringBuilder();
 
-		mainQuery.append(createSelectClauseForGermplasmSearch(germplasmSearchParameter.getAddedColumnsPropertyIds(),
-				germplasmSearchParameter.getAttributeTypesMap()));
-		mainQuery.append(createFromClauseForGermplasmSearch(germplasmSearchParameter.getAddedColumnsPropertyIds(),
-				germplasmSearchParameter.getAttributeTypesMap()));
+		mainQuery.append(createSelectClauseForGermplasmSearch(germplasmSearchParameter.getAddedColumnsPropertyIds(), attributeTypesMap));
+		mainQuery.append(createFromClauseForGermplasmSearch(germplasmSearchParameter.getAddedColumnsPropertyIds(), attributeTypesMap));
 		mainQuery.append("WHERE g.gid IN (:gids) GROUP BY g.gid");
-		mainQuery.append(this.addSortingColumns(germplasmSearchParameter.getSortState(), germplasmSearchParameter.getAttributeTypesMap()));
+		mainQuery.append(this.addSortingColumns(germplasmSearchParameter.getSortState(), attributeTypesMap));
 
 		return mainQuery.toString();
 
@@ -391,7 +408,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 	protected String createSelectClauseForGermplasmSearch(final List<String> addedColumnsPropertyIds,
 			final Map<String, Integer> attributeTypesMap) {
-
 
 		final StringBuilder selectClause = new StringBuilder();
 		selectClause.append("SELECT g.*, \n" + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
@@ -535,6 +551,37 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		} else {
 			return "";
 		}
+
+	}
+
+	protected boolean isAttributePropertyId(final String propertyId) {
+		return !KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.contains(propertyId);
+	}
+
+	protected Map<String, Integer> getAttributeTypesMap(final List<String> addedColumnsPropertyIds) {
+
+		final Map<String, Integer> attributeTypesMap = new HashMap<>();
+
+		final List<String> attributePropertyIds = new ArrayList<>();
+		for (final String propertyId : addedColumnsPropertyIds) {
+			if (isAttributePropertyId(propertyId)) {
+				attributePropertyIds.add(propertyId);
+			}
+		}
+
+		if (!addedColumnsPropertyIds.isEmpty()) {
+			final SQLQuery query =
+					this.getSession().createSQLQuery("SELECT fcode, fldno from udflds where ftype = 'ATTRIBUTE' and fcode IN (:fcodeList)");
+			query.setParameterList("fcodeList", addedColumnsPropertyIds);
+			final List<Object[]> results = query.list();
+
+			for (final Object[] row : results) {
+				attributeTypesMap.put(String.valueOf(row[0]), (Integer) row[1]);
+			}
+
+		}
+
+		return attributeTypesMap;
 
 	}
 

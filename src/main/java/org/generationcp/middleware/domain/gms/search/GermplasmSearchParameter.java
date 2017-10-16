@@ -121,14 +121,6 @@ public class GermplasmSearchParameter {
 		return this.sortState;
 	}
 
-	public Map<String, Integer> getAttributeTypesMap() {
-		return ImmutableMap.copyOf(attributeTypesMap);
-	}
-
-	public void setAttributeTypesMap(final Map<String, Integer> attributeTypesMap) {
-		this.attributeTypesMap = attributeTypesMap;
-	}
-
 	public void setAddedColumnsPropertyIds(final List<String> addedColumnsPropertyIds) {
 		if (addedColumnsPropertyIds == null) {
 			throw new NullArgumentException("addedColumnsPropertyIds must not be null");
