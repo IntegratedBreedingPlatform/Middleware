@@ -68,6 +68,55 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	private static final int LOT_INDEX = 5;
 	private static final int AVAIL_BALANCE_INDEX = 6;
 
+
+	private static final Map<String, String> selectClauseColumnsMap = new HashMap<>();
+
+	static {
+
+		selectClauseColumnsMap.put(METHOD_ABBREVIATION, String.format("m.mcode AS `%s` \n", METHOD_ABBREVIATION));
+		selectClauseColumnsMap.put(METHOD_NUMBER, String.format("m.mid AS `%s` \n", METHOD_NUMBER));
+		selectClauseColumnsMap.put(METHOD_GROUP, String.format("m.mgrp AS `%s` \n", METHOD_GROUP));
+		selectClauseColumnsMap.put(PREFERRED_ID, String.format("preferredIdOfGermplasm.nval AS `%s` \n", PREFERRED_ID));
+		selectClauseColumnsMap.put(PREFERRED_NAME, String.format("nameOfGermplasm.nval AS `%s` \n", PREFERRED_NAME));
+		selectClauseColumnsMap.put(GERMPLASM_DATE, String.format("g.gdate AS `%s` \n", GERMPLASM_DATE));
+		selectClauseColumnsMap.put(FEMALE_PARENT_ID, String.format(
+				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid1 IS NOT NULL \n"
+						+ "              AND g.gpid1 <> 0 THEN g.gpid1 \n" + "         ELSE '-' \n"
+						+ "       END                         AS `%s` \n", FEMALE_PARENT_ID));
+		selectClauseColumnsMap.put(FEMALE_PARENT_PREFERRED_NAME, String.format(
+				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid1 IS NOT NULL \n"
+						+ "              AND g.gpid1 <> 0 THEN nameOfFemaleParent.nval \n" + "         ELSE '-' \n"
+						+ "       END                         AS `%s` \n", FEMALE_PARENT_PREFERRED_NAME));
+		selectClauseColumnsMap.put(MALE_PARENT_ID, String.format(
+				"        CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n"
+						+ "              AND g.gpid2 <> 0 THEN g.gpid2 \n" + "         ELSE '-' \n"
+						+ "       END                         AS `%s` \n", MALE_PARENT_ID));
+		selectClauseColumnsMap.put(MALE_PARENT_PREFERRED_NAME, String.format(
+				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n"
+						+ "              AND g.gpid2 <> 0 THEN nameOfMaleParent.nval \n" + "         ELSE '-' \n"
+						+ "       END                         AS `%s` \n", MALE_PARENT_PREFERRED_NAME));
+
+	}
+
+	private static final Map<String, String> fromClauseColumnsMap = new HashMap<>();
+
+	static {
+
+		fromClauseColumnsMap.put(PREFERRED_NAME, "LEFT JOIN `names` nameOfGermplasm \n" + "              ON g.gid = nameOfGermplasm.gid \n"
+				+ "                 AND nameOfGermplasm.nstat = 1 \n");
+		fromClauseColumnsMap.put(PREFERRED_ID,
+				"LEFT JOIN `names` preferredIdOfGermplasm \n" + "              ON g.gid = preferredIdOfGermplasm.gid \n"
+						+ "                 AND preferredIdOfGermplasm.nstat = 8 \n");
+		fromClauseColumnsMap.put(FEMALE_PARENT_PREFERRED_NAME,
+				"LEFT JOIN `names` nameOfFemaleParent \n" + "              ON g.gpid1 = nameOfFemaleParent.gid \n"
+						+ "                 AND nameOfFemaleParent.nstat = 1 \n");
+		fromClauseColumnsMap.put(MALE_PARENT_PREFERRED_NAME,
+				"LEFT JOIN `names` nameOfMaleParent \n" + "              ON g.gpid2 = nameOfMaleParent.gid \n"
+						+ "                 AND nameOfMaleParent.nstat = 1 \n");
+
+	}
+
+
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) {
 
 		// actual searching here
@@ -319,20 +368,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	protected String createFromClauseForGermplasmSearch(final List<String> addedColumnsPropertyIds,
 			final Map<String, Integer> attributeTypesMap) {
 
-		final Map<String, String> fromClauseColumnsMap = new HashMap<>();
-
-		fromClauseColumnsMap.put(PREFERRED_NAME, "LEFT JOIN `names` nameOfGermplasm \n" + "              ON g.gid = nameOfGermplasm.gid \n"
-				+ "                 AND nameOfGermplasm.nstat = 1 \n");
-		fromClauseColumnsMap.put(PREFERRED_ID,
-				"LEFT JOIN `names` preferredIdOfGermplasm \n" + "              ON g.gid = preferredIdOfGermplasm.gid \n"
-						+ "                 AND preferredIdOfGermplasm.nstat = 8 \n");
-		fromClauseColumnsMap.put(FEMALE_PARENT_PREFERRED_NAME,
-				"LEFT JOIN `names` nameOfFemaleParent \n" + "              ON g.gpid1 = nameOfFemaleParent.gid \n"
-						+ "                 AND nameOfFemaleParent.nstat = 1 \n");
-		fromClauseColumnsMap.put(MALE_PARENT_PREFERRED_NAME,
-				"LEFT JOIN `names` nameOfMaleParent \n" + "              ON g.gpid2 = nameOfMaleParent.gid \n"
-						+ "                 AND nameOfMaleParent.nstat = 1 \n");
-
 		final StringBuilder fromClause = new StringBuilder();
 		fromClause.append("FROM   germplsm g \n" + "       LEFT JOIN ims_lot gl \n"
 				+ "              ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n"
@@ -357,30 +392,6 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	protected String createSelectClauseForGermplasmSearch(final List<String> addedColumnsPropertyIds,
 			final Map<String, Integer> attributeTypesMap) {
 
-		final Map<String, String> selectClauseColumnsMap = new HashMap<>();
-
-		selectClauseColumnsMap.put(METHOD_ABBREVIATION, String.format("m.mcode AS `%s` \n", METHOD_ABBREVIATION));
-		selectClauseColumnsMap.put(METHOD_NUMBER, String.format("m.mid AS `%s` \n", METHOD_NUMBER));
-		selectClauseColumnsMap.put(METHOD_GROUP, String.format("m.mgrp AS `%s` \n", METHOD_GROUP));
-		selectClauseColumnsMap.put(PREFERRED_ID, String.format("preferredIdOfGermplasm.nval AS `%s` \n", PREFERRED_ID));
-		selectClauseColumnsMap.put(PREFERRED_NAME, String.format("nameOfGermplasm.nval AS `%s` \n", PREFERRED_NAME));
-		selectClauseColumnsMap.put(GERMPLASM_DATE, String.format("g.gdate AS `%s` \n", GERMPLASM_DATE));
-		selectClauseColumnsMap.put(FEMALE_PARENT_ID, String.format(
-				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid1 IS NOT NULL \n"
-						+ "              AND g.gpid1 <> 0 THEN g.gpid1 \n" + "         ELSE '-' \n"
-						+ "       END                         AS `%s` \n", FEMALE_PARENT_ID));
-		selectClauseColumnsMap.put(FEMALE_PARENT_PREFERRED_NAME, String.format(
-				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid1 IS NOT NULL \n"
-						+ "              AND g.gpid1 <> 0 THEN nameOfFemaleParent.nval \n" + "         ELSE '-' \n"
-						+ "       END                         AS `%s` \n", FEMALE_PARENT_PREFERRED_NAME));
-		selectClauseColumnsMap.put(MALE_PARENT_ID, String.format(
-				"        CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n"
-						+ "              AND g.gpid2 <> 0 THEN g.gpid2 \n" + "         ELSE '-' \n"
-						+ "       END                         AS `%s` \n", MALE_PARENT_ID));
-		selectClauseColumnsMap.put(MALE_PARENT_PREFERRED_NAME, String.format(
-				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n"
-						+ "              AND g.gpid2 <> 0 THEN nameOfMaleParent.nval \n" + "         ELSE '-' \n"
-						+ "       END                         AS `%s` \n", MALE_PARENT_PREFERRED_NAME));
 
 		final StringBuilder selectClause = new StringBuilder();
 		selectClause.append("SELECT g.*, \n" + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"

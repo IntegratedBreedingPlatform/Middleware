@@ -878,7 +878,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsAttributeTypeeSortAscending() {
+	public void testSearchForGermplasmsAttributeTypeSortAscending() {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
