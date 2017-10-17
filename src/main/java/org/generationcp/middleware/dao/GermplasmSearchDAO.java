@@ -1,9 +1,15 @@
 package org.generationcp.middleware.dao;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.constant.GermplasmColumnLabels;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
@@ -17,14 +23,8 @@ import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 /**
  * DAO class for Germplasm Search functionality.
@@ -538,7 +538,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	protected boolean isAttributePropertyId(final String propertyId) {
-		return !GermplasmColumnLabels.ADDABLE_PROPERTY_IDS.contains(propertyId);
+		return !ColumnLabels.getAddableGermplasmColumns().contains(propertyId);
 	}
 
 	protected Map<String, Integer> getAttributeTypesMap(final List<String> addedColumnsPropertyIds) {

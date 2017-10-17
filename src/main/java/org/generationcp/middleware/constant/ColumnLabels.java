@@ -1,8 +1,10 @@
 
 package org.generationcp.middleware.constant;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.Term;
@@ -42,11 +44,25 @@ public enum ColumnLabels {
 	private TermId termId;
 	private String name;
 	private static final Map<String, ColumnLabels> LOOKUP = new HashMap<>();
+	private static final List<String> ADDABLE_GERMPLASM_COLUMNS = new ArrayList<>();
 
 	static {
 		for (final ColumnLabels cl : EnumSet.allOf(ColumnLabels.class)) {
 			ColumnLabels.LOOKUP.put(cl.getName(), cl);
 		}
+
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.PREFERRED_ID.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.PREFERRED_NAME.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.GERMPLASM_DATE.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.GERMPLASM_LOCATION.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.BREEDING_METHOD_NAME.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.BREEDING_METHOD_ABBREVIATION.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.BREEDING_METHOD_NUMBER.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.BREEDING_METHOD_GROUP.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_FEMALE_GID.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_MALE_GID.getName());
+		ColumnLabels.ADDABLE_GERMPLASM_COLUMNS.add(ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName());
 	}
 
 	private ColumnLabels(final TermId termId, final String name) {
@@ -75,6 +91,10 @@ public enum ColumnLabels {
 
 	public static ColumnLabels get(final String name) {
 		return ColumnLabels.LOOKUP.get(name);
+	}
+	
+	public static List<String> getAddableGermplasmColumns() {
+		return ColumnLabels.ADDABLE_GERMPLASM_COLUMNS;
 	}
 
 }
