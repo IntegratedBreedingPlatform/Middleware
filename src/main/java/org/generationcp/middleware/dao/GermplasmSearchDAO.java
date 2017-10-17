@@ -2,6 +2,8 @@ package org.generationcp.middleware.dao;
 
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.constant.GermplasmColumnLabels;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
@@ -47,45 +49,26 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 
 	public static final String NAMES = "NAMES";
-	public static final String GID = "GID";
-	public static final String GROUP_ID = "GROUP ID";
-	public static final String STOCK_IDS = "STOCKID";
-	public static final String AVAIL_LOTS = "LOTS";
-	public static final String AVAIL_BALANCE = "AVAILABLE";
-	public static final String METHOD_NAME = "METHOD NAME";
-	public static final String LOCATION_NAME = "LOCATIONS";
-	public static final String METHOD_ABBREVIATION = "METHOD ABBREV";
-	public static final String METHOD_NUMBER = "METHOD NUMBER";
-	public static final String METHOD_GROUP = "METHOD GROUP";
-	public static final String PREFERRED_NAME = "PREFERRED NAME";
-	public static final String PREFERRED_ID = "PREFERRED ID";
-	public static final String FEMALE_PARENT_ID = "CROSS-FEMALE GID";
-	public static final String FEMALE_PARENT_PREFERRED_NAME = "CROSS-FEMALE PREFERRED NAME";
-	public static final String MALE_PARENT_ID = "CROSS-MALE GID";
-	public static final String MALE_PARENT_PREFERRED_NAME = "CROSS-MALE PREFERRED NAME";
-	public static final String GERMPLASM_DATE = "GERMPLASM DATE";
+	public static final String GID = ColumnLabels.GID.getName();
+	public static final String GROUP_ID = ColumnLabels.GROUP_ID.getName();
+	public static final String STOCK_IDS = ColumnLabels.STOCKID.getName();
+	public static final String AVAIL_LOTS = ColumnLabels.AVAILABLE_INVENTORY.getName();
+	public static final String AVAIL_BALANCE = ColumnLabels.TOTAL.getName();
+	public static final String METHOD_NAME = ColumnLabels.BREEDING_METHOD_NAME.getName();
+	public static final String LOCATION_NAME = ColumnLabels.GERMPLASM_LOCATION.getName();
+	public static final String METHOD_ABBREVIATION = ColumnLabels.BREEDING_METHOD_ABBREVIATION.getName();
+	public static final String METHOD_NUMBER = ColumnLabels.BREEDING_METHOD_NUMBER.getName();
+	public static final String METHOD_GROUP = ColumnLabels.BREEDING_METHOD_GROUP.getName();
+	public static final String PREFERRED_NAME = ColumnLabels.PREFERRED_NAME.getName();
+	public static final String PREFERRED_ID = ColumnLabels.PREFERRED_ID.getName();
+	public static final String FEMALE_PARENT_ID = ColumnLabels.CROSS_FEMALE_GID.getName();
+	public static final String FEMALE_PARENT_PREFERRED_NAME = ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName();
+	public static final String MALE_PARENT_ID = ColumnLabels.CROSS_MALE_GID.getName();
+	public static final String MALE_PARENT_PREFERRED_NAME = ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName();
+	public static final String GERMPLASM_DATE = ColumnLabels.GERMPLASM_DATE.getName();
 	private static final int STOCKID_INDEX = 2;
 	private static final int LOT_INDEX = 5;
 	private static final int AVAIL_BALANCE_INDEX = 6;
-
-	private static final List<String> KNOWN_ADDABLE_COLUMN_PROPERTY_IDS = new ArrayList<>();
-
-	static {
-
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(PREFERRED_ID);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(PREFERRED_NAME);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(GERMPLASM_DATE);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(LOCATION_NAME);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_NAME);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_NUMBER);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_ABBREVIATION);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(METHOD_GROUP);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(FEMALE_PARENT_ID);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(FEMALE_PARENT_PREFERRED_NAME);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(MALE_PARENT_ID);
-		KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.add(MALE_PARENT_PREFERRED_NAME);
-
-	}
 
 	private static final Map<String, String> selectClauseColumnsMap = new HashMap<>();
 
@@ -555,7 +538,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	protected boolean isAttributePropertyId(final String propertyId) {
-		return !KNOWN_ADDABLE_COLUMN_PROPERTY_IDS.contains(propertyId);
+		return !GermplasmColumnLabels.ADDABLE_PROPERTY_IDS.contains(propertyId);
 	}
 
 	protected Map<String, Integer> getAttributeTypesMap(final List<String> addedColumnsPropertyIds) {
