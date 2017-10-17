@@ -71,12 +71,12 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.distinct(Projections.property("id")), "listId");
 		projectionList.add(Projections.property(LIST_NAME), LIST_NAME);
 
-		criteria.createAlias(SAMPLES, SAMPLES, CriteriaSpecification.INNER_JOIN)
-			.createAlias("samples.plant", "plant", CriteriaSpecification.INNER_JOIN)
-			.createAlias("plant.experiment", "experiment", CriteriaSpecification.INNER_JOIN)
-			.createAlias("experiment.project", "project", CriteriaSpecification.INNER_JOIN)
-			.createAlias("project.relatedTos", "relatedTos", CriteriaSpecification.INNER_JOIN)
-			.createAlias("relatedTos.objectProject", "objectProject", CriteriaSpecification.INNER_JOIN)
+		criteria.createAlias(SAMPLES, SAMPLES)
+			.createAlias("samples.plant", "plant")
+			.createAlias("plant.experiment", "experiment")
+			.createAlias("experiment.project", "project")
+			.createAlias("project.relatedTos", "relatedTos")
+			.createAlias("relatedTos.objectProject", "objectProject")
 			.add(Restrictions.eq("objectProject.projectId", trialId))
 			.setProjection(projectionList)
 			.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class))
@@ -101,13 +101,13 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("experiment.plotId"), "plotId");
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
 
-		criteria.createAlias(SAMPLES, "sample", CriteriaSpecification.INNER_JOIN)
-			.createAlias("samples.plant", "plant", CriteriaSpecification.INNER_JOIN)
-			.createAlias("samples.takenBy", "user", CriteriaSpecification.INNER_JOIN)
-			.createAlias("plant.experiment", "experiment", CriteriaSpecification.INNER_JOIN)
-			.createAlias("experiment.experimentStocks", "experimentStocks", CriteriaSpecification.INNER_JOIN)
-			.createAlias("experimentStocks.stock", "stock", CriteriaSpecification.INNER_JOIN)
-			.createAlias("experiment.properties", "properties", CriteriaSpecification.INNER_JOIN)
+		criteria.createAlias(SAMPLES, "sample")
+			.createAlias("samples.plant", "plant")
+			.createAlias("samples.takenBy", "user")
+			.createAlias("plant.experiment", "experiment")
+			.createAlias("experiment.experimentStocks", "experimentStocks")
+			.createAlias("experimentStocks.stock", "stock")
+			.createAlias("experiment.properties", "properties")
 			.add(Restrictions.eq("id", sampleListId))
 			.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()))
 			.setProjection(projectionList)
