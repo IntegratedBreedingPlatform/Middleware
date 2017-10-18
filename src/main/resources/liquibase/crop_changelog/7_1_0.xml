@@ -115,6 +115,10 @@
 			DELETE
 			FROM projectprop
 			WHERE variable_id = 8006 AND value = 12990;
+
+			DELETE
+			FROM cvterm
+			WHERE cvterm_id = 8006;
 		</sql>
 	</changeSet>
 
