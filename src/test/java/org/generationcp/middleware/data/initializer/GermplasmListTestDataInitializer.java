@@ -25,12 +25,12 @@ public class GermplasmListTestDataInitializer {
 		return GermplasmListTestDataInitializer.createGermplasmList(id, true);
 	}
 
-	public GermplasmList createGermplasmListWithType(final Integer id, final String type) {
+	public static GermplasmList createGermplasmListWithType(final Integer id, final String type) {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(id);
 		germplasmList.setType(type);
 		return germplasmList;
 	}
-
+	
 	/**
 	 * create GermplasmList object with basic list details initialized given the
 	 * user has an option to set the default id or not
