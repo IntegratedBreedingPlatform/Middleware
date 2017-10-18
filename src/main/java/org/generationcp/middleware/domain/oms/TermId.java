@@ -37,7 +37,7 @@ public enum TermId {
 	/* , STUDY_IP(8120) */
 	, CREATION_DATE(8048) // NOTE: Used this field for assigning variable creation date to property
 	, LAST_UPDATE_DATE(8049) // TODO: Update ID as per final cvterm id assigned officially.
-	, STUDY_STATUS(8006), STUDY_UPDATE(8009)
+	, STUDY_UPDATE(8009)
 
 	// Dataset Fields
 	, DATASET_NAME(8150), DATASET_TITLE(8155), DATASET_TYPE(8160)

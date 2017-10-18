@@ -82,10 +82,6 @@ public class Study implements Serializable {
 		return this.getDisplayValueAsInt(TermId.STUDY_UID);
 	}
 
-	public Integer getStatus() {
-		return this.getDisplayValueAsInt(TermId.STUDY_STATUS);
-	}
-
 	public Integer getCreationDate() {
 		return this.getDisplayValueAsInt(TermId.CREATION_DATE);
 	}

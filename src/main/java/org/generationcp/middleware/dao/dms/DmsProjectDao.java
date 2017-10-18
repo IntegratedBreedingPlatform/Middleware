@@ -67,8 +67,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final Integer LOCATION_ID = Integer.valueOf(TermId.LOCATION_ID.getId());
 
-	private static final int STUDY_STATUS = TermId.STUDY_STATUS.getId();
-
 	private static final String PROGRAM_UUID = "program_uuid";
 	private static final String VALUE = "value";
 	private static final String TYPE_ID = "typeId";
@@ -158,9 +156,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     MAX(IF(pProp.type_id = " + TermId.END_DATE.getId() + ", "
 		+ "         pProp.value, "
 		+ "         NULL)) AS endDate, "
-		+ "     MAX(IF(pProp.type_id = " + TermId.STUDY_STATUS.getId() + ", "
-		+ "         pProp.value, "
-		+ "         NULL)) AS active, "
+		+ "     pmain.deleted, "
 		+ "     CASE ppStudy.value "
 		+ "         WHEN "
 		+ "             '10000' "
@@ -564,9 +560,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					"SELECT s.project_id FROM project s " + " WHERE name = :name AND program_uuid = :program_uuid"
 							+ " AND EXISTS (SELECT 1 FROM project_relationship pr WHERE pr.subject_project_id = s.project_id "
 							+ "   AND pr.type_id = " + relationship.getId() + ") "
-							+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.variable_id = " + TermId.STUDY_STATUS.getId()
-							+ "   AND pp.project_id = s.project_id AND pp.value = "
-							+ "   (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) "
+							+ "	AND s.deleted !=  " + DELETED_STUDY
 							+ " LIMIT 1";
 
 			Query query =
@@ -1158,7 +1152,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.createAlias("properties", "pr");
 		criteria.add(Restrictions.eq("pr.variableId", TermId.STUDY_TYPE.getId()));
 
-		criteria.add(Restrictions.ne(DmsProjectDao.DELETED, DmsProjectDao.DELETED_STUDY));
+		criteria.add(Restrictions.ne(DmsProjectDao.DELETED, true));
 
 		if (parameters.containsKey(StudyFilters.PROGRAM_ID)) {
 			criteria.add(Restrictions.eq(StudyFilters.PROGRAM_ID.getParameter(), parameters.get(StudyFilters.PROGRAM_ID)));
@@ -1193,7 +1187,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("trialName");
 			query.addScalar("startDate");
 			query.addScalar("endDate");
-			query.addScalar("active");
+			query.addScalar("deleted");
 			query.addScalar("locationID");
 			query.setParameter("studyId", studyId);
 			Object result = query.uniqueResult();
@@ -1211,7 +1205,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
 				studyMetadata.setStartDate((row[7] instanceof String) ? (String) row[7] : null);
 				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
-				studyMetadata.setActive((row[9] != null) ? false : true);
+				studyMetadata.setActive(Boolean.FALSE.equals(row[9]));
 				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
 				return studyMetadata;
 			} else {
