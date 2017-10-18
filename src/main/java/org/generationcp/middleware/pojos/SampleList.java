@@ -65,6 +65,9 @@ public class SampleList implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private SampleListType type;
 
+	@Column(name = "program_uuid")
+	private String programUUID;
+
 	public SampleListType getType() {
 		return type;
 	}
@@ -167,6 +170,14 @@ public class SampleList implements Serializable {
 	}
 
 	public boolean isFolder() {
-		return this.getType() != null && this.getType().equals(SampleList.FOLDER_TYPE) ? true : false;
+		return this.getType() != null && this.getType().name().equalsIgnoreCase(SampleList.FOLDER_TYPE) ? true : false;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 }
