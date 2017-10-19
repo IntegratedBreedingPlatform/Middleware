@@ -312,6 +312,12 @@ public class StandardVariableBuilder extends Builder {
 		return stdVariableId;
 	}
 
+	/**
+	 *
+	 * @param headerNames
+	 * @param programUUID
+	 * @return a map with Property names (In UPPERCASE) as keys and a list of StandardVariable as Value
+	 */
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headerNames, final String programUUID) {
 
 		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<>();
@@ -361,7 +367,7 @@ public class StandardVariableBuilder extends Builder {
 				variables = this.create(standardVariableIds, programUUID);
 				this.setRoleOfVariables(variables, varIdsWithType);
 			}
-			standardVariablesInProjects.put(name, variables);
+			standardVariablesInProjects.put(upperName, variables);
 		}
 		return standardVariablesInProjects;
 	}
@@ -375,6 +381,11 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 
+	/**
+	 *
+	 * @param propertyNames
+	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
+	 */
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> propertyNames) {
 		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
 	}

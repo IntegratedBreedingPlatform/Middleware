@@ -41,18 +41,25 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProjectPropertyDao.class);
 
+	/**
+	 *
+	 * @param propertyNames
+	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
+	 * @throws MiddlewareQueryException
+	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(List<String> propertyNames)
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(final List<String> propertyNames)
 			throws MiddlewareQueryException {
 
-		propertyNames = Lists.transform(propertyNames, new Function<String, String>() {
+		final List<String> propertyNamesInUpperCase = Lists.transform(propertyNames, new Function<String, String>() {
+
 			public String apply(String s) {
 				return s.toUpperCase();
 			}
 		});
 
 		try {
-			if (!propertyNames.isEmpty()) {
+			if (!propertyNamesInUpperCase.isEmpty()) {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass(), "property")
 					.setProjection(Projections.distinct(Projections.projectionList()
 						.add(Projections.property("alias"))
