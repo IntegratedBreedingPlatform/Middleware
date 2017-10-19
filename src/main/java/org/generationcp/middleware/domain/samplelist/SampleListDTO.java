@@ -43,6 +43,8 @@ public class SampleListDTO implements Serializable {
 
 	private Date createdDate;
 
+	private String programUUID;
+
 	public String getCropName() {
 		return this.cropName;
 	}
@@ -167,5 +169,13 @@ public class SampleListDTO implements Serializable {
 
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 }
