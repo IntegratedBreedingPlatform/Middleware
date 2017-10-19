@@ -31,13 +31,19 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(SampleListDao.class);
 
 	public SampleList getBySampleListName(final String sampleListName) {
-		final DetachedCriteria criteria = DetachedCriteria.forClass(SampleList.class);
-		criteria.add(Restrictions.like(SampleListDao.LIST_NAME, sampleListName));
+		final DetachedCriteria criteria = this.getSampleListName(sampleListName);
 		return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
 
+	private DetachedCriteria getSampleListName(final String sampleListName){
+		final DetachedCriteria criteria = DetachedCriteria.forClass(SampleList.class);
+		return criteria.add(Restrictions.like(SampleListDao.LIST_NAME, sampleListName));
+	}
+
 	public SampleList getRootSampleList() {
-		return this.getBySampleListName(ROOT_FOLDER);
+		final DetachedCriteria criteria = this.getSampleListName(SampleListDao.ROOT_FOLDER);
+		criteria.add(Restrictions.isNull("programUUID"));
+		return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
 
 	public SampleList getParentSampleFolder(Integer id) {
