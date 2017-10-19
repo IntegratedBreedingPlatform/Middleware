@@ -80,6 +80,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
+		Preconditions.checkArgument(sampleListDTO.getProgramUUID() != null, "The programUUID must not be null");
+
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
@@ -92,6 +94,7 @@ public class SampleListServiceImpl implements SampleListService {
 			User takenBy = null;
 			sampleList.setCreatedDate(sampleListDTO.getCreatedDate());
 			User user = this.userDao.getUserByUserName(sampleListDTO.getCreatedBy());
+			sampleList.setProgramUUID(sampleListDTO.getProgramUUID());
 			sampleList.setCreatedBy(user);
 			sampleList.setDescription(sampleListDTO.getDescription());
 			sampleList.setListName(sampleListDTO.getListName());
@@ -169,23 +172,32 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @param folderName
 	 * @param parentId
 	 * @param createdBy
+	 * @param programUUID
 	 * @return Sample List
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy) throws Exception {
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy,  final String programUUID) throws Exception {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
 		Preconditions.checkNotNull(createdBy);
+		Preconditions.checkNotNull(programUUID);
 		Preconditions.checkArgument(!folderName.isEmpty(), "folderName can not be empty");
 		Preconditions.checkArgument(!createdBy.isEmpty(), "createdBy can not be empty");
+		Preconditions.checkArgument(!programUUID.isEmpty(), "programUUID can not be empty");
 
-		final SampleList parentList = this.sampleListDao.getById(parentId);
+		final SampleList parentList;
+		if (0 == parentId) {
+			parentList = this.sampleListDao.getRootSampleList();
+		} else {
+			parentList = this.sampleListDao.getById(parentId);
+
+		}
 		if (parentList == null) {
 			throw new Exception("Parent Folder does not exist");
 		}
 
-		if (!SampleListType.FOLDER.equals(parentList.getType())) {
+		if (!parentList.isFolder()) {
 			throw new Exception("Specified parentID is not a folder");
 		}
 
@@ -200,6 +212,7 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleFolder.setNotes(null);
 		sampleFolder.setHierarchy(parentList);
 		sampleFolder.setType(SampleListType.FOLDER);
+		sampleFolder.setProgramUUID(programUUID);
 		return this.sampleListDao.save(sampleFolder).getId();
 	}
 
@@ -255,22 +268,36 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListId);
 		Preconditions.checkNotNull(newParentFolderId);
 		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), "Arguments can not have the same value");
+
 		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
+
 		if (listToMove == null) {
 			throw new Exception("sampleList does not exist");
 		}
+
 		if (listToMove.getHierarchy() == null) {
 			throw new Exception("Root folder can not me moved");
 		}
-		final SampleList newParentFolder = this.sampleListDao.getById(newParentFolderId);
+
+		final SampleList newParentFolder;
+		if (0 == newParentFolderId) {
+			newParentFolder = this.sampleListDao.getRootSampleList();
+		} else {
+			newParentFolder = this.sampleListDao.getById(newParentFolderId);
+
+		}
+
 		if (newParentFolder == null) {
 			throw new Exception("Specified newParentFolderId does not exist");
 		}
-		if (!SampleListType.FOLDER.equals(newParentFolder.getType())) {
+
+		if (!newParentFolder.isFolder()) {
 			throw new Exception("Specified newParentFolderId is not a folder");
 		}
+
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
+
 		if (uniqueSampleListName != null) {
 			throw new Exception("folderName is not unique in the parent folder");
 		}

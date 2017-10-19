@@ -18,10 +18,11 @@ public interface SampleListService {
 	 * @param folderName
 	 * @param parentId
 	 * @param createdBy
+	 * @param programUUID
 	 * @return SampleList (Saved Folder)
 	 * @throws Exception
 	 */
-	Integer createSampleListFolder(final String folderName, final Integer parentId,final String createdBy) throws Exception;
+	Integer createSampleListFolder(final String folderName, final Integer parentId,final String createdBy, final String programUUID) throws Exception;
 
 	/**
 	 * Update sample list folder name
