@@ -64,5 +64,13 @@
 			projectprop_new TO projectprop;
 		</sql>
 	</changeSet>
+	
+	<changeSet author="nahuel" id="v7.1.0-2">
+		<preConditions>
+			<viewExists viewName="project_variable_details" />
+		</preConditions>
+		<dropView viewName="project_variable_details"></dropView>
+	</changeSet>
+	
 
 </databaseChangeLog>
