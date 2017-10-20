@@ -112,7 +112,13 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public void setTakenBy(final String takenBy) {
-		this.takenBy = takenBy;
+		if(takenBy != null) {
+			this.takenBy = takenBy;
+		}
+		else {
+			this.takenBy = "-";
+		}
+
 	}
 
 	public Date getSampleDate() {
@@ -123,6 +129,9 @@ public class SampleDetailsDTO implements Serializable {
 		this.sampleDate = sampleDate;
 		if (sampleDate != null) {
 			this.displayDate = dateFormat.format(sampleDate);
+		}
+		else{
+			this.displayDate = "-";
 		}
 	}
 
