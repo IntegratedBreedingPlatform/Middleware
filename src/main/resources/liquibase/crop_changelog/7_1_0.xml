@@ -65,7 +65,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="nahuel" id="v7.1.0-2" >
+	<changeSet author="nahuel" id="v7.1.0-2-2017-10-20T22:39:25" >
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="project" columnName="deleted" />
@@ -78,7 +78,7 @@
 		</addColumn>
 	</changeSet>
 
-	<changeSet author="nahuel" id="v7.1.0-3" >
+	<changeSet author="nahuel" id="v7.1.0-3-2017-10-20T22:39:25" >
 		<preConditions>
 			<columnExists tableName="project" columnName="deleted" />
 		</preConditions>
