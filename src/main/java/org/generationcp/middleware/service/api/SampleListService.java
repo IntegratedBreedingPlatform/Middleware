@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface SampleListService {
 
-	SampleList createSampleList(SampleListDTO sampleListDto);
+	SampleList createSampleList(final SampleListDTO sampleListDto);
 
 	/**
 	 * Create a sample list folder
@@ -60,7 +60,7 @@ public interface SampleListService {
 	 * @param programUUID - the program UUID
 	 * @return - List of SampleList POJOs
 	 */
-	List<SampleList> getAllTopLevelLists(String programUUID);
+	List<SampleList> getAllTopLevelLists(final String programUUID);
 
 	/**
 	 * Returns a list of {@code SampleList} child records given a parent id. Retrieval from the database is done by batch (as specified
@@ -72,13 +72,16 @@ public interface SampleListService {
 	 * @param batchSize - the number of records to be retrieved per iteration
 	 * @return Returns a List of SampleList POJOs for the child lists
 	 */
-	List<SampleList> getSampleListByParentFolderIdBatched(Integer parentId, String programUUID, int batchSize);
+	List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize);
 
 	/**
 	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
 	 * This helps avoiding the need to query metadata in a loop for each folder
 	 * @param sampleLists ids for which we should retrieve metadata
 	 */
-	Map<Integer, GermplasmFolderMetadata> getFolderMetadata(List<SampleList> sampleLists);
+	Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists);
 
+	SampleList getSampleListByListId(final Integer listId);
+
+	SampleList getLastSavedSampleListByUserId(final int userId, final String programUuid);
 }

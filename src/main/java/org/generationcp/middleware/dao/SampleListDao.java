@@ -4,12 +4,14 @@ package org.generationcp.middleware.dao;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -18,6 +20,7 @@ import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +32,12 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	protected static final String LIST_NAME = "listName";
 
 	private static final Logger LOG = LoggerFactory.getLogger(SampleListDao.class);
+
+	protected static final Criterion RESTRICTED_LIST;
+
+	static {
+		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
+	}
 
 	public SampleList getBySampleListName(final String sampleListName) {
 		final DetachedCriteria criteria = this.getSampleListName(sampleListName);
@@ -76,7 +85,18 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	public List<SampleList> getAllTopLevelLists(final String programUUID) {
 		try {
-			return this.getRootSampleList().getChildren();
+			//return this.getRootSampleList().getChildren();
+
+			final Criterion topFolder = Restrictions.eq("hierarchy.id", this.getRootSampleList().getId());
+			final Criterion nullFolder = Restrictions.isNull("hierarchy");
+			final Criteria criteria = this.getSession().createCriteria(SampleList.class);
+			criteria.add(Restrictions.or(topFolder, nullFolder));
+
+			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
+			this.hideSnapshotListTypes(criteria);
+
+			criteria.addOrder(Order.asc("listName"));
+			return criteria.list();
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getAllTopLevelLists() query from SampleList: " + e.getMessage(), e);
 		}
@@ -134,6 +154,46 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 				return folderMetaData.getListId();
 			}
 		});
+	}
+
+	@Nullable
+	public SampleList getLastCreatedByUserID(final Integer userID, final String programUUID) {
+		try {
+			if (userID != null) {
+				final Criteria criteria = this.getSession().createCriteria(SampleList.class);
+				criteria.add(Restrictions.eq("createdBy.userid", userID));
+
+				this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
+
+				this.hideSnapshotListTypes(criteria);
+
+				criteria.addOrder(Order.desc("id"));
+
+				final List result = criteria.list();
+				if (!result.isEmpty()) {
+					return (SampleList) result.get(0);
+				} else {
+					return null;
+				}
+			}
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with getByUserID(userID=" + userID + ") query from GermplasmList: " + e.getMessage(), e);
+		}
+		return null;
+	}
+
+	private void addCriteriaForProgramUUIDInLists(final String programUUID, final Criteria criteria) {
+		final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+		final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+		criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+	}
+
+	protected void hideSnapshotListTypes(final Criteria criteria) {
+		criteria.add(this.getRestrictedSnapshopTypes());
+	}
+
+	protected Criterion getRestrictedSnapshopTypes() {
+		return SampleListDao.RESTRICTED_LIST;
 	}
 
 }

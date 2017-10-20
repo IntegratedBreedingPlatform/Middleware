@@ -184,6 +184,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public SampleList getSampleListByListId(final Integer listId) {
+		return this.getSampleListService().getSampleListByListId(listId);
+	}
+
+	@Override
 	public Map<Integer, GermplasmFolderMetadata> getSampleFolderMetadata(final List<SampleList> sampleLists) {
 		return this.getSampleListService().getFolderMetadata(sampleLists);
 	}

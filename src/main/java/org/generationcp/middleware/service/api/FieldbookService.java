@@ -1025,5 +1025,11 @@ public interface FieldbookService {
 	Map<Integer, GermplasmFolderMetadata> getSampleFolderMetadata(List<SampleList> sampleLists);
 
 
+	/**
+	 *
+	 * @param listId - the list Id
+	 * @return - List of SampleList POJOs
+	 */
+	SampleList getSampleListByListId(Integer listId);
 
 }

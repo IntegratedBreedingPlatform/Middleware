@@ -342,6 +342,16 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
+	public SampleList getSampleListByListId(Integer listId) {
+		return this.getSampleListDao().getById(listId);
+	}
+
+	@Override
+	public SampleList getLastSavedSampleListByUserId(final int userId, final String programUuid) {
+		return this.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
+	}
+
+	@Override
 	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID,
 		final int batchSize) {
 		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
