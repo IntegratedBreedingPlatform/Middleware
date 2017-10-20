@@ -1,5 +1,6 @@
-
 package org.generationcp.middleware.domain.gms.search;
+
+import org.generationcp.middleware.dao.GermplasmSearchDAO;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -9,9 +10,27 @@ import java.util.Map;
  * This enum class contains the list of columns that can be sorted in Germplasm Search Tables.
  */
 public enum GermplasmSortableColumn {
-	// For now there are only 3 columns allowed to be sorted in Germplasm Search Table
+
 	// Make sure to add another constant for new sortable column in Germplasm Search Table
-	STOCK_IDS("STOCKID", "stockIDs"), SEED_RES("SEED RES", "seedRes"), GROUP_ID("GROUP ID", "g.mgid");
+	AVAILABLE_BALANCE("AVAILABLE", GermplasmSearchDAO.AVAIL_BALANCE),
+	AVAILABLE_LOTS("LOTS", GermplasmSearchDAO.AVAIL_LOTS),
+	STOCK_IDS("STOCKID", GermplasmSearchDAO.STOCK_IDS),
+	SEED_RES("SEED RES", "seedRes"),
+	METHOD_NAME("METHOD NAME", GermplasmSearchDAO.METHOD_NAME),
+	LOCATION_NAME("LOCATIONS", GermplasmSearchDAO.LOCATION_NAME),
+	METHOD_ABBREVIATION("METHOD ABBREV", GermplasmSearchDAO.METHOD_ABBREVIATION),
+	METHOD_NUMBER("METHOD NUMBER", GermplasmSearchDAO.METHOD_NUMBER),
+	METHOD_GROUP("METHOD GROUP", GermplasmSearchDAO.METHOD_GROUP),
+	PREFERRED_NAME("PREFERRED NAME", GermplasmSearchDAO.PREFERRED_NAME),
+	PREFERRED_ID("PREFERRED ID", GermplasmSearchDAO.PREFERRED_ID),
+	FEMALE_PARENT_ID("CROSS-FEMALE GID", GermplasmSearchDAO.FEMALE_PARENT_ID),
+	FEMALE_PARENT_PREFERRED_NAME("CROSS-FEMALE PREFERRED NAME", GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME),
+	MALE_PARENT_ID("CROSS-MALE GID", GermplasmSearchDAO.MALE_PARENT_ID),
+	MALE_PARENT_PREFERRED_NAME("CROSS-MALE PREFERRED NAME", GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME),
+	GID("GID", GermplasmSearchDAO.GID),
+	GERMPLASM_DATE("GERMPLASM DATE", GermplasmSearchDAO.GERMPLASM_DATE),
+	GROUP_ID("GROUP ID", GermplasmSearchDAO.GROUP_ID),
+	NAMES("NAMES", GermplasmSearchDAO.NAMES);
 
 	// The corresponding column name in the germplasm search table
 	String tableColumnName;

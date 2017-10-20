@@ -806,6 +806,14 @@ public interface GermplasmDataManager {
 	List<Germplasm> searchForGermplasm(GermplasmSearchParameter germplasmSearchParameter);
 
 	/**
+	 * Get the gids of the result of germplasm search given a search term.
+	 *
+	 * @param germplasmSearchParameter - contains all data needed for the germplasm search
+	 * @return List of Germplasm GIDs
+	 */
+	Set<Integer> retrieveGidsOfSearchGermplasmResult(GermplasmSearchParameter germplasmSearchParameter);
+
+	/**
 	 * Please use LocationDataManager.getLocationsByIDs().
 	 * 
 	 * Gets the locations by the given IDs.
@@ -1020,15 +1028,11 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
-	 * 
-	 * @param q - keyword
-	 * @param o - operation
-	 * @param includeParents - include the parents of the search germplasm
-	 * @param withInventoryOnly - include germplasm with inventory details only
-	 * @param includeMGMembers - include germplasm of the same group of the search germplasm
+	 *
+	 ** @param germplasmSearchParameter - contains all data needed for the germplasm search
 	 * @return
 	 */
-	Integer countSearchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
+	Integer countSearchForGermplasm(GermplasmSearchParameter germplasmSearchParameter);
 
 	List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids);
 	
