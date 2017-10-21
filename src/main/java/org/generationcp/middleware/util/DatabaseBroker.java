@@ -18,6 +18,7 @@ import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocationDAO;
@@ -457,6 +458,12 @@ public class DatabaseBroker {
 		GermplasmDAO germplasmDao = new GermplasmDAO();
 		germplasmDao.setSession(this.getActiveSession());
 		return germplasmDao;
+	}
+
+	public GermplasmSearchDAO getGermplasmSearchDao() {
+		GermplasmSearchDAO germplasmSearchDao = new GermplasmSearchDAO();
+		germplasmSearchDao.setSession(this.getActiveSession());
+		return germplasmSearchDao;
 	}
 
 	public LocationDAO getLocationDao() {
