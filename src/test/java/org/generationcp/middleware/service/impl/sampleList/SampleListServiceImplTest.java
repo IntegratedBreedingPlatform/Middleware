@@ -7,6 +7,7 @@ import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -520,6 +521,17 @@ public class SampleListServiceImplTest {
 			sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleList);
 
+		this.createSampleListDTO(studyId, selectionVariableId, instanceIds);
+
+		final ArgumentCaptor<SampleList> sampleListArgumentCaptor = ArgumentCaptor.forClass(SampleList.class);
+		Mockito.verify(this.sampleListDao).save(sampleListArgumentCaptor.capture());
+		Assert.assertEquals(SampleListType.SAMPLE_LIST, sampleListArgumentCaptor.getValue().getType());
+		Assert.assertEquals("desc", sampleListArgumentCaptor.getValue().getDescription());
+		Assert.assertEquals("notes", sampleListArgumentCaptor.getValue().getNotes());
+		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
+	}
+
+	private SampleListDTO createSampleListDTO(final int studyId, final Integer selectionVariableId, final List<Integer> instanceIds) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
 		sampleListDTO.setCreatedBy(ADMIN);
@@ -533,13 +545,57 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setStudyId(studyId);
 		sampleListDTO.setTakenBy(ADMIN);
 		sampleListService.createSampleList(sampleListDTO);
+		return sampleListDTO;
+	}
 
-		final ArgumentCaptor<SampleList> sampleListArgumentCaptor = ArgumentCaptor.forClass(SampleList.class);
-		Mockito.verify(this.sampleListDao).save(sampleListArgumentCaptor.capture());
-		Assert.assertEquals(SampleListType.SAMPLE_LIST, sampleListArgumentCaptor.getValue().getType());
-		Assert.assertEquals("desc", sampleListArgumentCaptor.getValue().getDescription());
-		Assert.assertEquals("notes", sampleListArgumentCaptor.getValue().getNotes());
-		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
+	@Test
+	public void testGetSampleLists() {
+		final Integer trialId = 1;
+		List<SampleListDTO> list = new ArrayList<>();
+
+		SampleListDTO sampleListDTO = new SampleListDTO();
+		sampleListDTO.setListId(21);
+		sampleListDTO.setListName("Test");
+		list.add(sampleListDTO);
+
+		Mockito.when(this.sampleListService.getSampleLists(trialId)).thenReturn(list);
+		List<SampleListDTO> result = this.sampleListService.getSampleLists(trialId);
+		SampleListDTO dto = result.get(0);
+		Assert.assertEquals(result.size(), 1);
+		Assert.assertNotNull(dto);
+		Assert.assertEquals(dto.getListId(), sampleListDTO.getListId());
+		Assert.assertEquals(dto.getListName(), sampleListDTO.getListName());
+	}
+
+	@Test
+	public void testGetSampleDetailsDTOs() {
+		final Integer sampleListId = 1;
+		List<SampleDetailsDTO> list = new ArrayList<>();
+		SampleDetailsDTO dto0 = new SampleDetailsDTO();
+		dto0.setGid(1);
+		dto0.setEntryNo(1);
+
+
+		SampleDetailsDTO dto1 = new SampleDetailsDTO();
+		dto1.setGid(2);
+		dto1.setEntryNo(2);
+
+		list.add(dto0);
+		list.add(dto1);
+		Mockito.when(this.sampleListService.getSampleDetailsDTOs(sampleListId)).thenReturn(list);
+
+		List<SampleDetailsDTO> result = this.sampleListService.getSampleDetailsDTOs(sampleListId);
+
+		SampleDetailsDTO result0 = result.get(0);
+		SampleDetailsDTO result1 = result.get(1);
+
+		Assert.assertEquals(result.size(), 2);
+		Assert.assertNotNull(result0);
+		Assert.assertNotNull(result1);
+		Assert.assertEquals(result0.getEntryNo(), dto0.getEntryNo());
+		Assert.assertEquals(result0.getGid(), dto0.getGid());
+		Assert.assertEquals(result1.getEntryNo(), dto1.getEntryNo());
+		Assert.assertEquals(result1.getGid(), dto1.getGid());
 	}
 }
 
