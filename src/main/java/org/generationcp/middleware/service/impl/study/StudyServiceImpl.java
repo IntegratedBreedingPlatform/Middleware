@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -26,6 +27,8 @@ import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerI
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -93,10 +96,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE
 		+ " and ph.value is not null ";
 
-	public static final String yearText =
-		"select value from project p inner join projectprop pp" + " on pp.project_id = p.project_id where  pp.type_id = '8050' and "
-			+ " p.project_id = :projectId";
-
 	private final String TRIAL_TYPE = "T";
 
 	private MeasurementVariableService measurementVariableService;
@@ -112,6 +111,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private StudyDataManager studyDataManager;
 
 	private UserDataManager userDataManager;
+
+	private ProjectPropertyDao projectPropertyDao;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -579,11 +580,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	private String getYearFromStudy(final int studyIdentifier) {
-		final SQLQuery query = this.getCurrentSession().createSQLQuery(yearText);
-		query.setParameter("projectId", studyIdentifier);
-		Object result = query.uniqueResult();
-		if (result != null)
-			return result.toString().substring(0, 4);
+		final DmsProject project = new DmsProject();
+		project.setProjectId(studyIdentifier);
+		final ProjectProperty projectProperty = this.studyDataManager.getByVariableIdAndProjectID(project, TermId.START_DATE.getId());
+		if (projectProperty != null)
+			return projectProperty.getValue().substring(0, 4);
 		return "";
 	}
 }

@@ -11,16 +11,9 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -59,8 +52,15 @@ import org.generationcp.middleware.util.DatasetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class WorkbookBuilder extends Builder {
 
@@ -212,7 +212,7 @@ public class WorkbookBuilder extends Builder {
 						}
 						// redundant logic?
 						if (value == null) {
-							value = "";
+							value = StringUtils.EMPTY;
 						}
 					}
 
@@ -248,7 +248,7 @@ public class WorkbookBuilder extends Builder {
 
 		final List<MeasurementRow> trialObservations = this.getTrialObservations(workbook, isTrial);
 		workbook.setTrialObservations(trialObservations);
-		WorkbookBuilder.LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
+		WorkbookBuilder.LOG.debug(StringUtils.EMPTY + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
 	}
@@ -435,7 +435,7 @@ public class WorkbookBuilder extends Builder {
 					if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
 						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
 						if (value == null) {
-							value = "";
+							value = StringUtils.EMPTY;
 						}
 					} else if (PhenotypicType.VARIATE == varType.getRole()) {
 						// constants, no need to retrieve the value if it's a trial study
@@ -454,14 +454,14 @@ public class WorkbookBuilder extends Builder {
 								}
 							}
 							if (value == null) {
-								value = "";
+								value = StringUtils.EMPTY;
 							}
 						} else {
-							value = "";
+							value = StringUtils.EMPTY;
 						}
 					}
 
-					if (isNursery && "".equalsIgnoreCase(value)) {
+					if (isNursery && value.isEmpty()) {
 						// set trial env for nursery studies
 						final List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
 						if (locIds != null && !locIds.isEmpty()) {
@@ -471,7 +471,7 @@ public class WorkbookBuilder extends Builder {
 							value = getVariableValueFromGeolocation(varId, value, geolocation);
 						}
 						if (value == null) {
-							value = "";
+							value = StringUtils.EMPTY;
 						}
 					}
 
@@ -505,7 +505,7 @@ public class WorkbookBuilder extends Builder {
 		final MeasurementVariable measurementVariable =
 			new MeasurementVariable(stdVariable.getId(), projectProperty.getAlias(), stdVariable.getDescription(),
 				stdVariable.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(),
-				stdVariable.getDataType().getName(), value, "", minRange, maxRange);
+				stdVariable.getDataType().getName(), value, StringUtils.EMPTY, minRange, maxRange);
 		measurementVariable.setFactor(true);
 		measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 		measurementVariable

@@ -294,7 +294,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DatasetReference> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException {
+	public List<DatasetReference> getDatasetNodesByStudyId(Integer studyId) {
 
 		List<DatasetReference> datasetReferences = new ArrayList<>();
 
@@ -331,7 +331,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getStudiesByName(String name) throws MiddlewareQueryException {
+	public List<DmsProject> getStudiesByName(String name) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
@@ -348,7 +348,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getStudiesByUserIds(Collection<Integer> userIds) throws MiddlewareQueryException {
+	public List<DmsProject> getStudiesByUserIds(Collection<Integer> userIds) {
 		List<Object> userIdStrings = new ArrayList<>();
 		if (userIds != null && !userIds.isEmpty()) {
 			for (Integer userId : userIds) {
@@ -358,11 +358,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return this.getStudiesByStudyProperty(TermId.STUDY_UID.getId(), Restrictions.in("p.value", userIdStrings));
 	}
 
-	public List<DmsProject> getStudiesByStartDate(Integer startDate) throws MiddlewareQueryException {
+	public List<DmsProject> getStudiesByStartDate(Integer startDate) {
 		return this.getStudiesByStudyProperty(TermId.START_DATE.getId(), Restrictions.eq("p.value", startDate.toString()));
 	}
 
-	private List<DmsProject> getStudiesByStudyProperty(Integer studyPropertyId, Criterion valueExpression) throws MiddlewareQueryException {
+	private List<DmsProject> getStudiesByStudyProperty(Integer studyPropertyId, Criterion valueExpression) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("properties", "p");
@@ -381,7 +381,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getStudiesByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
+	public List<DmsProject> getStudiesByIds(Collection<Integer> projectIds) {
 		try {
 			if (projectIds != null && !projectIds.isEmpty()) {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -398,7 +398,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getDatasetsByStudy(Integer studyId) throws MiddlewareQueryException {
+	public List<DmsProject> getDatasetsByStudy(Integer studyId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
@@ -413,7 +413,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	public DmsProject getParentStudyByDataset(Integer datasetId) throws MiddlewareQueryException {
+	public DmsProject getParentStudyByDataset(Integer datasetId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
@@ -430,7 +430,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return null;
 	}
 
-	public List<DmsProject> getStudyAndDatasetsById(Integer projectId) throws MiddlewareQueryException {
+	public List<DmsProject> getStudyAndDatasetsById(Integer projectId) {
 		Set<DmsProject> projects = new HashSet<>();
 
 		DmsProject project = this.getById(projectId);
@@ -452,7 +452,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>(projects);
 	}
 
-	public List<DmsProject> getByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
+	public List<DmsProject> getByIds(Collection<Integer> projectIds) {
 		List<DmsProject> studyNodes = new ArrayList<>();
 		try {
 			if (projectIds != null && !projectIds.isEmpty()) {
@@ -468,7 +468,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studyNodes;
 	}
 
-	public List<DmsProject> getProjectsByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<DmsProject> getProjectsByFolder(Integer folderId, int start, int numOfRows) {
 		List<DmsProject> projects = new ArrayList<>();
 		if (folderId == null) {
 			return projects;
@@ -490,7 +490,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return projects;
 	}
 
-	public long countProjectsByFolder(Integer folderId) throws MiddlewareQueryException {
+	public long countProjectsByFolder(Integer folderId) {
 		long count = 0;
 		if (folderId == null) {
 			return count;
@@ -509,7 +509,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getDataSetsByStudyAndProjectProperty(int studyId, int variable, String value) throws MiddlewareQueryException {
+	public List<DmsProject> getDataSetsByStudyAndProjectProperty(int studyId, int variable, String value) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
@@ -530,7 +530,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<StudyReference> getStudiesByTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesByTrialEnvironments(List<Integer> environmentIds) {
 		List<StudyReference> studies = new ArrayList<>();
 		try {
 			String sql =
@@ -554,7 +554,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studies;
 	}
 
-	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID, TermId relationship) throws MiddlewareQueryException {
+	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID, TermId relationship) {
 		try {
 			String sql =
 					"SELECT s.project_id FROM project s " + " WHERE name = :name AND program_uuid = :program_uuid"
@@ -573,12 +573,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return null;
 	}
 
-	public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException {
+	public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID) {
 		return this.getAllStudyDetails(studyType, programUUID, -1, -1);
 	}
 
 	public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows)
-			throws MiddlewareQueryException {
+			 {
 		List<StudyDetails> studyDetails = new ArrayList<>();
 
 		StringBuilder sqlString =
@@ -669,7 +669,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studyDetails;
 	}
 
-	public StudyType getStudyType(int studyId) throws MiddlewareQueryException {
+	public StudyType getStudyType(int studyId) {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
@@ -688,7 +688,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException {
+	public StudyDetails getStudyDetails(StudyType studyType, int studyId) {
 		StudyDetails studyDetails = null;
 		try {
 
@@ -729,7 +729,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studyDetails;
 	}
 
-	public long countAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException {
+	public long countAllStudyDetails(StudyType studyType, String programUUID) {
 		try {
 			StringBuilder sqlString =
 					new StringBuilder()
@@ -778,12 +778,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException {
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID) {
 		return this.getAllNurseryAndTrialStudyDetails(programUUID, 0, -1);
 	}
 
 	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows)
-			throws MiddlewareQueryException {
+			 {
 		List<StudyDetails> studyDetails = new ArrayList<>();
 		try {
 
@@ -874,7 +874,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public long countAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException {
+	public long countAllNurseryAndTrialStudyDetails(String programUUID) {
 		try {
 
 			StringBuilder sqlString =
@@ -936,10 +936,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * Retrieves all the study details
 	 *
 	 * @return List of all nursery and trial study nodes
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
 
-	public List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) throws MiddlewareQueryException {
+	public List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) {
 		List<StudyNode> studyNodes = new ArrayList<>();
 
 		StringBuilder sqlString =
@@ -999,7 +999,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException {
+	public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
@@ -1017,7 +1017,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return false;
 	}
 
-	public List<FolderReference> getAllFolders() throws MiddlewareQueryException {
+	public List<FolderReference> getAllFolders() {
 		List<FolderReference> folders = new ArrayList<>();
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_ALL_FOLDERS);
@@ -1034,7 +1034,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return folders;
 	}
 
-	public List<Integer> getAllProgramStudiesAndFolders(String programUUID) throws MiddlewareQueryException {
+	public List<Integer> getAllProgramStudiesAndFolders(String programUUID) {
 		List<Integer> projectIds = null;
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_ALL_PROGRAM_STUDIES_AND_FOLDERS);
@@ -1046,7 +1046,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return projectIds;
 	}
 
-	public List<ValueReference> getDistinctProjectNames() throws MiddlewareQueryException {
+	public List<ValueReference> getDistinctProjectNames() {
 		List<ValueReference> results = new ArrayList<>();
 		try {
 			String sql = "SELECT DISTINCT name FROM project ";
@@ -1063,7 +1063,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 
-	public List<ValueReference> getDistinctProjectDescriptions() throws MiddlewareQueryException {
+	public List<ValueReference> getDistinctProjectDescriptions() {
 		List<ValueReference> results = new ArrayList<>();
 		try {
 			String sql = "SELECT DISTINCT description FROM project ";
@@ -1080,7 +1080,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 
-	public Integer getProjectIdByStudyDbId(int studyDbId) throws MiddlewareQueryException {
+	public Integer getProjectIdByStudyDbId(int studyDbId) {
 		try {
 			Query query = this.getSession().createSQLQuery(GET_PROJECTID_BY_STUDYDBID);
 			query.setParameter("studyDbId", studyDbId);
@@ -1091,7 +1091,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException {
+	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) {
 		try {
 			String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid";
 			Query query = this.getSession().createSQLQuery(sql);
@@ -1107,7 +1107,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return null;
 	}
 
-	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException {
+	public List<String> getAllSharedProjectNames() {
 		List<String> results = new ArrayList<>();
 		try {
 			String sql = "SELECT name FROM project WHERE program_uuid is null";
@@ -1174,7 +1174,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria;
 	}
 
-	public StudyMetadata getStudyMetadata(Integer studyId) throws MiddlewareQueryException {
+	public StudyMetadata getStudyMetadata(Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID);

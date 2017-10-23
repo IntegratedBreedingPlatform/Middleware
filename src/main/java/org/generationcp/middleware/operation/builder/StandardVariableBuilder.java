@@ -312,12 +312,18 @@ public class StandardVariableBuilder extends Builder {
 		return stdVariableId;
 	}
 
+	/**
+	 *
+	 * @param headerNames
+	 * @param programUUID
+	 * @return a map with Property names (In UPPERCASE) as keys and a list of StandardVariable as Value
+	 */
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headerNames, final String programUUID) {
 
 		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<>();
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
 
-		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
+		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.alias equals input name (eg. REP)
 		standardVariableIdsWithTypeInProjects = this.getStandardVariableIdsWithTypeForProjectProperties(headerNames);
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
@@ -361,7 +367,7 @@ public class StandardVariableBuilder extends Builder {
 				variables = this.create(standardVariableIds, programUUID);
 				this.setRoleOfVariables(variables, varIdsWithType);
 			}
-			standardVariablesInProjects.put(name, variables);
+			standardVariablesInProjects.put(upperName, variables);
 		}
 		return standardVariablesInProjects;
 	}
@@ -375,8 +381,13 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> propertyNames) {
-		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
+	/**
+	 *
+	 * @param variableNames
+	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
+	 */
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> variableNames) {
+		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(variableNames);
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {

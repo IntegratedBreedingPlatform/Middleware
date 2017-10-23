@@ -11,10 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
@@ -33,7 +30,9 @@ import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * DAO class for {@link User}.
@@ -296,19 +295,11 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(studyId);
 		final List<UserDto> users = new ArrayList<>();
-		final String sql = " SELECT DISTINCT " + "     person.personid AS personId, " + "     person.fname AS fName, "
-				+ "     person.lname AS lName, " + "     person.pemail AS email, " + "     role.role AS role " + " FROM "
-				+ "     cvterm scale " + "         INNER JOIN " + "     cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
-				+ "         INNER JOIN " + "     cvterm variable ON (r.subject_id = variable.cvterm_id) " + "         INNER JOIN "
-				+ "     projectprop pp ON (pp.type_id = variable.cvterm_id) " + "         INNER JOIN "
-				+ "     workbench.persons person ON (pp.value = person.personid) " + "         INNER JOIN "
-				+ "     workbench.users user ON (user.personid = person.personid) " + "         LEFT JOIN "
-				+ "     workbench.users_roles role ON (role.userid = user.userid) " + " WHERE " + "     pp.project_id = :studyId "
-				+ "         AND r.object_id = 1901 ";
 
 		try {
-			final Query query = this.getSession().createSQLQuery(sql).addScalar("personId").addScalar("fName").addScalar("lName")
-					.addScalar("email").addScalar("role").setParameter("studyId", studyId);
+			final Query query =
+				this.getSession().createSQLQuery(User.GET_USERS_ASSOCIATED_TO_STUDY).addScalar("personId").addScalar("fName")
+					.addScalar("lName").addScalar("email").addScalar("role").setParameter("studyId", studyId);
 			final List<Object> results = query.list();
 			this.mapUsers(users, results);
 			return users;
@@ -327,7 +318,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
 				.append("    cvterm_relationship r ON (r.object_id = scale.cvterm_id) ").append("        INNER JOIN ")
 				.append("    cvterm variable ON (r.subject_id = variable.cvterm_id) ").append("        INNER JOIN ")
-				.append("    nd_geolocationprop pp ON (pp.type_id = variable.cvterm_id) ")
+				.append("    nd_geolocationprop pp ON (pp.variable_id = variable.cvterm_id) ")
 				.append("        INNER JOIN workbench.persons person ").append("    ON (pp.value = person.personid) ")
 				.append("    INNER JOIN workbench.users user on (user.personid = person.personid) ")
 				.append("    left join workbench.users_roles role on (role.userid = user.userid) ").append("WHERE ")

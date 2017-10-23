@@ -30,7 +30,6 @@
 		</sql>
 	</changeSet>
 
-
 	<changeSet author="nahuel" id="v7.1.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
@@ -87,6 +86,13 @@
 			RENAME TABLE
 			projectprop_new TO projectprop;
 		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v7.1.0-2">
+		<preConditions>
+			<viewExists viewName="project_variable_details" />
+		</preConditions>
+		<dropView viewName="project_variable_details"></dropView>
 	</changeSet>
 
 	<changeSet author="nahuel" id="v7.1.0-3" >
