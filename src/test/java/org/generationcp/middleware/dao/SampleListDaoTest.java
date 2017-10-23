@@ -17,7 +17,7 @@ import org.junit.Test;
 public class SampleListDaoTest extends IntegrationTestBase {
 
 	public static final String P = "P";
-	public static final String ADMIN = "Admin";
+	public static final String ADMIN = "admin";
 	public static final String DESCRIPTION = "description";
 	private static final String YYYY_M_MDD_HH = "yyyyMMddHH";
 	private static final String TRIAL_NAME = "trialName#";
@@ -56,7 +56,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		Assert.assertNotNull(sampleList.getId());
-		//Assert.assertEquals(sampleList.getCreatedBy().getName(), SampleListDaoTest.ADMIN); // TODO FIX LATER
+		Assert.assertEquals(sampleList.getCreatedBy().getName(), SampleListDaoTest.ADMIN); // TODO FIX LATER
 		Assert.assertEquals(sampleList.getDescription(), SampleListDaoTest.DESCRIPTION);
 		Assert.assertEquals(sampleList.getListName(),
 				SampleListDaoTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListDaoTest.YYYY_M_MDD_HH));
@@ -64,7 +64,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(plant.getPlantBusinessKey(), SampleListDaoTest.P + SampleListDaoTest.CROP_PREFIX);
 		Assert.assertEquals(plant.getPlantNumber(), new Integer(0));
 		Assert.assertEquals(sample.getPlant(), plant);
-		//Assert.assertEquals(sample.getTakenBy().getName(), SampleListDaoTest.ADMIN);
+		Assert.assertEquals(sample.getTakenBy().getName(), SampleListDaoTest.ADMIN);
 		Assert.assertEquals(sample.getSampleName(), SampleListDaoTest.GID);
 		Assert.assertEquals(sample.getSampleBusinessKey(), SampleListDaoTest.S + SampleListDaoTest.CROP_PREFIX);
 		Assert.assertEquals(sample.getSampleList(), sampleList);
@@ -123,7 +123,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 			SampleListDaoTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListDaoTest.YYYY_M_MDD_HH));
 		sampleList.setNotes(SampleListDaoTest.NOTES);
 		sampleList.setType(SampleListType.SAMPLE_LIST);
-
+		sampleList.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 		return sampleList;
 	}
 }
