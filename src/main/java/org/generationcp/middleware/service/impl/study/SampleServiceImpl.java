@@ -101,21 +101,21 @@ public class SampleServiceImpl implements SampleService {
 	public List<SampleDTO> getSamples(final String plotId) {
 		final List<SampleDTO> listSampleDto = new ArrayList<>();
 		final List<Sample> samples = this.sampleDao.getByPlotId(plotId);
-		for (Sample sample : samples) {
-			SampleDTO dto = new SampleDTO();
+		for (final Sample sample : samples) {
+			final SampleDTO dto = new SampleDTO();
 			dto.setSampleName(sample.getSampleName());
 			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
-			User takenBy = sample.getTakenBy();
+			final User takenBy = sample.getTakenBy();
 			if (takenBy != null) {
-				Person person = takenBy.getPerson();
+				final Person person = takenBy.getPerson();
 				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
 			}
 			dto.setSamplingDate(sample.getSamplingDate());
-			SampleList sampleList = sample.getSampleList();
+			final SampleList sampleList = sample.getSampleList();
 			if (sampleList != null) {
 				dto.setSampleList(sampleList.getListName());
 			}
-			Plant plant = sample.getPlant();
+			final Plant plant = sample.getPlant();
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
 			listSampleDto.add(dto);
