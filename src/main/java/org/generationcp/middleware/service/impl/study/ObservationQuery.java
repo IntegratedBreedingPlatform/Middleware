@@ -129,25 +129,11 @@ class ObservationQuery {
 	}
 
 	/**
-	 * Constructs a query that will enable us to retrieve information about all plots, associated metadata and measurements in one go, for a
-	 * trial/nursery.
+	 * TODO BMS-4061 Merge with {@link ObservationQuery#getObservationsMainQuery(List, List)}
 	 *
-	 * @param measurementVariables list of measurementVariables that we need to construct a query for.
+	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List)}
+	 * which is used Trial and Nursery Manager
 	 */
-	String getObservationQuery(final List<MeasurementVariableDto> measurementVariables) {
-
-		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
-		final String orderByTraitId = getOrderByMeasurementVariableId(measurementVariables);
-
-		final String fromText = getFromExpression(measurementVariables);
-
-		final String orderByText = getOrderByExpression(measurementVariables, orderByTraitId);
-
-		return SELECT_TEXT + columnNamesFromTraitNames +
-
-				fromText + WHERE_TEXT + orderByText;
-	}
-
 	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, Integer instanceId) {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
 		final String orderByMeasurementVariableId = getOrderByMeasurementVariableId(measurementVariables);

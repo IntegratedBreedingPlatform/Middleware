@@ -11,29 +11,27 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.math.NumberUtils;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link ProjectProperty}.
@@ -43,38 +41,35 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProjectPropertyDao.class);
 
+	/**
+	 *
+	 * @param propertyNames
+	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
+	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(
-			List<String> propertyNames) throws MiddlewareQueryException {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(final List<String> propertyNames)
+			 {
 
-		// Store the names in the map in uppercase
-		for (int i = 0, size = propertyNames.size(); i < size; i++) {
-			propertyNames.set(i, propertyNames.get(i).toUpperCase());
-		}
+		final List<String> propertyNamesInUpperCase = Lists.transform(propertyNames, new Function<String, String>() {
+
+			public String apply(String s) {
+				return s.toUpperCase();
+			}
+		});
 
 		try {
+			if (!propertyNamesInUpperCase.isEmpty()) {
+				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass(), "property")
+					.setProjection(Projections.distinct(Projections.projectionList()
+						.add(Projections.property("alias"))
+						.add(Projections.property("variableId"))
+						.add(Projections.property("typeId"))));
+				criteria.add(Restrictions.in("typeId", VariableType.ids()));
+				criteria.add(Restrictions.in("alias", propertyNames));
+				criteria.createAlias("property.variable", "variable").add(Restrictions.eq("variable.isObsolete", 0));
 
-			if (!propertyNames.isEmpty()) {
-
-				StringBuilder sqlString = new StringBuilder()
-						.append("SELECT DISTINCT ppValue.value, ppStdVar.id, ppValue.type_id ")
-						.append("FROM projectprop ppValue  ")
-						.append("INNER JOIN (SELECT project_id, value id, rank FROM projectprop WHERE type_id = 1070) AS ppStdVar ")
-						.append("    ON ppValue.project_id = ppStdVar.project_id ")
-						.append("    AND ppValue.type_id in (")
-						.append(Util.convertCollectionToCSV(VariableType.ids()))
-						.append(")")
-						.append("	 AND ppValue.rank = ppStdVar.rank ")
-						.append("    AND ppValue.value IN (:propertyNames) ")
-						.append("INNER JOIN cvterm ON cvterm.cvterm_id = ppStdVar.id AND cvterm.is_obsolete = 0");
-				SQLQuery query = this.getSession().createSQLQuery(
-						sqlString.toString());
-				query.setParameterList("propertyNames", propertyNames);
-
-				List<Object[]> results = query.list();
+				List<Object[]> results = criteria.list();
 				return convertToVariablestandardVariableIdsWithTypeMap(results);
-
-
 			}
 		} catch (HibernateException e) {
 			this.logAndThrowException(
@@ -90,53 +85,41 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
 
-		Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap<Integer, VariableType>();
-		for (Object[] row : queryResult) {
-			String name = ((String) row[0]).trim().toUpperCase();
-			String stdVarId = (String) row[1];
-			Integer variableTypeId = (Integer) row[2];
+		for (final Object[] row : queryResult) {
+			final String alias = (String) row[0];
+			final Integer variableId = (Integer) row[1];
+			final Integer typeId = (Integer) row[2];
+			Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap();
 
-			if (standardVariableIdsWithTypeInProjects.containsKey(name)) {
-				stdVarIdKeyTypeValueList = standardVariableIdsWithTypeInProjects
-						.get(name);
-			} else {
-				stdVarIdKeyTypeValueList = new HashMap<Integer, VariableType>();
+			if (standardVariableIdsWithTypeInProjects.containsKey(alias.toUpperCase())) {
+				stdVarIdKeyTypeValueList = standardVariableIdsWithTypeInProjects.get(alias.toUpperCase());
 			}
-			try {
-				stdVarIdKeyTypeValueList.put(
-						Integer.parseInt(stdVarId),
-						VariableType.getById(variableTypeId));
-				standardVariableIdsWithTypeInProjects.put(name,
-						stdVarIdKeyTypeValueList);
-			} catch (NumberFormatException e) {
-				// Ignore
-			}
+
+			stdVarIdKeyTypeValueList.put(variableId, VariableType.getById(typeId));
+			standardVariableIdsWithTypeInProjects.put(alias.toUpperCase(), stdVarIdKeyTypeValueList);
 		}
 
 		return standardVariableIdsWithTypeInProjects;
 	}
 
-	public ProjectProperty getByStandardVariableId(DmsProject project,
-			int standardVariableId) throws MiddlewareQueryException {
-		ProjectProperty projectProperty = null;
+	public ProjectProperty getByStandardVariableId(DmsProject project, int standardVariableId) {
+		ProjectProperty projectProperty;
 		try {
-			Criteria criteria = this.getSession().createCriteria(
-					this.getPersistentClass());
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("project", project));
-			criteria.add(Restrictions.eq("value",
-					String.valueOf(standardVariableId)));
+			criteria.add(Restrictions.eq("variableId", standardVariableId));
 
 			projectProperty = (ProjectProperty) criteria.uniqueResult();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getByStandardVariableId("
-					+ project.getProjectId() + ", " + standardVariableId
-					+ ") in ProjectPropertyDao: " + e.getMessage(), e);
+			final String message = "Error in getByStandardVariableId(" + project.getProjectId() + ", " + standardVariableId + ")";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return projectProperty;
 	}
 
-	public int getNextRank(int projectId) throws MiddlewareQueryException {
+	public int getNextRank(int projectId) {
 		try {
 			String sql = "SELECT max(rank) FROM projectprop WHERE project_id = :projectId";
 			Query query = this.getSession().createSQLQuery(sql);
@@ -144,39 +127,14 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			return (Integer) query.uniqueResult() + 1;
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getNextRank(" + projectId
-					+ ") in ProjectPropertyDao: " + e.getMessage(), e);
+			final String message = "Error in getNextRank(" + projectId + ")";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
-			throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
-
-		try {
-			String sql = "SELECT DISTINCT value "
-					+ " FROM projectprop WHERE type_id = :stdVarId ";
-			Query query = this.getSession().createSQLQuery(sql);
-			query.setParameter("stdVarId", stdVarId);
-
-			List<String> list = query.list();
-			if (list != null && !list.isEmpty()) {
-				for (String row : list) {
-					results.add(new ValueReference(row, row));
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getDistinctStandardVariableValues(" + stdVarId + ") in ProjectPropertyDao: " + e.getMessage(), e);
-		}
-		return results;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<ProjectProperty> getByTypeAndValue(int typeId, String value) throws MiddlewareQueryException {
+	public List<ProjectProperty> getByTypeAndValue(int typeId, String value) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -184,53 +142,28 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getByTypeAndValue(" + typeId + ", " + value + ") in ProjectPropertyDao: " + e.getMessage(),
-					e);
+			final String message = "Error in getByTypeAndValue(" + typeId + ", " + value + ")";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<ProjectProperty>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public String getValueByProjectIdAndTypeId(int projectId, int typeId) throws MiddlewareQueryException {
+	public List<Integer> getVariablesOfSiblingDatasets(int datasetId) {
+		List<Integer> ids;
 		try {
-			String sql = "SELECT value FROM projectprop WHERE project_id = " + projectId + " AND type_id = " + typeId;
+			String sql = "SELECT dprop.variable_id " + " FROM project_relationship mpr "
+					+ " INNER JOIN project_relationship pr ON pr.object_project_id = mpr.object_project_id " + "   AND pr.type_id = "
+					+ TermId.BELONGS_TO_STUDY.getId() + " AND pr.subject_project_id <> " + datasetId
+					+ " INNER JOIN projectprop dprop ON dprop.project_id = pr.subject_project_id " + " WHERE mpr.subject_project_id = "
+					+ datasetId + " AND mpr.type_id = " + TermId.BELONGS_TO_STUDY.getId();
 			Query query = this.getSession().createSQLQuery(sql);
-			List<String> results = query.list();
-			if (results != null && !results.isEmpty()) {
-				return results.get(0);
-			}
+			ids = query.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getByProjectIdAndTypeId(" + projectId + ", " + typeId + ") in ProjectPropertyDao: " + e.getMessage(), e);
-		}
-		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
-		List<Integer> ids = new ArrayList<Integer>();
-		try {
-			String sql =
-					"SELECT dprop.value " + " FROM project_relationship mpr "
-							+ " INNER JOIN project_relationship pr ON pr.object_project_id = mpr.object_project_id "
-							+ "   AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() + " AND pr.subject_project_id <> " + datasetId
-							+ " INNER JOIN projectprop dprop ON dprop.project_id = pr.subject_project_id " + " AND dprop.type_id = "
-							+ TermId.STANDARD_VARIABLE.getId() + " WHERE mpr.subject_project_id = " + datasetId + " AND mpr.type_id = "
-							+ TermId.BELONGS_TO_STUDY.getId();
-			Query query = this.getSession().createSQLQuery(sql);
-			List<String> results = query.list();
-			if (results != null && !results.isEmpty()) {
-				for (String result : results) {
-					if (NumberUtils.isNumber(result)) {
-						ids.add(Integer.valueOf(result));
-					}
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getVariablesOfSiblingDatasets(" + datasetId + ") in ProjectPropertyDao: " + e.getMessage(),
-					e);
+			final String message = "Error in getVariablesOfSiblingDatasets(" + datasetId + ")";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return ids;
 	}
@@ -238,22 +171,19 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<Integer> getDatasetVariableIdsForGivenStoredInIds(Integer projectId, List<Integer> storedInIds,
 			List<Integer> varIdsToExclude) {
-		List<Integer> variableIds = new ArrayList<Integer>();
-		String mainSql = " SELECT value " + " FROM projectprop p " + " WHERE project_id = :projectId and type_id = :stdVarConstant ";
-		String existsClause =
-				" AND EXISTS ( " + "		SELECT null " + "		FROM projectprop pp " + "		WHERE pp.project_id = p.project_id "
-						+ "		AND pp.rank = p.rank " + "		AND pp.type_id in (:storedInIds)" + " ) ORDER BY rank ";
+		List<Integer> variableIds = new ArrayList<>();
+		String mainSql = " SELECT variable_id " + " FROM projectprop pp " + " WHERE project_id = :projectId ";
+		String existsClause = " AND pp.type_id in (:storedInIds) ORDER BY rank ";
 		boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
 
 		StringBuilder sb = new StringBuilder(mainSql);
 		if (doExcludeIds) {
-			sb.append("AND value NOT IN (:excludeIds) ");
+			sb.append("AND variable_id NOT IN (:excludeIds) ");
 		}
 		sb.append(existsClause);
 
 		Query query = this.getSession().createSQLQuery(sb.toString());
 		query.setParameter("projectId", projectId);
-		query.setParameter("stdVarConstant", TermId.STANDARD_VARIABLE.getId());
 		if (doExcludeIds) {
 			query.setParameterList("excludeIds", varIdsToExclude);
 		}
@@ -266,73 +196,42 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return variableIds;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<Integer, List<Integer>> getProjectPropertyIDsPerVariableId(Integer projectId) {
-		Map<Integer, List<Integer>> projectPropertyIDsMap = new LinkedHashMap<Integer, List<Integer>>();
-		String sql =
-				"SELECT rank, projectprop_id, value, type_id " + "FROM projectprop " + "WHERE project_id = :projectId " + "ORDER BY rank ";
-		Query query = this.getSession().createSQLQuery(sql);
-		query.setParameter("projectId", projectId);
-		List<Object[]> results = query.list();
+	public List<ProjectProperty> getByProjectId(final Integer projectId) {
+		List<ProjectProperty> list;
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(projectId);
+		try {
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("project", dmsProject));
 
-		List<Integer> projectPropIds = new ArrayList<Integer>();
-		Integer currentRank = 1;
-		Integer currentVariableId = 1;
-		for (Object[] row : results) {
-			Integer rank = (Integer) row[0];
-			if (rank.compareTo(currentRank) > 0) {
-				projectPropertyIDsMap.put(currentVariableId, projectPropIds);
-				projectPropIds = new ArrayList<>();
-				currentRank = rank;
-			}
+			list = criteria.list();
 
-			String value = (String) row[2];
-			Integer typeId = (Integer) row[3];
-			if (typeId == TermId.STANDARD_VARIABLE.getId()) {
-				currentVariableId = Integer.parseInt(value);
-			}
-			projectPropIds.add((Integer) row[1]);
+		} catch (HibernateException e) {
+			final String message = "Error in getByProjectId(" + dmsProject.getProjectId() + ") in ProjectPropertyDao";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		if (!projectPropIds.isEmpty()) {
-			projectPropertyIDsMap.put(currentVariableId, projectPropIds);
-		}
-
-		return projectPropertyIDsMap;
+		return list;
 	}
 
-	public void updateRank(List<Integer> projectPropIds, int rank) {
-		String sql = " UPDATE projectprop SET rank = " + rank + " WHERE projectprop_id IN (:projectPropIds)";
-
-		Query query = this.getSession().createSQLQuery(sql);
-		query.setParameterList("projectPropIds", projectPropIds);
-		query.executeUpdate();
-	}
-
-	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
+	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		Map<String, String> geoProperties = new HashMap<>();
 		String sql = " SELECT  "
-			+ "     propName.value AS name, propValue.value AS value "
+			+ "     cvterm.definition AS name, pp.value AS value "
 			+ " FROM "
-			+ "     projectprop propName "
+			+ "     projectprop pp "
 			+ "         INNER JOIN "
-			+ "     projectprop propId ON (propId.type_id = " + TermId.STANDARD_VARIABLE.getId()
-			+ "         AND propId.rank = propName.rank "
-			+ "         AND propId.project_id = propName.project_id) "
-			+ "         INNER JOIN "
-			+ "     projectprop propValue ON (propValue.type_id = propId.value "
-			+ "         AND propValue.rank = propId.rank "
-			+ "         AND propId.project_id = propValue.project_id) "
+			+ "     cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
 			+ " WHERE "
-			+ "     propName.project_id = :studyId "
-			+ "         AND propName.type_id = " + TermId.VARIABLE_DESCRIPTION.getId()
-			+ "         AND propId.value NOT IN ("
+			+ "     pp.project_id = :studyId "
+			+ "         AND pp.variable_id NOT IN ("
 			+ TermId.START_DATE.getId() + " , "
 			+ TermId.END_DATE.getId() + ", "
 			+ TermId.SEASON_VAR.getId() + ", "
 			+ TermId.STUDY_STATUS.getId() + ", " + TermId.LOCATION_ID.getId() + ", "
 			+ TermId.STUDY_TYPE.getId() + ") "
-			+ "         AND propId.value NOT IN (SELECT  "
+			+ "         AND pp.variable_id NOT IN (SELECT  "
 			+ "             variable.cvterm_id "
 			+ "         FROM "
 			+ "             cvterm scale "

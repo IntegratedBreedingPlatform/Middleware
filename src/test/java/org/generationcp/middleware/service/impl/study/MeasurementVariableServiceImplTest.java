@@ -46,7 +46,7 @@ public class MeasurementVariableServiceImplTest {
 		final List<MeasurementVariableDto> returnedTraits = trailTraits.getVariables(TEST_STUDY_ID, VariableType.TRAIT.getId());
 
 		Mockito.verify(mockSqlQuery).setParameter("studyId", TEST_STUDY_ID);
-		Mockito.verify(mockSqlQuery).setParameterList("variablesType", new Integer[] {VariableType.TRAIT.getId()});
+		Mockito.verify(mockSqlQuery).setParameterList("variablesTypes", new Integer[] {VariableType.TRAIT.getId()});
 
 		assertThat(returnedTraits, not(empty()));
 		assertThat(returnedTraits, hasSize(1));

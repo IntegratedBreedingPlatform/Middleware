@@ -1,7 +1,5 @@
 package org.generationcp.middleware.manager.ontology;
 
-import java.util.Objects;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 
@@ -9,6 +7,10 @@ import org.generationcp.middleware.domain.ontology.VariableType;
  * This class is used for the basic ontology helper methods
  */
 public class OntologyDataHelper {
+
+	public static final String INVENTORY_AMOUNT = "Inventory amount";
+	public static final String SELECTIONS = "Selections";
+	public static final String BREEDING_METHOD = "Breeding method";
 
 	/**
 	 * Return VariableType based on PhenotypicType and property name.
@@ -28,9 +30,9 @@ public class OntologyDataHelper {
 		} else if (PhenotypicType.TRIAL_DESIGN == phenotypicType) {
 			variableType = VariableType.EXPERIMENTAL_DESIGN;
 		} else if (PhenotypicType.VARIATE == phenotypicType) {
-			boolean isSelectionMethod = Objects.equals(propertyName, "Inventory amount") ||
-					Objects.equals(propertyName, "Selections") ||
-					Objects.equals(propertyName, "Breeding method");
+			boolean isSelectionMethod = INVENTORY_AMOUNT.equals(propertyName) ||
+					SELECTIONS.equals(propertyName) ||
+					BREEDING_METHOD.equals(propertyName);
 
 			variableType = isSelectionMethod ? VariableType.SELECTION_METHOD : VariableType.TRAIT;
 		}

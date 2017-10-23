@@ -34,14 +34,10 @@ import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class ProjectPropertySaver {
-
-	protected static final String PROJECT_PROPERTY_ID = "projectPropertyId";
 
 	private final Saver daoFactory;
 
@@ -53,21 +49,21 @@ public class ProjectPropertySaver {
 		this.daoFactory = saver;
 	}
 
-	public List<ProjectProperty> create(final DmsProject project, final VariableTypeList variableTypeList) {
+	public List<ProjectProperty> create(final DmsProject project, final VariableTypeList variableTypeList, final VariableList variableList) {
 		final List<ProjectProperty> properties = new ArrayList<>();
 		final List<DMSVariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 
 		if (variableTypes != null && !variableTypes.isEmpty()) {
 			for (final DMSVariableType variableType : variableTypes) {
-				final List<ProjectProperty> list = this.createVariableProperties(project, variableType);
+				final List<ProjectProperty> list = this.createVariableProperties(project, variableType, variableList);
 				properties.addAll(list);
 			}
 		}
 		return properties;
 	}
 
-	public void saveProjectProperties(final DmsProject project, final VariableTypeList variableTypeList) {
-		final List<ProjectProperty> properties = this.create(project, variableTypeList);
+	public void saveProjectProperties(final DmsProject project, final VariableTypeList variableTypeList, final VariableList variableList) {
+		final List<ProjectProperty> properties = this.create(project, variableTypeList, variableList);
 		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDao();
 		for (final ProjectProperty property : properties) {
 			property.setProject(project);
@@ -77,7 +73,7 @@ public class ProjectPropertySaver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType) {
+	private List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType, final VariableList variableList) {
 
 	  	// Setting property, scale and method to standard variable
 	  	final StandardVariableSummary standardVariableSummary =
@@ -103,40 +99,22 @@ public class ProjectPropertySaver {
 		variableTypeId = variableTypeEnum.getId();
 
 		final List<ProjectProperty> properties = new ArrayList<>();
-		
-		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
-		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
-				.getRank()));
-		properties.add(new ProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType
-				.getRank()));
 
-		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
-			properties.add(new ProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType
-					.getRank()));
-		}
+		String value = null;
 
-		return properties;
-	}
-
-	public void saveProjectPropValues(final int projectId, final VariableList variableList) {
-		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
-			for (Variable variable : variableList.getVariables()) {
-
-				DMSVariableType dmsVariableType = variable.getVariableType();
-				dmsVariableType.setVariableTypeIfNull();
-
-				VariableType variableTypeEnum = dmsVariableType.getVariableType();
-
-				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
-					final ProjectProperty property = new ProjectProperty();
-					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
-					property.setValue(variable.getValue());
-					property.setRank(variable.getVariableType().getRank());
-					property.setProject(this.daoFactory.getDmsProjectDao().getById(projectId));
-					this.daoFactory.getProjectPropertyDao().save(property);
+		if (variableList != null) {
+			for (final Variable variable : variableList.getVariables()) {
+				if (variable.getVariableType().equals(variableType)) {
+					value = variable.getValue();
+					break;
 				}
 			}
 		}
+
+		properties.add(
+			new ProjectProperty(project, variableTypeId, value, variableType.getRank(), variableType.getId(), variableType.getLocalName()));
+
+		return properties;
 	}
 
 	/***
@@ -147,37 +125,25 @@ public class ProjectPropertySaver {
 	 *
 	 * @param project DMSProject
 	 * @param objDMSVariableType DMSVariableType
+	 * @param value the value of the measurement variable
 	 * @throws MiddlewareQueryException
 	 */
-	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType) {
-
-	  // Setting property, scale and method to standard variable
-	  	final StandardVariableSummary standardVariableSummary =
-			  this.daoFactory.getStandardVariableBuilder().getStandardVariableSummary(objDMSVariableType.getStandardVariable().getId());
-
-	  	objDMSVariableType.getStandardVariable().setProperty(new Term(0, standardVariableSummary.getProperty().getName(), ""));
-	  	objDMSVariableType.getStandardVariable().setScale(new Term(0, standardVariableSummary.getScale().getName(), ""));
-	  	objDMSVariableType.getStandardVariable().setMethod(new Term(0, standardVariableSummary.getMethod().getName(), ""));
-
+	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, String value) {
 		objDMSVariableType.setVariableTypeIfNull();
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
-		this.saveProjectProperty(project, variableTypeEnum.getId(), objDMSVariableType.getLocalName(), objDMSVariableType.getRank());
-		this.saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), objDMSVariableType.getLocalDescription(),
-			objDMSVariableType.getRank());
-		this.saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(),
-			Integer.toString(objDMSVariableType.getStandardVariable().getId()), objDMSVariableType.getRank());
-		if (objDMSVariableType.getTreatmentLabel() != null && !objDMSVariableType.getTreatmentLabel().isEmpty()) {
-			this.saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), objDMSVariableType.getTreatmentLabel(),
-				objDMSVariableType.getRank());
-		}
+		this.saveProjectProperty(project, variableTypeEnum.getId(), value, objDMSVariableType.getRank(),
+		objDMSVariableType.getStandardVariable().getId(), objDMSVariableType.getLocalName());
 	}
 
-	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank) {
+	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank, int variableId,
+		String alias) {
 		final ProjectProperty property = new ProjectProperty();
 		property.setTypeId(typeId);
 		property.setValue(value);
 		property.setRank(rank);
 		property.setProject(project);
+		property.setVariableId(variableId);
+		property.setAlias(alias);
 		this.daoFactory.getProjectPropertyDao().save(property);
 		project.addProperty(property);
 	}
@@ -198,7 +164,7 @@ public class ProjectPropertySaver {
 			}
 
 			final DMSVariableType variableType = new DMSVariableType(localVariableName, localVariableDescription, stdvar, rank);
-			this.saveVariableType(project, variableType);
+			this.saveVariableType(project, variableType, null);
 		}
 	}
 
@@ -294,9 +260,6 @@ public class ProjectPropertySaver {
 		} else {
 			// study
 			this.insertVariable(project, variable, rank);
-			final VariableList variableList = new VariableList();
-			variableList.add(new Variable(this.createVariableType(variable, rank), variable.getValue()));
-			this.saveProjectPropValues(project.getProjectId(), variableList);
 		}
 	}
 
@@ -304,7 +267,7 @@ public class ProjectPropertySaver {
 		if (project.getProperties() == null) {
 			project.setProperties(new ArrayList<ProjectProperty>());
 		}
-		this.saveVariableType(project, this.createVariableType(variable, rank));
+		this.saveVariableType(project, this.createVariableType(variable, rank), variable.getValue());
 	}
 
 	protected DMSVariableType createVariableType(final MeasurementVariable variable, final int rank) {
@@ -383,34 +346,15 @@ public class ProjectPropertySaver {
 
 	private void updateVariable(final DmsProject project, final MeasurementVariable variable) {
 		if (project.getProperties() != null) {
-			final int rank = this.getRank(project, variable.getTermId());
 			for (final ProjectProperty property : project.getProperties()) {
-				if (rank == property.getRank()) {
-					if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId()) {
-						property.setValue(variable.getDescription());
-					} else if (property.getTypeId().intValue() == variable.getTermId()) {
-						property.setValue(variable.getValue());
-					} else if (VariableType.getById(property.getTypeId().intValue()) != null) {
-						property.setValue(variable.getName());
-					}
+				if (property.getVariableId().equals(variable.getTermId())) {
+					property.setValue(variable.getValue());
+					property.setAlias(variable.getName());
 					this.daoFactory.getProjectPropertyDao().update(property);
-				}
-			}
-		}
-	}
-
-	private int getRank(final DmsProject project, final int termId) {
-		int rank = -1;
-		if (project.getProperties() != null) {
-			for (final ProjectProperty property : project.getProperties()) {
-				if (property.getTypeId().intValue() == TermId.STANDARD_VARIABLE.getId()
-						&& property.getValue().equals(String.valueOf(termId))) {
-					rank = property.getRank();
 					break;
 				}
 			}
 		}
-		return rank;
 	}
 
 	private void deleteVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
@@ -444,13 +388,12 @@ public class ProjectPropertySaver {
 	}
 
 	private void deleteVariable(final DmsProject project, final int termId) {
-		final int rank = this.getRank(project, termId);
-		if (project.getProperties() != null && !project.getProperties().isEmpty()) {
-			for (final Iterator<ProjectProperty> iterator = project.getProperties().iterator(); iterator.hasNext();) {
-				final ProjectProperty property = iterator.next();
-				if (rank == property.getRank()) {
+		if (project.getProperties() != null) {
+			for (final ProjectProperty property : project.getProperties()) {
+				if (property.getVariableId().equals(termId)) {
 					this.daoFactory.getProjectPropertyDao().makeTransient(property);
-					iterator.remove();
+					project.getProperties().remove(property);
+					break;
 				}
 			}
 		}
@@ -493,9 +436,9 @@ public class ProjectPropertySaver {
 
 	public void updateVariablesRanking(final int datasetId, final List<Integer> variableIds) {
 		int rank = this.daoFactory.getProjectPropertyDao().getNextRank(datasetId);
-		final Map<Integer, List<Integer>> projectPropIDMap =
-				this.daoFactory.getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);
-		rank = this.updateVariableRank(variableIds, rank, projectPropIDMap);
+		List<ProjectProperty> projectProperties =  this.daoFactory.getProjectPropertyDao().getByProjectId(datasetId);
+
+		rank = this.updateVariableRank(variableIds, rank, projectProperties);
 
 		// if any factors were added but not included in list of variables, update their ranks also so they come last
 		final List<Integer> storedInIds = new ArrayList<>();
@@ -505,17 +448,20 @@ public class ProjectPropertySaver {
 
 		final List<Integer> germplasmPlotVariateIds =
 				this.daoFactory.getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(datasetId, storedInIds, variableIds);
-		this.updateVariableRank(germplasmPlotVariateIds, rank, projectPropIDMap);
+		this.updateVariableRank(germplasmPlotVariateIds, rank, projectProperties);
 	}
 
 	// Iterate and update rank, exclude deleted variables
-	private int updateVariableRank(final List<Integer> variableIds, final int startRank, final Map<Integer, List<Integer>> projectPropIDMap) {
+	private int updateVariableRank(final List<Integer> variableIds, final int startRank, final List<ProjectProperty> projectProperties) {
 		int rank = startRank;
 		for (final Integer variableId : variableIds) {
-			final List<Integer> projectPropIds = projectPropIDMap.get(variableId);
-			if (projectPropIds != null) {
-				this.daoFactory.getProjectPropertyDao().updateRank(projectPropIds, rank);
-				rank++;
+			// FIXME needs to be improved because we should not have duplicated variables per study
+			for (final ProjectProperty pp: projectProperties) {
+				if (pp.getVariableId().equals(variableId)) {
+					pp.setRank(rank);
+					this.daoFactory.getProjectPropertyDao().saveOrUpdate(pp);
+					rank++;
+				}
 			}
 		}
 		return rank;

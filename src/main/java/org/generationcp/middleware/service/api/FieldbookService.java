@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.service.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -49,6 +45,10 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for Fieldbook requirements.

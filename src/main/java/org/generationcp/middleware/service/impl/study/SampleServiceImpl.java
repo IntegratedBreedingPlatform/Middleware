@@ -143,8 +143,7 @@ public class SampleServiceImpl implements SampleService {
 		}
 
 		final ExperimentModel experiment = sample.getPlant().getExperiment();
-		final DmsProject objectProject =
-			experiment.getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0).getObjectProject();
+		final DmsProject objectProject = experiment.getProject().getRelatedTos().get(0).getObjectProject();
 		final Integer studyId = objectProject.getProjectId();
 		final String takenBy = sample.getTakenBy() != null ? sample.getTakenBy().getPerson().getDisplayName() : null;
 		final String plotId = experiment.getPlotId();
@@ -163,10 +162,9 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setDesignation(stock.getName());
 		samplesDetailsDto.setPlantNo(sample.getPlant().getPlantNumber());
 
-		fillPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
-		fillProjectProperties(sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(),
-			samplesDetailsDto);
-		fillLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
+		fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
+		fillProjectProperties(objectProject.getProperties(), samplesDetailsDto);
+		fillLocationByGeoLocationProperties(experiment.getGeoLocation().getProperties(), samplesDetailsDto);
 
 		return samplesDetailsDto;
 	}
@@ -186,13 +184,17 @@ public class SampleServiceImpl implements SampleService {
 
 		for (final ProjectProperty projectProperty : projectProperties) {
 			//SEEDING_DATE
-			if (projectProperty.getTypeId().equals(TermId.SEEDING_DATE.getId()) && StringUtils.isNotBlank(projectProperty.getValue())) {
-				final String plantingDate = projectProperty.getValue();
+			String value = projectProperty.getValue();
+			if (StringUtils.isBlank(value)) {
+				continue;
+			}
+			if (projectProperty.getVariableId().equals(TermId.SEEDING_DATE.getId())) {
+				final String plantingDate = value;
 				samplesDetailsDto.setSeedingDate(plantingDate);
 			}
 			//CROP SEASON
-			if (projectProperty.getTypeId().equals(TermId.SEASON_VAR_TEXT.getId()) && StringUtils.isNotBlank(projectProperty.getValue())) {
-				final String season = projectProperty.getValue();
+			if (projectProperty.getVariableId().equals(TermId.SEASON_VAR_TEXT.getId())) {
+				final String season = value;
 				samplesDetailsDto.setSeason(season);
 			}
 		}
