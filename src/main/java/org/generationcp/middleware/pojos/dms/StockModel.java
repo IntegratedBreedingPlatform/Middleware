@@ -11,8 +11,7 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
-import java.util.Set;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -25,8 +24,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.BatchSize;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_stock

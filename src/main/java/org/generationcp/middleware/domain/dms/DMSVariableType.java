@@ -11,13 +11,13 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Contains the details of a variable type - local name, local description and rank.
@@ -34,6 +34,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 
 	private StandardVariable standardVariable;
 
+	@Deprecated
 	private String treatmentLabel;
 	
 	private PhenotypicType role;
@@ -95,10 +96,12 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		this.standardVariable = standardVariable;
 	}
 
+	@Deprecated
 	public String getTreatmentLabel() {
 		return this.treatmentLabel;
 	}
 
+	@Deprecated
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
@@ -125,15 +128,20 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	 */
 	public void setVariableTypeIfNull(){
 
-		if(this.getVariableType() != null) {
+		if (this.getVariableType() != null) {
 			return;
 		}
 
-		if(this.getRole() == null){
+		if (this.getRole() == null) {
 			return;
 		}
 
-		final String propertyName = this.getStandardVariable().getProperty().getName();
+		StandardVariable standardVariable = this.getStandardVariable();
+		String propertyName = "";
+		if (standardVariable != null && standardVariable.getProperty() != null) {
+			propertyName = standardVariable.getProperty().getName();
+		}
+
 		this.setVariableType(OntologyDataHelper.mapFromPhenotype(this.getRole(), propertyName));
 	}
 

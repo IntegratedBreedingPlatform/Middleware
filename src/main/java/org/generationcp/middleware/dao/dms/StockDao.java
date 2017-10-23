@@ -11,14 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -32,6 +24,14 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * DAO class for {@link StockModel}.
  *
@@ -39,7 +39,7 @@ import org.hibernate.criterion.Restrictions;
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getStockIdsByProperty(final String columnName, final String value) throws MiddlewareQueryException {
+	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
 		List<Integer> stockIds = new ArrayList<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -58,7 +58,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockIds;
 	}
 
-	public long countStudiesByGid(final int gid) throws MiddlewareQueryException {
+	public long countStudiesByGid(final int gid)  {
 
 		try {
 			final SQLQuery query = this.getSession()
@@ -68,7 +68,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
 							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
-							+ " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = "
+							+ " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.variable_id = "
 							+ TermId.STUDY_STATUS.getId() + " AND pp.value = " + TermId.DELETED_STUDY.getId() + ")");
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -78,7 +78,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows)  {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
@@ -88,8 +88,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
 							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
-							+ "LEFT OUTER JOIN projectprop prop ON prop.project_id = p.project_id AND prop.type_id = " + TermId.STUDY_TYPE.getId()
-							+ " WHERE s.dbxref_id = " + gid + " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = "
+							+ "LEFT OUTER JOIN projectprop prop ON prop.project_id = p.project_id AND prop.variable_id = " + TermId.STUDY_TYPE.getId()
+							+ " WHERE s.dbxref_id = " + gid + " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.variable_id = "
 							+ TermId.STUDY_STATUS.getId() + " AND pp.value = " + TermId.DELETED_STUDY.getId() + ")");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
@@ -111,7 +111,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Set<StockModel> findInDataSet(final int datasetId) throws MiddlewareQueryException {
+	public Set<StockModel> findInDataSet(final int datasetId)  {
 		final Set<StockModel> stockModels = new LinkedHashSet<>();
 		try {
 
@@ -131,7 +131,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockModels;
 	}
 
-	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId) throws MiddlewareQueryException {
+	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)  {
 		try {
 
 			final String sql = "select count(distinct nes.stock_id) "
@@ -151,7 +151,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	public long countObservations(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)
-			throws MiddlewareQueryException {
+			 {
 		try {
 
 			final String sql = "select count(e.nd_experiment_id) "
@@ -171,7 +171,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StockModel> getStocks(final int projectId) throws MiddlewareQueryException {
+	public List<StockModel> getStocks(final int projectId)  {
 		final List<StockModel> stocks = new ArrayList<>();
 
 		try {
@@ -211,7 +211,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, StockModel> getStocksByIds(final List<Integer> ids) throws MiddlewareQueryException {
+	public Map<Integer, StockModel> getStocksByIds(final List<Integer> ids)  {
 		final Map<Integer, StockModel> stockModels = new HashMap<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -229,7 +229,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockModels;
 	}
 
-	public int countStockObservations(final int datasetId, final String nonEditableFactors) throws MiddlewareQueryException {
+	public int countStockObservations(final int datasetId, final String nonEditableFactors)  {
 		try {
 
 			final StringBuilder sql = new StringBuilder().append("SELECT COUNT(sp.stockprop_id) ").append("FROM nd_experiment_stock es ")

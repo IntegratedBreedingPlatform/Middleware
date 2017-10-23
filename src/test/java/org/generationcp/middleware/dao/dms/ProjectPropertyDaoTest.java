@@ -110,15 +110,14 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final List<Object[]> objectToConvert = new ArrayList<>();
 
-		objectToConvert.add(new Object[] {TRIAL_INSTANCE, String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()),
-				VariableType.ENVIRONMENT_DETAIL.getId()});
-		objectToConvert.add(new Object[] {ENTRY_NO, String.valueOf(TermId.ENTRY_NO.getId()), VariableType.GERMPLASM_DESCRIPTOR.getId()});
-		objectToConvert.add(new Object[] {DESIGNATION, String.valueOf(TermId.DESIG.getId()), VariableType.GERMPLASM_DESCRIPTOR.getId()});
-		objectToConvert.add(new Object[] {GID, String.valueOf(TermId.GID.getId()), VariableType.GERMPLASM_DESCRIPTOR.getId()});
-		objectToConvert.add(new Object[] {CROSS, String.valueOf(TermId.CROSS.getId()), VariableType.GERMPLASM_DESCRIPTOR.getId()});
-		objectToConvert.add(new Object[] {PLOT_NO, String.valueOf(TermId.PLOT_NO.getId()), VariableType.EXPERIMENTAL_DESIGN.getId()});
-		objectToConvert.add(new Object[] {REP_NO, String.valueOf(TermId.REP_NO.getId()), VariableType.EXPERIMENTAL_DESIGN.getId()});
-		objectToConvert.add(new Object[] {SITE_SOIL_PH, SITE_SOIL_PH_TERMID, VariableType.TRAIT.getId()});
+		objectToConvert.add(new Object[] {TRIAL_INSTANCE, TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL.getId()});
+		objectToConvert.add(new Object[] {ENTRY_NO, TermId.ENTRY_NO.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()});
+		objectToConvert.add(new Object[] {DESIGNATION, TermId.DESIG.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()});
+		objectToConvert.add(new Object[] {GID, TermId.GID.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()});
+		objectToConvert.add(new Object[] {CROSS, TermId.CROSS.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()});
+		objectToConvert.add(new Object[] {PLOT_NO, TermId.PLOT_NO.getId(), VariableType.EXPERIMENTAL_DESIGN.getId()});
+		objectToConvert.add(new Object[] {REP_NO, TermId.REP_NO.getId(), VariableType.EXPERIMENTAL_DESIGN.getId()});
+		objectToConvert.add(new Object[] {SITE_SOIL_PH, Integer.valueOf(SITE_SOIL_PH_TERMID), VariableType.TRAIT.getId()});
 
 		return objectToConvert;
 	}

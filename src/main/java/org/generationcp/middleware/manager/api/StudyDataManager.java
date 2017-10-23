@@ -41,6 +41,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -844,5 +845,13 @@ public interface StudyDataManager {
 	 * @return
 	 */
 	Map<Integer, String> getExperimentSampleMap(final Integer studyDbId);
+
+	/**
+	 * Retrieves a ProjectProperty given a project and a variable
+	 * @param project
+	 * @param variableId
+	 * @return ProjectProperty
+	 */
+	ProjectProperty getByVariableIdAndProjectID (final DmsProject project, final int variableId);
 
 }

@@ -45,17 +45,16 @@ public class DatasetProjectSaver extends Saver {
 		datasetProject.setDescription(this.getDescription(datasetValues));
 		datasetProject.setProgramUUID(programUUID);
 
-		this.addNameVariableTypeIfNecessary(variableTypeList,programUUID);
-		this.addDescriptionVariableTypeIfNecessary(variableTypeList,programUUID);
+		this.addNameVariableTypeIfNecessary(variableTypeList, programUUID);
+		this.addDescriptionVariableTypeIfNecessary(variableTypeList, programUUID);
 		if (datasetValues.getType() != null) {
 			DMSVariableType variableType = this.addDataTypeVariableTypeIfNecessary(variableTypeList, programUUID);
 			this.addDataTypeVariableIfNecessary(datasetValues, variableType);
 		}
 
-		datasetProject.setProperties(this.getProjectPropertySaver().create(datasetProject, variableTypeList));
+		datasetProject.setProperties(this.getProjectPropertySaver().create(datasetProject, variableTypeList, datasetValues.getVariables()));
 		datasetProject.setRelatedTos(this.createProjectRelationship(studyId, datasetProject));
 		this.getDmsProjectDao().save(datasetProject);
-		this.getProjectPropertySaver().saveProjectPropValues(datasetProject.getProjectId(), datasetValues.getVariables());
 
 		return datasetProject;
 	}
@@ -122,7 +121,7 @@ public class DatasetProjectSaver extends Saver {
 	public void addDatasetVariableType(int datasetId, DMSVariableType variableType) throws MiddlewareQueryException {
 		DmsProject project = this.getDmsProjectDao().getById(datasetId);
 		if (project != null) {
-			this.getProjectPropertySaver().saveVariableType(project, variableType);
+			this.getProjectPropertySaver().saveVariableType(project, variableType, null);
 		}
 	}
 
@@ -161,6 +160,6 @@ public class DatasetProjectSaver extends Saver {
 				additionalProperties.add(variableType);
 			}
 		}
-		this.getProjectPropertySaver().saveProjectProperties(datasetProject, additionalProperties);
+		this.getProjectPropertySaver().saveProjectProperties(datasetProject, additionalProperties, null);
 	}
 }

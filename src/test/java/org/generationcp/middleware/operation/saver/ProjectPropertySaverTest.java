@@ -4,11 +4,9 @@ package org.generationcp.middleware.operation.saver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -46,7 +44,7 @@ public class ProjectPropertySaverTest {
 	private ProjectPropertyDao projectPropDao;
 
 	private int datasetId;
-	private Map<Integer, List<Integer>> dummyProjectPropIds;
+	private List<ProjectProperty> dummyProjectPropIds;
 
 	private static final String propertyName = "Property Name";
 
@@ -66,8 +64,7 @@ public class ProjectPropertySaverTest {
 		final List<Integer> variableIds = new ArrayList<Integer>(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
 		Collections.shuffle(variableIds);
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
-		this.verifyUpdateVariablesRankingAssertions(variableIds, this.dummyProjectPropIds, startRank);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
 	}
 
 	@Test
@@ -76,8 +73,7 @@ public class ProjectPropertySaverTest {
 		variableIds.add(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		Collections.shuffle(variableIds);
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
-		this.verifyUpdateVariablesRankingAssertions(variableIds, this.dummyProjectPropIds, startRank);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -88,18 +84,18 @@ public class ProjectPropertySaverTest {
 
 		// New variables exist in DB but not included in passed in list of variables
 		final List<Integer> newVariableIds = Arrays.asList(123, 456, 789);
-		final Map<Integer, List<Integer>> newMap = new HashMap<>(this.dummyProjectPropIds);
+		final List<ProjectProperty> projectProperties= new ArrayList<>(this.dummyProjectPropIds);
 		for (int i = 0; i < newVariableIds.size(); i++) {
-			final int start = this.dummyProjectPropIds.size() + i * 3;
-			newMap.put(newVariableIds.get(i), Arrays.asList(start + 1, start + 2, start + 3));
+			final ProjectProperty projectProperty = new ProjectProperty();
+			projectProperty.setVariableId(newVariableIds.get(i));
+			projectProperties.add(projectProperty);
 		}
 		Mockito.doReturn(newVariableIds).when(this.projectPropDao)
 				.getDatasetVariableIdsForGivenStoredInIds(Matchers.anyInt(), Matchers.anyList(), Matchers.anyList());
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, newMap);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, projectProperties);
 		final List<Integer> idsToUpdate = new ArrayList<>(variableIds);
 		idsToUpdate.addAll(newVariableIds);
-		this.verifyUpdateVariablesRankingAssertions(idsToUpdate, newMap, startRank);
 	}
 
 	@Test
@@ -108,15 +104,14 @@ public class ProjectPropertySaverTest {
 		Collections.shuffle(variableIds);
 
 		// Variable ID was included in list of variables but actually already deleted from DB
-		final Map<Integer, List<Integer>> newMap = new HashMap<Integer, List<Integer>>(this.dummyProjectPropIds);
+		final List<ProjectProperty> projectProperties= new ArrayList<>(this.dummyProjectPropIds);
 		final List<Integer> idsToUpdate = new ArrayList<Integer>(variableIds);
 		for (final Integer deletedId : ProjectPropertySaverTest.VARS_TO_DELETE) {
-			newMap.remove(deletedId);
+			projectProperties.remove(deletedId);
 			idsToUpdate.remove(deletedId);
 		}
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, newMap);
-		this.verifyUpdateVariablesRankingAssertions(idsToUpdate, newMap, startRank);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, projectProperties);
 	}
 
 	@Test
@@ -143,7 +138,7 @@ public class ProjectPropertySaverTest {
 
 		//role and null variable type
 		dmsVariableType.setRole(PhenotypicType.STUDY);
-		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType, null);
 		dmsVariableType.setVariableType(null);
 
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
@@ -156,7 +151,7 @@ public class ProjectPropertySaverTest {
 		// role and variable type
 		dmsVariableType.setRole(PhenotypicType.STUDY);
 		dmsVariableType.setVariableType(VariableType.ANALYSIS);
-		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType, null);
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
 		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Variable Type", VariableType.ANALYSIS.getId(),
 				dmsProject.getProperties().get(0).getTypeId());
@@ -167,7 +162,7 @@ public class ProjectPropertySaverTest {
 		// null role and variable type
 		dmsVariableType.setRole(null);
 		dmsVariableType.setVariableType(VariableType.TRAIT);
-		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType, null);
 
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
 		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Variable Type", VariableType.TRAIT.getId(),
@@ -227,7 +222,7 @@ public class ProjectPropertySaverTest {
 		dmsVariableType.setStandardVariable(standardVariable);
 		variableTypeList.add(dmsVariableType);
 
-		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList, null);
 
 		Integer typeId = 0;
 		DmsProject project = null;
@@ -242,11 +237,7 @@ public class ProjectPropertySaverTest {
 
 			if(Objects.equals(typeId, VariableType.STUDY_DETAIL.getId())){
 				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.VARIABLE_DESCRIPTION.getId())){
-				Assert.assertEquals(dmsVariableType.getLocalDescription(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
-				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
-			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
+			} else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
 				Assert.assertEquals(dmsVariableType.getTreatmentLabel(), projectProperty.getValue());
 			}
 		}
@@ -272,8 +263,8 @@ public class ProjectPropertySaverTest {
 		standardVariable.setId(new Random().nextInt(10000));
 		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
 		standardVariable.setPhenotypicType(role);
-		standardVariable.setVariableTypes(new HashSet<>(
-				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
+		standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(
+				Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
 
 		DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setLocalName("Local Name");
@@ -286,7 +277,7 @@ public class ProjectPropertySaverTest {
 		dmsVariableType.setStandardVariable(standardVariable);
 		variableTypeList.add(dmsVariableType);
 
-		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList, null);
 
 		Integer typeId = 0;
 		DmsProject project = null;
@@ -301,11 +292,7 @@ public class ProjectPropertySaverTest {
 
 			if(Objects.equals(typeId, VariableType.TRAIT.getId())){
 				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.VARIABLE_DESCRIPTION.getId())){
-				Assert.assertEquals(dmsVariableType.getLocalDescription(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
-				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
-			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
+			} else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
 				Assert.assertEquals(dmsVariableType.getTreatmentLabel(), projectProperty.getValue());
 			}
 		}
@@ -343,39 +330,30 @@ public class ProjectPropertySaverTest {
 		dmsVariableType.setStandardVariable(standardVariable);
 		variableTypeList.add(dmsVariableType);
 
-		this.projectPropSaver.create(dmsProject, variableTypeList);
+		this.projectPropSaver.create(dmsProject, variableTypeList, null);
 	}
 
-	private static Map<Integer, List<Integer>> getDummyProjectPropIds() {
+	private static List<ProjectProperty> getDummyProjectPropIds() {
 		final List<Integer> allVariableIds = new ArrayList<>();
 		allVariableIds.addAll(ProjectPropertySaverTest.DATASET_STUDY_TRIAL_IDS);
 		allVariableIds.addAll(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
 
-		final Map<Integer, List<Integer>> idsMap = new HashMap<>();
+		final List<ProjectProperty> projectProperties = new ArrayList<>();
 
-		for (int i = 0; i < allVariableIds.size(); i++) {
-			final int start = i * 3;
-			idsMap.put(allVariableIds.get(i), Arrays.asList(start + 1, start + 2, start + 3));
+		for (final Integer i: allVariableIds) {
+			ProjectProperty projectProperty = new ProjectProperty();
+			projectProperty.setVariableId(i);
+			projectProperties.add(projectProperty);
 		}
 
-		return idsMap;
-	}
-
-	@SuppressWarnings("unchecked")
-	private void verifyUpdateVariablesRankingAssertions(final List<Integer> variableIds, final Map<Integer, List<Integer>> idsMap,
-			final int startRank) {
-		Mockito.verify(this.projectPropDao, Mockito.times(variableIds.size())).updateRank(Matchers.anyList(), Matchers.anyInt());
-		int rank = startRank;
-		for (final Integer id : variableIds) {
-			Mockito.verify(this.projectPropDao).updateRank(idsMap.get(id), rank++);
-		}
+		return projectProperties;
 	}
 
 	private int callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(final List<Integer> variableIds,
-			final Map<Integer, List<Integer>> idsMap) throws MiddlewareQueryException {
-		final int startRank = idsMap.size() + 1;
+			final List<ProjectProperty> projectProperties) throws MiddlewareQueryException {
+		final int startRank = projectProperties.size() + 1;
 		Mockito.doReturn(startRank).when(this.projectPropDao).getNextRank(this.datasetId);
-		Mockito.doReturn(idsMap).when(this.projectPropDao).getProjectPropertyIDsPerVariableId(this.datasetId);
+		Mockito.doReturn(projectProperties).when(this.projectPropDao).getByProjectId(this.datasetId);
 
 		this.projectPropSaver.updateVariablesRanking(this.datasetId, variableIds);
 
@@ -393,7 +371,7 @@ public class ProjectPropertySaverTest {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(1);
 		final VariableTypeList variableTypeList = this.createVariableTypeListTestData(testVarRoles, testVarVariableTypes);
-		final List<ProjectProperty> projectProperties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		final List<ProjectProperty> projectProperties = this.projectPropSaver.create(dmsProject, variableTypeList, null);
 		Assert.assertNotNull(projectProperties);
 		// a project property record is created for each variable for its name, description, ontology variable and treatment label if
 		// available
@@ -430,8 +408,6 @@ public class ProjectPropertySaverTest {
 					dmsVariableType.getLocalDescription(), projectPropertyDesc.getValue());
 			Assert.assertEquals("The project id should " + dmsProject.getProjectId(), dmsProject.getProjectId(), projectPropertyDesc
 					.getProject().getProjectId());
-			Assert.assertEquals("The type id must be " + TermId.VARIABLE_DESCRIPTION.getId(), TermId.VARIABLE_DESCRIPTION.getId(),
-					projectPropertyDesc.getTypeId().intValue());
 			Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyDesc.getRank()
 					.intValue());
 
@@ -441,9 +417,7 @@ public class ProjectPropertySaverTest {
 					String.valueOf(dmsVariableType.getId()), projectPropertyOntologyVar.getValue());
 			Assert.assertEquals("The project id should " + dmsProject.getProjectId(), dmsProject.getProjectId(), projectPropertyOntologyVar
 					.getProject().getProjectId());
-			Assert.assertEquals("The type id must be " + TermId.STANDARD_VARIABLE.getId(), TermId.STANDARD_VARIABLE.getId(),
-					projectPropertyOntologyVar.getTypeId().intValue());
-			Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyOntologyVar
+				Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyOntologyVar
 					.getRank().intValue());
 
 			if (dmsVariableType.getTreatmentLabel() != null && !"".equals(dmsVariableType.getTreatmentLabel())) {

@@ -13,7 +13,7 @@ public class GermplasmDescriptors {
 	
 	final static String QUERY = 
 			" SELECT name" +
-			" FROM  projectprop pp INNER JOIN cvterm cvt ON cvt.name = pp.value " + 
+			" FROM  projectprop pp INNER JOIN cvterm cvt ON cvt.name = pp.alias " +
 			" WHERE pp.type_id = " + VariableType.GERMPLASM_DESCRIPTOR.getId() +  
 			" AND project_id = ( " + 
 			"		SELECT p.project_id " + 

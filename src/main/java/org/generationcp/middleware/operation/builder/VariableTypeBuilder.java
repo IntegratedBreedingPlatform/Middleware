@@ -11,15 +11,15 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+
+import java.util.List;
+import java.util.Set;
 
 public class VariableTypeBuilder extends Builder {
 

@@ -86,10 +86,6 @@ public class StudyTestDataInitializer {
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_STATUS.getId(), String.valueOf(TermId.ACTIVE_STUDY.getId()), 4);
-		typeList.add(variable.getVariableType());
-		variableList.add(variable);
-
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix);
@@ -109,10 +105,6 @@ public class StudyTestDataInitializer {
 		variableList.add(variable);
 
 		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(studyType.getId()), 3, PhenotypicType.STUDY);
-		typeList.add(variable.getVariableType());
-		variableList.add(variable);
-
-		variable = this.createVariable(TermId.STUDY_STATUS.getId(), String.valueOf(TermId.ACTIVE_STUDY.getId()), 4);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 

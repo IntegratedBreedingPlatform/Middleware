@@ -13,7 +13,6 @@ package org.generationcp.middleware.helper;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.util.Debug;
 
 public class VariableInfo {
 
@@ -25,6 +24,7 @@ public class VariableInfo {
 
 	private int stdVariableId;
 
+	@Deprecated
 	private String treatmentLabel;
 	
 	private PhenotypicType role;
@@ -63,10 +63,12 @@ public class VariableInfo {
 		this.rank = rank;
 	}
 
+	@Deprecated
 	public String getTreatmentLabel() {
 		return this.treatmentLabel;
 	}
 
+	@Deprecated
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}

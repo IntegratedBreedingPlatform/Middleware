@@ -11,12 +11,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
+import org.hibernate.annotations.Formula;
 
 /**
  * http://wiki.cimmyt.org/confluence/display/MBP/Business+Rules+for+Mapping+to+Chado
@@ -66,14 +68,29 @@ public class ProjectProperty implements Serializable {
 	@Column(name = "rank")
 	private Integer rank;
 
+	@Column(name = "variable_id")
+	private Integer variableId;
+
+	@OneToOne
+	@JoinColumn(name = "variable_id", updatable = false, insertable = false)
+	private CVTerm variable;
+
+	@Column(name = "alias")
+	private String alias;
+
+	@Formula("(select c.definition from cvterm c where c.cvterm_id = variable_id) ")
+	private String description;
+
 	public ProjectProperty() {
 	}
 
-	public ProjectProperty(DmsProject project, Integer typeId, String value, Integer rank) {
+	public ProjectProperty(DmsProject project, Integer typeId, String value, Integer rank, Integer variableId, String alias) {
 		this.project = project;
 		this.typeId = typeId;
 		this.value = value;
 		this.rank = rank;
+		this.variableId = variableId;
+		this.alias = alias;
 	}
 
 	public Integer getProjectPropertyId() {
@@ -114,6 +131,30 @@ public class ProjectProperty implements Serializable {
 
 	public void setRank(Integer rank) {
 		this.rank = rank;
+	}
+
+	public Integer getVariableId() {
+		return variableId;
+	}
+
+	public void setVariableId(Integer variableId) {
+		this.variableId = variableId;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	@Override
@@ -159,6 +200,10 @@ public class ProjectProperty implements Serializable {
 		builder.append(this.value);
 		builder.append(", rank=");
 		builder.append(this.rank);
+		builder.append(", variable_id=");
+		builder.append(this.variableId);
+		builder.append(", alias=");
+		builder.append(this.alias);
 		builder.append("]");
 		return builder.toString();
 	}

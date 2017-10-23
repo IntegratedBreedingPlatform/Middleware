@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
@@ -36,6 +29,13 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link ExperimentProperty}.
@@ -99,7 +99,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(TermId.BELONGS_TO_STUDY.getId())
 							.append(" INNER JOIN project st ON st.project_id = pr.object_project_id ")
 							.append(" LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id ")
-							.append("       AND ppStartDate.type_id =  ")
+							.append("       AND ppStartDate.variable_id =  ")
 							.append(TermId.START_DATE.getId())
 							.append(" ")
 							// 8050
@@ -206,7 +206,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append("  LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id ")
-							.append("     AND ppStartDate.type_id =  ").append(TermId.START_DATE.getId()).append(" ")
+							.append("     AND ppStartDate.variable_id =  ").append(TermId.START_DATE.getId()).append(" ")
 							.append("  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
 							.append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId());
