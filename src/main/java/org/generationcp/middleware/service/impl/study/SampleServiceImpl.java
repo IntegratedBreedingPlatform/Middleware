@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+@Repository
 @Transactional
 public class SampleServiceImpl implements SampleService {
 
@@ -99,31 +101,43 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> getSamples(final String plotId) {
-		final List<SampleDTO> listSampleDto = new ArrayList<>();
 		final List<Sample> samples = this.sampleDao.getByPlotId(plotId);
-		for (Sample sample : samples) {
-			SampleDTO dto = new SampleDTO();
+		return mapSampleToSampleDTO(samples);
+	}
+
+	private List<SampleDTO> mapSampleToSampleDTO(final List<Sample> samples) {
+		final List<SampleDTO> listSampleDto = new ArrayList<>();
+		for (final Sample sample : samples) {
+			final SampleDTO dto = new SampleDTO();
 			dto.setSampleName(sample.getSampleName());
 			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
-			User takenBy = sample.getTakenBy();
+			final User takenBy = sample.getTakenBy();
 			if (takenBy != null) {
-				Person person = takenBy.getPerson();
+				final Person person = takenBy.getPerson();
 				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
 			}
 			dto.setSamplingDate(sample.getSamplingDate());
-			dto.setSampleList(sample.getSampleList().getListName());
-			Plant plant = sample.getPlant();
+			final SampleList sampleList = sample.getSampleList();
+			if (sampleList != null) {
+				dto.setSampleList(sampleList.getListName());
+			}
+			final Plant plant = sample.getPlant();
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
+
 			listSampleDto.add(dto);
 		}
 		return listSampleDto;
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
-		final SampleDetailsDTO samplesDetailsDto;
 		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
 
+		return getSampleDetailsDTO(sample);
+	}
+
+	private SampleDetailsDTO getSampleDetailsDTO(final Sample sample) {
+		final SampleDetailsDTO samplesDetailsDto;
 		if (sample == null) {
 			return new SampleDetailsDTO();
 		}
@@ -144,6 +158,9 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setStudyName(studyName);
 		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
 		samplesDetailsDto.setGid(gid);
+		samplesDetailsDto.setSampleName(sample.getSampleName());
+		samplesDetailsDto.setDesignation(stock.getName());
+		samplesDetailsDto.setPlantNo(sample.getPlant().getPlantNumber());
 
 		fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
 		fillProjectProperties(objectProject.getProperties(), samplesDetailsDto);
