@@ -37,6 +37,17 @@ public class SampleListDTO implements Serializable {
 
 	private String cropName;
 
+	private String listName;
+
+	public SampleListDTO(final Integer id, final String listName) {
+		this.listId = id;
+		this.listName = listName;
+	}
+
+	public SampleListDTO() {
+		super();
+	}
+
 	public String getCropName() {
 		return this.cropName;
 	}
@@ -116,6 +127,14 @@ public class SampleListDTO implements Serializable {
 
 	public void setNotes(final String notes) {
 		this.notes = notes;
+	}
+
+	public String getListName() {
+		return listName;
+	}
+
+	public void setListName(final String listName) {
+		this.listName = listName;
 	}
 
 	@Override
