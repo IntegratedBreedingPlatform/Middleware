@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.SampleList;
@@ -52,6 +53,11 @@ public interface SampleListService {
 	 */
 	void deleteSampleListFolder(final Integer folderId) throws Exception;
 
+	List getSampleLists(final Integer trialId);
+
+	SampleList getSampleList(final Integer sampleListId);
+
+	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 	/**
 	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
 	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.

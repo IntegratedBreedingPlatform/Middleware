@@ -45,6 +45,15 @@ public class SampleListDTO implements Serializable {
 
 	private String programUUID;
 
+	public SampleListDTO(final Integer id, final String listName) {
+		this.listId = id;
+		this.listName = listName;
+	}
+
+	public SampleListDTO() {
+		super();
+	}
+
 	public String getCropName() {
 		return this.cropName;
 	}

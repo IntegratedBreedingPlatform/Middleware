@@ -32,6 +32,8 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
@@ -1031,5 +1033,9 @@ public interface FieldbookService {
 	 * @return - List of SampleList POJOs
 	 */
 	SampleList getSampleListByListId(Integer listId);
+	List<SampleListDTO> getSampleLists(final Integer trialId);
 
+	SampleList getSampleList(final Integer sampleListId);
+
+	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 }
