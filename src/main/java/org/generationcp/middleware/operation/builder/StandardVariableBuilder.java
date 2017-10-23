@@ -323,7 +323,7 @@ public class StandardVariableBuilder extends Builder {
 		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<>();
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
 
-		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
+		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.alias equals input name (eg. REP)
 		standardVariableIdsWithTypeInProjects = this.getStandardVariableIdsWithTypeForProjectProperties(headerNames);
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
