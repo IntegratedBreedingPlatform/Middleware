@@ -107,18 +107,21 @@ public class SampleServiceImpl implements SampleService {
 
 	private List<SampleDTO> mapSampleToSampleDTO(final List<Sample> samples) {
 		final List<SampleDTO> listSampleDto = new ArrayList<>();
-		for (Sample sample : samples) {
-			SampleDTO dto = new SampleDTO();
+		for (final Sample sample : samples) {
+			final SampleDTO dto = new SampleDTO();
 			dto.setSampleName(sample.getSampleName());
 			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
-			User takenBy = sample.getTakenBy();
+			final User takenBy = sample.getTakenBy();
 			if (takenBy != null) {
-				Person person = takenBy.getPerson();
+				final Person person = takenBy.getPerson();
 				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
 			}
 			dto.setSamplingDate(sample.getSamplingDate());
-			dto.setSampleList(sample.getSampleList().getListName());
-			Plant plant = sample.getPlant();
+			final SampleList sampleList = sample.getSampleList();
+			if (sampleList != null) {
+				dto.setSampleList(sampleList.getListName());
+			}
+			final Plant plant = sample.getPlant();
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
 
