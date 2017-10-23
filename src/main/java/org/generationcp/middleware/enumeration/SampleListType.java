@@ -3,7 +3,7 @@ package org.generationcp.middleware.enumeration;
 public enum SampleListType {
 	FOLDER, SAMPLE_LIST;
 
-	public static boolean isSampleList(String type) {
+	public static boolean isSampleList(final String type) {
 		SampleListType sampleListType;
 		try {
 			sampleListType = SampleListType.valueOf(type);
@@ -13,7 +13,7 @@ public enum SampleListType {
 		return isSampleList(sampleListType);
 	}
 
-	public static boolean isSampleList(SampleListType type) {
+	public static boolean isSampleList(final SampleListType type) {
 		return SAMPLE_LIST.equals(type);
 	}
 }

@@ -52,7 +52,7 @@ public interface SampleListService {
 
 	List getSampleLists(final Integer trialId);
 
-	SampleList getSampleList(Integer sampleListId);
+	SampleList getSampleList(final Integer sampleListId);
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 }

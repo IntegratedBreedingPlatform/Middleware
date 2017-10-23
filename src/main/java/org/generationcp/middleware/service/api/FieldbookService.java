@@ -998,7 +998,7 @@ public interface FieldbookService {
 
 	List<SampleListDTO> getSampleLists(final Integer trialId);
 
-	SampleList getSampleList(Integer sampleListId);
+	SampleList getSampleList(final Integer sampleListId);
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 }
