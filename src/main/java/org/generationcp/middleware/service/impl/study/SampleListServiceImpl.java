@@ -118,6 +118,10 @@ public class SampleListServiceImpl implements SampleListService {
 
 			Preconditions.checkState(parent.isFolder(), "The parent id must not be a list");
 
+			if (this.sampleListDao.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId()) != null) {
+				throw new MiddlewareQueryException("List name should be unique within the same directory");
+			}
+
 			sampleList.setHierarchy(parent);
 
 			final List<ObservationDto> observationDtos = this.studyMeasurements
@@ -210,7 +214,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentId) != null) {
-			throw new Exception("folderName is not unique in the specified folder");
+			throw new Exception("folderName should be unique within the same directory");
 		}
 		final SampleList sampleFolder = new SampleList();
 		sampleFolder.setCreatedDate(new Date());
@@ -254,7 +258,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId()) != null) {
-			throw new Exception("folderName is not unique in the parent folder");
+			throw new Exception("folderName should be unique within the same directory");
 		}
 
 		folder.setListName(newFolderName);
@@ -307,7 +311,7 @@ public class SampleListServiceImpl implements SampleListService {
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
 
 		if (uniqueSampleListName != null) {
-			throw new Exception("folderName is not unique in the parent folder");
+			throw new Exception("folderName should be unique within the same directory");
 		}
 
 		if (isDescendant(listToMove, newParentFolder)) {
@@ -330,17 +334,19 @@ public class SampleListServiceImpl implements SampleListService {
 	public void deleteSampleListFolder(final Integer folderId) throws Exception {
 		Preconditions.checkNotNull(folderId);
 		final SampleList folder = this.sampleListDao.getById(folderId);
-		if (folder == null)
+		if (folder == null) {
 			throw new Exception("Folder does not exist");
-
-		if (!SampleListType.FOLDER.equals(folder.getType())) {
+		}
+		if (!folder.isFolder()) {
 			throw new Exception("Specified folderID is not a folder");
 		}
 
-		if (folder.getHierarchy() == null)
+		if (folder.getHierarchy() == null) {
 			throw new Exception("Root folder can not be deleted");
-		if (folder.getChildren() != null && !folder.getChildren().isEmpty())
-			throw new Exception("Folder to delete can not have children");
+		}
+		if (folder.getChildren() != null && !folder.getChildren().isEmpty()) {
+			throw new Exception("Folder has children and cannot be delete");
+		}
 		this.sampleListDao.makeTransient(folder);
 	}
 
