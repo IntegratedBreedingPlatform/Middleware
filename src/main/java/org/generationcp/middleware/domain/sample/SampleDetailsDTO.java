@@ -4,19 +4,22 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.util.Util;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class SampleDetailsDTO implements Serializable {
 
 	private static final long serialVersionUID = -4175016670661637734L;
+	private SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.FRONTEND_DATE_FORMAT_3);
 
 	private Integer studyDbId;
 	private Integer locationDbId;
 	private String plotId;
 	private String plantBusinessKey;
-	private String SampleBusinessKey;
+	private String sampleBusinessKey;
 	private String takenBy;
 	private Date sampleDate;
 	private String sampleType;
@@ -30,16 +33,38 @@ public class SampleDetailsDTO implements Serializable {
 	private Integer gid;
 	private String seedingDate;
 	private String harvestDate;
+	private String sampleName;
+	private String designation;
+	private Integer plantNo;
+	private String displayDate;
+	private String entryNumber;
+	private String plotNumber;
 
 	public SampleDetailsDTO() {
 
 	}
 
-	public SampleDetailsDTO(final Integer studyDbId, final String plotId, final String plantBusinessKey, final String SampleBusinessKey) {
+	public SampleDetailsDTO(final Integer studyDbId, final String plotId, final String plantBusinessKey, final String sampleBusinessKey) {
 		this.setStudyDbId(studyDbId);
 		this.setPlotId(plotId);
 		this.setPlantBusinessKey(plantBusinessKey);
-		this.setSampleBusinessKey(SampleBusinessKey);
+		this.setSampleBusinessKey(sampleBusinessKey);
+	}
+
+	public String getPlotNumber() {
+		return plotNumber;
+	}
+
+	public void setPlotNumber(final String plotNumber) {
+		this.plotNumber = plotNumber;
+	}
+
+	public String getEntryNumber() {
+		return entryNumber;
+	}
+
+	public void setEntryNumber(final String entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	public Integer getStudyDbId() {
@@ -75,11 +100,11 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getSampleBusinessKey() {
-		return SampleBusinessKey;
+		return sampleBusinessKey;
 	}
 
 	public void setSampleBusinessKey(final String sampleBusinessKey) {
-		this.SampleBusinessKey = sampleBusinessKey;
+		this.sampleBusinessKey = sampleBusinessKey;
 	}
 
 	public String getTakenBy() {
@@ -87,7 +112,13 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public void setTakenBy(final String takenBy) {
-		this.takenBy = takenBy;
+		if(takenBy != null) {
+			this.takenBy = takenBy;
+		}
+		else {
+			this.takenBy = "-";
+		}
+
 	}
 
 	public Date getSampleDate() {
@@ -96,6 +127,12 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setSampleDate(final Date sampleDate) {
 		this.sampleDate = sampleDate;
+		if (sampleDate != null) {
+			this.displayDate = dateFormat.format(sampleDate);
+		}
+		else{
+			this.displayDate = "-";
+		}
 	}
 
 	public String getSampleType() {
@@ -195,17 +232,49 @@ public class SampleDetailsDTO implements Serializable {
 		return new EqualsBuilder().append(this.studyDbId, sampleDetailsDto.studyDbId)
 			.append(this.locationDbId, sampleDetailsDto.locationDbId).append(this.plotId, sampleDetailsDto.plotId)
 			.append(this.plantBusinessKey, sampleDetailsDto.plantBusinessKey)
-			.append(this.SampleBusinessKey, sampleDetailsDto.SampleBusinessKey).append(this.gid, sampleDetailsDto.gid).isEquals();
+			.append(this.sampleBusinessKey, sampleDetailsDto.sampleBusinessKey).append(this.gid, sampleDetailsDto.gid).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.studyDbId).append(this.locationDbId).append(this.plotId).append(this.plantBusinessKey)
-			.append(this.SampleBusinessKey).append(this.gid).hashCode();
+			.append(this.sampleBusinessKey).append(this.gid).hashCode();
 	}
 
 	@Override
 	public String toString() {
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
+
+	public void setSampleName(final String sampleName) {
+		this.sampleName = sampleName;
+	}
+
+	public void setDesignation(final String designation) {
+		this.designation = designation;
+	}
+
+	public void setPlantNo(final Integer plantNo) {
+		this.plantNo = plantNo;
+	}
+
+	public String getSampleName() {
+		return sampleName;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public Integer getPlantNo() {
+		return plantNo;
+	}
+
+	public void setDisplayDate(final String displayDate) {
+		this.displayDate = displayDate;
+	}
+
+	public String getDisplayDate() {
+		return displayDate;
 	}
 }

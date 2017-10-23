@@ -9,8 +9,10 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.service.api.PlantService;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 @Transactional
 public class PlantServiceImpl implements PlantService {
 
