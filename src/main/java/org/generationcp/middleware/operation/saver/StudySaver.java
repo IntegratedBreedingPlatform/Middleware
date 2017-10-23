@@ -40,7 +40,6 @@ public class StudySaver extends Saver {
 		try {
 			project = this.getProjectSaver().save(project);
 			this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
-//			this.getProjectPropertySaver().saveProjectPropValues(project.getProjectId(), studyValues.getVariableList());
 			this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
 			if (saveStudyExperiment) {
 				this.saveStudyExperiment(project.getProjectId(), studyValues, cropPrefix);

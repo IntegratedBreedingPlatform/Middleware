@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -33,6 +28,11 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * DAO class for {@link ProjectProperty}.
  * 
@@ -45,11 +45,10 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	 *
 	 * @param propertyNames
 	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
-	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(final List<String> propertyNames)
-			throws MiddlewareQueryException {
+			 {
 
 		final List<String> propertyNamesInUpperCase = Lists.transform(propertyNames, new Function<String, String>() {
 
@@ -103,7 +102,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return standardVariableIdsWithTypeInProjects;
 	}
 
-	public ProjectProperty getByStandardVariableId(DmsProject project, int standardVariableId) throws MiddlewareQueryException {
+	public ProjectProperty getByStandardVariableId(DmsProject project, int standardVariableId) {
 		ProjectProperty projectProperty;
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -120,7 +119,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return projectProperty;
 	}
 
-	public int getNextRank(int projectId) throws MiddlewareQueryException {
+	public int getNextRank(int projectId) {
 		try {
 			String sql = "SELECT max(rank) FROM projectprop WHERE project_id = :projectId";
 			Query query = this.getSession().createSQLQuery(sql);
@@ -135,7 +134,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ProjectProperty> getByTypeAndValue(int typeId, String value) throws MiddlewareQueryException {
+	public List<ProjectProperty> getByTypeAndValue(int typeId, String value) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -150,7 +149,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
+	public List<Integer> getVariablesOfSiblingDatasets(int datasetId) {
 		List<Integer> ids;
 		try {
 			String sql = "SELECT dprop.variable_id " + " FROM project_relationship mpr "
@@ -215,7 +214,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return list;
 	}
 
-	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
+	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		Map<String, String> geoProperties = new HashMap<>();
 		String sql = " SELECT  "

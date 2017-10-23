@@ -383,11 +383,11 @@ public class StandardVariableBuilder extends Builder {
 
 	/**
 	 *
-	 * @param propertyNames
+	 * @param variableNames
 	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
 	 */
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> propertyNames) {
-		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> variableNames) {
+		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(variableNames);
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {

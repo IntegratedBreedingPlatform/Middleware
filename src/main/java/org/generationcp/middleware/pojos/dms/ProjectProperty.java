@@ -91,7 +91,6 @@ public class ProjectProperty implements Serializable {
 		this.rank = rank;
 		this.variableId = variableId;
 		this.alias = alias;
-		this.description = description;
 	}
 
 	public Integer getProjectPropertyId() {

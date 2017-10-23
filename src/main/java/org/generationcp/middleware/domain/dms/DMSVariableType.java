@@ -11,13 +11,13 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Contains the details of a variable type - local name, local description and rank.

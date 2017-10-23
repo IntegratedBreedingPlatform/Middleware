@@ -13,7 +13,6 @@ package org.generationcp.middleware.helper;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.util.Debug;
 
 public class VariableInfo {
 

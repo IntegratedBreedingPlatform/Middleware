@@ -44,16 +44,15 @@ public interface OntologyDataManager {
 	 *
 	 * @param termId the term id
 	 * @return the term by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Term getTermById(int termId) throws MiddlewareQueryException;
+	Term getTermById(int termId) ;
 
 	/**
 	 * Retrieves a StandardVariable given its id. After the first read, the variable is cached in memory.
 	 *
 	 * @param stdVariableId the std variable id
 	 * @return the standard variable
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	StandardVariable getStandardVariable(int stdVariableId, String programUUID) throws MiddlewareException;
 
@@ -70,25 +69,25 @@ public interface OntologyDataManager {
 	 *
 	 * @param standardVariableIds the list of standard variable ids
 	 * @return the list of standard variable summaries
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException;
+	List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) ;
 
 	/**
 	 * Gets summary for a standard variable identified by given id. Returns {@code null} if no match is found.
 	 *
 	 * @param standardVariableId
 	 * @return
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
-	StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException;
+	StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) ;
 
 	/**
 	 * Find standard variables by name or synonym.
 	 *
 	 * @param nameOrSynonym the name or synonym
 	 * @return the sets the
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) throws MiddlewareException;
 
@@ -97,18 +96,18 @@ public interface OntologyDataManager {
 	 * throw an exception.
 	 *
 	 * @param stdVariable the std variable
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void addStandardVariable(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException;
+	void addStandardVariable(StandardVariable stdVariable, String programUUID) ;
 
 	/**
 	 * Adds a StandardVariable to the database. Must provide the property, method, scale, dataType, and storedIn info. Otherwise, it will
 	 * throw an exception.
 	 *
 	 * @param stdVariableList the std variable
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException;
+	void addStandardVariable(List<StandardVariable> stdVariableList) ;
 
 	/**
 	 * Adds a new Method to the database. Creates a new cvterm entry in the local database. Returns a negative id.
@@ -116,27 +115,27 @@ public interface OntologyDataManager {
 	 * @param name the name
 	 * @param definition the definition
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Term addMethod(String name, String definition) throws MiddlewareQueryException;
+	Term addMethod(String name, String definition) ;
 
 	/**
 	 * Find method by id.
 	 *
 	 * @param id the id
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Term findMethodById(int id) throws MiddlewareQueryException;
+	Term findMethodById(int id) ;
 
 	/**
 	 * Find method by name.
 	 *
 	 * @param name the name
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Term findMethodByName(String name) throws MiddlewareQueryException;
+	Term findMethodByName(String name) ;
 
 	/**
 	 * Retrieves the StandardVariable given the property, scale and method names.
@@ -145,7 +144,7 @@ public interface OntologyDataManager {
 	 * @param scale the scale
 	 * @param method the method
 	 * @return StandardVariable
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method, String programUUID)
 			throws MiddlewareException;
@@ -155,18 +154,18 @@ public interface OntologyDataManager {
 	 *
 	 * @param traitId the trait id
 	 * @return List<Term>
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException;
+	List<Term> getMethodsForTrait(Integer traitId) ;
 
 	/**
 	 * Retrieve scales given the traitId.
 	 *
 	 * @param traitId the trait id
 	 * @return List<Term>
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException;
+	List<Term> getScalesForTrait(Integer traitId) ;
 
 	/**
 	 * Returns the list of Term entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
@@ -175,9 +174,9 @@ public interface OntologyDataManager {
 	 *
 	 * @param cvId the cv id
 	 * @return the all terms by cv id
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
+	List<Term> getAllTermsByCvId(CvId cvId) ;
 
 	/**
 	 * Returns the count of entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
@@ -186,9 +185,9 @@ public interface OntologyDataManager {
 	 *
 	 * @param cvId the cv id
 	 * @return the long
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	long countTermsByCvId(CvId cvId) throws MiddlewareQueryException;
+	long countTermsByCvId(CvId cvId) ;
 
 	/**
 	 * Returns Term based on the given name and cvid.
@@ -196,9 +195,9 @@ public interface OntologyDataManager {
 	 * @param name the name
 	 * @param cvId the cv id
 	 * @return Term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException;
+	Term findTermByName(String name, CvId cvId) ;
 
 	/**
 	 * Adds a new Term to the database. Creates a new cvterm entry in the local database. Returns a negative id.
@@ -207,9 +206,9 @@ public interface OntologyDataManager {
 	 * @param definition the definition
 	 * @param cvId the cv id
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
+	Term addTerm(String name, String definition, CvId cvId) ;
 
 	/**
 	 * Updates an existing term in the database. This method searches for the given id in local. If it exists, the corresponding name and
@@ -217,7 +216,7 @@ public interface OntologyDataManager {
 	 *
 	 * @param term the term
 	 * @throws MiddlewareException the middleware exception
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	void updateTerm(Term term) throws MiddlewareException;
 
@@ -233,9 +232,9 @@ public interface OntologyDataManager {
 	 * Returns the list of Term entries based on possible data types.
 	 *
 	 * @return list of data type Term objects
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<Term> getDataTypes() throws MiddlewareQueryException;
+	List<Term> getDataTypes() ;
 
 	/**
 	 * Returns the key-value pairs of PhenotypicType - StandardVariable.
@@ -244,7 +243,7 @@ public interface OntologyDataManager {
 	 * @param start the start
 	 * @param numOfRows the num of rows
 	 * @return Map of PhenotypicType - StandardVariable
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, String programUUID, int start, int numOfRows)
 			throws MiddlewareException;
@@ -260,7 +259,7 @@ public interface OntologyDataManager {
 	 * @param headers the headers
 	 * @return The key in map would be the header string (In UPPERCASE). If no standard variable list found, an empty list on map is returned for that
 	 *         header key.
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID) throws MiddlewareException;
 
@@ -270,18 +269,18 @@ public interface OntologyDataManager {
 	 * @param nameOrSynonym the name or synonym
 	 * @param cvId the cv id
 	 * @return the list
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException;
+	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) ;
 
 	/**
 	 * Returns the count of Term entries based on possible "is a" of properties.
 	 *
 	 * @return count of is_a Term objects
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 
-	long countIsAOfProperties() throws MiddlewareQueryException;
+	long countIsAOfProperties() ;
 
 	/**
 	 * Adds a new property to the database that adds the property term and it's is a relationship) Creates a new cvterm entry in the local
@@ -291,9 +290,9 @@ public interface OntologyDataManager {
 	 * @param definition the definition
 	 * @param isA the is a
 	 * @return Term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
+	Term addProperty(String name, String definition, int isA) ;
 
     /**
      *
@@ -308,18 +307,18 @@ public interface OntologyDataManager {
 	 *
 	 * @param termId the term id
 	 * @return property
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Property getProperty(int termId) throws MiddlewareQueryException;
+	Property getProperty(int termId) ;
 
 	/**
 	 * Given the name, retrieve the Property POJO.
 	 *
 	 * @param name the name
 	 * @return property
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Property getProperty(String name) throws MiddlewareQueryException;
+	Property getProperty(String name) ;
 
 	/**
 	 * Retrieves ALL the trait classes containing the hierarchical structure of the trait classes. If includePropertiesAndVariables = true,
@@ -330,19 +329,19 @@ public interface OntologyDataManager {
 	 *
 	 * @param includePropertiesAndVariables true if we want to load the property and standard variable, else false
 	 * @return the trait groups
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 
-	List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException;
+	List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) ;
 
 	/**
 	 * Retrieves all the Term entries based on the given list of ids.
 	 *
 	 * @param ids the ids
 	 * @return the terms by ids
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException;
+	List<Term> getTermsByIds(List<Integer> ids) ;
 
 	/**
 	 * Adds the trait class.
@@ -351,15 +350,15 @@ public interface OntologyDataManager {
 	 * @param definition the definition
 	 * @param parentTraitClassId the parent trait class id
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException;
+	TraitClass addTraitClass(String name, String definition, int parentTraitClassId) ;
 
 	/**
 	 * Gets all the standard variables.
 	 *
 	 * @return the all standard variable
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException;
 
@@ -372,7 +371,7 @@ public interface OntologyDataManager {
 	 * @param methodId the method id
 	 * @param scaleId the scale id
 	 * @return the standard variables matching the given parameters
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId,
 			String programUUID) throws MiddlewareException;
@@ -381,9 +380,9 @@ public interface OntologyDataManager {
 	 *
 	 * @param property the specific Property Term element to which the crop ontology ID will be saved
 	 * @param cropOntologyID the crop ontology ID to be saved
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
-	void addOrUpdateCropOntologyID(Property property, String cropOntologyID) throws MiddlewareQueryException;
+	void addOrUpdateCropOntologyID(Property property, String cropOntologyID) ;
 
 	/**
 	 * Adds or updates the term and relationship.
@@ -394,7 +393,7 @@ public interface OntologyDataManager {
 	 * @param typeId the type id
 	 * @param objectId the object id
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 * @throws MiddlewareException the middleware exception
 	 */
 	Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId) throws MiddlewareException;
@@ -407,7 +406,7 @@ public interface OntologyDataManager {
 	 * @param typeId the type id of the relationship between the term id and the objectId
 	 * @param objectId the object id
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 * @throws MiddlewareException the middleware exception
 	 */
 	Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareException;
@@ -419,7 +418,7 @@ public interface OntologyDataManager {
 	 * @param definition the definition
 	 * @param cvId the cv id
 	 * @return the term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 * @throws MiddlewareException the middleware exception
 	 */
 	Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareException;
@@ -430,16 +429,16 @@ public interface OntologyDataManager {
 	 * @param cvTermId the cv term id
 	 * @param termId the term id
 	 * @return the standard variable id by term id
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
+	Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) ;
 
 	/**
 	 * Insert or Update a Standard Variable.
 	 *
 	 * @param standardVariable the standard variable
 	 * @param operation the operation
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 * @throws MiddlewareException the middleware exception
 	 */
 	void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareException;
@@ -449,7 +448,7 @@ public interface OntologyDataManager {
 	 *
 	 * @param standardVariableId the standard variable id
 	 * @param constraints the constraints
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 * @throws MiddlewareException the middleware exception
 	 */
 	void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareException;
@@ -458,9 +457,9 @@ public interface OntologyDataManager {
 	 * Deletes standard variable constraints.
 	 *
 	 * @param standardVariableId the standard variable id
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void deleteStandardVariableLocalConstraints(int standardVariableId) throws MiddlewareQueryException;
+	void deleteStandardVariableLocalConstraints(int standardVariableId) ;
 
 	/**
 	 * Adds standard variable enumeration.
@@ -468,7 +467,7 @@ public interface OntologyDataManager {
 	 * @param variable the variable
 	 * @param enumeration the enumeration
 	 * @return the enumeration
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 * @throws MiddlewareException the middleware exception
 	 */
 	Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException;
@@ -480,7 +479,7 @@ public interface OntologyDataManager {
 	 *
 	 * @param variable the variable
 	 * @param enumeration the enumeration
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 * @throws MiddlewareException the middleware exception
 	 */
 	void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException;
@@ -490,18 +489,18 @@ public interface OntologyDataManager {
 	 *
 	 * @param standardVariableId the standard variable id
 	 * @param validValueId the valid value id
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void deleteStandardVariableEnumeration(int standardVariableId, int validValueId) throws MiddlewareQueryException;
+	void deleteStandardVariableEnumeration(int standardVariableId, int validValueId) ;
 
 	/**
 	 * Delete term.
 	 *
 	 * @param cvTermId the cv term id
 	 * @param cvId the cv id
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException;
+	void deleteTerm(int cvTermId, CvId cvId) ;
 
     /**
      *
@@ -518,25 +517,25 @@ public interface OntologyDataManager {
 	 * @param cvId the cv id
 	 * @param typeId the type id
 	 * @param objectId the object id
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException;
+	void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) ;
 
 	/**
 	 * Returns all Properties with its trait class.
 	 *
 	 * @return the all properties with trait class
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
+	List<Property> getAllPropertiesWithTraitClass() ;
 
 	/**
 	 * Delete standard variable.
 	 *
 	 * @param stdVariableId the std variable id
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
+	void deleteStandardVariable(int stdVariableId) ;
 
 	/**
 	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
@@ -545,9 +544,9 @@ public interface OntologyDataManager {
 	 * @param scale the scale
 	 * @param method the method
 	 * @return the standard variable id by property scale method
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method) throws MiddlewareQueryException;
+	Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method) ;
 
 	/**
 	 * Returns the variable id given the property, scale, method (P-S-M).
@@ -556,10 +555,10 @@ public interface OntologyDataManager {
 	 * @param scaleId the scale id
 	 * @param methodId the method id
 	 * @return the standard variable id by property scale method
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 	Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId)
-			throws MiddlewareQueryException;
+			;
 
 	/**
 	 * validate if the enumeration is being used.
@@ -567,9 +566,9 @@ public interface OntologyDataManager {
 	 * @param standardVariableId
 	 * @param enumerationId
 	 * @return true if valid
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
-	boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
+	boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) ;
 
 	/**
 	 * Returns synonyms (if any) of given term (not limited to standard variable)
@@ -577,9 +576,9 @@ public interface OntologyDataManager {
 	 * @param termId
 	 * @return
 	 */
-	List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
+	List<NameSynonym> getSynonymsOfTerm(Integer termId) ;
 
-	boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException;
+	boolean isSeedAmountVariable(String variateProperty) ;
 
 	/**
 	 * Returns the cv id by name
@@ -587,7 +586,7 @@ public interface OntologyDataManager {
 	 * @param name of cv
 	 * @return cv_id
 	 */
-	Integer getCVIdByName(String name) throws MiddlewareQueryException;
+	Integer getCVIdByName(String name) ;
 
 	/**
 	 * Returns Term based on the given name and cv id.
@@ -595,9 +594,9 @@ public interface OntologyDataManager {
 	 * @param name the name
 	 * @param cvId the cv id
 	 * @return Term
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	Term findTermByName(String name, int cvId) throws MiddlewareQueryException;
+	Term findTermByName(String name, int cvId) ;
 
 	/**
 	 * This is specifically for use in Database Migrator. Adds a StandardVariable to the database. Must provide the property, method, scale,
@@ -605,7 +604,7 @@ public interface OntologyDataManager {
 	 *
 	 * @param stdVariable the std variable
 	 * @param programUUID TODO
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
-	void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException;
+	void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) ;
 }
