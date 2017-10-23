@@ -1308,7 +1308,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<SampleListDTO> getSampleLists(final Integer trialId) {
-		return this.getSampleListServiceImpl().getSampleLists(trialId);
+		return this.getSampleListService().getSampleLists(trialId);
 	}
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
@@ -1317,13 +1317,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public SampleList getSampleList(final Integer sampleListId) {
-		return this.getSampleListServiceImpl().getSampleList(sampleListId);
+		return this.getSampleListService().getSampleList(sampleListId);
 	}
 
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
-
-		return this.getSampleListServiceImpl().getSampleDetailsDTOs(sampleListId);
+		return this.getSampleListService().getSampleDetailsDTOs(sampleListId);
 	}
 
 }
