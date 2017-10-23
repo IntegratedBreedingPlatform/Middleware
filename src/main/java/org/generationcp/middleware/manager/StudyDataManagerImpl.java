@@ -183,7 +183,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		try {
 
-			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, cropPrefix);
+			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID,
+					cropPrefix);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 
@@ -1177,4 +1178,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
 		return this.getSampleDao().getExperimentSampleMap(studyDbId);
 	}
+
+	@Override
+	public ProjectProperty getByVariableIdAndProjectID(final DmsProject project, final int variableId) throws MiddlewareQueryException {
+		return this.getProjectPropertyDao().getByStandardVariableId(project, variableId);
+	}
+
 }
