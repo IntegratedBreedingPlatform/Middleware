@@ -39,4 +39,26 @@
 			group by sp.sample_list);
 		</sql>
 	</changeSet>
+	<changeSet author="cuenyad" id="v7.1-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+					WHERE
+					TABLE_NAME = 'sample_list'
+					AND CONSTRAINT_NAME = 'list_name_UNIQUE'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>update list_name_UNIQUE TABLE_CONSTRAINTS</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list
+			DROP INDEX list_name_UNIQUE ,
+			ADD UNIQUE INDEX list_name_UNIQUE (list_name ASC, type ASC, hierarchy ASC);
+		</sql>
+	</changeSet>
 </databaseChangeLog>
