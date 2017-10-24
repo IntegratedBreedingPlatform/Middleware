@@ -345,7 +345,7 @@ public class SampleListServiceImpl implements SampleListService {
 			throw new Exception("Root folder can not be deleted");
 		}
 		if (folder.getChildren() != null && !folder.getChildren().isEmpty()) {
-			throw new Exception("Folder has children and cannot be delete");
+			throw new Exception("Folder has children and cannot be deleted");
 		}
 		this.sampleListDao.makeTransient(folder);
 	}
