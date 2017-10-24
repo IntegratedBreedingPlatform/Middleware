@@ -1096,6 +1096,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
 
+			studySummary.setActive(!dmsProject.isDeleted());
+
 			final Map<String, String> additionalProps = Maps.newHashMap();
 
 			for (final ProjectProperty prop : dmsProject.getProperties()) {
@@ -1115,12 +1117,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(value)).getName());
 				} else {
 					additionalProps.put(prop.getAlias(), value);
-				}
-
-				studySummary.setActive(true);
-
-				if (variableId.equals(TermId.STUDY_STATUS.getId()) && value.equals(TermId.DELETED_STUDY.getId())) {
-					studySummary.setActive(false);
 				}
 			}
 

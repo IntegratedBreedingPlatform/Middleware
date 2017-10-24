@@ -229,7 +229,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ TermId.START_DATE.getId() + " , "
 			+ TermId.END_DATE.getId() + ", "
 			+ TermId.SEASON_VAR.getId() + ", "
-			+ TermId.STUDY_STATUS.getId() + ", " + TermId.LOCATION_ID.getId() + ", "
+			+ TermId.LOCATION_ID.getId() + ", "
 			+ TermId.STUDY_TYPE.getId() + ") "
 			+ "         AND pp.variable_id NOT IN (SELECT  "
 			+ "             variable.cvterm_id "

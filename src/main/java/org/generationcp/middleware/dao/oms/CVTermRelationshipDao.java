@@ -270,11 +270,8 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 					+ " 	 FROM phenotype p " + " 	INNER JOIN nd_experiment_phenotype eph on eph.phenotype_id = p.phenotype_id "
 					+ "     INNER JOIN nd_experiment_project ep on ep.nd_experiment_id = eph.nd_experiment_id "
 					+ "     WHERE cvalue_id = v.cvterm_id "
-					+ "       AND ep.project_id not in (SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = ep.project_id "
-					+ "       AND stat.variable_id = :studyStatusId AND value = :deletedStudy )" + "   )");
+					+ "       AND ep.project_id not in (SELECT p.project_id FROM project p WHERE p.deleted = 1)");
 			query.setParameter("scaleId", scaleId);
-			query.setParameter("studyStatusId", TermId.STUDY_STATUS.getId());
-			query.setParameter("deletedStudy", TermId.DELETED_STUDY.getId());
 			query.addScalar("category", CVTermRelationshipDao.STRING);
 			return query.list();
 		} catch (final HibernateException e) {
