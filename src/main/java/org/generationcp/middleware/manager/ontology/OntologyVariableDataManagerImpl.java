@@ -809,8 +809,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	public boolean isVariableUsedInStudy(final int variableId) {
 		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE "
 				+ " pp.variable_id = :variableId "
-				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
-				+ " AND stat.variable_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
+				+ " AND pp.project_id not in (SELECT p.project_id FROM project p WHERE p.deleted = 1) limit 1";
 
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameter("variableId", variableId);
@@ -907,8 +906,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	public boolean areVariablesUsedInStudy(final List<Integer> variablesIds) {
 		final String variableUsageCount = "SELECT *  FROM projectprop pp "
 				+ " WHERE pp.variable_id IN (:variablesIds) "
-				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
-				+ " AND stat.variable_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
+				+ " AND pp.project_id not in ( SELECT p.project_id FROM project p WHERE p.deleted = 1) limit 1";
 
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameterList("variablesIds", variablesIds);

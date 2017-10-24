@@ -39,8 +39,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	private static final String PROGRAM_UUID = "programUUID";
 	private static final String UNION_DISTINCT = "  UNION DISTINCT";
 	private static final Logger LOG = LoggerFactory.getLogger(StudySearchDao.class);
-	private static final String NOT_IN_DELETED_STUDIES_QUERY = " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.variable_id = "
-			+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") ";
+	private static final String NOT_IN_DELETED_STUDIES_QUERY = " AND p.deleted = 0 ";
 
 	public long countStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption, final String programUUID) {
 		try {

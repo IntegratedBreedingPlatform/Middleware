@@ -11,9 +11,10 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -26,10 +27,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_project
@@ -86,6 +86,11 @@ public class DmsProject implements Serializable {
 
 	@OneToMany(mappedBy = "objectProject", fetch = FetchType.LAZY)
 	private List<ProjectRelationship> relatedBys;
+
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Basic(optional = false)
+	@Column(name = "deleted", columnDefinition = "TINYINT")
+	private boolean deleted;
 
 	public DmsProject() {
 	}
@@ -157,6 +162,14 @@ public class DmsProject implements Serializable {
 		this.relatedBys = relatedBys;
 	}
 
+	public Boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(final Boolean deleted) {
+		this.deleted = deleted;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -196,6 +209,8 @@ public class DmsProject implements Serializable {
 		builder.append(this.name);
 		builder.append(", description=");
 		builder.append(this.description);
+		builder.append(", deleted=");
+		builder.append(this.deleted);
 		builder.append("]");
 		return builder.toString();
 	}

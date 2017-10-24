@@ -95,5 +95,62 @@
 		<dropView viewName="project_variable_details"></dropView>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v7.1.0-3" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="deleted" />
+			</not>
+		</preConditions>
+		<addColumn tableName="project">
+			<column name="deleted" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v7.1.0-4" >
+		<preConditions>
+			<columnExists tableName="project" columnName="deleted" />
+		</preConditions>
+		<sql>
+			DROP TABLE IF EXISTS deleted_studies;
+
+			CREATE TEMPORARY TABLE deleted_studies AS
+			  SELECT p.project_id
+			  FROM projectprop pp
+				INNER JOIN project p ON pp.project_id = p.project_id
+			  WHERE pp.variable_id = 8006 AND value = 12990;
+
+			UPDATE project
+			SET deleted = 1
+			WHERE project_id IN (
+			  SELECT project_id
+			  FROM deleted_studies
+			);
+
+			UPDATE project
+			SET deleted = 1
+			WHERE project_id IN (
+			  SELECT T.project_id
+			  FROM (
+					 SELECT subject.project_id
+					 FROM project_relationship pr
+					   INNER JOIN project object ON pr.object_project_id = object.project_id
+					   INNER JOIN project subject ON pr.subject_project_id = subject.project_id
+													 AND object.project_id IN (
+						 SELECT project_id
+						 FROM deleted_studies
+					   )) AS T);
+
+			DELETE
+			FROM projectprop
+			WHERE variable_id = 8006 AND value = 12990;
+
+			DELETE
+			FROM cvterm
+			WHERE cvterm_id = 8006;
+		</sql>
+	</changeSet>
+
 
 </databaseChangeLog>

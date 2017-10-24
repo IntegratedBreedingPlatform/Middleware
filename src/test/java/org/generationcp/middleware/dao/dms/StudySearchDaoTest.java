@@ -144,6 +144,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final StudyReference study = studiesByName.get(0);
 		this.fieldbookService.deleteStudy(study.getId(), this.fieldbookService.getStudy(study.getId()).getUser());
+		flush();
 
 		// Check that deleted study is not retrieved
 		studiesByName = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE,
@@ -204,6 +205,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
 		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
+		flush();
 
 		Assert.assertEquals("Study count should be " + (previousCount - 1), previousCount - 1, this.studySearchDao
 				.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID));
@@ -234,6 +236,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
 		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
+		flush();
 
 		Assert.assertEquals("Study count should be " + (previousCount - 1), previousCount - 1,
 				this.studySearchDao.countStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID));
@@ -267,6 +270,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final StudyReference studyToDelete = studyReferences.get(0);
 		this.fieldbookService.deleteStudy(studyToDelete.getId(), this.fieldbookService.getStudy(studyToDelete.getId()).getUser());
+		flush();
 
 		// Check that deleted study is not retrieved
 		studyReferences = this.studySearchDao.getStudiesByLocationIds(locationIds, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
@@ -304,6 +308,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
 		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
+		flush();
 
 		Assert.assertEquals("Study count should be " + (previousDrySeasonCount - 1), previousDrySeasonCount - 1,
 				this.studySearchDao.countStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID));
@@ -354,6 +359,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final StudyReference studyToDelete = drySeasonStudyReferences.get(0);
 		this.fieldbookService.deleteStudy(studyToDelete.getId(), this.fieldbookService.getStudy(studyToDelete.getId()).getUser());
+		flush();
 
 		// Check that deleted study is not retrieved
 		drySeasonStudyReferences =
@@ -388,6 +394,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
 		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
+		flush();
 
 		Assert.assertEquals("Study count should be " + (previousCount - 1), previousCount - 1,
 				this.studySearchDao.countStudiesByStartDate(2017, StudySearchDaoTest.PROGRAM_UUID));
@@ -418,10 +425,15 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		// Delete test study
 		final StudyReference study = studies.get(0);
 		this.fieldbookService.deleteStudy(study.getId(), this.fieldbookService.getStudy(study.getId()).getUser());
+		flush();
 
 		// Check that deleted study is not retrieved
 		studies = this.studySearchDao.getStudiesByStartDate(20201201, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("Deleted study should not be returned. ", 0, studies.size());
+	}
+
+	private void flush() {
+		this.sessionProvder.getSession().flush();
 	}
 
 	private void createTestStudies() throws Exception {
