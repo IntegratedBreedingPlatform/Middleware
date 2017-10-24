@@ -214,7 +214,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId()) != null) {
-			throw new Exception("folderName should be unique within the same directory");
+			throw new Exception("Folder name should be unique within the same directory");
 		}
 		final SampleList sampleFolder = new SampleList();
 		sampleFolder.setCreatedDate(new Date());
@@ -258,7 +258,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId()) != null) {
-			throw new Exception("folderName should be unique within the same directory");
+			throw new Exception("Folder name should be unique within the same directory");
 		}
 
 		folder.setListName(newFolderName);
@@ -311,7 +311,7 @@ public class SampleListServiceImpl implements SampleListService {
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
 
 		if (uniqueSampleListName != null) {
-			throw new Exception("folderName should be unique within the same directory");
+			throw new Exception("Folder name should be unique within the same directory");
 		}
 
 		if (isDescendant(listToMove, newParentFolder)) {
