@@ -213,7 +213,7 @@ public class SampleListServiceImpl implements SampleListService {
 			throw new Exception("Specified parentID is not a folder");
 		}
 
-		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentId) != null) {
+		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId()) != null) {
 			throw new Exception("folderName should be unique within the same directory");
 		}
 		final SampleList sampleFolder = new SampleList();
