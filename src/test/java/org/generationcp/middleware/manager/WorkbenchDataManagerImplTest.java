@@ -526,13 +526,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllUsersSorted() throws MiddlewareQueryException {
-		final List<User> results = this.workbenchDataManager.getAllUsersSorted();
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
-	}
-
-	@Test
 	public void testGetLastOpenedProject() throws MiddlewareQueryException {
 		final Project results = this.workbenchDataManager.getLastOpenedProject(this.testUser1.getUserid());
 		Assert.assertNotNull(results);

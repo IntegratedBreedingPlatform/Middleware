@@ -593,8 +593,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<User> getAllUsersSorted() {
-		return this.getUserDao().getAllUsersSorted();
+	public List<User> getAllActiveUsersSorted() {
+		return this.getUserDao().getAllActiveUsersSorted();
 	}
 
 	@Override

@@ -376,7 +376,7 @@ public interface WorkbenchDataManager {
 	 *
 	 * @return A {@code List} of all the {@code User}s in the Workbench database.
 	 */
-	List<User> getAllUsersSorted();
+	List<User> getAllActiveUsersSorted();
 
 	/**
 	 * Returns number of all Users.

@@ -197,9 +197,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getAllUsersSorted() throws MiddlewareQueryException {
+	public List<User> getAllActiveUsersSorted() throws MiddlewareQueryException {
 		try {
-			final Query query = this.getSession().getNamedQuery(User.GET_ALL_USERS_SORTED);
+			final Query query = this.getSession().getNamedQuery(User.GET_ALL_ACTIVE_USERS_SORTED);
 			return query.list();
 		} catch (final HibernateException e) {
 			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
