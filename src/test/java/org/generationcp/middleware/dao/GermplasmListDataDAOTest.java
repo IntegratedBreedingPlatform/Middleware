@@ -1,10 +1,15 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -13,9 +18,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
@@ -240,6 +242,13 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		return germplasmList;
 	}
 
+	private GermplasmList createSnapshotTestList() {
+		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithType(null,
+				GermplasmListType.ADVANCED.name());
+		this.germplasmListDAO.saveOrUpdate(germplasmList);
+		return germplasmList;
+	}
+
 	@Test
 	public void testGetByListIdAndGid() {
 		// insert new list data record from a newly-created list and germplasm
@@ -248,17 +257,80 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final GermplasmListData testGermplasmListData = this.createTestListWithListData(germplasm);
 
 		// get the list data record from the database
-		final GermplasmListData germplasmListData =
-			this.germplasmListDataDAO.getByListIdAndGid(testGermplasmListData.getList().getId(), germplasm.getGid());
+		final GermplasmListData germplasmListData = this.germplasmListDataDAO
+				.getByListIdAndGid(testGermplasmListData.getList().getId(), germplasm.getGid());
 		Assert.assertNotNull(germplasmListData);
 
 		Assert.assertNotNull("The germplasm list data should not be null", germplasmListData);
-		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(), germplasmListData.getId());
-		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(), testGermplasmListData.getList().getId(),
-			germplasmListData.getList().getId());
-		Assert.assertEquals("The entry id should be " + testGermplasmListData.getEntryId(), testGermplasmListData.getEntryId(),
-			germplasmListData.getEntryId());
+		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(),
+				germplasmListData.getId());
+		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(),
+				testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
+		Assert.assertEquals("The entry id should be " + testGermplasmListData.getEntryId(),
+				testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
 		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
-			germplasmListData.getGid());
+				germplasmListData.getGid());
 	}
+
+	@Test
+	public void testSearchForGermplasmListsWhereOperationIsEqual() {
+		final GermplasmList testList = this.createTestList();
+		final List<GermplasmList> resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(),
+				testList.getProgramUUID(), Operation.EQUAL);
+
+		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
+		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
+				resultLists.get(0).getName());
+		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
+				resultLists.get(0).getType());
+		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
+				resultLists.get(0).getId());
+	}
+
+	@Test
+	public void testSearchForGermplasmListsWhereOperationIsLike() {
+		final GermplasmList testList = this.createTestList();
+		List<GermplasmList> resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(),
+				testList.getProgramUUID(), Operation.LIKE);
+
+		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
+		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
+				resultLists.get(0).getName());
+		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
+				resultLists.get(0).getType());
+		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
+				resultLists.get(0).getId());
+
+		// With percent sign
+		resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName() + "%", testList.getProgramUUID(),
+				Operation.LIKE);
+
+		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
+		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
+				resultLists.get(0).getName());
+		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
+				resultLists.get(0).getType());
+		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
+				resultLists.get(0).getId());
+	}
+
+	@Test
+	public void testSearchForGermplasmListsForSnapshotList() {
+		final GermplasmList testList = this.createSnapshotTestList();
+		// Operation is EQUAL
+		List<GermplasmList> resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(),
+				testList.getProgramUUID(), Operation.EQUAL);
+		Assert.assertTrue("The results array should contain no germplasm lists", resultLists.isEmpty());
+
+		// Operation is LIKE
+		resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(), testList.getProgramUUID(),
+				Operation.LIKE);
+		Assert.assertTrue("The results array should contain no germplasm lists", resultLists.isEmpty());
+
+		// Operation is LIKE and search string with "%"
+		resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName() + "%", testList.getProgramUUID(),
+				Operation.LIKE);
+		Assert.assertTrue("The results array should contain no germplasm lists", resultLists.isEmpty());
+	}
+
 }
