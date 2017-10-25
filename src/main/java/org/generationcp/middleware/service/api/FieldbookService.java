@@ -995,7 +995,7 @@ public interface FieldbookService {
 	 * @param studyId id for the study Trial
 	 * @return the true if the study has samples
 	 */
-	boolean hasSamples(Integer studyId);
+	boolean hasSamples(final Integer studyId);
 
 	/**
 	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
