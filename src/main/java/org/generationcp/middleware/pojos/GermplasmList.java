@@ -46,14 +46,15 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Table(name = "listnms")
 @SQLDelete(sql = "UPDATE listnms SET liststatus = 9 WHERE listid = ?")
-@NamedQueries({@NamedQuery(name = "deleteGermplasmListByListIdPhysically", query = "DELETE FROM GermplasmList WHERE listid = :listid"),})
+@NamedQueries({
+		@NamedQuery(name = "deleteGermplasmListByListIdPhysically", query = "DELETE FROM GermplasmList WHERE listid = :listid"), })
 public class GermplasmList implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	public static final String FOLDER_TYPE = "FOLDER";
 	public static final String LIST_TYPE = "LST";
-    public static final String ADVANCED_LIST_TYPE = "ADVANCED";
-    public static final String CROSS_LIST_TYPE = "CROSSES";
+	public static final String ADVANCED_LIST_TYPE = "ADVANCED";
+	public static final String CROSS_LIST_TYPE = "CROSSES";
 	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
 	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
 	public static final String CROSSES = "Crosses";
@@ -81,7 +82,7 @@ public class GermplasmList implements Serializable {
 	@Column(name = "listdesc")
 	private String description;
 
-	@ManyToOne(targetEntity = GermplasmList.class, fetch=FetchType.LAZY)
+	@ManyToOne(targetEntity = GermplasmList.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "lhierarchy")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private GermplasmList parent;
@@ -112,49 +113,12 @@ public class GermplasmList implements Serializable {
 
 	@OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	@OrderBy("entryId asc")
-	private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
-	
+	private List<GermplasmListData> listData = new ArrayList<>();
+
 	@Transient
 	private String tabLabel;
 
-	public static final String GET_GERMPLASM_LIST_TYPES =
-			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
-					+ "FROM udflds "
-					+ "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' "
-				+ "and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES', 'CRT_CROSS', 'IMP_CROSS', 'FOLDER')";
-
-	public static final String GET_GERMPLASM_NAME_TYPES =
-			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " + "FROM udflds "
-					+ "WHERE ftable = 'NAMES' AND ftype = 'NAME'";
-
-	public static final String SEARCH_FOR_GERMPLASM_LIST =
-			"SELECT DISTINCT listnms.* "
-					+ "FROM listnms "
-					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
-					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
-					+ "      OR desig LIKE :q OR listname LIKE :q " + "      OR desig LIKE :qNoSpaces "
-					+ "      OR desig LIKE :qStandardized " + ")";
-
-	public static final String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE =
-			"SELECT DISTINCT listnms.* "
-					+ "FROM listnms "
-					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
-					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid "
-					+ "      OR desig LIKE :q OR listname LIKE :q" + "      OR desig LIKE :qNoSpaces "
-					+ "      OR desig LIKE :qStandardized " + ")";
-
-	public static final String SEARCH_FOR_GERMPLASM_LIST_EQUAL =
-			"SELECT DISTINCT listnms.* "
-					+ "FROM listnms "
-					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
-					+ "WHERE "
-					+ " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
-					+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces " + "      OR desig = :qStandardized " + ")";
-
-	public static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
+	
 
 	public GermplasmList() {
 
@@ -193,9 +157,9 @@ public class GermplasmList implements Serializable {
 	}
 
 	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
-			final String description, final GermplasmList parent, final Integer status, final Integer sDate, final Integer eDate,
-			final Integer listLocation, final Integer listRef, final Integer projectId, final String notes,
-			final List<GermplasmListData> listData) {
+			final String description, final GermplasmList parent, final Integer status, final Integer sDate,
+			final Integer eDate, final Integer listLocation, final Integer listRef, final Integer projectId,
+			final String notes, final List<GermplasmListData> listData) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -452,13 +416,11 @@ public class GermplasmList implements Serializable {
 		return this.getStatus() >= 100;
 	}
 
-	
 	public String getTabLabel() {
-		return tabLabel;
+		return this.tabLabel;
 	}
 
-	
-	public void setTabLabel(String tabLabel) {
+	public void setTabLabel(final String tabLabel) {
 		this.tabLabel = tabLabel;
 	}
 
