@@ -846,8 +846,4 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		}
 	}
 
-	@Override
-	public SampleList getLastSavedSampleListByUserId(final int userId, final String programUuid) {
-		return this.getSampleListDAO().getLastCreatedByUserID(userId, programUuid);
-	}
 }

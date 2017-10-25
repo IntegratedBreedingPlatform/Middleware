@@ -557,5 +557,4 @@ public interface GermplasmListManager {
 	 */
 	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
 
-	SampleList getLastSavedSampleListByUserId(final int userId, final String programUuid);
 }
