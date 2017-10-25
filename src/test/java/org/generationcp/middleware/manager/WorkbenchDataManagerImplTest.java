@@ -22,6 +22,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolDAO;
+import org.generationcp.middleware.data.initializer.UserDtoTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -931,5 +932,22 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			assertThat(project.getProjectName(),is(equalTo(Projects.get(0).getProjectName())));
 
 		}
+	}
+	
+	@Test
+	public void testGetAllActiveUsers() {
+		final List<User> prevListOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
+		UserDto userDto = UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", "Breeder", "username");
+		final int id = this.workbenchDataManager.createUser(userDto);
+		userDto.setUserId(id);
+		List<User> listOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
+		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size()+1 == listOfActiveUsers.size());
+		
+		//Deactivate the user to check if it's not retrieved
+		userDto.setStatus(1);
+		this.workbenchDataManager.updateUser(userDto);
+		listOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
+		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() == listOfActiveUsers.size());
+		
 	}
 }
