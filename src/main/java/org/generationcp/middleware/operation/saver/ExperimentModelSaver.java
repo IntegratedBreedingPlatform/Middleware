@@ -106,7 +106,7 @@ public class ExperimentModelSaver extends Saver {
 	private ExperimentModel create(int projectId, Values values, TermId expType, String cropPrefix) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(expType.getId());
-		experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
+		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, values.getVariableList()));
 
 		if (values.getLocationId() == null && values instanceof StudyValues) {
 			experimentModel.setGeoLocation(this.createNewGeoLocation());
@@ -143,31 +143,40 @@ public class ExperimentModelSaver extends Saver {
 		return location;
 	}
 
-	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors)
+	protected List<ExperimentProperty> createTrialDesignExperimentProperties(ExperimentModel experimentModel, VariableList factors)
 			throws MiddlewareQueryException {
+
+		List<ExperimentProperty> experimentProperties = new ArrayList<>();
+
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
 			for (Variable variable : factors.getVariables()) {
 				if (PhenotypicType.TRIAL_DESIGN == variable.getVariableType().getRole()) {
-					this.addProperty(experimentModel, variable);
+					experimentProperties.add(createTrialDesignProperty(experimentModel, variable));
 				}
 			}
 		}
 
-		return experimentModel.getProperties();
+		return experimentProperties;
 	}
 
-	private void addProperty(ExperimentModel experimentModel, Variable variable) throws MiddlewareQueryException {
-		if (experimentModel.getProperties() == null) {
-			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
+	protected ExperimentProperty createTrialDesignProperty(ExperimentModel experimentModel, Variable variable) throws MiddlewareQueryException {
+
+		ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(variable.getVariableType().getId());
+
+		if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			// If the variable is categorical, the variable's categorical value should be saved as categorical id.
+			experimentProperty.setValue(variable.getIdValue());
+		} else {
+			experimentProperty.setValue(variable.getValue());
 		}
-		ExperimentProperty property = new ExperimentProperty();
-		property.setExperiment(experimentModel);
-		property.setTypeId(variable.getVariableType().getId());
-		property.setValue(variable.getValue());
-		property.setRank(variable.getVariableType().getRank());
 
-		experimentModel.getProperties().add(property);
+		experimentProperty.setRank(variable.getVariableType().getRank());
+
+		return experimentProperty;
 	}
+
 
 	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
 		ExperimentProject exproj = new ExperimentProject();
