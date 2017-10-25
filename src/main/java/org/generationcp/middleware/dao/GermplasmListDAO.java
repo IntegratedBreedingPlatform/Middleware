@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,15 +62,52 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n" + "   INNER JOIN germplsm g ON ld.gid = g.gid"
 			+ " WHERE ld.gid IN (:gids) \n" + "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
 			+ " GROUP BY ld.gid \n" + " HAVING count(1) > 1";
+	
+	private static final String HIDDEN_LIST_TYPES_PARAM = "hiddenListTypes";
+	
+	private static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
+			+ "FROM udflds " + "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' " + "and fcode not in (:" + GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM + ")";
 
-	protected static final Criterion RESTRICTED_LIST;
+	private static final String GET_GERMPLASM_NAME_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
+			+ "FROM udflds " + "WHERE ftable = 'NAMES' AND ftype = 'NAME'";
+
+	private static final String SEARCH_FOR_GERMPLASM_LIST = "SELECT DISTINCT listnms.* " + "FROM listnms "
+			+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
+			+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
+			+ "WHERE listtype not in (:" + GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM + ") "
+			+ " AND liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
+			+ "      OR desig LIKE :q OR listname LIKE :q " + "      OR desig LIKE :qNoSpaces "
+			+ "      OR desig LIKE :qStandardized " + ")";
+
+	private static final String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE = "SELECT DISTINCT listnms.* " + "FROM listnms "
+			+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
+			+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
+			+ "WHERE listtype not in (:" + GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM + ")"
+			+ " AND liststatus!=9 AND (listdata.gid LIKE :gid OR desig LIKE :q OR listname LIKE :q"
+			+ "      OR desig LIKE :qNoSpaces " + "      OR desig LIKE :qStandardized " + ")";
+
+	private static final String SEARCH_FOR_GERMPLASM_LIST_EQUAL = "SELECT DISTINCT listnms.* " + "FROM listnms "
+			+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
+			+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) " 
+			+ "WHERE listtype not in (:" + GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM + ")"
+			+ " AND liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
+			+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces "
+			+ "      OR desig = :qStandardized " + ")";
+
+	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
+	
+	private static final List<String> SNAPSHOT_LIST_TYPES = Arrays.asList(GermplasmListType.NURSERY.name(), GermplasmListType.TRIAL.name(), 
+			GermplasmListType.CHECK.name(), GermplasmListType.ADVANCED.name(), GermplasmListType.CROSSES.name(), GermplasmListType.CRT_CROSS.name(),
+			GermplasmListType.IMP_CROSS.name());
+	
+	private static final List<String> HIDDEN_LIST_TYPES_ON_SEARCH;
+
+	private static final Criterion RESTRICTED_LIST;
 
 	static {
-		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type",
-				new String[] { GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(),
-						GermplasmListType.CHECK.toString(), GermplasmListType.ADVANCED.toString(),
-						GermplasmListType.CROSSES.toString(), GermplasmListType.CRT_CROSS.toString(),
-						GermplasmListType.IMP_CROSS.toString() }));
+		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type", GermplasmListDAO.SNAPSHOT_LIST_TYPES.toArray(new String[0])));
+		HIDDEN_LIST_TYPES_ON_SEARCH = new ArrayList<>(GermplasmListDAO.SNAPSHOT_LIST_TYPES);
+		HIDDEN_LIST_TYPES_ON_SEARCH.add(GermplasmList.FOLDER_TYPE);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -402,7 +440,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public List getGermplasmListTypes() {
 		try {
 			final Session session = this.getSession();
-			final SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_LIST_TYPES);
+			final SQLQuery query = session.createSQLQuery(GermplasmListDAO.GET_GERMPLASM_LIST_TYPES);
+			query.setParameterList(GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM, GermplasmListDAO.HIDDEN_LIST_TYPES_ON_SEARCH);
 			return query.list();
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(),
@@ -424,7 +463,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public List getGermplasmNameTypes() {
 		try {
 			final Session session = this.getSession();
-			final SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_NAME_TYPES);
+			final SQLQuery query = session.createSQLQuery(GermplasmListDAO.GET_GERMPLASM_NAME_TYPES);
 			return query.list();
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(),
@@ -455,7 +494,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			if (o.equals(Operation.EQUAL)) {
 				query = this.getSession().createSQLQuery(this.getSearchForGermplasmListsQueryString(
-						GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL, programUUID));
+						GermplasmListDAO.SEARCH_FOR_GERMPLASM_LIST_EQUAL, programUUID));
 				query.setParameter("gidLength", q.length());
 				query.setParameter("q", q);
 				query.setParameter("qNoSpaces", q.replace(" ", ""));
@@ -463,13 +502,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			} else {
 				if (q.contains("%") || q.contains("_")) {
 					query = this.getSession().createSQLQuery(this.getSearchForGermplasmListsQueryString(
-							GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE, programUUID));
+							GermplasmListDAO.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE, programUUID));
 					query.setParameter("q", q);
 					query.setParameter("qNoSpaces", q.replace(" ", ""));
 					query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
 				} else {
 					query = this.getSession().createSQLQuery(this.getSearchForGermplasmListsQueryString(
-							GermplasmList.SEARCH_FOR_GERMPLASM_LIST, programUUID));
+							GermplasmListDAO.SEARCH_FOR_GERMPLASM_LIST, programUUID));
 					query.setParameter("gidLength", q.length());
 					query.setParameter("q", q + "%");
 					query.setParameter("qNoSpaces", q.replace(" ", "") + "%");
@@ -478,6 +517,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			}
 			query.setParameter("gid", q);
+			query.setParameterList(GermplasmListDAO.HIDDEN_LIST_TYPES_PARAM, GermplasmListDAO.HIDDEN_LIST_TYPES_ON_SEARCH);
 
 			if (programUUID != null) {
 				query.setParameter(GermplasmListDAO.PROGRAM_UUID, programUUID);
@@ -495,7 +535,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	private String getSearchForGermplasmListsQueryString(final String initialQueryString, final String programUUID) {
 		String queryString = initialQueryString;
 		if (programUUID != null) {
-			queryString += GermplasmList.FILTER_BY_PROGRAM_UUID;
+			queryString += GermplasmListDAO.FILTER_BY_PROGRAM_UUID;
 		}
 		return queryString;
 	}
