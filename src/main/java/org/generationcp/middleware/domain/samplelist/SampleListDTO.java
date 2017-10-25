@@ -160,7 +160,7 @@ public class SampleListDTO implements Serializable {
 		return parentId;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(final Integer parentId) {
 		this.parentId = parentId;
 	}
 
@@ -168,7 +168,7 @@ public class SampleListDTO implements Serializable {
 		return listName;
 	}
 
-	public void setListName(String listName) {
+	public void setListName(final String listName) {
 		this.listName = listName;
 	}
 
@@ -176,7 +176,7 @@ public class SampleListDTO implements Serializable {
 		return createdDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
@@ -184,7 +184,7 @@ public class SampleListDTO implements Serializable {
 		return programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 }
