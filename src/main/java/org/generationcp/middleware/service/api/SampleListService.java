@@ -53,7 +53,7 @@ public interface SampleListService {
 	 */
 	void deleteSampleListFolder(final Integer folderId) throws Exception;
 
-	List getSampleLists(final Integer trialId);
+	List<SampleListDTO> getSampleLists(final Integer trialId);
 
 	SampleList getSampleList(final Integer sampleListId);
 
@@ -87,7 +87,23 @@ public interface SampleListService {
 	 */
 	Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists);
 
+	/**
+	 *
+	 * @param listId - the list Id
+	 * @return - List of SampleList POJOs
+	 */
 	SampleList getSampleListByListId(final Integer listId);
 
-	SampleList getLastSavedSampleListByUserId(final int userId, final String programUuid);
+	SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid);
+
+	/**
+	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
+	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
+	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
+	 *
+	 * @param programUUID - the program UUID
+	 * @return - List of GermplasmList POJOs
+	 */
+	List<SampleList> getAllSampleTopLevelLists(final String programUUID);
+
 }

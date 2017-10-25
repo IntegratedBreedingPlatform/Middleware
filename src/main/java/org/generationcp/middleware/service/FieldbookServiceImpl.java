@@ -175,26 +175,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<SampleList> getAllSampleTopLevelLists(final String programUUID) {
-		return this.getSampleListService().getAllTopLevelLists(programUUID);
-	}
-
-	@Override
-	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
-		return this.getSampleListService().getSampleListByParentFolderIdBatched(parentId,programUUID,batchSize);
-	}
-
-	@Override
-	public SampleList getSampleListByListId(final Integer listId) {
-		return this.getSampleListService().getSampleListByListId(listId);
-	}
-
-	@Override
-	public Map<Integer, GermplasmFolderMetadata> getSampleFolderMetadata(final List<SampleList> sampleLists) {
-		return this.getSampleListService().getFolderMetadata(sampleLists);
-	}
-
-	@Override
 	public List<Location> getAllBreedingLocations() {
 		return this.getLocationDataManager().getAllBreedingLocations();
 	}
@@ -1306,23 +1286,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return germplasmCrossesList;
 	}
 
-	@Override
-	public List<SampleListDTO> getSampleLists(final Integer trialId) {
-		return this.getSampleListService().getSampleLists(trialId);
-	}
-
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
-	}
-
-	@Override
-	public SampleList getSampleList(final Integer sampleListId) {
-		return this.getSampleListService().getSampleList(sampleListId);
-	}
-
-	@Override
-	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
-		return this.getSampleListService().getSampleDetailsDTOs(sampleListId);
 	}
 
 }

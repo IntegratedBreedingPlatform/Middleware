@@ -997,45 +997,4 @@ public interface FieldbookService {
 	 */
 	boolean hasSamples(final Integer studyId);
 
-	/**
-	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
-	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
-	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
-	 *
-	 * @param programUUID - the program UUID
-	 * @return - List of GermplasmList POJOs
-	 */
-	List<SampleList> getAllSampleTopLevelLists(String programUUID);
-
-	/**
-	 * Returns a list of {@code SampleList} child records given a parent id. Retrieval from the database is done by batch (as specified
-	 * in batchSize) to reduce the load in instances where there is a large volume of child folders to be retrieved. Though retrieval is by
-	 * batch, this method still returns all of the child folders as a single list.
-	 *
-	 * @param parentId - the ID of the parent to retrieve the child lists
-	 * @param programUUID - the program UUID of the program where to retrieve the child lists
-	 * @param batchSize - the number of records to be retrieved per iteration
-	 * @return Returns a List of SampleList POJOs for the child lists
-	 */
-	List<SampleList> getSampleListByParentFolderIdBatched(Integer parentId, String programUUID, int batchSize);
-
-	/**
-	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
-	 * This helps avoiding the need to query metadata in a loop for each folder
-	 * @param sampleLists ids for which we should retrieve metadata
-	 */
-	Map<Integer, GermplasmFolderMetadata> getSampleFolderMetadata(List<SampleList> sampleLists);
-
-
-	/**
-	 *
-	 * @param listId - the list Id
-	 * @return - List of SampleList POJOs
-	 */
-	SampleList getSampleListByListId(Integer listId);
-	List<SampleListDTO> getSampleLists(final Integer trialId);
-
-	SampleList getSampleList(final Integer sampleListId);
-
-	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 }

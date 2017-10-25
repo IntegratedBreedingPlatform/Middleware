@@ -356,19 +356,13 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public SampleList getSampleListByListId(Integer listId) {
+	public SampleList getSampleListByListId(final Integer listId) {
 		return this.getSampleListDao().getById(listId);
 	}
 
 	@Override
-	public SampleList getLastSavedSampleListByUserId(final int userId, final String programUuid) {
+	public SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid) {
 		return this.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
-	}
-
-	@Override
-	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID,
-		final int batchSize) {
-		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
 	}
 
 	@Override
@@ -411,6 +405,16 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
 		return this.sampleListDao.getSampleDetailsDTO(sampleListId);
+	}
+
+	@Override
+	public List<SampleList> getAllSampleTopLevelLists(final String programUUID) {
+		return this.sampleListDao.getAllTopLevelLists(programUUID);
+	}
+
+	@Override
+	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
+		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
