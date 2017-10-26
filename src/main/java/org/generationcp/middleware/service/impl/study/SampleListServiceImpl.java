@@ -366,12 +366,12 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public Map<Integer, GermplasmFolderMetadata> getFolderMetadata(List<SampleList> sampleLists) {
+	public Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists) {
 		final List<Integer> folderIdsToRetrieveFolderCount = getFolderIdsFromSampleList(sampleLists);
 		return this.getSampleListDao().getSampleFolderMetadata(folderIdsToRetrieveFolderCount);
 	}
 
-	private List<Integer> getFolderIdsFromSampleList(List<SampleList> listIds) {
+	private List<Integer> getFolderIdsFromSampleList(final List<SampleList> listIds) {
 		final List<Integer> folderIdsToRetrieveFolderCount = new ArrayList<>();
 		for (final SampleList parentList : listIds) {
 			if(parentList.isFolder()) {
@@ -381,7 +381,7 @@ public class SampleListServiceImpl implements SampleListService {
 		return folderIdsToRetrieveFolderCount;
 	}
 
-	protected boolean isDescendant(SampleList list, SampleList of) {
+	protected boolean isDescendant(final SampleList list, final SampleList of) {
 		if (of.getHierarchy() == null) {
 			return false;
 		}
