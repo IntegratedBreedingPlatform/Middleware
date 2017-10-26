@@ -223,19 +223,14 @@ public class MeasurementData {
 	}
 
 	public CategoricalDisplayValue getDisplayValueForCategoricalData() {
-		if (null == this.value || "".equals(this.value)) {
+		if (null == this.cValueId || "".equals(this.cValueId)) {
 			return new CategoricalDisplayValue("", "", "", false);
-		} else if (NumberUtils.isNumber(this.value)) {
+		} else if (NumberUtils.isNumber(this.cValueId)) {
 			final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
 			for (final ValueReference possibleValue : possibleValues) {
-				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
-
-					// if measurement data is a factor, show original description else, get the modified display description
-					final String displayDescription =
-							this.getMeasurementVariable().isFactor() ? possibleValue.getDescription() : possibleValue
-									.getDisplayDescription();
-
-					return new CategoricalDisplayValue(this.value, possibleValue.getName(), displayDescription);
+				if (possibleValue.getId().equals(Double.valueOf(this.cValueId).intValue())) {
+					return new CategoricalDisplayValue(this.cValueId, possibleValue.getName(), possibleValue
+							.getDisplayDescription());
 				}
 			}
 		}

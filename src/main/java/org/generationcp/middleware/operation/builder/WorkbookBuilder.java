@@ -567,7 +567,7 @@ public class WorkbookBuilder extends Builder {
 								final Integer id = NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
 
 								measurementData =
-									new MeasurementData(localName, variable.getDisplayValue(), isEditable, dataType, id, factor);
+									new MeasurementData(localName, variable.getActualValue(), isEditable, dataType, id, factor);
 							} else {
 								measurementData = new MeasurementData(localName, variable.getValue(), isEditable, dataType, factor);
 							}
