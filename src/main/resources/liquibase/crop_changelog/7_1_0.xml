@@ -153,7 +153,7 @@
 	</changeSet>
 
 
-	<changeSet author="cuenyad" id="v7.1-2">
+	<changeSet author="cuenyad" id="v7.1.0-5">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="sample_list" columnName="program_uuid"/>
@@ -168,7 +168,7 @@
 			</column>
 		</addColumn>
 	</changeSet>
-	<changeSet author="cuenyad" id="v7.1-3">
+	<changeSet author="cuenyad" id="v7.1.0-6">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">SELECT count(*) FROM sample_list where type='SAMPLE_LIST' and program_uuid is null;
@@ -186,7 +186,7 @@
 			group by sp.sample_list);
 		</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v7.1-4">
+	<changeSet author="cuenyad" id="v7.1.0-7">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
