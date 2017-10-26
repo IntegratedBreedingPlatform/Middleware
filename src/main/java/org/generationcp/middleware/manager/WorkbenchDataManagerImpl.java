@@ -610,7 +610,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<User> getUserByName(final String name, final int start, final int numOfRows, final Operation op) {
 		final UserDAO dao = this.getUserDao();
-		List<User> users = new ArrayList<User>();
+		List<User> users = new ArrayList<>();
 		if (op == Operation.EQUAL) {
 			users = dao.getByNameUsingEqual(name, start, numOfRows);
 		} else if (op == Operation.LIKE) {
@@ -679,8 +679,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchDataset> getWorkbenchDatasetByName(final String name, final Operation op, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
+	public List<WorkbenchDataset> getWorkbenchDatasetByName(final String name, final Operation op, final int start, final int numOfRows) {
 		return this.getWorkbenchDatasetDao().getByName(name, op, start, numOfRows);
 	}
 
@@ -740,7 +739,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Integer> addProjectUserRole(final List<ProjectUserRole> projectUserRoles) {
 
-		final List<Integer> idsSaved = new ArrayList<Integer>();
+		final List<Integer> idsSaved = new ArrayList<>();
 		try {
 
 			final ProjectUserRoleDAO dao = this.getProjectUserRoleDao();
@@ -832,7 +831,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addProjectActivity(final ProjectActivity projectActivity) {
-		final List<ProjectActivity> list = new ArrayList<ProjectActivity>();
+		final List<ProjectActivity> list = new ArrayList<>();
 		list.add(projectActivity);
 
 		final List<Integer> ids = this.addProjectActivity(list);
@@ -846,10 +845,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
 	}
 
-	private List<Integer> addOrUpdateProjectActivityData(final List<ProjectActivity> projectActivityList, final Operation operation)
-			throws MiddlewareQueryException {
+	private List<Integer> addOrUpdateProjectActivityData(final List<ProjectActivity> projectActivityList, final Operation operation) {
 
-		final List<Integer> idsSaved = new ArrayList<Integer>();
+		final List<Integer> idsSaved = new ArrayList<>();
 		try {
 
 			final ProjectActivityDAO dao = this.getProjectActivityDao();
@@ -1131,7 +1129,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.logAndThrowException("Error encountered while getting Security Questions: "
 					+ "WorkbenchDataManager.getQuestionsByUserId(userId=" + userId + "): " + e.getMessage(), e);
 		}
-		return new ArrayList<SecurityQuestion>();
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -1214,8 +1212,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(final WorkbenchSidebarCategory category)
-			throws MiddlewareQueryException {
+	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(final WorkbenchSidebarCategory category) {
 		return this.getWorkbenchSidebarCategoryLinkDao().getAllWorkbenchSidebarLinksByCategoryId(category, 0, Integer.MAX_VALUE);
 	}
 
@@ -1368,12 +1365,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
 
-		return new ArrayList<StandardPreset>();
+		return new ArrayList<>();
 	}
 
 	@Override
-	public List<StandardPreset> getStandardPresetFromCropAndTool(final String cropName, final int toolId, final String toolSection)
-			throws MiddlewareQueryException {
+	public List<StandardPreset> getStandardPresetFromCropAndTool(final String cropName, final int toolId, final String toolSection) {
 
 		try {
 			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
@@ -1388,12 +1384,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
 
-		return new ArrayList<StandardPreset>();
+		return new ArrayList<>();
 	}
 
 	@Override
 	public List<StandardPreset> getStandardPresetFromCropAndToolByName(final String presetName, final String cropName, final int toolId,
-			final String toolSection) throws MiddlewareQueryException {
+			final String toolSection) {
 
 		try {
 			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
@@ -1409,7 +1405,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
 
-		return new ArrayList<StandardPreset>();
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -1444,19 +1440,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException {
+	public List<UserDto> getAllUsersSortedByLastName() {
 		return this.getUserDao().getAllUsersSortedByLastName();
 
 	}
 
 	@Override
-	public List<UserDto> getUsersByProjectUuid(final String projectUuid) throws MiddlewareQueryException {
+	public List<UserDto> getUsersByProjectUuid(final String projectUuid) {
 		return this.getUserDao().getUsersByProjectUUId(projectUuid);
 
 	}
 
 	@Override
-	public Integer createUser(final UserDto userDto) throws MiddlewareQueryException {
+	public Integer createUser(final UserDto userDto) {
 
 		Integer idUserSaved = null;
 		// user.access = 0 - Default User
@@ -1503,7 +1499,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer updateUser(final UserDto userDto) throws MiddlewareQueryException {
+	public Integer updateUser(final UserDto userDto) {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
 		User user = null;
 		Integer idUserSaved = null;
@@ -1519,7 +1515,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			// update user roles to the particular user
 			final UserRole role = user.getRoles().get(0);
-			if (!role.getRole().equals(userDto.getRole().toUpperCase())) {
+			if (!role.getRole().equalsIgnoreCase(userDto.getRole())) {
 				role.setRole(userDto.getRole().toUpperCase());
 			}
 
