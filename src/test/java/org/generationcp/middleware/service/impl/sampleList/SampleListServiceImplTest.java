@@ -520,7 +520,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(sampleService.buildSample(MAIZE, PLOT_CODE_PREFIX, 1, preferredNameGid, Util.getCurrentDate(), ndExperimentId,
 			sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleList);
-		SampleList rootSampleList = new SampleList();
+		final SampleList rootSampleList = new SampleList();
 		rootSampleList.setType(SampleListType.FOLDER);
 		Mockito.when(sampleListDao.getRootSampleList()).thenReturn(rootSampleList);
 
