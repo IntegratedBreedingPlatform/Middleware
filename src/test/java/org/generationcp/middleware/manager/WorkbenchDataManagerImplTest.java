@@ -889,6 +889,22 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		assertThat("Expected id of a newly saved record in workbench_user.", result != null);
 		assertThat("Expected id of new user distinct of 0", !result.equals(0));
 	}
+	
+	@Test
+	public void testGetUserIDsByProjectId() {
+		final List<Integer> prevListOfUserIDs = this.workbenchDataManager.getUserIDsByProjectId(this.commonTestProject.getProjectId());
+		
+		//Set up data
+		UserDto userDto = UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", "Breeder", "username");
+		final int id = this.workbenchDataManager.createUser(userDto);
+		final User user = this.workbenchDataManager.getUserById(id);
+		final Role role = this.workbenchDataManager.getAllRoles().get(0);
+		this.workbenchDataManager.addProjectUserRole(new ProjectUserRole(this.commonTestProject, user, role));
+		
+		
+		List<Integer> userIDs = this.workbenchDataManager.getUserIDsByProjectId(this.commonTestProject.getProjectId());
+		Assert.assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
+	}
 
 	@Test
 	public void testUpdateUser() {
