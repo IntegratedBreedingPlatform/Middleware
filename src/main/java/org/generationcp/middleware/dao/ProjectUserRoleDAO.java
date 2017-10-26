@@ -37,7 +37,8 @@ import org.hibernate.criterion.Restrictions;
  *
  */
 public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
-
+	
+	public static final String GET_USER_IDS_BY_PROJECT_ID = "Select distinct pu.user_id from workbench_project_user_role pu inner join users u on u.userid = pu.user_id where u.ustatus = 0 and pu.project_id = :projectId"; 
 	@Override
 	public ProjectUserRole saveOrUpdate(ProjectUserRole projectUser) throws MiddlewareQueryException {
 
@@ -91,6 +92,21 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 					+ e.getMessage(), e);
 		}
 		return users;
+	}
+	
+	public List<Integer> getUserIDsByProjectId(final Long projectId) {
+		final List<Integer> userIDs = new ArrayList<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRoleDAO.GET_USER_IDS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+					+ e.getMessage(), e);
+		}
+		return userIDs;
 	}
 
 	@SuppressWarnings("unchecked")

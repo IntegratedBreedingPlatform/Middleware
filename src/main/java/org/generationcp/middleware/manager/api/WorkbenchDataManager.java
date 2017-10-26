@@ -539,7 +539,15 @@ public interface WorkbenchDataManager {
 	 * @return the associated list of ProjectUser
 	 */
 	List<ProjectUserRole> getProjectUserRolesByProject(Project project);
-
+	
+	/**
+	 * Retrieves the user ids of the program members using the project id
+	 * 
+	 * @param projectId
+	 * @return
+	 */
+	List<Integer> getUserIDsByProjectId(final Long projectId);
+	
 	/**
 	 * Deletes the given ProjectUserRole.
 	 *
