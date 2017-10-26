@@ -39,6 +39,22 @@ import org.hibernate.criterion.Restrictions;
 public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 	
 	public static final String GET_USER_IDS_BY_PROJECT_ID = "Select distinct pu.user_id from workbench_project_user_role pu inner join users u on u.userid = pu.user_id where u.ustatus = 0 and pu.project_id = :projectId"; 
+	
+	public static final String GET_USERS_BY_PROJECT_ID = "SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, "
+			+ "users.uname, users.upswd, users.personid, users.adate, users.cdate "
+			+ "FROM users JOIN workbench_project_user_role pu ON users.userid = pu.user_id " + "WHERE pu.project_id = :projectId "
+			+ "GROUP BY users.userid";
+
+	public static final String GET_PERSONS_BY_PROJECT_ID = "SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
+			+ "persons.lname "
+			+ "FROM persons "
+			+ "JOIN users ON users.personid = persons.personid "
+			+ "JOIN workbench_project_user_role pu ON users.userid = pu.user_id "
+			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
+
+	public static final String COUNT_USERS_BY_PROJECT_ID = "SELECT COUNT(DISTINCT user_id) " + "FROM workbench_project_user_role "
+			+ "WHERE project_id = :projectId";
+	
 	@Override
 	public ProjectUserRole saveOrUpdate(ProjectUserRole projectUser) throws MiddlewareQueryException {
 
