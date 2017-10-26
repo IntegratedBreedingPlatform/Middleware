@@ -101,6 +101,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private MeasurementVariableService measurementVariableService;
 
 	private GermplasmDescriptors germplasmDescriptors;
+	
+	private DesignFactors designFactors;
 
 	private StudyMeasurements studyMeasurements;
 
@@ -124,8 +126,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
-		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
-		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
+		this.designFactors = new DesignFactors(currentSession);
+		this.studyMeasurements = new StudyMeasurements(currentSession);
+		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(currentSession);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider),
 				new OntologyPropertyDataManagerImpl(sessionProvider),
 				new OntologyScaleDataManagerImpl(sessionProvider), sessionProvider);
@@ -149,7 +152,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialMeasurements
 	 */
 	StudyServiceImpl(final MeasurementVariableService measurementVariableService, final StudyMeasurements trialMeasurements,
-			final StudyGermplasmListService studyGermplasmListServiceImpl, GermplasmDescriptors germplasmDescriptors) {
+			final StudyGermplasmListService studyGermplasmListServiceImpl, final GermplasmDescriptors germplasmDescriptors) {
 		this.measurementVariableService = measurementVariableService;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
@@ -262,12 +265,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final List<MeasurementVariableDto> variablesStudy =this.measurementVariableService.getVariables(studyIdentifier,
 			VariableType.TRAIT.getId(),VariableType.SELECTION_METHOD.getId());
 
-		return this.studyMeasurements
-			.getAllMeasurements(studyIdentifier, variablesStudy, findGenericGermplasmDescriptors(studyIdentifier), instanceId,
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, variablesStudy,
+				this.findGenericGermplasmDescriptors(studyIdentifier), this.findAdditionalDesignFactors(studyIdentifier), instanceId,
 				pageNumber, pageSize, sortBy, sortOrder);
 	}
 
-	private List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {
+	List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {
 
 		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyIdentifier);
 		/**
@@ -285,12 +288,31 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 		return genericGermplasmDescriptors;
 	}
+	
+	List<String> findAdditionalDesignFactors(final int studyIdentifier) {
+
+		final List<String> allDesignFactors = this.designFactors.find(studyIdentifier);
+		/**
+		 * Fixed design factors are already being retrieved individually in Measurements query. We are only
+		 * interested in additional EXPERIMENTAL_DESIGN and TREATMENT FACTOR variables
+		 */
+		final List<String> fixedDesignFactors =
+				Lists.newArrayList("REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE");
+		final List<String> additionalDesignFactors = Lists.newArrayList();
+
+		for (final String designFactor : allDesignFactors) {
+			if (!fixedDesignFactors.contains(designFactor)) {
+				additionalDesignFactors.add(designFactor);
+			}
+		}
+		return additionalDesignFactors;
+	}
 
 	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
 		final List<MeasurementVariableDto> traits = this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
-		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
-				measurementIdentifier);
+		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, this.findGenericGermplasmDescriptors(studyIdentifier),
+				this.findAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
 	}
 
 	@Override

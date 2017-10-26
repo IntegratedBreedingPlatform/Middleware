@@ -36,7 +36,8 @@ public class ObservationQueryTest {
 		final List<MeasurementVariableDto> traitNames = new LinkedList<MeasurementVariableDto>();
 		traitNames.add(new MeasurementVariableDto(1, "PH_cm"));
 		List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		String result = fixture.getAllObservationsQuery(traitNames, germplasmDescriptors,null, null);
+		List<String> designFactors = Lists.newArrayList();
+		String result = fixture.getAllObservationsQuery(traitNames, germplasmDescriptors, designFactors, null, null);
 		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForAllMeasurements()),
 				formatString(result));
 	}
@@ -47,7 +48,8 @@ public class ObservationQueryTest {
 		final List<MeasurementVariableDto> traitNames = new LinkedList<MeasurementVariableDto>();
 		traitNames.add(new MeasurementVariableDto(1, "PH_cm"));
 		List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		String result = fixture.getSingleObservationQuery(traitNames, germplasmDescriptors);
+		List<String> designFactors = Lists.newArrayList();
+		String result = fixture.getSingleObservationQuery(traitNames, germplasmDescriptors, designFactors);
 		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForSingleMeasurement()),
 				formatString(result));
 	}

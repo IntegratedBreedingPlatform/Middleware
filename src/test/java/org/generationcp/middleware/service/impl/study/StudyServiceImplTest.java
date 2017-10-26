@@ -145,18 +145,19 @@ public class StudyServiceImplTest {
 
 		final List<MeasurementVariableDto> projectTraits = Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
 		final List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
+		final List<String> designFactors = Lists.newArrayList();
 		Mockito.when(mockTrialTraits.getVariables(1234)).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "triatValue"));
 		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource",
 				"repitionNumber", "plotNumber", "blockNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
-		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, 1, 1, 100, null, null))
+		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, designFactors, 1, 1, 100, null, null))
 				.thenReturn(testMeasurements);
 		result.getObservations(1234, 1, 1, 100, null, null);
 
 		final List<ObservationDto> allMeasurements =
-				mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, 1, 1, 100, null, null);
+				mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, designFactors, 1, 1, 100, null, null);
 		Assert.assertEquals(allMeasurements, testMeasurements);
 	}
 

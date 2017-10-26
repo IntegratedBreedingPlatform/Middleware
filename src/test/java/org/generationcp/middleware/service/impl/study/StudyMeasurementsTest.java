@@ -29,6 +29,7 @@ public class StudyMeasurementsTest {
 	private SQLQuery mockSqlQuery;
 	private List<MeasurementVariableDto> testTraits;
 	private List<String> germplasmDescriptors;
+	private List<String> designFactors;
 	private Object[] testRows;
 	private List<Object[]> sampleMeasurements;
 
@@ -44,6 +45,7 @@ public class StudyMeasurementsTest {
 		this.mockSqlQuery = Mockito.mock(SQLQuery.class);
 		this.testTraits = Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(2, "Trait2"));
 		this.germplasmDescriptors = Lists.newArrayList("STOCK_ID");
+		this.designFactors = Lists.newArrayList();
 		this.testRows = new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
 			"PLOT_NUMBER", "BLOCK_NO", "ROW", "COL", "", "", "PlotID-ABC123", "SUM_OF_SAMPLES", "Trait1Value", 1000, "Trait2Value", 2000,
 			"Stock_Id_Value"};
@@ -59,13 +61,12 @@ public class StudyMeasurementsTest {
 	@Test
 	public void allPlotsMeasurementQueryRetrievesDataCorrectly() throws Exception {
 
-		Mockito.when(this.session
-				.createSQLQuery(new ObservationQuery().getAllObservationsQuery(this.testTraits, this.germplasmDescriptors, null, null)))
+		Mockito.when(this.session.createSQLQuery(
+				new ObservationQuery().getAllObservationsQuery(this.testTraits, this.germplasmDescriptors, this.designFactors, null, null)))
 				.thenReturn(this.mockSqlQuery);
 
-		List<ObservationDto> returnedMeasurements =
-				this.trailTraits.getAllMeasurements(this.TEST_PROJECT_IDENTIFIER, this.testTraits, this.germplasmDescriptors, 1, 1, 100,
-						null, null);
+		List<ObservationDto> returnedMeasurements = this.trailTraits.getAllMeasurements(this.TEST_PROJECT_IDENTIFIER, this.testTraits,
+				this.germplasmDescriptors, this.designFactors, 1, 1, 100, null, null);
 
 		this.verifyScalarSetting();
 		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("instanceId"), Matchers.anyString());
@@ -83,12 +84,12 @@ public class StudyMeasurementsTest {
 	@Test
 	public void singlePlotMeasurementsQueryRetrievesDataCorrectly() throws Exception {
 		Mockito.when(
-				this.session.createSQLQuery(new ObservationQuery().getSingleObservationQuery(this.testTraits, this.germplasmDescriptors)))
+				this.session.createSQLQuery(new ObservationQuery().getSingleObservationQuery(this.testTraits, this.germplasmDescriptors, this.designFactors)))
 				.thenReturn(
 				this.mockSqlQuery);
 
 		List<ObservationDto> returnedMeasurements =
-				this.trailTraits.getMeasurement(this.TEST_PROJECT_IDENTIFIER, this.testTraits, this.germplasmDescriptors,
+				this.trailTraits.getMeasurement(this.TEST_PROJECT_IDENTIFIER, this.testTraits, this.germplasmDescriptors, this.designFactors,
 						this.TEST_PLOT_IDENTIFIER);
 
 		this.verifyScalarSetting();
