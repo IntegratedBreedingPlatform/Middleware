@@ -32,7 +32,7 @@ public class UserProgramStateDataManagerImpl extends DataManager implements User
 	@Override
 	public List<String> getUserProgramTreeStateByUserIdProgramUuidAndType(int userId, String programUuid, String type)
 			throws MiddlewareQueryException {
-		List<String> treeState = new ArrayList<String>();
+		List<String> treeState = new ArrayList<>();
 		try {
 			UserProgramTreeState userProgramTreeState = this.getUserProgramTreeState(userId, programUuid, type);
 			if (userProgramTreeState != null) {

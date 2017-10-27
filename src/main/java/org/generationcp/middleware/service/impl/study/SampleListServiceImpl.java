@@ -8,7 +8,6 @@ import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
@@ -18,13 +17,13 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -89,23 +88,40 @@ public class SampleListServiceImpl implements SampleListService {
 
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
+		Preconditions.checkArgument(sampleListDTO.getProgramUUID() != null, "The programUUID must not be null");
+
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
+		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
+		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
+
+
 
 		try {
-			final Study study = this.studyService.getStudy(sampleListDTO.getStudyId());
-			Preconditions.checkNotNull(study, "The study must not be null");
 			final SampleList sampleList = new SampleList();
 			User takenBy = null;
-			Date createdDate = new Date();
-			sampleList.setCreatedDate(createdDate);
+			sampleList.setCreatedDate(sampleListDTO.getCreatedDate());
 			User user = this.userDao.getUserByUserName(sampleListDTO.getCreatedBy());
+			sampleList.setProgramUUID(sampleListDTO.getProgramUUID());
 			sampleList.setCreatedBy(user);
 			sampleList.setDescription(sampleListDTO.getDescription());
-			sampleList.setListName(study.getName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
+			sampleList.setListName(sampleListDTO.getListName());
 			sampleList.setNotes(sampleListDTO.getNotes());
 			sampleList.setType(SampleListType.SAMPLE_LIST);
-			final SampleList parent = this.sampleListDao.getRootSampleList();
+			final SampleList parent;
+
+			if (sampleListDTO.getParentId() == null || sampleListDTO.getParentId().equals(0)) {
+				parent = this.sampleListDao.getRootSampleList();
+			} else {
+				parent = this.sampleListDao.getParentSampleFolder(sampleListDTO.getParentId());
+			}
+
+			Preconditions.checkState(parent.isFolder(), "The parent id must not be a list");
+
+			if (this.sampleListDao.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId()) != null) {
+				throw new MiddlewareQueryException("List name should be unique within the same directory");
+			}
+
 			sampleList.setHierarchy(parent);
 
 			final List<ObservationDto> observationDtos = this.studyMeasurements
@@ -134,7 +150,7 @@ public class SampleListServiceImpl implements SampleListService {
 					count++;
 					final Sample sample = this.sampleService
 						.buildSample(sampleListDTO.getCropName(), cropPrefix, count, observationDto.getDesignation(),
-							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user, createdDate, takenBy);
+							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
 			}
@@ -168,28 +184,37 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @param folderName
 	 * @param parentId
 	 * @param createdBy
+	 * @param programUUID
 	 * @return Sample List
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy) throws Exception {
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy,  final String programUUID) throws Exception {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
 		Preconditions.checkNotNull(createdBy);
+		Preconditions.checkNotNull(programUUID);
 		Preconditions.checkArgument(!folderName.isEmpty(), "folderName can not be empty");
 		Preconditions.checkArgument(!createdBy.isEmpty(), "createdBy can not be empty");
+		Preconditions.checkArgument(!programUUID.isEmpty(), "programUUID can not be empty");
 
-		final SampleList parentList = this.sampleListDao.getById(parentId);
+		final SampleList parentList;
+		if (0 == parentId) {
+			parentList = this.sampleListDao.getRootSampleList();
+		} else {
+			parentList = this.sampleListDao.getById(parentId);
+
+		}
 		if (parentList == null) {
 			throw new Exception("Parent Folder does not exist");
 		}
 
-		if (!SampleListType.FOLDER.equals(parentList.getType())) {
+		if (!parentList.isFolder()) {
 			throw new Exception("Specified parentID is not a folder");
 		}
 
-		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentId) != null) {
-			throw new Exception("folderName is not unique in the specified folder");
+		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId()) != null) {
+			throw new Exception("Folder name should be unique within the same directory");
 		}
 		final SampleList sampleFolder = new SampleList();
 		sampleFolder.setCreatedDate(new Date());
@@ -199,6 +224,7 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleFolder.setNotes(null);
 		sampleFolder.setHierarchy(parentList);
 		sampleFolder.setType(SampleListType.FOLDER);
+		sampleFolder.setProgramUUID(programUUID);
 		return this.sampleListDao.save(sampleFolder).getId();
 	}
 
@@ -232,7 +258,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId()) != null) {
-			throw new Exception("folderName is not unique in the parent folder");
+			throw new Exception("Folder name should be unique within the same directory");
 		}
 
 		folder.setListName(newFolderName);
@@ -254,24 +280,38 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListId);
 		Preconditions.checkNotNull(newParentFolderId);
 		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), "Arguments can not have the same value");
+
 		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
+
 		if (listToMove == null) {
 			throw new Exception("sampleList does not exist");
 		}
+
 		if (listToMove.getHierarchy() == null) {
 			throw new Exception("Root folder can not me moved");
 		}
-		final SampleList newParentFolder = this.sampleListDao.getById(newParentFolderId);
+
+		final SampleList newParentFolder;
+		if (0 == newParentFolderId) {
+			newParentFolder = this.sampleListDao.getRootSampleList();
+		} else {
+			newParentFolder = this.sampleListDao.getById(newParentFolderId);
+
+		}
+
 		if (newParentFolder == null) {
 			throw new Exception("Specified newParentFolderId does not exist");
 		}
-		if (!SampleListType.FOLDER.equals(newParentFolder.getType())) {
+
+		if (!newParentFolder.isFolder()) {
 			throw new Exception("Specified newParentFolderId is not a folder");
 		}
+
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
+
 		if (uniqueSampleListName != null) {
-			throw new Exception("folderName is not unique in the parent folder");
+			throw new Exception("Folder name should be unique within the same directory");
 		}
 
 		if (isDescendant(listToMove, newParentFolder)) {
@@ -294,21 +334,54 @@ public class SampleListServiceImpl implements SampleListService {
 	public void deleteSampleListFolder(final Integer folderId) throws Exception {
 		Preconditions.checkNotNull(folderId);
 		final SampleList folder = this.sampleListDao.getById(folderId);
-		if (folder == null)
+		if (folder == null) {
 			throw new Exception("Folder does not exist");
-
-		if (!SampleListType.FOLDER.equals(folder.getType())) {
+		}
+		if (!folder.isFolder()) {
 			throw new Exception("Specified folderID is not a folder");
 		}
 
-		if (folder.getHierarchy() == null)
+		if (folder.getHierarchy() == null) {
 			throw new Exception("Root folder can not be deleted");
-		if (folder.getChildren() != null && !folder.getChildren().isEmpty())
-			throw new Exception("Folder to delete can not have children");
+		}
+		if (folder.getChildren() != null && !folder.getChildren().isEmpty()) {
+			throw new Exception("Folder has children and cannot be deleted");
+		}
 		this.sampleListDao.makeTransient(folder);
 	}
 
-	protected boolean isDescendant(SampleList list, SampleList of) {
+	@Override
+	public List<SampleList> getAllTopLevelLists(final String programUUID) {
+		return this.getSampleListDao().getAllTopLevelLists(programUUID);
+	}
+
+	@Override
+	public SampleList getSampleListByListId(final Integer listId) {
+		return this.getSampleListDao().getById(listId);
+	}
+
+	@Override
+	public SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid) {
+		return this.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
+	}
+
+	@Override
+	public Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists) {
+		final List<Integer> folderIdsToRetrieveFolderCount = getFolderIdsFromSampleList(sampleLists);
+		return this.getSampleListDao().getSampleFolderMetadata(folderIdsToRetrieveFolderCount);
+	}
+
+	private List<Integer> getFolderIdsFromSampleList(final List<SampleList> listIds) {
+		final List<Integer> folderIdsToRetrieveFolderCount = new ArrayList<>();
+		for (final SampleList parentList : listIds) {
+			if(parentList.isFolder()) {
+				folderIdsToRetrieveFolderCount.add(parentList.getId());
+			}
+		}
+		return folderIdsToRetrieveFolderCount;
+	}
+
+	protected boolean isDescendant(final SampleList list, final SampleList of) {
 		if (of.getHierarchy() == null) {
 			return false;
 		}
@@ -334,6 +407,16 @@ public class SampleListServiceImpl implements SampleListService {
 		return this.sampleListDao.getSampleDetailsDTO(sampleListId);
 	}
 
+	@Override
+	public List<SampleList> getAllSampleTopLevelLists(final String programUUID) {
+		return this.sampleListDao.getAllTopLevelLists(programUUID);
+	}
+
+	@Override
+	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
+		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
+	}
+
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
 		this.studyMeasurements = studyMeasurements;
 	}
@@ -356,5 +439,37 @@ public class SampleListServiceImpl implements SampleListService {
 
 	public  void setSampleDao(final SampleDao sampleDao) {
 		this.sampleDao = sampleDao;
+	}
+
+	public SampleListDao getSampleListDao() {
+		return sampleListDao;
+	}
+
+	public UserDAO getUserDao() {
+		return userDao;
+	}
+
+	public SampleDao getSampleDao() {
+		return sampleDao;
+	}
+
+	public StudyMeasurements getStudyMeasurements() {
+		return studyMeasurements;
+	}
+
+	public PlantDao getPlantDao() {
+		return plantDao;
+	}
+
+	public SampleService getSampleService() {
+		return sampleService;
+	}
+
+	public StudyDataManager getStudyService() {
+		return studyService;
+	}
+
+	public WorkbenchDataManager getWorkbenchDataManager() {
+		return workbenchDataManager;
 	}
 }

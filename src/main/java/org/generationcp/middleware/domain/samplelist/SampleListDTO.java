@@ -37,7 +37,13 @@ public class SampleListDTO implements Serializable {
 
 	private String cropName;
 
+	private Integer parentId;
+
 	private String listName;
+
+	private Date createdDate;
+
+	private String programUUID;
 
 	public SampleListDTO(final Integer id, final String listName) {
 		this.listId = id;
@@ -129,14 +135,6 @@ public class SampleListDTO implements Serializable {
 		this.notes = notes;
 	}
 
-	public String getListName() {
-		return listName;
-	}
-
-	public void setListName(final String listName) {
-		this.listName = listName;
-	}
-
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof SampleListDTO)) {
@@ -156,5 +154,37 @@ public class SampleListDTO implements Serializable {
 	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(final Integer parentId) {
+		this.parentId = parentId;
+	}
+
+	public String getListName() {
+		return listName;
+	}
+
+	public void setListName(final String listName) {
+		this.listName = listName;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(final Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
 	}
 }

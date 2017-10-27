@@ -48,6 +48,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
@@ -1285,24 +1286,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return germplasmCrossesList;
 	}
 
-	@Override
-	public List<SampleListDTO> getSampleLists(final Integer trialId) {
-		return this.getSampleListServiceImpl().getSampleLists(trialId);
-	}
-
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
-	}
-
-	@Override
-	public SampleList getSampleList(final Integer sampleListId) {
-		return this.getSampleListServiceImpl().getSampleList(sampleListId);
-	}
-
-	@Override
-	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
-
-		return this.getSampleListServiceImpl().getSampleDetailsDTOs(sampleListId);
 	}
 
 }

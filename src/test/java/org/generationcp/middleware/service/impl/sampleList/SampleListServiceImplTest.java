@@ -95,33 +95,33 @@ public class SampleListServiceImplTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderFolderNull() throws Exception {
-		this.sampleListService.createSampleListFolder(null, 1, "userName");
+		this.sampleListService.createSampleListFolder(null, 1, "userName", "programUUID");
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderParentIdNull() throws Exception {
-		this.sampleListService.createSampleListFolder("name", null, "userName");
+		this.sampleListService.createSampleListFolder("name", null, "userName", "programUUID");
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderCreatedByNull() throws Exception {
-		this.sampleListService.createSampleListFolder("name", 1, null);
+		this.sampleListService.createSampleListFolder("name", 1, null, "programUUID");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateSampleListFolderFolderNameEmpty() throws Exception {
-		this.sampleListService.createSampleListFolder("", 1, "userName");
+		this.sampleListService.createSampleListFolder("", 1, "userName", "programUUID");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateSampleListFolderCreatedByEmpty() throws Exception {
-		this.sampleListService.createSampleListFolder("4", 1, "");
+		this.sampleListService.createSampleListFolder("4", 1, "", "programUUID");
 	}
 
 	@Test(expected = Exception.class)
 	public void testCreateSampleListFolderParentListNotExist() throws Exception {
 		Mockito.when(sampleListDao.getById(1)).thenReturn(null);
-		this.sampleListService.createSampleListFolder("4", 1, "userName");
+		this.sampleListService.createSampleListFolder("4", 1, "userName", "programUUID");
 	}
 
 	@Test(expected = Exception.class)
@@ -130,7 +130,7 @@ public class SampleListServiceImplTest {
 		final SampleList parentFolder = new SampleList();
 		Mockito.when(sampleListDao.getById(1)).thenReturn(parentFolder);
 		Mockito.when(sampleListDao.getSampleListByParentAndName("4", 1)).thenReturn(notUniqueValue);
-		this.sampleListService.createSampleListFolder("4", 1, "userName");
+		this.sampleListService.createSampleListFolder("4", 1, "userName", "programUUID");
 	}
 
 	@Test (expected = Exception.class)
@@ -144,7 +144,7 @@ public class SampleListServiceImplTest {
 		sampleFolder.setId(1);
 		sampleFolder.setType(SampleListType.FOLDER);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleFolder);
-		this.sampleListService.createSampleListFolder("4", 1, "userName");
+		this.sampleListService.createSampleListFolder("4", 1, "userName", "programUUID");
 	}
 
 	@Test
@@ -158,7 +158,7 @@ public class SampleListServiceImplTest {
 		sampleFolder.setId(1);
 		sampleFolder.setType(SampleListType.FOLDER);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleFolder);
-		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, "userName");
+		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, "userName", "programUUID");
 		assertThat(sampleFolder.getId(), equalTo(savedObject));
 	}
 
@@ -170,7 +170,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(sampleListDao.getSampleListByParentAndName("4", 1)).thenReturn(null);
 		Mockito.when(userDAO.getUserByUserName("userName")).thenReturn(new User());
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenThrow(MiddlewareQueryException.class);
-		this.sampleListService.createSampleListFolder("4", 1, "userName");
+		this.sampleListService.createSampleListFolder("4", 1, "userName", "programUUID");
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -520,6 +520,9 @@ public class SampleListServiceImplTest {
 		Mockito.when(sampleService.buildSample(MAIZE, PLOT_CODE_PREFIX, 1, preferredNameGid, Util.getCurrentDate(), ndExperimentId,
 			sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleList);
+		final SampleList rootSampleList = new SampleList();
+		rootSampleList.setType(SampleListType.FOLDER);
+		Mockito.when(sampleListDao.getRootSampleList()).thenReturn(rootSampleList);
 
 		this.createSampleListDTO(studyId, selectionVariableId, instanceIds);
 
@@ -536,6 +539,7 @@ public class SampleListServiceImplTest {
 
 		sampleListDTO.setCreatedBy(ADMIN);
 		sampleListDTO.setCropName("maize");
+		sampleListDTO.setListName("SampleListTest");
 		sampleListDTO.setDescription("desc");
 		sampleListDTO.setInstanceIds(instanceIds);
 		sampleListDTO.setNotes("notes");
@@ -544,6 +548,9 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setSelectionVariableId(selectionVariableId);
 		sampleListDTO.setStudyId(studyId);
 		sampleListDTO.setTakenBy(ADMIN);
+		sampleListDTO.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
+		sampleListDTO.setCreatedDate(Util.getCurrentDate());
+		sampleListDTO.setParentId(0);
 		sampleListService.createSampleList(sampleListDTO);
 		return sampleListDTO;
 	}

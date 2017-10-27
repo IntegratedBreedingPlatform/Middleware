@@ -59,6 +59,7 @@ import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
@@ -219,7 +220,7 @@ public abstract class Service extends DatabaseBroker {
 		return locationDataManager;
 	}
 
-	protected final SampleListServiceImpl getSampleListServiceImpl() {
+	protected final SampleListService getSampleListService() {
 		return new SampleListServiceImpl(this.sessionProvider);
 	}
 }
