@@ -609,6 +609,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return projectProperty.getValue().substring(0, 4);
 		return "";
 	}
+
+	
+	public void setGermplasmDescriptors(GermplasmDescriptors germplasmDescriptors) {
+		this.germplasmDescriptors = germplasmDescriptors;
+	}
+
+	
+	public void setDesignFactors(DesignFactors designFactors) {
+		this.designFactors = designFactors;
+	}
 }
 
 
