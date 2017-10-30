@@ -180,11 +180,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		// Step 2: Get markerId, linkageGroup, startPosition from gdms_markers_onmap
 		List<MarkerOnMap> markersOnMap = this.getMarkerOnMapDao().getMarkersOnMapByMapId(map.getMapId());
 
+		HashMap<Integer,Marker> markersMap = getMarkerByMapId(map.getMapId());
+
 		// Step 3: Get marker name from gdms_marker and build MapInfo
-		for (MarkerOnMap markerOnMap : markersOnMap) {
-			Integer markerId = markerOnMap.getMarkerId();
-			String markerName = this.getMarkerNameByMarkerId(markerId);
-			MapInfo mapInfo =
+		for (final MarkerOnMap markerOnMap : markersOnMap) {
+			final Integer markerId = markerOnMap.getMarkerId();
+			final String markerName = markersMap.get(markerId).getMarkerName();//this.getMarkerNameByMarkerId(markerId);
+			final MapInfo mapInfo =
 					new MapInfo(markerId, markerName, markerOnMap.getMapId(), map.getMapName(), markerOnMap.getLinkageGroup(),
 							markerOnMap.getStartPosition(), map.getMapType(), map.getMapUnit());
 			mapInfoList.add(mapInfo);
@@ -503,6 +505,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private String getMarkerNameByMarkerId(Integer markerId) throws MiddlewareQueryException {
 		return this.getMarkerDao().getNameById(markerId);
+	}
+
+	private HashMap<Integer, Marker> getMarkerByMapId(Integer mapId) throws MiddlewareQueryException {
+		final HashMap<Integer, Marker> markersMap = new HashMap<>();
+		List<Marker> markerList = this.getMarkerDao().getMarkersByMapId(mapId);
+		for (Marker marker : markerList) {
+			markersMap.put(marker.getMarkerId(), marker);
+		}
+		return markersMap;
 	}
 
 	@Override
