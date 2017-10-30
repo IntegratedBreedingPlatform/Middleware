@@ -160,6 +160,7 @@ public class MeasurementDataTest {
 		return possibleValues;
 	}
 
+	@Test
 	public void testGetDisplayValueForCategoricalData() throws Exception {
 		MeasurementData dataWithValue =
 				this.measurementDataTestDataInitializer.createCategoricalMeasurementData(1234, "test_categorical_data", "1");
@@ -179,6 +180,8 @@ public class MeasurementDataTest {
 	public void testGetDisplayValueForCategoricalDataWithInvalidValue() throws Exception {
 		MeasurementData dataWithInvalidValue =
 				this.measurementDataTestDataInitializer.createCategoricalMeasurementData(1234, "test_categorical_data", "2");
+		// If the data is invalid value, then cValueId should be empty.
+		dataWithInvalidValue.setcValueId("");
 		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
 
 		Assert.assertNotNull(invalidValue);
@@ -192,6 +195,8 @@ public class MeasurementDataTest {
 	public void testGetDisplayValueForCategoricalDataWithNullValue() throws Exception {
 		MeasurementData dataWithInvalidValue =
 				this.measurementDataTestDataInitializer.createCategoricalMeasurementData(1234, "test_categorical_data", null);
+		// If the data is null, then cValueId should be empty.
+		dataWithInvalidValue.setcValueId("");
 		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
 
 		Assert.assertNotNull(invalidValue);

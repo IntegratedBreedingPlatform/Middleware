@@ -223,7 +223,7 @@ public class MeasurementData {
 	}
 
 	public CategoricalDisplayValue getDisplayValueForCategoricalData() {
-		if (null == this.cValueId || "".equals(this.cValueId)) {
+		if ((null == this.cValueId ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(value)) {
 			return new CategoricalDisplayValue("", "", "", false);
 		} else if (NumberUtils.isNumber(this.cValueId)) {
 			final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
