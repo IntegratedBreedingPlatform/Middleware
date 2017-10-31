@@ -140,7 +140,8 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveMeasurementsTrue() {
 		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
+		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer
+				.createMeasurementVariableList();
 		final List<MeasurementRow> observations = MeasurementRowTestDataInitializer.createMeasurementRowList(1,
 				"Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
@@ -151,7 +152,8 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveMeasurementsFalse() {
 		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
+		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer
+				.createMeasurementVariableList();
 		final List<MeasurementRow> observations = MeasurementRowTestDataInitializer.createMeasurementRowList(1,
 				"Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
