@@ -96,17 +96,11 @@ public class FieldbookServiceImplTest {
 
 	private List<Pair<Germplasm, List<Attribute>>> germplasmAttributes;
 
-	private MeasurementVariableTestDataInitializer measurementVariableTestDataInitializer;
-
-	private MeasurementRowTestDataInitializer measurementRowTestDataInitializer;
-
 	@InjectMocks
 	private FieldbookServiceImpl fieldbookServiceImpl;
 
 	@Before
 	public void setUp() {
-		this.measurementVariableTestDataInitializer = new MeasurementVariableTestDataInitializer();
-		this.measurementRowTestDataInitializer = new MeasurementRowTestDataInitializer();
 		this.fieldbookServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 		this.fieldbookServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
 		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
@@ -146,9 +140,8 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveMeasurementsTrue() {
 		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer
-				.createMeasurementVariableList();
-		final List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1,
+		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
+		final List<MeasurementRow> observations = MeasurementRowTestDataInitializer.createMeasurementRowList(1,
 				"Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
 		// Verify that the method is called
@@ -158,9 +151,8 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveMeasurementsFalse() {
 		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer
-				.createMeasurementVariableList();
-		final List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1,
+		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
+		final List<MeasurementRow> observations = MeasurementRowTestDataInitializer.createMeasurementRowList(1,
 				"Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
 		// Verify that the method is never called
