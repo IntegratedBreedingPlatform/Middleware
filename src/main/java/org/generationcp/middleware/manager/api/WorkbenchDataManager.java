@@ -950,13 +950,21 @@ public interface WorkbenchDataManager {
 	public Integer createUser(UserDto userDto) throws MiddlewareQueryException;
 
 	/**
-	 * updates the user.
+	 * Updates the user.
 	 *
 	 * @param user the user to update
 	 * @return Returns the id of the {@code UserDto} record added
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	public Integer updateUser(UserDto userDto) throws MiddlewareQueryException;
+
+	/**
+	 * updates the user.
+	 *
+	 * @param user the user to update
+	 * @return Returns the id of the {@code User} record updated
+	 */
+	public void updateUser(User user);
 
 	/**
 	 * Gets the user by project_uuid.

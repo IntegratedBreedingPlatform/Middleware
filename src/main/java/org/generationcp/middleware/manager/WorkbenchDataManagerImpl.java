@@ -1534,6 +1534,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return idUserSaved;
 	}
 
+	@Override
+	public void updateUser(final User user) {
+		this.getUserDao().saveOrUpdate(user);
+		this.getPersonDao().saveOrUpdate(user.getPerson());
+	}
+
 	private Person setPerson(final UserDto userDto, final Person person) {
 
 		person.setFirstName(userDto.getFirstName());
