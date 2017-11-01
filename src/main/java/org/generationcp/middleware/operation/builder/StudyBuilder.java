@@ -59,6 +59,7 @@ public class StudyBuilder extends Builder {
 		Study study = new Study();
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
+		study.setStudyType(project.getStudyType());
 		
 		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties(),
 				project.getProgramUUID());
@@ -77,6 +78,7 @@ public class StudyBuilder extends Builder {
 		Study study = new Study();
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
+		study.setStudyType(project.getStudyType());
 
 		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
 				project.getProperties(),project.getProgramUUID());

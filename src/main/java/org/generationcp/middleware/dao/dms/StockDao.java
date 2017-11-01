@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao.dms;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.hibernate.Criteria;
@@ -81,13 +80,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select distinct p.project_id, p.name, p.description, prop.value, p.program_uuid " + "FROM stock s "
+					.createSQLQuery("select distinct p.project_id, p.name, p.description, p.study_type, p.program_uuid " + "FROM stock s "
 							+ "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
 							+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
 							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
-							+ "LEFT OUTER JOIN projectprop prop ON prop.project_id = p.project_id AND prop.variable_id = " + TermId.STUDY_TYPE.getId()
 							+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
@@ -98,7 +96,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					continue;
 				}
 				final String studyTypeRaw = (String) row[3];
-				final StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
+				final StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeByName(studyTypeRaw) : null;
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2],(String) row[4],studyType));
 			}
 
