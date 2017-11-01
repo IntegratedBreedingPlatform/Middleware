@@ -277,16 +277,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return standardPresetDAO;
 	}
 
-	private void logAndThrowException(final String message, final Exception e) {
-		WorkbenchDataManagerImpl.LOG.error(e.getMessage(), e);
-		throw new MiddlewareQueryException(message + e.getMessage(), e);
-	}
-
-	private void logAndThrowException(final String message) {
-		WorkbenchDataManagerImpl.LOG.error(message);
-		throw new MiddlewareQueryException(message);
-	}
-
 	@Override
 	public List<Project> getProjects() {
 		return this.getProjectDao().getAll();
@@ -420,7 +410,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Cannot delete ProjectUserInfo: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo="
+			throw new MiddlewareQueryException("Cannot delete ProjectUserInfo: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo="
 					+ projectUserInfo + "): " + e.getMessage(), e);
 		}
 	}
@@ -434,7 +424,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): " + e.getMessage(), e);
 		}
 	}
@@ -510,7 +500,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while saving Person: WorkbenchDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
 		}
 		return idPersonSaved;
@@ -527,7 +517,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
 
@@ -561,7 +551,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Error encountered while saving workbench dataset: WorkbenchDataManager.addWorkbenchDataset(dataset="
+			throw  new MiddlewareQueryException("Error encountered while saving workbench dataset: WorkbenchDataManager.addWorkbenchDataset(dataset="
 					+ dataset + "): " + e.getMessage(), e);
 		}
 
@@ -582,7 +572,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Cannot delete WorkbenchDataset: WorkbenchDataManager.deleteWorkbenchDataset(dataset=" + dataset
+			throw  new MiddlewareQueryException("Cannot delete WorkbenchDataset: WorkbenchDataManager.deleteWorkbenchDataset(dataset=" + dataset
 					+ "):  " + e.getMessage(), e);
 		}
 	}
@@ -628,7 +618,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while deleting User: WorkbenchDataManager.deleteUser(user=" + user + "):  " + e.getMessage(), e);
 		}
 	}
@@ -657,7 +647,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while deleting Person: WorkbenchDataManager.deletePerson(person=" + person + "): " + e.getMessage(),
 					e);
 		}
@@ -679,8 +669,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchDataset> getWorkbenchDatasetByName(final String name, final Operation op, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
+	public List<WorkbenchDataset> getWorkbenchDatasetByName(final String name, final Operation op, final int start, final int numOfRows) {
 		return this.getWorkbenchDatasetDao().getByName(name, op, start, numOfRows);
 	}
 
@@ -709,7 +698,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while saving ProjectUserRole: WorkbenchDataManager.addProjectUserRole(projectUserRole="
 							+ projectUserRole + "): " + e.getMessage(),
 					e);
@@ -732,7 +721,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				this.getCurrentSession().delete(projectUserRole);
 			}
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUserRoles(oldRoles="
+			throw  new MiddlewareQueryException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUserRoles(oldRoles="
 					+ oldRoles + "): " + e.getMessage(), e);
 		}
 	}
@@ -752,7 +741,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while saving ProjectUserRoles: WorkbenchDataManager.addProjectUserRoles(projectUserRoles="
 							+ projectUserRoles + "): " + e.getMessage(),
 					e);
@@ -772,7 +761,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 			this.getProjectUserRoleDao().makeTransient(projectUserRole);
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser="
+			throw  new MiddlewareQueryException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser="
 					+ projectUserRole + "): " + e.getMessage(), e);
 		}
 	}
@@ -807,7 +796,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		final CropTypeDAO dao = this.getCropTypeDao();
 		if (this.getCropTypeDao().getByName(cropType.getCropName()) != null) {
-			this.logAndThrowException("Crop type already exists.");
+			throw  new MiddlewareQueryException("Crop type already exists.");
 		}
 
 		String idSaved = null;
@@ -818,7 +807,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Error encountered while adding crop type: WorkbenchDataManager.addCropType(cropType=" + cropType
+			throw  new MiddlewareQueryException("Error encountered while adding crop type: WorkbenchDataManager.addCropType(cropType=" + cropType
 					+ "): " + e.getMessage(), e);
 		}
 
@@ -846,8 +835,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
 	}
 
-	private List<Integer> addOrUpdateProjectActivityData(final List<ProjectActivity> projectActivityList, final Operation operation)
-			throws MiddlewareQueryException {
+	private List<Integer> addOrUpdateProjectActivityData(final List<ProjectActivity> projectActivityList, final Operation operation) {
 
 		final List<Integer> idsSaved = new ArrayList<Integer>();
 		try {
@@ -861,7 +849,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while adding addProjectActivity: WorkbenchDataManager.addOrUpdateProjectActivityData(projectActivityList="
 							+ projectActivityList + ", operation=" + operation + "): " + e.getMessage(),
 					e);
@@ -884,7 +872,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while deleting ProjectActivity: WorkbenchDataManager.deleteProjectActivity(projectActivity="
 							+ projectActivity + "): " + e.getMessage(),
 					e);
@@ -916,7 +904,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while saving ToolConfiguration: WorkbenchDataManager.addOrUpdateToolConfiguration(toolConfig="
 							+ toolConfig + ", operation=" + op + "): " + e.getMessage(),
 					e);
@@ -933,7 +921,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while deleting ToolConfiguration: WorkbenchDataManager.deleteToolConfiguration(toolConfig="
 							+ toolConfig + "): " + e.getMessage(),
 					e);
@@ -990,7 +978,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while retrieving Local IbdbUserMap: WorkbenchDataManager.getIbdbUserMap(workbenchUserId="
 							+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(),
 					e);
@@ -1009,7 +997,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
 							+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(),
 					e);
@@ -1032,7 +1020,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while adding IbdbUserMap: WorkbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData="
 							+ workbenchRuntimeData + "): " + e.getMessage(),
 					e);
@@ -1087,9 +1075,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 			return this.getRoleDao().getAllRolesOrderedByLabel();
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered while getting all roles (sorted): " + e.getMessage(), e);
+			throw  new MiddlewareQueryException("Error encountered while getting all roles (sorted): " + e.getMessage(), e);
 		}
-		return null;
 	}
 
 	@Override
@@ -1104,9 +1091,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			return setting;
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered while getting workbench setting: " + e.getMessage(), e);
+			throw  new MiddlewareQueryException("Error encountered while getting workbench setting: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
 	@Override
@@ -1118,7 +1104,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Error encountered while adding Security Question: "
+			throw  new MiddlewareQueryException("Error encountered while adding Security Question: "
 					+ "WorkbenchDataManager.addSecurityQuestion(securityQuestion=" + securityQuestion + "): " + e.getMessage(), e);
 		}
 	}
@@ -1128,10 +1114,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 			return this.getSecurityQuestionDao().getByUserId(userId);
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered while getting Security Questions: "
+			throw new MiddlewareQueryException("Error encountered while getting Security Questions: "
 					+ "WorkbenchDataManager.getQuestionsByUserId(userId=" + userId + "): " + e.getMessage(), e);
 		}
-		return new ArrayList<SecurityQuestion>();
 	}
 
 	@Override
@@ -1139,10 +1124,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 			return this.getUserInfoDao().getUserInfoByUserId(userId);
 		} catch (final Exception e) {
-			this.logAndThrowException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
 		}
 
-		return new UserInfo();
 	}
 
 	@Override
@@ -1171,7 +1155,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Cannot update userInfo =" + userInfo.getUserId() + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Cannot update userInfo =" + userInfo.getUserId() + "): " + e.getMessage(), e);
 
 		}
 		return userInfo;
@@ -1189,7 +1173,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -1214,8 +1198,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(final WorkbenchSidebarCategory category)
-			throws MiddlewareQueryException {
+	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(final WorkbenchSidebarCategory category) {
 		return this.getWorkbenchSidebarCategoryLinkDao().getAllWorkbenchSidebarLinksByCategoryId(category, 0, Integer.MAX_VALUE);
 	}
 
@@ -1249,7 +1232,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Error encountered while adding Template Setting: "
+			throw new MiddlewareQueryException("Error encountered while adding Template Setting: "
 					+ "WorkbenchDataManager.addTemplateSetting(templateSetting=" + templateSetting + "): " + e.getMessage(), e);
 		}
 		return templateSetting.getTemplateSettingId();
@@ -1265,7 +1248,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Cannot update TemplateSeting: WorkbenchDataManager.updateTemplateSetting(templateSetting="
+			throw new MiddlewareQueryException("Cannot update TemplateSeting: WorkbenchDataManager.updateTemplateSetting(templateSetting="
 					+ templateSetting + "): " + e.getMessage(), e);
 		}
 	}
@@ -1300,7 +1283,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(templateSetting="
+			throw new MiddlewareQueryException("Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(templateSetting="
 					+ templateSetting + "): " + e.getMessage(), e);
 		}
 
@@ -1318,12 +1301,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			if (settings.size() == 1) {
 				this.getTemplateSettingDao().makeTransient(settings.get(0));
 			} else {
-				this.logAndThrowException("Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(id=" + id + ")");
+				throw  new MiddlewareQueryException("Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(id=" + id + ")");
 			}
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(id=" + id + "): " + e.getMessage(), e);
 		}
 
@@ -1364,16 +1347,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			return criteria.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName=" + cropName + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
 
-		return new ArrayList<StandardPreset>();
 	}
 
 	@Override
-	public List<StandardPreset> getStandardPresetFromCropAndTool(final String cropName, final int toolId, final String toolSection)
-			throws MiddlewareQueryException {
+	public List<StandardPreset> getStandardPresetFromCropAndTool(final String cropName, final int toolId, final String toolSection){
 
 		try {
 			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
@@ -1384,16 +1365,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			return criteria.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName=" + cropName + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
-
-		return new ArrayList<StandardPreset>();
 	}
 
 	@Override
 	public List<StandardPreset> getStandardPresetFromCropAndToolByName(final String presetName, final String cropName, final int toolId,
-			final String toolSection) throws MiddlewareQueryException {
+			final String toolSection) {
 
 		try {
 			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
@@ -1405,11 +1384,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			return criteria.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName=" + cropName + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"error in: WorkbenchDataManager.getStandardPresetFromCropAndToolByName(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
 
-		return new ArrayList<StandardPreset>();
 	}
 
 	@Override
@@ -1418,11 +1396,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return this.getStandardPresetDAO().saveOrUpdate(standardPreset);
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset="
+			throw new MiddlewareQueryException("Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset="
 					+ standardPreset.getName() + "): " + e.getMessage(), e);
 		}
-
-		return null;
 	}
 
 	@Override
@@ -1431,7 +1407,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			final StandardPreset preset = this.getStandardPresetDAO().getById(standardPresetId);
 			this.getCurrentSession().delete(preset);
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId=" + standardPresetId
+			throw new MiddlewareQueryException("Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId=" + standardPresetId
 					+ "): " + e.getMessage(), e);
 		}
 	}
@@ -1444,19 +1420,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException {
+	public List<UserDto> getAllUsersSortedByLastName() {
 		return this.getUserDao().getAllUsersSortedByLastName();
 
 	}
 
 	@Override
-	public List<UserDto> getUsersByProjectUuid(final String projectUuid) throws MiddlewareQueryException {
+	public List<UserDto> getUsersByProjectUuid(final String projectUuid) {
 		return this.getUserDao().getUsersByProjectUUId(projectUuid);
 
 	}
 
 	@Override
-	public Integer createUser(final UserDto userDto) throws MiddlewareQueryException {
+	public Integer createUser(final UserDto userDto) {
 
 		Integer idUserSaved = null;
 		// user.access = 0 - Default User
@@ -1489,7 +1465,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException(
+			throw  new MiddlewareQueryException(
 					"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
 
@@ -1503,7 +1479,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer updateUser(final UserDto userDto) throws MiddlewareQueryException {
+	public Integer updateUser(final UserDto userDto) {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
 		User user = null;
 		Integer idUserSaved = null;
@@ -1519,7 +1495,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			// update user roles to the particular user
 			final UserRole role = user.getRoles().get(0);
-			if (!role.getRole().equals(userDto.getRole().toUpperCase())) {
+			if (!role.getRole().equalsIgnoreCase(userDto.getRole())) {
 				role.setRole(userDto.getRole().toUpperCase());
 			}
 

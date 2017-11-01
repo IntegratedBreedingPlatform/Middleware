@@ -1,23 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -43,6 +38,9 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
@@ -222,7 +220,7 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
 	boolean isPersonWithEmailExists(String email);
 
@@ -230,7 +228,7 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
 	Person getPersonByEmail(String email);
 
@@ -242,7 +240,7 @@ public interface WorkbenchDataManager {
 	 * @param username
 	 * @param email
 	 * @return
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
 	boolean isPersonWithUsernameAndEmailExists(String username, String email);
 
@@ -267,7 +265,7 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param username
 	 * @return
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
 	UserInfo getUserInfoByUsername(String username);
 
@@ -824,8 +822,7 @@ public interface WorkbenchDataManager {
 	 * @param category the category
 	 * @return the all workbench sidebar links by category id
 	 */
-	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category)
-			throws MiddlewareQueryException;
+	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category);
 
 	/**
 	 * Gets the template settings.
@@ -884,7 +881,7 @@ public interface WorkbenchDataManager {
 	 * @param cropName
 	 * @param toolId
 	 * @return
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
 
@@ -897,15 +894,13 @@ public interface WorkbenchDataManager {
 
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId, String toolSection);
 
-	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId, String toolSection)
-			throws MiddlewareQueryException;
+	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId, String toolSection);
 
 	/**
 	 * save or update a standard preset
 	 *
 	 * @param standardPreset
 	 * @return
-	 * @throws MiddlewareQueryException
 	 */
 	StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset);
 
@@ -913,7 +908,6 @@ public interface WorkbenchDataManager {
 	 * delete a standard preset by id
 	 *
 	 * @param standardPresetId
-	 * @throws MiddlewareQueryException
 	 */
 	void deleteStandardPreset(int standardPresetId);
 
@@ -936,27 +930,25 @@ public interface WorkbenchDataManager {
 	 * Gets the all Users Sorted
 	 *
 	 * @return
-	 * @throws MiddlewareQueryException
+	 * @
 	 */
-	List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException;
+	List<UserDto> getAllUsersSortedByLastName();
 
 	/**
 	 * create the user.
 	 *
 	 * @param user the user
 	 * @return Returns the id of the {@code UserDto} record added
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public Integer createUser(UserDto userDto) throws MiddlewareQueryException;
+	public Integer createUser(UserDto userDto);
 
 	/**
 	 * Updates the user.
 	 *
 	 * @param user the user to update
 	 * @return Returns the id of the {@code UserDto} record added
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public Integer updateUser(UserDto userDto) throws MiddlewareQueryException;
+	public Integer updateUser(UserDto userDto);
 
 	/**
 	 * updates the user.
@@ -968,10 +960,9 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the user by project_uuid.
-	 * 
+	 *
 	 * @param projectUuid
 	 * @return the user matching the given project_uuid
-	 * @throws MiddlewareQueryException
 	 */
-	List<UserDto> getUsersByProjectUuid(final String projectUuid) throws MiddlewareQueryException;
+	List<UserDto> getUsersByProjectUuid(final String projectUuid);
 }
