@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.Date;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -11,6 +9,8 @@ import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.service.api.PlantService;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 @Repository
 @Transactional

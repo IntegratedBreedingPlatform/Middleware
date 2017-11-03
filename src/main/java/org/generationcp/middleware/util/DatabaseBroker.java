@@ -29,6 +29,7 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
+import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
@@ -518,6 +519,12 @@ public class DatabaseBroker {
 		GermplasmListDAO germplasmListDao = new GermplasmListDAO();
 		germplasmListDao.setSession(this.getActiveSession());
 		return germplasmListDao;
+	}
+
+	public SampleListDao getSampleListDAO() {
+		SampleListDao sampleListDao = new SampleListDao();
+		sampleListDao.setSession(this.getActiveSession());
+		return sampleListDao;
 	}
 
 	public GermplasmListDataDAO getGermplasmListDataDAO() {

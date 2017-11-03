@@ -153,4 +153,59 @@
 	</changeSet>
 
 
+	<changeSet author="cuenyad" id="v7.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="sample_list" columnName="program_uuid"/>
+			</not>
+		</preConditions>
+
+		<comment>Add program_uuid column</comment>
+
+		<addColumn tableName="sample_list">
+			<column name="program_uuid" type="varchar(36)" afterColumn="type">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="cuenyad" id="v7.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">SELECT count(*) FROM sample_list where type='SAMPLE_LIST' and program_uuid is null;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Updating sample_list adding program_uuid corresponding to lists existing</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE sample_list spl SET spl.program_uuid=(SELECT p.program_uuid FROM project p
+			INNER JOIN nd_experiment_project exp on p.project_id = exp.project_id
+			INNER JOIN nd_experiment ex on exp.nd_experiment_id = ex.nd_experiment_id
+			INNER JOIN plant pl on ex.nd_experiment_id = pl.nd_experiment_id
+			INNER JOIN sample sp on sp.plant_id = pl.plant_id
+			where sp.sample_list=spl.list_id
+			group by sp.sample_list);
+		</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v7.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+					WHERE
+					TABLE_NAME = 'sample_list'
+					AND CONSTRAINT_NAME = 'list_name_UNIQUE'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>update list_name_UNIQUE TABLE_CONSTRAINTS</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list
+			DROP INDEX list_name_UNIQUE ,
+			ADD UNIQUE INDEX list_name_UNIQUE (list_name ASC, type ASC, hierarchy ASC);
+		</sql>
+	</changeSet>
 </databaseChangeLog>

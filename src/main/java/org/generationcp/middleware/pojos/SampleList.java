@@ -35,6 +35,7 @@ public class SampleList implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 6160350425863896876L;
+	private static final String FOLDER_TYPE = "FOLDER";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,6 +76,9 @@ public class SampleList implements Serializable {
 	@Column(name="type")
 	@Enumerated(EnumType.STRING)
 	private SampleListType type;
+
+	@Column(name = "program_uuid")
+	private String programUUID;
 
 	public SampleListType getType() {
 		return type;
@@ -175,5 +179,17 @@ public class SampleList implements Serializable {
 	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
+
+	public boolean isFolder() {
+		return this.getType() != null && this.getType().name().equalsIgnoreCase(SampleList.FOLDER_TYPE) ? true : false;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 }

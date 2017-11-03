@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
 /**
@@ -555,4 +556,5 @@ public interface GermplasmListManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
+
 }

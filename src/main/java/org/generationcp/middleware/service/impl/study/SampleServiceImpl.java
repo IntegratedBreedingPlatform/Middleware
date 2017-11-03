@@ -2,7 +2,6 @@ package org.generationcp.middleware.service.impl.study;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -41,7 +40,6 @@ public class SampleServiceImpl implements SampleService {
 
 	private final SampleDao sampleDao;
 	private final ExperimentDao experimentDao;
-	private final PlantDao plantDao;
 	private final UserDAO userDao;
 
 	@Autowired
@@ -56,9 +54,6 @@ public class SampleServiceImpl implements SampleService {
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(sessionProvider.getSession());
-
-		this.plantDao = new PlantDao();
-		this.plantDao.setSession(sessionProvider.getSession());
 
 		this.userDao = new UserDAO();
 		this.userDao.setSession(sessionProvider.getSession());

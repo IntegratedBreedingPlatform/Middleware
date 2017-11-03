@@ -56,7 +56,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		Assert.assertNotNull(sampleList.getId());
-		Assert.assertEquals(sampleList.getCreatedBy().getName(), SampleListDaoTest.ADMIN);
+		Assert.assertEquals(sampleList.getCreatedBy().getName(), SampleListDaoTest.ADMIN); // TODO FIX LATER
 		Assert.assertEquals(sampleList.getDescription(), SampleListDaoTest.DESCRIPTION);
 		Assert.assertEquals(sampleList.getListName(),
 				SampleListDaoTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListDaoTest.YYYY_M_MDD_HH));
@@ -123,7 +123,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 			SampleListDaoTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListDaoTest.YYYY_M_MDD_HH));
 		sampleList.setNotes(SampleListDaoTest.NOTES);
 		sampleList.setType(SampleListType.SAMPLE_LIST);
-
+		sampleList.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 		return sampleList;
 	}
 }
