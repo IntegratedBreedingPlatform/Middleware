@@ -254,21 +254,22 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private String getVariableValueFromGeolocation(int stdVariableId, String value, Geolocation geolocation) {
+
 		if (geolocation != null) {
 			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == stdVariableId) {
-				value = geolocation.getDescription();
+				return geolocation.getDescription();
 
 			} else if (TermId.LATITUDE.getId() == stdVariableId && geolocation.getLatitude() != null) {
-				value = geolocation.getLatitude().toString();
+				return geolocation.getLatitude().toString();
 
 			} else if (TermId.LONGITUDE.getId() == stdVariableId && geolocation.getLongitude() != null) {
-				value = geolocation.getLongitude().toString();
+				return geolocation.getLongitude().toString();
 
 			} else if (TermId.GEODETIC_DATUM.getId() == stdVariableId && geolocation.getGeodeticDatum() != null) {
 				geolocation.setGeodeticDatum(value);
 
 			} else if (TermId.ALTITUDE.getId() == stdVariableId && geolocation.getAltitude() != null) {
-				value = geolocation.getAltitude().toString();
+				return geolocation.getAltitude().toString();
 			}
 		}
 		return value;
