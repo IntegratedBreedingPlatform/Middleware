@@ -239,7 +239,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetDatasetDetailsByDatasetName() throws Exception {
 		List<DatasetElement> results =
-				this.genotypicDataManager.getDatasetDetailsByDatasetName(this.dataset.getDatasetName(), Database.LOCAL);
+				this.genotypicDataManager.getDatasetDetailsByDatasetName(this.dataset.getDatasetName());
 		Debug.println("testGetDatasetDetailsByDatasetName(" + this.dataset.getDatasetName() + ",LOCAL) RESULTS: " + results);
 	}
 
@@ -264,7 +264,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		markerNames.add("GA101");
 		markerNames.add("GA110");
 		markerNames.add("GA122");
-		List<Marker> markers = this.genotypicDataManager.getMarkersByMarkerNames(markerNames, 0, 100, Database.CENTRAL);
+		List<Marker> markers = this.genotypicDataManager.getMarkersByMarkerNames(markerNames, 0, 100);
 		Assert.assertTrue(markers.size() > 0);
 		Debug.printObjects(IntegrationTestBase.INDENT, markers);
 	}

@@ -62,7 +62,7 @@ public class DatasetUsers implements Serializable {
 		return this.userId;
 	}
 
-	public void setAlias(Integer userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
