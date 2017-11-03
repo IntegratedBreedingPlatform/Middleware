@@ -122,9 +122,9 @@ class ObservationQuery {
 		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 
-	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, final List<String> germplasmDescriptors,
+	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 			final List<String> designFactors, final String sortBy, final String sortOrder) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors, designFactors) + getInstanceNumberClause() + getGroupingClause()
+		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -178,8 +178,8 @@ class ObservationQuery {
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n";
 	}
 
-	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, final List<String> germplasmDescriptors, final List<String> designFactors) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors, designFactors) + " AND nde.nd_experiment_id = :experiment_id \n"
+	String getSingleObservationQuery(final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors, final List<String> designFactors) {
+		return this.getObservationsMainQuery(traits, germplasmDescriptors, designFactors) + " AND nde.nd_experiment_id = :experiment_id \n"
 				+ getGroupingClause();
 	}
 
@@ -201,7 +201,7 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<MeasurementVariableDto> measurementVariables, final List<String> germplasmDescriptors, final List<String> designFactors) {
+	String getObservationsMainQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors, final List<String> designFactors) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("SELECT \n")
@@ -225,7 +225,7 @@ class ObservationQuery {
 		String traitClauseFormat =
 			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
-		for (MeasurementVariableDto measurementVariable : measurementVariables) {
+		for (MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
 			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
 				measurementVariable.getName(), measurementVariable.getName() + PHENOTYPE_ID));
 		}

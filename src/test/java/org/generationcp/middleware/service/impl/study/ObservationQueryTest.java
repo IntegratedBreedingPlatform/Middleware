@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.jdbc.util.BasicFormatterImpl;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.beust.jcommander.internal.Lists;
@@ -21,7 +22,19 @@ import com.beust.jcommander.internal.Lists;
  */
 public class ObservationQueryTest {
 
+	private static final String PH_CM = "PH_cm";
+	private static final String STOCK_ID = "STOCK_ID";
+	private static final String FACT1 = "FACT1";
 	final BasicFormatterImpl formattedSQL = new BasicFormatterImpl();
+	final List<String> germplasmDescriptors = Lists.newArrayList(STOCK_ID);
+	final List<String> designFactors = Lists.newArrayList(FACT1);
+	List<MeasurementVariableDto> traitNames  = new LinkedList<>();
+	
+	@Before
+	public void setup() {
+		this.traitNames = new LinkedList<>();
+		this.traitNames.add(new MeasurementVariableDto(1, PH_CM));
+	}
 
 	/**
 	 * Run the String generateQuery(String,List<String>) method test.
@@ -32,24 +45,16 @@ public class ObservationQueryTest {
 	 */
 	@Test
 	public void testGetAllMeasurementsQueryGeneration() throws Exception {
-		ObservationQuery fixture = new ObservationQuery();
-		final List<MeasurementVariableDto> traitNames = new LinkedList<MeasurementVariableDto>();
-		traitNames.add(new MeasurementVariableDto(1, "PH_cm"));
-		List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		List<String> designFactors = Lists.newArrayList();
-		String result = fixture.getAllObservationsQuery(traitNames, germplasmDescriptors, designFactors, null, null);
+		final ObservationQuery fixture = new ObservationQuery();
+		final String result = fixture.getAllObservationsQuery(this.traitNames, this.germplasmDescriptors, this.designFactors, null, null);
 		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForAllMeasurements()),
 				formatString(result));
 	}
 
 	@Test
 	public void testGetSingleMeasurementQueryGeneration() throws Exception {
-		ObservationQuery fixture = new ObservationQuery();
-		final List<MeasurementVariableDto> traitNames = new LinkedList<MeasurementVariableDto>();
-		traitNames.add(new MeasurementVariableDto(1, "PH_cm"));
-		List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		List<String> designFactors = Lists.newArrayList();
-		String result = fixture.getSingleObservationQuery(traitNames, germplasmDescriptors, designFactors);
+		final ObservationQuery fixture = new ObservationQuery();
+		final String result = fixture.getSingleObservationQuery(this.traitNames, this.germplasmDescriptors, this.designFactors);
 		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForSingleMeasurement()),
 				formatString(result));
 	}
@@ -76,9 +81,10 @@ public class ObservationQueryTest {
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
 				+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n"
 				+ "    nde.plot_id as PLOT_ID,"
-				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.value, NULL)) AS 'PH_cm', \n"
-				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.phenotype_id, NULL)) AS 'PH_cm_PhenotypeId', \n"
-				+ "   (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = 'STOCK_ID') 'STOCK_ID', \n"
+				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.value, NULL)) AS '" + ObservationQueryTest.PH_CM + "', \n"
+				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.phenotype_id, NULL)) AS '" + ObservationQueryTest.PH_CM + "_PhenotypeId', \n"
+				+ "   (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '" + ObservationQueryTest.STOCK_ID + "') '" + ObservationQueryTest.STOCK_ID + "', \n"
+				+ "   (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = ep.nd_experiment_id AND xpropcvt.name = '" + ObservationQueryTest.FACT1 + "') '" + ObservationQueryTest.FACT1 + "', \n"
 				+ " 1=1 FROM \n"
 				+ "    project p \n"
 				+ "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
@@ -112,9 +118,10 @@ public class ObservationQueryTest {
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
 				+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n"
 				+ "    nde.plot_id as PLOT_ID,"
-				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.value, NULL)) AS 'PH_cm', \n"
-				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.phenotype_id, NULL)) AS 'PH_cm_PhenotypeId', \n"
-				+ "   (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = 'STOCK_ID') 'STOCK_ID', \n"
+				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.value, NULL)) AS '" + ObservationQueryTest.PH_CM + "', \n"
+				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.phenotype_id, NULL)) AS '" + ObservationQueryTest.PH_CM + "_PhenotypeId', \n"
+				+ "   (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '" + ObservationQueryTest.STOCK_ID + "') '" + ObservationQueryTest.STOCK_ID + "', \n"
+				+ "   (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = ep.nd_experiment_id AND xpropcvt.name = '" + ObservationQueryTest.FACT1 + "') '" + ObservationQueryTest.FACT1 + "', \n"
 				+ " 1=1 FROM \n"
 				+ "    project p \n"
 				+ "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"

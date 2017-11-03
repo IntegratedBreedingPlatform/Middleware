@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -45,6 +48,12 @@ import com.beust.jcommander.internal.Lists;
  */
 public class StudyServiceImplTest {
 	
+	private static final String FACT1 = "FACT1";
+
+	private static final String STOCK_ID = "STOCK_ID";
+
+	private static final int STUDY_ID = 1234;
+
 	@Mock
 	private Session mockSession;
 
@@ -53,46 +62,52 @@ public class StudyServiceImplTest {
 
 	@Mock
 	private HibernateSessionProvider mockSessionProvider;
+	
+	@Mock
+	private GermplasmDescriptors germplasmDescriptors;
+	
+	@Mock
+	private DesignFactors designFactors;
 
 	private StudyServiceImpl studyServiceImpl;
+	
+	final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
+	
+	final List<String> additionalDesignFactors = Lists.newArrayList(FACT1);
+	
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		this.studyServiceImpl = new StudyServiceImpl(this.mockSessionProvider);
+		this.studyServiceImpl.setGermplasmDescriptors(this.germplasmDescriptors);
+		this.studyServiceImpl.setDesignFactors(this.designFactors);
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockSqlQuery);
 		Mockito.when(this.mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(this.mockSqlQuery);
+		Mockito.when(this.germplasmDescriptors.find(StudyServiceImplTest.STUDY_ID))
+				.thenReturn(Lists.newArrayList(TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
+						TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.PLOT_ID.name(), StudyServiceImplTest.STOCK_ID));
+		Mockito.when(this.designFactors.find(StudyServiceImplTest.STUDY_ID))
+				.thenReturn(Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), StudyServiceImplTest.FACT1));
 	}
 
 	@Test
 	public void testHasMeasurementDataOnEnvironmentAssertTrue() throws Exception {
 		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(1);
+		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
+				.thenReturn(this.mockSqlQuery);
 
-		final Session mockSession = Mockito.mock(Session.class);
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		Mockito.when(mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-				.thenReturn(mockSqlQuery);
-
-		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-
-		Assert.assertTrue(studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
+		Assert.assertTrue(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
 	}
 
 	@Test
 	public void testHasMeasurementDataOnEnvironmentAssertFalse() throws Exception {
 		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(0);
+		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
+				.thenReturn(this.mockSqlQuery);
 
-		final Session mockSession = Mockito.mock(Session.class);
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		Mockito.when(mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
-				.thenReturn(mockSqlQuery);
-
-		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-
-		Assert.assertFalse(studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
+		Assert.assertFalse(this.studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
 	}
 
 	@Test
@@ -101,15 +116,11 @@ public class StudyServiceImplTest {
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
 
-		final Session mockSession = Mockito.mock(Session.class);
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		Mockito.when(mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(mockSqlQuery);
+		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
+			.thenReturn(this.mockSqlQuery);
 
-		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
 		List<Integer> ids = Arrays.asList(1000,1002);
-		assertThat(true, is(equalTo(studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
+		assertThat(true, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
 	@Test
@@ -117,16 +128,11 @@ public class StudyServiceImplTest {
 		final List<Object[]> testResult = Arrays.<Object[]>asList();
 
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
+		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
+			.thenReturn(this.mockSqlQuery);
 
-		final Session mockSession = Mockito.mock(Session.class);
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		Mockito.when(mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
-			.thenReturn(mockSqlQuery);
-
-		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
 		List<Integer> ids = Arrays.asList(1000,1002);
-		assertThat(false,is(equalTo(studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
+		assertThat(false,is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
 	/**
@@ -134,35 +140,41 @@ public class StudyServiceImplTest {
 	 *
 	 */
 	@Test
-	public void listMeasurementData() throws Exception {
+	public void testGetObservations() throws Exception {
 		final MeasurementVariableService mockTrialTraits = Mockito.mock(MeasurementVariableService.class);
-		final StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
+		final StudyMeasurements mockTrialMeasurements = Mockito.mock(StudyMeasurements.class);
 		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
-		final GermplasmDescriptors germplasmDescriptorService = Mockito.mock(GermplasmDescriptors.class);
 
-		final StudyServiceImpl result =
-				new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, mockStudyGermplasmListService, germplasmDescriptorService);
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockTrialTraits, mockTrialMeasurements, mockStudyGermplasmListService,
+				this.germplasmDescriptors);
+		studyServiceImpl.setDesignFactors(this.designFactors);
 
-		final List<MeasurementVariableDto> projectTraits = Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
-		final List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		final List<String> designFactors = Lists.newArrayList();
-		Mockito.when(mockTrialTraits.getVariables(1234)).thenReturn(projectTraits);
+		final List<MeasurementVariableDto> projectTraits =
+				Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
+		Mockito.when(mockTrialTraits.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
+				VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
-		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "triatValue"));
-		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource",
-				"repitionNumber", "plotNumber", "blockNumber", traits);
+		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue"));
+		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", StudyServiceImplTest.STUDY_ID, "designation",
+				"entryNo", "seedSource", "repitionNumber", "plotNumber", "blockNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
-		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, designFactors, 1, 1, 100, null, null))
+		final int instanceId = 1;
+		final int pageNumber = 1;
+		final int pageSize = 100;
+		Mockito.when(mockTrialMeasurements.getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
+				this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null))
 				.thenReturn(testMeasurements);
-		result.getObservations(1234, 1, 1, 100, null, null);
 
-		final List<ObservationDto> allMeasurements =
-				mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, designFactors, 1, 1, 100, null, null);
-		Assert.assertEquals(allMeasurements, testMeasurements);
+		// Method to test
+		final List<ObservationDto> actualMeasurements = studyServiceImpl.getObservations(StudyServiceImplTest.STUDY_ID, 1, 1, 100, null, null);
+
+		Assert.assertEquals(testMeasurements, actualMeasurements);
+		Mockito.verify(mockTrialMeasurements).getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
+				this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null);
 	}
 
 	@Test
-	public void testlistAllStudies() throws MiddlewareQueryException {
+	public void testListAllStudies() throws MiddlewareQueryException {
 
 		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010",
 				"Wheat Trial 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
@@ -227,22 +239,17 @@ public class StudyServiceImplTest {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("p1", "v1");
 
-		final Session mockSession = Mockito.mock(Session.class);
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-
 		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
 		final UserDataManager userDataManager = Mockito.mock(UserDataManager.class);
 
-		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-		studyServiceImpl.setStudyDataManager(studyDataManager);
-		studyServiceImpl.setUserDataManager(userDataManager);
+		this.studyServiceImpl.setStudyDataManager(studyDataManager);
+		this.studyServiceImpl.setUserDataManager(userDataManager);
 
 		Mockito.when(studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users);
 		Mockito.when(studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties);
 
-		final StudyDetailsDto studyDetailsDto = studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
+		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
 
 		assertThat(studyDetailsDto.getMetadata().getActive(), equalTo(metadata.getActive()));
 		assertThat(studyDetailsDto.getMetadata().getEndDate(), equalTo(metadata.getEndDate()));
@@ -285,16 +292,10 @@ public class StudyServiceImplTest {
 		Map<String, String> properties2 = new HashMap<>();
 		properties2.put("p2", "v2");
 
-		final Session mockSession = Mockito.mock(Session.class);
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-
 		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
 		final UserDataManager userDataManager = Mockito.mock(UserDataManager.class);
-
-		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-		studyServiceImpl.setStudyDataManager(studyDataManager);
-		studyServiceImpl.setUserDataManager(userDataManager);
+		this.studyServiceImpl.setStudyDataManager(studyDataManager);
+		this.studyServiceImpl.setUserDataManager(userDataManager);
 
 		Mockito.when(studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users1);
@@ -303,7 +304,7 @@ public class StudyServiceImplTest {
 		Mockito.when(studyDataManager.getGeolocationPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties2);
 
 
-		final StudyDetailsDto studyDetailsDto = studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
+		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
 
 		assertThat(studyDetailsDto.getMetadata().getActive(), equalTo(metadata.getActive()));
 		assertThat(studyDetailsDto.getMetadata().getEndDate(), equalTo(metadata.getEndDate()));
@@ -319,5 +320,17 @@ public class StudyServiceImplTest {
 		assertThat(studyDetailsDto.getAdditionalInfo().size(), equalTo(properties1.size() + properties2.size()));
 		assertThat(studyDetailsDto.getContacts().size(), equalTo(users1.size() + users2.size()));
 
+	}
+	
+	@Test
+	public void testFindGenericGermplasmDescriptors() {
+		final List<String> genericGermplasmFactors = this.studyServiceImpl.findGenericGermplasmDescriptors(StudyServiceImplTest.STUDY_ID);
+		Assert.assertEquals(this.additionalGermplasmDescriptors, genericGermplasmFactors);
+	}
+	
+	@Test
+	public void testFindAdditionalDesignFactors() {
+		final List<String> genericDesignFactors = this.studyServiceImpl.findAdditionalDesignFactors(StudyServiceImplTest.STUDY_ID);
+		Assert.assertEquals(this.additionalDesignFactors, genericDesignFactors);
 	}
 }
