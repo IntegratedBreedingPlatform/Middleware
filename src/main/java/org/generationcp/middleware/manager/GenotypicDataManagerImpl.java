@@ -274,12 +274,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException {
+	public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName) throws MiddlewareQueryException {
 		return this.getDatasetDao().getDetailsByName(datasetName);
 	}
 
 	@Override
-	public List<Marker> getMarkersByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
+	public List<Marker> getMarkersByMarkerNames(List<String> markerNames, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		return this.getMarkerDao().getByNames(markerNames, start, numOfRows);
 	}

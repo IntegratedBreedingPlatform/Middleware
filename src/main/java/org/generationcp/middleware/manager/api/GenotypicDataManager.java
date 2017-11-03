@@ -269,7 +269,7 @@ public interface GenotypicDataManager {
 	 * @return the dataset details by dataset name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException;
+	List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName) throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves a list of matching marker ids from the marker table based on the specified list of Marker Names.
@@ -277,11 +277,10 @@ public interface GenotypicDataManager {
 	 * @param markerNames - List of marker names to search for the corresponding marker ids
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
 	 * @return List of matching markers based on the specified marker names
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Marker> getMarkersByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
+	List<Marker> getMarkersByMarkerNames(List<String> markerNames, int start, int numOfRows)
 			throws MiddlewareQueryException;
 
 	/**
