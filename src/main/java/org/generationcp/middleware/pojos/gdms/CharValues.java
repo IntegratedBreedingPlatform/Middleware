@@ -47,8 +47,8 @@ public class CharValues implements Serializable {
 	private Integer markerId;
 
 	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer gId;
+	@Column(name = "sample_id")
+	private Integer sampleId;
 
 	@Column(name = "char_value")
 	String charValue;
@@ -62,12 +62,12 @@ public class CharValues implements Serializable {
 	public CharValues() {
 	}
 
-	public CharValues(Integer acId, Integer datasetId, Integer markerId, Integer gId, String charValue, Integer markerSampleId,
+	public CharValues(Integer acId, Integer datasetId, Integer markerId, Integer sampleId, String charValue, Integer markerSampleId,
 			Integer accSampleId) {
 		this.acId = acId;
 		this.datasetId = datasetId;
 		this.markerId = markerId;
-		this.gId = gId;
+		this.sampleId = sampleId;
 		this.charValue = charValue;
 		this.markerSampleId = markerSampleId;
 		this.accSampleId = accSampleId;
@@ -97,12 +97,12 @@ public class CharValues implements Serializable {
 		this.markerId = markerId;
 	}
 
-	public Integer getGid() {
-		return this.gId;
+	public Integer getSampleId() {
+		return this.sampleId;
 	}
 
-	public void setGid(Integer gId) {
-		this.gId = gId;
+	public void setSampleId(Integer sampleId) {
+		this.sampleId = sampleId;
 	}
 
 	public String getCharValue() {
@@ -137,7 +137,7 @@ public class CharValues implements Serializable {
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		result = prime * result + (this.charValue == null ? 0 : this.charValue.hashCode());
 		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
-		result = prime * result + (this.gId == null ? 0 : this.gId.hashCode());
+		result = prime * result + (this.sampleId == null ? 0 : this.sampleId.hashCode());
 		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
 		return result;
@@ -183,11 +183,11 @@ public class CharValues implements Serializable {
 		} else if (!this.datasetId.equals(other.datasetId)) {
 			return false;
 		}
-		if (this.gId == null) {
-			if (other.gId != null) {
+		if (this.sampleId == null) {
+			if (other.sampleId != null) {
 				return false;
 			}
-		} else if (!this.gId.equals(other.gId)) {
+		} else if (!this.sampleId.equals(other.sampleId)) {
 			return false;
 		}
 		if (this.markerId == null) {
@@ -216,8 +216,8 @@ public class CharValues implements Serializable {
 		builder.append(this.datasetId);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
-		builder.append(", gId=");
-		builder.append(this.gId);
+		builder.append(", sampleId=");
+		builder.append(this.sampleId);
 		builder.append(", charValue=");
 		builder.append(this.charValue);
 		builder.append(", markerSampleId=");

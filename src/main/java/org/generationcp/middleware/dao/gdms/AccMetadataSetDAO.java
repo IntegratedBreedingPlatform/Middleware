@@ -35,15 +35,10 @@ import org.hibernate.criterion.Restrictions;
  */
 public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 
-	public static final String GET_NAME_IDS_BY_GERMPLASM_IDS = "SELECT nid " + "FROM gdms_acc_metadataset " + "WHERE gid IN (:gIdList)";
-
 	public static final String GET_DATASET_IDS_BY_GERMPLASM_IDS = "SELECT dataset_id " + "FROM gdms_acc_metadataset " + "WHERE gid IN (:gIdList)";
 
-	public static final String GET_ACC_METADATASETS_BY_GIDS = "SELECT gid, nid, dataset_id " + "FROM gdms_acc_metadataset "
-			+ "WHERE gid IN (:gids) ";
-
-	public static final String GET_ACC_METADATASETS_BY_DATASET_ID_AND_IN_GIDS = "SELECT acc_metadataset_id, gid, nid "
-			+ "FROM gdms_acc_metadataset " + "WHERE gid IN (:gids) " + "AND dataset_id = :datasetId";
+	public static final String GET_ACC_METADATASETS_BY_DATASET_ID_AND_IN_GIDS = "SELECT acc_metadataset_id, sample_id "
+			+ "FROM gdms_acc_metadataset " + "WHERE sample_id IN (:sampleIds) " + "AND dataset_id = :datasetId";
 
 	public static final String GET_ACC_METADATASETS_BY_DATASET_ID_AND_NOT_IN_GIDS = "SELECT acc_metadataset_id, gid, nid "
 			+ "FROM gdms_acc_metadataset " + "WHERE gid NOT IN (:gids) " + "AND dataset_id = :datasetId";
@@ -75,21 +70,8 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			+ " order by gid, nid,acc_sample_id asc";
 
 	private static final String GET_NIDS_BY_DATASET_IDS = "SELECT nid FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
-	
-	@SuppressWarnings("unchecked")
-	public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
-		try {
-			if (gIds != null && !gIds.isEmpty()) {
-				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_NAME_IDS_BY_GERMPLASM_IDS);
-				query.setParameterList("gIdList", gIds);
-				return query.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getNameIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
-		}
-		return new ArrayList<Integer>();
-	}
-	
+
+	//FIXME
 	@SuppressWarnings("unchecked")
 	public List<Integer> getDatasetIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
 		try {
@@ -105,7 +87,8 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<AccMetadataSet> getByDatasetIdsAndNotInGids(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
+	// Reviewed
+	public List<AccMetadataSet> getByDatasetIds(List<Integer> datasetIds, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		List<AccMetadataSet> returnValues = new ArrayList<AccMetadataSet>();
 		try {
@@ -113,20 +96,17 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 				criteria.add(Restrictions.in("datasetId", datasetIds));
 
-				if (gids != null && !gids.isEmpty()) {
-					criteria.add(Restrictions.not(Restrictions.in("germplasmId", gids)));
-				}
-
 				returnValues = criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByDatasetIdsAndNotInGids(datasetIds=" + datasetIds + ", gids=" + gids
+			this.logAndThrowException("Error with getByDatasetIds(datasetIds=" + datasetIds
 					+ ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return returnValues;
 	}
 
 	@SuppressWarnings("unchecked")
+	//FIXME
 	public Set<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds,
 			int start, int numOfRows) throws MiddlewareQueryException {
 		try {
@@ -166,6 +146,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 		return new TreeSet<Integer>();
 	}
 
+	//FIXME
 	public long countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
 			throws MiddlewareQueryException {
 		try {
@@ -206,6 +187,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	//FIXME
 	public Set<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds) throws MiddlewareQueryException {
 		try {
 
@@ -235,6 +217,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	//FIXME
 	public List<AccMetadataSet> getAccMetadataSetsByGids(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
 		List<AccMetadataSet> dataValues = new ArrayList<AccMetadataSet>();
 		try {
@@ -249,6 +232,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 		return dataValues;
 	}
 
+	//FIXME
 	public long countAccMetadataSetsByGids(List<Integer> gids) throws MiddlewareQueryException {
 		long count = 0;
 		try {
@@ -266,7 +250,8 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 		}
 		return count;
 	}
-	
+
+	//FIXME
 	public List<Integer> getNidsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
 		List<Integer> results = new ArrayList<>();
 		try{
@@ -281,6 +266,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 		return results;
 	}
 
+	//FIXME
 	public long countNidsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
 		long count = 0;
 		try {
@@ -301,18 +287,19 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<AccMetadataSet> getAccMetadataSetByGidsAndDatasetId(List<Integer> gids, Integer datasetId, SetOperation operation)
+	//FIXME
+	public List<AccMetadataSet> getAccMetadataSetByGidsAndDatasetId(List<Integer> sampleIds, Integer datasetId, SetOperation operation)
 			throws MiddlewareQueryException {
 
 		List<AccMetadataSet> dataValues = new ArrayList<AccMetadataSet>();
 		try {
-			if (gids != null && !gids.isEmpty()) {
+			if (sampleIds != null && !sampleIds.isEmpty()) {
 
 				String queryString =
 						SetOperation.IN.equals(operation) ? AccMetadataSetDAO.GET_ACC_METADATASETS_BY_DATASET_ID_AND_IN_GIDS
 								: AccMetadataSetDAO.GET_ACC_METADATASETS_BY_DATASET_ID_AND_NOT_IN_GIDS;
 				SQLQuery query = this.getSession().createSQLQuery(queryString);
-				query.setParameterList("gids", gids);
+				query.setParameterList("sampleIds", sampleIds);
 				query.setParameter("datasetId", datasetId);
 
 				List results = query.list();
@@ -320,21 +307,21 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 					Object[] result = (Object[]) o;
 					if (result != null) {
 						Integer accMetadataSetId = (Integer) result[0];
-						Integer gid = (Integer) result[1];
-						Integer nid = (Integer) result[2];
+						Integer sampleId = (Integer) result[1];
 
-						AccMetadataSet dataElement = new AccMetadataSet(accMetadataSetId, datasetId, gid, nid, null);
+						AccMetadataSet dataElement = new AccMetadataSet(accMetadataSetId, datasetId, sampleId, null);
 						dataValues.add(dataElement);
 					}
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAccMetadataSetByGidsAndDatasetId(gids=" + gids + ", datasetId=" + datasetId
+			this.logAndThrowException("Error with getAccMetadataSetByGidsAndDatasetId(sampleIds=" + sampleIds + ", datasetId=" + datasetId
 					+ ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return dataValues;
 	}
 
+	// FIXME, use hibernate to delete
 	public void deleteByDatasetId(Integer datasetId) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -351,6 +338,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	//Reviewed
 	public List<AccMetadataSet> getAccMetadataSetsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
 		List<AccMetadataSet> dataValues = new ArrayList<AccMetadataSet>();
 		try {
@@ -366,6 +354,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
+	//FIXME
 	public List<Object> getUniqueAccMetaDatsetByDatasetId(String datasetId) throws MiddlewareQueryException {
 		try {
 				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_GID_NIC_SAMPLE_ID_BY_DATASET);
@@ -381,6 +370,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	}	
 	
 	@SuppressWarnings("unchecked")
+	//FIXME
 	public List<Object> getUniqueAccMetaDatsetByGids(List<Integer> gids) throws MiddlewareQueryException {
 		try {
 				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_UNIQUE_ACC_METADATASET_BY_GIDS);
@@ -393,28 +383,6 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			this.logAndThrowException("Error with getUniqueAccMetaDatasetByGids(" + gids + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return new ArrayList<Object>();
-	}	
-
-	@SuppressWarnings("rawtypes")
-	public boolean isExisting(AccMetadataSet accMetadataSet) throws MiddlewareQueryException {
-		try {
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"SELECT * FROM gdms_acc_metadataset where dataset_id = :datasetId " + "AND gid = :gid AND nid = :nid ");
-			query.setParameter("datasetId", accMetadataSet.getDatasetId());
-			query.setParameter("gid", accMetadataSet.getGermplasmId());
-			query.setParameter("nid", accMetadataSet.getNameId());
-
-			List results = query.list();
-
-			if (!results.isEmpty()) {
-				return true;
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with isExisting(accMetadataSet=" + accMetadataSet + ") query from AccMetadataSet " + e.getMessage(), e);
-		}
-		return false;
 	}
 
 }

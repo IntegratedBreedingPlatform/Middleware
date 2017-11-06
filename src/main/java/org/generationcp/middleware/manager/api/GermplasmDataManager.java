@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -1085,5 +1086,5 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	List<String> getMethodCodeByMethodIds(Set<Integer> methodIds);
-	
+
 }

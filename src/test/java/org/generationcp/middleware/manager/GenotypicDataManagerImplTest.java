@@ -94,15 +94,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetNameIdsByGermplasmIds() throws Exception {
-		List<Integer> germplasmIds = Arrays.asList(-3787, -6785, -4070, 1434, 2219);
-		// For test data, get gids from LOCAL and CENTRAL: SELECT nid, gid FROM gdms_acc_metadataset
-
-		List<Integer> results = this.genotypicDataManager.getNameIdsByGermplasmIds(germplasmIds);
-		Debug.println("testGetNameIdsByGermplasmIds(" + germplasmIds + ") RESULTS: " + results.size() + " = " + results);
-	}
-
-	@Test
 	public void testGetNamesByNameIds() throws Exception {
 		List<Integer> nameIds = Arrays.asList(1, 2, 3, -1, -2, -3);
 		// For test data, get gids from LOCAL and CENTRAL: SELECT * FROM names where nid in (:nidList)
@@ -535,11 +526,8 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		List<Integer> gids = Arrays.asList(-2);
 
 		List<AccMetadataSet> nids = this.genotypicDataManager.getAccMetadatasetsByDatasetIds(datasetIds, 0, 10);
-		List<AccMetadataSet> nidsWithGidFilter =
-				this.genotypicDataManager.getAccMetadatasetsByDatasetIdsAndNotGids(datasetIds, gids, 0, 10);
 
 		Debug.println("testGgetAccMetadatasetByDatasetIds: " + nids);
-		Debug.println("testGetgetAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
 	}
 
 	@Test
@@ -591,8 +579,8 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		Integer gid = Integer.valueOf(-2215);
 		List<Integer> datasetIds = Arrays.asList(1, 2);
 		List<Integer> markerIds =
-				this.genotypicDataManager.getMarkersByGidAndDatasetIds(gid, datasetIds, 0,
-						(int) this.genotypicDataManager.countMarkersByGidAndDatasetIds(gid, datasetIds));
+				this.genotypicDataManager.getMarkersBySampleIdAndDatasetIds(gid, datasetIds, 0,
+						(int) this.genotypicDataManager.countMarkersBySampleIdAndDatasetIds(gid, datasetIds));
 		Debug.println("testGetMarkersByGidAndDatasetIds() RESULTS: " + markerIds);
 	}
 
@@ -600,7 +588,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testCountMarkersByGidAndDatasetIds() throws Exception {
 		Integer gid = Integer.valueOf(-2215);
 		List<Integer> datasetIds = Arrays.asList(1, 2);
-		long count = this.genotypicDataManager.countMarkersByGidAndDatasetIds(gid, datasetIds);
+		long count = this.genotypicDataManager.countMarkersBySampleIdAndDatasetIds(gid, datasetIds);
 		Debug.println("testCountGdmsAccMetadatasetByGid() RESULTS: " + count);
 	}
 
@@ -673,27 +661,27 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		Debug.println("testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
 	}
 
-	@Test
-	public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
-		List<Integer> gIds = Arrays.asList(956, 1042, 1128);
-		List<Integer> datasetIds = Arrays.asList(2);
-		List<Integer> markerIds = Arrays.asList(6, 10);
-
-		List<Integer> nIdList =
-				this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 0,
-						this.genotypicDataManager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=" + datasetIds + ") RESULTS: " + nIdList);
-
-		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(null, gIds, markerIds, 0, 5);
-		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=null) RESULTS: " + nIdList);
-
-		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, null, markerIds, 0, 5);
-		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(gIds=null) RESULTS: " + nIdList);
-
-		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, gIds, null, 0, 5);
-		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(markerIds=null) RESULTS: " + nIdList);
-
-	}
+//	@Test
+//	public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
+//		List<Integer> gIds = Arrays.asList(956, 1042, 1128);
+//		List<Integer> datasetIds = Arrays.asList(2);
+//		List<Integer> markerIds = Arrays.asList(6, 10);
+//
+//		List<Integer> nIdList =
+//				this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 0,
+//						this.genotypicDataManager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=" + datasetIds + ") RESULTS: " + nIdList);
+//
+//		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(null, gIds, markerIds, 0, 5);
+//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=null) RESULTS: " + nIdList);
+//
+//		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, null, markerIds, 0, 5);
+//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(gIds=null) RESULTS: " + nIdList);
+//
+//		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, gIds, null, 0, 5);
+//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(markerIds=null) RESULTS: " + nIdList);
+//
+//	}
 
 	@Test
 	public void testCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
@@ -959,10 +947,9 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddAccMetadataSet() throws Exception {
-		Integer germplasmId = 1;
-		Integer nameId = 1;
+		Integer accSampleId = 1;
 		Integer sampleId = 1;
-		AccMetadataSet accMetadataSet = new AccMetadataSet(null, this.datasetId, germplasmId, nameId, sampleId);
+		AccMetadataSet accMetadataSet = new AccMetadataSet(null, this.datasetId, sampleId, accSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addAccMetadataSet(accMetadataSet);
 		Debug.println("testAccMetadataSet() Added: " + (idAdded != null ? accMetadataSet : null));
@@ -1232,24 +1219,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 		return idAdded;
 
-	}
-
-	@Test
-	public void testSetSSRMarkers() throws Exception {
-		List<Object> markerRecords = this.createMarkerRecords();
-		Marker marker = (Marker) markerRecords.get(0);
-		MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
-		MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
-		MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
-
-		Boolean addStatus = this.genotypicDataManager.setSSRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-		if (addStatus) {
-			Debug.println("testSetSSRMarkers() Added: ");
-			Debug.println(IntegrationTestBase.INDENT, marker.toString());
-			Debug.println(IntegrationTestBase.INDENT, markerAlias.toString());
-			Debug.println(IntegrationTestBase.INDENT, markerDetails.toString());
-			Debug.println(IntegrationTestBase.INDENT, markerUserInfo.toString());
-		}
 	}
 
 	private Marker createMarker() {
@@ -2017,21 +1986,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteSSRGenotypingDatasets() throws Exception {
-
-		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
-		uploadTest.testSetSSR();
-
-		List<Dataset> dataset = this.genotypicDataManager.getDatasetsByType(GdmsType.TYPE_SSR);
-
-		Integer datasetId = dataset.get(0).getDatasetId();
-
-		Debug.println("testDeleteSSRGenotypingDatasets(" + datasetId + ")");
-		this.genotypicDataManager.deleteSSRGenotypingDatasets(datasetId);
-		Debug.println("done with testDeleteSSRGenotypingDatasets");
-	}
-
-	@Test
 	public void testDeleteSNPGenotypingDatasets() throws Exception {
 
 		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
@@ -2047,34 +2001,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteDArTGenotypingDatasets() throws Exception {
-
-		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
-		uploadTest.testSetDart();
-
-		List<Dataset> dataset = this.genotypicDataManager.getDatasetsByType(GdmsType.TYPE_DART);
-		Integer datasetId = dataset.get(0).getDatasetId();
-
-		Debug.println("testDeleteDArTGenotypingDatasets(" + datasetId + ")");
-		this.genotypicDataManager.deleteDArTGenotypingDatasets(datasetId);
-		Debug.println("done with testDeleteDArTGenotypingDatasets");
-	}
-
-	@Test
-	public void testDeleteMappingPopulationDatasets() throws Exception {
-
-		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
-
-		// Test deleting Mapping ABH Data
-		uploadTest.testSetMappingABH();
-		List<Dataset> dataset = this.genotypicDataManager.getDatasetsByType(GdmsType.TYPE_MAPPING);
-		Integer datasetId = dataset.get(0).getDatasetId();
-		this.genotypicDataManager.deleteMappingPopulationDatasets(datasetId);
-		Debug.println("Deleted MappingPopulationDataset:MappingABH(datasetId=" + datasetId + ")");
-
-	}
-
-	@Test
 	public void testDeleteMappingPopulationDatasetsSNP() throws Exception {
 
 		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
@@ -2085,19 +2011,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		Integer datasetId = dataset.get(0).getDatasetId();
 		this.genotypicDataManager.deleteMappingPopulationDatasets(datasetId);
 		Debug.println("Deleted MappingPopulationDataset:MappingAllelicSNP(datasetId=" + datasetId + ")");
-	}
-
-	@Test
-	public void testDeleteMappingPopulationDatasetsSSRDArT() throws Exception {
-
-		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
-
-		// Test deleting Mapping Allelic SNP Data
-		uploadTest.testSetMappingAllelicSSRDArT(); // should also delete from gdms_allele_values / gdms_dart_values
-		List<Dataset> dataset = this.genotypicDataManager.getDatasetsByType(GdmsType.TYPE_MAPPING);
-		Integer datasetId = dataset.get(0).getDatasetId();
-		this.genotypicDataManager.deleteMappingPopulationDatasets(datasetId);
-		Debug.println("Deleted MappingPopulationDataset:MappingAllelicSSRDArT(datasetId=" + datasetId + ")");
 	}
 
 	@Test
@@ -2247,13 +2160,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 			this.genotypicDataManager.addMtaMetadata(mtaMetadata);
 			Debug.println(IntegrationTestBase.INDENT, "MtaMetadataset added: " + mtaMetadata);
 		}
-	}
-
-	@Test
-	public void testGetDartMarkerDetails() throws Exception {
-		List<Integer> markerIds = Arrays.asList(-1, -2);
-		List<DartValues> result = this.genotypicDataManager.getDartMarkerDetails(markerIds);
-		Debug.printObjects(IntegrationTestBase.INDENT, result);
 	}
 
 	@Test

@@ -34,16 +34,16 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	public static final String GET_MARKER_ID_BY_DATASET_ID = "SELECT marker_id " + "FROM gdms_marker_metadataset "
 			+ "WHERE dataset_id = :datasetId " + "ORDER BY marker_id;";
 
-	public static final String GET_MARKERS_BY_GID_AND_DATASETS = "SELECT DISTINCT marker_id "
+	public static final String GET_MARKERS_BY_SAMPLEID_AND_DATASETS = "SELECT DISTINCT marker_id "
 			+ "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset "
 			+ "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id "
-			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.gid = :gid "
+			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.sample_id = :sampleId "
 			+ "ORDER BY gdms_marker_metadataset.marker_id ";
 
-	public static final String COUNT_MARKERS_BY_GID_AND_DATASETS = "SELECT COUNT(DISTINCT marker_id) "
+	public static final String COUNT_MARKERS_BY_SAMPLEID_AND_DATASETS = "SELECT COUNT(DISTINCT marker_id) "
 			+ "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset "
 			+ "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id "
-			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.gid = :gid "
+			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.sample_id = :sampleId "
 			+ "ORDER BY gdms_marker_metadataset.marker_id ";
 
 	public static final String GET_BY_MARKER_IDS = "SELECT marker_metadataset_id, dataset_id, marker_id, marker_sample_id "
@@ -76,15 +76,15 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows)
+	public List<Integer> getMarkersBySampleIdAndDatasetIds(Integer sampleId, List<Integer> datasetIds, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		List<Integer> markerIds = new ArrayList<Integer>();
 
 		try {
-			if (gid != null && datasetIds != null) {
-				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.GET_MARKERS_BY_GID_AND_DATASETS);
+			if (sampleId != null && datasetIds != null) {
+				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.GET_MARKERS_BY_SAMPLEID_AND_DATASETS);
 				query.setParameterList("datasetids", datasetIds);
-				query.setParameter("gid", gid);
+				query.setParameter("sampleId", sampleId);
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 
@@ -93,26 +93,26 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 				return new ArrayList<Integer>();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds
+			this.logAndThrowException("Error with getMarkersBySampleIdAndDatasetIds(sampleID=" + sampleId + ", datasetIds=" + datasetIds
 					+ ") query from MarkerMetadataSet: " + e.getMessage(), e);
 		}
 		return markerIds;
 	}
 
-	public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException {
+	public long countMarkersBySampleIdAndDatasetIds(Integer sampleId, List<Integer> datasetIds) throws MiddlewareQueryException {
 		long count = 0;
 		try {
-			if (gid != null) {
-				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.COUNT_MARKERS_BY_GID_AND_DATASETS);
+			if (sampleId != null) {
+				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.COUNT_MARKERS_BY_SAMPLEID_AND_DATASETS);
 				query.setParameterList("datasetids", datasetIds);
-				query.setParameter("gid", gid);
+				query.setParameter("sampleId", sampleId);
 				BigInteger result = (BigInteger) query.uniqueResult();
 				if (result != null) {
 					count = result.longValue();
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds
+			this.logAndThrowException("Error with countMarkersBySampleIdAndDatasetIds(sampleId=" + sampleId + ", datasetIds=" + datasetIds
 					+ ") query from MarkerMetadataSet: " + e.getMessage(), e);
 		}
 		return count;

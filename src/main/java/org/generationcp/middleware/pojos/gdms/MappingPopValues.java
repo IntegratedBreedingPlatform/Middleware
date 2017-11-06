@@ -44,8 +44,8 @@ public class MappingPopValues implements Serializable {
 	@Column(name = "dataset_id")
 	private Integer datasetId;
 
-	@Column(name = "gid")
-	private Integer gid;
+	@Column(name = "sample_id")
+	private Integer sampleId;
 
 	@Column(name = "marker_id")
 	private Integer markerId;
@@ -59,12 +59,12 @@ public class MappingPopValues implements Serializable {
 	public MappingPopValues() {
 	}
 
-	public MappingPopValues(Integer mpId, String mapCharValue, Integer datasetId, Integer gid, Integer markerId, Integer accSampleId,
+	public MappingPopValues(Integer mpId, String mapCharValue, Integer datasetId, Integer sampleId, Integer markerId, Integer accSampleId,
 			Integer markerSampleId) {
 		this.mpId = mpId;
 		this.mapCharValue = mapCharValue;
 		this.datasetId = datasetId;
-		this.gid = gid;
+		this.sampleId = sampleId;
 		this.markerId = markerId;
 		this.accSampleId = accSampleId;
 		this.markerSampleId = markerSampleId;
@@ -94,12 +94,12 @@ public class MappingPopValues implements Serializable {
 		this.datasetId = datasetId;
 	}
 
-	public Integer getGid() {
-		return this.gid;
+	public Integer getSampleId() {
+		return this.sampleId;
 	}
 
-	public void setGid(Integer gid) {
-		this.gid = gid;
+	public void setSampleId(Integer sampleId) {
+		this.sampleId = sampleId;
 	}
 
 	public Integer getMarkerId() {
@@ -132,7 +132,7 @@ public class MappingPopValues implements Serializable {
 		int result = 1;
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
-		result = prime * result + (this.gid == null ? 0 : this.gid.hashCode());
+		result = prime * result + (this.sampleId == null ? 0 : this.sampleId.hashCode());
 		result = prime * result + (this.mapCharValue == null ? 0 : this.mapCharValue.hashCode());
 		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
@@ -166,11 +166,11 @@ public class MappingPopValues implements Serializable {
 		} else if (!this.datasetId.equals(other.datasetId)) {
 			return false;
 		}
-		if (this.gid == null) {
-			if (other.gid != null) {
+		if (this.sampleId == null) {
+			if (other.sampleId != null) {
 				return false;
 			}
-		} else if (!this.gid.equals(other.gid)) {
+		} else if (!this.sampleId.equals(other.sampleId)) {
 			return false;
 		}
 		if (this.mapCharValue == null) {
@@ -213,8 +213,8 @@ public class MappingPopValues implements Serializable {
 		builder.append(this.mapCharValue);
 		builder.append(", datasetId=");
 		builder.append(this.datasetId);
-		builder.append(", gid=");
-		builder.append(this.gid);
+		builder.append(", sampleId=");
+		builder.append(this.sampleId);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
 		builder.append(", accSampleId=");

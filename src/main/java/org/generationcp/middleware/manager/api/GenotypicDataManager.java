@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -25,7 +26,6 @@ import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
-import org.generationcp.middleware.pojos.gdms.DartDataRow;
 import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -37,7 +37,6 @@ import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingABHRow;
 import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
 import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -61,7 +60,6 @@ import org.generationcp.middleware.pojos.gdms.QtlDataRow;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
-import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
 
@@ -71,15 +69,6 @@ import org.generationcp.middleware.pojos.gdms.TrackMarker;
  */
 public interface GenotypicDataManager {
 
-	/**
-	 * Gets the name ids by germplasm ids. Searches the acc_metadataset table by giving the list of germplasm ids.
-	 *
-	 * @param gIds the list germplasm ids
-	 * @return the name ids matching the given germplasm ids
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException;
-	
 	/**
 	 * Gets the dataset ids by germplasm ids. Searches the acc_metadataset table by giving the list of germplasm ids.
 	 *
@@ -593,15 +582,6 @@ public interface GenotypicDataManager {
 	List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
-	 * Counts the number of germplasm ids matching the given marker id from the allele_values table.
-	 *
-	 * @param markerId the marker id
-	 * @return the count of germplasm ids corresponding to the given marker id from allele_values
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws MiddlewareQueryException;
-
-	/**
 	 * Retrieves all the associated germplasm ids matching the given marker id from the mapping_pop_values table.
 	 *
 	 * @param markerId - the marker id to match
@@ -685,19 +665,6 @@ public interface GenotypicDataManager {
 	List<AccMetadataSet> getAccMetadatasetsByDatasetIds(List<Integer> datasetIds, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
-	 * Gets the nids from acc metadataset by dataset ids filtered by gids.
-	 *
-	 * @param datasetIds - the dataset ids to match
-	 * @param notGids - the gids to exclude
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of name ids from acc_metadataset based on the given list of dataset ids
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<AccMetadataSet> getAccMetadatasetsByDatasetIdsAndNotGids(List<Integer> datasetIds, List<Integer> notGids, int start, int numOfRows)
-			throws MiddlewareQueryException;
-
-	/**
 	 * Gets all the dataset Ids for Fingerprinting. Retrieves data from both central and local database instances.
 	 *
 	 * @param start - the starting index of the sublist of results to be returned
@@ -765,7 +732,7 @@ public interface GenotypicDataManager {
 	 * @return List of marker ids matching the given GID and dataset ids
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows)
+	List<Integer> getMarkersBySampleIdAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows)
 			throws MiddlewareQueryException;
 
 	/**
@@ -776,7 +743,7 @@ public interface GenotypicDataManager {
 	 * @return the number of marker ids matching the given GID and dataset ids
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException;
+	long countMarkersBySampleIdAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the number of alleles given a set of GIDs.
@@ -851,7 +818,7 @@ public interface GenotypicDataManager {
 	 * @return Set of name ids based on the given list of dataset ids, list of marker ids and a list of germplasm ids
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> gIds, List<Integer> markerIds,
+	Set<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> gIds, List<Integer> markerIds,
 			int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
@@ -1314,19 +1281,6 @@ public interface GenotypicDataManager {
 	Integer addMap(Map map) throws MiddlewareQueryException;
 
 	/**
-	 * Sets SSR Markers.
-	 *
-	 * @param marker (Marker) marker_type will be set to/overridden by "SSR"
-	 * @param markerAlias (MarkerAlias) (marker_id will automatically be set to inserted marker's ID)
-	 * @param markerDetails (MarkerDetails) (marker_id will automatically be set to inserted marker's ID)
-	 * @param markerUserInfo (MarkerUserInfo) (marker_id will automatically be set to inserted marker's ID)
-	 * @return (boolean) - true if successful, exception or false if failed
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setSSRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
-			throws MiddlewareQueryException;
-
-	/**
 	 * Sets SNP Markers.
 	 *
 	 * @param marker (Marker) marker_type will be set to/overridden by "SNP"
@@ -1366,19 +1320,6 @@ public interface GenotypicDataManager {
 			throws MiddlewareQueryException;
 
 	/**
-	 * Sets the d ar t markers.
-	 *
-	 * @param marker the marker
-	 * @param markerAlias the marker alias
-	 * @param markerDetails the marker details
-	 * @param markerUserInfo the marker user info
-	 * @return the boolean
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setDArTMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
-			throws MiddlewareQueryException;
-
-	/**
 	 * Sets QTL.
 	 * 
 	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the QTL Genotyping data rows as a list of QtlDataRow objects.
@@ -1390,73 +1331,6 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Boolean setQTL(Dataset dataset, DatasetUsers datasetUser, List<QtlDataRow> rows) throws MiddlewareQueryException;
-
-	/**
-	 * Sets DArT
-	 * 
-	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the DArT Genotyping data rows as a list of DartDataRow
-	 * objects. For new values to be added, set the id to null.
-	 *
-	 * @param dataset - (Dataset) dataset_type = "DArT", datatype = "int"
-	 * @param datasetUser - (DatasetUser)
-	 * @param markers - List of Markers to add
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add
-	 * @param accMetadataSets - List of AccMetadataSets to add
-	 * @param dartValueList - List of DartValues to add
-	 * @param alleleValueList - List of AlleleValues to add
-	 * @return (boolean) - true if successful, exception or false if failed
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
-			List<AccMetadataSet> accMetadataSets, List<DartValues> dartValueList, List<AlleleValues> alleleValueList)
-			throws MiddlewareQueryException;
-
-	/**
-	 * Update DArT Records. For new values to be added, set the id to null.
-	 *
-	 * @param dataset the Dataset
-	 * @param markers - List of Markers to add/update
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add/update
-	 * @param rows the rows to update
-	 * @return true if successful
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @throws MiddlewareException the middleware exception
-	 */
-	Boolean updateDart(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<DartDataRow> rows)
-			throws MiddlewareQueryException, MiddlewareException;
-
-	/**
-	 * Sets SSR
-	 * 
-	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the SSR Genotyping data rows as a list of SSRDataRow objects.
-	 * For new values to be added, set the id to null.
-	 *
-	 * @param dataset - (Dataset) dataset_type = "SSR", datatype = "int"
-	 * @param datasetUser - (DatasetUser)
-	 * @param markers - List of Markers to add
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add
-	 * @param accMetadataSets - List of AccMetadataSets to add
-	 * @param alleleValueList - List of AlleleValues to add
-	 * @param rows the rows
-	 * @return (boolean) - true if successful, exception or false if failed
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
-			List<AccMetadataSet> accMetadataSets, List<AlleleValues> alleleValueList) throws MiddlewareQueryException;
-
-	/**
-	 * Update SSR Records. For new values to be added, set the id to null.
-	 *
-	 * @param dataset the Dataset
-	 * @param markers - List of Markers to add/update
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add/update
-	 * @param rows the rows to update
-	 * @return true if successful
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @throws MiddlewareException the middleware exception
-	 */
-	Boolean updateSSR(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<SSRDataRow> rows)
-			throws MiddlewareQueryException, MiddlewareException;
 
 	/**
 	 * Sets SNP
@@ -1561,45 +1435,6 @@ public interface GenotypicDataManager {
 	 */
 	Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, List<Marker> markers,
 			List<MarkerMetadataSet> markerMetadataSets, List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException,
-			MiddlewareException;
-
-	/**
-	 * Sets Mapping Data of Allelic SSR DArT
-	 * 
-	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the Mapping Allelic SSR DArT Genotyping data rows as a list of
-	 * MappingAllelicSSRDArTRow objects. For new values to be added, set the id to null.
-	 *
-	 * @param dataset - Dataset
-	 * @param datasetUser - Dataset Users
-	 * @param mappingPop - Mapping Population
-	 * @param markers - List of Markers to add
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add
-	 * @param accMetadataSets - List of AccMetadataSets to add
-	 * @param mappingPopValueList - List of MappingPopValues to add
-	 * @param alleleValueList - List of AlleleValues to add
-	 * @param dartValueList - List of DartValues to add
-	 * @return true if values were successfully saved in the database, false otherwise
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-
-	Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList,
-			List<AlleleValues> alleleValueList, List<DartValues> dartValueList) throws MiddlewareQueryException;
-
-	/**
-	 * Update Mapping Allelic SSR DArT records. For new values to be added, set the id to null.
-	 *
-	 * @param dataset the Dataset
-	 * @param mappingPop the mapping pop
-	 * @param markers - List of Markers to add/update
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add/update
-	 * @param rows the rows to update
-	 * @return true if successful
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @throws MiddlewareException the middleware exception
-	 */
-	Boolean updateMappingAllelicSSRDArT(Dataset dataset, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException,
 			MiddlewareException;
 
 	/**
@@ -1929,28 +1764,12 @@ public interface GenotypicDataManager {
 	void deleteQTLs(List<Integer> qtlIds, Integer datasetId) throws MiddlewareQueryException;
 
 	/**
-	 * Delete SSRGenotypingDatasets by dataset id.
-	 *
-	 * @param datasetId the dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	void deleteSSRGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
 	 * Delete SNPGenotypingDatasets by dataset id.
 	 *
 	 * @param datasetId the dataset id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void deleteSNPGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
-	 * Delete DArTGenotypingDatasets by dataset id.
-	 *
-	 * @param datasetId the dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	void deleteDArTGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
 
 	/**
 	 * Delete MappingPopulationDatasets by dataset id.
@@ -2122,15 +1941,6 @@ public interface GenotypicDataManager {
 	List<AllelicValueElement> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
 
 	/**
-	 * Gets the dart data rows.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the dart data rows
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<DartDataRow> getDartDataRows(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
 	 * Gets the sNP data rows.
 	 *
 	 * @param datasetId the dataset id
@@ -2138,15 +1948,6 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<SNPDataRow> getSNPDataRows(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the sSR data rows.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the sSR data rows
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<SSRDataRow> getSSRDataRows(Integer datasetId) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the mapping abh rows.
@@ -2166,14 +1967,6 @@ public interface GenotypicDataManager {
 	 */
 	List<MappingAllelicSNPRow> getMappingAllelicSNPRows(Integer datasetId) throws MiddlewareQueryException;
 
-	/**
-	 * Gets the mapping allelic ssrd ar t rows.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the mapping allelic ssrd ar t rows
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<MappingAllelicSSRDArTRow> getMappingAllelicSSRDArTRows(Integer datasetId) throws MiddlewareQueryException;
 
 	/**
 	 * Update marker info. For new values to be added, set the id to null.
@@ -2187,15 +1980,6 @@ public interface GenotypicDataManager {
 	 */
 	Boolean updateMarkerInfo(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
 			throws MiddlewareQueryException;
-
-	/**
-	 * Gets the dart marker details.
-	 *
-	 * @param markerIds the marker ids
-	 * @return the dart marker details
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<DartValues> getDartMarkerDetails(List<Integer> markerIds) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the marker metadataset by dataset id.
@@ -2243,12 +2027,14 @@ public interface GenotypicDataManager {
 	// Map Pop Alleles (MappingPopValueDAO)
 	List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
 	
-	public int countAllMarkers();
+	int countAllMarkers();
 	
-	public List<Integer> getMarkerIdsByNames(List<String> names, int start, int numOfRows);
+	List<Integer> getMarkerIdsByNames(List<String> names, int start, int numOfRows);
 	
-	public List<Object> getMarkersOnMapByMarkerIdsAndMapId(List<Integer> markerIds, Integer mapID);
+	List<Object> getMarkersOnMapByMarkerIdsAndMapId(List<Integer> markerIds, Integer mapID);
 	
-	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId);
+	List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId);
+
+	java.util.Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs);
 
 }

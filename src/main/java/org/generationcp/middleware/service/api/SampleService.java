@@ -9,6 +9,8 @@ import org.generationcp.middleware.pojos.User;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface SampleService {
 
@@ -18,4 +20,7 @@ public interface SampleService {
 	List<SampleDTO> getSamples(final String plotId);
 
 	SampleDetailsDTO getSampleObservation(final String sampleId);
+
+	Map<String, SampleDTO> getSamplesBySampleUID (final Set<String> sampleUIDs);
+
 }

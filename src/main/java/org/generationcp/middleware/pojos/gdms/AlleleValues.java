@@ -46,8 +46,8 @@ public class AlleleValues implements Serializable {
 	private Integer datasetId;
 
 	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer gId;
+	@Column(name = "sample_id")
+	private Integer sampleId;
 
 	@Basic(optional = false)
 	@Column(name = "marker_id")
@@ -73,11 +73,11 @@ public class AlleleValues implements Serializable {
 	public AlleleValues() {
 	}
 
-	public AlleleValues(Integer anId, Integer datasetId, Integer gId, Integer markerId, String alleleBinValue, String alleleRawValue,
+	public AlleleValues(Integer anId, Integer datasetId, Integer sampleId, Integer markerId, String alleleBinValue, String alleleRawValue,
 			Integer peakHeight) {
 		this.anId = anId;
 		this.datasetId = datasetId;
-		this.gId = gId;
+		this.sampleId = sampleId;
 		this.markerId = markerId;
 		this.alleleBinValue = alleleBinValue;
 		this.alleleRawValue = alleleRawValue;
@@ -100,12 +100,12 @@ public class AlleleValues implements Serializable {
 		this.datasetId = datasetId;
 	}
 
-	public Integer getGid() {
-		return this.gId;
+	public Integer getSampleId() {
+		return this.sampleId;
 	}
 
-	public void setGid(Integer gId) {
-		this.gId = gId;
+	public void setSampleId(Integer sampleId) {
+		this.sampleId = sampleId;
 	}
 
 	public Integer getMarkerId() {
@@ -184,8 +184,8 @@ public class AlleleValues implements Serializable {
 		builder.append(this.anId);
 		builder.append(", datasetId=");
 		builder.append(this.datasetId);
-		builder.append(", gId=");
-		builder.append(this.gId);
+		builder.append(", sampleId=");
+		builder.append(this.sampleId);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
 		builder.append(", alleleBinValue=");

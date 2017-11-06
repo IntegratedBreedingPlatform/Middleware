@@ -11,6 +11,7 @@ import org.hibernate.criterion.Restrictions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
@@ -74,5 +75,13 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
 		}
 		return sample;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Sample> getBySampleBks(final Set<String> sampleBks) {
+		return this.getSession()
+				.createCriteria(Sample.class, "sample")
+				.add(Restrictions.in("sampleBusinessKey", sampleBks))
+				.list();
 	}
 }
