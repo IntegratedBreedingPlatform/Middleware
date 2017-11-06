@@ -3,13 +3,15 @@ package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SampleListService {
 
-	SampleList createSampleList(SampleListDTO sampleListDto);
+	SampleList createSampleList(final SampleListDTO sampleListDto);
 
 	/**
 	 * Create a sample list folder
@@ -17,10 +19,11 @@ public interface SampleListService {
 	 * @param folderName
 	 * @param parentId
 	 * @param createdBy
+	 * @param programUUID
 	 * @return SampleList (Saved Folder)
 	 * @throws Exception
 	 */
-	Integer createSampleListFolder(final String folderName, final Integer parentId,final String createdBy) throws Exception;
+	Integer createSampleListFolder(final String folderName, final Integer parentId,final String createdBy, final String programUUID) throws Exception;
 
 	/**
 	 * Update sample list folder name
@@ -50,9 +53,57 @@ public interface SampleListService {
 	 */
 	void deleteSampleListFolder(final Integer folderId) throws Exception;
 
-	List getSampleLists(final Integer trialId);
+	List<SampleListDTO> getSampleLists(final Integer trialId);
 
 	SampleList getSampleList(final Integer sampleListId);
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
+	/**
+	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
+	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
+	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
+	 *
+	 * @param programUUID - the program UUID
+	 * @return - List of SampleList POJOs
+	 */
+	List<SampleList> getAllTopLevelLists(final String programUUID);
+
+	/**
+	 * Returns a list of {@code SampleList} child records given a parent id. Retrieval from the database is done by batch (as specified
+	 * in batchSize) to reduce the load in instances where there is a large volume of child folders to be retrieved. Though retrieval is by
+	 * batch, this method still returns all of the child folders as a single list.
+	 *
+	 * @param parentId - the ID of the parent to retrieve the child lists
+	 * @param programUUID - the program UUID of the program where to retrieve the child lists
+	 * @param batchSize - the number of records to be retrieved per iteration
+	 * @return Returns a List of SampleList POJOs for the child lists
+	 */
+	List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize);
+
+	/**
+	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
+	 * This helps avoiding the need to query metadata in a loop for each folder
+	 * @param sampleLists ids for which we should retrieve metadata
+	 */
+	Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists);
+
+	/**
+	 *
+	 * @param listId - the list Id
+	 * @return - List of SampleList POJOs
+	 */
+	SampleList getSampleListByListId(final Integer listId);
+
+	SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid);
+
+	/**
+	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
+	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
+	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
+	 *
+	 * @param programUUID - the program UUID
+	 * @return - List of GermplasmList POJOs
+	 */
+	List<SampleList> getAllSampleTopLevelLists(final String programUUID);
+
 }

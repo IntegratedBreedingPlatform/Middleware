@@ -35,6 +35,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
@@ -994,11 +995,6 @@ public interface FieldbookService {
 	 * @param studyId id for the study Trial
 	 * @return the true if the study has samples
 	 */
-	boolean hasSamples(Integer studyId);
+	boolean hasSamples(final Integer studyId);
 
-	List<SampleListDTO> getSampleLists(final Integer trialId);
-
-	SampleList getSampleList(final Integer sampleListId);
-
-	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 }

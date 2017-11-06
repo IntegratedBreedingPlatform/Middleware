@@ -159,7 +159,7 @@ class ObservationQuery {
 	}
 
 	private String getOrderByExpression(final List<MeasurementVariableDto> variables, final String orderByTraitId) {
-		return !(variables != null && variables.isEmpty()) ? "" : " ORDER BY " + orderByTraitId;
+		return null == variables || variables.isEmpty() ? "" : " ORDER BY " + orderByTraitId;
 	}
 
 	private String getFromExpression(final List<MeasurementVariableDto> variables) {

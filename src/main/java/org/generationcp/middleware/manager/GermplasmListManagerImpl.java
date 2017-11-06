@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
@@ -844,4 +845,5 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 					e);
 		}
 	}
+
 }

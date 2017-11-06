@@ -318,7 +318,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
 				.append("    cvterm_relationship r ON (r.object_id = scale.cvterm_id) ").append("        INNER JOIN ")
 				.append("    cvterm variable ON (r.subject_id = variable.cvterm_id) ").append("        INNER JOIN ")
-				.append("    nd_geolocationprop pp ON (pp.variable_id = variable.cvterm_id) ")
+				.append("    nd_geolocationprop pp ON (pp.type_id = variable.cvterm_id) ")
 				.append("        INNER JOIN workbench.persons person ").append("    ON (pp.value = person.personid) ")
 				.append("    INNER JOIN workbench.users user on (user.personid = person.personid) ")
 				.append("    left join workbench.users_roles role on (role.userid = user.userid) ").append("WHERE ")

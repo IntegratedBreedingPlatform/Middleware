@@ -53,12 +53,18 @@ import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.ReportService;
+import org.generationcp.middleware.service.api.SampleListService;
+import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
+import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
+import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
+import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
@@ -282,4 +288,15 @@ public class ManagerFactory implements Serializable {
 		return new StudyServiceImpl(this.sessionProvider);
 	}
 
+	public SampleListService getSampleListService() {
+		return new SampleListServiceImpl(this.sessionProvider);
+	}
+
+	public SampleService getSampleService() {
+		return new SampleServiceImpl(this.sessionProvider);
+	}
+
+	public PlantService getPlantService() {
+		return new PlantServiceImpl(this.sessionProvider);
+	}
 }
