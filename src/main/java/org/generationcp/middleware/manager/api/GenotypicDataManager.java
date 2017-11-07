@@ -1644,15 +1644,6 @@ public interface GenotypicDataManager {
 	List<Dataset> getDatasetsByType(GdmsType type) throws MiddlewareQueryException;
 
 	/**
-	 * Gets the datasets by mapping type from local.
-	 *
-	 * @param type the type
-	 * @return the datasets by mapping type from local
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Dataset> getDatasetsByMappingTypeFromLocal(GdmsType type) throws MiddlewareQueryException;
-
-	/**
 	 * Gets the mapping pop by dataset id.
 	 *
 	 * @param datasetId the dataset id
@@ -1905,34 +1896,6 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<AllelicValueElement> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the sNP data rows.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the sNP data rows
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<SNPDataRow> getSNPDataRows(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the mapping abh rows.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the mapping abh rows
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<MappingABHRow> getMappingABHRows(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the mapping allelic snp rows.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the mapping allelic snp rows
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<MappingAllelicSNPRow> getMappingAllelicSNPRows(Integer datasetId) throws MiddlewareQueryException;
-
 
 	/**
 	 * Update marker info. For new values to be added, set the id to null.

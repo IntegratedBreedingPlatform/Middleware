@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
@@ -40,17 +38,11 @@ import org.generationcp.middleware.dao.gdms.MtaDAO;
 import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Plant;
-import org.generationcp.middleware.pojos.Sample;
-import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
@@ -1473,11 +1465,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public List<Dataset> getDatasetsByMappingTypeFromLocal(GdmsType type) throws MiddlewareQueryException {
-		return this.getDatasetDao().getDatasetsByMappingType(type);
-	}
-
-	@Override
 	public MappingPop getMappingPopByDatasetId(Integer datasetId) throws MiddlewareQueryException {
 		return this.getMappingPopDao().getMappingPopByDatasetId(datasetId);
 	}
@@ -2150,31 +2137,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 	}
 
-	private void saveAlleleValues(List<AlleleValues> alleleValuesList) throws Exception {
-		if (alleleValuesList == null) {
-			return;
-		}
-		this.getActiveSession();
-		AlleleValuesDAO alleleValuesDao = this.getAlleleValuesDao();
-		for (AlleleValues alleleValues : alleleValuesList) {
-			alleleValuesDao.merge(alleleValues);
-		}
-
-	}
-
-	private void saveDartValues(List<DartValues> dartValuesList) throws Exception {
-
-		if (dartValuesList == null) {
-			return;
-		}
-
-		this.getActiveSession();
-		DartValuesDAO dartValuesDao = this.getDartValuesDao();
-		for (DartValues dartValues : dartValuesList) {
-			dartValuesDao.merge(dartValues);
-		}
-	}
-
 	// GCP-7873
 	@Override
 	public List<Marker> getAllSNPMarkers() throws MiddlewareQueryException {
@@ -2230,106 +2192,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		returnVal.addAll(this.getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds));
 		returnVal.addAll(this.getCharValuesDao().getAlleleValuesByMarkerId(markerIds));
 		return returnVal;
-	}
-
-	@Override
-	public List<SNPDataRow> getSNPDataRows(Integer datasetId) throws MiddlewareQueryException {
-		List<SNPDataRow> toReturn = new ArrayList<>();
-
-		// Get MarkerMetadataSets of the given datasetId
-		List<MarkerMetadataSet> markerMetadataSets = this.getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
-
-		List<AccMetadataSet> accMetadataSets = this.getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
-
-		List<CharValues> charValues = this.getCharValuesDao().getCharValuesByDatasetId(datasetId);
-
-		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-			Integer markerId = markerMetadataSet.getMarkerId();
-			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				Integer sampleId = accMetadataSet.getSampleId();
-				for (CharValues charValue : charValues) {
-					if (charValue != null && charValue.getDataset().getDatasetId().equals(datasetId) && charValue.getSampleId().equals(sampleId)
-							&& charValue.getMarkerId().equals(markerId)) {
-						toReturn.add(new SNPDataRow(accMetadataSet, charValue));
-						break;
-					}
-				}
-			}
-		}
-
-		return toReturn;
-	}
-
-	@Override
-	public List<MappingABHRow> getMappingABHRows(Integer datasetId) throws MiddlewareQueryException {
-		List<MappingABHRow> toReturn = new ArrayList<>();
-
-		List<MarkerMetadataSet> markerMetadataSets = this.getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
-
-		List<AccMetadataSet> accMetadataSets = this.getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
-
-		List<MappingPopValues> mappingPopValues = this.getMappingPopValuesDao().getMappingPopValuesByDatasetId(datasetId);
-
-		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-
-			Integer markerId = markerMetadataSet.getMarkerId();
-			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				Integer sampleId = accMetadataSet.getSampleId();
-				for (MappingPopValues mappingPopValue : mappingPopValues) {
-					if (mappingPopValue != null && mappingPopValue.getDatasetId().equals(datasetId) && mappingPopValue.getSampleId().equals(sampleId)
-							&& mappingPopValue.getMarkerId().equals(markerId)) {
-						toReturn.add(new MappingABHRow(accMetadataSet, mappingPopValue));
-						break;
-					}
-				}
-			}
-		}
-
-		return toReturn;
-	}
-
-	@Override
-	public List<MappingAllelicSNPRow> getMappingAllelicSNPRows(Integer datasetId) throws MiddlewareQueryException {
-		List<MappingAllelicSNPRow> toReturn = new ArrayList<>();
-
-		List<MarkerMetadataSet> markerMetadataSets = this.getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
-
-		List<AccMetadataSet> accMetadataSets = this.getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
-
-		List<MappingPopValues> mappingPopValues = this.getMappingPopValuesDao().getMappingPopValuesByDatasetId(datasetId);
-
-		List<CharValues> charValues = this.getCharValuesDao().getCharValuesByDatasetId(datasetId);
-
-		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-			Integer markerId = markerMetadataSet.getMarkerId();
-			Marker marker = this.getMarkerDao().getById(markerId);
-			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				Integer sampleId = accMetadataSet.getSampleId();
-				MappingPopValues mappingPopValue = null;
-				for (MappingPopValues value : mappingPopValues) {
-					if (value.getDatasetId().equals(datasetId) && value.getSampleId().equals(sampleId) && value.getMarkerId().equals(markerId)) {
-
-						mappingPopValue = value;
-						break;
-					}
-				}
-
-				CharValues charValue = null;
-				for (CharValues value : charValues) {
-					if (value.getDataset().getDatasetId().equals(datasetId) && value.getAccSampleId().equals(sampleId)) {
-						charValue = value;
-						break;
-					}
-				}
-
-				if (mappingPopValue != null) {
-					toReturn.add(new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue, charValue));
-				}
-
-			}
-		}
-
-		return toReturn;
 	}
 
 	@Override
