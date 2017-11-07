@@ -994,7 +994,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		String purposeOfStudy = null;
 
 		Dataset datas =  new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType,
-				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null);
+				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null, null);
 
 		List<AccMetadataSet> accMetadataSets = new ArrayList<>();
 		AccMetadataSet accMetadataSet = new AccMetadataSet(null, datas, 1 ,1);
@@ -2111,7 +2111,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testAddMtaGCP9174() throws Exception {
 		Dataset dataset =
 				new Dataset(null, "sample", "testing", "MTA", "Groundnut", "Groundnut", null, "", "int", null, "Tassel", "LOD", "ICRISAT",
-						"TrusharShah", null, null, null, null, null);
+						"TrusharShah", null, null, null, null, null, null);
 		Integer datasetId = this.genotypicDataManager.addDataset(dataset);
 		dataset.setDatasetId(datasetId);
 
@@ -2139,7 +2139,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testSetMTA() throws Exception {
 		Dataset dataset =
 				new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null, "REMARKS", "int", null, "METHOD",
-						"0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE", null, null, null);
+						"0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE", null, null, null, null);
 		List<Mta> mtaList = new ArrayList<Mta>();
 		mtaList.add(new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA", "alleleB", "alleleAPhenotype",
 				"alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod", 8.8f, 9.9f, "dominance", "evidence", "reference", "notes"));

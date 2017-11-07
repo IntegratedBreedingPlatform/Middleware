@@ -25,7 +25,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -95,6 +97,10 @@ public class Dataset implements Serializable {
 	@Column(name = "purpose_of_study")
 	private String purposeOfStudy;
 
+	@OneToOne
+	@JoinColumn(name = "dataset_id")
+	private DatasetUsers datasetUsers;
+
 	@OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<AccMetadataSet> accMetadataSets;
 
@@ -109,7 +115,7 @@ public class Dataset implements Serializable {
 
 	public Dataset(Integer datasetId, String datasetName, String datasetDesc, String datasetType, String genus, String species,
 			Date uploadTemplateDate, String remarks, String dataType, String missingData, String method, String score, String institute,
-			String principalInvestigator, String email, String purposeOfStudy, List<AccMetadataSet> accMetadataSets, List<CharValues> charValues, List<MarkerMetadataSet> markerMetadataSets) {
+			String principalInvestigator, String email, String purposeOfStudy, List<AccMetadataSet> accMetadataSets, List<CharValues> charValues, List<MarkerMetadataSet> markerMetadataSets, DatasetUsers datasetUser) {
 		super();
 		this.datasetId = datasetId;
 		this.datasetName = datasetName;
@@ -130,6 +136,7 @@ public class Dataset implements Serializable {
 		this.accMetadataSets = accMetadataSets;
 		this.charValues = charValues;
 		this.markerMetadataSets = markerMetadataSets;
+		this.datasetUsers = datasetUser;
 	}
 
 	public Integer getDatasetId() {
@@ -282,6 +289,14 @@ public class Dataset implements Serializable {
 
 	public void setMarkerMetadataSets(final List<MarkerMetadataSet> markerMetadataSets) {
 		this.markerMetadataSets = markerMetadataSets;
+	}
+
+	public DatasetUsers getDatasetUsers() {
+		return datasetUsers;
+	}
+
+	public void setDatasetUsers(final DatasetUsers datasetUsers) {
+		this.datasetUsers = datasetUsers;
 	}
 
 	@Override

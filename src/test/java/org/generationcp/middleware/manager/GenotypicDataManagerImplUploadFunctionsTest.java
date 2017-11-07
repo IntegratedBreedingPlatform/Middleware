@@ -78,7 +78,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 		String purposeOfStudy = null;
 
 		return new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType,
-				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null);
+				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null, null);
 	}
 
 	private List<Object> createMarkerRecords() {

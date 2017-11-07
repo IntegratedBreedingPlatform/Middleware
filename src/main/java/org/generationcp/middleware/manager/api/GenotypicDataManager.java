@@ -1110,15 +1110,6 @@ public interface GenotypicDataManager {
 	List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
-	 * Gets the marker type map by ids.
-	 *
-	 * @param markerIds the marker ids
-	 * @return the marker type map by ids
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	java.util.Map<Integer, String> getMarkerTypeMapByIds(List<Integer> markerIds) throws MiddlewareQueryException;
-
-	/**
 	 * Adds a QtlDetails entry to the database.
 	 *
 	 * @param qtlDetails - the object to add
@@ -1364,25 +1355,6 @@ public interface GenotypicDataManager {
 	Boolean updateSNP(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows)
 			throws MiddlewareQueryException, MiddlewareException;
 
-	/**
-	 * Sets Mapping Data of type ABH
-	 * 
-	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the Mapping ABH Genotyping data rows as a list of
-	 * MappingABHRow objects. For new values to be added, set the id to null.
-	 *
-	 * @param dataset - Dataset
-	 * @param datasetUser - Dataset Users
-	 * @param mappingPop - Mapping Population
-	 * @param markers - List of Markers to add
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add
-	 * @param accMetadataSets - List of AccMetadataSets to add
-	 * @param mappingPopValueList - List of MappingPopValues to add
-	 * @return true if values were successfully saved in the database, false otherwise
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList)
-			throws MiddlewareQueryException;
 
 	/**
 	 * Update Mapping ABH Records. For new values to be added, set the id to null.
@@ -1843,8 +1815,6 @@ public interface GenotypicDataManager {
 	 */
 	void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException;
 
-	Integer addMTA(Mta mta) throws MiddlewareQueryException;
-
 	/**
 	 * 
 	 * Uploads MTA data to the database. Adds MTA, MTA Metadata, Dataset, and DatasetUsers records to the database. Mta and MtaMetadata have
@@ -1912,10 +1882,6 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addHaplotype(TrackData trackData, List<TrackMarker> trackMarkers) throws MiddlewareQueryException;
-
-	Integer addTrackData(TrackData trackData) throws MiddlewareQueryException;
-
-	Integer addTrackMarker(TrackMarker trackMarker) throws MiddlewareQueryException;
 
 	// GCP-7881
 	/**

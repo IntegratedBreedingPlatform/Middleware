@@ -904,15 +904,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public java.util.Map<Integer, String> getMarkerTypeMapByIds(List<Integer> markerIds) throws MiddlewareQueryException {
-		java.util.Map<Integer, String> markerTypes = new HashMap<>();
-		if (markerIds != null && !markerIds.isEmpty()) {
-			markerTypes.putAll(this.getMarkerDao().getMarkerTypeMapByIds(markerIds));
-		}
-		return markerTypes;
-	}
-
-	@Override
 	public Integer addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException {
 
 		Integer savedId = null;
@@ -1172,34 +1163,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		} catch (Exception e) {
 
 			throw new MiddlewareQueryException("Error encountered while setting SNP: setSNP(): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList)
-					throws MiddlewareQueryException {
-
-		try {
-
-			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
-			Dataset dataset1 = new Dataset();
-			dataset1.setDatasetId(datasetId);
-			// Save data rows
-			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				accMetadataSet.setDataset(dataset1);
-			}
-
-			for (MappingPopValues mappingPopValue : mappingPopValueList) {
-				mappingPopValue.setDatasetId(datasetId);
-			}
-
-			this.saveAccMetadataSets(accMetadataSets);
-			this.saveMappingPopValues(mappingPopValueList);
-
-			return true;
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while setting MappingABH: setMappingABH(): " + e.getMessage(), e);
 		}
 	}
 
@@ -1697,11 +1660,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error in GenotypicDataManager.addMTA: " + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public Integer addMTA(Mta mta) throws MiddlewareQueryException {
-		return ((Mta) super.save(this.getMtaDao(), mta)).getMtaId();
 	}
 
 	@Override
@@ -2255,16 +2213,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 					+ trackMarkers + "): " + e.getMessage(), e);
 		}
 
-	}
-
-	@Override
-	public Integer addTrackData(TrackData trackData) throws MiddlewareQueryException {
-		return ((TrackData) super.save(this.getTrackDataDao(), trackData)).getTrackId();
-	}
-
-	@Override
-	public Integer addTrackMarker(TrackMarker trackMarker) throws MiddlewareQueryException {
-		return ((TrackMarker) super.save(this.getTrackMarkerDao(), trackMarker)).getTrackId();
 	}
 
 	// GCP-7881
