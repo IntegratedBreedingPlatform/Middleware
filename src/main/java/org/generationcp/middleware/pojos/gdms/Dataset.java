@@ -11,15 +11,21 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import org.generationcp.middleware.pojos.Sample;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -89,12 +95,21 @@ public class Dataset implements Serializable {
 	@Column(name = "purpose_of_study")
 	private String purposeOfStudy;
 
+	@OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<AccMetadataSet> accMetadataSets;
+
+	@OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<CharValues> charValues;
+
+	@OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<MarkerMetadataSet> markerMetadataSets;
+
 	public Dataset() {
 	}
 
 	public Dataset(Integer datasetId, String datasetName, String datasetDesc, String datasetType, String genus, String species,
 			Date uploadTemplateDate, String remarks, String dataType, String missingData, String method, String score, String institute,
-			String principalInvestigator, String email, String purposeOfStudy) {
+			String principalInvestigator, String email, String purposeOfStudy, List<AccMetadataSet> accMetadataSets, List<CharValues> charValues, List<MarkerMetadataSet> markerMetadataSets) {
 		super();
 		this.datasetId = datasetId;
 		this.datasetName = datasetName;
@@ -112,6 +127,9 @@ public class Dataset implements Serializable {
 		this.principalInvestigator = principalInvestigator;
 		this.email = email;
 		this.purposeOfStudy = purposeOfStudy;
+		this.accMetadataSets = accMetadataSets;
+		this.charValues = charValues;
+		this.markerMetadataSets = markerMetadataSets;
 	}
 
 	public Integer getDatasetId() {
@@ -240,6 +258,30 @@ public class Dataset implements Serializable {
 
 	public void setPurposeOfStudy(String purposeOfStudy) {
 		this.purposeOfStudy = purposeOfStudy;
+	}
+
+	public List<AccMetadataSet> getAccMetadataSets() {
+		return accMetadataSets;
+	}
+
+	public void setAccMetadataSets(final List<AccMetadataSet> accMetadataSets) {
+		this.accMetadataSets = accMetadataSets;
+	}
+
+	public List<CharValues> getCharValues() {
+		return charValues;
+	}
+
+	public void setCharValues(final List<CharValues> charValues) {
+		this.charValues = charValues;
+	}
+
+	public List<MarkerMetadataSet> getMarkerMetadataSets() {
+		return markerMetadataSets;
+	}
+
+	public void setMarkerMetadataSets(final List<MarkerMetadataSet> markerMetadataSets) {
+		this.markerMetadataSets = markerMetadataSets;
 	}
 
 	@Override

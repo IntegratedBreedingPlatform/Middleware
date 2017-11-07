@@ -19,6 +19,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -38,9 +40,9 @@ public class CharValues implements Serializable {
 	@Column(name = "ac_id")
 	private Integer acId;
 
-	@Basic(optional = false)
-	@Column(name = "dataset_id")
-	private Integer datasetId;
+	@ManyToOne
+	@JoinColumn(name = "dataset_id")
+	private Dataset dataset;
 
 	@Basic(optional = false)
 	@Column(name = "marker_id")
@@ -62,10 +64,10 @@ public class CharValues implements Serializable {
 	public CharValues() {
 	}
 
-	public CharValues(Integer acId, Integer datasetId, Integer markerId, Integer sampleId, String charValue, Integer markerSampleId,
+	public CharValues(Integer acId, Dataset dataset, Integer markerId, Integer sampleId, String charValue, Integer markerSampleId,
 			Integer accSampleId) {
 		this.acId = acId;
-		this.datasetId = datasetId;
+		this.dataset = dataset;
 		this.markerId = markerId;
 		this.sampleId = sampleId;
 		this.charValue = charValue;
@@ -81,12 +83,12 @@ public class CharValues implements Serializable {
 		this.acId = acId;
 	}
 
-	public Integer getDatasetId() {
-		return this.datasetId;
+	public Dataset getDataset() {
+		return this.dataset;
 	}
 
-	public void setDatasetId(Integer datasetId) {
-		this.datasetId = datasetId;
+	public void setDataset(Dataset dataset) {
+		this.dataset = dataset;
 	}
 
 	public Integer getMarkerId() {
@@ -136,7 +138,7 @@ public class CharValues implements Serializable {
 		result = prime * result + (this.acId == null ? 0 : this.acId.hashCode());
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		result = prime * result + (this.charValue == null ? 0 : this.charValue.hashCode());
-		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
+		result = prime * result + (this.dataset == null ? 0 : this.dataset.hashCode());
 		result = prime * result + (this.sampleId == null ? 0 : this.sampleId.hashCode());
 		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
@@ -176,11 +178,11 @@ public class CharValues implements Serializable {
 		} else if (!this.charValue.equals(other.charValue)) {
 			return false;
 		}
-		if (this.datasetId == null) {
-			if (other.datasetId != null) {
+		if (this.dataset == null) {
+			if (other.dataset != null) {
 				return false;
 			}
-		} else if (!this.datasetId.equals(other.datasetId)) {
+		} else if (!this.dataset.equals(other.dataset)) {
 			return false;
 		}
 		if (this.sampleId == null) {
@@ -212,8 +214,8 @@ public class CharValues implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CharValues [acId=");
 		builder.append(this.acId);
-		builder.append(", datasetId=");
-		builder.append(this.datasetId);
+		builder.append(", dataset=");
+		builder.append(this.dataset);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
 		builder.append(", sampleId=");

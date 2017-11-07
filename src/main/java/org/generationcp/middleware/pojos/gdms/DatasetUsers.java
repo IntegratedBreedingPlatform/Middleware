@@ -17,6 +17,9 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -34,9 +37,9 @@ public class DatasetUsers implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Basic(optional = false)
-	@Column(name = "dataset_id")
-	private Integer datasetId;
+	@OneToOne
+	@JoinColumn(name = "dataset_id")
+	private Dataset dataset;
 
 	@Basic(optional = false)
 	@Column(name = "user_id")
@@ -45,17 +48,17 @@ public class DatasetUsers implements Serializable {
 	public DatasetUsers() {
 	}
 
-	public DatasetUsers(Integer datasetId, Integer userId) {
-		this.datasetId = datasetId;
+	public DatasetUsers(Dataset dataset, Integer userId) {
+		this.dataset = dataset;
 		this.userId = userId;
 	}
 
-	public Integer getDatasetId() {
-		return this.datasetId;
+	public Dataset getDataset() {
+		return this.dataset;
 	}
 
-	public void setDatasetId(Integer datasetId) {
-		this.datasetId = datasetId;
+	public void setDataset(Dataset dataset) {
+		this.dataset = dataset;
 	}
 
 	public Integer getUserId() {
@@ -79,19 +82,19 @@ public class DatasetUsers implements Serializable {
 		}
 
 		DatasetUsers rhs = (DatasetUsers) obj;
-		return new EqualsBuilder().append(this.datasetId, rhs.datasetId).isEquals();
+		return new EqualsBuilder().append(this.dataset, rhs.dataset).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(61, 131).append(this.datasetId).toHashCode();
+		return new HashCodeBuilder(61, 131).append(this.dataset).toHashCode();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("DatasetUser [datasetId=");
-		builder.append(this.datasetId);
+		builder.append("DatasetUser [dataset=");
+		builder.append(this.dataset);
 		builder.append(", userId=");
 		builder.append(this.userId);
 		builder.append("]");

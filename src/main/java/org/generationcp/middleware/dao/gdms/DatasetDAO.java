@@ -317,7 +317,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 
 				Dataset dataset =
 						new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-								dataType, missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
+								dataType, missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null);
 				dataValues.add(dataset);
 			}
 		}

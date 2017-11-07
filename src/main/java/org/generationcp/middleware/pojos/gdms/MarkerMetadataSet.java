@@ -19,6 +19,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -38,9 +40,9 @@ public class MarkerMetadataSet implements Serializable {
 	@Column(name = "marker_metadataset_id")
 	private Integer markerMetadataSetId;
 
-	@Basic(optional = false)
-	@Column(name = "dataset_id")
-	private Integer datasetId;
+	@ManyToOne
+	@JoinColumn(name = "dataset_id")
+	private Dataset dataset;
 
 	@Basic(optional = false)
 	@Column(name = "marker_id")
@@ -52,9 +54,9 @@ public class MarkerMetadataSet implements Serializable {
 	public MarkerMetadataSet() {
 	}
 
-	public MarkerMetadataSet(Integer markerMetadataSetId, Integer datasetId, Integer markerId, Integer markerSampleId) {
+	public MarkerMetadataSet(Integer markerMetadataSetId, Dataset dataset, Integer markerId, Integer markerSampleId) {
 		this.markerMetadataSetId = markerMetadataSetId;
-		this.datasetId = datasetId;
+		this.dataset = dataset;
 		this.markerId = markerId;
 		this.markerSampleId = markerSampleId;
 	}
@@ -67,12 +69,12 @@ public class MarkerMetadataSet implements Serializable {
 		this.markerMetadataSetId = markerMetadataSetId;
 	}
 
-	public Integer getDatasetId() {
-		return this.datasetId;
+	public Dataset getDataset() {
+		return this.dataset;
 	}
 
-	public void setDatasetId(Integer datasetId) {
-		this.datasetId = datasetId;
+	public void setDataset(Dataset dataset) {
+		this.dataset = dataset;
 	}
 
 	public Integer getMarkerId() {
@@ -95,7 +97,7 @@ public class MarkerMetadataSet implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
+		result = prime * result + (this.dataset == null ? 0 : this.dataset.hashCode());
 		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
 		result = prime * result + (this.markerMetadataSetId == null ? 0 : this.markerMetadataSetId.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
@@ -114,11 +116,11 @@ public class MarkerMetadataSet implements Serializable {
 			return false;
 		}
 		MarkerMetadataSet other = (MarkerMetadataSet) obj;
-		if (this.datasetId == null) {
-			if (other.datasetId != null) {
+		if (this.dataset == null) {
+			if (other.dataset != null) {
 				return false;
 			}
-		} else if (!this.datasetId.equals(other.datasetId)) {
+		} else if (!this.dataset.equals(other.dataset)) {
 			return false;
 		}
 		if (this.markerId == null) {
@@ -152,8 +154,8 @@ public class MarkerMetadataSet implements Serializable {
 		builder.append(this.markerMetadataSetId);
 		builder.append(", markerSampleId=");
 		builder.append(this.markerSampleId);
-		builder.append(", datasetId=");
-		builder.append(this.datasetId);
+		builder.append(", dataset=");
+		builder.append(this.dataset);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
 		builder.append("]");

@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
@@ -281,7 +282,9 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 						Integer markerSampleId = (Integer) result[5];
 						Integer accSampleId = (Integer) result[6];
 
-						CharValues dataElement = new CharValues(acId, datasetId2, markerId, gId, charValue, markerSampleId, accSampleId);
+						Dataset dataset = new Dataset();
+						dataset.setDatasetId(datasetId2);
+						CharValues dataElement = new CharValues(acId, dataset, markerId, gId, charValue, markerSampleId, accSampleId);
 						toReturn.add(dataElement);
 					}
 				}

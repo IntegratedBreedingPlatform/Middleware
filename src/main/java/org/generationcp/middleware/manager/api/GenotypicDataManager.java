@@ -2035,6 +2035,4 @@ public interface GenotypicDataManager {
 	
 	List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId);
 
-	java.util.Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs);
-
 }

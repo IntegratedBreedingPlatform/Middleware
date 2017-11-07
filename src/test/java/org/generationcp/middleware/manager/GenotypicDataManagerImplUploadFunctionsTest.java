@@ -78,7 +78,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 		String purposeOfStudy = null;
 
 		return new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType,
-				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
+				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null);
 	}
 
 	private List<Object> createMarkerRecords() {
@@ -191,11 +191,11 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 
 		Dataset dataset = this.createDataset();
 
-		AccMetadataSet accMetadataSet = new AccMetadataSet(null, datasetId, sampleId, accSampleId);
-		MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(null, datasetId, markerId, markerSampleId);
-		DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
+		AccMetadataSet accMetadataSet = new AccMetadataSet(null, dataset, sampleId, accSampleId);
+		MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(null, dataset, markerId, markerSampleId);
+		DatasetUsers datasetUser = new DatasetUsers(dataset, userId);
 		AlleleValues alleleValues = new AlleleValues(anId, datasetId, sampleId, markerId, alleleBinValue, alleleRawValue, peakHeight);
-		CharValues charValues = new CharValues(acId, datasetId, markerId, sampleId, charValue, markerSampleId, accSampleId);
+		CharValues charValues = new CharValues(acId, dataset, markerId, sampleId, charValue, markerSampleId, accSampleId);
 		DartValues dartValues =
 				new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
 		MappingPop mappingPop =

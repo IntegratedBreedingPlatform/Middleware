@@ -88,8 +88,9 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		this.dataset = this.createDataset();
 		this.dataset.setDatasetName("TestDataset" + System.currentTimeMillis());
 		this.datasetId = this.genotypicDataManager.addDataset(this.dataset);
+		dataset.setDatasetId(datasetId);
 		this.testSetQTL();
-		this.markerMetadataSet = new MarkerMetadataSet(null, this.datasetId, this.markerId, 1);
+		this.markerMetadataSet = new MarkerMetadataSet(null, dataset, this.markerId, 1);
 		this.genotypicDataManager.addMarkerMetadataSet(this.markerMetadataSet);
 	}
 
@@ -949,7 +950,9 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testAddAccMetadataSet() throws Exception {
 		Integer accSampleId = 1;
 		Integer sampleId = 1;
-		AccMetadataSet accMetadataSet = new AccMetadataSet(null, this.datasetId, sampleId, accSampleId);
+		Dataset dataset1 = new Dataset();
+		dataset1.setDatasetId(datasetId);
+		AccMetadataSet accMetadataSet = new AccMetadataSet(null, dataset1, sampleId, accSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addAccMetadataSet(accMetadataSet);
 		Debug.println("testAccMetadataSet() Added: " + (idAdded != null ? accMetadataSet : null));
@@ -959,7 +962,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testAddMarkerMetadataSet() throws Exception {
 		Integer markerMetadatasetId = null;
 		Integer markerSampleId = 1;
-		MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(markerMetadatasetId, this.datasetId, this.markerId, markerSampleId);
+		MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(markerMetadatasetId, dataset, this.markerId, markerSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addMarkerMetadataSet(markerMetadataSet);
 		Debug.println("testAddMarkerMetadataSet() Added: " + (idAdded != null ? markerMetadataSet : null));
@@ -990,8 +993,22 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		String email = null;
 		String purposeOfStudy = null;
 
-		return new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType,
-				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
+		Dataset datas =  new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType,
+				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null);
+
+		List<AccMetadataSet> accMetadataSets = new ArrayList<>();
+		AccMetadataSet accMetadataSet = new AccMetadataSet(null, datas, 1 ,1);
+		accMetadataSets.add(accMetadataSet);
+
+		List<CharValues> charValues = new ArrayList<>();
+		CharValues charValues1 = new CharValues(null, datas, 1, 1, "A/C", 1, 1);
+		charValues.add(charValues1);
+
+		datas.setAccMetadataSets(accMetadataSets);
+		datas.setCharValues(charValues);
+
+		return datas;
+
 	}
 
 	@Test
@@ -1051,7 +1068,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testAddDatasetUser() throws Exception {
 
 		Integer userId = 123;
-		DatasetUsers datasetUser = new DatasetUsers(this.datasetId, userId);
+		DatasetUsers datasetUser = new DatasetUsers(dataset, userId);
 
 		Integer idAdded = this.genotypicDataManager.addDatasetUser(datasetUser);
 		Debug.println("testAddDatasetUser() Added: " + (idAdded != null ? datasetUser : null));
@@ -1078,7 +1095,9 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		String charValue = "CV";
 		Integer markerSampleId = 1;
 		Integer accSampleId = 1;
-		CharValues charValues = new CharValues(acId, this.datasetId, this.markerId, gId, charValue, markerSampleId, accSampleId);
+		Dataset dataset = new Dataset();
+		dataset.setDatasetId(datasetId);
+		CharValues charValues = new CharValues(acId, dataset, this.markerId, gId, charValue, markerSampleId, accSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addCharValues(charValues);
 		Debug.println("testAddCharValues() Added: " + (idAdded != null ? charValues : null));
@@ -1445,10 +1464,11 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 		String qtlName = "TestQTL" + System.currentTimeMillis();
 
-		DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-
 		Dataset dataset = this.createDataset();
 		dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
+		dataset.setDatasetId(datasetId);
+
+		DatasetUsers datasetUser = new DatasetUsers(dataset, userId);
 
 		QtlDetails qtlDetails =
 				new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect, scoreValue, rSquare, linkageGroup,
@@ -2076,7 +2096,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 						"alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod", 8.8f, 9.9f, "dominance", "evidence", "reference",
 						"notes");
 		MtaMetadata mtaMetadata = new MtaMetadata(this.datasetId, "project1", "population", 100, "Thousand");
-		DatasetUsers users = new DatasetUsers(this.datasetId, 1);
+		DatasetUsers users = new DatasetUsers(dataset, 1);
 		this.genotypicDataManager.addMTA(this.dataset, mta, mtaMetadata, users);
 
 		// non-null id means the records were inserted.
@@ -2091,8 +2111,9 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testAddMtaGCP9174() throws Exception {
 		Dataset dataset =
 				new Dataset(null, "sample", "testing", "MTA", "Groundnut", "Groundnut", null, "", "int", null, "Tassel", "LOD", "ICRISAT",
-						"TrusharShah", null, null);
+						"TrusharShah", null, null, null, null, null);
 		Integer datasetId = this.genotypicDataManager.addDataset(dataset);
+		dataset.setDatasetId(datasetId);
 
 		Mta mta =
 				new Mta(null, this.markerId, datasetId, this.mapId, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T",
@@ -2101,7 +2122,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 		MtaMetadata mtaMetadata = new MtaMetadata(datasetId, "project1", "population", 100, "Thousand");
 
-		DatasetUsers users = new DatasetUsers(datasetId, 1);
+		DatasetUsers users = new DatasetUsers(dataset, 1);
 
 		this.genotypicDataManager.addMTA(dataset, mta, mtaMetadata, users);
 
@@ -2118,7 +2139,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testSetMTA() throws Exception {
 		Dataset dataset =
 				new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null, "REMARKS", "int", null, "METHOD",
-						"0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
+						"0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE", null, null, null);
 		List<Mta> mtaList = new ArrayList<Mta>();
 		mtaList.add(new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA", "alleleB", "alleleAPhenotype",
 				"alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod", 8.8f, 9.9f, "dominance", "evidence", "reference", "notes"));

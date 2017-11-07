@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -291,6 +292,9 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	public List<AccMetadataSet> getAccMetadataSetByGidsAndDatasetId(List<Integer> sampleIds, Integer datasetId, SetOperation operation)
 			throws MiddlewareQueryException {
 
+		Dataset dataset1 = new Dataset();
+		dataset1.setDatasetId(datasetId);
+
 		List<AccMetadataSet> dataValues = new ArrayList<AccMetadataSet>();
 		try {
 			if (sampleIds != null && !sampleIds.isEmpty()) {
@@ -309,7 +313,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 						Integer accMetadataSetId = (Integer) result[0];
 						Integer sampleId = (Integer) result[1];
 
-						AccMetadataSet dataElement = new AccMetadataSet(accMetadataSetId, datasetId, sampleId, null);
+						AccMetadataSet dataElement = new AccMetadataSet(accMetadataSetId, dataset1, sampleId, null);
 						dataValues.add(dataElement);
 					}
 				}

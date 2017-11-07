@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet author="clarysabel" id="v7.1.0-1">
+    <changeSet author="clarysabel" id="v7.2.0-1">
         <preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="gdms_acc_metadataset" columnName="sample_id"/>

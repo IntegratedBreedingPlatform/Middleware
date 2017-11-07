@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -153,7 +154,10 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 						Integer markerId2 = (Integer) result[2];
 						Integer markerSampleId = (Integer) result[3];
 
-						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, datasetId, markerId2, markerSampleId);
+						Dataset dataset = new Dataset();
+						dataset.setDatasetId(datasetId);
+
+						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, dataset, markerId2, markerSampleId);
 						toReturn.add(dataElement);
 					}
 				}
@@ -202,7 +206,10 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 						Integer markerId = (Integer) result[0];
 						Integer markerSampleId = (Integer) result[1];
 
-						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, datasetId2, markerId, markerSampleId);
+						Dataset dataset = new Dataset();
+						dataset.setDatasetId(datasetId2);
+
+						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, dataset, markerId, markerSampleId);
 						toReturn.add(dataElement);
 					}
 				}
@@ -212,27 +219,6 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 					+ ") query from MarkerMetadataSet " + e.getMessage(), e);
 		}
 		return toReturn;
-	}
-
-	@SuppressWarnings("rawtypes")
-	public boolean isExisting(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException {
-		try {
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"SELECT * FROM gdms_marker_metadataset where dataset_id = :datasetId " + "AND marker_id = :markerId ");
-			query.setParameter("datasetId", markerMetadataSet.getDatasetId());
-			query.setParameter("markerId", markerMetadataSet.getMarkerId());
-
-			List results = query.list();
-
-			if (!results.isEmpty()) {
-				return true;
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with isExisting(markerMetadataSet=" + markerMetadataSet + ") query from MarkerMetadataSet "
-					+ e.getMessage(), e);
-		}
-		return false;
 	}
 
 	@SuppressWarnings("unchecked")

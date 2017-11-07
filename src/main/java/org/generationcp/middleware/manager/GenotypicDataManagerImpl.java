@@ -1015,7 +1015,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException {
 		DatasetUsersDAO dao = this.getDatasetUsersDao();
-		DatasetUsers user = dao.getById(datasetUser.getDatasetId());
+		DatasetUsers user = dao.getById(datasetUser.getDataset().getDatasetId());
 		if (user == null) {
 			return ((DatasetUsers) super.save(dao, datasetUser)).getUserId();
 		}
@@ -1155,13 +1155,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_SNP);
 			dataset.setDataType(GenotypicDataManagerImpl.DATA_TYPE_INT);
 			Integer datasetId = this.saveDatasetDatasetUserMarkersAndMarkerMetadataSets(dataset, datasetUser, markers, markerMetadataSets);
-
+			Dataset dataset1 = new Dataset();
+			dataset1.setDatasetId(datasetId);
 			// Save data rows
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				accMetadataSet.setDatasetId(datasetId);
+				accMetadataSet.setDataset(dataset1);
 			}
 			for (CharValues charValue : charValueList) {
-				charValue.setDatasetId(datasetId);
+				charValue.setDataset(dataset1);
 			}
 
 			this.saveAccMetadataSets(accMetadataSets);
@@ -1182,10 +1183,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
-
+			Dataset dataset1 = new Dataset();
+			dataset1.setDatasetId(datasetId);
 			// Save data rows
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				accMetadataSet.setDatasetId(datasetId);
+				accMetadataSet.setDataset(dataset1);
 			}
 
 			for (MappingPopValues mappingPopValue : mappingPopValueList) {
@@ -1209,10 +1211,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
-
+			Dataset dataset1 = new Dataset();
+			dataset1.setDatasetId(datasetId);
 			// Save data rows
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				accMetadataSet.setDatasetId(datasetId);
+				accMetadataSet.setDataset(dataset1);
 			}
 
 			for (MappingPopValues mappingPopValue : mappingPopValueList) {
@@ -1220,7 +1223,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			}
 
 			for (CharValues charValue : charValueList) {
-				charValue.setDatasetId(datasetId);
+				charValue.setDataset(dataset1);
 			}
 
 			this.saveAccMetadataSets(accMetadataSets);
@@ -1245,6 +1248,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
+			Dataset dataset1 = new Dataset();
+			dataset1.setDatasetId(datasetId);
 
 			// Save data rows
 			if (rows != null && !rows.isEmpty()) {
@@ -1262,11 +1267,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 					// Save or update AccMetadaset
 					AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-					accMetadataSet.setDatasetId(datasetId);
+					accMetadataSet.setDataset(dataset1);
 					accMetadataSets.add(accMetadataSet);
 
 					// Save or update charValues
-					charValue.setDatasetId(datasetId);
+					charValue.setDataset(dataset1);
 					charValues.add(charValue);
 
 				}
@@ -1292,6 +1297,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
+			Dataset dataset1 = new Dataset();
+			dataset1.setDatasetId(datasetId);
 
 			// Save data rows
 			if (rows != null && !rows.isEmpty()) {
@@ -1309,7 +1316,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 					// Save or update AccMetadaset
 					AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-					accMetadataSet.setDatasetId(datasetId);
+					accMetadataSet.setDataset(dataset1);
 					accMetadataSets.add(accMetadataSet);
 
 					// Save or update mappingPopValues
@@ -1341,6 +1348,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
+			Dataset dataset1 = new Dataset();
+			dataset1.setDatasetId(datasetId);
 
 			// Save data rows
 			if (rows != null && !rows.isEmpty()) {
@@ -1359,7 +1368,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 					// Save or update AccMetadaset
 					AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-					accMetadataSet.setDatasetId(datasetId);
+					accMetadataSet.setDataset(dataset1);
 					accMetadataSets.add(accMetadataSet);
 
 					// Save or update mappingPopValues
@@ -1368,7 +1377,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 					// Save or update charValues
 					CharValues charValue = row.getCharValues();
-					charValue.setDatasetId(datasetId);
+					charValue.setDataset(dataset1);
 					charValues.add(charValue);
 
 				}
@@ -1673,7 +1682,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.getDatasetDao().merge(dataset);
 
-			users.setDatasetId(dataset.getDatasetId());
+			users.setDataset(dataset);
 			this.getDatasetUsersDao().merge(users);
 
 			MtaDAO mtaDao = this.getMtaDao();
@@ -1709,7 +1718,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.getDatasetDao().merge(dataset);
 
-			users.setDatasetId(dataset.getDatasetId());
+			users.setDataset(dataset);
 			this.getDatasetUsersDao().merge(users);
 
 			MtaDAO mtaDao = this.getMtaDao();
@@ -1825,7 +1834,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
 			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-				markerMetadataSet.setDatasetId(datasetId);
+				markerMetadataSet.setDataset(dataset);
 			}
 			this.saveMarkerMetadataSets(markerMetadataSets);
 		}
@@ -1843,7 +1852,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
 			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-				markerMetadataSet.setDatasetId(datasetId);
+				markerMetadataSet.setDataset(dataset);
 			}
 			this.saveMarkerMetadataSets(markerMetadataSets);
 		}
@@ -2092,7 +2101,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveDatasetUser(Integer datasetId, DatasetUsers datasetUser) throws Exception {
 		this.getActiveSession();
 		DatasetUsersDAO datasetUserDao = this.getDatasetUsersDao();
-		datasetUser.setDatasetId(datasetId);
+		Dataset dataset = new Dataset();
+		dataset.setDatasetId(datasetId);
+		datasetUser.setDataset(dataset);
 
 		DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
 		Integer datasetUserSavedId = datasetUserSaved.getUserId();
@@ -2289,7 +2300,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
 				Integer sampleId = accMetadataSet.getSampleId();
 				for (CharValues charValue : charValues) {
-					if (charValue != null && charValue.getDatasetId().equals(datasetId) && charValue.getSampleId().equals(sampleId)
+					if (charValue != null && charValue.getDataset().getDatasetId().equals(datasetId) && charValue.getSampleId().equals(sampleId)
 							&& charValue.getMarkerId().equals(markerId)) {
 						toReturn.add(new SNPDataRow(accMetadataSet, charValue));
 						break;
@@ -2357,7 +2368,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 				CharValues charValue = null;
 				for (CharValues value : charValues) {
-					if (value.getDatasetId().equals(datasetId) && value.getAccSampleId().equals(sampleId)) {
+					if (value.getDataset().getDatasetId().equals(datasetId) && value.getAccSampleId().equals(sampleId)) {
 						charValue = value;
 						break;
 					}
@@ -2498,46 +2509,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId) {
 		return this.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
-	}
-
-	@Override
-	public java.util.Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs) {
-		final List<Sample> samplesByBk = getSampleDao().getBySampleBks(sampleUIDs);
-		final List<SampleDTO> sampleDTOs = mapSampleToSampleDTO(samplesByBk);
-		final java.util.Map<String, SampleDTO> mappedSampleDTOs = Maps.uniqueIndex(sampleDTOs, new Function<SampleDTO, String>() {
-
-			public String apply(SampleDTO from) {
-				return from.getSampleBusinessKey();
-			}
-		});
-		return mappedSampleDTOs;
-	}
-
-
-	private List<SampleDTO> mapSampleToSampleDTO(final List<Sample> samples) {
-		final List<SampleDTO> listSampleDto = new ArrayList<>();
-		for (final Sample sample : samples) {
-			final SampleDTO dto = new SampleDTO();
-			dto.setSampleId(sample.getSampleId());
-			dto.setSampleName(sample.getSampleName());
-			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
-			final User takenBy = sample.getTakenBy();
-			if (takenBy != null) {
-				final Person person = takenBy.getPerson();
-				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
-			}
-			dto.setSamplingDate(sample.getSamplingDate());
-			final SampleList sampleList = sample.getSampleList();
-			if (sampleList != null) {
-				dto.setSampleList(sampleList.getListName());
-			}
-			final Plant plant = sample.getPlant();
-			dto.setPlantNumber(plant.getPlantNumber());
-			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
-
-			listSampleDto.add(dto);
-		}
-		return listSampleDto;
 	}
 
 }
