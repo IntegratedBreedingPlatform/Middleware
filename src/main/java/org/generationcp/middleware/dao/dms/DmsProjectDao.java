@@ -571,7 +571,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ")
 		.append("FROM (Select ip.project_id, ip.name, ip.description, ip.program_uuid FROM project ip ")
 		.append("WHERE ip.deleted != " + DELETED_STUDY + "  ")
-		.append(" AND ip.study_type = " + studyType.getId() + " ")
+		.append(" AND ip.study_type = '" + studyType.getName() + "' ")
 		.append("AND ip.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ")
 		.append("OR ip.program_uuid IS NULL ")
 		.append("ORDER BY ip.name ");
@@ -735,8 +735,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
 			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 			.append("WHERE p.deleted != " + DELETED_STUDY + " ")
-			.append(" AND p.study_type = " + studyType.getName() )
-			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
+			.append(" AND p.study_type = '" + studyType.getName() )
+			.append("'   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
 			.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
 			.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
@@ -755,48 +755,46 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return this.getAllNurseryAndTrialStudyDetails(programUUID, 0, -1);
 	}
 
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows)
-			 {
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows) {
 		List<StudyDetails> studyDetails = new ArrayList<>();
 		try {
 
 			StringBuilder sqlString = new StringBuilder().append(
 				"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
 				.append(
-					"ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, p.studyType AS studyType ")
-				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ")
-				.append("FROM (Select ip.project_id, ip.name, ip.description, ip.program_uuid, ppStudy.value AS studyType FROM project ip ")
-				.append("INNER JOIN  projectprop ppStudy ON ip.project_id = ppStudy.project_id ")
-				.append("WHERE ip.deleted != " + DELETED_STUDY + " ")
-				.append(" AND ip.study_type IN ( '" + StudyType.N.getName() + "', '" + StudyType.T.getName() + "')")
-				.append("AND ip.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR ip.program_uuid IS NULL ")
-				.append("ORDER BY ip.name ");
+					"ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, p.study_type AS "
+						+ "studyType ")
+				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ");
 
 			if (start > 0 && numOfRows > 0) {
-				sqlString.append("LIMIT " + start + "," + numOfRows);
+				sqlString.append(" LIMIT " + start + "," + numOfRows);
 			}
 
-			sqlString.append(") p  LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-				.append("                   AND ppObjective.variable_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ")
+			sqlString.append(" LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+				.append(" AND ppObjective.variable_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ")
 				// 8030
-				.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-				.append("                   AND ppStartDate.variable_id =  ").append(TermId.START_DATE.getId()).append(" ")
+				.append(" LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+				.append(" AND ppStartDate.variable_id =  ").append(TermId.START_DATE.getId()).append(" ")
 				// 8050
-				.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-				.append("                   AND ppEndDate.variable_id =  ").append(TermId.END_DATE.getId()).append(" ")
+				.append(" LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+				.append(" AND ppEndDate.variable_id =  ").append(TermId.END_DATE.getId()).append(" ")
 				// 8060
-				.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-				.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
+				.append(" LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+				.append(" AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 				// 8100
-				.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
-				.append("                   AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
-				.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-				.append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-				.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-				.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
+				.append(" LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
+				.append(" AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
+				.append(" LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+				.append(" INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+				.append(" LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+				.append(" AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 				// 8180
-				.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-				.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ");
+				.append(" LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
+				.append(" AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
+				.append(" WHERE p.deleted != " + DELETED_STUDY + " ")
+				.append(" AND p.study_type IN ( '" + StudyType.N.getName() + "', '" + StudyType.T.getName() + "')")
+				.append(" AND (p.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR p.program_uuid IS NULL) ")
+				.append(" ORDER BY p.name ");
 
 			Query query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 				.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
@@ -818,9 +816,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					String piId = (String) row[9];
 					String siteId = (String) row[10];
 
-					studyDetails.add(new StudyDetails(id, name, title, objective, startDate, endDate,
-						StudyType.getStudyTypeByName(studyTypeId), piName, siteName, piId,
-						siteId));
+					studyDetails.add(
+						new StudyDetails(id, name, title, objective, startDate, endDate, StudyType.getStudyTypeByName(studyTypeId), piName,
+							siteName, piId, siteId));
 				}
 			}
 
