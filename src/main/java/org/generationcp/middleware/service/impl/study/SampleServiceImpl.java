@@ -27,7 +27,6 @@ import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Repository
-@Transactional(propagation= Propagation.REQUIRES_NEW)
+@Transactional
 public class SampleServiceImpl implements SampleService {
 
 	private static final String S = "S";

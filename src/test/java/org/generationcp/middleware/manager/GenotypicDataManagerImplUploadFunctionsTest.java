@@ -12,13 +12,11 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
@@ -26,8 +24,6 @@ import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
-import org.generationcp.middleware.pojos.gdms.MappingABHRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
@@ -35,7 +31,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
-import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Test;
@@ -305,50 +300,6 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 	}
 
 	// ============================================ UPDATE FUNCTIONS =====================================================
-
-	private void updateDataset(Dataset dataset, String updateId) {
-		Debug.printObject(0, "DATASET BEFORE: " + dataset);
-		String datasetDescription = dataset.getDatasetDesc() + updateId;
-		if (datasetDescription.length() > 255) {
-			datasetDescription = datasetDescription.substring(0, 255);
-		}
-		dataset.setDatasetDesc(datasetDescription);
-	}
-
-	private MappingPop updateMappingPop(MappingPop mappingPop, String updateId) {
-		Debug.printObject(0, "MAPPINGPOP BEFORE: " + mappingPop);
-		String mapDataDescription =
-				mappingPop.getMapDataDescription() == null ? "" + updateId : mappingPop.getMapDataDescription() + updateId;
-		if (mapDataDescription.length() > 150) {
-			mapDataDescription = mapDataDescription.substring(0, 150);
-		}
-		mappingPop.setMapDataDescription(mapDataDescription);
-		return mappingPop;
-	}
-
-	private MappingPopValues updateMappingPopValues(MappingPopValues mappingPopValues, String updateId) {
-		if (mappingPopValues == null) {
-			return null;
-		}
-		String mapCharValue = mappingPopValues.getMapCharValue() + updateId;
-		if (mapCharValue.length() > 20) {
-			mapCharValue = mapCharValue.substring(0, 20);
-		}
-		mappingPopValues.setMapCharValue(mapCharValue);
-		return mappingPopValues;
-	}
-
-	private CharValues updateCharValues(CharValues charValues, String updateId) {
-		if (charValues == null) {
-			return null;
-		}
-		String charValue = charValues.getCharValue() + updateId;
-		if (charValue.length() > 4) {
-			charValue = charValue.substring(0, 4);
-		}
-		charValues.setCharValue(charValue);
-		return charValues;
-	}
 
 	@Test
 	public void testSetMappingAllelicSNP() throws Exception {

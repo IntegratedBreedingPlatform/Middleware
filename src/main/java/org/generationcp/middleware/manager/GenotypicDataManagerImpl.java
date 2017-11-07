@@ -21,9 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
-import org.generationcp.middleware.dao.gdms.DartValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;

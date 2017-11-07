@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
