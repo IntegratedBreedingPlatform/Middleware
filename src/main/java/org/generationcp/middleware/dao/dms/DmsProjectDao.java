@@ -115,33 +115,29 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "     CASE pmain.study_type "
-		+ "         WHEN      " + StudyType.N.getName() + "  THEN pmain.name "
-		+ "         WHEN " + StudyType.T.getName() + "   THEN CONCAT(pmain.name, '-', geoloc.description) "
+		+ "         WHEN      '" + StudyType.N.getName() + "'  THEN pmain.name "
+		+ "         WHEN '" + StudyType.T.getName() + "'   THEN CONCAT(pmain.name, '-', geoloc.description) "
 		+ "         ELSE '' "
 		+ "     END AS studyName, "
 		+ "     pmain.study_type AS studyType, "
 		+ "     CASE pmain.study_type "
-		+ "         WHEN "
-		+ "             " + StudyType.N.getName()
-		+ "         THEN "
+		+ "         WHEN '" + StudyType.N.getName() + "'         THEN "
 		+ "             MAX(IF(pProp.variable_id = " + TermId.SEASON_VAR.getId() + ", "
 		+ "                 pProp.value, "
 		+ "                 NULL)) "
-		+ "         WHEN "
-		+ "             " + StudyType.T.getName()
-		+ "         THEN "
+		+ "         WHEN '" + StudyType.T.getName()	+ "'         THEN "
 		+ "             MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
 		+ "                 geoprop.value, "
 		+ "                 NULL)) "
 		+ "     END AS seasonId, "
 		+ "     CASE pmain.study_type "
-		+ "         WHEN " + StudyType.N.getName() + " THEN NULL "
-		+ "         WHEN " + StudyType.T.getName() + "   THEN pmain.project_id "
+		+ "         WHEN '" + StudyType.N.getName() + "' THEN NULL "
+		+ "         WHEN '" + StudyType.T.getName() + "'   THEN pmain.project_id "
 		+ "         ELSE '' "
 		+ "     END AS trialDbId, "
 		+ "     CASE pmain.study_type "
-		+ "         WHEN " + StudyType.N.getName() + " THEN NULL "
-		+ "         WHEN " + StudyType.T.getName() + "   THEN pmain.name "
+		+ "         WHEN '" + StudyType.N.getName() + "' THEN NULL "
+		+ "         WHEN '" + StudyType.T.getName() + "'   THEN pmain.name "
 		+ "         ELSE '' "
 		+ "     END AS trialName, "
 		+ "     MAX(IF(pProp.variable_id = " + TermId.START_DATE.getId() + ", "
@@ -152,15 +148,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         NULL)) AS endDate, "
 		+ "     pmain.deleted, "
 		+ "     CASE pmain.study_type "
-		+ "         WHEN "
-		+ "             " + StudyType.N.getName()
-		+ "         THEN "
+		+ "         WHEN '" + StudyType.N.getName()	+ "'         THEN "
 		+ "             MAX(IF(pProp.variable_id = " + TermId.LOCATION_ID.getId() + ", "
 		+ "                 pProp.value, "
 		+ "                 NULL)) "
-		+ "         WHEN "
-		+ "             " + StudyType.T.getName()
-		+ "         THEN "
+		+ "         WHEN '" + StudyType.T.getName() + "'         THEN "
 		+ "             MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
 		+ "                 geoprop.value, "
 		+ "                 NULL)) "
@@ -776,7 +768,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.append("FROM (Select ip.project_id, ip.name, ip.description, ip.program_uuid, ppStudy.value AS studyType FROM project ip ")
 				.append("INNER JOIN  projectprop ppStudy ON ip.project_id = ppStudy.project_id ")
 				.append("WHERE ip.deleted != " + DELETED_STUDY + " ")
-				.append(" AND ip.study_type IN ( " + StudyType.N.getName() + ", " + StudyType.T.getName() + ")")
+				.append(" AND ip.study_type IN ( '" + StudyType.N.getName() + "', '" + StudyType.T.getName() + "')")
 				.append("AND ip.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR ip.program_uuid IS NULL ")
 				.append("ORDER BY ip.name ");
 
@@ -874,7 +866,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append(" ")
 			// 8180
 			.append("WHERE p.deleted != " + DELETED_STUDY + " ")
-			.append( " AND p.study_type in (" + StudyType.N.getName() + ", " + StudyType.T.getName() + " ) ")
+			.append( " AND p.study_type in ('" + StudyType.N.getName() + "', '" + StudyType.T.getName() + "' ) ")
 			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
 			.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
@@ -911,7 +903,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 				.append("           AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ")
 				.append("WHERE p.deleted != " + DELETED_STUDY + " ")
-				.append( " AND p.study_type in (" + StudyType.N.getName() + ", " + StudyType.T.getName() + " ) ")
+				.append( " AND p.study_type in ('" + StudyType.N.getName() + "', '" + StudyType.T.getName() + "' ) ")
 				.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
 				.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
 				.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
@@ -1098,7 +1090,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private Criteria buildCoreCriteria(final Map<StudyFilters, String> parameters, final Order orderBy) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.isNotNull("study_type"));
+		criteria.add(Restrictions.isNotNull("studyType"));
 
 		criteria.add(Restrictions.ne(DmsProjectDao.DELETED, true));
 
