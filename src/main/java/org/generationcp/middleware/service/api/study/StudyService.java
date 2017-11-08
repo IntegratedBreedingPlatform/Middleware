@@ -42,5 +42,13 @@ public interface StudyService {
 	 * @return StudyDetailsDto
 	 */
 	StudyDetailsDto getStudyDetails(Integer studyId);
+	
+	/**
+	 *
+	 * @param ids of the variables that i need to check data
+	 * @param studyId id for the study (Nursery / Trial)
+	 * @return the true if any id have data on the study
+	 */
+	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId);
 
 }

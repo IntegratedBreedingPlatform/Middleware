@@ -562,6 +562,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
+	@Override
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
 		final List queryResults;
 		try {
