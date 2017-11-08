@@ -1,18 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
-
-import java.util.List;
-import java.util.Map;
 
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
@@ -42,6 +38,9 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
@@ -221,6 +220,10 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
+<<<<<<< HEAD
+=======
+	 * @
+>>>>>>> master
 	 */
 	boolean isPersonWithEmailExists(String email);
 
@@ -228,6 +231,10 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
+<<<<<<< HEAD
+=======
+	 * @
+>>>>>>> master
 	 */
 	Person getPersonByEmail(String email);
 
@@ -239,6 +246,10 @@ public interface WorkbenchDataManager {
 	 * @param username
 	 * @param email
 	 * @return
+<<<<<<< HEAD
+=======
+	 * @
+>>>>>>> master
 	 */
 	boolean isPersonWithUsernameAndEmailExists(String username, String email);
 
@@ -263,6 +274,10 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param username
 	 * @return
+<<<<<<< HEAD
+=======
+	 * @
+>>>>>>> master
 	 */
 	UserInfo getUserInfoByUsername(String username);
 
@@ -886,6 +901,10 @@ public interface WorkbenchDataManager {
 	 * @param cropName
 	 * @param toolId
 	 * @return
+<<<<<<< HEAD
+=======
+	 * @
+>>>>>>> master
 	 */
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
 
@@ -934,6 +953,10 @@ public interface WorkbenchDataManager {
 	 * Gets the all Users Sorted
 	 *
 	 * @return
+<<<<<<< HEAD
+=======
+	 * @
+>>>>>>> master
 	 */
 	List<UserDto> getAllUsersSortedByLastName();
 
@@ -946,7 +969,7 @@ public interface WorkbenchDataManager {
 	public Integer createUser(UserDto userDto);
 
 	/**
-	 * updates the user.
+	 * Updates the user.
 	 *
 	 * @param user the user to update
 	 * @return Returns the id of the {@code UserDto} record added
@@ -954,8 +977,16 @@ public interface WorkbenchDataManager {
 	public Integer updateUser(UserDto userDto);
 
 	/**
+	 * updates the user.
+	 *
+	 * @param user the user to update
+	 * @return Returns the id of the {@code User} record updated
+	 */
+	public void updateUser(User user);
+
+	/**
 	 * Gets the user by project_uuid.
-	 * 
+	 *
 	 * @param projectUuid
 	 * @return the user matching the given project_uuid
 	 */

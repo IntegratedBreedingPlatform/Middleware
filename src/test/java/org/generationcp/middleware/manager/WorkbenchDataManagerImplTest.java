@@ -947,7 +947,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		}
 	}
-	
 	@Test
 	public void testGetAllActiveUsers() {
 		final List<User> prevListOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
@@ -963,5 +962,34 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		listOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
 		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() == listOfActiveUsers.size());
 		
+	}
+
+
+	@Test
+	public void testUpdateUserWithPerson() {
+
+		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
+
+		User userToBeUpdated = workbenchDataManager.getUserById(this.workbenchDataManager.createUser(userDto));
+
+		final String password = "password1111";
+		final String firstName = "John";
+		final String lastName = "Doe";
+		final String email = "John.Doe@email.com";
+
+
+		userToBeUpdated.setPassword(password);
+		userToBeUpdated.getPerson().setFirstName(firstName);
+		userToBeUpdated.getPerson().setLastName(lastName);
+		userToBeUpdated.getPerson().setEmail(email);
+
+		this.workbenchDataManager.updateUser(userToBeUpdated);
+
+		User updatedUser = workbenchDataManager.getUserById(userToBeUpdated.getUserid());
+
+		Assert.assertEquals(password, updatedUser.getPassword());
+		Assert.assertEquals(firstName, updatedUser.getPerson().getFirstName());
+		Assert.assertEquals(lastName, updatedUser.getPerson().getLastName());
+		Assert.assertEquals(email, updatedUser.getPerson().getEmail());
 	}
 }
