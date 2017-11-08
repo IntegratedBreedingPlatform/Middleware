@@ -1,9 +1,11 @@
 package org.generationcp.middleware.data.initializer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 
 public class UserTestDataInitializer {
 
@@ -33,6 +35,13 @@ public class UserTestDataInitializer {
 		user.setPersonid(-1);
 		user.setAssignDate(20120101);
 		user.setCloseDate(20120101);
+		return user;
+	}
+	
+	public static User createUserWithRole(Integer userid) {
+		final User user = new User();
+		user.setUserid(userid);
+		user.setRoles(Arrays.asList(new UserRole(user, "Admin")));
 		return user;
 	}
 
