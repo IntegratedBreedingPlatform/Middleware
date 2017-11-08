@@ -20,6 +20,7 @@ import java.util.TreeSet;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.SetOperation;
+import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.hibernate.Criteria;
@@ -312,8 +313,9 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 					if (result != null) {
 						Integer accMetadataSetId = (Integer) result[0];
 						Integer sampleId = (Integer) result[1];
-
-						AccMetadataSet dataElement = new AccMetadataSet(accMetadataSetId, dataset1, sampleId, null);
+						Sample sample = new Sample();
+						sample.setSampleId(sampleId);
+						AccMetadataSet dataElement = new AccMetadataSet(accMetadataSetId, dataset1, sample, null);
 						dataValues.add(dataElement);
 					}
 				}

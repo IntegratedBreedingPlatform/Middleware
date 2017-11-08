@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
@@ -29,6 +30,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link CharValues}.
@@ -49,15 +52,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	public static final String GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = "SELECT n.nval, CONCAT(m.marker_name, '') "
 			+ "FROM names n JOIN gdms_char_values c ON n.gid = c.gid " + "           JOIN gdms_marker m ON c.marker_id = m.marker_id "
 			+ "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " + "ORDER BY n.nval, m.marker_name";
-
-	// For getAllelicValues by gid and marker names
-	public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES = "SELECT DISTINCT " + "gdms_char_values.gid, "
-			+ "CONCAT(gdms_char_values.char_value, ''), " + "CONCAT(gdms_marker.marker_name, ''), "
-			+ "CAST(NULL AS UNSIGNED INTEGER) "
-			+ // peak height
-			"FROM gdms_char_values, " + "gdms_marker " + "WHERE gdms_char_values.marker_id = gdms_marker.marker_id "
-			+ "AND gdms_char_values.gid IN (:gidList) " + "AND gdms_char_values.marker_id IN (:markerIdList) "
-			+ "ORDER BY gdms_char_values.gid DESC, gdms_marker.marker_name";
 
 	public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS = "SELECT DISTINCT " + "gcv.gid, " + "gcv.marker_id, "
 			+ "CONCAT(gcv.char_value, ''), " + "CAST(NULL AS UNSIGNED INTEGER), "
@@ -99,6 +93,8 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
 			"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, ''), marker_sample_id, acc_sample_id "
 					+ "FROM gdms_char_values cv " + "WHERE  cv.marker_id IN (:markerIdList) " + "ORDER BY cv.gid DESC ";
+
+	private static final Logger LOG = LoggerFactory.getLogger(CharValuesDAO.class);
 
 	/**
 	 * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.
@@ -260,40 +256,19 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 
 	@SuppressWarnings("rawtypes")
 	public List<CharValues> getCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-
-		List<CharValues> toReturn = new ArrayList<CharValues>();
+		Preconditions.checkNotNull(datasetId);
+		Dataset dataset = new Dataset();
+		dataset.setDatasetId(datasetId);
 		try {
-			if (datasetId != null) {
-				SQLQuery query =
-						this.getSession().createSQLQuery(
-								"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, ''), marker_sample_id, acc_sample_id "
-										+ " FROM gdms_char_values where dataset_id = :datasetId ");
-				query.setParameter("datasetId", datasetId);
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("dataset", dataset));
+			return criteria.list();
 
-				List results = query.list();
-				for (Object o : results) {
-					Object[] result = (Object[]) o;
-					if (result != null) {
-						Integer acId = (Integer) result[0];
-						Integer datasetId2 = (Integer) result[1];
-						Integer markerId = (Integer) result[2];
-						Integer gId = (Integer) result[3];
-						String charValue = (String) result[4];
-						Integer markerSampleId = (Integer) result[5];
-						Integer accSampleId = (Integer) result[6];
-
-						Dataset dataset = new Dataset();
-						dataset.setDatasetId(datasetId2);
-						CharValues dataElement = new CharValues(acId, dataset, markerId, gId, charValue, markerSampleId, accSampleId);
-						toReturn.add(dataElement);
-					}
-				}
-			}
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getCharValuesByDatasetId(datasetId=" + datasetId + ") query from CharValues " + e.getMessage(), e);
+			final String errorMessage = "Error with getCharValuesByDatasetId(datasetId=" + datasetId + ") query from CharValues " + e.getMessage();
+			CharValuesDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return toReturn;
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})

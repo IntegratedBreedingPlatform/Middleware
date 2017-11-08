@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Dataset;
@@ -90,20 +89,21 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 
 	@SuppressWarnings("rawtypes")
 	public List<DatasetElement> getDetailsByName(final String name) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(name);
 		List<DatasetElement> dataValues = new ArrayList<>();
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DETAILS_BY_NAME);
-			query.setParameter("datasetName", name);
-			List results = query.list();
+			if (name != null) {
+				SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DETAILS_BY_NAME);
+				query.setParameter("datasetName", name);
+				List results = query.list();
 
-			for (final Object o : results) {
-				Object[] result = (Object[]) o;
-				if (result != null) {
-					Integer datasetId = (Integer) result[0];
-					String datasetType = (String) result[1];
-					DatasetElement datasetElement = new DatasetElement(datasetId, datasetType);
-					dataValues.add(datasetElement);
+				for (final Object o : results) {
+					Object[] result = (Object[]) o;
+					if (result != null) {
+						Integer datasetId = (Integer) result[0];
+						String datasetType = (String) result[1];
+						DatasetElement datasetElement = new DatasetElement(datasetId, datasetType);
+						dataValues.add(datasetElement);
+					}
 				}
 			}
 			return dataValues;
@@ -160,13 +160,15 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	}
 
 	public List<String> getDatasetNamesByQtlId(final Integer qtlId, final int start, final int numOfRows) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(qtlId);
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DATASET_NAMES_BY_QTL_ID);
-			query.setParameter("qtlId", qtlId);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			return query.list();
+			if (qtlId != null) {
+				SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DATASET_NAMES_BY_QTL_ID);
+				query.setParameter("qtlId", qtlId);
+				query.setFirstResult(start);
+				query.setMaxResults(numOfRows);
+				return query.list();
+			}
+			return new ArrayList<>();
 		} catch (HibernateException e) {
 			final String errorMessage = "Error with getDatasetNamesByQtlId() query from Dataset: " + e.getMessage();
 			DatasetDAO.LOG.error(errorMessage, e);
@@ -176,16 +178,16 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	}
 
 	public long countDatasetNamesByQtlId(final Integer qtlId) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(qtlId);
 		try {
-			Query query = this.getSession().createSQLQuery(DatasetDAO.COUNT_DATASET_NAMES_BY_QTL_ID);
-			query.setParameter("qtlId", qtlId);
-			BigInteger result = (BigInteger) query.uniqueResult();
-			if (result != null) {
-				return result.longValue();
-			} else {
-				return 0;
+			if (qtlId != null) {
+				Query query = this.getSession().createSQLQuery(DatasetDAO.COUNT_DATASET_NAMES_BY_QTL_ID);
+				query.setParameter("qtlId", qtlId);
+				BigInteger result = (BigInteger) query.uniqueResult();
+				if (result != null) {
+					return result.longValue();
+				}
 			}
+			return 0;
 		} catch (HibernateException e) {
 			final String errorMessage = "Error with countDatasetNamesByQtlId() query from Dataset: " + e.getMessage();
 			DatasetDAO.LOG.error(errorMessage, e);
@@ -211,9 +213,11 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 
 	@SuppressWarnings("rawtypes")
 	public List<Dataset> getDatasetsByIds(final List<Integer> datasetIds) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(datasetIds);
 		try {
-			return this.getSession().createCriteria(Dataset.class, "dataset").add(Restrictions.in("datasetId", datasetIds)).list();
+			if (datasetIds != null) {
+				return this.getSession().createCriteria(Dataset.class, "dataset").add(Restrictions.in("datasetId", datasetIds)).list();
+			}
+			return new ArrayList<>();
 		} catch (HibernateException e) {
 			final String errorMessage = "Error with getDatasetsByIds() query from Dataset: " + e.getMessage();
 			DatasetDAO.LOG.error(errorMessage, e);
@@ -222,12 +226,13 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	}
 
 	public List<Dataset> getDatasetsByType(final String type) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(type);
 		try {
-			Criteria crit = this.getSession().createCriteria(Dataset.class);
-			crit.add(Restrictions.eq("datasetType", type));
-			return crit.list();
-
+			if (type != null) {
+				Criteria crit = this.getSession().createCriteria(Dataset.class);
+				crit.add(Restrictions.eq("datasetType", type));
+				return crit.list();
+			}
+			return new ArrayList<>();
 		} catch (HibernateException e) {
 			final String errorMessage = "Error with getDatasetsByType(type=" + type + ") query from Dataset " + e.getMessage();
 			DatasetDAO.LOG.error(errorMessage, e);
@@ -236,16 +241,16 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	}
 
 	public Dataset getByName(final String datasetName) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(datasetName);
 		try {
-			Criteria crit = this.getSession().createCriteria(Dataset.class);
-			crit.add(Restrictions.eq("datasetName", datasetName));
-			List<Object> result = crit.list();
-			if (!result.isEmpty()) {
-				return (Dataset) result.get(0);
-			} else {
-				return null;
+			if (datasetName != null) {
+				Criteria crit = this.getSession().createCriteria(Dataset.class);
+				crit.add(Restrictions.eq("datasetName", datasetName));
+				List<Object> result = crit.list();
+				if (!result.isEmpty()) {
+					return (Dataset) result.get(0);
+				}
 			}
+			return null;
 		} catch (HibernateException e) {
 			final String errorMessage = "Error with getByName(datasetName=" + datasetName + ") query from Dataset " + e.getMessage();
 			DatasetDAO.LOG.error(errorMessage, e);

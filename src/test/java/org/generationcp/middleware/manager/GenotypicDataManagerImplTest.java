@@ -21,6 +21,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
@@ -952,7 +953,10 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		Integer sampleId = 1;
 		Dataset dataset1 = new Dataset();
 		dataset1.setDatasetId(datasetId);
-		AccMetadataSet accMetadataSet = new AccMetadataSet(null, dataset1, sampleId, accSampleId);
+
+		Sample sample = new Sample();
+		sample.setSampleId(sampleId);
+		AccMetadataSet accMetadataSet = new AccMetadataSet(null, dataset1, sample, accSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addAccMetadataSet(accMetadataSet);
 		Debug.println("testAccMetadataSet() Added: " + (idAdded != null ? accMetadataSet : null));
@@ -996,12 +1000,16 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		Dataset datas =  new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType,
 				missingData, method, score, institute, principalInvestigator, email, purposeOfStudy, null, null, null, null);
 
+
+		Sample sample = new Sample();
+		sample.setSampleId(1);
+
 		List<AccMetadataSet> accMetadataSets = new ArrayList<>();
-		AccMetadataSet accMetadataSet = new AccMetadataSet(null, datas, 1 ,1);
+		AccMetadataSet accMetadataSet = new AccMetadataSet(null, datas, sample ,1);
 		accMetadataSets.add(accMetadataSet);
 
 		List<CharValues> charValues = new ArrayList<>();
-		CharValues charValues1 = new CharValues(null, datas, 1, 1, "A/C", 1, 1);
+		CharValues charValues1 = new CharValues(null, datas, 1, sample, "A/C", 1, 1);
 		charValues.add(charValues1);
 
 		datas.setAccMetadataSets(accMetadataSets);
@@ -1078,11 +1086,14 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddAlleleValues() throws Exception {
 		Integer anId = null;
-		Integer gId = 1920;
+		Integer sampleId = 1920;
 		String alleleBinValue = "alleleBinValue";
 		String alleleRawValue = "alleleRawValue";
 		Integer peakHeight = 10;
-		AlleleValues alleleValues = new AlleleValues(anId, this.datasetId, gId, this.markerId, alleleBinValue, alleleRawValue, peakHeight);
+
+		Sample sample = new Sample();
+		sample.setSampleId(sampleId);
+		AlleleValues alleleValues = new AlleleValues(anId, this.datasetId, sample, this.markerId, alleleBinValue, alleleRawValue, peakHeight);
 
 		Integer idAdded = this.genotypicDataManager.addAlleleValues(alleleValues);
 		Debug.println("testAddAlleleValues() Added: " + (idAdded != null ? alleleValues : null));
@@ -1091,13 +1102,15 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddCharValues() throws Exception {
 		Integer acId = null;
-		Integer gId = 1920;
+		Integer sampleId = 1920;
 		String charValue = "CV";
 		Integer markerSampleId = 1;
 		Integer accSampleId = 1;
 		Dataset dataset = new Dataset();
 		dataset.setDatasetId(datasetId);
-		CharValues charValues = new CharValues(acId, dataset, this.markerId, gId, charValue, markerSampleId, accSampleId);
+		Sample sample = new Sample();
+		sample.setSampleId(sampleId);
+		CharValues charValues = new CharValues(acId, dataset, this.markerId, sample, charValue, markerSampleId, accSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addCharValues(charValues);
 		Debug.println("testAddCharValues() Added: " + (idAdded != null ? charValues : null));
@@ -1125,11 +1138,13 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testAddMappingPopValue() throws Exception {
 		Integer mpId = null;
 		String mapCharValue = "X";
-		Integer gid = 1434;
+		Integer sampleId = 1434;
 		Integer markerSampleId = 1;
 		Integer accSampleId = 1;
+		Sample sample = new Sample();
+		sample.setSampleId(sampleId);
 		MappingPopValues mappingPopValue =
-				new MappingPopValues(mpId, mapCharValue, this.datasetId, gid, this.markerId, markerSampleId, accSampleId);
+				new MappingPopValues(mpId, mapCharValue, this.datasetId, sample, this.markerId, markerSampleId, accSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addMappingPopValue(mappingPopValue);
 		Debug.println("testAddMappingPopValue() Added: " + (idAdded != null ? mappingPopValue : null));

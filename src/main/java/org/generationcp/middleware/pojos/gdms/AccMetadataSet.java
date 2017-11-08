@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import org.generationcp.middleware.pojos.Sample;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -44,9 +46,9 @@ public class AccMetadataSet implements Serializable {
 	@JoinColumn(name = "dataset_id")
 	private Dataset dataset;
 
-	@Basic(optional = false)
-	@Column(name = "sample_id")
-	private Integer sampleId;
+	@ManyToOne
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
 
 	@Column(name = "acc_sample_id")
 	private Integer accSampleId;
@@ -54,11 +56,11 @@ public class AccMetadataSet implements Serializable {
 	public AccMetadataSet() {
 	}
 
-	public AccMetadataSet(Integer accMetadataSetId, Dataset dataset, Integer sampleId, Integer accSampleId) {
+	public AccMetadataSet(Integer accMetadataSetId, Dataset dataset, Sample sample, Integer accSampleId) {
 		super();
 		this.accMetadataSetId = accMetadataSetId;
 		this.dataset = dataset;
-		this.sampleId = sampleId;
+		this.sample = sample;
 		this.accSampleId = accSampleId;
 	}
 
@@ -78,12 +80,12 @@ public class AccMetadataSet implements Serializable {
 		this.dataset = dataset;
 	}
 
-	public Integer getSampleId() {
-		return sampleId;
+	public Sample getSample() {
+		return sample;
 	}
 
-	public void setSampleId(final Integer sampleId) {
-		this.sampleId = sampleId;
+	public void setSample(final Sample sample) {
+		this.sample = sample;
 	}
 
 	public Integer getAccSampleId() {
@@ -100,7 +102,7 @@ public class AccMetadataSet implements Serializable {
 		int result = 1;
 		result = prime * result + (this.accMetadataSetId == null ? 0 : this.accMetadataSetId.hashCode());
 		result = prime * result + (this.dataset == null ? 0 : this.dataset.hashCode());
-		result = prime * result + (this.sampleId == null ? 0 : this.sampleId.hashCode());
+		result = prime * result + (this.sample == null ? 0 : this.sample.hashCode());
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		return result;
 	}
@@ -131,11 +133,11 @@ public class AccMetadataSet implements Serializable {
 		} else if (!this.dataset.equals(other.dataset)) {
 			return false;
 		}
-		if (this.sampleId == null) {
-			if (other.sampleId != null) {
+		if (this.sample == null) {
+			if (other.sample != null) {
 				return false;
 			}
-		} else if (!this.sampleId.equals(other.sampleId)) {
+		} else if (!this.sample.equals(other.sample)) {
 			return false;
 		}
 		if (this.accSampleId == null) {
@@ -155,8 +157,8 @@ public class AccMetadataSet implements Serializable {
 		builder.append(this.accMetadataSetId);
 		builder.append(", dataset=");
 		builder.append(this.dataset);
-		builder.append(", sampleId=");
-		builder.append(this.sampleId);
+		builder.append(", sample=");
+		builder.append(this.sample);
 		builder.append(", accSampleId=");
 		builder.append(this.accSampleId);
 		builder.append("]");
