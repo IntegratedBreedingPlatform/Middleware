@@ -63,10 +63,11 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 	public static final String GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS = "SELECT DISTINCT nid from gdms_acc_metadataset gam "
 			+ "INNER JOIN gdms_marker_metadataset gmm on gmm.dataset_id = gam.dataset_id " + "WHERE gam.dataset_id IN (:represnos) ";
 
-	public static final String COUNT_NIDS_BY_DATASET_IDS =
-			"SELECT COUNT(DISTINCT nid) FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
-	
-	public static final String GET_GID_NIC_SAMPLE_ID_BY_DATASET = "SELECT distinct gid,nid, acc_sample_id from gdms_acc_metadataset where dataset_id = (:datasetId) order by gid, nid,acc_sample_id asc";
+	public static final String COUNT_SAMPLE_IDS_BY_DATASET_IDS =
+			"SELECT COUNT(DISTINCT sample_id) FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
+
+	public static final String GET_SAMPLE_ID_BY_DATASET =
+		"SELECT distinct sample_id, acc_sample_id from gdms_acc_metadataset where dataset_id = (:datasetId) order by sample_id ,acc_sample_id asc";
 
 	public static final String GET_UNIQUE_ACC_METADATASET_BY_GIDS = "select distinct gid,nid, acc_sample_id from gdms_acc_metadataset where gid in (:gids)" 
 			+ " order by gid, nid,acc_sample_id asc";
@@ -83,28 +84,27 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 				return query.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getDatasetIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDatasetIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return new ArrayList<Integer>();
 	}
 	
 	@SuppressWarnings("unchecked")
-	// Reviewed
+	// FIXME implement start and numOfRows
 	public List<AccMetadataSet> getByDatasetIds(List<Integer> datasetIds, int start, int numOfRows)
 			throws MiddlewareQueryException {
-		List<AccMetadataSet> returnValues = new ArrayList<AccMetadataSet>();
 		try {
 			if (datasetIds != null && !datasetIds.isEmpty()) {
-				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-				criteria.add(Restrictions.in("datasetId", datasetIds));
-
-				returnValues = criteria.list();
+				return this.getSession()
+					.createCriteria(this.getPersistentClass())
+					.add(Restrictions.in("dataset.datasetId", datasetIds))
+					.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByDatasetIds(datasetIds=" + datasetIds
+			throw new MiddlewareQueryException("Error with getByDatasetIds(datasetIds=" + datasetIds
 					+ ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
-		return returnValues;
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -142,7 +142,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds="
+			throw new MiddlewareQueryException("Error with getNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds="
 					+ markerIds + ", gIds=" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return new TreeSet<Integer>();
@@ -182,7 +182,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds="
+			throw new MiddlewareQueryException("Error with countNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds="
 					+ markerIds + ", gIds=" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return 0;
@@ -212,7 +212,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getNIdsByMarkerIdsAndDatasetIds(datasetIds=" + datasetIds + ", markerIds=" + markerIds
+			throw new MiddlewareQueryException("Error with getNIdsByMarkerIdsAndDatasetIds(datasetIds=" + datasetIds + ", markerIds=" + markerIds
 					+ ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return new TreeSet<Integer>();
@@ -228,7 +228,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			criteria.add(Restrictions.in("germplasmId", gids));
 			dataValues = criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAccMetadataSetByGids(gids=" + gids + ") query from AccMetadataSet: " + e.getMessage(),
+			throw new MiddlewareQueryException("Error with getAccMetadataSetByGids(gids=" + gids + ") query from AccMetadataSet: " + e.getMessage(),
 					e);
 		}
 		return dataValues;
@@ -247,7 +247,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error with countAccMetadataSetByGids(gids=" + gids + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return count;
@@ -262,18 +262,17 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 				results = query.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getNidsByDatasetIds=" + datasetIds + ") query from AccMetadataSet: " + e.getMessage(),
+			throw new MiddlewareQueryException("Error with getNidsByDatasetIds=" + datasetIds + ") query from AccMetadataSet: " + e.getMessage(),
 					e);
 		}
 		return results;
 	}
 
-	//FIXME
-	public long countNidsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+	public long countSampleIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
 		long count = 0;
 		try {
 			if (datasetIds != null && !datasetIds.isEmpty()) {
-				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.COUNT_NIDS_BY_DATASET_IDS);
+				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.COUNT_SAMPLE_IDS_BY_DATASET_IDS);
 				query.setParameterList("datasetIds", datasetIds);
 				BigInteger result = (BigInteger) query.uniqueResult();
 				if (result != null) {
@@ -282,8 +281,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countNidsByDatasetIds=" + datasetIds + ") query from AccMetadataSet: " + e.getMessage(),
-					e);
+			throw new MiddlewareQueryException("Error with countSampleIdsByDatasetIds=" + datasetIds + ") query from AccMetadataSet", e);
 		}
 		return count;
 	}
@@ -321,7 +319,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAccMetadataSetByGidsAndDatasetId(sampleIds=" + sampleIds + ", datasetId=" + datasetId
+			throw new MiddlewareQueryException("Error with getAccMetadataSetByGidsAndDatasetId(sampleIds=" + sampleIds + ", datasetId=" + datasetId
 					+ ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return dataValues;
@@ -339,7 +337,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			statement.executeUpdate();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in AccMetadataSetDAO: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in deleteByDatasetId=" + datasetId + " in AccMetadataSetDAO: " + e.getMessage(), e);
 		}
 	}
 
@@ -353,27 +351,24 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			criteria.add(Restrictions.eq("datasetId", datasetId));
 			dataValues = criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAccMetadataSetsByDatasetId(datasetId=" + datasetId + ") query from AccMetadataSet "
+			throw new MiddlewareQueryException("Error with getAccMetadataSetsByDatasetId(datasetId=" + datasetId + ") query from AccMetadataSet "
 					+ e.getMessage(), e);
 		}
 		return dataValues;
 	}
 	
 	@SuppressWarnings("unchecked")
-	//FIXME
 	public List<Object> getUniqueAccMetaDatsetByDatasetId(String datasetId) throws MiddlewareQueryException {
 		try {
-				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_GID_NIC_SAMPLE_ID_BY_DATASET);
+				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_SAMPLE_ID_BY_DATASET);
 				query.setParameter("datasetId", datasetId);
-				query.addScalar("gid", Hibernate.INTEGER);
-				query.addScalar("nid", Hibernate.INTEGER);
-				query.addScalar("acc_sample_id", Hibernate.INTEGER);				
+				query.addScalar("sample_id");
+				query.addScalar("acc_sample_id");
 				return query.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getUniqueAccMetaDatasetByDatasetId(" + datasetId + ") query from AccMetadataSet: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getUniqueAccMetaDatasetByDatasetId(" + datasetId + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
-		return new ArrayList<Object>();
-	}	
+	}
 	
 	@SuppressWarnings("unchecked")
 	//FIXME
@@ -386,9 +381,8 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 				query.addScalar("acc_sample_id", Hibernate.INTEGER);				
 				return query.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getUniqueAccMetaDatasetByGids(" + gids + ") query from AccMetadataSet: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getUniqueAccMetaDatasetByGids(" + gids + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
-		return new ArrayList<Object>();
 	}
 
 }

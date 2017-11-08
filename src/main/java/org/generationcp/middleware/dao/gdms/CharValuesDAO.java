@@ -70,9 +70,21 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 			+ "ORDER BY gid ASC, marker_id ASC";
 	
 	//getAllelicValues by datasetId - distinct (not sure of difference wrt query above)
-	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID = 
-			"SELECT distinct gid,marker_id,char_value,acc_sample_id,marker_sample_id from gdms_char_values where dataset_id= :datasetId"
-					+ " ORDER BY gid, marker_id,acc_sample_id asc";
+	// FIXME use sample_id in retrieve logic - Temporarily keeping gid
+	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID = "SELECT DISTINCT\n"
+		+ "   stock.dbxref_id gid,\n"
+		+ "   marker_id,\n"
+		+ "   char_value,\n"
+		+ "   acc_sample_id,\n"
+		+ "   marker_sample_id\n"
+		+ " FROM gdms_char_values char_val\n"
+		+ "   INNER JOIN sample s ON char_val.sample_id = s.sample_id\n"
+		+ "   INNER JOIN plant p ON s.plant_id = p.plant_id\n"
+		+ "   INNER JOIN nd_experiment nde ON p.nd_experiment_id = nde.nd_experiment_id\n"
+		+ "   INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id\n"
+		+ "   INNER JOIN stock ON es.stock_id = stock.stock_id\n"
+		+ " WHERE dataset_id = :datasetId\n"
+		+ " ORDER BY stock.dbxref_id, marker_id, acc_sample_id ASC";
 	
 	// another transferred query from the Vaadin layer
 	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id, char_value,acc_sample_id,marker_sample_id from gdms_char_values where"
@@ -277,9 +289,8 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		List<Object> results = new ArrayList<>();
 		try {
 			if (datasetId != null) {
-				SQLQuery query =
-						this.getSession().createSQLQuery(CharValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID);
-				query.setParameter("datasetId", datasetId);				
+				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID);
+				query.setParameter("datasetId", datasetId);
 				query.addScalar("gid", Hibernate.INTEGER);
 				query.addScalar("marker_id", Hibernate.INTEGER);
 				query.addScalar("char_value", Hibernate.STRING);
@@ -287,7 +298,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 				query.addScalar("marker_sample_id", Hibernate.INTEGER);
 				results = query.list();
 
-					}
+			}
 		} catch (HibernateException e) {
 			this.logAndThrowException(
 					"Error with getUniqueAllelesByDatasetId(datasetId=" + datasetId + ") query from CharValuesDAO " + e.getMessage(), e);

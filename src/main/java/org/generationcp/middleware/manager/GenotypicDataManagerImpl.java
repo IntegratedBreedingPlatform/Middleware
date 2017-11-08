@@ -1424,7 +1424,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public long countAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-		return this.getAccMetadataSetDao().countNidsByDatasetIds(datasetIds);
+		return this.getAccMetadataSetDao().countSampleIdsByDatasetIds(datasetIds);
 	}
 
 	@Override
@@ -2317,6 +2317,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId) {
 		return this.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
+	}
+
+	@Override
+	public java.util.Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
+		return getSampleDao().getGIDsBySampleIds(sampleIds);
 	}
 
 }

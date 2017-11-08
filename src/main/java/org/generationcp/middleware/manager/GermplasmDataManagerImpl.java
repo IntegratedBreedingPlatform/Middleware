@@ -1069,6 +1069,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public Map<Integer, Integer> getPreferredNameIdsByGIDs(final List<Integer> gids) {
+		return this.getNameDao().getPreferredNameIdsByGIDs(gids);
+	}
+
+	@Override
 	public Map<Integer, String> getLocationNamesByGids(final List<Integer> gids) {
 		return this.getLocationDao().getLocationNamesMapByGIDs(gids);
 	}

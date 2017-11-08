@@ -791,6 +791,11 @@ public interface GermplasmDataManager {
 	Map<Integer, String> getPreferredNamesByGids(List<Integer> gids);
 
 	/**
+	 * @return the preferred name ids by gids
+	 */
+	Map<Integer, Integer> getPreferredNameIdsByGIDs(List<Integer> gids);
+
+	/**
 	 * Given a List of GIDs, return the list of gids mapped to their corresponding location name.
 	 * 
 	 * @param gids the gids
