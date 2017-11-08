@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -96,7 +95,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE
 		+ " and ph.value is not null ";
 
-	private final String TRIAL_TYPE = "T";
+	private static final String TRIAL_TYPE = "T";
 
 	private MeasurementVariableService measurementVariableService;
 
@@ -113,8 +112,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private StudyDataManager studyDataManager;
 
 	private UserDataManager userDataManager;
-
-	private ProjectPropertyDao projectPropertyDao;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -321,10 +318,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final Session currentSession = this.getCurrentSession();
 		final Observations observations = new Observations(currentSession, ontologyVariableDataManager);
 		try {
-			final ObservationDto updatedMeasurement =
-					observations.updataObsevationTraits(middlewareMeasurement,
+			return observations.updataObsevationTraits(middlewareMeasurement,
 							studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop())));
-			return updatedMeasurement;
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Unexpected error updating observations. Please contact support for "
 					+ "further assistence.", e); // or
@@ -407,9 +402,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
 
-		final List<Integer> observationVariableDbIds = new ArrayList<Integer>();
+		final List<Integer> observationVariableDbIds = new ArrayList<>();
 
-		final List<String> observationVariableNames = new ArrayList<String>();
+		final List<String> observationVariableNames = new ArrayList<>();
 
 		for (final Iterator<MeasurementVariableDto> iterator = measurementVariables.iterator(); iterator.hasNext();) {
 			final MeasurementVariableDto measurementVariableDto = iterator.next();
@@ -543,7 +538,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetails(final Integer studyId) throws MiddlewareQueryException {
+	public StudyDetailsDto getStudyDetails(final Integer studyId) {
 		try {
 			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadata(studyId);
 			if (studyMetadata != null) {
@@ -585,10 +580,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 
-		if (queryResults.isEmpty()) {
-			return false;
-		}
-		return true;
+		return !queryResults.isEmpty();
 	}
 
 	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {
