@@ -56,7 +56,7 @@ public class MeasurementRowTestDataInitializer {
 		return measurementRow;
 	}
 
-	public List<MeasurementRow> createMeasurementRowList(final int id, final String name, final String value,
+	public static List<MeasurementRow> createMeasurementRowList(final int id, final String name, final String value,
 			final MeasurementVariable measurementVariable) {
 		final List<MeasurementRow> measurementRows = new ArrayList<>();
 
