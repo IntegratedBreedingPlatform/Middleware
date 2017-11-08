@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 
 public class StandardVariableTestDataInitializer {
@@ -21,6 +22,10 @@ public class StandardVariableTestDataInitializer {
 		stdVariable.setScale(new Term(61220, "DBCV", "Controlled vocabulary from a database"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
+		stdVariable.setEnumerations(new ArrayList<Enumeration>());
+		stdVariable.getEnumerations().add(new Enumeration(StudyType.N.getId(), StudyType.N.getName(),  StudyType.N.getLabel(), 1));
+		stdVariable.getEnumerations().add(new Enumeration(StudyType.HB.getId(), StudyType.HB.getName(),  StudyType.HB.getLabel(), 2));
+		stdVariable.getEnumerations().add(new Enumeration(StudyType.PN.getId(), StudyType.PN.getName(),  StudyType.PN.getLabel(), 3));
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		stdVariable.setCropOntologyId("CROP-TEST");
 
