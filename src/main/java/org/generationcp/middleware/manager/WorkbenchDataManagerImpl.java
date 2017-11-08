@@ -1556,8 +1556,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Integer> getUserIDsByProjectId(Long projectId) {
-		return this.getProjectUserRoleDao().getUserIDsByProjectId(projectId);
+	public List<Integer> getActiveUserIDsByProjectId(Long projectId) {
+		return this.getProjectUserRoleDao().getActiveUserIDsByProjectId(projectId);
 	}
 
 }

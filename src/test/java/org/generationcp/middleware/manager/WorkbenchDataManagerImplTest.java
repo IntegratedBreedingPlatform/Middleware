@@ -891,8 +891,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testGetUserIDsByProjectId() {
-		final List<Integer> prevListOfUserIDs = this.workbenchDataManager.getUserIDsByProjectId(this.commonTestProject.getProjectId());
+	public void testGetActiveUserIDsByProjectId() {
+		final List<Integer> prevListOfUserIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 		
 		//Set up data
 		UserDto userDto = UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", "Breeder", "username");
@@ -902,7 +902,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		this.workbenchDataManager.addProjectUserRole(new ProjectUserRole(this.commonTestProject, user, role));
 		
 		
-		List<Integer> userIDs = this.workbenchDataManager.getUserIDsByProjectId(this.commonTestProject.getProjectId());
+		List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 		Assert.assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
 	}
 

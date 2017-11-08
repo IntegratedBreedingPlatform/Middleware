@@ -541,7 +541,7 @@ public interface WorkbenchDataManager {
 	 * @param projectId
 	 * @return
 	 */
-	List<Integer> getUserIDsByProjectId(final Long projectId);
+	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
 	
 	/**
 	 * Deletes the given ProjectUserRole.
