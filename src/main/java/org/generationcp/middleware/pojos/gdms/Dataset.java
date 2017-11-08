@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
-import org.generationcp.middleware.pojos.Sample;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +23,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -97,8 +94,7 @@ public class Dataset implements Serializable {
 	@Column(name = "purpose_of_study")
 	private String purposeOfStudy;
 
-	@OneToOne
-	@JoinColumn(name = "dataset_id")
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "dataset")
 	private DatasetUsers datasetUsers;
 
 	@OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

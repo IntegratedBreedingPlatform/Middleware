@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import org.generationcp.middleware.pojos.Sample;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -19,6 +21,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -44,8 +48,9 @@ public class MappingPopValues implements Serializable {
 	@Column(name = "dataset_id")
 	private Integer datasetId;
 
-	@Column(name = "sample_id")
-	private Integer sampleId;
+	@ManyToOne
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
 
 	@Column(name = "marker_id")
 	private Integer markerId;
@@ -59,12 +64,12 @@ public class MappingPopValues implements Serializable {
 	public MappingPopValues() {
 	}
 
-	public MappingPopValues(Integer mpId, String mapCharValue, Integer datasetId, Integer sampleId, Integer markerId, Integer accSampleId,
+	public MappingPopValues(Integer mpId, String mapCharValue, Integer datasetId, Sample sample, Integer markerId, Integer accSampleId,
 			Integer markerSampleId) {
 		this.mpId = mpId;
 		this.mapCharValue = mapCharValue;
 		this.datasetId = datasetId;
-		this.sampleId = sampleId;
+		this.sample = sample;
 		this.markerId = markerId;
 		this.accSampleId = accSampleId;
 		this.markerSampleId = markerSampleId;
@@ -94,12 +99,12 @@ public class MappingPopValues implements Serializable {
 		this.datasetId = datasetId;
 	}
 
-	public Integer getSampleId() {
-		return this.sampleId;
+	public Sample getSample() {
+		return this.sample;
 	}
 
-	public void setSampleId(Integer sampleId) {
-		this.sampleId = sampleId;
+	public void setSample(Sample sample) {
+		this.sample = sample;
 	}
 
 	public Integer getMarkerId() {
@@ -132,7 +137,7 @@ public class MappingPopValues implements Serializable {
 		int result = 1;
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
-		result = prime * result + (this.sampleId == null ? 0 : this.sampleId.hashCode());
+		result = prime * result + (this.sample == null ? 0 : this.sample.hashCode());
 		result = prime * result + (this.mapCharValue == null ? 0 : this.mapCharValue.hashCode());
 		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
@@ -166,11 +171,11 @@ public class MappingPopValues implements Serializable {
 		} else if (!this.datasetId.equals(other.datasetId)) {
 			return false;
 		}
-		if (this.sampleId == null) {
-			if (other.sampleId != null) {
+		if (this.sample == null) {
+			if (other.sample != null) {
 				return false;
 			}
-		} else if (!this.sampleId.equals(other.sampleId)) {
+		} else if (!this.sample.equals(other.sample)) {
 			return false;
 		}
 		if (this.mapCharValue == null) {
@@ -213,8 +218,8 @@ public class MappingPopValues implements Serializable {
 		builder.append(this.mapCharValue);
 		builder.append(", datasetId=");
 		builder.append(this.datasetId);
-		builder.append(", sampleId=");
-		builder.append(this.sampleId);
+		builder.append(", sample=");
+		builder.append(this.sample);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
 		builder.append(", accSampleId=");

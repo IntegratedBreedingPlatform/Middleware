@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.CharValues;
@@ -185,18 +186,20 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 		String mapCharValue = "-";
 
 		Dataset dataset = this.createDataset();
+		Sample sample = new Sample();
+		sample.setSampleId(sampleId);
 
-		AccMetadataSet accMetadataSet = new AccMetadataSet(null, dataset, sampleId, accSampleId);
+		AccMetadataSet accMetadataSet = new AccMetadataSet(null, dataset, sample, accSampleId);
 		MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(null, dataset, markerId, markerSampleId);
 		DatasetUsers datasetUser = new DatasetUsers(dataset, userId);
-		AlleleValues alleleValues = new AlleleValues(anId, datasetId, sampleId, markerId, alleleBinValue, alleleRawValue, peakHeight);
-		CharValues charValues = new CharValues(acId, dataset, markerId, sampleId, charValue, markerSampleId, accSampleId);
+		AlleleValues alleleValues = new AlleleValues(anId, datasetId, sample, markerId, alleleBinValue, alleleRawValue, peakHeight);
+		CharValues charValues = new CharValues(acId, dataset, markerId, sample, charValue, markerSampleId, accSampleId);
 		DartValues dartValues =
 				new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
 		MappingPop mappingPop =
 				new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize, populationType, mapDataDescription,
 						scoringScheme, mapId);
-		MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, sampleId, markerId, markerSampleId, accSampleId);
+		MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, sample, markerId, markerSampleId, accSampleId);
 		Marker marker = (Marker) this.createMarkerRecords().get(0);
 
 		records.put(GenotypicDataManagerImplUploadFunctionsTest.DATASET, dataset);
@@ -233,6 +236,9 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 		int id = 1;
 		for (int i = 0; i < GenotypicDataManagerImplUploadFunctionsTest.NUMBER_OF_ROWS; i++) {
 
+			Sample sample = new Sample();
+			sample.setSampleId(id);
+
 			mappingRecords = this.createMappingRecords();
 
 			Marker marker = (Marker) mappingRecords.get(GenotypicDataManagerImplUploadFunctionsTest.MARKER);
@@ -243,7 +249,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 
 			AccMetadataSet accMetadataSet =
 					(AccMetadataSet) mappingRecords.get(GenotypicDataManagerImplUploadFunctionsTest.ACC_METADATA_SET);
-			accMetadataSet.setSampleId(id);
+			accMetadataSet.setSample(sample);
 			accMetadataSets.add(accMetadataSet);
 
 			MarkerMetadataSet markerMetadataSet =
@@ -253,7 +259,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 
 			CharValues charValues = (CharValues) mappingRecords.get(GenotypicDataManagerImplUploadFunctionsTest.CHAR_VALUES);
 			charValues.setMarkerId(marker.getMarkerId());
-			charValues.setSampleId(accMetadataSet.getSampleId());
+			charValues.setSample(sample);
 			charValueList.add(charValues);
 
 			id++;
@@ -323,6 +329,9 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 		int id = 1;
 		for (int i = 0; i < GenotypicDataManagerImplUploadFunctionsTest.NUMBER_OF_ROWS; i++) {
 
+			Sample sample = new Sample();
+			sample.setSampleId(id);
+
 			mappingRecords = this.createMappingRecords();
 
 			Marker marker = (Marker) mappingRecords.get(GenotypicDataManagerImplUploadFunctionsTest.MARKER);
@@ -333,7 +342,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 
 			AccMetadataSet accMetadataSet =
 					(AccMetadataSet) mappingRecords.get(GenotypicDataManagerImplUploadFunctionsTest.ACC_METADATA_SET);
-			accMetadataSet.setSampleId(id);
+			accMetadataSet.setSample(sample);
 			accMetadataSets.add(accMetadataSet);
 
 			MarkerMetadataSet markerMetadataSet =
@@ -344,12 +353,12 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTest
 			MappingPopValues mappingPopValues =
 					(MappingPopValues) mappingRecords.get(GenotypicDataManagerImplUploadFunctionsTest.MAPPING_POP_VALUES);
 			mappingPopValues.setMarkerId(marker.getMarkerId());
-			mappingPopValues.setSampleId(accMetadataSet.getSampleId());
+			mappingPopValues.setSample(sample);
 			mappingPopValueList.add(mappingPopValues);
 
 			CharValues charValues = (CharValues) mappingRecords.get(GenotypicDataManagerImplUploadFunctionsTest.CHAR_VALUES);
 			charValues.setMarkerId(marker.getMarkerId());
-			charValues.setSampleId(accMetadataSet.getSampleId());
+			charValues.setSample(sample);
 			charValueList.add(charValues);
 
 			id++;

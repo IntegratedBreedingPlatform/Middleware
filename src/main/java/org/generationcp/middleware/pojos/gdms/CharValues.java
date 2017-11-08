@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import org.generationcp.middleware.pojos.Sample;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -48,9 +50,9 @@ public class CharValues implements Serializable {
 	@Column(name = "marker_id")
 	private Integer markerId;
 
-	@Basic(optional = false)
-	@Column(name = "sample_id")
-	private Integer sampleId;
+	@ManyToOne
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
 
 	@Column(name = "char_value")
 	String charValue;
@@ -64,12 +66,12 @@ public class CharValues implements Serializable {
 	public CharValues() {
 	}
 
-	public CharValues(Integer acId, Dataset dataset, Integer markerId, Integer sampleId, String charValue, Integer markerSampleId,
+	public CharValues(Integer acId, Dataset dataset, Integer markerId, Sample sample, String charValue, Integer markerSampleId,
 			Integer accSampleId) {
 		this.acId = acId;
 		this.dataset = dataset;
 		this.markerId = markerId;
-		this.sampleId = sampleId;
+		this.sample = sample;
 		this.charValue = charValue;
 		this.markerSampleId = markerSampleId;
 		this.accSampleId = accSampleId;
@@ -99,12 +101,12 @@ public class CharValues implements Serializable {
 		this.markerId = markerId;
 	}
 
-	public Integer getSampleId() {
-		return this.sampleId;
+	public Sample getSample() {
+		return this.sample;
 	}
 
-	public void setSampleId(Integer sampleId) {
-		this.sampleId = sampleId;
+	public void setSample(Sample sample) {
+		this.sample = sample;
 	}
 
 	public String getCharValue() {
@@ -139,7 +141,7 @@ public class CharValues implements Serializable {
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		result = prime * result + (this.charValue == null ? 0 : this.charValue.hashCode());
 		result = prime * result + (this.dataset == null ? 0 : this.dataset.hashCode());
-		result = prime * result + (this.sampleId == null ? 0 : this.sampleId.hashCode());
+		result = prime * result + (this.sample == null ? 0 : this.sample.hashCode());
 		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
 		return result;
@@ -185,11 +187,11 @@ public class CharValues implements Serializable {
 		} else if (!this.dataset.equals(other.dataset)) {
 			return false;
 		}
-		if (this.sampleId == null) {
-			if (other.sampleId != null) {
+		if (this.sample == null) {
+			if (other.sample != null) {
 				return false;
 			}
-		} else if (!this.sampleId.equals(other.sampleId)) {
+		} else if (!this.sample.equals(other.sample)) {
 			return false;
 		}
 		if (this.markerId == null) {
@@ -218,8 +220,8 @@ public class CharValues implements Serializable {
 		builder.append(this.dataset);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
-		builder.append(", sampleId=");
-		builder.append(this.sampleId);
+		builder.append(", sample=");
+		builder.append(this.sample);
 		builder.append(", charValue=");
 		builder.append(this.charValue);
 		builder.append(", markerSampleId=");
