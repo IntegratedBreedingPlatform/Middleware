@@ -27,20 +27,21 @@ public class StudyMeasurements {
 
 	}
 
-	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<MeasurementVariableDto> selectionMethodsAndTraits,
-			final List<String> germplasmDescriptors, final List<String> designFactors, final int instanceId, final int pageNumber, final int pageSize, final String sortBy,
+	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier,
+			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+			final List<String> designFactors, final int instanceId, final int pageNumber, final int pageSize, final String sortBy,
 			final String sortOrder) {
-		final String generateQuery =
-				this.measurementQuery.getAllObservationsQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors,sortBy, sortOrder);
-		return this.executeQueryAndMapResults(projectBusinessIdentifier, selectionMethodsAndTraits, germplasmDescriptors, designFactors, generateQuery,
-				instanceId, pageNumber, pageSize);
+		final String generateQuery = this.measurementQuery.getAllObservationsQuery(selectionMethodsAndTraits, germplasmDescriptors,
+				designFactors, sortBy, sortOrder);
+		return this.executeQueryAndMapResults(projectBusinessIdentifier, selectionMethodsAndTraits, germplasmDescriptors, designFactors,
+				generateQuery, instanceId, pageNumber, pageSize);
 	}
 
 	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<MeasurementVariableDto> traits,
 			final List<String> germplasmDescriptors, final List<String> designFactors, final Integer measurementId) {
 		final String generateQuery = this.measurementQuery.getSingleObservationQuery(traits, germplasmDescriptors, designFactors);
-		final List<ObservationDto> measurement = this.executeQueryAndMapResults(projectBusinessIdentifier, traits,
-				germplasmDescriptors, designFactors, generateQuery, measurementId);
+		final List<ObservationDto> measurement = this.executeQueryAndMapResults(projectBusinessIdentifier, traits, germplasmDescriptors,
+				designFactors, generateQuery, measurementId);
 		// Defensive programming
 		if (measurement.size() > 1) {
 
@@ -52,8 +53,8 @@ public class StudyMeasurements {
 
 	@SuppressWarnings("unchecked")
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier,
-			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors, final List<String> designFactors, final String generateQuery,
-			final int instanceId, final int pageNumber, final int pageSize) {
+			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+			final List<String> designFactors, final String generateQuery, final int instanceId, final int pageNumber, final int pageSize) {
 		final SQLQuery createSQLQuery =
 				this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors, designFactors, generateQuery);
 		createSQLQuery.setParameter(StudyMeasurements.STUDY_ID, projectBusinessIdentifier);
@@ -66,11 +67,10 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier,
-			final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors,
-			final List<String> designFactors, final String generateQuery, final Integer measurementId) {
-		final SQLQuery createSQLQuery =
-				this.createQueryAndAddScalar(traits, germplasmDescriptors, designFactors, generateQuery);
+	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<MeasurementVariableDto> traits,
+			final List<String> germplasmDescriptors, final List<String> designFactors, final String generateQuery,
+			final Integer measurementId) {
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, germplasmDescriptors, designFactors, generateQuery);
 		createSQLQuery.setParameter(StudyMeasurements.STUDY_ID, projectBusinessIdentifier);
 		createSQLQuery.setParameter("experiment_id", measurementId);
 		return this.mapResults(createSQLQuery.list(), traits, germplasmDescriptors, designFactors);
@@ -90,7 +90,7 @@ public class StudyMeasurements {
 		for (final String gpDescriptor : germplasmDescriptors) {
 			createSQLQuery.addScalar(gpDescriptor, new StringType());
 		}
-		
+
 		for (final String designFactor : designFactors) {
 			createSQLQuery.addScalar(designFactor, new StringType());
 		}
@@ -128,8 +128,7 @@ public class StudyMeasurements {
 				measurement.setPlotId((String) row[12]);
 				measurement.setFieldMapColumn((String) row[13]);
 				measurement.setFieldMapRange((String) row[14]);
-				measurement.setSamples((String)(row[15]));
-
+				measurement.setSamples((String) row[15]);
 
 				int additionalFactorsIndex = fixedColumns + selectionMethodsAndTraits.size() * 2;
 				for (final String gpDesc : germplasmDescriptors) {
