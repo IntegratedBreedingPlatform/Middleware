@@ -939,4 +939,36 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		}
 	}
+
+
+	@Test
+	public void testUpdateUserWithPerson() throws MiddlewareQueryException {
+
+		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
+
+		User userToBeUpdated = workbenchDataManager.getUserById(this.workbenchDataManager.createUser(userDto));
+
+		final String password = "password1111";
+		final String firstName = "John";
+		final String lastName = "Doe";
+		final String email = "John.Doe@email.com";
+
+
+		userToBeUpdated.setPassword(password);
+		userToBeUpdated.getPerson().setFirstName(firstName);
+		userToBeUpdated.getPerson().setLastName(lastName);
+		userToBeUpdated.getPerson().setEmail(email);
+
+		this.workbenchDataManager.updateUser(userToBeUpdated);
+
+		User updatedUser = workbenchDataManager.getUserById(userToBeUpdated.getUserid());
+
+		Assert.assertEquals(password, updatedUser.getPassword());
+		Assert.assertEquals(firstName, updatedUser.getPerson().getFirstName());
+		Assert.assertEquals(lastName, updatedUser.getPerson().getLastName());
+		Assert.assertEquals(email, updatedUser.getPerson().getEmail());
+
+
+
+	}
 }
