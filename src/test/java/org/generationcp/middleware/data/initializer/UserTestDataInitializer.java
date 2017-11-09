@@ -23,7 +23,7 @@ public class UserTestDataInitializer {
 		user.setCloseDate(20120101);
 		return user;
 	}
-	
+
 	public static User createActiveUser() {
 		final User user = new User();
 		user.setInstalid(-1);
@@ -37,8 +37,8 @@ public class UserTestDataInitializer {
 		user.setCloseDate(20120101);
 		return user;
 	}
-	
-	public static User createUserWithRole(Integer userid) {
+
+	public static User createUserWithRole(final Integer userid) {
 		final User user = new User();
 		user.setUserid(userid);
 		user.setRoles(Arrays.asList(new UserRole(user, "Admin")));
