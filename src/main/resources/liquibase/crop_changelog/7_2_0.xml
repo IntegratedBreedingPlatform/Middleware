@@ -84,4 +84,31 @@
 			delete from projectprop where variable_id = 8070;
 		</sql>
 	</changeSet>
+
+		<changeSet author="vanina" id="v7.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="cvterm"/>
+			<and>
+				<tableExists tableName="cvterm_relationship"/>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			delete from cvterm_relationship where object_id = 17262;
+			delete from cvterm_relationship where subject_id = 8070;
+			delete from cvterm_relationship where subject_id = 17262;
+			delete from cvterm where cvterm_id = 8070;
+			delete from cvterm where cvterm_id = 17262;
+			delete from cvterm where cvterm_id in (	10000,
+													10001,
+													10002,
+													10003,
+													10005,
+													10010,
+													10015,
+													10017,
+													10020,
+													10030);
+
+		</sql>
+	</changeSet>
 </databaseChangeLog>
