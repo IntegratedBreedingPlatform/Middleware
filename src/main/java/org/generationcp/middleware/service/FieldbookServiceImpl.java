@@ -17,6 +17,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
@@ -46,6 +47,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
@@ -63,6 +65,7 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -322,9 +325,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 							for (final MeasurementData field : row.getDataList()) {
 								if (factor.getName().equals(field.getLabel())
 										&& factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
-									this.getExperimentPropertySaver().saveOrUpdateProperty(
-											this.getExperimentDao().getById(row.getExperimentId()), factor.getTermId(),
-											field.getValue());
+
+									saveOrUpdateTrialDesignData(this.getExperimentPropertySaver(),
+											this.getExperimentDao().getById(row.getExperimentId()), field, factor.getTermId());
+
 								}
 							}
 						}
@@ -344,6 +348,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		FieldbookServiceImpl.LOG.debug(
 				"========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+
+	}
+
+	protected void saveOrUpdateTrialDesignData(final ExperimentPropertySaver experimentPropertySaver, final ExperimentModel experimentModel,
+			final MeasurementData measurementData, final int termId) {
+
+		String value = "";
+		if (measurementData.isCategorical()) {
+			// If the variable is categorical, the variable's categorical value should be saved as categorical id.
+			value = measurementData.getcValueId();
+		} else {
+			value = measurementData.getValue();
+		}
+
+		experimentPropertySaver.saveOrUpdateProperty(experimentModel
+				, termId, value);
 
 	}
 
