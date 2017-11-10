@@ -90,7 +90,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		this.dataset.setDatasetName("TestDataset" + System.currentTimeMillis());
 		this.datasetId = this.genotypicDataManager.addDataset(this.dataset);
 		dataset.setDatasetId(datasetId);
-		this.testSetQTL();
 		this.markerMetadataSet = new MarkerMetadataSet(null, dataset, this.markerId, 1);
 		this.genotypicDataManager.addMarkerMetadataSet(this.markerMetadataSet);
 	}
@@ -663,28 +662,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		Debug.println("testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
 	}
 
-//	@Test
-//	public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
-//		List<Integer> gIds = Arrays.asList(956, 1042, 1128);
-//		List<Integer> datasetIds = Arrays.asList(2);
-//		List<Integer> markerIds = Arrays.asList(6, 10);
-//
-//		List<Integer> nIdList =
-//				this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 0,
-//						this.genotypicDataManager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=" + datasetIds + ") RESULTS: " + nIdList);
-//
-//		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(null, gIds, markerIds, 0, 5);
-//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=null) RESULTS: " + nIdList);
-//
-//		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, null, markerIds, 0, 5);
-//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(gIds=null) RESULTS: " + nIdList);
-//
-//		nIdList = this.genotypicDataManager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, gIds, null, 0, 5);
-//		Debug.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(markerIds=null) RESULTS: " + nIdList);
-//
-//	}
-
 	@Test
 	public void testCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
 		List<Integer> gIds = Arrays.asList(29, 303, 4950);
@@ -749,21 +726,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue(results.size() > 0);
 		Debug.printFormattedObjects(IntegrationTestBase.INDENT, results);
 		Debug.println("testGetQtlByNameFromCentral() #records: " + results.size());
-	}
-
-	@Test
-	public void testGetQtlByNameFromLocal() throws Exception {
-		try {
-			this.testSetQTL(); // to add a qtl_details entry with name = "TestQTL"
-		} catch (MiddlewareQueryException e) {
-			// Ignore. There is already a record for testing.
-		}
-		String qtlName = "TestQTL%";
-		List<QtlDetailElement> results =
-				this.genotypicDataManager.getQtlByName(qtlName, 0, (int) this.genotypicDataManager.countQtlByName(qtlName));
-		Assert.assertTrue(results.size() > 0);
-		Debug.printFormattedObjects(IntegrationTestBase.INDENT, results);
-		Debug.println("testGetQtlByNameFromLocal() #records: " + results.size());
 	}
 
 	@Test
@@ -1452,60 +1414,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSetQTL() throws Exception {
-		Integer datasetId = null; // Will be set/overridden by the function
-		Integer userId = 123;
-
-		Integer qtlId = null; // Will be set/overridden by the function
-		Integer mapId = 1;
-		Float minPosition = 0f;
-		Float maxPosition = 8f;
-		Integer traitId = 1001; // "DE";
-		String experiment = "";
-		Float effect = 0f;
-		Float scoreValue = 2.5f;
-		Float rSquare = 10f;
-		String linkageGroup = "LG06";
-		String interactions = "";
-		String leftFlankingMarker = "Ah4-101";
-		String rightFlankingMarker = "GM2536";
-		Float position = 34.71f;
-		Float clen = 0f;
-		String seAdditive = null;
-		String hvParent = null;
-		String hvAllele = null;
-		String lvParent = null;
-		String lvAllele = null;
-
-		String qtlName = "TestQTL" + System.currentTimeMillis();
-
-		Dataset dataset = this.createDataset();
-		dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
-		dataset.setDatasetId(datasetId);
-
-		DatasetUsers datasetUser = new DatasetUsers(dataset, userId);
-
-		QtlDetails qtlDetails =
-				new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect, scoreValue, rSquare, linkageGroup,
-						interactions, leftFlankingMarker, rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent,
-						lvAllele);
-
-		Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
-
-		List<QtlDataRow> dataRows = new ArrayList<QtlDataRow>();
-		dataRows.add(new QtlDataRow(qtl, qtlDetails));
-
-		Boolean addStatus = this.genotypicDataManager.setQTL(dataset, datasetUser, dataRows);
-
-		Assert.assertTrue(addStatus);
-
-		Debug.println("testSetQTL() Added: ");
-		Debug.println(IntegrationTestBase.INDENT, datasetUser.toString());
-		Debug.println(IntegrationTestBase.INDENT, dataset.toString());
-		Debug.printObjects(IntegrationTestBase.INDENT, dataRows);
-	}
-
-	@Test
 	public void testSetMaps() throws Exception {
 
 		// Marker Fields
@@ -1625,19 +1533,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		List<QtlDetailElement> results =
 				this.genotypicDataManager.getQtlByQtlIds(qtlIds, 0, (int) this.genotypicDataManager.countQtlByQtlIds(qtlIds));
 		Assert.assertTrue(results.size() > 0);
-		Debug.printFormattedObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
-	public void testGetQtlByQtlIdsFromLocal() throws Exception {
-		try {
-			this.testSetQTL(); // to add a qtl_details entry
-		} catch (MiddlewareQueryException e) {
-			// Ignore. There is already a record for testing.
-		}
-		List<Integer> qtlIds = Arrays.asList(-1, -2, -3);
-		List<QtlDetailElement> results =
-				this.genotypicDataManager.getQtlByQtlIds(qtlIds, 0, (int) this.genotypicDataManager.countQtlByQtlIds(qtlIds));
 		Debug.printFormattedObjects(IntegrationTestBase.INDENT, results);
 	}
 
@@ -2021,50 +1916,9 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteSNPGenotypingDatasets() throws Exception {
-
-		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
-		uploadTest.testSetSNP();
-
-		List<Dataset> dataset = this.genotypicDataManager.getDatasetsByType(GdmsType.TYPE_SNP);
-
-		Integer datasetId = dataset.get(0).getDatasetId();
-
-		Debug.println("testDeleteSNPGenotypingDatasets(" + datasetId + ")");
-		this.genotypicDataManager.deleteSNPGenotypingDatasets(datasetId);
-		Debug.println("done with testDeleteSNPGenotypingDatasets");
-	}
-
-	@Test
-	public void testDeleteMappingPopulationDatasetsSNP() throws Exception {
-
-		GenotypicDataManagerImplUploadFunctionsTest uploadTest = new GenotypicDataManagerImplUploadFunctionsTest();
-
-		// Test deleting Mapping Allelic SNP Data
-		uploadTest.testSetMappingAllelicSNP(); // should also delete from gdms_char_values
-		List<Dataset> dataset = this.genotypicDataManager.getDatasetsByType(GdmsType.TYPE_MAPPING);
-		Integer datasetId = dataset.get(0).getDatasetId();
-		this.genotypicDataManager.deleteMappingPopulationDatasets(datasetId);
-		Debug.println("Deleted MappingPopulationDataset:MappingAllelicSNP(datasetId=" + datasetId + ")");
-	}
-
-	@Test
 	public void testGetDatasetsByType() throws Exception {
 		List<Dataset> datasets = this.genotypicDataManager.getDatasetsByType(GdmsType.TYPE_MAPPING);
 		Debug.printObjects(IntegrationTestBase.INDENT, datasets);
-	}
-
-	@Test
-	public void testGetQtlDetailsByMapId() throws Exception {
-		try {
-			this.testSetQTL(); // to add a qtl_details entry with map_id = 1
-		} catch (MiddlewareQueryException e) {
-			// Ignore. There is already a record for testing.
-		}
-		int mapId = 1;
-		List<QtlDetails> qtls = this.genotypicDataManager.getQtlDetailsByMapId(mapId);
-		Debug.println("testGetQtlDetailsByMapId(" + mapId + ")");
-		Debug.printObjects(IntegrationTestBase.INDENT, qtls);
 	}
 
 	@Test

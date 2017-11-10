@@ -20,22 +20,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.CharValuesDAO;
-import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
-import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
-import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.MtaDAO;
 import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
-import org.generationcp.middleware.dao.gdms.QtlDAO;
-import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -55,8 +48,6 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MappingABHRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
 import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -76,10 +67,8 @@ import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
-import org.generationcp.middleware.pojos.gdms.QtlDataRow;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
-import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
 import org.slf4j.Logger;
@@ -98,15 +87,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private static final Logger LOG = LoggerFactory.getLogger(GenotypicDataManagerImpl.class);
 
 	private static final String TYPE_SNP = GdmsType.TYPE_SNP.getValue();
-	private static final String TYPE_MAPPING = GdmsType.TYPE_MAPPING.getValue();
 	private static final String TYPE_MTA = GdmsType.TYPE_MTA.getValue();
-	private static final String TYPE_QTL = GdmsType.TYPE_QTL.getValue();
 	private static final String TYPE_CAP = GdmsType.TYPE_CAP.getValue();
 	private static final String TYPE_CISR = GdmsType.TYPE_CISR.getValue();
 	private static final String TYPE_UA = GdmsType.TYPE_UA.getValue(); // Unassigned
-
-	private static final String DATA_TYPE_INT = GdmsType.DATA_TYPE_INT.getValue();
-	private static final String DATA_TYPE_MAP = GdmsType.DATA_TYPE_MAP.getValue();
 
 	public GenotypicDataManagerImpl() {
 	}
@@ -1101,284 +1085,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public Boolean setQTL(Dataset dataset, DatasetUsers datasetUser, List<QtlDataRow> rows) throws MiddlewareQueryException {
-
-		try {
-
-			Integer datasetId = this.saveDataset(dataset, GenotypicDataManagerImpl.TYPE_QTL, null);
-
-			this.saveDatasetUser(datasetId, datasetUser);
-
-			// Save QTL data rows
-			if (rows != null && !rows.isEmpty()) {
-				for (QtlDataRow row : rows) {
-					Qtl qtl = row.getQtl();
-					QtlDetails qtlDetails = row.getQtlDetails();
-
-					Integer qtlIdSaved = this.saveQtl(datasetId, qtl);
-					qtlDetails.setQtlId(qtlIdSaved);
-					this.saveQtlDetails(qtlDetails);
-				}
-			}
-
-			return true;
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered with setQTL(): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
-			List<AccMetadataSet> accMetadataSets, List<CharValues> charValueList) throws MiddlewareQueryException {
-
-		try {
-
-			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_SNP);
-			dataset.setDataType(GenotypicDataManagerImpl.DATA_TYPE_INT);
-			Integer datasetId = this.saveDatasetDatasetUserMarkersAndMarkerMetadataSets(dataset, datasetUser, markers, markerMetadataSets);
-			Dataset dataset1 = new Dataset();
-			dataset1.setDatasetId(datasetId);
-			// Save data rows
-			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				accMetadataSet.setDataset(dataset1);
-			}
-			for (CharValues charValue : charValueList) {
-				charValue.setDataset(dataset1);
-			}
-
-			this.saveAccMetadataSets(accMetadataSets);
-			this.saveCharValues(charValueList);
-
-			return true;
-		} catch (Exception e) {
-
-			throw new MiddlewareQueryException("Error encountered while setting SNP: setSNP(): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList,
-			List<CharValues> charValueList) throws MiddlewareQueryException {
-
-		try {
-
-			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
-			Dataset dataset1 = new Dataset();
-			dataset1.setDatasetId(datasetId);
-			// Save data rows
-			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				accMetadataSet.setDataset(dataset1);
-			}
-
-			for (MappingPopValues mappingPopValue : mappingPopValueList) {
-				mappingPopValue.setDatasetId(datasetId);
-			}
-
-			for (CharValues charValue : charValueList) {
-				charValue.setDataset(dataset1);
-			}
-
-			this.saveAccMetadataSets(accMetadataSets);
-			this.saveMappingPopValues(mappingPopValueList);
-			this.saveCharValues(charValueList);
-
-			return true;
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while setting MappingAllelicSNP: setMappingAllelicSNP(): "
-					+ e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public Boolean updateSNP(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows)
-			throws MiddlewareQueryException, MiddlewareException {
-
-		if (dataset == null || dataset.getDatasetId() == null) {
-			throw new MiddlewareException("Dataset is null and cannot be updated.");
-		}
-
-		try {
-
-			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
-			Dataset dataset1 = new Dataset();
-			dataset1.setDatasetId(datasetId);
-
-			// Save data rows
-			if (rows != null && !rows.isEmpty()) {
-
-				List<AccMetadataSet> accMetadataSets = new ArrayList<>();
-				List<CharValues> charValues = new ArrayList<>();
-
-				for (SNPDataRow row : rows) {
-
-					// CharValues is mandatory
-					CharValues charValue = row.getCharValues();
-					if (charValue == null) {
-						throw new MiddlewareException("CharValues must not be null: " + row.toString());
-					}
-
-					// Save or update AccMetadaset
-					AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-					accMetadataSet.setDataset(dataset1);
-					accMetadataSets.add(accMetadataSet);
-
-					// Save or update charValues
-					charValue.setDataset(dataset1);
-					charValues.add(charValue);
-
-				}
-
-				this.saveAccMetadataSets(accMetadataSets);
-				this.saveCharValues(charValues);
-			}
-
-			return true;
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while updating SNP: updateSNP(): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<MappingABHRow> rows) throws MiddlewareQueryException, MiddlewareException {
-
-		if (dataset == null || dataset.getDatasetId() == null) {
-			throw new MiddlewareException("Dataset is null and cannot be updated.");
-		}
-
-		try {
-
-			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
-			Dataset dataset1 = new Dataset();
-			dataset1.setDatasetId(datasetId);
-
-			// Save data rows
-			if (rows != null && !rows.isEmpty()) {
-
-				List<AccMetadataSet> accMetadataSets = new ArrayList<>();
-				List<MappingPopValues> mappingPopValues = new ArrayList<>();
-
-				for (MappingABHRow row : rows) {
-
-					// MappingPopValues is mandatory
-					MappingPopValues mappingPopValue = row.getMappingPopValues();
-					if (mappingPopValue == null) {
-						throw new MiddlewareException("MappingPopValues must not be null: " + row.toString());
-					}
-
-					// Save or update AccMetadaset
-					AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-					accMetadataSet.setDataset(dataset1);
-					accMetadataSets.add(accMetadataSet);
-
-					// Save or update mappingPopValues
-					mappingPopValue.setDatasetId(datasetId);
-					mappingPopValues.add(mappingPopValue);
-
-				}
-
-				this.saveAccMetadataSets(accMetadataSets);
-				this.saveMappingPopValues(mappingPopValues);
-			}
-
-			return true;
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while updating MappingABH: updateMappingABH(): " + e.getMessage(), e);
-
-		}
-	}
-
-	@Override
-	public Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException,
-			MiddlewareException {
-
-		if (dataset == null || dataset.getDatasetId() == null) {
-			throw new MiddlewareException("Dataset is null and cannot be updated.");
-		}
-
-		try {
-
-			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
-			Dataset dataset1 = new Dataset();
-			dataset1.setDatasetId(datasetId);
-
-			// Save data rows
-			if (rows != null && !rows.isEmpty()) {
-
-				List<AccMetadataSet> accMetadataSets = new ArrayList<>();
-				List<MappingPopValues> mappingPopValues = new ArrayList<>();
-				List<CharValues> charValues = new ArrayList<>();
-
-				for (MappingAllelicSNPRow row : rows) {
-
-					// MappingPopValues is mandatory
-					MappingPopValues mappingPopValue = row.getMappingPopValues();
-					if (mappingPopValue == null) {
-						throw new MiddlewareException("MappingPopValues must not be null: " + row.toString());
-					}
-
-					// Save or update AccMetadaset
-					AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-					accMetadataSet.setDataset(dataset1);
-					accMetadataSets.add(accMetadataSet);
-
-					// Save or update mappingPopValues
-					mappingPopValue.setDatasetId(datasetId);
-					mappingPopValues.add(mappingPopValue);
-
-					// Save or update charValues
-					CharValues charValue = row.getCharValues();
-					charValue.setDataset(dataset1);
-					charValues.add(charValue);
-
-				}
-
-				this.saveAccMetadataSets(accMetadataSets);
-				this.saveMappingPopValues(mappingPopValues);
-				this.saveCharValues(charValues);
-			}
-
-			return true;
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): "
-					+ e.getMessage(), e);
-		}
-	}
-
-	private Integer saveMappingData(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets) throws Exception {
-
-		dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MAPPING);
-		dataset.setDataType(GenotypicDataManagerImpl.DATA_TYPE_MAP);
-		Integer datasetId = this.saveDatasetDatasetUserMarkersAndMarkerMetadataSets(dataset, datasetUser, markers, markerMetadataSets);
-		this.saveMappingPop(datasetId, mappingPop);
-		return datasetId;
-	}
-
-	private Integer saveOrUpdateMappingData(Dataset dataset, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets) throws Exception {
-
-		if (dataset == null) {
-			throw new MiddlewareException("dataset is null and cannot be saved nor updated.");
-		}
-
-		Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
-
-		// Save or update MappingPop
-		if (mappingPop != null) {
-			if (mappingPop.getDatasetId() == null) {
-				this.saveMappingPop(datasetId, mappingPop);
-			} else {
-				this.updateMappingPop(datasetId, mappingPop);
-			}
-		}
-
-		return datasetId;
-	}
-
-	@Override
 	public Boolean setMaps(Marker marker, MarkerOnMap markerOnMap, Map map) throws MiddlewareQueryException {
 
 		try {
@@ -1465,10 +1171,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public MappingPop getMappingPopByDatasetId(Integer datasetId) throws MiddlewareQueryException {
 		return this.getMappingPopDao().getMappingPopByDatasetId(datasetId);
-	}
-
-	private Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException {
-		return this.getDatasetDao().getByName(datasetName);
 	}
 
 	@Override
@@ -1726,103 +1428,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	// --------------------------------- COMMON SAVER METHODS ------------------------------------------//
 
-	// Saves a dataset of the given datasetType and dataType
-	private Integer saveDataset(Dataset dataset, String datasetType, String dataType) throws Exception {
-		this.getActiveSession();
-
-		// If the dataset has same dataset name existing in the database (local and central) - should throw an error.
-		if (this.getDatasetByName(dataset.getDatasetName()) != null) {
-			throw new MiddlewareQueryException("Dataset already exists. Please specify a new GDMS dataset record with a different name.");
-		}
-
-		// If the dataset is not yet existing in the database (local and central) - should create a new dataset in the local database.
-		Integer datasetId;
-		this.getActiveSession();
-		DatasetDAO datasetDao = this.getDatasetDao();
-
-		dataset.setDatasetType(datasetType);
-
-		if (!datasetType.equals(GenotypicDataManagerImpl.TYPE_QTL)) {
-			dataset.setDataType(dataType);
-		}
-
-		Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
-		datasetId = datasetRecordSaved.getDatasetId();
-
-		if (datasetId == null) {
-			throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
-		}
-
-		return datasetId;
-
-	}
-
-	// Saves a dataset
-	private Integer saveDataset(Dataset dataset) throws Exception {
-		this.getActiveSession();
-		DatasetDAO datasetDao = this.getDatasetDao();
-		Dataset datasetRecordSaved = datasetDao.save(dataset);
-		return datasetRecordSaved.getDatasetId();
-	}
-
-	private Integer saveDatasetDatasetUserMarkersAndMarkerMetadataSets(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets) throws Exception {
-
-		Integer datasetId = this.saveDataset(dataset);
-		dataset.setDatasetId(datasetId);
-
-		this.saveDatasetUser(datasetId, datasetUser);
-
-		this.saveMarkers(markers);
-
-		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
-			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-				markerMetadataSet.setDataset(dataset);
-			}
-			this.saveMarkerMetadataSets(markerMetadataSets);
-		}
-
-		return datasetId;
-	}
-
-	private Integer updateDatasetMarkersAndMarkerMetadataSets(Dataset dataset, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets) throws Exception {
-
-		Integer datasetId = this.updateDataset(dataset);
-		dataset.setDatasetId(datasetId);
-
-		this.saveMarkers(markers);
-
-		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
-			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-				markerMetadataSet.setDataset(dataset);
-			}
-			this.saveMarkerMetadataSets(markerMetadataSets);
-		}
-
-		return datasetId;
-	}
-
-	private Integer updateDataset(Dataset dataset) throws Exception {
-		this.getActiveSession();
-
-		if (dataset == null) {
-			throw new MiddlewareException("Dataset is null and cannot be updated.");
-		}
-
-		Integer datasetId = dataset.getDatasetId();
-
-		if (datasetId == null) {
-			datasetId = this.saveDataset(dataset);
-		} else {
-			this.getActiveSession();
-			Dataset datasetSaved = this.getDatasetDao().merge(dataset);
-			datasetId = datasetSaved.getDatasetId();
-		}
-
-		return datasetId;
-	}
-
 	private Integer saveMarkerIfNotExisting(Marker marker, String markerType) throws Exception {
 		this.getActiveSession();
 
@@ -2019,120 +1624,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 		return markerOnMapSavedId;
 
-	}
-
-	private void saveAccMetadataSets(List<AccMetadataSet> accMetadataSets) throws Exception {
-
-		this.getActiveSession();
-		AccMetadataSetDAO accMetadataSetDao = this.getAccMetadataSetDao();
-
-		if (accMetadataSets != null) {
-			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				accMetadataSetDao.merge(accMetadataSet);
-			}
-		}
-	}
-
-	private void saveMarkerMetadataSets(List<MarkerMetadataSet> markerMetadataSets) throws Exception {
-		this.getActiveSession();
-		MarkerMetadataSetDAO markerMetadataSetDao = this.getMarkerMetadataSetDao();
-		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-			markerMetadataSetDao.merge(markerMetadataSet);
-		}
-	}
-
-	private Integer saveDatasetUser(Integer datasetId, DatasetUsers datasetUser) throws Exception {
-		this.getActiveSession();
-		DatasetUsersDAO datasetUserDao = this.getDatasetUsersDao();
-		Dataset dataset = new Dataset();
-		dataset.setDatasetId(datasetId);
-		datasetUser.setDataset(dataset);
-
-		DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
-		Integer datasetUserSavedId = datasetUserSaved.getUserId();
-
-		if (datasetUserSavedId == null) {
-			throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
-		}
-
-		return datasetUserSavedId;
-
-	}
-
-	private Integer saveQtl(Integer datasetId, Qtl qtl) throws Exception {
-		this.getActiveSession();
-		QtlDAO qtlDao = this.getQtlDao();
-
-		qtl.setDatasetId(datasetId);
-
-		Qtl qtlRecordSaved = qtlDao.saveOrUpdate(qtl);
-		Integer qtlIdSaved = qtlRecordSaved.getQtlId();
-
-		if (qtlIdSaved == null) {
-			throw new Exception();
-		}
-
-		return qtlIdSaved;
-	}
-
-	private Integer saveQtlDetails(QtlDetails qtlDetails) throws Exception {
-		this.getActiveSession();
-
-		QtlDetailsDAO qtlDetailsDao = this.getQtlDetailsDao();
-		QtlDetails qtlDetailsRecordSaved = qtlDetailsDao.saveOrUpdate(qtlDetails);
-		Integer qtlDetailsSavedId = qtlDetailsRecordSaved.getQtlId();
-
-		if (qtlDetailsSavedId == null) {
-			throw new Exception();
-		}
-
-		return qtlDetailsSavedId;
-
-	}
-
-	private void saveCharValues(List<CharValues> charValuesList) throws Exception {
-		if (charValuesList == null) {
-			return;
-		}
-		this.getActiveSession();
-		CharValuesDAO charValuesDao = this.getCharValuesDao();
-		for (CharValues charValues : charValuesList) {
-			charValuesDao.merge(charValues);
-		}
-	}
-
-	private Integer saveMappingPop(Integer datasetId, MappingPop mappingPop) throws Exception {
-		this.getActiveSession();
-		MappingPopDAO mappingPopDao = this.getMappingPopDao();
-		mappingPop.setDatasetId(datasetId);
-
-		MappingPop mappingPopRecordSaved = mappingPopDao.save(mappingPop);
-		Integer mappingPopSavedId = mappingPopRecordSaved.getDatasetId();
-
-		if (mappingPopSavedId == null) {
-			throw new Exception();
-		}
-
-		return mappingPopSavedId;
-	}
-
-	private Integer updateMappingPop(Integer datasetId, MappingPop mappingPop) throws Exception {
-		this.getActiveSession();
-		mappingPop.setDatasetId(datasetId);
-
-		MappingPop mappingPopRecordSaved = this.getMappingPopDao().merge(mappingPop);
-		return mappingPopRecordSaved.getDatasetId();
-	}
-
-	private void saveMappingPopValues(List<MappingPopValues> mappingPopValuesList) throws Exception {
-		if (mappingPopValuesList == null) {
-			return;
-		}
-		this.getActiveSession();
-		MappingPopValuesDAO mappingPopValuesDao = this.getMappingPopValuesDao();
-		for (MappingPopValues mappingPopValues : mappingPopValuesList) {
-			mappingPopValuesDao.merge(mappingPopValues);
-		}
 	}
 
 	// GCP-7873

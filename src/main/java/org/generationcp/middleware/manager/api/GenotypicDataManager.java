@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GdmsType;
@@ -34,8 +33,6 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MappingABHRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
 import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -55,10 +52,8 @@ import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
-import org.generationcp.middleware.pojos.gdms.QtlDataRow;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
-import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
 
@@ -1308,105 +1303,6 @@ public interface GenotypicDataManager {
 	 */
 	Boolean setCISRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
 			throws MiddlewareQueryException;
-
-	/**
-	 * Sets QTL.
-	 * 
-	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the QTL Genotyping data rows as a list of QtlDataRow objects.
-	 *
-	 * @param dataset - (Dataset) dataset_type will be set to/overridden by "QTL"
-	 * @param datasetUser - (DatasetUser)
-	 * @param rows the rows
-	 * @return (boolean) - true if successful, exception or false if failed
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setQTL(Dataset dataset, DatasetUsers datasetUser, List<QtlDataRow> rows) throws MiddlewareQueryException;
-
-	/**
-	 * Sets SNP
-	 * 
-	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the list of Markers and MarkerMetadataSets, and SNP Genotyping
-	 * data rows as a list of SNPDataRow objects. For new values to be added, set the id to null.
-	 *
-	 * @param dataset - (Dataset) dataset_type = "SNP", datatype = "int"
-	 * @param datasetUser - (DatasetUser)
-	 * @param markers - List of Markers to add
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add
-	 * @param accMetadataSets - List of AccMetadataSets to add
-	 * @param charValueList - List of CharValues to add
-	 * @return (boolean) - true if successful, exception or false if failed
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
-			List<AccMetadataSet> accMetadataSets, List<CharValues> charValueList) throws MiddlewareQueryException;
-
-	/**
-	 * Update SNP Records. For new values to be added, set the id to null.
-	 *
-	 * @param dataset the Dataset
-	 * @param markers - List of Markers to add/update
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add/update
-	 * @param rows the rows to update
-	 * @return true if successful
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @throws MiddlewareException the middleware exception
-	 */
-	Boolean updateSNP(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows)
-			throws MiddlewareQueryException, MiddlewareException;
-
-
-	/**
-	 * Update Mapping ABH Records. For new values to be added, set the id to null.
-	 *
-	 * @param dataset the dataset
-	 * @param mappingPop the mapping pop
-	 * @param markers - List of Markers to add/update
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add/update
-	 * @param rows the rows to update
-	 * @return true if successful
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @throws MiddlewareException the middleware exception
-	 */
-	Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
-			List<MappingABHRow> rows) throws MiddlewareQueryException, MiddlewareException;
-
-	/**
-	 * Sets Mapping Data of Allelic SNP
-	 * 
-	 * To use, supply the Dataset and DatasetUsers objects to save. Also pass the Mapping Allelic SNP Genotyping data rows as a list of
-	 * MappingAllelicSNPRow objects. For new values to be added, set the id to null.
-	 *
-	 * @param dataset - Dataset
-	 * @param datasetUser - Dataset Users
-	 * @param mappingPop - Mapping Population
-	 * @param markers - List of Markers to add
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add
-	 * @param accMetadataSets - List of AccMetadataSets to add
-	 * @param mappingPopValueList - List of MappingPopValues to add
-	 * @param charValueList - List of CharValues to add
-	 * @param rows the rows
-	 * @return true if values were successfully saved in the database, false otherwise
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList,
-			List<CharValues> charValueList) throws MiddlewareQueryException;
-
-	/**
-	 * Update Mapping Allelic SNP Record. For new values to be added, set the id to null.
-	 *
-	 * @param dataset the Dataset
-	 * @param mappingPop the mapping pop
-	 * @param markers - List of Markers to add/update
-	 * @param markerMetadataSets - List of MarkerMetadataSets to add/update
-	 * @param rows the rows to update
-	 * @return true if successful
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @throws MiddlewareException the middleware exception
-	 */
-	Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, List<Marker> markers,
-			List<MarkerMetadataSet> markerMetadataSets, List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException,
-			MiddlewareException;
 
 	/**
 	 * Sets Maps.
