@@ -58,6 +58,11 @@ public class UserTestDataInitializer {
 		user.setPersonid(personId);
 		user.setPerson(PersonTestDataInitializer.createPerson(username, userId, firstName, middleName));
 		user.setStatus(0);
+		
+		final List<UserRole> userRoleList = new ArrayList<>();
+		userRoleList.add(new UserRole(user, "ADMIN"));
+		user.setRoles(userRoleList);
+		
 		return user;
 	}
 }
