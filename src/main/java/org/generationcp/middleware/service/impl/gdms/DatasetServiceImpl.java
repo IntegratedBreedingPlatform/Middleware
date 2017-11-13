@@ -46,7 +46,12 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Integer saveDataset(final DatasetDto datasetDto) throws Exception {
+		Preconditions.checkNotNull(datasetDto);
+		Preconditions.checkNotNull(datasetDto.getMarkers());
+		Preconditions.checkNotNull(datasetDto.getSampleAccesions());
+
 		Preconditions.checkArgument(StringUtils.isNotEmpty(datasetDto.getName()), new Exception("Empty dataset name"));
+
 		if (datasetDto.getName().length() > 30) {
 			throw new Exception("Dataset Name value exceeds max char size");
 		}
@@ -123,11 +128,14 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	private Boolean validateInput(final DatasetDto datasetDto) {
-		//TODO
-		// Validate size
-		// Validate null values for main arrays
-		return Boolean.TRUE;
+	private void validateInput(final DatasetDto datasetDto) throws Exception{
+		final Integer numberOfRows = datasetDto.getCharValues().length;
+		final Integer numberOfColums = datasetDto.getCharValues()[0].length;
+
+		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetDto.getMarkers().size() && numberOfRows == datasetDto
+				.getSampleAccesions().size())){
+			throw new Exception("Invalid matrix size");
+		}
 	}
 
 	public DatasetDAO getDatasetDAO() {

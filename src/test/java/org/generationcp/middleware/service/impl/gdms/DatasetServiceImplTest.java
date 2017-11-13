@@ -58,10 +58,32 @@ public class DatasetServiceImplTest {
 		datasetService.saveDataset(datasetDto);
 	}
 
+
+	@Test (expected = Exception.class)
+	public void testSaveDataset_NullMarkers() throws Exception {
+		final DatasetDto datasetDto = new DatasetDto();
+		datasetService.saveDataset(datasetDto);
+	}
+
+	@Test (expected = Exception.class)
+	public void testSaveDataset_NullSamples() throws Exception {
+		final DatasetDto datasetDto = new DatasetDto();
+		datasetDto.setSampleAccesions(null);
+		datasetService.saveDataset(datasetDto);
+	}
+
+
+	@Test (expected = Exception.class)
+	public void testSaveDataset_NullDataset() throws Exception {
+		datasetService.saveDataset(null);
+	}
+
 	@Test (expected = Exception.class)
 	public void testSaveDataset_LongName() throws Exception {
 		final DatasetDto datasetDto = new DatasetDto();
 		datasetDto.setName(RandomStringUtils.random(31));
+		datasetDto.setSampleAccesions(new LinkedHashSet<DatasetDto.SampleKey>());
+		datasetDto.setMarkers(new ArrayList<String>());
 		datasetService.saveDataset(datasetDto);
 	}
 
@@ -77,18 +99,43 @@ public class DatasetServiceImplTest {
 		final Dataset datasetFromDB = new Dataset();
 		datasetFromDB.setDatasetName("Dataset");
 		Mockito.when(datasetDAO.getByName(datasetDto.getName())).thenReturn(datasetFromDB);
+		datasetDto.setSampleAccesions(new LinkedHashSet<DatasetDto.SampleKey>());
 		datasetService.saveDataset(datasetDto);
 	}
 
 	@Test (expected = Exception.class)
 	public void testSaveDataset_DuplicatedMarkers() throws Exception {
 		final DatasetDto datasetDto = new DatasetDto();
+		datasetDto.setSampleAccesions(new LinkedHashSet<DatasetDto.SampleKey>());
 		final List<String> markers = new ArrayList<>();
 		markers.add("a");
 		markers.add("a");
 		datasetDto.setName("Dataset");
 		datasetDto.setMarkers(markers);
 		Mockito.when(datasetDAO.getByName(datasetDto.getName())).thenReturn(null);
+		datasetService.saveDataset(datasetDto);
+	}
+
+
+	@Test (expected = Exception.class)
+	public void testSaveDataset_InvalidCharValuesSize() throws Exception {
+		final DatasetDto datasetDto = new DatasetDto();
+		final List<String> markers = new ArrayList<>();
+		markers.add("a");
+		markers.add("b");
+		datasetDto.setName("Dataset");
+		datasetDto.setMarkers(markers);
+		Mockito.when(datasetDAO.getByName(datasetDto.getName())).thenReturn(null);
+
+		final LinkedHashSet sampleAccesionSet = new LinkedHashSet<>();
+		final DatasetDto.SampleKey sampleKey1 = new DatasetDto().new SampleKey();
+		sampleKey1.setSampleUID("SampleUID1");
+		sampleAccesionSet.add(sampleKey1);
+		datasetDto.setSampleAccesions(sampleAccesionSet);
+
+		final String[][] charValues = { {"A","B"}, {"C","D"}, {"E", "F"}};
+		datasetDto.setCharValues(charValues);
+
 		datasetService.saveDataset(datasetDto);
 	}
 
@@ -114,6 +161,9 @@ public class DatasetServiceImplTest {
 
 		Mockito.when(datasetDAO.getByName(datasetDto.getName())).thenReturn(null);
 
+		final String[][] charValues = { {"A","B"}};
+		datasetDto.setCharValues(charValues);
+
 		datasetService.saveDataset(datasetDto);
 	}
 
@@ -138,6 +188,8 @@ public class DatasetServiceImplTest {
 		Mockito.when(datasetDAO.getByName(datasetDto.getName())).thenReturn(null);
 		final List<Marker> markersFromDB = new ArrayList<>();
 		Mockito.when(markerDAO.getByNames(datasetDto.getMarkers(), 0, 0)).thenReturn(markersFromDB);
+		final String[][] charValues = { {"A","B"}};
+		datasetDto.setCharValues(charValues);
 		datasetService.saveDataset(datasetDto);
 	}
 

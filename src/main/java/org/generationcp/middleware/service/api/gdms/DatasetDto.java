@@ -78,7 +78,7 @@ public class DatasetDto {
 
 	private String specie;
 
-	private List<List<String>> charValues;
+	private String[][] charValues;
 
 	private List<String> markers;
 
@@ -164,11 +164,11 @@ public class DatasetDto {
 		this.userId = userId;
 	}
 
-	public List<List<String>> getCharValues() {
+	public String[][] getCharValues() {
 		return charValues;
 	}
 
-	public void setCharValues(final List<List<String>> charValues) {
+	public void setCharValues(final String[][] charValues) {
 		this.charValues = charValues;
 	}
 
