@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.gdms;
 
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.CharValues;
@@ -20,8 +21,8 @@ import java.util.Map;
  */
 public class DatasetBuilder {
 
-	public static Dataset build(final DatasetDto datasetDto, final Map<String, SampleDTO> sampleDTOMap, final Map<String, Marker> markerMap)
-			throws Exception {
+	public static Dataset build(final DatasetDto datasetDto, final Map<String, SampleDTO> sampleDTOMap,
+		final Map<String, Marker> markerMap) {
 		final Dataset dataset = buildDataset(datasetDto);
 		dataset.setDatasetUsers(buildDatasetUser(dataset, datasetDto));
 		dataset.setAccMetadataSets(buildAccessionMetadataset(dataset, datasetDto, sampleDTOMap));
@@ -48,7 +49,7 @@ public class DatasetBuilder {
 	}
 
 	private static List<CharValues> buildCharValues(final Dataset dataset, final DatasetDto datasetDto, final Map<String, SampleDTO> sampleDTOMap,
-			final Map<String, Marker> markerMap) throws Exception {
+			final Map<String, Marker> markerMap) {
 
 		List<CharValues> charValuesList = new ArrayList<>();
 
@@ -112,7 +113,7 @@ public class DatasetBuilder {
 		return accMetadataSetList;
 	}
 
-	private static String getCharData(final String charValue) throws Exception {
+	private static String getCharData(final String charValue) {
 		String charData = "";
 		if (charValue.length() > 2) {
 			if (charValue.contains(":")) {
@@ -124,7 +125,7 @@ public class DatasetBuilder {
 			} else if ((charValue.equalsIgnoreCase("DUPE")) || (charValue.equalsIgnoreCase("BAD"))) {
 				charData = "?";
 			} else {
-				throw new Exception("Heterozygote data representation should be either : or /" + charValue);
+				throw new MiddlewareException("Heterozygote data representation should be either : or /" + charValue);
 			}
 
 		} else if (charValue.length() == 2) {

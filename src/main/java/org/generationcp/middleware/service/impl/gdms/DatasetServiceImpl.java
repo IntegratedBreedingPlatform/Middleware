@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.Marker;
@@ -14,6 +16,8 @@ import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.gdms.DatasetDto;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +34,10 @@ import java.util.Set;
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(DatasetServiceImpl.class);
+
 	private DatasetDAO datasetDAO;
-
 	private MarkerDAO markerDAO;
-
 	private SampleService sampleService;
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -45,7 +49,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer saveDataset(final DatasetDto datasetDto) throws Exception {
+	public Integer saveDataset(final DatasetDto datasetDto) {
 		Preconditions.checkNotNull(datasetDto);
 		Preconditions.checkNotNull(datasetDto.getMarkers());
 		Preconditions.checkNotNull(datasetDto.getSampleAccesions());
@@ -53,13 +57,13 @@ public class DatasetServiceImpl implements DatasetService {
 		Preconditions.checkArgument(StringUtils.isNotEmpty(datasetDto.getName()), new Exception("Empty dataset name"));
 
 		if (datasetDto.getName().length() > 30) {
-			throw new Exception("Dataset Name value exceeds max char size");
+			throw new MiddlewareException("Dataset Name value exceeds max char size");
 		}
 		if (datasetDAO.getByName(datasetDto.getName()) != null) {
-			throw new Exception("Dataset Name already exists");
+			throw new MiddlewareException("Dataset Name already exists");
 		}
 		if (isDuplicatedMarkerNames(datasetDto)) {
-			throw new Exception("Duplicated markers not allowed");
+			throw new MiddlewareException("Duplicated markers not allowed");
 		}
 
 		this.validateInput(datasetDto);
@@ -68,7 +72,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Map<String, SampleDTO> sampleDTOMap = sampleService.getSamplesBySampleUID(sampleUIDSet);
 
 		if (sampleDTOMap.size() != sampleUIDSet.size()) {
-			throw new Exception("Some of the data uploaded is not present in the system. Please verify your file again.");
+			throw new MiddlewareException("Some of the data uploaded is not present in the system. Please verify your file again.");
 		}
 
 		final List<Marker> markers = this.markerDAO.getByNames(datasetDto.getMarkers(), 0, 0);
@@ -79,8 +83,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 		try {
 			return datasetDAO.save(dataset).getDatasetId();
-		} catch (Exception e) {
-			throw new Exception("An error has occurred while saving the dataset");
+		} catch (MiddlewareQueryException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new MiddlewareException("An error has occurred while saving the dataset");
 		}
 	}
 
@@ -111,7 +116,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return mappedMarkers;
 	}
 
-	private void validateMarkers(final DatasetDto datasetDto, final Map<String, Marker> markerMap) throws Exception {
+	private void validateMarkers(final DatasetDto datasetDto, final Map<String, Marker> markerMap) {
 
 		if (markerMap.size() != datasetDto.getMarkers().size()) {
 			List<String> markersNotFound = new ArrayList<>();
@@ -123,18 +128,18 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 
 			if (!markersNotFound.isEmpty()) {
-				throw new Exception("Markers not found: " + StringUtils.join(markersNotFound, ","));
+				throw new MiddlewareException("Markers not found: " + StringUtils.join(markersNotFound, ","));
 			}
 		}
 	}
 
-	private void validateInput(final DatasetDto datasetDto) throws Exception{
+	private void validateInput(final DatasetDto datasetDto){
 		final Integer numberOfRows = datasetDto.getCharValues().length;
 		final Integer numberOfColums = datasetDto.getCharValues()[0].length;
 
 		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetDto.getMarkers().size() && numberOfRows == datasetDto
 				.getSampleAccesions().size())){
-			throw new Exception("Invalid matrix size");
+			throw new MiddlewareException("Invalid matrix size");
 		}
 	}
 
