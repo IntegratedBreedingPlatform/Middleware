@@ -66,7 +66,8 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new Exception("Some of the data uploaded is not present in the system. Please verify your file again.");
 		}
 
-		final Map<String, Marker> markerMap = this.getMarkersByName(datasetDto.getMarkers());
+		final List<Marker> markers = this.markerDAO.getByNames(datasetDto.getMarkers(), 0, 0);
+		final Map<String, Marker> markerMap = this.getMarkersMap(markers);
 		this.validateMarkers(datasetDto, markerMap);
 
 		final Dataset dataset = DatasetBuilder.build(datasetDto, sampleDTOMap, markerMap);
@@ -95,8 +96,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return uniqueSamples;
 	}
 
-	private Map<String, Marker> getMarkersByName(final List<String> names) {
-		final List<Marker> markers = this.markerDAO.getByNames(names, 0, 0);
+	private Map<String, Marker> getMarkersMap(final List<Marker> markers) {
 		final Map<String, Marker> mappedMarkers = Maps.uniqueIndex(markers, new Function<Marker, String>() {
 
 			public String apply(Marker from) {
@@ -130,4 +130,27 @@ public class DatasetServiceImpl implements DatasetService {
 		return Boolean.TRUE;
 	}
 
+	public DatasetDAO getDatasetDAO() {
+		return datasetDAO;
+	}
+
+	public void setDatasetDAO(final DatasetDAO datasetDAO) {
+		this.datasetDAO = datasetDAO;
+	}
+
+	public MarkerDAO getMarkerDAO() {
+		return markerDAO;
+	}
+
+	public void setMarkerDAO(final MarkerDAO markerDAO) {
+		this.markerDAO = markerDAO;
+	}
+
+	public SampleService getSampleService() {
+		return sampleService;
+	}
+
+	public void setSampleService(final SampleService sampleService) {
+		this.sampleService = sampleService;
+	}
 }

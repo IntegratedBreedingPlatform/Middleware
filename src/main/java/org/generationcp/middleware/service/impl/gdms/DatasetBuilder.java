@@ -62,7 +62,7 @@ public class DatasetBuilder {
 
 				charValues.setDataset(dataset);
 				charValues.setSample(sample);
-				charValues.setCharValue(getCharData(datasetDto.getCharValues()[row][column]));
+				charValues.setCharValue(getCharData(datasetDto.getCharValues().get(row).get(column)));
 				charValues.setMarkerId(markerMap.get(marker).getMarkerId());
 				charValues.setAccSampleId(sampleKey.getAccesion());
 				charValuesList.add(charValues);

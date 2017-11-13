@@ -3,8 +3,8 @@ package org.generationcp.middleware.service.api.gdms;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.List;
 import java.util.LinkedHashSet;
-import java.util.Vector;
 
 /**
  * Created by clarysabel on 11/9/17.
@@ -18,6 +18,10 @@ public class DatasetDto {
 		String sampleUID;
 
 		Integer accesion;
+
+		public SampleKey() {
+
+		}
 
 		public String getSampleUID() {
 			return sampleUID;
@@ -74,9 +78,9 @@ public class DatasetDto {
 
 	private String specie;
 
-	private String[][] charValues;
+	private List<List<String>> charValues;
 
-	private Vector<String> markers;
+	private List<String> markers;
 
 	private LinkedHashSet<SampleKey> sampleAccesions;
 
@@ -160,19 +164,19 @@ public class DatasetDto {
 		this.userId = userId;
 	}
 
-	public String[][] getCharValues() {
+	public List<List<String>> getCharValues() {
 		return charValues;
 	}
 
-	public void setCharValues(final String[][] charValues) {
+	public void setCharValues(final List<List<String>> charValues) {
 		this.charValues = charValues;
 	}
 
-	public Vector<String> getMarkers() {
+	public List<String> getMarkers() {
 		return markers;
 	}
 
-	public void setMarkers(final Vector<String> markers) {
+	public void setMarkers(final List<String> markers) {
 		this.markers = markers;
 	}
 
