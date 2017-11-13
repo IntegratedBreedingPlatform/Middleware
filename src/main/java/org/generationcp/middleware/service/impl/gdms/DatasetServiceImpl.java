@@ -71,9 +71,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Set<String> sampleUIDSet = this.getSampleUIDList(datasetDto);
 		final Map<String, SampleDTO> sampleDTOMap = sampleService.getSamplesBySampleUID(sampleUIDSet);
 
-		if (sampleDTOMap.size() != sampleUIDSet.size()) {
-			throw new MiddlewareException("Some of the data uploaded is not present in the system. Please verify your file again.");
-		}
+		validateSamples(sampleUIDSet, sampleDTOMap);
 
 		final List<Marker> markers = this.markerDAO.getByNames(datasetDto.getMarkers(), 0, 0);
 		final Map<String, Marker> markerMap = this.getMarkersMap(markers);
@@ -128,17 +126,37 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 
 			if (!markersNotFound.isEmpty()) {
-				throw new MiddlewareException("Markers not found: " + StringUtils.join(markersNotFound, ","));
+				throw new MiddlewareException(
+						"Some of the data uploaded is not present in the system. Please verify your file again. Markers not found: "
+								+ StringUtils.join(markersNotFound, ","));
 			}
 		}
 	}
 
-	private void validateInput(final DatasetDto datasetDto){
+	private void validateSamples(final Set<String> sampleUIDSet, final Map<String, SampleDTO> sampleDTOMap) {
+		if (sampleDTOMap.size() != sampleUIDSet.size()) {
+			List<String> samplesNotFound = new ArrayList<>();
+
+			for (final String sample : sampleUIDSet) {
+				if (!sampleDTOMap.containsKey(sample)) {
+					samplesNotFound.add(sample);
+				}
+			}
+
+			if (!samplesNotFound.isEmpty()) {
+				throw new MiddlewareException(
+						"Some of the data uploaded is not present in the system. Please verify your file again. Samples not found: "
+								+ StringUtils.join(samplesNotFound, ","));
+			}
+		}
+	}
+
+	private void validateInput(final DatasetDto datasetDto) {
 		final Integer numberOfRows = datasetDto.getCharValues().length;
 		final Integer numberOfColums = datasetDto.getCharValues()[0].length;
 
 		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetDto.getMarkers().size() && numberOfRows == datasetDto
-				.getSampleAccesions().size())){
+				.getSampleAccesions().size())) {
 			throw new MiddlewareException("Invalid matrix size");
 		}
 	}
