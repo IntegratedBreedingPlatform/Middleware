@@ -22,13 +22,17 @@ import java.util.List;
 //FIXME Review types other than N and T and see if we can just remove them as we dont use others except in historic studies.
 public enum StudyType {
 
-	N("N", 10000, "Nursery"), HB("HB", 10001, "Hybridization Nursery"), PN("PN", 10002, "Pedigree Nursery"), CN("CN", 10003,
-		"Characterization Nursery"), BON("BON", 10007, "BULU Observational Nursery"),
-
-	T("T", 10010, "Trial"), OYT("OYT", 10005, "Observational Yield Trial"), RYT("RYT", 10015, "Replication Yield Trial"), OFT("OFT", 10017,
-		"On Form Trial"),
-
-	S("S", 10020, "Survey"), E("E", 10030, "Experiment");
+	N("N", 10000, "Nursery"),
+	HB("HB", 10001, "Hybridization Nursery"),
+	PN("PN", 10002, "Pedigree Nursery"),
+	CN("CN", 10003, "Characterization Nursery"),
+	BON("BON", 10007, "BULU Observational Nursery"),
+	T("T", 10010, "Trial"),
+	OYT("OYT", 10005, "Observational Yield Trial"),
+	RYT("RYT", 10015, "Replication Yield Trial"),
+	OFT("OFT", 10017, "On Form Trial"),
+	S("S", 10020, "Survey"),
+	E("E", 10030, "Experiment");
 
 	private final int id;
 	private final String name;
