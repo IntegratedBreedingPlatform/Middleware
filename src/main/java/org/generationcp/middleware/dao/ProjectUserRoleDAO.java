@@ -37,9 +37,26 @@ import org.hibernate.criterion.Restrictions;
  *
  */
 public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
+	
+	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID = "SELECT DISTINCT pu.user_id FROM workbench_project_user_role pu INNER JOIN users u ON u.userid = pu.user_id WHERE u.ustatus = 0 AND pu.project_id = :projectId"; 
+	
+	public static final String GET_USERS_BY_PROJECT_ID = "SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, "
+			+ "users.uname, users.upswd, users.personid, users.adate, users.cdate "
+			+ "FROM users JOIN workbench_project_user_role pu ON users.userid = pu.user_id " + "WHERE pu.project_id = :projectId "
+			+ "GROUP BY users.userid";
 
+	public static final String GET_PERSONS_BY_PROJECT_ID = "SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
+			+ "persons.lname "
+			+ "FROM persons "
+			+ "JOIN users ON users.personid = persons.personid "
+			+ "JOIN workbench_project_user_role pu ON users.userid = pu.user_id "
+			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
+
+	public static final String COUNT_USERS_BY_PROJECT_ID = "SELECT COUNT(DISTINCT user_id) " + "FROM workbench_project_user_role "
+			+ "WHERE project_id = :projectId";
+	
 	@Override
-	public ProjectUserRole saveOrUpdate(ProjectUserRole projectUser) throws MiddlewareQueryException {
+	public ProjectUserRole saveOrUpdate(ProjectUserRole projectUser) {
 
 		if (projectUser.getProject() == null || projectUser.getProject().getProjectId() == null) {
 			throw new IllegalArgumentException("Project cannot be null");
@@ -51,9 +68,9 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 		return super.saveOrUpdate(projectUser);
 	}
 
-	public List<ProjectUserRole> getByProject(Project project) throws MiddlewareQueryException {
+	public List<ProjectUserRole> getByProject(Project project) {
 		try {
-			List<Criterion> criteria = new ArrayList<Criterion>();
+			List<Criterion> criteria = new ArrayList<>();
 			criteria.add(Restrictions.eq("project", project));
 			return super.getByCriteria(criteria);
 		} catch (HibernateException e) {
@@ -67,7 +84,7 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 		final List<User> users = new ArrayList<>();
 		try {
 			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRole.GET_USERS_BY_PROJECT_ID);
+				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRoleDAO.GET_USERS_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
 				final List<Object> results = query.list();
 				for (final Object o : results) {
@@ -92,13 +109,28 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 		}
 		return users;
 	}
+	
+	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
+		final List<Integer> userIDs = new ArrayList<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRoleDAO.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+					+ e.getMessage(), e);
+		}
+		return userIDs;
+	}
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
 		final Map<Integer, Person> persons = new HashMap<>();
 		try {
 			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRole.GET_PERSONS_BY_PROJECT_ID);
+				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRoleDAO.GET_PERSONS_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
 				final List<Object> results = query.list();
 				for (final Object o : results) {
@@ -119,10 +151,10 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 		return persons;
 	}
 
-	public long countUsersByProjectId(Long projectId) throws MiddlewareQueryException {
+	public long countUsersByProjectId(Long projectId) {
 		try {
 			if (projectId != null) {
-				SQLQuery query = this.getSession().createSQLQuery(ProjectUserRole.COUNT_USERS_BY_PROJECT_ID);
+				SQLQuery query = this.getSession().createSQLQuery(ProjectUserRoleDAO.COUNT_USERS_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
@@ -134,8 +166,8 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
-		List<Role> roles = new ArrayList<Role>();
+	public List<Role> getRolesByProjectAndUser(Project project, User user) {
+		List<Role> roles = new ArrayList<>();
 		try {
 			if (project != null && user != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserRole.class);
@@ -155,7 +187,7 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByUser(User user) throws MiddlewareQueryException {
+	public List<Project> getProjectsByUser(User user) {
 		try {
 			if (user != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserRole.class);
@@ -166,6 +198,6 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in getProjectsByUser(user=" + user + ") query from Project: " + e.getMessage(), e);
 		}
-		return new ArrayList<Project>();
+		return new ArrayList<>();
 	}
 }
