@@ -76,7 +76,7 @@ public class DatasetBuilder {
 
 
 	private static List<MarkerMetadataSet> buildMarkerMetadataSet(final Dataset dataset, final Map<String, Marker> markerMap) {
-		List<MarkerMetadataSet> markerMetadataSetList = new ArrayList<>();
+		final List<MarkerMetadataSet> markerMetadataSetList = new ArrayList<>();
 		for (final Marker marker : markerMap.values()) {
 			final MarkerMetadataSet mdb = new MarkerMetadataSet();
 			mdb.setDataset(dataset);

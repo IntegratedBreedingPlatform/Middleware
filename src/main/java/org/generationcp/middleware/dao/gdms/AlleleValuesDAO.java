@@ -631,22 +631,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 		}
 		return 0;
 	}
-
-	public List<AlleleValues> getAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(datasetId);
-		Dataset dataset = new Dataset();
-		dataset.setDatasetId(datasetId);
-		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("dataset", dataset));
-			return criteria.list();
-
-		} catch (HibernateException e) {
-			final String errorMessage = "Error with getAlleleValuesByDatasetId(datasetId=" + datasetId + ") query from AlleleValues " + e.getMessage();
-			AlleleValuesDAO.LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
 	public List<Object> getUniqueAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {

@@ -54,7 +54,7 @@ public class MarkerMetadataSet implements Serializable {
 	public MarkerMetadataSet() {
 	}
 
-	public MarkerMetadataSet(Integer markerMetadataSetId, Dataset dataset, Integer markerId, Integer markerSampleId) {
+	public MarkerMetadataSet(final Integer markerMetadataSetId, final Dataset dataset, final Integer markerId, final Integer markerSampleId) {
 		this.markerMetadataSetId = markerMetadataSetId;
 		this.dataset = dataset;
 		this.markerId = markerId;
@@ -65,7 +65,7 @@ public class MarkerMetadataSet implements Serializable {
 		return this.markerMetadataSetId;
 	}
 
-	public void setMarkerMetadataSetId(Integer markerMetadataSetId) {
+	public void setMarkerMetadataSetId(final Integer markerMetadataSetId) {
 		this.markerMetadataSetId = markerMetadataSetId;
 	}
 
@@ -73,7 +73,7 @@ public class MarkerMetadataSet implements Serializable {
 		return this.dataset;
 	}
 
-	public void setDataset(Dataset dataset) {
+	public void setDataset(final Dataset dataset) {
 		this.dataset = dataset;
 	}
 
@@ -81,7 +81,7 @@ public class MarkerMetadataSet implements Serializable {
 		return this.markerId;
 	}
 
-	public void setMarkerId(Integer markerId) {
+	public void setMarkerId(final Integer markerId) {
 		this.markerId = markerId;
 	}
 
@@ -89,7 +89,7 @@ public class MarkerMetadataSet implements Serializable {
 		return this.markerSampleId;
 	}
 
-	public void setMarkerSampleId(Integer markerSampleId) {
+	public void setMarkerSampleId(final Integer markerSampleId) {
 		this.markerSampleId = markerSampleId;
 	}
 
@@ -105,7 +105,7 @@ public class MarkerMetadataSet implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}

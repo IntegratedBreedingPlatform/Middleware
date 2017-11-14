@@ -56,7 +56,7 @@ public class AccMetadataSet implements Serializable {
 	public AccMetadataSet() {
 	}
 
-	public AccMetadataSet(Integer accMetadataSetId, Dataset dataset, Sample sample, Integer accSampleId) {
+	public AccMetadataSet(final Integer accMetadataSetId, final Dataset dataset, final Sample sample, final Integer accSampleId) {
 		super();
 		this.accMetadataSetId = accMetadataSetId;
 		this.dataset = dataset;
@@ -68,7 +68,7 @@ public class AccMetadataSet implements Serializable {
 		return this.accMetadataSetId;
 	}
 
-	public void setAccMetadataSetId(Integer accMetadataSetId) {
+	public void setAccMetadataSetId(final Integer accMetadataSetId) {
 		this.accMetadataSetId = accMetadataSetId;
 	}
 
@@ -76,7 +76,7 @@ public class AccMetadataSet implements Serializable {
 		return this.dataset;
 	}
 
-	public void setDataset(Dataset dataset) {
+	public void setDataset(final Dataset dataset) {
 		this.dataset = dataset;
 	}
 
@@ -92,7 +92,7 @@ public class AccMetadataSet implements Serializable {
 		return this.accSampleId;
 	}
 
-	public void setAccSampleId(Integer accSampleId) {
+	public void setAccSampleId(final Integer accSampleId) {
 		this.accSampleId = accSampleId;
 	}
 
@@ -108,7 +108,7 @@ public class AccMetadataSet implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}

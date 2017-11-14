@@ -278,24 +278,6 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 		return toReturn;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List<MappingPopValues> getMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(datasetId);
-		Dataset dataset = new Dataset();
-		dataset.setDatasetId(datasetId);
-		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("dataset", dataset));
-			return criteria.list();
-
-		} catch (HibernateException e) {
-			final String errorMessage = "Error with getMappingPopValuesByDatasetId(datasetId=" + datasetId + ") query from MappingPopValues "
-					+ e.getMessage();
-			MappingPopValuesDAO.LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-	
 	@SuppressWarnings({"deprecation", "unchecked"})
 	public List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
 		

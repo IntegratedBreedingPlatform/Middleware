@@ -259,23 +259,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		}
 		return toReturn;
 	}
-
-	@SuppressWarnings("rawtypes")
-	public List<CharValues> getCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(datasetId);
-		Dataset dataset = new Dataset();
-		dataset.setDatasetId(datasetId);
-		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("dataset", dataset));
-			return criteria.list();
-
-		} catch (HibernateException e) {
-			final String errorMessage = "Error with getCharValuesByDatasetId(datasetId=" + datasetId + ") query from CharValues " + e.getMessage();
-			CharValuesDAO.LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
 	public List<Object> getUniqueAllelesByDatasetId(String datasetId) {

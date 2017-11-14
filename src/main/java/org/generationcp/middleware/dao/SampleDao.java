@@ -1,13 +1,11 @@
 
 package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -82,9 +80,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
-		Map<Integer, Integer> map = new HashMap<>();
+		final Map<Integer, Integer> map = new HashMap<>();
 
-		List<Object[]> result =  this.getSession()
+		final List<Object[]> result =  this.getSession()
 			.createCriteria(Sample.class, "sample")
 			.createAlias("sample.plant", "plant")
 			.createAlias("plant.experiment", "experiment")
@@ -95,7 +93,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("sample.sampleId"))
 				.add(Projections.property("stock.dbxrefId")))
 			.list();
-		for (Object[] row : result) {
+		for (final Object[] row : result) {
 			map.put((Integer) row[0], (Integer) row[1]);
 		}
 		return map;

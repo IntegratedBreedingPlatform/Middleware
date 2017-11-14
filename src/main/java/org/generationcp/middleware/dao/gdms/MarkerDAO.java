@@ -137,7 +137,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the ids by names
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<Integer> getIdsByNames(List<String> names, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Integer> getIdsByNames(final List<String> names, final int start, final int numOfRows) throws MiddlewareQueryException {
 
 		if (names == null || names.isEmpty()) {
 			return new ArrayList<Integer>();
@@ -155,7 +155,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return new ArrayList<Integer>();
 	}
 
-	public List<Marker> getByNames(List<String> names, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Marker> getByNames(final List<String> names, final int start, final int numOfRows) throws MiddlewareQueryException {
 		List<Marker> toReturn = new ArrayList<Marker>();
 		if (names == null || names.isEmpty()) {
 			return toReturn;
@@ -171,7 +171,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return toReturn;
 	}
 
-	public List<Marker> getByType(String markerType) throws MiddlewareQueryException {
+	public List<Marker> getByType(final String markerType) throws MiddlewareQueryException {
 		List<Marker> returnVal = new ArrayList<Marker>();
 
 		try {
@@ -192,7 +192,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return Map of markerId-markerName pairs
 	 * @throws MiddlewareQueryException
 	 */
-	public Map<Integer, String> getFirstMarkerIdByMarkerName(List<String> names, Database instance) throws MiddlewareQueryException {
+	public Map<Integer, String> getFirstMarkerIdByMarkerName(final List<String> names, final Database instance) throws MiddlewareQueryException {
 		Map<Integer, String> toReturn = new HashMap<Integer, String>();
 		if (names == null || names.isEmpty()) {
 			return toReturn;
@@ -206,7 +206,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 			query.setParameterList("markerNameList", names);
 			List<Object> results = query.list();
 
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					Integer id = (Integer) result[0];
@@ -233,7 +233,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the marker type by marker ids
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+	public List<String> getMarkerTypeByMarkerIds(final List<Integer> markerIds) throws MiddlewareQueryException {
 
 		if (markerIds == null || markerIds.isEmpty()) {
 			return new ArrayList<String>();
@@ -252,7 +252,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return new ArrayList<String>();
 	}
 
-	public Map<Integer, String> getMarkerTypeMapByIds(List<Integer> markerIds) throws MiddlewareQueryException {
+	public Map<Integer, String> getMarkerTypeMapByIds(final List<Integer> markerIds) throws MiddlewareQueryException {
 		Map<Integer, String> markerTypes = new HashMap<Integer, String>();
 
 		if (markerIds == null || markerIds.isEmpty()) {
@@ -269,7 +269,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
 			List<Object> results = query.list();
 
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					Integer id = (Integer) result[0];
@@ -296,7 +296,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the marker names by g ids
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
+	public List<MarkerNameElement> getMarkerNamesByGIds(final List<Integer> gIds) throws MiddlewareQueryException {
 		List<MarkerNameElement> dataValues = new ArrayList<MarkerNameElement>();
 
 		if (gIds == null || gIds.isEmpty()) {
@@ -349,9 +349,9 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return dataValues;
 	}
 
-	private List<MarkerNameElement> createMarkerNameElementList(List<Object> list) {
+	private List<MarkerNameElement> createMarkerNameElementList(final List<Object> list) {
 		List<MarkerNameElement> dataValues = new ArrayList<MarkerNameElement>();
-		for (Object o : list) {
+		for (final Object o : list) {
 			Object[] result = (Object[]) o;
 			if (result != null) {
 				Integer gId = (Integer) result[0];
@@ -371,12 +371,12 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @param results the results
 	 * @return the GermplasmMarkerElement items extracted from the list
 	 */
-	private List<GermplasmMarkerElement> getGermplasmMarkerElementsFromList(List results) {
+	private List<GermplasmMarkerElement> getGermplasmMarkerElementsFromList(final List results) {
 		ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
 		String prevGermplasmName = null;
 		ArrayList<String> markerNameList = new ArrayList<String>();
 
-		for (Object o : results) {
+		for (final Object o : results) {
 			Object[] result = (Object[]) o;
 			if (result != null) {
 				String germplasmName = (String) result[0];
@@ -412,7 +412,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the germplasm names by marker names
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames) throws MiddlewareQueryException {
+	public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(final List<String> markerNames) throws MiddlewareQueryException {
 
 		ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
 
@@ -482,10 +482,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @param results the results
 	 * @return the allelic value elements from list
 	 */
-	private List<AllelicValueElement> getAllelicValueElementsFromList(List results) {
+	private List<AllelicValueElement> getAllelicValueElementsFromList(final List results) {
 		List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
 
-		for (Object o : results) {
+		for (final Object o : results) {
 			Object[] result = (Object[]) o;
 			if (result != null) {
 				Integer gid = (Integer) result[0];
@@ -503,10 +503,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return values;
 	}
 
-	private List<AllelicValueElement> getAllelicValueElementsFromListLocal(List results) {
+	private List<AllelicValueElement> getAllelicValueElementsFromListLocal(final List results) {
 		List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
 
-		for (Object o : results) {
+		for (final Object o : results) {
 			Object[] result = (Object[]) o;
 			if (result != null) {
 				Integer gid = (Integer) result[0];
@@ -530,7 +530,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the allelic values by gids and marker names
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
+	public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(final List<Integer> gids, final List<String> markerNames)
 			throws MiddlewareQueryException {
 
 		List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
@@ -557,7 +557,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the allelic values by gids and marker ids
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerIds(List<Integer> gids, List<Integer> markerIds)
+	public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerIds(final List<Integer> gids, final List<Integer> markerIds)
 			throws MiddlewareQueryException {
 
 		List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
@@ -597,7 +597,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return allelicValues;
 	}
 
-	public List<AllelicValueElement> getAllelicValuesFromLocal(List<Integer> gids) throws MiddlewareQueryException {
+	public List<AllelicValueElement> getAllelicValuesFromLocal(final List<Integer> gids) throws MiddlewareQueryException {
 
 		List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
 
@@ -639,25 +639,25 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the names by ids
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<MarkerIdMarkerNameElement> getNamesByIds(List<Integer> ids) throws MiddlewareQueryException {
+	public List<MarkerIdMarkerNameElement> getNamesByIds(final List<Integer> ids) throws MiddlewareQueryException {
 
 		if (ids == null || ids.isEmpty()) {
 			return new ArrayList<>();
 		}
 
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_NAMES_BY_IDS);
+			final SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_NAMES_BY_IDS);
 			query.setParameterList("markerIdList", ids);
 
-			List<MarkerIdMarkerNameElement> dataValues = new ArrayList<>();
-			List<Object> results = query.list();
+			final List<MarkerIdMarkerNameElement> dataValues = new ArrayList<>();
+			final List<Object> results = query.list();
 
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 				if (result != null) {
-					Integer id = (Integer) result[0];
-					String name = (String) result[1];
-					MarkerIdMarkerNameElement elem = new MarkerIdMarkerNameElement(id, name);
+					final Integer id = (Integer) result[0];
+					final String name = (String) result[1];
+					final MarkerIdMarkerNameElement elem = new MarkerIdMarkerNameElement(id, name);
 					dataValues.add(elem);
 				}
 			}
@@ -669,7 +669,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return new ArrayList<>();
 	}
 
-	public Map<Integer, String> getNamesByIdsMap(List<Integer> ids) throws MiddlewareQueryException {
+	public Map<Integer, String> getNamesByIdsMap(final List<Integer> ids) throws MiddlewareQueryException {
 		Map<Integer, String> dataValues = new HashMap<Integer, String>();
 		if (ids == null || ids.isEmpty()) {
 			return dataValues;
@@ -681,7 +681,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
 			List<Object> results = query.list();
 
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					Integer id = (Integer) result[0];
@@ -696,7 +696,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return dataValues;
 	}
 
-	public String getNameById(Integer markerId) throws MiddlewareQueryException {
+	public String getNameById(final Integer markerId) throws MiddlewareQueryException {
 		String name = null;
 
 		try {
@@ -723,7 +723,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the all marker types
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<String> getAllMarkerTypes(final int start, final int numOfRows) throws MiddlewareQueryException {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_ALL_MARKER_TYPES);
 			query.setFirstResult(start);
@@ -769,7 +769,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the all marker names by marker type
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<String> getMarkerNamesByMarkerType(final String markerType, final int start, final int numOfRows) throws MiddlewareQueryException {
 
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_NAMES_BY_TYPE);
@@ -794,7 +794,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return the long
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException {
+	public long countMarkerNamesByMarkerType(final String markerType) throws MiddlewareQueryException {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.COUNT_MARKER_NAMES_BY_MARKER_TYPE);
 			query.setParameter("markerType", markerType);
@@ -819,7 +819,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return all non-empty db accession ids
 	 * @throws MiddlewareQueryException
 	 */
-	public List<String> getAllDbAccessionIds(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<String> getAllDbAccessionIds(final int start, final int numOfRows) throws MiddlewareQueryException {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_ALL_DB_ACCESSION_IDS);
 			query.setFirstResult(start);
@@ -852,11 +852,11 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return 0L;
 	}
 
-	public List<Marker> getMarkersByIds(List<Integer> markerIds) throws MiddlewareQueryException {
+	public List<Marker> getMarkersByIds(final List<Integer> markerIds) throws MiddlewareQueryException {
 		return this.getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
 	}
 
-	public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Marker> getMarkersByIds(final List<Integer> markerIds, final int start, final int numOfRows) throws MiddlewareQueryException {
 		if (markerIds == null || markerIds.isEmpty()) {
 			return new ArrayList<Marker>();
 		}
@@ -869,7 +869,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 			List results = query.list();
 
 			List<Marker> dataValues = new ArrayList<Marker>();
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					dataValues.add(this.convertToMarker(result));
@@ -883,7 +883,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	}
 
 	// GCP-7874
-	public List<Marker> getSNPMarkersByHaplotype(String haplotype) throws MiddlewareQueryException {
+	public List<Marker> getSNPMarkersByHaplotype(final String haplotype) throws MiddlewareQueryException {
 		if (StringUtils.isEmpty(haplotype)) {
 			return new ArrayList<Marker>();
 		}
@@ -894,7 +894,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 			List results = query.list();
 
 			List<Marker> dataValues = new ArrayList<Marker>();
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					dataValues.add(this.convertToMarker(result));
@@ -908,7 +908,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return new ArrayList<Marker>();
 	}
 
-	public List<Integer> getMarkerIDsByHaplotype(String haplotype) throws MiddlewareQueryException {
+	public List<Integer> getMarkerIDsByHaplotype(final String haplotype) throws MiddlewareQueryException {
 		if (StringUtils.isEmpty(haplotype)) {
 			return new ArrayList<Integer>();
 		}
@@ -924,7 +924,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return new ArrayList<Integer>();
 	}
 
-	public List<Marker> getMarkersByIdsAndType(List<Integer> markerIds, String markerType) throws MiddlewareQueryException {
+	public List<Marker> getMarkersByIdsAndType(final List<Integer> markerIds, final String markerType) throws MiddlewareQueryException {
 		List<Marker> dataValues = new ArrayList<Marker>();
 		if (StringUtils.isEmpty(markerType)) {
 			return dataValues;
@@ -933,7 +933,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		try {
 			List<Marker> markersByIds = this.getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
 
-			for (Marker marker : markersByIds) {
+			for (final Marker marker : markersByIds) {
 				if (marker.getMarkerType().equalsIgnoreCase(markerType)) {
 					dataValues.add(marker);
 				}
@@ -945,7 +945,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return dataValues;
 	}
 
-	public List<Marker> getMarkersByType(String markerType) throws MiddlewareQueryException {
+	public List<Marker> getMarkersByType(final String markerType) throws MiddlewareQueryException {
 		List<Marker> dataValues = new ArrayList<Marker>();
 		if (StringUtils.isEmpty(markerType)) {
 			return dataValues;
@@ -955,7 +955,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_MARKERS_BY_TYPE);
 			query.setParameter("markerType", markerType);
 			List results = query.list();
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					dataValues.add(this.convertToMarker(result));
@@ -969,7 +969,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return dataValues;
 	}
 
-	protected Marker convertToMarker(Object[] result) {
+	protected Marker convertToMarker(final Object[] result) {
 
 		Integer markerId = (Integer) result[0];
 		String markerType = (String) result[1];
@@ -996,7 +996,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return element;
 	}
 
-	public long countMarkersByIds(List<Integer> markerIds) throws MiddlewareQueryException {
+	public long countMarkersByIds(final List<Integer> markerIds) throws MiddlewareQueryException {
 		if (markerIds == null || markerIds.isEmpty()) {
 			return 0;
 		}
@@ -1015,8 +1015,8 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return 0L;
 	}
 
-	public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos,
-			int start, int numOfRows) throws MiddlewareQueryException {
+	public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(final int mapID, final String linkageGroup, final double startPos, final double endPos,
+			final int start, final int numOfRows) throws MiddlewareQueryException {
 		try {
 
 			SQLQuery query;
@@ -1039,7 +1039,8 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return new TreeSet<Integer>();
 	}
 
-	public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos)
+	public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(
+			final int mapID, final String linkageGroup, final double startPos, final double endPos)
 			throws MiddlewareQueryException {
 		try {
 
@@ -1064,7 +1065,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return 0L;
 	}
 
-	public Integer getIdByName(String name) throws MiddlewareQueryException {
+	public Integer getIdByName(final String name) throws MiddlewareQueryException {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_ID_BY_NAME);
 			query.setParameter("markerName", name);
@@ -1077,7 +1078,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 		return null;
 	}
 
-	public List<String> getMarkerNamesByIds(List<Integer> markerIds) throws MiddlewareQueryException {
+	public List<String> getMarkerNamesByIds(final List<Integer> markerIds) throws MiddlewareQueryException {
 		if (markerIds == null || markerIds.isEmpty()) {
 			return new ArrayList<String>();
 		}
@@ -1106,7 +1107,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_MARKERS_BY_MAP_ID);
 			query.setParameter("map_id", mapId);
 			List results = query.list();
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					dataValues.add(this.convertToMarker(result));

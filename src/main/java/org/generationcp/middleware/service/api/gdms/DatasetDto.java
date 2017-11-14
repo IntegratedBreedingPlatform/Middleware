@@ -15,9 +15,9 @@ public class DatasetDto {
 	@AutoProperty
 	public class SampleKey {
 
-		String sampleUID;
+		private String sampleUID;
 
-		Integer accesion;
+		private Integer accesion;
 
 		public SampleKey() {
 
@@ -50,7 +50,7 @@ public class DatasetDto {
 		}
 
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(final Object o) {
 			return Pojomatic.equals(this, o);
 		}
 
@@ -207,7 +207,7 @@ public class DatasetDto {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 

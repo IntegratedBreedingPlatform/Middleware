@@ -51,7 +51,7 @@ public class DatasetUsers implements Serializable {
 	public DatasetUsers() {
 	}
 
-	public DatasetUsers(Dataset dataset, Integer userId) {
+	public DatasetUsers(final Dataset dataset, final Integer userId) {
 		this.dataset = dataset;
 		this.userId = userId;
 	}
@@ -60,7 +60,7 @@ public class DatasetUsers implements Serializable {
 		return this.dataset;
 	}
 
-	public void setDataset(Dataset dataset) {
+	public void setDataset(final Dataset dataset) {
 		this.dataset = dataset;
 	}
 
@@ -68,12 +68,12 @@ public class DatasetUsers implements Serializable {
 		return this.userId;
 	}
 
-	public void setUserId(Integer userId) {
+	public void setUserId(final Integer userId) {
 		this.userId = userId;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}

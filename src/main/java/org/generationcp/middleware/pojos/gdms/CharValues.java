@@ -66,8 +66,9 @@ public class CharValues implements Serializable {
 	public CharValues() {
 	}
 
-	public CharValues(Integer acId, Dataset dataset, Integer markerId, Sample sample, String charValue, Integer markerSampleId,
-			Integer accSampleId) {
+	public CharValues(
+			final Integer acId, final Dataset dataset, final Integer markerId, final Sample sample, final String charValue, final Integer markerSampleId,
+			final Integer accSampleId) {
 		this.acId = acId;
 		this.dataset = dataset;
 		this.markerId = markerId;
@@ -81,7 +82,7 @@ public class CharValues implements Serializable {
 		return this.acId;
 	}
 
-	public void setAcId(Integer acId) {
+	public void setAcId(final Integer acId) {
 		this.acId = acId;
 	}
 
@@ -89,7 +90,7 @@ public class CharValues implements Serializable {
 		return this.dataset;
 	}
 
-	public void setDataset(Dataset dataset) {
+	public void setDataset(final Dataset dataset) {
 		this.dataset = dataset;
 	}
 
@@ -97,7 +98,7 @@ public class CharValues implements Serializable {
 		return this.markerId;
 	}
 
-	public void setMarkerId(Integer markerId) {
+	public void setMarkerId(final Integer markerId) {
 		this.markerId = markerId;
 	}
 
@@ -105,7 +106,7 @@ public class CharValues implements Serializable {
 		return this.sample;
 	}
 
-	public void setSample(Sample sample) {
+	public void setSample(final Sample sample) {
 		this.sample = sample;
 	}
 
@@ -113,7 +114,7 @@ public class CharValues implements Serializable {
 		return this.charValue;
 	}
 
-	public void setCharValue(String charValue) {
+	public void setCharValue(final String charValue) {
 		this.charValue = charValue;
 	}
 
@@ -121,7 +122,7 @@ public class CharValues implements Serializable {
 		return this.markerSampleId;
 	}
 
-	public void setMarkerSampleId(Integer markerSampleId) {
+	public void setMarkerSampleId(final Integer markerSampleId) {
 		this.markerSampleId = markerSampleId;
 	}
 
@@ -129,7 +130,7 @@ public class CharValues implements Serializable {
 		return this.accSampleId;
 	}
 
-	public void setAccSampleId(Integer accSampleId) {
+	public void setAccSampleId(final Integer accSampleId) {
 		this.accSampleId = accSampleId;
 	}
 
@@ -148,7 +149,7 @@ public class CharValues implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}

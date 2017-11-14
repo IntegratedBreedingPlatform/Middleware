@@ -109,9 +109,9 @@ public class Dataset implements Serializable {
 	public Dataset() {
 	}
 
-	public Dataset(Integer datasetId, String datasetName, String datasetDesc, String datasetType, String genus, String species,
-			Date uploadTemplateDate, String remarks, String dataType, String missingData, String method, String score, String institute,
-			String principalInvestigator, String email, String purposeOfStudy, List<AccMetadataSet> accMetadataSets, List<CharValues> charValues, List<MarkerMetadataSet> markerMetadataSets, DatasetUsers datasetUser) {
+	public Dataset(final Integer datasetId, final String datasetName, final String datasetDesc, final String datasetType, final String genus, final String species,
+			final Date uploadTemplateDate, final String remarks, final String dataType, final String missingData, final String method, final String score, final String institute,
+			final String principalInvestigator, final String email, final String purposeOfStudy, final List<AccMetadataSet> accMetadataSets, final List<CharValues> charValues, final List<MarkerMetadataSet> markerMetadataSets, final DatasetUsers datasetUser) {
 		super();
 		this.datasetId = datasetId;
 		this.datasetName = datasetName;
@@ -139,7 +139,7 @@ public class Dataset implements Serializable {
 		return this.datasetId;
 	}
 
-	public void setDatasetId(Integer datasetId) {
+	public void setDatasetId(final Integer datasetId) {
 		this.datasetId = datasetId;
 	}
 
@@ -147,7 +147,7 @@ public class Dataset implements Serializable {
 		return this.datasetName;
 	}
 
-	public void setDatasetName(String datasetName) {
+	public void setDatasetName(final String datasetName) {
 		this.datasetName = datasetName;
 	}
 
@@ -155,7 +155,7 @@ public class Dataset implements Serializable {
 		return this.datasetDesc;
 	}
 
-	public void setDatasetDesc(String datasetDesc) {
+	public void setDatasetDesc(final String datasetDesc) {
 		this.datasetDesc = datasetDesc;
 	}
 
@@ -163,7 +163,7 @@ public class Dataset implements Serializable {
 		return this.datasetType;
 	}
 
-	public void setDatasetType(String datasetType) {
+	public void setDatasetType(final String datasetType) {
 		this.datasetType = datasetType;
 	}
 
@@ -171,7 +171,7 @@ public class Dataset implements Serializable {
 		return this.genus;
 	}
 
-	public void setGenus(String genus) {
+	public void setGenus(final String genus) {
 		this.genus = genus;
 	}
 
@@ -179,7 +179,7 @@ public class Dataset implements Serializable {
 		return this.species;
 	}
 
-	public void setSpecies(String species) {
+	public void setSpecies(final String species) {
 		this.species = species;
 	}
 
@@ -187,7 +187,7 @@ public class Dataset implements Serializable {
 		return this.uploadTemplateDate;
 	}
 
-	public void setUploadTemplateDate(Date uploadTemplateDate) {
+	public void setUploadTemplateDate(final Date uploadTemplateDate) {
 		this.uploadTemplateDate = uploadTemplateDate;
 	}
 
@@ -195,7 +195,7 @@ public class Dataset implements Serializable {
 		return this.remarks;
 	}
 
-	public void setRemarks(String remarks) {
+	public void setRemarks(final String remarks) {
 		this.remarks = remarks;
 	}
 
@@ -203,7 +203,7 @@ public class Dataset implements Serializable {
 		return this.dataType;
 	}
 
-	public void setDataType(String dataType) {
+	public void setDataType(final String dataType) {
 		this.dataType = dataType;
 	}
 
@@ -211,7 +211,7 @@ public class Dataset implements Serializable {
 		return this.missingData;
 	}
 
-	public void setMissingData(String missingData) {
+	public void setMissingData(final String missingData) {
 		this.missingData = missingData;
 	}
 
@@ -219,7 +219,7 @@ public class Dataset implements Serializable {
 		return this.method;
 	}
 
-	public void setMethod(String method) {
+	public void setMethod(final String method) {
 		this.method = method;
 	}
 
@@ -227,7 +227,7 @@ public class Dataset implements Serializable {
 		return this.score;
 	}
 
-	public void setScore(String score) {
+	public void setScore(final String score) {
 		this.score = score;
 	}
 
@@ -235,7 +235,7 @@ public class Dataset implements Serializable {
 		return this.institute;
 	}
 
-	public void setInstitute(String institute) {
+	public void setInstitute(final String institute) {
 		this.institute = institute;
 	}
 
@@ -243,7 +243,7 @@ public class Dataset implements Serializable {
 		return this.principalInvestigator;
 	}
 
-	public void setPrincipalInvestigator(String principalInvestigator) {
+	public void setPrincipalInvestigator(final String principalInvestigator) {
 		this.principalInvestigator = principalInvestigator;
 	}
 
@@ -251,7 +251,7 @@ public class Dataset implements Serializable {
 		return this.email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
@@ -259,7 +259,7 @@ public class Dataset implements Serializable {
 		return this.purposeOfStudy;
 	}
 
-	public void setPurposeOfStudy(String purposeOfStudy) {
+	public void setPurposeOfStudy(final String purposeOfStudy) {
 		this.purposeOfStudy = purposeOfStudy;
 	}
 
@@ -296,7 +296,7 @@ public class Dataset implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
