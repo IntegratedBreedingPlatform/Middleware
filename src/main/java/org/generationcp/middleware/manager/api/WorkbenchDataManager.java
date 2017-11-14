@@ -220,7 +220,10 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
+<<<<<<< HEAD
+=======
 	 * @
+>>>>>>> master
 	 */
 	boolean isPersonWithEmailExists(String email);
 
@@ -228,7 +231,10 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
+<<<<<<< HEAD
+=======
 	 * @
+>>>>>>> master
 	 */
 	Person getPersonByEmail(String email);
 
@@ -240,7 +246,10 @@ public interface WorkbenchDataManager {
 	 * @param username
 	 * @param email
 	 * @return
+<<<<<<< HEAD
+=======
 	 * @
+>>>>>>> master
 	 */
 	boolean isPersonWithUsernameAndEmailExists(String username, String email);
 
@@ -265,7 +274,10 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param username
 	 * @return
+<<<<<<< HEAD
+=======
 	 * @
+>>>>>>> master
 	 */
 	UserInfo getUserInfoByUsername(String username);
 
@@ -374,7 +386,7 @@ public interface WorkbenchDataManager {
 	 *
 	 * @return A {@code List} of all the {@code User}s in the Workbench database.
 	 */
-	List<User> getAllUsersSorted();
+	List<User> getAllActiveUsersSorted();
 
 	/**
 	 * Returns number of all Users.
@@ -537,7 +549,15 @@ public interface WorkbenchDataManager {
 	 * @return the associated list of ProjectUser
 	 */
 	List<ProjectUserRole> getProjectUserRolesByProject(Project project);
-
+	
+	/**
+	 * Retrieves the user ids of the program members using the project id
+	 * 
+	 * @param projectId
+	 * @return
+	 */
+	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
+	
 	/**
 	 * Deletes the given ProjectUserRole.
 	 *
@@ -881,7 +901,10 @@ public interface WorkbenchDataManager {
 	 * @param cropName
 	 * @param toolId
 	 * @return
+<<<<<<< HEAD
+=======
 	 * @
+>>>>>>> master
 	 */
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
 
@@ -930,7 +953,10 @@ public interface WorkbenchDataManager {
 	 * Gets the all Users Sorted
 	 *
 	 * @return
+<<<<<<< HEAD
+=======
 	 * @
+>>>>>>> master
 	 */
 	List<UserDto> getAllUsersSortedByLastName();
 

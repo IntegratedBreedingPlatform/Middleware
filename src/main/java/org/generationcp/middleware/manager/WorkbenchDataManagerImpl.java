@@ -588,8 +588,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<User> getAllUsersSorted() {
-		return this.getUserDao().getAllUsersSorted();
+	public List<User> getAllActiveUsersSorted() {
+		return this.getUserDao().getAllActiveUsersSorted();
 	}
 
 	@Override
@@ -605,7 +605,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<User> getUserByName(final String name, final int start, final int numOfRows, final Operation op) {
 		final UserDAO dao = this.getUserDao();
-		List<User> users = new ArrayList<User>();
+		List<User> users = new ArrayList<>();
 		if (op == Operation.EQUAL) {
 			users = dao.getByNameUsingEqual(name, start, numOfRows);
 		} else if (op == Operation.LIKE) {
@@ -734,7 +734,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Integer> addProjectUserRole(final List<ProjectUserRole> projectUserRoles) {
 
-		final List<Integer> idsSaved = new ArrayList<Integer>();
+		final List<Integer> idsSaved = new ArrayList<>();
 		try {
 
 			final ProjectUserRoleDAO dao = this.getProjectUserRoleDao();
@@ -827,7 +827,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addProjectActivity(final ProjectActivity projectActivity) {
-		final List<ProjectActivity> list = new ArrayList<ProjectActivity>();
+		final List<ProjectActivity> list = new ArrayList<>();
 		list.add(projectActivity);
 
 		final List<Integer> ids = this.addProjectActivity(list);
@@ -843,7 +843,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	private List<Integer> addOrUpdateProjectActivityData(final List<ProjectActivity> projectActivityList, final Operation operation) {
 
-		final List<Integer> idsSaved = new ArrayList<Integer>();
+		final List<Integer> idsSaved = new ArrayList<>();
 		try {
 
 			final ProjectActivityDAO dao = this.getProjectActivityDao();
@@ -1355,7 +1355,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			throw new MiddlewareQueryException(
 					"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
-
 	}
 
 	@Override
@@ -1393,7 +1392,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 					"error in: WorkbenchDataManager.getStandardPresetFromCropAndToolByName(cropName=" + cropName + "): " + e.getMessage(),
 					e);
 		}
-
 	}
 
 	@Override
@@ -1547,6 +1545,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getProjectByUuid(final String projectUuid) {
 		return this.getProjectDao().getByUuid(projectUuid);
+	}
+
+	@Override
+	public List<Integer> getActiveUserIDsByProjectId(Long projectId) {
+		return this.getProjectUserRoleDao().getActiveUserIDsByProjectId(projectId);
 	}
 
 }
