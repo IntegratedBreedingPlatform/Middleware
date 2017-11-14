@@ -161,11 +161,33 @@ public class MeasurementDataTest {
 	}
 
 	@Test
-	public void testGetDisplayValueForCategoricalData() throws Exception {
-		MeasurementData dataWithValue =
+	public void testGetDisplayValueForCategoricalDataCategoricalValueIDHasValue() throws Exception {
+		MeasurementData measurementData =
 				this.measurementDataTestDataInitializer.createCategoricalMeasurementData(1234, "test_categorical_data", "1");
 
-		CategoricalDisplayValue value = dataWithValue.getDisplayValueForCategoricalData();
+		measurementData.setcValueId("1");
+		measurementData.setValue("Name");
+		CategoricalDisplayValue value = measurementData.getDisplayValueForCategoricalData();
+
+		Assert.assertNotNull(value);
+		Assert.assertEquals("value is 1", "1", value.getValue());
+		Assert.assertEquals("name is \"Name\"", "Name", value.getName());
+
+		// we now expect Name= Desc views
+		Assert.assertEquals("description is \"Desc\"", "Name= Desc", value.getDescription());
+		Assert.assertTrue("value is valid", value.isValid());
+	}
+
+	@Test
+	public void testGetDisplayValueForCategoricalDataValueContainsCategoricalValueID() throws Exception {
+		MeasurementData measurementData =
+				this.measurementDataTestDataInitializer.createCategoricalMeasurementData(1234, "test_categorical_data", "1");
+
+		// When the 'measurementData.cvalueId' is empty but 'measurementData.value' contains the categorical value id, then
+		// then the system should try to use 'measurementData.value' to find the categorical data value.
+		measurementData.setcValueId("");
+		measurementData.setValue("1");
+		CategoricalDisplayValue value = measurementData.getDisplayValueForCategoricalData();
 
 		Assert.assertNotNull(value);
 		Assert.assertEquals("value is 1", "1", value.getValue());
@@ -180,12 +202,12 @@ public class MeasurementDataTest {
 	public void testGetDisplayValueForCategoricalDataWithInvalidValue() throws Exception {
 		MeasurementData dataWithInvalidValue =
 				this.measurementDataTestDataInitializer.createCategoricalMeasurementData(1234, "test_categorical_data", "2");
-		// If the data is invalid value, then cValueId should be empty.
+		// If the data is invalid value, it is expected that cValueId is empty.
 		dataWithInvalidValue.setcValueId("");
 		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
 
 		Assert.assertNotNull(invalidValue);
-		Assert.assertEquals("value is 1", "2", invalidValue.getValue());
+		Assert.assertEquals("value is 2", "2", invalidValue.getValue());
 		Assert.assertEquals("name is \"Name\"", "2", invalidValue.getName());
 		Assert.assertEquals("description is \"Desc\"", "2", invalidValue.getDescription());
 		Assert.assertFalse("value is not valid", invalidValue.isValid());
@@ -195,7 +217,7 @@ public class MeasurementDataTest {
 	public void testGetDisplayValueForCategoricalDataWithNullValue() throws Exception {
 		MeasurementData dataWithInvalidValue =
 				this.measurementDataTestDataInitializer.createCategoricalMeasurementData(1234, "test_categorical_data", null);
-		// If the data is null, then cValueId should be empty.
+		// If the data is invalid value, it is expected that cValueId is empty.
 		dataWithInvalidValue.setcValueId("");
 		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
 
