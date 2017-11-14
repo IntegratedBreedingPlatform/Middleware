@@ -175,12 +175,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
-		final String programUUID, final String cropPrefix) {
+		final String programUUID, final String cropPrefix, final StudyType studyType) {
 
 		try {
 
 			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID,
-					cropPrefix);
+					cropPrefix, studyType);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 
@@ -1113,8 +1113,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					studySummary.addSeason(value);
 				} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
 					studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
-				} else if (variableId.equals(TermId.STUDY_TYPE.getId())) {
-					studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(value)).getName());
 				} else {
 					additionalProps.put(prop.getAlias(), value);
 				}

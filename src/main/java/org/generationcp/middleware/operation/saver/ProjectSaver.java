@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -30,13 +31,14 @@ public class ProjectSaver extends Saver {
 		return projectDao.save(project);
 	}
 
-	public DmsProject create(StudyValues studyValues) throws MiddlewareException {
+	public DmsProject create(StudyValues studyValues, final StudyType studyType) throws MiddlewareException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			project = new DmsProject();
 			String name = this.getStringValue(studyValues, TermId.STUDY_NAME.getId());
 			String description = this.getStringValue(studyValues, TermId.STUDY_TITLE.getId());
+			project.setStudyType(studyType);
 			this.mapStudytoProject(name, description, project);
 		}
 

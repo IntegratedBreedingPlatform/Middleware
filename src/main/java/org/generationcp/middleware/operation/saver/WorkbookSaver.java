@@ -575,9 +575,16 @@ public class WorkbookSaver extends Saver {
 					this.getStudyValuesTransformer().transform(null, studyLocationId, workbook.getStudyDetails(), studyMV, studyVariables);
 
 			watch.restart("save study");
+
+			StudyType studyType;
+			if (workbook.isNursery()) {
+				studyType = StudyType.N;
+			} else {
+				studyType = StudyType.T;
+			}
 			final DmsProject study =
 					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
-							saveStudyExperiment, programUUID, cropPrefix);
+							saveStudyExperiment, programUUID, cropPrefix, studyType);
 			studyId = study.getProjectId();
 		}
 		watch.stop();
