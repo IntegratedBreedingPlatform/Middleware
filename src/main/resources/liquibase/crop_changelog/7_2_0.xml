@@ -41,7 +41,7 @@
 			</not>
 			<and>
 				<not>
-					<tableExists tableName="projectprop_study_type"/>
+					<tableExists tableName="projectprop_study_type_bkp"/>
 				</not>
 			</and>
 		</preConditions>
@@ -68,7 +68,7 @@
 				        AND p.name NOT LIKE '%-ENVIRONMENT'
 				        AND p.name NOT LIKE '%-PLOTDATA';
 
-			CREATE TABLE  projectprop_study_type  (
+			CREATE TABLE  projectprop_study_type_bkp  (
 			   projectprop_id  int(11) NOT NULL AUTO_INCREMENT,
 			   project_id  int(11) NOT NULL,
 			   type_id  int(11) NOT NULL,
@@ -79,7 +79,7 @@
 			  PRIMARY KEY ( projectprop_id ),
 			  UNIQUE KEY  projectprop_idx1  ( project_id , type_id , rank , variable_id ));
 
-			insert into projectprop_study_type (select * from projectprop where variable_id = 8070);
+			insert into projectprop_study_type_bkp (select * from projectprop where variable_id = 8070);
 
 			delete from projectprop where variable_id = 8070;
 		</sql>
