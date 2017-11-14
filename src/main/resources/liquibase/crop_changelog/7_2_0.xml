@@ -1,10 +1,117 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+
                    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+	<changeSet author="vanina" id="v7.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="study_type"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE study_type (
+			  study_type_id INT(11) NOT NULL,
+			  label VARCHAR(45) NOT NULL,
+			  name VARCHAR(45) NOT NULL,
+			  PRIMARY KEY (name));
+
+			insert into study_type values (10000, "Nursery", "N");
+			insert into study_type values (10001, "Hybridization Nursery", "HB");
+			insert into study_type values (10002, "Pedigree Nursery", "PN");
+			insert into study_type values (10003, "Characterization Nursery", "CN");
+			insert into study_type values (10007, "BULU Observational Nursery", "BON");
+			insert into study_type values (10010, "Trial", "T");
+			insert into study_type values (10005, "Observational Yield Trial", "OYT");
+			insert into study_type values (10015, "Replication Yield Trial", "RYT");
+			insert into study_type values (10017, "On Form Trial", "OFT");
+			insert into study_type values (10020, "Survey", "S");
+			insert into study_type values (10030, "Experiment", "E");
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v7.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="study_type_id"/>
+			</not>
+			<and>
+				<not>
+					<tableExists tableName="projectprop_study_type_bkp"/>
+				</not>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE project
+				ADD COLUMN study_type VARCHAR(45) NULL,
+				ADD INDEX study_type_fk_idx (study_type ASC);
+				ALTER TABLE project
+				ADD CONSTRAINT study_type_fk
+				  FOREIGN KEY (study_type)
+				  REFERENCES study_type (name)
+				  ON DELETE NO ACTION
+				  ON UPDATE NO ACTION;
+
+				UPDATE project p
+				        INNER JOIN
+				    projectprop pp ON p.project_id = pp.project_id
+				        INNER JOIN
+				    study_type st ON st.study_type_id = pp.value
+				SET
+				    p.STUDY_TYPE = st.name
+				WHERE
+				    pp.variable_id = 8070
+				        AND p.name NOT LIKE '%-ENVIRONMENT'
+				        AND p.name NOT LIKE '%-PLOTDATA';
+
+			CREATE TABLE  projectprop_study_type_bkp  (
+			   projectprop_id  int(11) NOT NULL AUTO_INCREMENT,
+			   project_id  int(11) NOT NULL,
+			   type_id  int(11) NOT NULL,
+			   value  varchar(255) DEFAULT NULL,
+			   rank  int(11) NOT NULL DEFAULT '0',
+			   variable_id  int(11) NOT NULL,
+			   alias  varchar(255) DEFAULT NULL,
+			  PRIMARY KEY ( projectprop_id ),
+			  UNIQUE KEY  projectprop_idx1  ( project_id , type_id , rank , variable_id ));
+
+			insert into projectprop_study_type_bkp (select * from projectprop where variable_id = 8070);
+
+			delete from projectprop where variable_id = 8070;
+		</sql>
+	</changeSet>
+
+		<changeSet author="vanina" id="v7.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="cvterm"/>
+			<and>
+				<tableExists tableName="cvterm_relationship"/>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			delete from cvterm_relationship where object_id = 17262;
+			delete from cvterm_relationship where subject_id = 8070;
+			delete from cvterm_relationship where subject_id = 17262;
+			delete from cvterm where cvterm_id = 8070;
+			delete from cvterm where cvterm_id = 17262;
+			delete from cvterm where cvterm_id in (	10000,
+													10001,
+													10002,
+													10003,
+													10005,
+													10010,
+													10015,
+													10017,
+													10020,
+													10030);
+
+		</sql>
+	</changeSet>
 
     <changeSet author="clarysabel" id="v7.2.0-1">
         <preConditions onFail="MARK_RAN">

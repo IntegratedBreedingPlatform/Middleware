@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -20,6 +21,8 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -92,18 +95,13 @@ public class DmsProject implements Serializable {
 	@Column(name = "deleted", columnDefinition = "TINYINT")
 	private boolean deleted;
 
-	public DmsProject() {
-	}
+	@Basic(optional = true)
+	@Column(name = "study_type")
+	@Enumerated(EnumType.STRING)
+	private StudyType studyType;
 
-	public DmsProject(Integer projectId, String name, String description, List<ProjectProperty> properties,
-			List<ProjectRelationship> relatedTos, List<ProjectRelationship> relatedBys) {
+	public DmsProject() {
 		super();
-		this.projectId = projectId;
-		this.name = name;
-		this.description = description;
-		this.properties = properties;
-		this.relatedTos = relatedTos;
-		this.relatedBys = relatedBys;
 	}
 
 	public Integer getProjectId() {
@@ -168,6 +166,14 @@ public class DmsProject implements Serializable {
 
 	public void setDeleted(final Boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public StudyType getStudyType() {
+		return studyType;
+	}
+
+	public void setStudyType(final StudyType studyType) {
+		this.studyType = studyType;
 	}
 
 	@Override

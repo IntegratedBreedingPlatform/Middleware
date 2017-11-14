@@ -19,7 +19,7 @@ import org.generationcp.middleware.domain.oms.TermId;
  */
 public enum StudyPropertyConstants {
 
-	USER_ID(TermId.STUDY_UID.getId(), "USERID", "User ID", 1), STUDY_TYPE(TermId.STUDY_TYPE.getId(), "TYPE", "Study type", 2), START_DATE(
+	USER_ID(TermId.STUDY_UID.getId(), "USERID", "User ID", 1), START_DATE(
 			TermId.START_DATE.getId(), "START", "Start date", 3);
 
 	private Integer cvTermId;

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -163,7 +164,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testlistAllStudies() throws MiddlewareQueryException {
 
-		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010",
+		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", StudyType.T.getName(),
 				"Wheat Trial 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 
@@ -181,7 +182,7 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(testDBRow[1], studySummary.getName());
 		Assert.assertEquals(testDBRow[2], studySummary.getTitle());
 		Assert.assertEquals(testDBRow[3], studySummary.getProgramUUID());
-		Assert.assertEquals(testDBRow[4], String.valueOf(studySummary.getType().getId()));
+		Assert.assertEquals(testDBRow[4], studySummary.getType().getName());
 		Assert.assertEquals(testDBRow[5], studySummary.getObjective());
 		Assert.assertEquals(testDBRow[6], studySummary.getStartDate());
 		Assert.assertEquals(testDBRow[7], studySummary.getEndDate());
@@ -212,7 +213,8 @@ public class StudyServiceImplTest {
 		List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
-				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", "N", "studyName");
+				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyType.N.getName(),
+					"studyName");
 
 		UserDto user = new UserDto();
 		user.setEmail("a@a.com");
@@ -264,7 +266,8 @@ public class StudyServiceImplTest {
 		List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
-				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", "T", "studyName");
+				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyType.T.getName(),
+					"studyName");
 
 		UserDto user = new UserDto();
 		user.setEmail("a@a.com");

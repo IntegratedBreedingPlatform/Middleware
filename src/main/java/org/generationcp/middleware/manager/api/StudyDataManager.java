@@ -191,11 +191,12 @@ public interface StudyDataManager {
 	 * @param studyValues The values for the variables to insert
 	 * @param programUUID the program UUID
 	 * @param cropPrefix
+	 * @param studyType
 	 * @return StudyReference corresponding to the newly-created Study
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
-		final String cropPrefix)
+		final String cropPrefix, final StudyType studyType)
 			throws MiddlewareQueryException;
 
 	/**
