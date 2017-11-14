@@ -58,7 +58,7 @@
 
 				UPDATE project p
 				        INNER JOIN
-				    projectprop PP ON p.project_id = pp.project_id
+				    projectprop pp ON p.project_id = pp.project_id
 				        INNER JOIN
 				    study_type st ON st.study_type_id = pp.value
 				SET
