@@ -51,7 +51,7 @@ public class DatasetBuilder {
 	private static List<CharValues> buildCharValues(final Dataset dataset, final DatasetDto datasetDto, final Map<String, SampleDTO> sampleDTOMap,
 			final Map<String, Marker> markerMap) {
 
-		List<CharValues> charValuesList = new ArrayList<>();
+		final List<CharValues> charValuesList = new ArrayList<>();
 
 		int row = 0;
 		for (final DatasetDto.SampleKey sampleKey : datasetDto.getSampleAccesions()) {
