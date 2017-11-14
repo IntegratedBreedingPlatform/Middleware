@@ -112,7 +112,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
-	public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(Integer datasetId, int start, int numOfRows)
+	public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(final Integer datasetId, final int start, final int numOfRows)
 			throws MiddlewareQueryException {
 		List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
 
@@ -124,7 +124,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 				query.setMaxResults(numOfRows);
 				List results = query.list();
 
-				for (Object o : results) {
+				for (final Object o : results) {
 					Object[] result = (Object[]) o;
 					if (result != null) {
 						Integer gid = (Integer) result[0];
@@ -153,7 +153,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	 * @return the number of entries in char_values table corresponding to the given datasetId
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public long countByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+	public long countByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
 		try {
 			if (datasetId != null) {
 				Query query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_BY_DATASET_ID);
@@ -171,7 +171,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getGIDsByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Integer> getGIDsByMarkerId(final Integer markerId, final int start, final int numOfRows) throws MiddlewareQueryException {
 
 		try {
 			if (markerId != null) {
@@ -187,7 +187,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		return new ArrayList<Integer>();
 	}
 
-	public long countGIDsByMarkerId(Integer markerId) throws MiddlewareQueryException {
+	public long countGIDsByMarkerId(final Integer markerId) throws MiddlewareQueryException {
 		try {
 			if (markerId != null) {
 				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_GIDS_BY_MARKER_ID);
@@ -204,7 +204,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		return 0;
 	}
 
-	public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
+	public long countCharValuesByGids(final List<Integer> gids) throws MiddlewareQueryException {
 		try {
 			if (gids != null && !gids.isEmpty()) {
 				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_CHAR_VALUES_BY_GIDS);
@@ -220,7 +220,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		return 0;
 	}
 
-	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
+	public void deleteByDatasetId(final int datasetId) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -235,7 +235,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MarkerSampleId> getMarkerSampleIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+	public List<MarkerSampleId> getMarkerSampleIdsByGids(final List<Integer> gIds) throws MiddlewareQueryException {
 		List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
 
 		try {
@@ -244,7 +244,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 				query.setParameterList("gids", gIds);
 
 				List results = query.list();
-				for (Object o : results) {
+				for (final Object o : results) {
 					Object[] result = (Object[]) o;
 					if (result != null) {
 						Integer markerId = (Integer) result[0];
@@ -261,7 +261,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
-	public List<Object> getUniqueAllelesByDatasetId(String datasetId) {
+	public List<Object> getUniqueAllelesByDatasetId(final String datasetId) {
 		
 		List<Object> results = new ArrayList<>();
 		try {
@@ -285,7 +285,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
-	public List<Object> getUniqueCharAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+	public List<Object> getUniqueCharAllelesByGidsAndMids(final List<Integer> gids, final List<Integer> mids) {
 		
 		List<Object> results = new ArrayList<>();
 		try {
@@ -311,7 +311,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<AllelicValueElement> getAlleleValuesByMarkerId(List<Integer> markerIdList) throws MiddlewareQueryException {
+	public List<AllelicValueElement> getAlleleValuesByMarkerId(final List<Integer> markerIdList) throws MiddlewareQueryException {
 		List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
 
 		if (markerIdList == null || markerIdList.isEmpty()) {
@@ -324,7 +324,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 
 			List results = query.list();
 
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					Integer acId = (Integer) result[0];
@@ -346,7 +346,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<AllelicValueElement> getByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
+	public List<AllelicValueElement> getByMarkersAndAlleleValues(final List<Integer> markerIdList, final List<String> alleleValueList)
 			throws MiddlewareQueryException {
 		List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
 
@@ -378,7 +378,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 
 			List results = query.list();
 
-			for (Object o : results) {
+			for (final Object o : results) {
 				Object[] result = (Object[]) o;
 				if (result != null) {
 					Integer datasetId = (Integer) result[0];
@@ -402,7 +402,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+	public List<CharValues> getCharValuesByMarkerIds(final List<Integer> markerIds) throws MiddlewareQueryException {
 		List<CharValues> toReturn = new ArrayList<CharValues>();
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());

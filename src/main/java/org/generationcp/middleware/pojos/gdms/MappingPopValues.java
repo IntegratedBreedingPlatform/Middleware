@@ -64,8 +64,8 @@ public class MappingPopValues implements Serializable {
 	public MappingPopValues() {
 	}
 
-	public MappingPopValues(Integer mpId, String mapCharValue, Integer datasetId, Sample sample, Integer markerId, Integer accSampleId,
-			Integer markerSampleId) {
+	public MappingPopValues(final Integer mpId, final String mapCharValue, final Integer datasetId, final Sample sample, final Integer markerId, final Integer accSampleId,
+			final Integer markerSampleId) {
 		this.mpId = mpId;
 		this.mapCharValue = mapCharValue;
 		this.datasetId = datasetId;
@@ -79,7 +79,7 @@ public class MappingPopValues implements Serializable {
 		return this.mpId;
 	}
 
-	public void setMpId(Integer mpId) {
+	public void setMpId(final Integer mpId) {
 		this.mpId = mpId;
 	}
 
@@ -87,7 +87,7 @@ public class MappingPopValues implements Serializable {
 		return this.mapCharValue;
 	}
 
-	public void setMapCharValue(String mapCharValue) {
+	public void setMapCharValue(final String mapCharValue) {
 		this.mapCharValue = mapCharValue;
 	}
 
@@ -95,7 +95,7 @@ public class MappingPopValues implements Serializable {
 		return this.datasetId;
 	}
 
-	public void setDatasetId(Integer datasetId) {
+	public void setDatasetId(final Integer datasetId) {
 		this.datasetId = datasetId;
 	}
 
@@ -103,7 +103,7 @@ public class MappingPopValues implements Serializable {
 		return this.sample;
 	}
 
-	public void setSample(Sample sample) {
+	public void setSample(final Sample sample) {
 		this.sample = sample;
 	}
 
@@ -111,7 +111,7 @@ public class MappingPopValues implements Serializable {
 		return this.markerId;
 	}
 
-	public void setMarkerId(Integer markerId) {
+	public void setMarkerId(final Integer markerId) {
 		this.markerId = markerId;
 	}
 
@@ -119,7 +119,7 @@ public class MappingPopValues implements Serializable {
 		return this.accSampleId;
 	}
 
-	public void setAccSampleId(Integer accSampleId) {
+	public void setAccSampleId(final Integer accSampleId) {
 		this.accSampleId = accSampleId;
 	}
 
@@ -127,7 +127,7 @@ public class MappingPopValues implements Serializable {
 		return this.markerSampleId;
 	}
 
-	public void setMarkerSampleId(Integer markerSampleId) {
+	public void setMarkerSampleId(final Integer markerSampleId) {
 		this.markerSampleId = markerSampleId;
 	}
 
@@ -146,7 +146,7 @@ public class MappingPopValues implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
