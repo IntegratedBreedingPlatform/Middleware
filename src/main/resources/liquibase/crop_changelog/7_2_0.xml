@@ -120,6 +120,7 @@
 			</not>
 		</preConditions>
         <sql dbms="mysql" splitStatements="true">
+            SET FOREIGN_KEY_CHECKS = 0;
             CREATE TEMPORARY TABLE max_map (
               schemaname VARCHAR(255),
               max_value  INT
@@ -147,6 +148,12 @@
               ('ibdbv2_sweetpotato_merged', 0),
               ('ibdbv2_wheat_merged', 1),
               ('ibdbv2_yam_merged', 0);
+
+            DELETE FROM gdms_qtl_details
+            WHERE map_id >
+                  (SELECT max_value
+                   FROM max_map
+                   WHERE schemaname = DATABASE());
 
             DELETE FROM gdms_markers_onmap
             WHERE map_id >
@@ -181,9 +188,7 @@
 
             TRUNCATE TABLE gdms_qtl_details;
 
-            SET FOREIGN_KEY_CHECKS = 0;
             TRUNCATE TABLE gdms_qtl;
-            SET FOREIGN_KEY_CHECKS = 1;
 
             TRUNCATE TABLE gdms_mta_metadata;
 
@@ -193,11 +198,9 @@
 
             TRUNCATE TABLE gdms_track_markers;
 
-            SET FOREIGN_KEY_CHECKS = 0;
             TRUNCATE TABLE gdms_track_data;
 
             TRUNCATE TABLE gdms_dataset;
-            SET FOREIGN_KEY_CHECKS = 1;
 
             CREATE TEMPORARY TABLE gdms_duplicated_markers
                 SELECT
@@ -301,6 +304,7 @@
              FROM (`gdms_marker_metadataset`
                JOIN `gdms_acc_metadataset` ON ((`gdms_marker_metadataset`.`dataset_id` = `gdms_acc_metadataset`.`dataset_id`)))
              GROUP BY ucase(`gdms_marker_metadataset`.`marker_id`));
+            SET FOREIGN_KEY_CHECKS = 1;
         </sql>
     </changeSet>
 
