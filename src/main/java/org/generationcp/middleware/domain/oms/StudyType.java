@@ -26,7 +26,6 @@ public enum StudyType {
 	HB("HB", 10001, "Hybridization Nursery"),
 	PN("PN", 10002, "Pedigree Nursery"),
 	CN("CN", 10003, "Characterization Nursery"),
-	BON("BON", 10007, "BULU Observational Nursery"),
 	T("T", 10010, "Trial"),
 	OYT("OYT", 10005, "Observational Yield Trial"),
 	RYT("RYT", 10015, "Replication Yield Trial"),
@@ -75,7 +74,7 @@ public enum StudyType {
 	 * NOTE: N is the primary type we use in BMS all others are from old/historic fieldbook and may be removed in future.
 	 */
 	public static List<StudyType> nurseries() {
-		return Lists.newArrayList(N, HB, PN, CN, BON);
+		return Lists.newArrayList(N, HB, PN, CN);
 	}
 
 	/**
