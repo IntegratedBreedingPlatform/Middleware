@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -34,16 +35,16 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	public static final String GET_MARKER_ID_BY_DATASET_ID = "SELECT marker_id " + "FROM gdms_marker_metadataset "
 			+ "WHERE dataset_id = :datasetId " + "ORDER BY marker_id;";
 
-	public static final String GET_MARKERS_BY_GID_AND_DATASETS = "SELECT DISTINCT marker_id "
+	public static final String GET_MARKERS_BY_SAMPLEID_AND_DATASETS = "SELECT DISTINCT marker_id "
 			+ "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset "
 			+ "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id "
-			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.gid = :gid "
+			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.sample_id = :sampleId "
 			+ "ORDER BY gdms_marker_metadataset.marker_id ";
 
-	public static final String COUNT_MARKERS_BY_GID_AND_DATASETS = "SELECT COUNT(DISTINCT marker_id) "
+	public static final String COUNT_MARKERS_BY_SAMPLEID_AND_DATASETS = "SELECT COUNT(DISTINCT marker_id) "
 			+ "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset "
 			+ "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id "
-			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.gid = :gid "
+			+ "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " + "    AND gdms_acc_metadataset.sample_id = :sampleId "
 			+ "ORDER BY gdms_marker_metadataset.marker_id ";
 
 	public static final String GET_BY_MARKER_IDS = "SELECT marker_metadataset_id, dataset_id, marker_id, marker_sample_id "
@@ -60,7 +61,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+	public List<Integer> getMarkerIdByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
 		try {
 			if (datasetId != null) {
 				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.GET_MARKER_ID_BY_DATASET_ID);
@@ -76,15 +77,16 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows)
+	public List<Integer> getMarkersBySampleIdAndDatasetIds(
+			final Integer sampleId, final List<Integer> datasetIds, final int start, final int numOfRows)
 			throws MiddlewareQueryException {
 		List<Integer> markerIds = new ArrayList<Integer>();
 
 		try {
-			if (gid != null && datasetIds != null) {
-				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.GET_MARKERS_BY_GID_AND_DATASETS);
+			if (sampleId != null && datasetIds != null) {
+				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.GET_MARKERS_BY_SAMPLEID_AND_DATASETS);
 				query.setParameterList("datasetids", datasetIds);
-				query.setParameter("gid", gid);
+				query.setParameter("sampleId", sampleId);
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 
@@ -93,32 +95,32 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 				return new ArrayList<Integer>();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds
+			this.logAndThrowException("Error with getMarkersBySampleIdAndDatasetIds(sampleID=" + sampleId + ", datasetIds=" + datasetIds
 					+ ") query from MarkerMetadataSet: " + e.getMessage(), e);
 		}
 		return markerIds;
 	}
 
-	public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException {
+	public long countMarkersBySampleIdAndDatasetIds(final Integer sampleId, final List<Integer> datasetIds) throws MiddlewareQueryException {
 		long count = 0;
 		try {
-			if (gid != null) {
-				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.COUNT_MARKERS_BY_GID_AND_DATASETS);
+			if (sampleId != null) {
+				SQLQuery query = this.getSession().createSQLQuery(MarkerMetadataSetDAO.COUNT_MARKERS_BY_SAMPLEID_AND_DATASETS);
 				query.setParameterList("datasetids", datasetIds);
-				query.setParameter("gid", gid);
+				query.setParameter("sampleId", sampleId);
 				BigInteger result = (BigInteger) query.uniqueResult();
 				if (result != null) {
 					count = result.longValue();
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds
+			this.logAndThrowException("Error with countMarkersBySampleIdAndDatasetIds(sampleId=" + sampleId + ", datasetIds=" + datasetIds
 					+ ") query from MarkerMetadataSet: " + e.getMessage(), e);
 		}
 		return count;
 	}
 
-	public long countByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+	public long countByDatasetIds(final List<Integer> datasetIds) throws MiddlewareQueryException {
 		long count = 0;
 		try {
 			if (datasetIds != null && !datasetIds.isEmpty()) {
@@ -137,7 +139,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MarkerMetadataSet> getByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+	public List<MarkerMetadataSet> getByMarkerIds(final List<Integer> markerIds) throws MiddlewareQueryException {
 		List<MarkerMetadataSet> toReturn = new ArrayList<MarkerMetadataSet>();
 		try {
 			if (markerIds != null && !markerIds.isEmpty()) {
@@ -145,7 +147,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 				query.setParameterList("markerIdList", markerIds);
 
 				List results = query.list();
-				for (Object o : results) {
+				for (final Object o : results) {
 					Object[] result = (Object[]) o;
 					if (result != null) {
 						Integer markerMetadatasetId = (Integer) result[0];
@@ -153,7 +155,10 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 						Integer markerId2 = (Integer) result[2];
 						Integer markerSampleId = (Integer) result[3];
 
-						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, datasetId, markerId2, markerSampleId);
+						Dataset dataset = new Dataset();
+						dataset.setDatasetId(datasetId);
+
+						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, dataset, markerId2, markerSampleId);
 						toReturn.add(dataElement);
 					}
 				}
@@ -166,7 +171,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 
 	}
 
-	public void deleteByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+	public void deleteByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -182,7 +187,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MarkerMetadataSet> getMarkerMetadataSetsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+	public List<MarkerMetadataSet> getMarkerMetadataSetsByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
 
 		List<MarkerMetadataSet> toReturn = new ArrayList<MarkerMetadataSet>();
 		try {
@@ -194,7 +199,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 				query.setParameter("datasetId", datasetId);
 
 				List results = query.list();
-				for (Object o : results) {
+				for (final Object o : results) {
 					Object[] result = (Object[]) o;
 					if (result != null) {
 						Integer markerMetadatasetId = (Integer) result[0];
@@ -202,7 +207,10 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 						Integer markerId = (Integer) result[0];
 						Integer markerSampleId = (Integer) result[1];
 
-						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, datasetId2, markerId, markerSampleId);
+						Dataset dataset = new Dataset();
+						dataset.setDatasetId(datasetId2);
+
+						MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, dataset, markerId, markerSampleId);
 						toReturn.add(dataElement);
 					}
 				}
@@ -214,29 +222,8 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 		return toReturn;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public boolean isExisting(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException {
-		try {
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"SELECT * FROM gdms_marker_metadataset where dataset_id = :datasetId " + "AND marker_id = :markerId ");
-			query.setParameter("datasetId", markerMetadataSet.getDatasetId());
-			query.setParameter("markerId", markerMetadataSet.getMarkerId());
-
-			List results = query.list();
-
-			if (!results.isEmpty()) {
-				return true;
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with isExisting(markerMetadataSet=" + markerMetadataSet + ") query from MarkerMetadataSet "
-					+ e.getMessage(), e);
-		}
-		return false;
-	}
-
 	@SuppressWarnings("unchecked")
-	public List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+	public List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("datasetId", datasetId));

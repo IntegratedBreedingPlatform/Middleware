@@ -6,11 +6,13 @@ import org.generationcp.middleware.pojos.Sample;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
@@ -74,5 +76,34 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
 		}
 		return sample;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
+		final Map<Integer, Integer> map = new HashMap<>();
+
+		final List<Object[]> result =  this.getSession()
+			.createCriteria(Sample.class, "sample")
+			.createAlias("sample.plant", "plant")
+			.createAlias("plant.experiment", "experiment")
+			.createAlias("experiment.experimentStocks", "experimentStocks")
+			.createAlias("experimentStocks.stock", "stock")
+			.add(Restrictions.in("sampleId", sampleIds))
+			.setProjection(Projections.projectionList()
+				.add(Projections.property("sample.sampleId"))
+				.add(Projections.property("stock.dbxrefId")))
+			.list();
+		for (final Object[] row : result) {
+			map.put((Integer) row[0], (Integer) row[1]);
+		}
+		return map;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Sample> getBySampleBks(final Set<String> sampleBks) {
+		return this.getSession()
+				.createCriteria(Sample.class, "sample")
+				.add(Restrictions.in("sampleBusinessKey", sampleBks))
+				.list();
 	}
 }

@@ -192,7 +192,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	// TODO: Should deprecate as this is considered as antipattern
+	@Deprecated
 	protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
 		GenericDAO.LOG.error(message, e);
 		throw new MiddlewareQueryException(message, e);

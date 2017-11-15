@@ -1,7 +1,8 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
@@ -111,4 +112,197 @@
 
 		</sql>
 	</changeSet>
+
+    <changeSet author="clarysabel" id="v7.2.0-1">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="gdms_acc_metadataset" columnName="sample_id"/>
+			</not>
+		</preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            CREATE TEMPORARY TABLE max_map (
+              schemaname VARCHAR(255),
+              max_value  INT
+            );
+
+            INSERT INTO max_map (schemaname, max_value)
+            VALUES
+              ('ibdbv2_bean_merged', 1),
+              ('ibdbv2_brachiaria_merged', 0),
+              ('ibdbv2_cassava_merged', 1),
+              ('ibdbv2_chickpea_merged', 10),
+              ('ibdbv2_cowpea_merged', 1),
+              ('ibdbv2_fingermillet_merged', 0),
+              ('ibdbv2_generic_merged', 0),
+              ('ibdbv2_groundnut_merged', 1),
+              ('ibdbv2_lentil_merged', 0),
+              ('ibdbv2_maize_merged', 1),
+              ('ibdbv2_mungbean_merged', 0),
+              ('ibdbv2_pearmillet_merged', 0),
+              ('ibdbv2_pigeonpea_merged', 0),
+              ('ibdbv2_rice_merged', 1),
+              ('ibdbv2_sorghum_merged', 1),
+              ('ibdbv2_soybean_merged', 1),
+              ('ibdbv2_sunflower_merged', 0),
+              ('ibdbv2_sweetpotato_merged', 0),
+              ('ibdbv2_wheat_merged', 1),
+              ('ibdbv2_yam_merged', 0);
+
+            DELETE FROM gdms_markers_onmap
+            WHERE map_id >
+                  (SELECT max_value
+                   FROM max_map
+                   WHERE schemaname = DATABASE());
+
+
+            DELETE FROM gdms_map
+            WHERE map_id >
+                  (SELECT max_value
+                   FROM max_map
+                   WHERE schemaname = DATABASE());
+
+            DROP TABLE max_map;
+
+            TRUNCATE TABLE gdms_acc_metadataset;
+
+            TRUNCATE TABLE gdms_marker_metadataset;
+
+            TRUNCATE TABLE gdms_allele_values;
+
+            TRUNCATE TABLE gdms_char_values;
+
+            TRUNCATE TABLE gdms_dart_values;
+
+            TRUNCATE TABLE gdms_dataset_users;
+
+            TRUNCATE TABLE gdms_mapping_pop_values;
+
+            TRUNCATE TABLE gdms_mapping_pop;
+
+            TRUNCATE TABLE gdms_qtl_details;
+
+            SET FOREIGN_KEY_CHECKS = 0;
+            TRUNCATE TABLE gdms_qtl;
+            SET FOREIGN_KEY_CHECKS = 1;
+
+            TRUNCATE TABLE gdms_mta_metadata;
+
+            TRUNCATE TABLE gdms_mta;
+
+            TRUNCATE TABLE gdms_track_acc;
+
+            TRUNCATE TABLE gdms_track_markers;
+
+            SET FOREIGN_KEY_CHECKS = 0;
+            TRUNCATE TABLE gdms_track_data;
+
+            TRUNCATE TABLE gdms_dataset;
+            SET FOREIGN_KEY_CHECKS = 1;
+
+            CREATE TEMPORARY TABLE gdms_duplicated_markers
+                SELECT
+                  _all.marker_id    AS duplicated_id,
+                  to_keep.marker_id AS unique_id
+                FROM
+                  (SELECT
+                     marker_name,
+                     min(marker_id) AS marker_id
+                   FROM gdms_marker
+                   GROUP BY marker_name
+                   HAVING count(marker_name) > 1) to_keep
+                  INNER JOIN (
+                               SELECT
+                                 marker_id,
+                                 marker_name
+                               FROM gdms_marker
+                             ) _all
+                WHERE to_keep.marker_name = _all.marker_name AND to_keep.marker_id != _all.marker_id;
+
+            DELETE FROM gdms_marker_alias
+            WHERE marker_id IN (SELECT duplicated_id
+                                FROM gdms_duplicated_markers);
+
+            DELETE FROM gdms_marker_details
+            WHERE marker_id IN (SELECT duplicated_id
+                                FROM gdms_duplicated_markers);
+
+            DELETE FROM gdms_marker_user_info
+            WHERE marker_id IN (SELECT duplicated_id
+                                FROM gdms_duplicated_markers);
+
+            DELETE FROM gdms_marker
+            WHERE marker_id IN (SELECT duplicated_id
+                                FROM gdms_duplicated_markers);
+
+            ALTER TABLE gdms_marker ADD CONSTRAINT unique_marker_name UNIQUE (marker_name);
+
+            DROP TABLE gdms_duplicated_markers;
+
+            ALTER TABLE gdms_allele_values
+            DROP INDEX ind_alleleval_dmgid,
+            DROP COLUMN gid,
+            ADD COLUMN sample_id INT NOT NULL
+            AFTER marker_id,
+            ADD CONSTRAINT fk_alleleval_sample FOREIGN KEY (sample_id) REFERENCES sample (sample_id);
+
+            CREATE INDEX ind_alleleval_dmgid ON gdms_allele_values (dataset_id, marker_id, sample_id);
+
+            ALTER TABLE gdms_char_values
+            DROP INDEX ind_charval_dmgid,
+            DROP COLUMN gid,
+            ADD COLUMN sample_id INT NOT NULL
+            AFTER marker_id,
+            ADD CONSTRAINT fk_charval_sample FOREIGN KEY (sample_id) REFERENCES sample (sample_id);
+
+            CREATE INDEX ind_charval_dmgid ON gdms_char_values (dataset_id, marker_id, sample_id);
+
+            ALTER TABLE gdms_mapping_pop_values
+            DROP COLUMN gid,
+            ADD COLUMN sample_id INT NOT NULL
+            AFTER dataset_id,
+            ADD CONSTRAINT fk_mappopval_sampleid FOREIGN KEY (sample_id) REFERENCES sample (sample_id);
+
+            ALTER TABLE gdms_acc_metadataset
+            DROP INDEX indaccdata,
+            DROP COLUMN gid,
+            DROP COLUMN nid,
+            ADD COLUMN sample_id INT NOT NULL
+            AFTER dataset_id,
+            ADD CONSTRAINT fk_accm_sampleid FOREIGN KEY (sample_id) REFERENCES sample (sample_id);
+
+            CREATE INDEX indaccdata ON gdms_acc_metadataset (dataset_id, sample_id, acc_sample_id);
+
+            ALTER VIEW gdms_dataset_details
+            AS
+            (SELECT
+               ucase(`gdms_dataset`.`dataset_id`)                    AS `dataset_id`,
+               `gdms_dataset`.`dataset_name`                         AS `dataset_name`,
+               `gdms_dataset`.`dataset_type`                         AS `dataset_type`,
+               `gdms_dataset`.`genus`                                AS `genus`,
+               `gdms_dataset`.`species`                              AS `species`,
+               `gdms_dataset`.`missing_data`                         AS `missing_data`,
+               `gdms_dataset`.`institute`                            AS `institute`,
+               `gdms_dataset`.`principal_investigator`               AS `principal_investigator`,
+               `gdms_dataset`.`email`                                AS `email`,
+               `gdms_dataset`.`purpose_of_study`                     AS `purpose_of_study`,
+               `gdms_dataset`.`upload_template_date`                 AS `upload_template_date`,
+               count(DISTINCT `gdms_marker_metadataset`.`marker_id`) AS `marker_count`,
+               count(DISTINCT `gdms_acc_metadataset`.`sample_id`)    AS `sample_id_count`
+             FROM ((`gdms_dataset`
+               JOIN `gdms_marker_metadataset` ON ((`gdms_dataset`.`dataset_id` = `gdms_marker_metadataset`.`dataset_id`))) JOIN `gdms_acc_metadataset`
+                 ON ((`gdms_dataset`.`dataset_id` = `gdms_acc_metadataset`.`dataset_id`)))
+             GROUP BY ucase(`gdms_dataset`.`dataset_id`));
+
+            ALTER VIEW gdms_genotypes_count
+            AS
+            (SELECT
+               ucase(`gdms_marker_metadataset`.`marker_id`)       AS `marker_id`,
+               count(DISTINCT `gdms_acc_metadataset`.`sample_id`) AS `genotypes_count`
+             FROM (`gdms_marker_metadataset`
+               JOIN `gdms_acc_metadataset` ON ((`gdms_marker_metadataset`.`dataset_id` = `gdms_acc_metadataset`.`dataset_id`)))
+             GROUP BY ucase(`gdms_marker_metadataset`.`marker_id`));
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

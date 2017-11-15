@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.impl.study;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.SampleDao;
@@ -31,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Repository
 @Transactional
@@ -104,6 +108,7 @@ public class SampleServiceImpl implements SampleService {
 		final List<SampleDTO> listSampleDto = new ArrayList<>();
 		for (final Sample sample : samples) {
 			final SampleDTO dto = new SampleDTO();
+			dto.setSampleId(sample.getSampleId());
 			dto.setSampleName(sample.getSampleName());
 			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
 			final User takenBy = sample.getTakenBy();
@@ -129,6 +134,19 @@ public class SampleServiceImpl implements SampleService {
 		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
 
 		return getSampleDetailsDTO(sample);
+	}
+
+	@Override
+	public Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs) {
+		final List<Sample> samplesByBk = this.sampleDao.getBySampleBks(sampleUIDs);
+		final List<SampleDTO> sampleDTOs = mapSampleToSampleDTO(samplesByBk);
+		final Map<String, SampleDTO> mappedSampleDTOs = Maps.uniqueIndex(sampleDTOs, new Function<SampleDTO, String>() {
+
+			public String apply(SampleDTO from) {
+				return from.getSampleBusinessKey();
+			}
+		});
+		return mappedSampleDTOs;
 	}
 
 	private SampleDetailsDTO getSampleDetailsDTO(final Sample sample) {

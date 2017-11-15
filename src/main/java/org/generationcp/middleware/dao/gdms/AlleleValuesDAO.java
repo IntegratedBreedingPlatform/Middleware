@@ -15,17 +15,24 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
+import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link AlleleValues}.
@@ -129,6 +136,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 	// another transferred query from the Vaadin layer
 	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id, allele_bin_value,acc_sample_id,marker_sample_id from gdms_allele_values where"
 			+ " gid in(:gids) and marker_id in (:mids) ORDER BY gid, marker_id,acc_sample_id asc";
+
+	private static final Logger LOG = LoggerFactory.getLogger(AlleleValuesDAO.class);
 
 
 	/**
@@ -621,42 +630,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 			this.logAndThrowException("Error with countByGids(gIds=" + gIds + ") query from AlleleValuesDAO: " + e.getMessage(), e);
 		}
 		return 0;
-	}
-
-	public List<AlleleValues> getAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-
-		List<AlleleValues> toReturn = new ArrayList<AlleleValues>();
-		try {
-			if (datasetId != null) {
-				SQLQuery query =
-						this.getSession().createSQLQuery(
-								"SELECT an_id, dataset_id, marker_id, gid, CONCAT(allele_bin_value, ''), CONCAT(allele_raw_value,''), peak_height "
-										+ " FROM gdms_allele_values where dataset_id = :datasetId ");
-				query.setParameter("datasetId", datasetId);
-
-				List results = query.list();
-				for (Object o : results) {
-					Object[] result = (Object[]) o;
-					if (result != null) {
-						Integer anId = (Integer) result[0];
-						Integer datasetId2 = (Integer) result[1];
-						Integer markerId = (Integer) result[2];
-						Integer gId = (Integer) result[3];
-						String alleleBinValue = (String) result[4];
-						String alleleRawValue = (String) result[5];
-						Integer peakHeight = (Integer) result[6];
-
-						AlleleValues dataElement =
-								new AlleleValues(anId, datasetId2, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
-						toReturn.add(dataElement);
-					}
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getAlleleValuesByDatasetId(datasetId=" + datasetId + ") query from AlleleValues " + e.getMessage(), e);
-		}
-		return toReturn;
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})

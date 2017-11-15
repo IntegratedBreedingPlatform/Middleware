@@ -11,14 +11,18 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import org.generationcp.middleware.pojos.Sample;
+
 import java.io.Serializable;
 
-import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -38,17 +42,13 @@ public class AccMetadataSet implements Serializable {
 	@Column(name = "acc_metadataset_id")
 	private Integer accMetadataSetId;
 
-	@Basic(optional = false)
-	@Column(name = "dataset_id")
-	private Integer datasetId;
+	@ManyToOne
+	@JoinColumn(name = "dataset_id")
+	private Dataset dataset;
 
-	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer germplasmId;
-
-	@Basic(optional = false)
-	@Column(name = "nid")
-	private Integer nameId;
+	@ManyToOne
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
 
 	@Column(name = "acc_sample_id")
 	private Integer accSampleId;
@@ -56,52 +56,43 @@ public class AccMetadataSet implements Serializable {
 	public AccMetadataSet() {
 	}
 
-	public AccMetadataSet(Integer accMetadataSetId, Integer datasetId, Integer germplasmId, Integer nameId, Integer sampleId) {
+	public AccMetadataSet(final Integer accMetadataSetId, final Dataset dataset, final Sample sample, final Integer accSampleId) {
 		super();
 		this.accMetadataSetId = accMetadataSetId;
-		this.datasetId = datasetId;
-		this.germplasmId = germplasmId;
-		this.nameId = nameId;
-		this.accSampleId = sampleId;
+		this.dataset = dataset;
+		this.sample = sample;
+		this.accSampleId = accSampleId;
 	}
 
 	public Integer getAccMetadataSetId() {
 		return this.accMetadataSetId;
 	}
 
-	public void setAccMetadataSetId(Integer accMetadataSetId) {
+	public void setAccMetadataSetId(final Integer accMetadataSetId) {
 		this.accMetadataSetId = accMetadataSetId;
 	}
 
-	public Integer getDatasetId() {
-		return this.datasetId;
+	public Dataset getDataset() {
+		return this.dataset;
 	}
 
-	public void setDatasetId(Integer datasetId) {
-		this.datasetId = datasetId;
+	public void setDataset(final Dataset dataset) {
+		this.dataset = dataset;
 	}
 
-	public Integer getGermplasmId() {
-		return this.germplasmId;
+	public Sample getSample() {
+		return sample;
 	}
 
-	public void setGermplasmId(Integer germplasmId) {
-		this.germplasmId = germplasmId;
-	}
-
-	public Integer getNameId() {
-		return this.nameId;
-	}
-
-	public void setNameId(Integer nameId) {
-		this.nameId = nameId;
+	public void setSample(final Sample sample) {
+		this.sample = sample;
 	}
 
 	public Integer getAccSampleId() {
 		return this.accSampleId;
 	}
 
-	public void setAccSampleId(Integer accSampleId) {
+	public void setAccSampleId(final Integer accSampleId) {
 		this.accSampleId = accSampleId;
 	}
 
@@ -110,15 +101,14 @@ public class AccMetadataSet implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (this.accMetadataSetId == null ? 0 : this.accMetadataSetId.hashCode());
-		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
-		result = prime * result + (this.germplasmId == null ? 0 : this.germplasmId.hashCode());
-		result = prime * result + (this.nameId == null ? 0 : this.nameId.hashCode());
+		result = prime * result + (this.dataset == null ? 0 : this.dataset.hashCode());
+		result = prime * result + (this.sample == null ? 0 : this.sample.hashCode());
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -136,25 +126,18 @@ public class AccMetadataSet implements Serializable {
 		} else if (!this.accMetadataSetId.equals(other.accMetadataSetId)) {
 			return false;
 		}
-		if (this.datasetId == null) {
-			if (other.datasetId != null) {
+		if (this.dataset == null) {
+			if (other.dataset != null) {
 				return false;
 			}
-		} else if (!this.datasetId.equals(other.datasetId)) {
+		} else if (!this.dataset.equals(other.dataset)) {
 			return false;
 		}
-		if (this.germplasmId == null) {
-			if (other.germplasmId != null) {
+		if (this.sample == null) {
+			if (other.sample != null) {
 				return false;
 			}
-		} else if (!this.germplasmId.equals(other.germplasmId)) {
-			return false;
-		}
-		if (this.nameId == null) {
-			if (other.nameId != null) {
-				return false;
-			}
-		} else if (!this.nameId.equals(other.nameId)) {
+		} else if (!this.sample.equals(other.sample)) {
 			return false;
 		}
 		if (this.accSampleId == null) {
@@ -172,13 +155,11 @@ public class AccMetadataSet implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("AccMetadataSet [accMetadataSetId=");
 		builder.append(this.accMetadataSetId);
-		builder.append(", datasetId=");
-		builder.append(this.datasetId);
-		builder.append(", germplasmId=");
-		builder.append(this.germplasmId);
-		builder.append(", nameId=");
-		builder.append(this.nameId);
-		builder.append(", sampleId=");
+		builder.append(", dataset=");
+		builder.append(this.dataset);
+		builder.append(", sample=");
+		builder.append(this.sample);
+		builder.append(", accSampleId=");
 		builder.append(this.accSampleId);
 		builder.append("]");
 		return builder.toString();

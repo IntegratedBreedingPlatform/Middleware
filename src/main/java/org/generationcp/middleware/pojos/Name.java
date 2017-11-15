@@ -44,6 +44,8 @@ public class Name implements Serializable {
 
 	public static final String GET_PREFERRED_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
 
+	public static final String GET_PREFERRED_NAME_IDS_BY_GIDS = "SELECT gid, nid " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)

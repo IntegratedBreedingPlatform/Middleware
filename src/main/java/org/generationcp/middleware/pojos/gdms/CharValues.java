@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import org.generationcp.middleware.pojos.Sample;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -19,6 +21,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -38,17 +42,17 @@ public class CharValues implements Serializable {
 	@Column(name = "ac_id")
 	private Integer acId;
 
-	@Basic(optional = false)
-	@Column(name = "dataset_id")
-	private Integer datasetId;
+	@ManyToOne
+	@JoinColumn(name = "dataset_id")
+	private Dataset dataset;
 
 	@Basic(optional = false)
 	@Column(name = "marker_id")
 	private Integer markerId;
 
-	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer gId;
+	@ManyToOne
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
 
 	@Column(name = "char_value")
 	String charValue;
@@ -62,12 +66,13 @@ public class CharValues implements Serializable {
 	public CharValues() {
 	}
 
-	public CharValues(Integer acId, Integer datasetId, Integer markerId, Integer gId, String charValue, Integer markerSampleId,
-			Integer accSampleId) {
+	public CharValues(
+			final Integer acId, final Dataset dataset, final Integer markerId, final Sample sample, final String charValue, final Integer markerSampleId,
+			final Integer accSampleId) {
 		this.acId = acId;
-		this.datasetId = datasetId;
+		this.dataset = dataset;
 		this.markerId = markerId;
-		this.gId = gId;
+		this.sample = sample;
 		this.charValue = charValue;
 		this.markerSampleId = markerSampleId;
 		this.accSampleId = accSampleId;
@@ -77,39 +82,39 @@ public class CharValues implements Serializable {
 		return this.acId;
 	}
 
-	public void setAcId(Integer acId) {
+	public void setAcId(final Integer acId) {
 		this.acId = acId;
 	}
 
-	public Integer getDatasetId() {
-		return this.datasetId;
+	public Dataset getDataset() {
+		return this.dataset;
 	}
 
-	public void setDatasetId(Integer datasetId) {
-		this.datasetId = datasetId;
+	public void setDataset(final Dataset dataset) {
+		this.dataset = dataset;
 	}
 
 	public Integer getMarkerId() {
 		return this.markerId;
 	}
 
-	public void setMarkerId(Integer markerId) {
+	public void setMarkerId(final Integer markerId) {
 		this.markerId = markerId;
 	}
 
-	public Integer getGid() {
-		return this.gId;
+	public Sample getSample() {
+		return this.sample;
 	}
 
-	public void setGid(Integer gId) {
-		this.gId = gId;
+	public void setSample(final Sample sample) {
+		this.sample = sample;
 	}
 
 	public String getCharValue() {
 		return this.charValue;
 	}
 
-	public void setCharValue(String charValue) {
+	public void setCharValue(final String charValue) {
 		this.charValue = charValue;
 	}
 
@@ -117,7 +122,7 @@ public class CharValues implements Serializable {
 		return this.markerSampleId;
 	}
 
-	public void setMarkerSampleId(Integer markerSampleId) {
+	public void setMarkerSampleId(final Integer markerSampleId) {
 		this.markerSampleId = markerSampleId;
 	}
 
@@ -125,7 +130,7 @@ public class CharValues implements Serializable {
 		return this.accSampleId;
 	}
 
-	public void setAccSampleId(Integer accSampleId) {
+	public void setAccSampleId(final Integer accSampleId) {
 		this.accSampleId = accSampleId;
 	}
 
@@ -136,15 +141,15 @@ public class CharValues implements Serializable {
 		result = prime * result + (this.acId == null ? 0 : this.acId.hashCode());
 		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		result = prime * result + (this.charValue == null ? 0 : this.charValue.hashCode());
-		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
-		result = prime * result + (this.gId == null ? 0 : this.gId.hashCode());
+		result = prime * result + (this.dataset == null ? 0 : this.dataset.hashCode());
+		result = prime * result + (this.sample == null ? 0 : this.sample.hashCode());
 		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -176,18 +181,18 @@ public class CharValues implements Serializable {
 		} else if (!this.charValue.equals(other.charValue)) {
 			return false;
 		}
-		if (this.datasetId == null) {
-			if (other.datasetId != null) {
+		if (this.dataset == null) {
+			if (other.dataset != null) {
 				return false;
 			}
-		} else if (!this.datasetId.equals(other.datasetId)) {
+		} else if (!this.dataset.equals(other.dataset)) {
 			return false;
 		}
-		if (this.gId == null) {
-			if (other.gId != null) {
+		if (this.sample == null) {
+			if (other.sample != null) {
 				return false;
 			}
-		} else if (!this.gId.equals(other.gId)) {
+		} else if (!this.sample.equals(other.sample)) {
 			return false;
 		}
 		if (this.markerId == null) {
@@ -212,12 +217,12 @@ public class CharValues implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CharValues [acId=");
 		builder.append(this.acId);
-		builder.append(", datasetId=");
-		builder.append(this.datasetId);
+		builder.append(", dataset=");
+		builder.append(this.dataset);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
-		builder.append(", gId=");
-		builder.append(this.gId);
+		builder.append(", sample=");
+		builder.append(this.sample);
 		builder.append(", charValue=");
 		builder.append(this.charValue);
 		builder.append(", markerSampleId=");

@@ -15,15 +15,21 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
+import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link MappingPopValues}.
@@ -91,6 +97,9 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 	// another transferred query from the Vaadin layer
 	public static final String GET_UNIQUE_MAPPOP_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id,map_char_value,acc_sample_id,marker_sample_id from gdms_mapping_pop_values where"
 			+ " gid in(:gids) and marker_id in (:mids) ORDER BY gid, marker_id,acc_sample_id asc";
+
+	private static final Logger LOG = LoggerFactory.getLogger(MappingPopValuesDAO.class);
+
 
 
 	/**
@@ -269,43 +278,6 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 		return toReturn;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List<MappingPopValues> getMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-
-		List<MappingPopValues> toReturn = new ArrayList<MappingPopValues>();
-		try {
-			if (datasetId != null) {
-				SQLQuery query =
-						this.getSession().createSQLQuery(
-								"SELECT mp_id, CONCAT(map_char_value, ''), dataset_id, gid, marker_id, marker_sample_id, acc_sample_id "
-										+ " FROM gdms_mapping_pop_values where dataset_id = :datasetId ");
-				query.setParameter("datasetId", datasetId);
-
-				List results = query.list();
-				for (Object o : results) {
-					Object[] result = (Object[]) o;
-					if (result != null) {
-						Integer mpId = (Integer) result[0];
-						String mapCharValue = (String) result[1];
-						Integer datasetId2 = (Integer) result[2];
-						Integer gId = (Integer) result[3];
-						Integer markerId = (Integer) result[4];
-						Integer markerSampleId = (Integer) result[5];
-						Integer accSampleId = (Integer) result[6];
-
-						MappingPopValues dataElement =
-								new MappingPopValues(mpId, mapCharValue, datasetId2, gId, markerId, markerSampleId, accSampleId);
-						toReturn.add(dataElement);
-					}
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMappingPopValuesByDatasetId(datasetId=" + datasetId + ") query from MappingPopValues "
-					+ e.getMessage(), e);
-		}
-		return toReturn;
-	}
-	
 	@SuppressWarnings({"deprecation", "unchecked"})
 	public List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
 		

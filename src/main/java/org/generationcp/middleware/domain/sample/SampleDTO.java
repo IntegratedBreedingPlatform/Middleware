@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class SampleDTO {
 
+	private Integer sampleId;
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
@@ -19,7 +20,7 @@ public class SampleDTO {
 	}
 
 	public SampleDTO(final String sampleName, final String sampleBusinessKey, final String takenBy, final Date samplingDate,
-		final String sampleList, final Integer plantNumber, final String plantBusinessKey) {
+		final String sampleList, final Integer plantNumber, final String plantBusinessKey, final Integer sampleId) {
 		this.sampleName = sampleName;
 		this.sampleBusinessKey = sampleBusinessKey;
 		this.takenBy = takenBy;
@@ -27,6 +28,7 @@ public class SampleDTO {
 		this.sampleList = sampleList;
 		this.plantNumber = plantNumber;
 		this.plantBusinessKey = plantBusinessKey;
+		this.sampleId = sampleId;
 	}
 
 	public String getSampleName() {
@@ -85,6 +87,10 @@ public class SampleDTO {
 		this.plantBusinessKey = plantBusinessKey;
 	}
 
+	public Integer getSampleId() { return sampleId; }
+
+	public void setSampleId(final Integer sampleId) { this.sampleId = sampleId;}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {
@@ -104,6 +110,7 @@ public class SampleDTO {
 			.append(sampleList, sampleDTO.sampleList)
 			.append(plantNumber, sampleDTO.plantNumber)
 			.append(plantBusinessKey, sampleDTO.plantBusinessKey)
+			.append(sampleId, sampleDTO.sampleId)
 			.isEquals();
 	}
 
@@ -116,6 +123,7 @@ public class SampleDTO {
 			.append(sampleList)
 			.append(plantNumber)
 			.append(plantBusinessKey)
+			.append(sampleId)
 			.toHashCode();
 	}
 }

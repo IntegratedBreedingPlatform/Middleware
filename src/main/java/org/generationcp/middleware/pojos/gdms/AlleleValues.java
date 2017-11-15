@@ -19,10 +19,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.Sample;
 
 /**
  * POJO for allele_values table.
@@ -45,9 +48,9 @@ public class AlleleValues implements Serializable {
 	@Column(name = "dataset_id")
 	private Integer datasetId;
 
-	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer gId;
+	@ManyToOne
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
 
 	@Basic(optional = false)
 	@Column(name = "marker_id")
@@ -73,11 +76,11 @@ public class AlleleValues implements Serializable {
 	public AlleleValues() {
 	}
 
-	public AlleleValues(Integer anId, Integer datasetId, Integer gId, Integer markerId, String alleleBinValue, String alleleRawValue,
-			Integer peakHeight) {
+	public AlleleValues(final Integer anId, final Integer datasetId, final Sample sample, final Integer markerId, final String alleleBinValue, final String alleleRawValue,
+			final Integer peakHeight) {
 		this.anId = anId;
 		this.datasetId = datasetId;
-		this.gId = gId;
+		this.sample = sample;
 		this.markerId = markerId;
 		this.alleleBinValue = alleleBinValue;
 		this.alleleRawValue = alleleRawValue;
@@ -88,7 +91,7 @@ public class AlleleValues implements Serializable {
 		return this.anId;
 	}
 
-	public void setAnId(Integer anId) {
+	public void setAnId(final Integer anId) {
 		this.anId = anId;
 	}
 
@@ -96,23 +99,23 @@ public class AlleleValues implements Serializable {
 		return this.datasetId;
 	}
 
-	public void setDatasetId(Integer datasetId) {
+	public void setDatasetId(final Integer datasetId) {
 		this.datasetId = datasetId;
 	}
 
-	public Integer getGid() {
-		return this.gId;
+	public Sample getSample() {
+		return this.sample;
 	}
 
-	public void setGid(Integer gId) {
-		this.gId = gId;
+	public void setSample(final Sample sample) {
+		this.sample = sample;
 	}
 
 	public Integer getMarkerId() {
 		return this.markerId;
 	}
 
-	public void setMarkerId(Integer markerId) {
+	public void setMarkerId(final Integer markerId) {
 		this.markerId = markerId;
 	}
 
@@ -120,7 +123,7 @@ public class AlleleValues implements Serializable {
 		return this.alleleBinValue;
 	}
 
-	public void setAlleleBinValue(String alleleBinValue) {
+	public void setAlleleBinValue(final String alleleBinValue) {
 		this.alleleBinValue = alleleBinValue;
 	}
 
@@ -128,7 +131,7 @@ public class AlleleValues implements Serializable {
 		return this.alleleRawValue;
 	}
 
-	public void setAlleleRawValue(String alleleRawValue) {
+	public void setAlleleRawValue(final String alleleRawValue) {
 		this.alleleRawValue = alleleRawValue;
 	}
 
@@ -136,7 +139,7 @@ public class AlleleValues implements Serializable {
 		return this.peakHeight;
 	}
 
-	public void setPeakHeight(Integer peakHeight) {
+	public void setPeakHeight(final Integer peakHeight) {
 		this.peakHeight = peakHeight;
 	}
 
@@ -144,7 +147,7 @@ public class AlleleValues implements Serializable {
 		return this.markerSampleId;
 	}
 
-	public void setMarkerSampleId(Integer markerSampleId) {
+	public void setMarkerSampleId(final Integer markerSampleId) {
 		this.markerSampleId = markerSampleId;
 	}
 
@@ -152,7 +155,7 @@ public class AlleleValues implements Serializable {
 		return this.accSampleId;
 	}
 
-	public void setAccSampleId(Integer accSampleId) {
+	public void setAccSampleId(final Integer accSampleId) {
 		this.accSampleId = accSampleId;
 	}
 
@@ -162,7 +165,7 @@ public class AlleleValues implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -184,8 +187,8 @@ public class AlleleValues implements Serializable {
 		builder.append(this.anId);
 		builder.append(", datasetId=");
 		builder.append(this.datasetId);
-		builder.append(", gId=");
-		builder.append(this.gId);
+		builder.append(", sampleId=");
+		builder.append(this.sample);
 		builder.append(", markerId=");
 		builder.append(this.markerId);
 		builder.append(", alleleBinValue=");

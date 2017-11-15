@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -1068,6 +1069,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public Map<Integer, Integer> getPreferredNameIdsByGIDs(final List<Integer> gids) {
+		return this.getNameDao().getPreferredNameIdsByGIDs(gids);
+	}
+
+	@Override
 	public Map<Integer, String> getLocationNamesByGids(final List<Integer> gids) {
 		return this.getLocationDao().getLocationNamesMapByGIDs(gids);
 	}
@@ -1499,5 +1505,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<UserDefinedField> getAllAttributesTypes() {
 		return this.getAttributeDao().getAttributeTypes();
 	}
+
+
 
 }
