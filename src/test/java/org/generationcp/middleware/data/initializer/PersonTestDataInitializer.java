@@ -21,10 +21,16 @@ public class PersonTestDataInitializer {
 		person.setPhone("4");
 		return person;
 	}
-	
-	public Person createPerson(int id) {
-		Person person = new Person("First Name", "Middle Name", "Last Name");
+
+	public static Person createPerson(final int id) {
+		final Person person = new Person("First Name", "Middle Name", "Last Name");
 		person.setId(id);
+		return person;
+	}
+
+	public static Person createPerson(final String username, final int userId, final String firstName,
+			final String middleName) {
+		final Person person = new Person(firstName, middleName, username + userId);
 		return person;
 	}
 }

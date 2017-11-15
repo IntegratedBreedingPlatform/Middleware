@@ -42,7 +42,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDAO.class);
 
-	public User getByUsernameAndPassword(final String username, final String password) throws MiddlewareQueryException {
+	public User getByUsernameAndPassword(final String username, final String password) {
 		try {
 			if (username != null && password != null) {
 				final Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username))
@@ -60,7 +60,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return null;
 	}
 
-	public boolean isPasswordSameAsUserName(final String username) throws MiddlewareQueryException {
+	public boolean isPasswordSameAsUserName(final String username) {
 		try {
 			if (username != null) {
 				final Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username))
@@ -78,7 +78,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return false;
 	}
 
-	public boolean changePassword(final String username, final String password) throws MiddlewareQueryException {
+	public boolean changePassword(final String username, final String password) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
 			// of synch with
@@ -104,7 +104,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return false;
 	}
 
-	public User getUserDetailsByUsername(final String username) throws MiddlewareQueryException {
+	public User getUserDetailsByUsername(final String username) {
 		try {
 			if (username != null) {
 				final Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username));
@@ -120,7 +120,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return null;
 	}
 
-	public boolean isUsernameExists(final String username) throws MiddlewareQueryException {
+	public boolean isUsernameExists(final String username) {
 		try {
 			if (username != null) {
 				final Criteria criteria = this.getSession().createCriteria(User.class);
@@ -140,7 +140,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return false;
 	}
 
-	public User getUserByUserName(final String username) throws MiddlewareQueryException {
+	public User getUserByUserName(final String username) {
 		try {
 			if (username != null) {
 				final Criteria criteria = this.getSession().createCriteria(User.class);
@@ -161,7 +161,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getByNameUsingEqual(final String name, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<User> getByNameUsingEqual(final String name, final int start, final int numOfRows) {
 		try {
 			if (name != null) {
 				final Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_EQUAL);
@@ -179,7 +179,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getByNameUsingLike(final String name, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<User> getByNameUsingLike(final String name, final int start, final int numOfRows) {
 		try {
 			if (name != null) {
 				final Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_LIKE);
@@ -197,9 +197,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getAllUsersSorted() throws MiddlewareQueryException {
+	public List<User> getAllActiveUsersSorted() {
 		try {
-			final Query query = this.getSession().getNamedQuery(User.GET_ALL_USERS_SORTED);
+			final Query query = this.getSession().getNamedQuery(User.GET_ALL_ACTIVE_USERS_SORTED);
 			return query.list();
 		} catch (final HibernateException e) {
 			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
@@ -209,7 +209,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getUserIdsByCountryIds(final Collection<Integer> countryIds) throws MiddlewareQueryException {
+	public List<Integer> getUserIdsByCountryIds(final Collection<Integer> countryIds) {
 		try {
 			if (countryIds != null && !countryIds.isEmpty()) {
 				final Criteria criteria = this.getSession().createCriteria(Locdes.class);
@@ -227,7 +227,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getByIds(final List<Integer> ids) throws MiddlewareQueryException {
+	public List<User> getByIds(final List<Integer> ids) {
 		List<User> toReturn = new ArrayList<>();
 
 		if (ids == null || ids.isEmpty()) {
@@ -261,7 +261,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException {
+	public List<UserDto> getAllUsersSortedByLastName() {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(User.class);
 
@@ -292,7 +292,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 	}
 
-	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
+	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		final List<UserDto> users = new ArrayList<>();
 
@@ -310,7 +310,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 	}
 
-	public List<UserDto> getUsersForEnvironment(final Integer instanceId) throws MiddlewareQueryException {
+	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
 		Preconditions.checkNotNull(instanceId);
 		final List<UserDto> users = new ArrayList<>();
 		final StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
