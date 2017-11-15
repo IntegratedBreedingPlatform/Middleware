@@ -11,11 +11,11 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the details of a study - id, conditions and constants.
@@ -33,13 +33,16 @@ public class Study implements Serializable {
 	
 	private String programUUID;
 
+	private StudyType studyType;
+
 	public Study() {
 	}
 
-	public Study(int id, VariableList conditions, VariableList constants) {
+	public Study(final int id, final VariableList conditions, final VariableList constants, final StudyType studyType) {
 		this.id = id;
 		this.conditions = conditions;
 		this.constants = constants;
+		this.studyType = studyType;
 	}
 
 	public int getId() {
@@ -67,7 +70,7 @@ public class Study implements Serializable {
 	}
 
 	public StudyType getType() {
-		return StudyType.getStudyType(this.getDisplayValue(TermId.STUDY_TYPE));
+		return studyType;
 	}
 
 	public Integer getStartDate() {
@@ -203,6 +206,8 @@ public class Study implements Serializable {
 	public void setProgramUUID(String programUUID) {
 		this.programUUID = programUUID;
 	}
-	
-	
+
+	public void setStudyType(final StudyType studyType) {
+		this.studyType = studyType;
+	}
 }

@@ -1,13 +1,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -19,9 +12,14 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.mockito.internal.matchers.Matches;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class DmsProjectDaoTest {
 
@@ -57,10 +55,10 @@ public class DmsProjectDaoTest {
 		Object[] mockDBRow2 = new Object[] {2, "My Folder", "My Folder Desc", 0, PROG_UUID, null};
 		mockQueryResult.add(mockDBRow2);
 
-		Object[] mockDBRow3 = new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, String.valueOf(TermId.NURSERY.getId())};
+		Object[] mockDBRow3 = new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, StudyType.N.getName()};
 		mockQueryResult.add(mockDBRow3);
 
-		Object[] mockDBRow4 = new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, String.valueOf(TermId.TRIAL.getId())};
+		Object[] mockDBRow4 = new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, StudyType.T.getName()};
 		mockQueryResult.add(mockDBRow4);
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
@@ -112,7 +110,7 @@ public class DmsProjectDaoTest {
 	public void testGetStudyMetadata() {
  		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID)).thenReturn(this.mockQuery);
 
-		final Object[] mockDBRow1 = new Object[] {"31", 2088, "TR", "T", "10300", "2088", "TR", "20161212", "", "9006", "2"};
+		final Object[] mockDBRow1 = new Object[] {"31", 2088, "TR", StudyType.T.getName(), "10300", "2088", "TR", "20161212", "", "9006", "2"};
 		Mockito.when(this.mockQuery.uniqueResult()).thenReturn(mockDBRow1);
 		StudyMetadata studyMetadata = this.dao.getStudyMetadata(31);
 

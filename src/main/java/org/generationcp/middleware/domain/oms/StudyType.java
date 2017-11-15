@@ -11,32 +11,27 @@
 
 package org.generationcp.middleware.domain.oms;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 /**
  * The possible study types used in Middleware.
- *
  */
 //FIXME Review types other than N and T and see if we can just remove them as we dont use others except in historic studies.
 public enum StudyType {
 
-	// CV_ID = 2010
-
-	N("N", 10000, "Nursery"), //
-	HB("HB", 10001, "Hybridization Nursery"), //
-	PN("PN", 10002, "Pedigree Nursery"), //
-	CN("CN", 10003, "Characterization Nursery"), //
-	BON("BON", 10007, "BULU Observational Nursery"), //
-	
-	T("T", 10010, "Trial"), //
-	OYT("OYT", 10005, "Observational Yield Trial"), //
-	RYT("RYT", 10015, "Replication Yield Trial"), //
-	OFT("OFT", 10017, "On Form Trial"), //
-	
-	S("S", 10020, "Survey"), //
+	N("N", 10000, "Nursery"),
+	HB("HB", 10001, "Hybridization Nursery"),
+	PN("PN", 10002, "Pedigree Nursery"),
+	CN("CN", 10003, "Characterization Nursery"),
+	BON("BON", 10007, "BULU Observational Nursery"),
+	T("T", 10010, "Trial"),
+	OYT("OYT", 10005, "Observational Yield Trial"),
+	RYT("RYT", 10015, "Replication Yield Trial"),
+	OFT("OFT", 10017, "On Form Trial"),
+	S("S", 10020, "Survey"),
 	E("E", 10030, "Experiment");
 
 	private final int id;
@@ -61,7 +56,7 @@ public enum StudyType {
 		return this.label;
 	}
 
-	public static StudyType getStudyType(String name) {
+	public static StudyType getStudyTypeByName(String name) {
 		for (StudyType studyType : StudyType.values()) {
 			if (studyType.getName().equals(name)) {
 				return studyType;
@@ -70,28 +65,19 @@ public enum StudyType {
 		return null;
 	}
 
-	public static StudyType getStudyTypeById(int id) {
-		for (StudyType studyType : StudyType.values()) {
-			if (studyType.getId() == id) {
-				return studyType;
-			}
-		}
-		return null;
-	}
-	
 	public static List<StudyType> nurseriesAndTrials() {
 		final List<StudyType> nurseriesAndTrials = new ArrayList<>(nurseries());
 		nurseriesAndTrials.addAll(trials());
 		return nurseriesAndTrials;
 	}
-	
+
 	/**
 	 * NOTE: N is the primary type we use in BMS all others are from old/historic fieldbook and may be removed in future.
 	 */
 	public static List<StudyType> nurseries() {
 		return Lists.newArrayList(N, HB, PN, CN, BON);
 	}
-	
+
 	/**
 	 * NOTE: T is the primary type we use in BMS all others are from old/historic fieldbook and may be removed in future.
 	 */

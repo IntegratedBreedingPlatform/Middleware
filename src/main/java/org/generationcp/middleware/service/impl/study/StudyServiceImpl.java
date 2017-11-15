@@ -1,15 +1,11 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -53,11 +49,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -96,7 +95,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE
 		+ " and ph.value is not null ";
 
-	private final String TRIAL_TYPE = "T";
+	private final String TRIAL_TYPE = StudyType.T.getName();
 
 	private MeasurementVariableService measurementVariableService;
 
@@ -164,10 +163,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		StringBuffer sql = new StringBuffer()
 		.append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ")
-		.append("	p.program_uuid AS programUUID, ppType.value AS studyTypeId, ppObjective.value AS objective, ")
+		.append("	p.program_uuid AS programUUID, p.study_type AS studyType, ppObjective.value AS objective, ")
 		.append("	ppStartDate.value AS startDate, ppEndDate.value AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason.value AS season ")
 		.append(" FROM project p ")
-		.append("  INNER JOIN projectprop ppType ON p.project_id = ppType.project_id AND ppType.type_id = ").append(TermId.STUDY_TYPE.getId())
 		.append("  LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id AND ppObjective.type_id = ").append(TermId.STUDY_OBJECTIVE.getId())
 		.append("  LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id AND ppStartDate.type_id = ").append(TermId.START_DATE.getId())
 		.append("  LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id AND ppEndDate.type_id = ").append(TermId.END_DATE.getId())
@@ -193,7 +191,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final Query query =
 					this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
-					.addScalar("programUUID").addScalar("studyTypeId").addScalar("objective").addScalar("startDate")
+					.addScalar("programUUID").addScalar("studyType").addScalar("objective").addScalar("startDate")
 					.addScalar("endDate").addScalar("piName").addScalar("location").addScalar("season");
 			list = query.list();
 		} catch (final HibernateException e) {
@@ -206,7 +204,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final String name = (String) row[1];
 				final String title = (String) row[2];
 				final String programUUID = (String) row[3];
-				final String studyTypeId = (String) row[4];
+				final String studyType = (String) row[4];
 				final String objective = (String) row[5];
 				final String startDate = (String) row[6];
 				final String endDate = (String) row[7];
@@ -215,7 +213,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final String season = (String) row[10];
 
 				final StudySummary studySummary =
-						new StudySummary(id, name, title, objective, StudyType.getStudyTypeById(Integer.valueOf(studyTypeId)), startDate,
+						new StudySummary(id, name, title, objective, StudyType.getStudyTypeByName(studyType), startDate,
 								endDate, programUUID, pi, location, season);
 				studySummaries.add(studySummary);
 			}
