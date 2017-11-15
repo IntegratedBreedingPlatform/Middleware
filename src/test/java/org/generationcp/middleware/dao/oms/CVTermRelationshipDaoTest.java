@@ -21,7 +21,7 @@ public class CVTermRelationshipDaoTest {
 		this.dao = new CVTermRelationshipDao();
 		this.dao.setSession(this.session);
 	}
-	
+
 	@Test
 	public void testGetCategoriesReferredInPhenotype() {
 		final List<String> categories = Arrays.asList("1", "2", "3", "4", "5");
@@ -31,7 +31,7 @@ public class CVTermRelationshipDaoTest {
 		final List<String> result = this.dao.getCategoriesReferredInPhenotype(1001);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(categories.size(), result.size());
-		for(String category: categories){
+		for (final String category : categories) {
 			Assert.assertTrue(result.contains(category));
 		}
 	}
