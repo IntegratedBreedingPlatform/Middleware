@@ -240,7 +240,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " ELSE gp.value END AS propvalue " + " FROM nd_geolocationprop gp"
 					+ " LEFT JOIN cvterm cvt ON gp.type_id = cvt.cvterm_id"
 					+ " LEFT JOIN cvterm v ON v.cvterm_id = gp.value"
-					+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = gp.type_id AND cvr.type_id = 1190"
+					+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = gp.type_id AND cvr.type_id = 1220"
 					+ " WHERE gp.nd_geolocation_id IN (:environmentIds)" + " ORDER BY gp.type_id, gp.nd_geolocation_id";
 			final Query query = this.getSession().createSQLQuery(sql).setParameterList("environmentIds",
 					environmentIds);
