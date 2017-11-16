@@ -135,7 +135,7 @@
               ('ibdbv2_cowpea_merged', 1),
               ('ibdbv2_fingermillet_merged', 0),
               ('ibdbv2_generic_merged', 0),
-              ('ibdbv2_groundnut_merged', 1),
+              ('ibdbv2_groundnut_merged', 14),
               ('ibdbv2_lentil_merged', 0),
               ('ibdbv2_maize_merged', 1),
               ('ibdbv2_mungbean_merged', 0),
