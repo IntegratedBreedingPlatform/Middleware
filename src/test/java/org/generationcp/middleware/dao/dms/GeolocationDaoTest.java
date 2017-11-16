@@ -13,13 +13,16 @@
 package org.generationcp.middleware.dao.dms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -30,6 +33,8 @@ import org.mockito.Mockito;
 
 public class GeolocationDaoTest {
 
+	private static final String LOCATION_DESCRIPTION = "LOCATION_DESCRIPTION";
+	private static final String LOCATION_NAME = "LOCATION_NAME";
 	private static final String ALGERIA = "ALGERIA";
 	private static final String ADRAR = "ADRAR";
 	private static final String STUDY_DESCRIPTION = "STUDY DESCRIPTION";
@@ -53,7 +58,7 @@ public class GeolocationDaoTest {
 		final Set<Integer> environmentIds = new HashSet<Integer>();
 		environmentIds.add(5822);
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
-		final ArrayList<Object[]> mockQueryResult = new ArrayList<Object[]>();
+		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
 		final Object[] result = new Object[] { GeolocationDaoTest.ENVIRONMENT_ID, GeolocationDaoTest.AFRICA_RICE_CENTER,
 				GeolocationDaoTest.LOCATION_ID, GeolocationDaoTest.STUDY_ID, GeolocationDaoTest.STUDY_NAME,
 				GeolocationDaoTest.STUDY_DESCRIPTION, GeolocationDaoTest.ADRAR, GeolocationDaoTest.ALGERIA };
@@ -78,5 +83,26 @@ public class GeolocationDaoTest {
 		Assert.assertEquals(GeolocationDaoTest.STUDY_ID, studyReference.getId());
 		Assert.assertEquals(GeolocationDaoTest.STUDY_NAME, studyReference.getName());
 		Assert.assertEquals(GeolocationDaoTest.STUDY_DESCRIPTION, studyReference.getDescription());
+	}
+
+	@Test
+	public void testGetPropertiesForTrialEnvironments() {
+		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
+		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
+		final Object[] result = new Object[] { GeolocationDaoTest.LOCATION_ID, GeolocationDaoTest.LOCATION_NAME,
+				GeolocationDaoTest.LOCATION_DESCRIPTION, GeolocationDaoTest.ENVIRONMENT_ID,
+				GeolocationDaoTest.AFRICA_RICE_CENTER };
+		mockQueryResult.add(result);
+		Mockito.when(mockQuery.list()).thenReturn(mockQueryResult);
+		Mockito.when(this.session.createSQLQuery(Matchers.anyString())).thenReturn(mockQuery);
+		final List<TrialEnvironmentProperty> properties = this.dao
+				.getPropertiesForTrialEnvironments(Arrays.asList(GeolocationDaoTest.ENVIRONMENT_ID));
+		final TrialEnvironmentProperty property = properties.get(0);
+		Assert.assertEquals(GeolocationDaoTest.LOCATION_ID, property.getId());
+		Assert.assertEquals(GeolocationDaoTest.LOCATION_NAME, property.getName());
+		Assert.assertEquals(GeolocationDaoTest.LOCATION_DESCRIPTION, property.getDescription());
+		final Map<Integer, String> environmentValuesMap = property.getEnvironmentValuesMap();
+		Assert.assertEquals(GeolocationDaoTest.AFRICA_RICE_CENTER,
+				environmentValuesMap.get(GeolocationDaoTest.ENVIRONMENT_ID));
 	}
 }
