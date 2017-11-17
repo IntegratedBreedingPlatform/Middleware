@@ -587,30 +587,6 @@ public interface GenotypicDataManager {
 	List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
-	 * Retrieve GIDs by markers and allele values.
-	 *
-	 * @param instance the instance
-	 * @param markerIdList the marker id list
-	 * @param alleleValueList the allele value list
-	 * @return the gid, datasetId, markerId, alleleValue by markers and allele values
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<AllelicValueElement> getAllelicValuesByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList,
-			List<String> alleleValueList) throws MiddlewareQueryException;
-
-	/**
-	 * Get AllelicValueElement(gid, markerId, datasetId, alleleValue(data)) by markers and allele values from both local and central
-	 * database.
-	 *
-	 * @param markerIdList the marker id list
-	 * @param alleleValueList the allele value list
-	 * @return the all gids by markers and allele values
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
-			throws MiddlewareQueryException;
-
-	/**
 	 * Gets the gids by markers and allele values.
 	 *
 	 * @param markerIdList the marker id list
@@ -747,15 +723,6 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the number of char values given a set of GIDs.
-	 *
-	 * @param gids - the GIDs to match
-	 * @return the number of char values matching the given GIDs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException;
 
 	/**
 	 * Gets int alleleValues for polymorphic markers retrieval given a list of GIDs Retrieves data from both central and local database

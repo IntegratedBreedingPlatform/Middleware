@@ -477,24 +477,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllelicValuesByMarkersAndAlleleValues() throws Exception {
-		List<Integer> markerIdList = Arrays.asList(2325, 3345);
-		List<String> alleleValueList = Arrays.asList("238/238", "T/T");
-		List<AllelicValueElement> values =
-				this.genotypicDataManager.getAllelicValuesByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList);
-		Debug.printObjects(IntegrationTestBase.INDENT, values);
-	}
-
-	@Test
-	public void testGetAllAllelicValuesByMarkersAndAlleleValues() throws Exception {
-		List<Integer> markerIdList = Arrays.asList(2325);
-		List<String> alleleValueList = Arrays.asList("238/238");
-		List<AllelicValueElement> values =
-				this.genotypicDataManager.getAllAllelicValuesByMarkersAndAlleleValues(markerIdList, alleleValueList);
-		Debug.printObjects(IntegrationTestBase.INDENT, values);
-	}
-
-	@Test
 	public void testGetGidsByMarkersAndAlleleValues() throws Exception {
 		List<Integer> markerIdList = Arrays.asList(2325);
 		List<String> alleleValueList = Arrays.asList("238/238");
@@ -598,13 +580,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
 		long count = this.genotypicDataManager.countAlleleValuesByGids(germplasmIds);
 		Debug.println("testCountAlleleValuesByGids() RESULTS: " + count);
-	}
-
-	@Test
-	public void testCountCharValuesByGids() throws Exception {
-		List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
-		long count = this.genotypicDataManager.countCharValuesByGids(germplasmIds);
-		Debug.println("testCountCharValuesByGids() RESULTS: " + count);
 	}
 
 	@Test
@@ -970,8 +945,11 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		AccMetadataSet accMetadataSet = new AccMetadataSet(null, datas, sample ,1);
 		accMetadataSets.add(accMetadataSet);
 
+		final Marker marker = new Marker();
+		marker.setMarkerId(1);
+
 		List<CharValues> charValues = new ArrayList<>();
-		CharValues charValues1 = new CharValues(null, datas, 1, sample, "A/C", 1, 1);
+		CharValues charValues1 = new CharValues(null, datas, marker, sample, "A/C", 1, 1);
 		charValues.add(charValues1);
 
 		datas.setAccMetadataSets(accMetadataSets);
@@ -1072,7 +1050,10 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		dataset.setDatasetId(datasetId);
 		Sample sample = new Sample();
 		sample.setSampleId(sampleId);
-		CharValues charValues = new CharValues(acId, dataset, this.markerId, sample, charValue, markerSampleId, accSampleId);
+
+		final Marker marker = new Marker();
+		marker.setMarkerId(this.markerId);
+		CharValues charValues = new CharValues(acId, dataset, marker, sample, charValue, markerSampleId, accSampleId);
 
 		Integer idAdded = this.genotypicDataManager.addCharValues(charValues);
 		Debug.println("testAddCharValues() Added: " + (idAdded != null ? charValues : null));

@@ -532,21 +532,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public List<AllelicValueElement> getAllelicValuesByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList,
-			List<String> alleleValueList) throws MiddlewareQueryException {
-		List<AllelicValueElement> elements = new ArrayList<>();
-		elements.addAll(this.getAlleleValuesDao().getByMarkersAndAlleleValues(markerIdList, alleleValueList));
-		elements.addAll(this.getCharValuesDao().getByMarkersAndAlleleValues(markerIdList, alleleValueList));
-		return elements;
-	}
-
-	@Override
-	public List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
-			throws MiddlewareQueryException {
-		return this.getAllelicValuesByMarkersAndAlleleValues(Database.LOCAL, markerIdList, alleleValueList);
-	}
-
-	@Override
 	public List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
 			throws MiddlewareQueryException {
 		return this.getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
@@ -655,11 +640,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
 		return this.getAlleleValuesDao().countAlleleValuesByGids(gids);
-	}
-
-	@Override
-	public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
-		return this.getCharValuesDao().countCharValuesByGids(gids);
 	}
 
 	@Override

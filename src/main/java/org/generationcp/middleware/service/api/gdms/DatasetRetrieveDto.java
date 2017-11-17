@@ -1,27 +1,29 @@
 package org.generationcp.middleware.service.api.gdms;
 
 import org.pojomatic.Pojomatic;
-import org.pojomatic.annotations.AutoProperty;
 
-import java.util.List;
-import java.util.LinkedHashSet;
+import java.util.Map;
 
 /**
- * Created by clarysabel on 11/9/17.
+ * Created by clarysabel on 11/16/17.
  */
-@AutoProperty
-public class DatasetDto {
+public class DatasetRetrieveDto {
 
-	@AutoProperty
-	public class SampleKey {
+	public class CharValueDto {
 
 		private String sampleUID;
 
 		private Integer accesion;
 
-		public SampleKey() {
+		private String sampleName;
 
-		}
+		private Integer gid;
+
+		private String designation;
+
+		private Integer plantNumber;
+
+		private Map<String, String> charValues;
 
 		public String getSampleUID() {
 			return sampleUID;
@@ -39,6 +41,46 @@ public class DatasetDto {
 			this.accesion = accesion;
 		}
 
+		public String getSampleName() {
+			return sampleName;
+		}
+
+		public void setSampleName(final String sampleName) {
+			this.sampleName = sampleName;
+		}
+
+		public Integer getGid() {
+			return gid;
+		}
+
+		public void setGid(final Integer gid) {
+			this.gid = gid;
+		}
+
+		public String getDesignation() {
+			return designation;
+		}
+
+		public void setDesignation(final String designation) {
+			this.designation = designation;
+		}
+
+		public Integer getPlantNumber() {
+			return plantNumber;
+		}
+
+		public void setPlantNumber(final Integer plantNumber) {
+			this.plantNumber = plantNumber;
+		}
+
+		public Map<String, String> getCharValues() {
+			return charValues;
+		}
+
+		public void setCharValues(final Map<String, String> charValues) {
+			this.charValues = charValues;
+		}
+
 		@Override
 		public int hashCode() {
 			return Pojomatic.hashCode(this);
@@ -50,7 +92,7 @@ public class DatasetDto {
 		}
 
 		@Override
-		public boolean equals(final Object o) {
+		public boolean equals(Object o) {
 			return Pojomatic.equals(this, o);
 		}
 
@@ -76,13 +118,9 @@ public class DatasetDto {
 
 	private Integer userId;
 
-	private String specie;
+	private String species;
 
-	private String[][] charValues;
-
-	private List<String> markers;
-
-	private LinkedHashSet<SampleKey> sampleAccesions;
+	private String uploadDate;
 
 	public String getName() {
 		return name;
@@ -164,36 +202,20 @@ public class DatasetDto {
 		this.userId = userId;
 	}
 
-	public String[][] getCharValues() {
-		return charValues;
+	public String getSpecies() {
+		return species;
 	}
 
-	public void setCharValues(final String[][] charValues) {
-		this.charValues = charValues;
+	public void setSpecies(final String species) {
+		this.species = species;
 	}
 
-	public List<String> getMarkers() {
-		return markers;
+	public String getUploadDate() {
+		return uploadDate;
 	}
 
-	public void setMarkers(final List<String> markers) {
-		this.markers = markers;
-	}
-
-	public LinkedHashSet<SampleKey> getSampleAccesions() {
-		return sampleAccesions;
-	}
-
-	public void setSampleAccesions(final LinkedHashSet<SampleKey> sampleAccesions) {
-		this.sampleAccesions = sampleAccesions;
-	}
-
-	public String getSpecie() {
-		return specie;
-	}
-
-	public void setSpecie(final String specie) {
-		this.specie = specie;
+	public void setUploadDate(final String uploadDate) {
+		this.uploadDate = uploadDate;
 	}
 
 	@Override
@@ -207,7 +229,7 @@ public class DatasetDto {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
+	public boolean equals(Object o) {
 		return Pojomatic.equals(this, o);
 	}
 

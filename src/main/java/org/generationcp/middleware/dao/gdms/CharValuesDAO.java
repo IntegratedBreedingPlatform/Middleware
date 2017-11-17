@@ -91,8 +91,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	public static final String COUNT_GIDS_BY_MARKER_ID = "SELECT COUNT(distinct gid) " + "FROM gdms_char_values "
 			+ "WHERE marker_id = :markerId";
 
-	public static final String COUNT_CHAR_VALUES_BY_GIDS = "SELECT COUNT(*) " + "FROM gdms_char_values " + "WHERE gid in (:gids)";
-
 	public static final String GET_MARKER_SAMPLE_IDS_BY_GIDS = "SELECT DISTINCT marker_id, marker_sample_id " + "FROM gdms_char_values "
 			+ "WHERE gid IN (:gids)";
 
@@ -112,6 +110,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
+	// FIXME Could be removed after fixing retrieves
 	public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(final Integer datasetId, final int start, final int numOfRows)
 			throws MiddlewareQueryException {
 		List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
@@ -153,6 +152,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	 * @return the number of entries in char_values table corresponding to the given datasetId
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
+	// FIXME Could be removed after fixing retrieves
 	public long countByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
 		try {
 			if (datasetId != null) {
@@ -204,22 +204,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		return 0;
 	}
 
-	public long countCharValuesByGids(final List<Integer> gids) throws MiddlewareQueryException {
-		try {
-			if (gids != null && !gids.isEmpty()) {
-				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_CHAR_VALUES_BY_GIDS);
-				query.setParameterList("gids", gids);
-				BigInteger result = (BigInteger) query.uniqueResult();
-				if (result != null) {
-					return result.longValue();
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countCharValuesByGids(gids=" + gids + ") query from CharValues: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
 	public void deleteByDatasetId(final int datasetId) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -235,6 +219,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
+	// FIXME Could be removed after fixing retrieves
 	public List<MarkerSampleId> getMarkerSampleIdsByGids(final List<Integer> gIds) throws MiddlewareQueryException {
 		List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
 
@@ -261,6 +246,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
+	// FIXME Could be removed after fixing retrieves
 	public List<Object> getUniqueAllelesByDatasetId(final String datasetId) {
 		
 		List<Object> results = new ArrayList<>();
@@ -285,6 +271,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
+	// FIXME Could be removed after fixing retrieves
 	public List<Object> getUniqueCharAllelesByGidsAndMids(final List<Integer> gids, final List<Integer> mids) {
 		
 		List<Object> results = new ArrayList<>();
@@ -345,61 +332,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		return returnVal;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List<AllelicValueElement> getByMarkersAndAlleleValues(final List<Integer> markerIdList, final List<String> alleleValueList)
-			throws MiddlewareQueryException {
-		List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
-
-		if (markerIdList.isEmpty() || alleleValueList.isEmpty()) {
-			throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
-		}
-		if (markerIdList.size() != alleleValueList.size()) {
-			throw new MiddlewareQueryException("markerIdList and alleleValueList must have the same size");
-		}
-
-		List<String> placeholderList = new ArrayList<String>();
-		for (int i = 0; i < markerIdList.size(); i++) {
-			placeholderList.add("(?,?)");
-		}
-		String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
-
-		String sql =
-				new StringBuffer().append("SELECT dataset_id, gid, marker_id, CONCAT(char_value,''), marker_sample_id, acc_sample_id ")
-						.append("FROM gdms_char_values ").append("   WHERE (marker_id, char_value) IN (" + placeholders + ") ").toString();
-
-		try {
-			SQLQuery query = this.getSession().createSQLQuery(sql);
-			for (int i = 0; i < markerIdList.size(); i++) {
-				int baseIndex = i * 2;
-
-				query.setInteger(baseIndex, markerIdList.get(i));
-				query.setString(baseIndex + 1, alleleValueList.get(i));
-			}
-
-			List results = query.list();
-
-			for (final Object o : results) {
-				Object[] result = (Object[]) o;
-				if (result != null) {
-					Integer datasetId = (Integer) result[0];
-					Integer gid = (Integer) result[1];
-					Integer markerId = (Integer) result[2];
-					String charValue = (String) result[3];
-					Integer markerSampleId = (Integer) result[4];
-					Integer accSampleId = (Integer) result[5];
-					AllelicValueElement allelicValueElement =
-							new AllelicValueElement(null, datasetId, gid, markerId, charValue, markerSampleId, accSampleId);
-					values.add(allelicValueElement);
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByMarkersAndAlleleValues(markerIdList=" + markerIdList + ", alleleValueList="
-					+ alleleValueList + "): " + e.getMessage(), e);
-		}
-
-		return values;
-	}
 
 	@SuppressWarnings("unchecked")
 	public List<CharValues> getCharValuesByMarkerIds(final List<Integer> markerIds) throws MiddlewareQueryException {

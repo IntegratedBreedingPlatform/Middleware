@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.gdms;
 
-import org.generationcp.middleware.service.api.gdms.DatasetDto;
 import org.junit.Test;
 
 /**

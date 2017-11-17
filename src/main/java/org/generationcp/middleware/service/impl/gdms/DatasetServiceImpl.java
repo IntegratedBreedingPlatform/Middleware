@@ -13,7 +13,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.service.api.SampleService;
-import org.generationcp.middleware.service.api.gdms.DatasetDto;
+import org.generationcp.middleware.service.api.gdms.DatasetRetrieveDto;
+import org.generationcp.middleware.service.api.gdms.DatasetUploadDto;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.slf4j.Logger;
@@ -49,35 +50,35 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer saveDataset(final DatasetDto datasetDto) {
-		Preconditions.checkNotNull(datasetDto);
-		Preconditions.checkNotNull(datasetDto.getMarkers());
-		Preconditions.checkNotNull(datasetDto.getSampleAccesions());
+	public Integer saveDataset(final DatasetUploadDto datasetUploadDto) {
+		Preconditions.checkNotNull(datasetUploadDto);
+		Preconditions.checkNotNull(datasetUploadDto.getMarkers());
+		Preconditions.checkNotNull(datasetUploadDto.getSampleAccesions());
 
-		Preconditions.checkArgument(StringUtils.isNotEmpty(datasetDto.getName()), new Exception("Empty dataset name"));
+		Preconditions.checkArgument(StringUtils.isNotEmpty(datasetUploadDto.getName()), new Exception("Empty dataset name"));
 
-		if (datasetDto.getName().length() > 30) {
+		if (datasetUploadDto.getName().length() > 30) {
 			throw new MiddlewareException("Dataset Name value exceeds max char size");
 		}
-		if (datasetDAO.getByName(datasetDto.getName()) != null) {
+		if (datasetDAO.getByName(datasetUploadDto.getName()) != null) {
 			throw new MiddlewareException("Dataset Name already exists");
 		}
-		if (isDuplicatedMarkerNames(datasetDto)) {
+		if (isDuplicatedMarkerNames(datasetUploadDto)) {
 			throw new MiddlewareException("Duplicated markers not allowed");
 		}
 
-		this.validateInput(datasetDto);
+		this.validateInput(datasetUploadDto);
 
-		final Set<String> sampleUIDSet = this.getSampleUIDList(datasetDto);
+		final Set<String> sampleUIDSet = this.getSampleUIDList(datasetUploadDto);
 		final Map<String, SampleDTO> sampleDTOMap = sampleService.getSamplesBySampleUID(sampleUIDSet);
 
 		validateSamples(sampleUIDSet, sampleDTOMap);
 
-		final List<Marker> markers = this.markerDAO.getByNames(datasetDto.getMarkers(), 0, 0);
+		final List<Marker> markers = this.markerDAO.getByNames(datasetUploadDto.getMarkers(), 0, 0);
 		final Map<String, Marker> markerMap = this.getMarkersMap(markers);
-		this.validateMarkers(datasetDto, markerMap);
+		this.validateMarkers(datasetUploadDto, markerMap);
 
-		final Dataset dataset = DatasetBuilder.build(datasetDto, sampleDTOMap, markerMap);
+		final Dataset dataset = DatasetBuilder.build(datasetUploadDto, sampleDTOMap, markerMap);
 
 		try {
 			return datasetDAO.save(dataset).getDatasetId();
@@ -87,18 +88,28 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	private Boolean isDuplicatedMarkerNames(final DatasetDto datasetDto) {
-		final Set<String> uniqueMarkers = new HashSet<>(datasetDto.getMarkers());
-		if (uniqueMarkers.size() != datasetDto.getMarkers().size()) {
+	@Override
+	public DatasetRetrieveDto getDataset(final String datasetName) {
+		Preconditions.checkNotNull(datasetName);
+		final Dataset dataset = this.datasetDAO.getByName(datasetName);
+		if (dataset != null) {
+
+		}
+		return null;
+	}
+
+	private Boolean isDuplicatedMarkerNames(final DatasetUploadDto datasetUploadDto) {
+		final Set<String> uniqueMarkers = new HashSet<>(datasetUploadDto.getMarkers());
+		if (uniqueMarkers.size() != datasetUploadDto.getMarkers().size()) {
 			return Boolean.TRUE;
 		} else {
 			return Boolean.FALSE;
 		}
 	}
 
-	private Set<String> getSampleUIDList(final DatasetDto datasetDto) {
+	private Set<String> getSampleUIDList(final DatasetUploadDto datasetUploadDto) {
 		final Set<String> uniqueSamples = new HashSet<>();
-		for (final DatasetDto.SampleKey key : datasetDto.getSampleAccesions()) {
+		for (final DatasetUploadDto.SampleKey key : datasetUploadDto.getSampleAccesions()) {
 			uniqueSamples.add(key.getSampleUID());
 		}
 		return uniqueSamples;
@@ -114,12 +125,12 @@ public class DatasetServiceImpl implements DatasetService {
 		return mappedMarkers;
 	}
 
-	private void validateMarkers(final DatasetDto datasetDto, final Map<String, Marker> markerMap) {
+	private void validateMarkers(final DatasetUploadDto datasetUploadDto, final Map<String, Marker> markerMap) {
 
-		if (markerMap.size() != datasetDto.getMarkers().size()) {
+		if (markerMap.size() != datasetUploadDto.getMarkers().size()) {
 			List<String> markersNotFound = new ArrayList<>();
 
-			for (final String marker : datasetDto.getMarkers()) {
+			for (final String marker : datasetUploadDto.getMarkers()) {
 				if (!markerMap.containsKey(marker)) {
 					markersNotFound.add(marker);
 				}
@@ -151,11 +162,11 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	private void validateInput(final DatasetDto datasetDto) {
-		final Integer numberOfRows = datasetDto.getCharValues().length;
-		final Integer numberOfColums = datasetDto.getCharValues()[0].length;
+	private void validateInput(final DatasetUploadDto datasetUploadDto) {
+		final Integer numberOfRows = datasetUploadDto.getCharValues().length;
+		final Integer numberOfColums = datasetUploadDto.getCharValues()[0].length;
 
-		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetDto.getMarkers().size() && numberOfRows == datasetDto
+		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetUploadDto.getMarkers().size() && numberOfRows == datasetUploadDto
 				.getSampleAccesions().size())) {
 			throw new MiddlewareException("Invalid matrix size");
 		}
