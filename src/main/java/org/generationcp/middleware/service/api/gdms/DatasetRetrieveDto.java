@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.gdms;
 
+import com.sun.tools.javac.util.List;
 import org.pojomatic.Pojomatic;
 
 import java.util.Map;
@@ -121,6 +122,8 @@ public class DatasetRetrieveDto {
 	private String species;
 
 	private String uploadDate;
+
+	private List<CharValueDto> charValueDtos;
 
 	public String getName() {
 		return name;

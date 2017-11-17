@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
+import org.generationcp.middleware.service.api.gdms.DatasetRetrieveDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -347,6 +348,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		}
 
 		return toReturn;
+	}
+
+	public List<DatasetRetrieveDto.CharValueDto> getCharValuesByDatasetId (final Integer datasetId) throws MiddlewareQueryException {
+		return null;
 	}
 
 }
