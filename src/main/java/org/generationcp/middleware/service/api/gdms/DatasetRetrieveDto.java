@@ -1,20 +1,26 @@
 package org.generationcp.middleware.service.api.gdms;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
 
 /**
  * Created by clarysabel on 11/16/17.
  */
+@AutoProperty
 public class DatasetRetrieveDto {
 
+	@AutoProperty
 	public class CharValueDto {
 
 		private String sampleUID;
 
-		private Integer accesion;
+		private Integer accession;
 
 		private String sampleName;
 
@@ -24,7 +30,7 @@ public class DatasetRetrieveDto {
 
 		private Integer plantNumber;
 
-		private Map<String, String> charValues;
+		private Map<String, String> charValues = new HashMap<>();
 
 		public String getSampleUID() {
 			return sampleUID;
@@ -34,12 +40,12 @@ public class DatasetRetrieveDto {
 			this.sampleUID = sampleUID;
 		}
 
-		public Integer getAccesion() {
-			return accesion;
+		public Integer getAccession() {
+			return accession;
 		}
 
-		public void setAccesion(final Integer accesion) {
-			this.accesion = accesion;
+		public void setAccession(final Integer accession) {
+			this.accession = accession;
 		}
 
 		public String getSampleName() {
@@ -121,9 +127,9 @@ public class DatasetRetrieveDto {
 
 	private String species;
 
-	private String uploadDate;
+	private Date uploadDate;
 
-	private List<CharValueDto> charValueDtos;
+	private List<CharValueDto> charValueDtos = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -213,12 +219,20 @@ public class DatasetRetrieveDto {
 		this.species = species;
 	}
 
-	public String getUploadDate() {
+	public Date getUploadDate() {
 		return uploadDate;
 	}
 
-	public void setUploadDate(final String uploadDate) {
+	public void setUploadDate(final Date uploadDate) {
 		this.uploadDate = uploadDate;
+	}
+
+	public List<CharValueDto> getCharValueDtos() {
+		return charValueDtos;
+	}
+
+	public void setCharValueDtos(final List<CharValueDto> charValueDtos) {
+		this.charValueDtos = charValueDtos;
 	}
 
 	@Override

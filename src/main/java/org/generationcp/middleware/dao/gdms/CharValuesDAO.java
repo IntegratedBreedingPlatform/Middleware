@@ -17,9 +17,11 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.CharValueElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
@@ -31,6 +33,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +103,28 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
 			"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, ''), marker_sample_id, acc_sample_id "
 					+ "FROM gdms_char_values cv " + "WHERE  cv.marker_id IN (:markerIdList) " + "ORDER BY cv.gid DESC ";
+
+	private static final String GET_CHAR_VALUES_ELEMENTS_BY_DATASETID =
+			"SELECT sample.sample_bk as sampleUID, " //
+					+ "  charvalues.acc_sample_id as accessionId, " //
+					+ "  sample.sample_name as sampleName, " //
+					+ "  stock.dbxref_id as gid, " //
+					+ "  (SELECT na.nval FROM names na " //
+					+ "  WHERE na.gid = stock.dbxref_id AND na.nstat = 1 LIMIT 1) AS designation, " //
+					+ "  plant.plant_no as plantNo, " //
+					+ "  marker.marker_id as markerId, " //
+					+ "  marker.marker_name as markerName, " //
+					+ "  charvalues.char_value as charValue, " //
+					+ "  charvalues.dataset_id as datasetId " //
+					+ "  FROM gdms_char_values charvalues " //
+					+ "  INNER JOIN sample sample ON (sample.sample_id = charvalues.sample_id) " //
+					+ "  INNER JOIN plant plant ON (sample.plant_id = plant.plant_id) " //
+					+ "  INNER JOIN nd_experiment experiment ON (plant.nd_experiment_id = experiment.nd_experiment_id) " //
+					+ "  INNER JOIN nd_experiment_stock exp_stock ON (exp_stock.nd_experiment_id = experiment.nd_experiment_id) " //
+					+ "  INNER JOIN stock stock ON (stock.stock_id = exp_stock.stock_id) " //
+					+ "  INNER JOIN nd_experimentprop prop ON (prop.nd_experiment_id = experiment.nd_experiment_id AND prop.type_id = " + TermId.PLOT_NO.getId() + ") " //
+					+ "  INNER JOIN gdms_marker marker ON (marker.marker_id = charvalues.marker_id) " //
+					+ "  WHERE charvalues.dataset_id = :datasetId "; //
 
 	private static final Logger LOG = LoggerFactory.getLogger(CharValuesDAO.class);
 
@@ -350,8 +377,29 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		return toReturn;
 	}
 
-	public List<DatasetRetrieveDto.CharValueDto> getCharValuesByDatasetId (final Integer datasetId) throws MiddlewareQueryException {
-		return null;
+	public List<CharValueElement> getCharValueElementsByDatasetId (final Integer datasetId) throws MiddlewareQueryException {
+		Preconditions.checkNotNull(datasetId);
+		try {
+			return this.getSession().createSQLQuery(GET_CHAR_VALUES_ELEMENTS_BY_DATASETID)
+					.addScalar("sampleUID", new StringType())
+					.addScalar("accessionId", new IntegerType())
+					.addScalar("sampleName", new StringType())
+					.addScalar("gid", new IntegerType())
+					.addScalar("designation", new StringType())
+					.addScalar("plantNo", new IntegerType())
+					.addScalar("markerId", new IntegerType())
+					.addScalar("markerName", new StringType())
+					.addScalar("charValue", new StringType())
+					.addScalar("datasetId", new IntegerType())
+					.setParameter("datasetId", datasetId)
+					.setResultTransformer(Transformers.aliasToBean(CharValueElement.class))
+					.list();
+
+		} catch (HibernateException e) {
+			final String errorMessage = "Error with getCharValueElementsByDatasetId(datasetId=" + datasetId + ") query from CharValuesDAO " + e.getMessage();
+			CharValuesDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
 
 }

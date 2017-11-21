@@ -4,12 +4,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.gdms.CharValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.gdms.CharValueElement;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.service.api.SampleService;
@@ -40,12 +42,15 @@ public class DatasetServiceImpl implements DatasetService {
 	private DatasetDAO datasetDAO;
 	private MarkerDAO markerDAO;
 	private SampleService sampleService;
+	private CharValuesDAO charValuesDAO;
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
 		datasetDAO = new DatasetDAO();
 		markerDAO = new MarkerDAO();
+		charValuesDAO = new CharValuesDAO();
 		this.datasetDAO.setSession(sessionProvider.getSession());
 		this.markerDAO.setSession(sessionProvider.getSession());
+		this.charValuesDAO.setSession(sessionProvider.getSession());
 		sampleService = new SampleServiceImpl(sessionProvider);
 	}
 
@@ -91,11 +96,18 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public DatasetRetrieveDto getDataset(final String datasetName) {
 		Preconditions.checkNotNull(datasetName);
-		final Dataset dataset = this.datasetDAO.getByName(datasetName);
-		if (dataset != null) {
-
+		try {
+			final Dataset dataset = this.datasetDAO.getByName(datasetName);
+			if (dataset != null) {
+				List<CharValueElement> charValueElements = this.charValuesDAO.getCharValueElementsByDatasetId(dataset.getDatasetId());
+				return DatasetRetrieveDtoBuilder.build(dataset, charValueElements);
+			} else {
+				return null;
+			}
+		} catch (MiddlewareQueryException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new MiddlewareException("An error has occurred while querying the dataset");
 		}
-		return null;
 	}
 
 	private Boolean isDuplicatedMarkerNames(final DatasetUploadDto datasetUploadDto) {
@@ -194,5 +206,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public void setSampleService(final SampleService sampleService) {
 		this.sampleService = sampleService;
+	}
+
+	public CharValuesDAO getCharValuesDAO() {
+		return charValuesDAO;
+	}
+
+	public void setCharValuesDAO(final CharValuesDAO charValuesDAO) {
+		this.charValuesDAO = charValuesDAO;
 	}
 }

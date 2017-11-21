@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.gdms;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.dao.gdms.CharValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -40,6 +41,9 @@ public class DatasetServiceImplTest {
 	@Mock
 	private MarkerDAO markerDAO;
 
+	@Mock
+	private CharValuesDAO charValuesDAO;
+
 	private DatasetServiceImpl datasetService;
 
 	@Before
@@ -49,6 +53,7 @@ public class DatasetServiceImplTest {
 		datasetService.setSampleService(sampleService);
 		datasetService.setDatasetDAO(datasetDAO);
 		datasetService.setMarkerDAO(markerDAO);
+		datasetService.setCharValuesDAO(charValuesDAO);
 	}
 
 	@Test (expected = Exception.class)

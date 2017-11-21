@@ -60,13 +60,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 			+ "FROM names n JOIN gdms_allele_values a ON n.gid = a.gid " + "           JOIN gdms_marker m ON a.marker_id = m.marker_id "
 			+ "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " + "ORDER BY n.nval, m.marker_name";
 
-	// For getAllelicValues by gid and marker names
-	public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES = "SELECT DISTINCT " + "gdms_allele_values.gid, "
-			+ "CONCAT(gdms_allele_values.allele_bin_value, ''), " + "CONCAT(gdms_marker.marker_name, ''), "
-			+ "gdms_allele_values.peak_height " + "FROM gdms_allele_values, " + "gdms_marker "
-			+ "WHERE gdms_allele_values.marker_id = gdms_marker.marker_id " + "AND gdms_allele_values.gid IN (:gidList) "
-			+ "AND gdms_allele_values.marker_id IN (:markerIdList) " + "ORDER BY gdms_allele_values.gid DESC, gdms_marker.marker_name";
-
 	public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS = "SELECT DISTINCT " + "gav.gid, " + "gav.marker_id, "
 			+ "CONCAT(gav.allele_bin_value, ''), " + "gav.peak_height, " + "gav.marker_sample_id, " + "gav.acc_sample_id "
 			+ "FROM gdms_allele_values gav " + "WHERE  gav.gid IN (:gidList) " + "AND gav.marker_id IN (:markerIdList) "
@@ -89,9 +82,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 	public static final String COUNT_BY_DATASET_ID = "SELECT COUNT(*) " + "FROM gdms_allele_values " + "WHERE dataset_id = :datasetId";
 
 	public static final String GET_GIDS_BY_MARKER_ID = "SELECT DISTINCT gid " + "FROM gdms_allele_values " + "WHERE marker_id = :markerId";
-
-	public static final String COUNT_GIDS_BY_MARKER_ID = "SELECT COUNT(DISTINCT gid) " + "FROM gdms_allele_values "
-			+ "WHERE marker_id = :markerId";
 
 	public static final String COUNT_ALLELE_VALUES_BY_GIDS = "SELECT COUNT(*) " + "FROM gdms_allele_values " + "WHERE gid in (:gids)";
 
@@ -270,63 +260,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 		return new ArrayList<Integer>();
 	}
 
-	public List<AllelicValueElement> getByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
-			throws MiddlewareQueryException {
-		List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
-
-		if (markerIdList.isEmpty() || alleleValueList.isEmpty()) {
-			throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
-		}
-		if (markerIdList.size() != alleleValueList.size()) {
-			throw new MiddlewareQueryException("markerIdList and alleleValueList must have the same size");
-		}
-
-		List<String> placeholderList = new ArrayList<String>();
-		for (int i = 0; i < markerIdList.size(); i++) {
-			placeholderList.add("(?,?)");
-		}
-		String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
-
-		String sql =
-				new StringBuffer()
-						.append("SELECT dataset_id, gid, marker_id, CONCAT(allele_bin_value,''), marker_sample_id, acc_sample_id ")
-						.append("FROM gdms_allele_values ").append("WHERE (marker_id, allele_bin_value) IN (" + placeholders + ") ")
-						.toString();
-
-		try {
-			SQLQuery query = this.getSession().createSQLQuery(sql);
-			for (int i = 0; i < markerIdList.size(); i++) {
-				int baseIndex = i * 2;
-
-				query.setInteger(baseIndex, markerIdList.get(i));
-				query.setString(baseIndex + 1, alleleValueList.get(i));
-			}
-
-			List results = query.list();
-
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
-				if (result != null) {
-					Integer datasetId = (Integer) result[0];
-					Integer gid = (Integer) result[1];
-					Integer markerId = (Integer) result[2];
-					String alleleBinValue = (String) result[3];
-					Integer markerSampleId = (Integer) result[4];
-					Integer accSampleId = (Integer) result[5];
-					AllelicValueElement allelicValueElement =
-							new AllelicValueElement(null, datasetId, gid, markerId, alleleBinValue, markerSampleId, accSampleId);
-					values.add(allelicValueElement);
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByMarkersAndAlleleValues(markerIdList=" + markerIdList + ", alleleValueList="
-					+ alleleValueList + "): " + e.getMessage(), e);
-		}
-
-		return values;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
 			throws MiddlewareQueryException {
@@ -366,30 +299,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 		}
 
 		return values;
-	}
-
-	/**
-	 * Count gids by marker id.
-	 *
-	 * @param markerId the marker id
-	 * @return the number of GIds by Marker Id
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	public long countGIDsByMarkerId(Integer markerId) throws MiddlewareQueryException {
-		try {
-			if (markerId != null) {
-				SQLQuery query = this.getSession().createSQLQuery(AlleleValuesDAO.COUNT_GIDS_BY_MARKER_ID);
-				query.setParameter("markerId", markerId);
-				BigInteger result = (BigInteger) query.uniqueResult();
-				if (result != null) {
-					return result.longValue();
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with countGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);
-		}
-		return 0;
 	}
 
 	public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
