@@ -91,6 +91,10 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	@Column(name = "altitude")
 	private Double altitude;
 
+	@Basic(optional = true)
+	@Column(name = "program_uuid")
+	private String programUUID;
+
 	public LocationDetails() {
 	}
 
@@ -262,5 +266,13 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	public void setLtype(Integer ltype) {
 		this.ltype = ltype;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 }

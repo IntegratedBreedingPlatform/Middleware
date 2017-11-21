@@ -421,7 +421,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			queryString
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,");
 			queryString.append(" ud.fname as location_type,");
-			queryString.append(" ud.fdesc as location_description");
+			queryString.append(" ud.fdesc as location_description, l.program_uuid");
 			queryString.append(" from location l");
 			queryString.append(" left join georef g on l.locid = g.locid");
 			queryString.append(" left join cntry c on l.cntryid = c.cntryid");
@@ -468,7 +468,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,");
 			queryString.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,");
 			queryString.append(" ud.fname as location_type,");
-			queryString.append(" ud.fdesc as location_description");
+			queryString.append(" ud.fdesc as location_description, l.program_uuid");
 			queryString.append(" from location l");
 			queryString.append(" left join georef g on l.locid = g.locid");
 			queryString.append(" left join cntry c on l.cntryid = c.cntryid");
@@ -886,7 +886,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			queryString.append("SELECT l.lname as location_name,l.locid,l.ltype as ltype,")
 					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 					.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,")
-					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description").append(" FROM location l")
+					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid").append(" FROM location l")
 					.append(" LEFT JOIN georef g on l.locid = g.locid").append(" LEFT JOIN cntry c on l.cntryid = c.cntryid")
 					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype").append(" WHERE (l.program_uuid = '").append(programUUID)
 					.append("'").append(" or l.program_uuid is null) ");
