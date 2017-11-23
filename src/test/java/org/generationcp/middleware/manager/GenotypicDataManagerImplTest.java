@@ -344,16 +344,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {
-		Integer datasetId = Integer.valueOf(6);
-		long count = this.genotypicDataManager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-		List<AllelicValueWithMarkerIdElement> allelicValues =
-				this.genotypicDataManager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, (int) count);
-		Debug.println(0, "testGetAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues.size());
-		Debug.printObjects(allelicValues);
-	}
-
-	@Test
 	public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {
 		Integer datasetId = Integer.valueOf(2);
 		long count = this.genotypicDataManager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
@@ -1582,13 +1572,6 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 		long count = this.genotypicDataManager.countAllelicValuesFromAlleleValuesByDatasetId(this.datasetId);
 		Assert.assertNotNull(count);
 		Debug.println("testCountAllelicValuesFromAlleleValuesByDatasetId(" + this.datasetId + ") Results: " + count);
-	}
-
-	@Test
-	public void testCountAllelicValuesFromCharValuesByDatasetId() throws Exception {
-		long count = this.genotypicDataManager.countAllelicValuesFromCharValuesByDatasetId(this.datasetId);
-		Assert.assertNotNull(count);
-		Debug.println("testCountAllelicValuesFromCharValuesByDatasetId(" + this.datasetId + ") Results: " + count);
 	}
 
 	@Test

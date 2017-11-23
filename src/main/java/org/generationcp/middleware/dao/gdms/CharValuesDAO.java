@@ -70,27 +70,9 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 																																	// height
 			"FROM gdms_char_values " + "WHERE gdms_char_values.gid IN (:gidList) " + "ORDER BY gdms_char_values.gid ASC ";
 
-	// For getAllelicValues by datasetId
-	public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = "SELECT gid, marker_id,  CONCAT(char_value, '') "
-			+ "           , marker_sample_id, acc_sample_id " + "FROM gdms_char_values " + "WHERE dataset_id = :datasetId "
-			+ "ORDER BY gid ASC, marker_id ASC";
-	
-	//getAllelicValues by datasetId - distinct (not sure of difference wrt query above)
-	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID = "SELECT DISTINCT\n"
-		+ "  sample_id,\n"
-		+ "  marker_id,\n"
-		+ "  char_value,\n"
-		+ "  acc_sample_id,\n"
-		+ "  marker_sample_id\n"
-		+ "FROM gdms_char_values\n"
-		+ "WHERE dataset_id = :datasetId\n"
-		+ "ORDER BY sample_id, marker_id, acc_sample_id ASC";
-
 	// another transferred query from the Vaadin layer
 	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id, char_value,acc_sample_id,marker_sample_id from gdms_char_values where"
 			+ " gid in(:gids) and marker_id in (:mids) ORDER BY gid, marker_id,acc_sample_id asc";
-
-	public static final String COUNT_BY_DATASET_ID = "SELECT COUNT(*) " + "FROM gdms_char_values " + "WHERE dataset_id = :datasetId";
 
 	public static final String GET_GIDS_BY_MARKER_ID = "SELECT DISTINCT gid " + "FROM gdms_char_values " + "WHERE marker_id = :markerId";
 
@@ -127,76 +109,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					+ "  WHERE charvalues.dataset_id = :datasetId "; //
 
 	private static final Logger LOG = LoggerFactory.getLogger(CharValuesDAO.class);
-
-	/**
-	 * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.
-	 * 
-	 * @param datasetId the dataset id
-	 * @param start the start of the rows to retrieve
-	 * @param numOfRows the number of rows to retrieve
-	 * @return the Allelic Values (germplasm id, data value, and marker id) for the given dataset id
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	@SuppressWarnings("rawtypes")
-	// FIXME Could be removed after fixing retrieves
-	public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(final Integer datasetId, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
-		List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
-
-		try {
-			if (datasetId != null) {
-				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.GET_ALLELIC_VALUES_BY_DATASET_ID);
-				query.setParameter("datasetId", datasetId);
-				query.setFirstResult(start);
-				query.setMaxResults(numOfRows);
-				List results = query.list();
-
-				for (final Object o : results) {
-					Object[] result = (Object[]) o;
-					if (result != null) {
-						Integer gid = (Integer) result[0];
-						Integer markerId = (Integer) result[1];
-						String data = (String) result[2];
-						Integer markerSampleId = (Integer) result[3];
-						Integer accSampleId = (Integer) result[4];
-
-						AllelicValueWithMarkerIdElement allelicValueElement =
-								new AllelicValueWithMarkerIdElement(gid, data, markerId, markerSampleId, accSampleId);
-						toReturn.add(allelicValueElement);
-					}
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getAllelicValuesByDatasetId(datasetId=" + datasetId + ") queryfrom char_values : " + e.getMessage(), e);
-		}
-		return toReturn;
-	}
-
-	/**
-	 * Count by dataset id.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the number of entries in char_values table corresponding to the given datasetId
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	// FIXME Could be removed after fixing retrieves
-	public long countByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
-		try {
-			if (datasetId != null) {
-				Query query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_BY_DATASET_ID);
-				query.setParameter("datasetId", datasetId);
-				BigInteger result = (BigInteger) query.uniqueResult();
-				if (result != null) {
-					return result.longValue();
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from char_values: " + e.getMessage(),
-					e);
-		}
-		return 0;
-	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGIDsByMarkerId(final Integer markerId, final int start, final int numOfRows) throws MiddlewareQueryException {
@@ -247,7 +159,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	// FIXME Could be removed after fixing retrieves
 	public List<MarkerSampleId> getMarkerSampleIdsByGids(final List<Integer> gIds) throws MiddlewareQueryException {
 		List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
 
@@ -274,32 +185,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
-	// FIXME Could be removed after fixing retrieves
-	public List<Object> getUniqueAllelesByDatasetId(final String datasetId) {
-		
-		List<Object> results = new ArrayList<>();
-		try {
-			if (datasetId != null) {
-				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID);
-				query.setParameter("datasetId", datasetId);
-				query.addScalar("sample_id", Hibernate.INTEGER);
-				query.addScalar("marker_id", Hibernate.INTEGER);
-				query.addScalar("char_value", Hibernate.STRING);
-				query.addScalar("acc_sample_id", Hibernate.INTEGER);
-				query.addScalar("marker_sample_id", Hibernate.INTEGER);
-				results = query.list();
-
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getUniqueAllelesByDatasetId(datasetId=" + datasetId + ") query from CharValuesDAO " + e.getMessage(), e);
-		}
-		return results;
-				
-	}
-	
-	@SuppressWarnings({"deprecation", "unchecked"})
-	// FIXME Could be removed after fixing retrieves
 	public List<Object> getUniqueCharAllelesByGidsAndMids(final List<Integer> gids, final List<Integer> mids) {
 		
 		List<Object> results = new ArrayList<>();
@@ -363,18 +248,16 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<CharValues> getCharValuesByMarkerIds(final List<Integer> markerIds) throws MiddlewareQueryException {
-		List<CharValues> toReturn = new ArrayList<CharValues>();
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("markerId", markerIds));
-			toReturn = criteria.list();
+			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getCharValuesByMarkerIds=" + markerIds.toString() + " query on CharValuesDAO: " + e.getMessage(), e);
+			final String errorMessage = "Error in getCharValuesByMarkerIds=" + markerIds.toString() + " query on CharValuesDAO: " + e.getMessage();
+			CharValuesDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-
-		return toReturn;
 	}
 
 	public List<CharValueElement> getCharValueElementsByDatasetId (final Integer datasetId) throws MiddlewareQueryException {

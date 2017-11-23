@@ -361,17 +361,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(Integer datasetId, int start, int numOfRows)
-			throws MiddlewareQueryException {
-		return this.getCharValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
-	}
-
-	@Override
-	public long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-		return this.getCharValuesDao().countByDatasetId(datasetId);
-	}
-
-	@Override
 	public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		return this.getAlleleValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
@@ -1719,17 +1708,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	// --- Added by Matthew transferring GDMS SQL to middleware -- //
-	
-	@Override
-	public List<Object> getUniqueAccMetaDataSetByDatasetId(String datasetId) {
-		return this.getAccMetadataSetDao().getUniqueAccMetaDatsetByDatasetId(datasetId);
-	}
-
-	@Override
-	public List<Object> getUniqueCharAllelesByDataset(String datasetId) {
-		return this.getCharValuesDao().getUniqueAllelesByDatasetId(datasetId);
-	}
-
 	@Override
 	public List<QtlDetails> getAllQtlDetails() {
 		return this.getQtlDetailsDao().getAll();

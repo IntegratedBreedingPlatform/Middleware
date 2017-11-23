@@ -345,28 +345,6 @@ public interface GenotypicDataManager {
 			throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves a list of allelic values (germplasm id, char_value, marker id) based on the specified dataset id from the char_values
-	 * table.
-	 *
-	 * @param datasetId - the dataset id matching the allelic values
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of allelic values based on the specified dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(Integer datasetId, int start, int numOfRows)
-			throws MiddlewareQueryException;
-
-	/**
-	 * Counts the allelic values based on the specified dataset id from the char_values table.
-	 *
-	 * @param datasetId the dataset id matching the allelic values
-	 * @return the number of allelic values from char_values table based on the specified dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
 	 * Retrieves a list of allelic values (germplasm id, allele_bin_value, marker id) based on the specified dataset id from the
 	 * allele_values table.
 	 *
@@ -1798,12 +1776,8 @@ public interface GenotypicDataManager {
 	
 	// Added by Matthew to move GDMS SQL to middleware : services not heavily understood
 	
-	List<Object> getUniqueAccMetaDataSetByDatasetId(String datasetId);
-	
 	List<Object> getUniqueAccMetaDataSetByGids(List gids);
 
-	List<Object> getUniqueCharAllelesByDataset(String datasetId);
-	
 	List<QtlDetails> getAllQtlDetails();
 
 	// I have a feeling we may need to paginate this guy ..... see the other limited getAllQtl
