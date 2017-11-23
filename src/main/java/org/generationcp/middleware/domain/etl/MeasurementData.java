@@ -26,7 +26,7 @@ public class MeasurementData {
 	private static final String EMPTY_STRING = "";
 
 	public static final String MISSING_VALUE = "missing";
-	public boolean isCustomCategoricalValue;
+	private boolean isCustomCategoricalValue;
 	private String label;
 	private String value;
 	private String cValueId;
@@ -223,19 +223,30 @@ public class MeasurementData {
 	}
 
 	public CategoricalDisplayValue getDisplayValueForCategoricalData() {
-		if (null == this.value || "".equals(this.value)) {
+
+		final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
+
+		if ((null == this.cValueId ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(value)) {
+			// If the categorical value id and value are empty, just return a CategoricalDisplayValue with empty
+			// id, name and description.
 			return new CategoricalDisplayValue("", "", "", false);
+		} else if (NumberUtils.isNumber(this.cValueId)) {
+			// If the variable is categorical and its value is within the valid range, then it is expected that the
+			// cValueId is assigned with the ID of the selected categorical value.
+			for (final ValueReference possibleValue : possibleValues) {
+				if (possibleValue.getId().equals(Double.valueOf(this.cValueId).intValue())) {
+					return new CategoricalDisplayValue(this.cValueId, possibleValue.getName(), possibleValue
+							.getDisplayDescription());
+				}
+			}
 		} else if (NumberUtils.isNumber(this.value)) {
-			final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
+			// Handles the case where the measurementData.value contains the categorical id value.
+			// FIXME: Identify which scenario where measurementData.value becomes the categorical value id. I believe we should
+			// correct/remove this logic because ideally, the categorical value id should always be stored in measurementData.cvalueId
 			for (final ValueReference possibleValue : possibleValues) {
 				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
-
-					// if measurement data is a factor, show original description else, get the modified display description
-					final String displayDescription =
-							this.getMeasurementVariable().isFactor() ? possibleValue.getDescription() : possibleValue
-									.getDisplayDescription();
-
-					return new CategoricalDisplayValue(this.value, possibleValue.getName(), displayDescription);
+					return new CategoricalDisplayValue(this.value, possibleValue.getName(), possibleValue
+							.getDisplayDescription());
 				}
 			}
 		}
