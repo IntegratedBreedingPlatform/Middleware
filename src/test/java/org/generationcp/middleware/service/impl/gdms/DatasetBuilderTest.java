@@ -173,6 +173,8 @@ public class DatasetBuilderTest {
 
 		assertThat(markerIdsFromMarkerMetadataset, contains(markerIdsFromMarkerMap.toArray()));
 
+		assertThat(dataset.getCharValues(), hasSize(4));
+
 	}
 
 }
