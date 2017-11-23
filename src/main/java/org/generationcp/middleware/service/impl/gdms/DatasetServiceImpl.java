@@ -58,7 +58,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public Integer saveDataset(final DatasetUploadDto datasetUploadDto) {
 		Preconditions.checkNotNull(datasetUploadDto);
 		Preconditions.checkNotNull(datasetUploadDto.getMarkers());
-		Preconditions.checkNotNull(datasetUploadDto.getSampleAccesions());
+		Preconditions.checkNotNull(datasetUploadDto.getSampleAccessions());
 
 		Preconditions.checkArgument(StringUtils.isNotEmpty(datasetUploadDto.getName()), new Exception("Empty dataset name"));
 
@@ -121,7 +121,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private Set<String> getSampleUIDList(final DatasetUploadDto datasetUploadDto) {
 		final Set<String> uniqueSamples = new HashSet<>();
-		for (final DatasetUploadDto.SampleKey key : datasetUploadDto.getSampleAccesions()) {
+		for (final DatasetUploadDto.SampleKey key : datasetUploadDto.getSampleAccessions()) {
 			uniqueSamples.add(key.getSampleUID());
 		}
 		return uniqueSamples;
@@ -179,7 +179,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer numberOfColums = datasetUploadDto.getCharValues()[0].length;
 
 		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetUploadDto.getMarkers().size() && numberOfRows == datasetUploadDto
-				.getSampleAccesions().size())) {
+				.getSampleAccessions().size())) {
 			throw new MiddlewareException("Invalid matrix size");
 		}
 	}

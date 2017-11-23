@@ -17,7 +17,7 @@ public class DatasetUploadDto {
 
 		private String sampleUID;
 
-		private Integer accesion;
+		private Integer accession;
 
 		public SampleKey() {
 
@@ -31,12 +31,12 @@ public class DatasetUploadDto {
 			this.sampleUID = sampleUID;
 		}
 
-		public Integer getAccesion() {
-			return accesion;
+		public Integer getAccession() {
+			return accession;
 		}
 
-		public void setAccesion(final Integer accesion) {
-			this.accesion = accesion;
+		public void setAccession(final Integer accession) {
+			this.accession = accession;
 		}
 
 		@Override
@@ -82,7 +82,7 @@ public class DatasetUploadDto {
 
 	private List<String> markers;
 
-	private LinkedHashSet<SampleKey> sampleAccesions;
+	private LinkedHashSet<SampleKey> sampleAccessions;
 
 	public String getName() {
 		return name;
@@ -180,12 +180,12 @@ public class DatasetUploadDto {
 		this.markers = markers;
 	}
 
-	public LinkedHashSet<SampleKey> getSampleAccesions() {
-		return sampleAccesions;
+	public LinkedHashSet<SampleKey> getSampleAccessions() {
+		return sampleAccessions;
 	}
 
-	public void setSampleAccesions(final LinkedHashSet<SampleKey> sampleAccesions) {
-		this.sampleAccesions = sampleAccesions;
+	public void setSampleAccessions(final LinkedHashSet<SampleKey> sampleAccessions) {
+		this.sampleAccessions = sampleAccessions;
 	}
 
 	public String getSpecies() {

@@ -54,7 +54,7 @@ public class DatasetBuilder {
 		final List<CharValues> charValuesList = new ArrayList<>();
 
 		int row = 0;
-		for (final DatasetUploadDto.SampleKey sampleKey : datasetUploadDto.getSampleAccesions()) {
+		for (final DatasetUploadDto.SampleKey sampleKey : datasetUploadDto.getSampleAccessions()) {
 			int column = 0;
 			for (final String marker : datasetUploadDto.getMarkers()) {
 				final CharValues charValues = new CharValues();
@@ -65,7 +65,7 @@ public class DatasetBuilder {
 				charValues.setSample(sample);
 				charValues.setCharValue(getCharData(datasetUploadDto.getCharValues()[row][column]));
 				charValues.setMarker(markerMap.get(marker));
-				charValues.setAccSampleId(sampleKey.getAccesion());
+				charValues.setAccSampleId(sampleKey.getAccession());
 				charValuesList.add(charValues);
 				column++;
 			}
@@ -99,14 +99,14 @@ public class DatasetBuilder {
 
 		final List<AccMetadataSet> accMetadataSetList = new ArrayList<>();
 
-		for (final DatasetUploadDto.SampleKey sampleAccesionKey : datasetUploadDto.getSampleAccesions()) {
+		for (final DatasetUploadDto.SampleKey sampleAccesionKey : datasetUploadDto.getSampleAccessions()) {
 			final AccMetadataSet ams = new AccMetadataSet();
 			final Sample sample = new Sample();
 			sample.setSampleId(sampleDTOMap.get(sampleAccesionKey.getSampleUID()).getSampleId());
-
+			sample.setSampleBusinessKey(sampleDTOMap.get(sampleAccesionKey.getSampleUID()).getSampleBusinessKey());
 			ams.setDataset(dataset);
 			ams.setSample(sample);
-			ams.setAccSampleId(sampleAccesionKey.getAccesion());
+			ams.setAccSampleId(sampleAccesionKey.getAccession());
 			accMetadataSetList.add(ams);
 		}
 

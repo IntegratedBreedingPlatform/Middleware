@@ -73,7 +73,7 @@ public class DatasetServiceImplTest {
 	@Test (expected = Exception.class)
 	public void testSaveDataset_NullSamples() throws Exception {
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
-		datasetUploadDto.setSampleAccesions(null);
+		datasetUploadDto.setSampleAccessions(null);
 		datasetService.saveDataset(datasetUploadDto);
 	}
 
@@ -87,7 +87,7 @@ public class DatasetServiceImplTest {
 	public void testSaveDataset_LongName() throws Exception {
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
 		datasetUploadDto.setName(RandomStringUtils.random(31));
-		datasetUploadDto.setSampleAccesions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
+		datasetUploadDto.setSampleAccessions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
 		datasetUploadDto.setMarkers(new ArrayList<String>());
 		datasetService.saveDataset(datasetUploadDto);
 	}
@@ -104,14 +104,14 @@ public class DatasetServiceImplTest {
 		final Dataset datasetFromDB = new Dataset();
 		datasetFromDB.setDatasetName("Dataset");
 		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(datasetFromDB);
-		datasetUploadDto.setSampleAccesions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
+		datasetUploadDto.setSampleAccessions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
 		datasetService.saveDataset(datasetUploadDto);
 	}
 
 	@Test (expected = Exception.class)
 	public void testSaveDataset_DuplicatedMarkers() throws Exception {
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
-		datasetUploadDto.setSampleAccesions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
+		datasetUploadDto.setSampleAccessions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
 		final List<String> markers = new ArrayList<>();
 		markers.add("a");
 		markers.add("a");
@@ -136,7 +136,7 @@ public class DatasetServiceImplTest {
 		final DatasetUploadDto.SampleKey sampleKey1 = new DatasetUploadDto().new SampleKey();
 		sampleKey1.setSampleUID("SampleUID1");
 		sampleAccesionSet.add(sampleKey1);
-		datasetUploadDto.setSampleAccesions(sampleAccesionSet);
+		datasetUploadDto.setSampleAccessions(sampleAccesionSet);
 
 		final String[][] charValues = { {"A","B"}, {"C","D"}, {"E", "F"}};
 		datasetUploadDto.setCharValues(charValues);
@@ -162,7 +162,7 @@ public class DatasetServiceImplTest {
 		final DatasetUploadDto.SampleKey sampleKey1 = new DatasetUploadDto().new SampleKey();
 		sampleKey1.setSampleUID("SampleUID1");
 		sampleAccesionSet.add(sampleKey1);
-		datasetUploadDto.setSampleAccesions(sampleAccesionSet);
+		datasetUploadDto.setSampleAccessions(sampleAccesionSet);
 
 		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
 
@@ -189,7 +189,7 @@ public class DatasetServiceImplTest {
 		final DatasetUploadDto.SampleKey sampleKey1 = new DatasetUploadDto().new SampleKey();
 		sampleKey1.setSampleUID("SampleUID1");
 		sampleAccesionSet.add(sampleKey1);
-		datasetUploadDto.setSampleAccesions(sampleAccesionSet);
+		datasetUploadDto.setSampleAccessions(sampleAccesionSet);
 		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
 		final List<Marker> markersFromDB = new ArrayList<>();
 		Mockito.when(markerDAO.getByNames(datasetUploadDto.getMarkers(), 0, 0)).thenReturn(markersFromDB);
