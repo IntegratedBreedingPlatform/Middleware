@@ -45,6 +45,7 @@ public class MeasurementDataTestDataInitializer {
 		measurementData.setLabel(label);
 		measurementData.setPhenotypeId(0);
 		measurementData.setValue(value);
+		measurementData.setcValueId("1");
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setTermId(termId);
