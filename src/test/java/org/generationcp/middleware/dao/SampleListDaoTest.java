@@ -1,15 +1,16 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.Date;
+import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.enumeration.SampleListType;
+import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
+import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
+import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.pojos.User;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,8 +20,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public static final String P = "P";
 	public static final String ADMIN = "admin";
 	public static final String DESCRIPTION = "description";
-	private static final String YYYY_M_MDD_HH = "yyyyMMddHH";
-	private static final String TRIAL_NAME = "trialName#";
+	private static final String SAMPLE_LIST_NAME = "Sample list";
 	public static final String NOTES = "Notes";
 	private static final String CROP_PREFIX = "ABCD";
 	public static final String GID = "GID";
@@ -47,24 +47,22 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testCreateSampleList() {
+		final User user = this.userDao.getById(1);
+		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 
-		final SampleList sampleList = this.getSampleList();
-
-		final Plant plant = this.getPlant();
-		final Sample sample = new Sample();
-		this.getSample(sampleList, plant, sample);
+		final Plant plant = PlantTestDataInitializer.createPlant();
+		final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, user);
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		Assert.assertNotNull(sampleList.getId());
-		Assert.assertEquals(sampleList.getCreatedBy().getName(), SampleListDaoTest.ADMIN); // TODO FIX LATER
+		Assert.assertEquals(user.getName(), sampleList.getCreatedBy().getName()); // TODO FIX LATER
 		Assert.assertEquals(sampleList.getDescription(), SampleListDaoTest.DESCRIPTION);
-		Assert.assertEquals(sampleList.getListName(),
-				SampleListDaoTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListDaoTest.YYYY_M_MDD_HH));
+		Assert.assertEquals(SampleListDaoTest.SAMPLE_LIST_NAME, sampleList.getListName());
 		Assert.assertEquals(sampleList.getNotes(), SampleListDaoTest.NOTES);
 		Assert.assertEquals(plant.getPlantBusinessKey(), SampleListDaoTest.P + SampleListDaoTest.CROP_PREFIX);
 		Assert.assertEquals(plant.getPlantNumber(), new Integer(0));
 		Assert.assertEquals(sample.getPlant(), plant);
-		Assert.assertEquals(sample.getTakenBy().getName(), SampleListDaoTest.ADMIN);
+		Assert.assertEquals(sample.getTakenBy().getName(), user.getName());
 		Assert.assertEquals(sample.getSampleName(), SampleListDaoTest.GID);
 		Assert.assertEquals(sample.getSampleBusinessKey(), SampleListDaoTest.S + SampleListDaoTest.CROP_PREFIX);
 		Assert.assertEquals(sample.getSampleList(), sampleList);
@@ -73,13 +71,18 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetSampleListByParentAndNameOk() throws Exception {
-		final SampleList sampleList = this.getSampleList();
+		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(this.userDao.getUserByUserName(SampleListDaoTest.ADMIN));
 		final SampleList parent = this.sampleListDao.getBySampleListName(ROOT_FOLDER);
 		sampleList.setHierarchy(parent);
-		sampleList.setType(SampleListType.SAMPLE_LIST);
 		this.sampleListDao.save(sampleList);
 		final SampleList uSampleList = this.sampleListDao.getSampleListByParentAndName(sampleList.getListName(), parent.getId());
-		Assert.assertEquals(uSampleList.getId(), sampleList.getId());
+		Assert.assertEquals(sampleList.getId(), uSampleList.getId());
+		Assert.assertEquals(sampleList.getListName(), uSampleList.getListName());
+		Assert.assertEquals(sampleList.getDescription(), uSampleList.getDescription());
+		Assert.assertEquals(sampleList.getHierarchy(), uSampleList.getHierarchy());
+		Assert.assertEquals(sampleList.getCreatedDate(), uSampleList.getCreatedDate());
+		Assert.assertEquals(sampleList.getNotes(), uSampleList.getNotes());
+		Assert.assertEquals(sampleList.getType(), uSampleList.getType());
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -91,39 +94,5 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public void testGetSampleListByParentAndNameNullParent() throws Exception {
 		this.sampleListDao.getSampleListByParentAndName("name", null);
 	}
-
-	private void getSample(final SampleList sampleList, final Plant plant1, final Sample sample) {
-
-		sample.setPlant(plant1);
-		sample.setTakenBy(this.userDao.getUserByUserName(SampleListDaoTest.ADMIN));
-		sample.setSampleName(SampleListDaoTest.GID);
-		sample.setCreatedDate(new Date());
-		sample.setSamplingDate(new Date());
-		sample.setSampleBusinessKey(SampleListDaoTest.S + SampleListDaoTest.CROP_PREFIX);
-		sample.setSampleList(sampleList);
-	}
-
-	private Plant getPlant() {
-		final Plant plant = new Plant();
-
-		plant.setCreatedDate(new Date());
-		plant.setExperiment(new ExperimentModel());
-		plant.setPlantBusinessKey(SampleListDaoTest.P + SampleListDaoTest.CROP_PREFIX);
-		plant.setPlantNumber(0);
-		return plant;
-	}
-
-	private SampleList getSampleList() {
-		final SampleList sampleList = new SampleList();
-
-		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(this.userDao.getUserByUserName(SampleListDaoTest.ADMIN));
-		sampleList.setDescription(SampleListDaoTest.DESCRIPTION);
-		sampleList.setListName(
-			SampleListDaoTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListDaoTest.YYYY_M_MDD_HH));
-		sampleList.setNotes(SampleListDaoTest.NOTES);
-		sampleList.setType(SampleListType.SAMPLE_LIST);
-		sampleList.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
-		return sampleList;
 	}
 }
