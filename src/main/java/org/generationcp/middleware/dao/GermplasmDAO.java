@@ -10,6 +10,16 @@
 
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -28,16 +38,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * DAO class for {@link Germplasm}.
  *
@@ -46,6 +46,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String GRPLCE = "grplce";
 	private static final String DELETED = "deleted";
+			
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
@@ -694,40 +695,63 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public String getNextSequenceNumberForCrossName(final String prefix) {
+	public String getNextSequenceNumberForCrossName(final String prefix, final String suffix) {
 		String nextInSequence = "1";
-
-		try {
-			/*
-			 * This query will generate next number will be queried on first "word" of cross name.
-			 * 
-			 * eg. input prefix: "IR" output: next number in "IRNNNNN -----" sequence
-			 */
-
-			final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
-			query.setParameter("prefix", prefix);
-			query.setParameter("prefixLike", prefix + "%");
-
-			/*
-			 * If the next number will be queried on second "word" of cross name. IMPORTANT: assumes that passed in prefix value has a
-			 * whitespace at the end
-			 * 
-			 * eg. input prefix: "IR " output: next number in "IR NNNNN..." sequence
-			 */
-
-			final BigInteger nextNumberInSequence = (BigInteger) query.uniqueResult();
-
-			if (nextNumberInSequence != null) {
-				nextInSequence = String.valueOf(nextNumberInSequence);
+		
+		if (!prefix.trim().isEmpty()) {
+			try {
+				final StringBuilder sb = new StringBuilder();
+				sb.append("SELECT CASE NVAL REGEXP '");
+				// need to append prefix and suffix manually. setParameter does not work because of enclosing quotes for REGEXP string
+				this.buildCrossNameRegularExpression(prefix, suffix, sb);
+				sb.append("' ");
+				
+				// We used LIKE when matching names so as not to do full table scan when using REGEXP matching
+				// Only parse number part for those matching regular expression with the prefix and suffix supplied
+				sb.append(" WHEN 1 THEN CONVERT(REPLACE(UPPER(nval), :prefix, ''), SIGNED)+1 ELSE 0 "
+						+ " END as next_number"
+						+" FROM ( "
+						+ " 	SELECT  distinct nval "
+						+ "		FROM names "
+						+ "		WHERE names.nval LIKE :prefixLike "
+						+ "   	AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)"
+						+ " ) matches "
+						+ " ORDER BY next_number desc LIMIT 1");
+				
+				final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+				query.setParameter("prefix", prefix);
+				query.setParameter("prefixLike", prefix + "%");
+				
+				final BigInteger nextNumberInSequence = (BigInteger) query.uniqueResult();
+				
+				if (nextNumberInSequence != null) {
+					nextInSequence = String.valueOf(nextNumberInSequence);
+				}
+				
+			} catch (final HibernateException e) {
+				final String message = "Error with getNextSequenceNumberForCrossName(prefix=" + prefix + ") " + "query : " + e.getMessage();
+				GermplasmDAO.LOG.error(message, e);
+				throw new MiddlewareQueryException(message, e);
 			}
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getNextSequenceNumberForCrossName(prefix=" + prefix + ") " + "query : " + e.getMessage();
-			GermplasmDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
 		}
 
+
 		return nextInSequence;
+	}
+
+	void buildCrossNameRegularExpression(final String prefix, final String suffix, final StringBuilder sb) {
+		sb.append("^(");
+		sb.append(prefix);
+		// match names with or without space after prefix
+		sb.append(")( )*");
+		// only match names with number after the prefix. Other names will not be considered
+		sb.append("[0-9]+");
+		if (suffix != null && !suffix.isEmpty()) {
+			sb.append("(");
+			sb.append(suffix);
+			sb.append(")");
+		}
+		sb.append("$");
 	}
 
 	@SuppressWarnings("unchecked")

@@ -999,9 +999,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public String getNextSequenceNumberForCrossName(final String prefix) {
+	public String getNextSequenceNumberForCrossName(final String prefix, final String suffix) {
 		final String nextSequenceStr;
-		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
+		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumberForCrossName(prefix, suffix);
 		return nextSequenceStr;
 	}
 

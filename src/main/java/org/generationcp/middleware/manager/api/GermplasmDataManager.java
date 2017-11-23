@@ -18,7 +18,6 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -732,13 +731,13 @@ public interface GermplasmDataManager {
 	List<Location> getAllBreedingLocations();
 
 	/**
-	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix. Queries both
-	 * Database.LOCAL and Database.CENTRAL and returns the greater number.
+	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix and suffix
 	 * 
 	 * @param prefix - String used as prefix for Germplasm Names querying
-	 * @return next available sequence number for a germplasm with given prefix.
+	 * @param suffix - String used as prefix for Germplasm Names querying
+	 * @return next available sequence number for a germplasm with given prefix and suffix
 	 */
-	String getNextSequenceNumberForCrossName(String prefix);
+	String getNextSequenceNumberForCrossName(String prefix, String suffix);
 
 	/**
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.

@@ -419,12 +419,32 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		this.germplasmDataDM.addGermplasmName(germplasmName);
 
-		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
-
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
 		Assert.assertEquals(
-				"Germplasm with name" + existingGermplasmNameWithPrefix + " is existing " + "so the next sequence number should be 2", "2",
+				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " is existing " + "so the next sequence number should be 2", "2",
 				result);
+	}
+	
+	@Test
+	public void testGetNextSequenceNumberForCrossNameWithSuffixSupplied() {
 
+		final String crossNamePrefix = "ABCDEFG";
+		final String suffix = "-XYZ";
+		final String existingGermplasmNameWithPrefix = crossNamePrefix + "99" + suffix;
+
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
+
+		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
+
+		this.germplasmDataDM.addGermplasmName(germplasmName);
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, suffix);
+		Assert.assertEquals(
+				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " and suffix " + suffix + " is existing " + "so the next sequence number should be 100", "100",
+				result);
 	}
 
 	@Test
@@ -446,12 +466,29 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		this.germplasmDataDM.addGermplasmName(germplasmName);
 
-		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
 
 		Assert.assertEquals(
 				"Germplasm with name" + existingGermplasmNameWithPrefix + " is deleted " + "so the next sequence number should still be 1",
 				"1", result);
 
+	}
+	
+	@Test
+	public void testBuildCrossNameRegularExpression() {
+		final String prefix = "QWERTY";
+		final StringBuilder sb = new StringBuilder();
+		dao.buildCrossNameRegularExpression(prefix, null, sb);
+		Assert.assertEquals("^(" + prefix + ")( )*[0-9]+$", sb.toString());
+	}
+	
+	@Test
+	public void testBuildCrossNameRegularExpressionWithSuffix() {
+		final String prefix = "QWERTY";
+		final String suffix = "-LTD";
+		final StringBuilder sb = new StringBuilder();
+		dao.buildCrossNameRegularExpression(prefix, suffix, sb);
+		Assert.assertEquals("^(" + prefix + ")( )*[0-9]+(" + suffix +")$", sb.toString());
 	}
 
 	private void initializeGermplasms() {
@@ -474,5 +511,5 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 						"LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
 	}
-
+	
 }
