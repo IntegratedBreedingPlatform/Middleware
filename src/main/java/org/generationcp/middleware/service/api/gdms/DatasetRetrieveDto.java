@@ -235,6 +235,16 @@ public class DatasetRetrieveDto {
 		this.charValueDtos = charValueDtos;
 	}
 
+	public List<String> getMarkers() {
+		if (this.getCharValueDtos() != null
+			&& this.getCharValueDtos().get(0) != null
+			&& this.getCharValueDtos().get(0).getCharValues() != null) {
+			return new ArrayList<>(this.getCharValueDtos().get(0).getCharValues().keySet());
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
