@@ -418,8 +418,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("select l.lname as location_name,l.locid,l.ltype as ltype,");
 			queryString.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,");
-			queryString
-					.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,");
+			queryString.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,");
 			queryString.append(" ud.fname as location_type,");
 			queryString.append(" ud.fdesc as location_description, l.program_uuid");
 			queryString.append(" from location l");
@@ -458,40 +457,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in saveOrUpdate(location): " + e.getMessage(), e);
 		}
-	}
-
-	public List<LocationDetails> getLocationDetails(final List<Integer> locationId, final Integer start,
-			final Integer numOfRows) throws MiddlewareQueryException {
-		try {
-			final StringBuilder queryString = new StringBuilder();
-			queryString.append("select l.lname as location_name,l.locid,l.ltype as ltype, c.cntryid as cntryid,");
-			queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,");
-			queryString.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,");
-			queryString.append(" ud.fname as location_type,");
-			queryString.append(" ud.fdesc as location_description, l.program_uuid");
-			queryString.append(" from location l");
-			queryString.append(" left join georef g on l.locid = g.locid");
-			queryString.append(" left join cntry c on l.cntryid = c.cntryid");
-			queryString.append(" left join udflds ud on ud.fldno = l.ltype");
-
-			if (locationId != null) {
-
-				queryString.append(" where l.locid = :id");
-
-				final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-				query.setParameterList("id", locationId);
-				query.setFirstResult(start);
-				query.setMaxResults(numOfRows);
-				query.addEntity(LocationDetails.class);
-
-				return query.list();
-
-			}
-		} catch (final HibernateException e) {
-			this.logAndThrowException(this.getLogExceptionMessage("getLocationDetails", "id",
-					String.valueOf(locationId), e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return new ArrayList<>();
 	}
 
 	public List<Location> getAllProvincesByCountry(final Integer countryId) throws MiddlewareQueryException {
