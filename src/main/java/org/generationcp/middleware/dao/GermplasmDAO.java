@@ -698,25 +698,24 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public String getNextSequenceNumberForCrossName(final String prefix, final String suffix) {
 		String nextInSequence = "1";
 		
-		if (!prefix.trim().isEmpty()) {
+		if (!prefix.isEmpty()) {
 			try {
 				final StringBuilder sb = new StringBuilder();
-				sb.append("SELECT CASE NVAL REGEXP '");
-				// need to append prefix and suffix manually. setParameter does not work because of enclosing quotes for REGEXP string
-				this.buildCrossNameRegularExpression(prefix, suffix, sb);
-				sb.append("' ");
+				sb.append("SELECT CONVERT(REPLACE(UPPER(nval), :prefix, ''), SIGNED)+1 as next_number ");
 				
 				// We used LIKE when matching names so as not to do full table scan when using REGEXP matching
-				// Only parse number part for those matching regular expression with the prefix and suffix supplied
-				sb.append(" WHEN 1 THEN CONVERT(REPLACE(UPPER(nval), :prefix, ''), SIGNED)+1 ELSE 0 "
-						+ " END as next_number"
-						+" FROM ( "
+				// We do a second REGEXP matching on the matched records so that only those matching prefix and suffix will be parsed
+				sb.append(" FROM ( "
 						+ " 	SELECT  distinct nval "
 						+ "		FROM names "
 						+ "		WHERE names.nval LIKE :prefixLike "
 						+ "   	AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)"
-						+ " ) matches "
-						+ " ORDER BY next_number desc LIMIT 1");
+						+ " ) matches ");
+				sb.append("WHERE nval REGEXP '");
+				// need to append prefix and suffix manually. setParameter does not work because of enclosing quotes for REGEXP string
+				this.buildCrossNameRegularExpression(prefix, suffix, sb);
+				sb.append("' ");
+				sb.append(" ORDER BY next_number desc LIMIT 1");
 				
 				final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 				query.setParameter("prefix", prefix);
@@ -742,8 +741,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	void buildCrossNameRegularExpression(final String prefix, final String suffix, final StringBuilder sb) {
 		sb.append("^(");
 		sb.append(prefix);
-		// match names with or without space after prefix
-		sb.append(")( )*");
+		sb.append(")");
 		// only match names with number after the prefix. Other names will not be considered
 		sb.append("[0-9]+");
 		if (suffix != null && !suffix.isEmpty()) {

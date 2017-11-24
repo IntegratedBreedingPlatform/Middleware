@@ -26,6 +26,8 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -426,6 +428,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 	
 	@Test
+	public void testGetNextSequenceNumberForCrossNameWithEmptyPrefix() {
+		this.germplasmDataDM.getNextSequenceNumberForCrossName("", null);
+		Mockito.verify(this.dao, Mockito.never()).getNextSequenceNumberForCrossName(Matchers.anyString(), Matchers.anyString());
+	}
+	
+	@Test
 	public void testGetNextSequenceNumberForCrossNameWithSuffixSupplied() {
 
 		final String crossNamePrefix = "ABCDEFG";
@@ -479,7 +487,15 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String prefix = "QWERTY";
 		final StringBuilder sb = new StringBuilder();
 		dao.buildCrossNameRegularExpression(prefix, null, sb);
-		Assert.assertEquals("^(" + prefix + ")( )*[0-9]+$", sb.toString());
+		Assert.assertEquals("^(" + prefix + ")[0-9]+$", sb.toString());
+	}
+	
+	@Test
+	public void testBuildCrossNameRegularExpressionWithSpaceAfterPrefix() {
+		final String prefix = "QWERTY ";
+		final StringBuilder sb = new StringBuilder();
+		dao.buildCrossNameRegularExpression(prefix, null, sb);
+		Assert.assertEquals("^(" + prefix + ")[0-9]+$", sb.toString());
 	}
 	
 	@Test
@@ -488,7 +504,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String suffix = "-LTD";
 		final StringBuilder sb = new StringBuilder();
 		dao.buildCrossNameRegularExpression(prefix, suffix, sb);
-		Assert.assertEquals("^(" + prefix + ")( )*[0-9]+(" + suffix +")$", sb.toString());
+		Assert.assertEquals("^(" + prefix + ")[0-9]+(" + suffix +")$", sb.toString());
 	}
 
 	private void initializeGermplasms() {
