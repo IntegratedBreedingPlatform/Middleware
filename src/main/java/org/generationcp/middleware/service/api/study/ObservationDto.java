@@ -1,13 +1,13 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ObservationDto {
 
@@ -46,6 +46,8 @@ public class ObservationDto {
 	private final List<MeasurementDto> variableMeasurements;
 
 	private final List<Pair<String, String>> additionalGermplasmDescriptors = new ArrayList<>();
+	
+	private final List<Pair<String, String>> additionalDesignFactors = new ArrayList<>();
 
 	private transient int hashCode;
 
@@ -150,9 +152,17 @@ public class ObservationDto {
 	public void additionalGermplasmDescriptor(final String name, final String value) {
 		this.additionalGermplasmDescriptors.add(new ImmutablePair<String, String>(name, value));
 	}
-
+	
 	public List<Pair<String, String>> getAdditionalGermplasmDescriptors() {
 		return this.additionalGermplasmDescriptors;
+	}
+	
+	public void additionalDesignFactor(final String name, final String value) {
+		this.additionalDesignFactors.add(new ImmutablePair<String, String>(name, value));
+	}
+
+	public List<Pair<String, String>> getAdditionalDesignFactors() {
+		return this.additionalDesignFactors;
 	}
 
 	@Override
