@@ -1,15 +1,26 @@
 package org.generationcp.middleware.service.impl.gdms;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.gdms.DatasetRetrieveDto;
 import org.generationcp.middleware.service.api.gdms.DatasetUploadDto;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -197,5 +208,28 @@ public class DatasetServiceImplTest {
 		datasetUploadDto.setCharValues(charValues);
 		datasetService.saveDataset(datasetUploadDto);
 	}
+
+	@Test (expected = NullPointerException.class)
+	public void testGetDataset_NullDatasetName() throws Exception{
+		datasetService.getDataset(null);
+	}
+
+	@Test
+	public void testGetDataset_DatasetNotExist() throws Exception{
+		final String datasetName = "name";
+		Mockito.when(datasetDAO.getByName(datasetName)).thenReturn(null);
+		final DatasetRetrieveDto datasetRetrieveDto = datasetService.getDataset(datasetName);
+		assertThat(datasetRetrieveDto, is(nullValue()));
+	}
+
+	@Test (expected = MiddlewareException.class)
+	public void testGetDataset_ExceptionWhenQueryingData() throws Exception{
+		final String datasetName = "name";
+		Mockito.when(datasetDAO.getByName(datasetName)).thenReturn(new Dataset());
+		Mockito.when(charValuesDAO.getCharValueElementsByDatasetId(Mockito.anyInt())).thenThrow(MiddlewareQueryException.class);
+		datasetService.getDataset(datasetName);
+	}
+
+
 
 }
