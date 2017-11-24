@@ -46,6 +46,19 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	public static final String GET_ALL = "getAllLocation";
 	public static final String COUNT_ALL = "countAllLocation";
 
+	public static final Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
+
+		@Override
+		public int compare(LocationDetails location1, LocationDetails location2) {
+			String locationName1 = location1.getLocationName().toUpperCase();
+			String locationName2 = location2.getLocationName().toUpperCase();
+
+			// ascending order
+			return locationName1.compareTo(locationName2);
+		}
+
+	};
+
 	@Id
 	@Basic(optional = false)
 	@Column(name = "locid")
@@ -238,19 +251,6 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		// ascending order
 		return this.locationName.compareTo(compareName);
 	}
-
-	public static Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
-
-		@Override
-		public int compare(LocationDetails location1, LocationDetails location2) {
-			String locationName1 = location1.getLocationName().toUpperCase();
-			String locationName2 = location2.getLocationName().toUpperCase();
-
-			// ascending order
-			return locationName1.compareTo(locationName2);
-		}
-
-	};
 
 	public Integer getCntryid() {
 		return this.cntryid;
