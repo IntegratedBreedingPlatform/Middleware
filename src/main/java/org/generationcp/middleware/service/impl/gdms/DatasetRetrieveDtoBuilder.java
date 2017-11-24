@@ -40,7 +40,7 @@ public class DatasetRetrieveDtoBuilder {
 	private static List<DatasetRetrieveDto.CharValueDto> buildCharValuesDtoList(final List<CharValueElement> charValueElements) {
 		final Map<String, List<CharValueElement>> charValuesBySampleAccessionMap = new HashMap<>();
 		for (final CharValueElement charValueElement : charValueElements) {
-			final String key = charValueElement.getSampleName() + charValueElement.getAccessionId();
+			final String key = charValueElement.getSampleUID() + charValueElement.getAccessionId();
 			if (charValuesBySampleAccessionMap.containsKey(key)) {
 				charValuesBySampleAccessionMap.get(key).add(charValueElement);
 			} else {
