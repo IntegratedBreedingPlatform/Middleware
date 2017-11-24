@@ -1,18 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
-
-import java.io.Serializable;
-import java.util.Comparator;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -23,6 +19,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * POJO for location details query.
@@ -115,8 +113,8 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		this.locid = locid;
 	}
 
-	public LocationDetails(Integer locid, String locationName, String countryFullName, String locationAbbreviation,
-			String locationType, String locationDescription) {
+	public LocationDetails(Integer locid, String locationName, String countryFullName, String locationAbbreviation, String locationType,
+			String locationDescription) {
 		super();
 		this.locid = locid;
 		this.locationName = locationName;

@@ -897,8 +897,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("l.locid").addScalar("ud.fname").addScalar("l.lname")
 							.addScalar("l.labbr").addScalar("c.isothree").addScalar("c.isoabbr").addScalar("g.lat").addScalar("g.lon")
 							.addScalar("g.alt").addScalar("province");
-			int start = pageSize * (pageNumber - 1);
-			int numOfRows = pageSize;
+			final int start = pageSize * (pageNumber - 1);
+			final int numOfRows = pageSize;
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 			this.setQueryParameters(query, filters);
@@ -921,7 +921,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 							new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName, latitude,
 									longitude, altitude);
 					if (!locationType.equalsIgnoreCase(LocationDAO.COUNTRY)) {
-						AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationDetailsDto.getLocationDbId());
+						final AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationDetailsDto.getLocationDbId());
 						additionalInfoDto.addInfo("province", (String) row[9]);
 						locationDetailsDto.setMapAdditionalInfo(additionalInfoDto);
 					}
@@ -939,9 +939,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	private void setQueryParameters(final SQLQuery query, final Map<LocationFilters, Object> filters) {
-		for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
-			LocationFilters filter = entry.getKey();
-			Object value = entry.getValue();
+		for (final Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+			final LocationFilters filter = entry.getKey();
+			final Object value = entry.getValue();
 			if (value.getClass().isArray()) {
 				query.setParameterList(filter.getParameter(), (Object[]) value);
 			} else {
@@ -954,9 +954,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		final StringBuilder sqlString = new StringBuilder();
 		sqlString.append(" WHERE 1 = 1");
 
-		for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
-			LocationFilters filter = entry.getKey();
-			Object value = entry.getValue();
+		for (final Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+			final LocationFilters filter = entry.getKey();
+			final Object value = entry.getValue();
 
 			sqlString.append(" AND ");
 
