@@ -28,54 +28,14 @@ import java.util.Map;
  */
 public class DatasetBuilderTest {
 
-	private String name;
-
-	private String description;
-
-	private String type;
-
-	private String genus;
-
-	private String remarks;
-
-	private String dataType;
-
-	private String missingData;
-
-	private String method;
-
-	private String score;
-
-	private Integer userId;
-
-	private String species;
-
-	private String[][] charValues;
-
-	private List<String> markers;
-
-	private LinkedHashSet<DatasetUploadDto.SampleKey> sampleAccessions;
-
-	private Map<String, SampleDTO> sampleDTOMap;
-
-	private Map<String, Marker> markerMap;
-
-	public DatasetBuilderTest() {
-		name = RandomStringUtils.random(20);
-		description = RandomStringUtils.random(20);
-		type = RandomStringUtils.random(3);
-		genus = RandomStringUtils.random(3);
-		remarks = RandomStringUtils.random(3);
-		dataType = RandomStringUtils.random(3);
-		missingData = RandomStringUtils.random(30);
-		method = RandomStringUtils.random(30);
-		score = RandomStringUtils.random(30);
-		userId = 1;
-		species = RandomStringUtils.random(3);
-		charValues = new String[][] {{"A/C", "A/C"}, {"A/C", "A/C"}};
+	private DatasetUploadDto getDatasetUploadDto() {
+		final LinkedHashSet<DatasetUploadDto.SampleKey> sampleAccessions;
+		final String[][] charValues = new String[][] {{"A/C", "A/C"}, {"A/C", "A/C"}};
+		final List<String> markers;
 		markers = new ArrayList<>();
 		markers.add("marker1");
 		markers.add("marker2");
+
 		sampleAccessions = new LinkedHashSet<>();
 		final DatasetUploadDto.SampleKey sampleKey1 = new DatasetUploadDto().new SampleKey();
 		sampleKey1.setAccession(1);
@@ -85,47 +45,48 @@ public class DatasetBuilderTest {
 		sampleKey2.setSampleUID("UID2");
 		sampleAccessions.add(sampleKey1);
 		sampleAccessions.add(sampleKey2);
-		SampleDTO sample1 = new SampleDTO();
-		sample1.setSampleBusinessKey("UID1");
-		sample1.setSampleId(1);
-		SampleDTO sample2 = new SampleDTO();
-		sample2.setSampleBusinessKey("UID2");
-		sample2.setSampleId(2);
-		sampleDTOMap = new HashMap<>();
-		sampleDTOMap.put("UID1", sample1);
-		sampleDTOMap.put("UID2", sample2);
+
+		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
+		datasetUploadDto.setName(RandomStringUtils.random(20));
+		datasetUploadDto.setDescription(RandomStringUtils.random(20));
+		datasetUploadDto.setType(RandomStringUtils.random(3));
+		datasetUploadDto.setGenus(RandomStringUtils.random(3));
+		datasetUploadDto.setRemarks(RandomStringUtils.random(3));
+		datasetUploadDto.setDataType(RandomStringUtils.random(3));
+		datasetUploadDto.setMissingData(RandomStringUtils.random(30));
+		datasetUploadDto.setMethod(RandomStringUtils.random(30));
+		datasetUploadDto.setScore(RandomStringUtils.random(30));
+		datasetUploadDto.setUserId(1);
+		datasetUploadDto.setSpecies(RandomStringUtils.random(3));
+		datasetUploadDto.setCharValues(charValues);
+		datasetUploadDto.setMarkers(markers);
+		datasetUploadDto.setSampleAccessions(sampleAccessions);
+
+		return datasetUploadDto;
+	}
+
+	@Test
+	public void build_Ok() throws Exception {
+		final Map<String, Marker> markerMap = new HashMap<>();
 		final Marker marker1 = new Marker();
 		marker1.setMarkerId(1);
 		marker1.setMarkerName("marker1");
 		final Marker marker2 = new Marker();
 		marker2.setMarkerId(2);
 		marker2.setMarkerName("marker2");
-		markerMap = new HashMap<>();
 		markerMap.put("marker1", marker1);
 		markerMap.put("marker2", marker2);
-	}
 
-	private DatasetUploadDto getDatasetUploadDto() {
-		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
-		datasetUploadDto.setName(name);
-		datasetUploadDto.setDescription(description);
-		datasetUploadDto.setType(type);
-		datasetUploadDto.setGenus(genus);
-		datasetUploadDto.setRemarks(remarks);
-		datasetUploadDto.setDataType(dataType);
-		datasetUploadDto.setMissingData(missingData);
-		datasetUploadDto.setMethod(method);
-		datasetUploadDto.setScore(score);
-		datasetUploadDto.setUserId(userId);
-		datasetUploadDto.setSpecies(species);
-		datasetUploadDto.setCharValues(charValues);
-		datasetUploadDto.setMarkers(markers);
-		datasetUploadDto.setSampleAccessions(sampleAccessions);
-		return datasetUploadDto;
-	}
+		final Map<String, SampleDTO> sampleDTOMap = new HashMap<>();
+		SampleDTO sample1 = new SampleDTO();
+		sample1.setSampleBusinessKey("UID1");
+		sample1.setSampleId(1);
+		SampleDTO sample2 = new SampleDTO();
+		sample2.setSampleBusinessKey("UID2");
+		sample2.setSampleId(2);
+		sampleDTOMap.put("UID1", sample1);
+		sampleDTOMap.put("UID2", sample2);
 
-	@Test
-	public void build_Ok() throws Exception {
 		final DatasetUploadDto datasetUploadDto = this.getDatasetUploadDto();
 		final Dataset dataset = DatasetBuilder.build(datasetUploadDto, sampleDTOMap, markerMap);
 		assertThat(dataset.getDatasetName(), is(equalTo(datasetUploadDto.getName())));
@@ -141,7 +102,7 @@ public class DatasetBuilderTest {
 		assertThat(dataset.getDatasetUsers().getUserId(), is(equalTo(datasetUploadDto.getUserId())));
 
 		final List<AccMetadataSet> accMetadataSets = dataset.getAccMetadataSets();
-		assertThat(accMetadataSets, hasSize(sampleAccessions.size()));
+		assertThat(accMetadataSets, hasSize(datasetUploadDto.getSampleAccessions().size()));
 		final List<DatasetUploadDto.SampleKey> sampleKeys = new ArrayList<>();
 		for (final AccMetadataSet accMetadataSet : accMetadataSets) {
 			final DatasetUploadDto.SampleKey sampleKey = new DatasetUploadDto().new SampleKey();
@@ -149,7 +110,7 @@ public class DatasetBuilderTest {
 			sampleKey.setAccession(accMetadataSet.getAccSampleId());
 			sampleKeys.add(sampleKey);
 		}
-		assertThat(sampleKeys, contains(sampleAccessions.toArray()));
+		assertThat(sampleKeys, contains(datasetUploadDto.getSampleAccessions().toArray()));
 
 		final List<MarkerMetadataSet> markerMetadataSets = dataset.getMarkerMetadataSets();
 

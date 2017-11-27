@@ -17,20 +17,14 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
-import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValueElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
-import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
-import org.generationcp.middleware.service.api.gdms.DatasetRetrieveDto;
-import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -104,7 +98,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					+ "  INNER JOIN nd_experiment experiment ON (plant.nd_experiment_id = experiment.nd_experiment_id) " //
 					+ "  INNER JOIN nd_experiment_stock exp_stock ON (exp_stock.nd_experiment_id = experiment.nd_experiment_id) " //
 					+ "  INNER JOIN stock stock ON (stock.stock_id = exp_stock.stock_id) " //
-					+ "  INNER JOIN nd_experimentprop prop ON (prop.nd_experiment_id = experiment.nd_experiment_id AND prop.type_id = " + TermId.PLOT_NO.getId() + ") " //
 					+ "  INNER JOIN gdms_marker marker ON (marker.marker_id = charvalues.marker_id) " //
 					+ "  WHERE charvalues.dataset_id = :datasetId "; //
 
