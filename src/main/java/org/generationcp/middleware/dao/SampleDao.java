@@ -130,7 +130,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.add(Restrictions.eq("stock.dbxrefId", gid))//
 			.addOrder(Order.desc("sample.sampleBusinessKey"))//
 
-			.setProjection(Projections.projectionList()//
+			.setProjection(Projections.distinct(Projections.projectionList()//
 				.add(Projections.property("sampleList.listName"))//
 				.add(Projections.property("sample.sampleBusinessKey"))//
 				.add(Projections.property("experiment.plotId"))//
@@ -141,7 +141,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("objectProject.projectId"))//
 				.add(Projections.property("objectProject.name"))//
 				.add(Projections.property("objectProject.programUUID"))//
-				.add(Projections.property("objectProject.studyType")))//
+				.add(Projections.property("objectProject.studyType"))))//
 
 			.list();//
 
