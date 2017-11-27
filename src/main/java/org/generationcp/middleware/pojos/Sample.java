@@ -78,7 +78,7 @@ public class Sample implements Serializable {
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sample_id")
 	@NotFound(action = NotFoundAction.IGNORE)
-	private List<AccMetadataSet> accMetadataSets;// = new ArrayList<>();
+	private List<AccMetadataSet> accMetadataSets;
 
 	public Sample() {
 
