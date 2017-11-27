@@ -39,6 +39,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(SampleListDao.class);
 
 	protected static final String ROOT_FOLDER = "Samples";
+	protected static final Integer ROOT_FOLDER_ID = 1;
 	protected static final String LIST_NAME = "listName";
 	protected static final String PROGRAMUUID = "programUUID";
 	protected static final String SAMPLES = "samples";
@@ -145,11 +146,11 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	public List<SampleList> getAllTopLevelLists(final String programUUID) {
 		final Criteria criteria;
 		try {
-			final Criterion topFolder = Restrictions.like("hierarchy.listName", SampleListDao.ROOT_FOLDER);
-			final Criterion nullFolder = Restrictions.isNull("hierarchy.hierarchy");
+			final Criterion topFolder = Restrictions.eq("hierarchy.id", SampleListDao.ROOT_FOLDER_ID);
+			final Criterion nullFolder = Restrictions.isNull("hierarchy");
 			criteria = this.getSession().createCriteria(SampleList.class);
 			criteria.createAlias("hierarchy", "hierarchy");
-			criteria.add(Restrictions.and(topFolder, nullFolder));
+			criteria.add(Restrictions.or(topFolder, nullFolder));
 
 			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
 			criteria.addOrder(Order.asc("listName"));
