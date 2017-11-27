@@ -114,10 +114,10 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		Assert.assertEquals(topLevelLists.size(), updatedTopLevelLists.size() - 1);
 	}
-	
+
 	@Test
 	public void testGetRootSampleList() {
-		final SampleList rootList =  this.sampleListDao.getRootSampleList();
+		final SampleList rootList = this.sampleListDao.getRootSampleList();
 		Assert.assertEquals(new Integer(1), rootList.getId());
 	}
 }

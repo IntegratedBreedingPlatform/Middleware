@@ -61,7 +61,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	/**
 	 * Find a SampleList given the parent folder ID and the sample list name
-	 * 
+	 *
 	 * @param sampleListName
 	 * @param parentId
 	 * @return SampleList, null when not found
