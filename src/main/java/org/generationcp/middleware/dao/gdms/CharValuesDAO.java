@@ -19,17 +19,17 @@ import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
-import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.CharValueElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
-import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
-import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,34 +64,14 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 																																	// height
 			"FROM gdms_char_values " + "WHERE gdms_char_values.gid IN (:gidList) " + "ORDER BY gdms_char_values.gid ASC ";
 
-	// For getAllelicValues by datasetId
-	public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = "SELECT gid, marker_id,  CONCAT(char_value, '') "
-			+ "           , marker_sample_id, acc_sample_id " + "FROM gdms_char_values " + "WHERE dataset_id = :datasetId "
-			+ "ORDER BY gid ASC, marker_id ASC";
-	
-	//getAllelicValues by datasetId - distinct (not sure of difference wrt query above)
-	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID = "SELECT DISTINCT\n"
-		+ "  sample_id,\n"
-		+ "  marker_id,\n"
-		+ "  char_value,\n"
-		+ "  acc_sample_id,\n"
-		+ "  marker_sample_id\n"
-		+ "FROM gdms_char_values\n"
-		+ "WHERE dataset_id = :datasetId\n"
-		+ "ORDER BY sample_id, marker_id, acc_sample_id ASC";
-
 	// another transferred query from the Vaadin layer
 	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id, char_value,acc_sample_id,marker_sample_id from gdms_char_values where"
 			+ " gid in(:gids) and marker_id in (:mids) ORDER BY gid, marker_id,acc_sample_id asc";
-
-	public static final String COUNT_BY_DATASET_ID = "SELECT COUNT(*) " + "FROM gdms_char_values " + "WHERE dataset_id = :datasetId";
 
 	public static final String GET_GIDS_BY_MARKER_ID = "SELECT DISTINCT gid " + "FROM gdms_char_values " + "WHERE marker_id = :markerId";
 
 	public static final String COUNT_GIDS_BY_MARKER_ID = "SELECT COUNT(distinct gid) " + "FROM gdms_char_values "
 			+ "WHERE marker_id = :markerId";
-
-	public static final String COUNT_CHAR_VALUES_BY_GIDS = "SELECT COUNT(*) " + "FROM gdms_char_values " + "WHERE gid in (:gids)";
 
 	public static final String GET_MARKER_SAMPLE_IDS_BY_GIDS = "SELECT DISTINCT marker_id, marker_sample_id " + "FROM gdms_char_values "
 			+ "WHERE gid IN (:gids)";
@@ -100,75 +80,28 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 			"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, ''), marker_sample_id, acc_sample_id "
 					+ "FROM gdms_char_values cv " + "WHERE  cv.marker_id IN (:markerIdList) " + "ORDER BY cv.gid DESC ";
 
+	private static final String GET_CHAR_VALUES_ELEMENTS_BY_DATASETID =
+			"SELECT sample.sample_bk as sampleUID, " //
+					+ "  charvalues.acc_sample_id as accessionId, " //
+					+ "  sample.sample_name as sampleName, " //
+					+ "  stock.dbxref_id as gid, " //
+					+ "  (SELECT na.nval FROM names na " //
+					+ "  WHERE na.gid = stock.dbxref_id AND na.nstat = 1 LIMIT 1) AS designation, " //
+					+ "  plant.plant_no as plantNo, " //
+					+ "  marker.marker_id as markerId, " //
+					+ "  marker.marker_name as markerName, " //
+					+ "  charvalues.char_value as charValue, " //
+					+ "  charvalues.dataset_id as datasetId " //
+					+ "  FROM gdms_char_values charvalues " //
+					+ "  INNER JOIN sample sample ON (sample.sample_id = charvalues.sample_id) " //
+					+ "  INNER JOIN plant plant ON (sample.plant_id = plant.plant_id) " //
+					+ "  INNER JOIN nd_experiment experiment ON (plant.nd_experiment_id = experiment.nd_experiment_id) " //
+					+ "  INNER JOIN nd_experiment_stock exp_stock ON (exp_stock.nd_experiment_id = experiment.nd_experiment_id) " //
+					+ "  INNER JOIN stock stock ON (stock.stock_id = exp_stock.stock_id) " //
+					+ "  INNER JOIN gdms_marker marker ON (marker.marker_id = charvalues.marker_id) " //
+					+ "  WHERE charvalues.dataset_id = :datasetId "; //
+
 	private static final Logger LOG = LoggerFactory.getLogger(CharValuesDAO.class);
-
-	/**
-	 * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.
-	 * 
-	 * @param datasetId the dataset id
-	 * @param start the start of the rows to retrieve
-	 * @param numOfRows the number of rows to retrieve
-	 * @return the Allelic Values (germplasm id, data value, and marker id) for the given dataset id
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	@SuppressWarnings("rawtypes")
-	public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(final Integer datasetId, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
-		List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
-
-		try {
-			if (datasetId != null) {
-				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.GET_ALLELIC_VALUES_BY_DATASET_ID);
-				query.setParameter("datasetId", datasetId);
-				query.setFirstResult(start);
-				query.setMaxResults(numOfRows);
-				List results = query.list();
-
-				for (final Object o : results) {
-					Object[] result = (Object[]) o;
-					if (result != null) {
-						Integer gid = (Integer) result[0];
-						Integer markerId = (Integer) result[1];
-						String data = (String) result[2];
-						Integer markerSampleId = (Integer) result[3];
-						Integer accSampleId = (Integer) result[4];
-
-						AllelicValueWithMarkerIdElement allelicValueElement =
-								new AllelicValueWithMarkerIdElement(gid, data, markerId, markerSampleId, accSampleId);
-						toReturn.add(allelicValueElement);
-					}
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getAllelicValuesByDatasetId(datasetId=" + datasetId + ") queryfrom char_values : " + e.getMessage(), e);
-		}
-		return toReturn;
-	}
-
-	/**
-	 * Count by dataset id.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the number of entries in char_values table corresponding to the given datasetId
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	public long countByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
-		try {
-			if (datasetId != null) {
-				Query query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_BY_DATASET_ID);
-				query.setParameter("datasetId", datasetId);
-				BigInteger result = (BigInteger) query.uniqueResult();
-				if (result != null) {
-					return result.longValue();
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from char_values: " + e.getMessage(),
-					e);
-		}
-		return 0;
-	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGIDsByMarkerId(final Integer markerId, final int start, final int numOfRows) throws MiddlewareQueryException {
@@ -200,22 +133,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(),
 					e);
-		}
-		return 0;
-	}
-
-	public long countCharValuesByGids(final List<Integer> gids) throws MiddlewareQueryException {
-		try {
-			if (gids != null && !gids.isEmpty()) {
-				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_CHAR_VALUES_BY_GIDS);
-				query.setParameterList("gids", gids);
-				BigInteger result = (BigInteger) query.uniqueResult();
-				if (result != null) {
-					return result.longValue();
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countCharValuesByGids(gids=" + gids + ") query from CharValues: " + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -258,30 +175,6 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 			this.logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from CharValues: " + e.getMessage(), e);
 		}
 		return toReturn;
-	}
-	
-	@SuppressWarnings({"deprecation", "unchecked"})
-	public List<Object> getUniqueAllelesByDatasetId(final String datasetId) {
-		
-		List<Object> results = new ArrayList<>();
-		try {
-			if (datasetId != null) {
-				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID);
-				query.setParameter("datasetId", datasetId);
-				query.addScalar("sample_id", Hibernate.INTEGER);
-				query.addScalar("marker_id", Hibernate.INTEGER);
-				query.addScalar("char_value", Hibernate.STRING);
-				query.addScalar("acc_sample_id", Hibernate.INTEGER);
-				query.addScalar("marker_sample_id", Hibernate.INTEGER);
-				results = query.list();
-
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getUniqueAllelesByDatasetId(datasetId=" + datasetId + ") query from CharValuesDAO " + e.getMessage(), e);
-		}
-		return results;
-				
 	}
 	
 	@SuppressWarnings({"deprecation", "unchecked"})
@@ -345,76 +238,44 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		return returnVal;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List<AllelicValueElement> getByMarkersAndAlleleValues(final List<Integer> markerIdList, final List<String> alleleValueList)
-			throws MiddlewareQueryException {
-		List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
-
-		if (markerIdList.isEmpty() || alleleValueList.isEmpty()) {
-			throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
-		}
-		if (markerIdList.size() != alleleValueList.size()) {
-			throw new MiddlewareQueryException("markerIdList and alleleValueList must have the same size");
-		}
-
-		List<String> placeholderList = new ArrayList<String>();
-		for (int i = 0; i < markerIdList.size(); i++) {
-			placeholderList.add("(?,?)");
-		}
-		String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
-
-		String sql =
-				new StringBuffer().append("SELECT dataset_id, gid, marker_id, CONCAT(char_value,''), marker_sample_id, acc_sample_id ")
-						.append("FROM gdms_char_values ").append("   WHERE (marker_id, char_value) IN (" + placeholders + ") ").toString();
-
-		try {
-			SQLQuery query = this.getSession().createSQLQuery(sql);
-			for (int i = 0; i < markerIdList.size(); i++) {
-				int baseIndex = i * 2;
-
-				query.setInteger(baseIndex, markerIdList.get(i));
-				query.setString(baseIndex + 1, alleleValueList.get(i));
-			}
-
-			List results = query.list();
-
-			for (final Object o : results) {
-				Object[] result = (Object[]) o;
-				if (result != null) {
-					Integer datasetId = (Integer) result[0];
-					Integer gid = (Integer) result[1];
-					Integer markerId = (Integer) result[2];
-					String charValue = (String) result[3];
-					Integer markerSampleId = (Integer) result[4];
-					Integer accSampleId = (Integer) result[5];
-					AllelicValueElement allelicValueElement =
-							new AllelicValueElement(null, datasetId, gid, markerId, charValue, markerSampleId, accSampleId);
-					values.add(allelicValueElement);
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByMarkersAndAlleleValues(markerIdList=" + markerIdList + ", alleleValueList="
-					+ alleleValueList + "): " + e.getMessage(), e);
-		}
-
-		return values;
-	}
 
 	@SuppressWarnings("unchecked")
 	public List<CharValues> getCharValuesByMarkerIds(final List<Integer> markerIds) throws MiddlewareQueryException {
-		List<CharValues> toReturn = new ArrayList<CharValues>();
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("markerId", markerIds));
-			toReturn = criteria.list();
+			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getCharValuesByMarkerIds=" + markerIds.toString() + " query on CharValuesDAO: " + e.getMessage(), e);
+			final String errorMessage = "Error in getCharValuesByMarkerIds=" + markerIds.toString() + " query on CharValuesDAO: " + e.getMessage();
+			CharValuesDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
+	}
 
-		return toReturn;
+	public List<CharValueElement> getCharValueElementsByDatasetId (final Integer datasetId) throws MiddlewareQueryException {
+		Preconditions.checkNotNull(datasetId);
+		try {
+			return this.getSession().createSQLQuery(GET_CHAR_VALUES_ELEMENTS_BY_DATASETID)
+					.addScalar("sampleUID", new StringType())
+					.addScalar("accessionId", new IntegerType())
+					.addScalar("sampleName", new StringType())
+					.addScalar("gid", new IntegerType())
+					.addScalar("designation", new StringType())
+					.addScalar("plantNo", new IntegerType())
+					.addScalar("markerId", new IntegerType())
+					.addScalar("markerName", new StringType())
+					.addScalar("charValue", new StringType())
+					.addScalar("datasetId", new IntegerType())
+					.setParameter("datasetId", datasetId)
+					.setResultTransformer(Transformers.aliasToBean(CharValueElement.class))
+					.list();
+
+		} catch (HibernateException e) {
+			final String errorMessage = "Error with getCharValueElementsByDatasetId(datasetId=" + datasetId + ") query from CharValuesDAO " + e.getMessage();
+			CharValuesDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
 
 }
