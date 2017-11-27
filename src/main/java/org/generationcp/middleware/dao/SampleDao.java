@@ -118,8 +118,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 			.createCriteria(Sample.class, "sample").createAlias("sample.plant", "plant")//
 			.createAlias("sample.sampleList", "sampleList", Criteria.LEFT_JOIN)//
-			.createAlias("sample.accMetadataSets", "accMetadataSets")//
-			.createAlias("accMetadataSets.dataset", "dataset")//
+			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)//
+			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)//
 
 			.createAlias("plant.experiment", "experiment")//
 			.createAlias("experiment.experimentStocks", "experimentStocks")//
