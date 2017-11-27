@@ -718,7 +718,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				sb.append(" ORDER BY next_number desc LIMIT 1");
 				
 				final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
-				query.setParameter("prefix", prefix);
+				query.setParameter("prefix", prefix.toUpperCase());
 				query.setParameter("prefixLike", prefix + "%");
 				
 				final BigInteger nextNumberInSequence = (BigInteger) query.uniqueResult();

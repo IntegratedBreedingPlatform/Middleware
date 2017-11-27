@@ -10,7 +10,11 @@
 
 package org.generationcp.middleware.dao;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -23,6 +27,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +35,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Lists;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
@@ -412,47 +414,97 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String crossNamePrefix = "ABCDEFG";
 		final String existingGermplasmNameWithPrefix = crossNamePrefix + "1";
 
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
-
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-
-		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
-
-		this.germplasmDataDM.addGermplasmName(germplasmName);
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix);
 
 		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
 		Assert.assertEquals(
-				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " is existing " + "so the next sequence number should be 2", "2",
+				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " is existing so the next sequence number should be 2", "2",
 				result);
 	}
-	
+
 	@Test
-	public void testGetNextSequenceNumberForCrossNameWithEmptyPrefix() {
-		this.germplasmDataDM.getNextSequenceNumberForCrossName("", null);
-		Mockito.verify(this.dao, Mockito.never()).getNextSequenceNumberForCrossName(Matchers.anyString(), Matchers.anyString());
+	public void testGetNextSequenceNumberForCrossNameWithEmptyPrefixSupplied() {
+		final Session mockSession = Mockito.mock(Session.class);
+		this.dao.setSession(mockSession);
+		this.dao.getNextSequenceNumberForCrossName("", null);
+		// Verify that no query was made if the prefix is empty
+		Mockito.verify(mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
 	}
 	
 	@Test
 	public void testGetNextSequenceNumberForCrossNameWithSuffixSupplied() {
-
 		final String crossNamePrefix = "ABCDEFG";
+		final Integer lastCode = 99;
 		final String suffix = "-XYZ";
-		final String existingGermplasmNameWithPrefix = crossNamePrefix + "99" + suffix;
+		final String existingGermplasmNameWithPrefixAndSuffix = crossNamePrefix + lastCode + suffix;
 
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
-
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-
-		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
-
-		this.germplasmDataDM.addGermplasmName(germplasmName);
+		// Also insert a name without the suffix to verify that the last code in sequence will not come from it
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefixAndSuffix);
+		this.insertGermplasmWithName(crossNamePrefix + "999");
 
 		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, suffix);
-		Assert.assertEquals(
-				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " and suffix " + suffix + " is existing " + "so the next sequence number should be 100", "100",
-				result);
+		final Integer expectedNextCode = lastCode + 1;
+		Assert.assertEquals("Germplasm with name " + existingGermplasmNameWithPrefixAndSuffix
+				+ " is existing so the next sequence number should be " + expectedNextCode, expectedNextCode.toString(), result);
+	}
+	
+	@Test
+	public void testGetNextSequenceNumberForCrossNameWithSpaceAfterPrefix() {
+
+		final String crossNamePrefix = "ABCDEFG";
+		final Integer lastCodeForPrefix = 9;
+		final String existingGermplasmNameWithPrefix = crossNamePrefix + lastCodeForPrefix;
+		final Integer lastCodeForPrefixWithSpace = 99;
+		final String existingGermplasmNameWithPrefixWithSpace = crossNamePrefix + " " + lastCodeForPrefixWithSpace;
+
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix);
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefixWithSpace);
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
+		final Integer nextCodeForPrefix = lastCodeForPrefix + 1;
+		Assert.assertEquals("Germplasm with prefix " + existingGermplasmNameWithPrefix
+				+ " is existing so the next sequence number should be " + nextCodeForPrefix, nextCodeForPrefix.toString(), result);
+		
+		final String result2 = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix + " ", null);
+		final Integer nextCodeForPrefixWithSpace = lastCodeForPrefixWithSpace + 1;
+		Assert.assertEquals("Germplasm with prefix " + existingGermplasmNameWithPrefixWithSpace
+				+ " is existing so the next sequence number should be " + nextCodeForPrefixWithSpace, nextCodeForPrefixWithSpace.toString(), result2);
+	}
+	
+	@Test
+	public void testGetNextSequenceNumberForCrossNameForMixedCasePrefix() {
+
+		final String crossNamePrefix = "aBcDeFg";
+		final Integer lastCodeForMixedCasePrefix = 29;
+		final String nameWithMixedCasePrefix = crossNamePrefix + lastCodeForMixedCasePrefix;
+		final Integer lastCodeForUppercasePrefix = 19;
+		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
+		
+		this.insertGermplasmWithName(nameWithMixedCasePrefix);
+		this.insertGermplasmWithName(nameWithUppercasePrefix);
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
+		final Integer nextCodeForPrefix = lastCodeForMixedCasePrefix + 1;
+		Assert.assertEquals("Germplasm with prefix " + nameWithMixedCasePrefix
+				+ " is existing so the next sequence number should be " + nextCodeForPrefix, nextCodeForPrefix.toString(), result);
+	}
+	
+	@Test
+	public void testGetNextSequenceNumberForCrossNameForLowerCasePrefix() {
+
+		final String crossNamePrefix = "aBcDeFgHij";
+		final Integer lastCodeForLowercasePrefix = 49;
+		final String nameWithLowercasePrefix = crossNamePrefix.toLowerCase() + lastCodeForLowercasePrefix;
+		final Integer lastCodeForUppercasePrefix = 39;
+		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
+		
+		this.insertGermplasmWithName(nameWithLowercasePrefix);
+		this.insertGermplasmWithName(nameWithUppercasePrefix);
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
+		final Integer nextCodeForPrefix = lastCodeForLowercasePrefix + 1;
+		Assert.assertEquals("Germplasm with prefix " + nameWithLowercasePrefix
+				+ " is existing so the next sequence number should be " + nextCodeForPrefix, nextCodeForPrefix.toString(), result);
 	}
 
 	@Test
@@ -461,23 +513,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String crossNamePrefix = "ABCDEFG";
 		final String existingGermplasmNameWithPrefix = crossNamePrefix + "1";
 
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
-
 		// Flag the germplasm as deleted
-		germplasm.setDeleted(true);
-
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-
-		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
-		germplasmName.setNstat(1);
-
-		this.germplasmDataDM.addGermplasmName(germplasmName);
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix, true);
 
 		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
-
 		Assert.assertEquals(
-				"Germplasm with name" + existingGermplasmNameWithPrefix + " is deleted " + "so the next sequence number should still be 1",
+				"Germplasm with name" + existingGermplasmNameWithPrefix + " is deleted so the next sequence number should still be 1",
 				"1", result);
 
 	}
@@ -505,6 +546,19 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final StringBuilder sb = new StringBuilder();
 		dao.buildCrossNameRegularExpression(prefix, suffix, sb);
 		Assert.assertEquals("^(" + prefix + ")[0-9]+(" + suffix +")$", sb.toString());
+	}
+	
+	private void insertGermplasmWithName(final String existingGermplasmNameWithPrefix, final boolean isDeleted) {
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
+		germplasm.setDeleted(isDeleted);
+		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
+		this.germplasmDataDM.addGermplasmName(germplasmName);
+	}
+	private void insertGermplasmWithName(final String existingGermplasmNameWithPrefix) {
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix, false);
 	}
 
 	private void initializeGermplasms() {
