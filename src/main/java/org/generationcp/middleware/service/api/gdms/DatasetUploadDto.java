@@ -10,14 +10,14 @@ import java.util.LinkedHashSet;
  * Created by clarysabel on 11/9/17.
  */
 @AutoProperty
-public class DatasetDto {
+public class DatasetUploadDto {
 
 	@AutoProperty
 	public class SampleKey {
 
 		private String sampleUID;
 
-		private Integer accesion;
+		private Integer accession;
 
 		public SampleKey() {
 
@@ -31,12 +31,12 @@ public class DatasetDto {
 			this.sampleUID = sampleUID;
 		}
 
-		public Integer getAccesion() {
-			return accesion;
+		public Integer getAccession() {
+			return accession;
 		}
 
-		public void setAccesion(final Integer accesion) {
-			this.accesion = accesion;
+		public void setAccession(final Integer accession) {
+			this.accession = accession;
 		}
 
 		@Override
@@ -76,13 +76,13 @@ public class DatasetDto {
 
 	private Integer userId;
 
-	private String specie;
+	private String species;
 
 	private String[][] charValues;
 
 	private List<String> markers;
 
-	private LinkedHashSet<SampleKey> sampleAccesions;
+	private LinkedHashSet<SampleKey> sampleAccessions;
 
 	public String getName() {
 		return name;
@@ -180,20 +180,20 @@ public class DatasetDto {
 		this.markers = markers;
 	}
 
-	public LinkedHashSet<SampleKey> getSampleAccesions() {
-		return sampleAccesions;
+	public LinkedHashSet<SampleKey> getSampleAccessions() {
+		return sampleAccessions;
 	}
 
-	public void setSampleAccesions(final LinkedHashSet<SampleKey> sampleAccesions) {
-		this.sampleAccesions = sampleAccesions;
+	public void setSampleAccessions(final LinkedHashSet<SampleKey> sampleAccessions) {
+		this.sampleAccessions = sampleAccessions;
 	}
 
-	public String getSpecie() {
-		return specie;
+	public String getSpecies() {
+		return species;
 	}
 
-	public void setSpecie(final String specie) {
-		this.specie = specie;
+	public void setSpecies(final String species) {
+		this.species = species;
 	}
 
 	@Override

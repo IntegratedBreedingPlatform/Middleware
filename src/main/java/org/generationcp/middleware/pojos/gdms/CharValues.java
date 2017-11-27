@@ -46,32 +46,32 @@ public class CharValues implements Serializable {
 	@JoinColumn(name = "dataset_id")
 	private Dataset dataset;
 
-	@Basic(optional = false)
-	@Column(name = "marker_id")
-	private Integer markerId;
+	@ManyToOne
+	@JoinColumn(name = "marker_id")
+	private Marker marker;
 
 	@ManyToOne
 	@JoinColumn(name = "sample_id")
 	private Sample sample;
 
 	@Column(name = "char_value")
-	String charValue;
+	private String charValue;
 
 	@Column(name = "marker_sample_id")
-	Integer markerSampleId;
+	private Integer markerSampleId;
 
 	@Column(name = "acc_sample_id")
-	Integer accSampleId;
+	private Integer accSampleId;
 
 	public CharValues() {
 	}
 
 	public CharValues(
-			final Integer acId, final Dataset dataset, final Integer markerId, final Sample sample, final String charValue, final Integer markerSampleId,
+			final Integer acId, final Dataset dataset, final Marker marker, final Sample sample, final String charValue, final Integer markerSampleId,
 			final Integer accSampleId) {
 		this.acId = acId;
 		this.dataset = dataset;
-		this.markerId = markerId;
+		this.marker = marker;
 		this.sample = sample;
 		this.charValue = charValue;
 		this.markerSampleId = markerSampleId;
@@ -94,12 +94,12 @@ public class CharValues implements Serializable {
 		this.dataset = dataset;
 	}
 
-	public Integer getMarkerId() {
-		return this.markerId;
+	public Marker getMarker() {
+		return this.marker;
 	}
 
-	public void setMarkerId(final Integer markerId) {
-		this.markerId = markerId;
+	public void setMarker(final Marker marker) {
+		this.marker = marker;
 	}
 
 	public Sample getSample() {
@@ -143,7 +143,7 @@ public class CharValues implements Serializable {
 		result = prime * result + (this.charValue == null ? 0 : this.charValue.hashCode());
 		result = prime * result + (this.dataset == null ? 0 : this.dataset.hashCode());
 		result = prime * result + (this.sample == null ? 0 : this.sample.hashCode());
-		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
+		result = prime * result + (this.marker == null ? 0 : this.marker.hashCode());
 		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
 		return result;
 	}
@@ -195,11 +195,11 @@ public class CharValues implements Serializable {
 		} else if (!this.sample.equals(other.sample)) {
 			return false;
 		}
-		if (this.markerId == null) {
-			if (other.markerId != null) {
+		if (this.marker == null) {
+			if (other.marker != null) {
 				return false;
 			}
-		} else if (!this.markerId.equals(other.markerId)) {
+		} else if (!this.marker.equals(other.marker)) {
 			return false;
 		}
 		if (this.markerSampleId == null) {
@@ -220,7 +220,7 @@ public class CharValues implements Serializable {
 		builder.append(", dataset=");
 		builder.append(this.dataset);
 		builder.append(", markerId=");
-		builder.append(this.markerId);
+		builder.append(this.marker);
 		builder.append(", sample=");
 		builder.append(this.sample);
 		builder.append(", charValue=");
