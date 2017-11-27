@@ -72,7 +72,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public void testGetSampleListByParentAndNameOk() throws Exception {
 		final SampleList sampleList = SampleListTestDataInitializer
 				.createSampleList(this.userDao.getUserByUserName(SampleListDaoTest.ADMIN));
-		final SampleList parent = this.sampleListDao.getBySampleListName(SampleListDaoTest.ROOT_FOLDER);
+		final SampleList parent = this.sampleListDao.getRootSampleList();
 		sampleList.setHierarchy(parent);
 		this.sampleListDao.save(sampleList);
 		final SampleList uSampleList = this.sampleListDao.getSampleListByParentAndName(sampleList.getListName(),
@@ -100,7 +100,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public void testGetAllTopLevelLists() {
 		final User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
-		final SampleList parent = this.sampleListDao.getBySampleListName(SampleListDaoTest.ROOT_FOLDER);
+		final SampleList parent = this.sampleListDao.getRootSampleList();
 		sampleList.setHierarchy(parent);
 		this.sampleListDao.save(sampleList);
 
@@ -113,5 +113,11 @@ public class SampleListDaoTest extends IntegrationTestBase {
 				.getAllTopLevelLists(sampleList.getProgramUUID());
 
 		Assert.assertEquals(topLevelLists.size(), updatedTopLevelLists.size() - 1);
+	}
+	
+	@Test
+	public void testGetRootSampleList() {
+		final SampleList rootList =  this.sampleListDao.getRootSampleList();
+		Assert.assertEquals(new Integer(1), rootList.getId());
 	}
 }

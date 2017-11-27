@@ -38,7 +38,6 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SampleListDao.class);
 
-	protected static final String ROOT_FOLDER = "Samples";
 	protected static final Integer ROOT_FOLDER_ID = 1;
 	protected static final String LIST_NAME = "listName";
 	protected static final String PROGRAMUUID = "programUUID";
@@ -49,18 +48,9 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
 	}
 
-	public SampleList getBySampleListName(final String sampleListName) {
-		final DetachedCriteria criteria = this.getSampleListName(sampleListName);
-		return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
-	}
-
-	private DetachedCriteria getSampleListName(final String sampleListName) {
-		final DetachedCriteria criteria = DetachedCriteria.forClass(SampleList.class);
-		return criteria.add(Restrictions.like(SampleListDao.LIST_NAME, sampleListName));
-	}
-
 	public SampleList getRootSampleList() {
-		final DetachedCriteria criteria = this.getSampleListName(SampleListDao.ROOT_FOLDER);
+		final DetachedCriteria criteria = DetachedCriteria.forClass(SampleList.class);
+		criteria.add(Restrictions.eq("id", SampleListDao.ROOT_FOLDER_ID));
 		criteria.add(Restrictions.isNull(SampleListDao.PROGRAMUUID));
 		return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
