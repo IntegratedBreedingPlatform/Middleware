@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -18,10 +19,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "sample")
@@ -71,6 +74,11 @@ public class Sample implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	private User createdBy;
 
+
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumn(name = "sample_id")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private List<AccMetadataSet> accMetadataSets;// = new ArrayList<>();
 
 	public Sample() {
 
@@ -178,5 +186,13 @@ public class Sample implements Serializable {
 	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
+
+	public List<AccMetadataSet> getAccMetadataSets() {
+		return accMetadataSets;
+	}
+
+	public void setAccMetadataSets(List<AccMetadataSet> accMetadataSets) {
+		this.accMetadataSets = accMetadataSets;
 	}
 }
