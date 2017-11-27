@@ -3,7 +3,9 @@ package org.generationcp.middleware.domain.sample;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class SampleDTO {
 
@@ -15,6 +17,28 @@ public class SampleDTO {
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
+	private List<Dataset> datasets;
+
+	public class Dataset {
+		private String name;
+		private int datasetId;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(final String name) {
+			this.name = name;
+		}
+
+		public int getDatasetId() {
+			return datasetId;
+		}
+
+		public void setDatasetId(final int datasetId) {
+			this.datasetId = datasetId;
+		}
+	}
 
 	public SampleDTO() {
 	}
@@ -90,6 +114,17 @@ public class SampleDTO {
 	public Integer getSampleId() { return sampleId; }
 
 	public void setSampleId(final Integer sampleId) { this.sampleId = sampleId;}
+
+	public List<Dataset> getDatasets() {
+		if (datasets == null) {
+			return new ArrayList<>();
+		}
+		return datasets;
+	}
+
+	public void setDatasets(final List<Dataset> datasets) {
+		this.datasets = datasets;
+	}
 
 	@Override
 	public boolean equals(final Object o) {
