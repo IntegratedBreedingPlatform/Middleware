@@ -59,18 +59,20 @@ public class StudyTestDataInitializer {
 	}
 
 	public StudyReference addTestStudy(final String cropPrefix) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T, cropPrefix);
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T, cropPrefix,
+			StudyTestDataInitializer.STUDY_DESCRIPTION);
 	}
 	
 	public StudyReference addTestStudy(final String uniqueId, final String cropPrefix) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T, cropPrefix);
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION);
 	}
 	
 	public StudyReference addTestStudy(final StudyType studyType, final String studyName, final String cropPrefix) throws Exception {
-		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix);
+		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType, final String cropPrefix) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType, final String cropPrefix,
+		final String description) throws Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
 
@@ -78,14 +80,10 @@ public class StudyTestDataInitializer {
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_TITLE.getId(), StudyTestDataInitializer.STUDY_DESCRIPTION, 2);
-		typeList.add(variable.getVariableType());
-		variableList.add(variable);
-
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix,
-			studyType);
+			studyType, description);
 	}
 
 	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId, final String startDate, final String cropPrefix) throws Exception {
@@ -94,10 +92,6 @@ public class StudyTestDataInitializer {
 		final VariableList variableList = new VariableList();
 
 		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), studyName, 1);
-		typeList.add(variable.getVariableType());
-		variableList.add(variable);
-
-		variable = this.createVariable(TermId.STUDY_TITLE.getId(), StudyTestDataInitializer.STUDY_DESCRIPTION, 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
@@ -117,7 +111,7 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), cropPrefix,
-			studyType);
+			studyType, StudyTestDataInitializer.STUDY_DESCRIPTION);
 	}
 	
 	private StudyValues createStudyValues(final VariableList variableList) throws Exception {
