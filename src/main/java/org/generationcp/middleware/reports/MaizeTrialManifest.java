@@ -20,9 +20,9 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 	public static final String HARVEST_DATE_REPORT_KEY = "harvestDate";
 	public static final String DISTANCE_BETWEEN_ROWS_REPORT_KEY = "distanceBetweenRows";
 	public static final String NET_PLOT_LENGTH_REPORT_KEY = "netPlotLength";
-	public static final String[] UNIQUE_REPORT_KEYS = (String[]) Arrays.asList(DISTANCE_BETWEEN_STATIONS_REPORT_KEY,
+	protected static final String[] UNIQUE_REPORT_KEYS = Arrays.asList(DISTANCE_BETWEEN_STATIONS_REPORT_KEY,
 			ROWS_HARVESTED_REPORT_KEY, COLLABORATOR_REPORT_KEY, PLANTING_DATE_REPORT_KEY, HARVEST_DATE_REPORT_KEY,
-			DISTANCE_BETWEEN_ROWS_REPORT_KEY, NET_PLOT_LENGTH_REPORT_KEY).toArray();
+			DISTANCE_BETWEEN_ROWS_REPORT_KEY, NET_PLOT_LENGTH_REPORT_KEY).toArray(new String[0]);
     public static final String MAIZE_MANIFEST_PROGRAM_KEY = "breedingProgram";
 
     protected ReportParameterMapper parameterMapper = new ReportParameterMapper();
@@ -52,7 +52,7 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 
         final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
         for (final MeasurementVariable studyCondition : studyConditions) {
-            this.parameterMapper.mapBasicStudyValues(studyCondition, params, studyCondition.getValue());
+            this.parameterMapper.mapBasicStudyValues(studyCondition, params);
             mapEnvironmentValue(studyCondition, params, studyCondition.getValue());
         }
 

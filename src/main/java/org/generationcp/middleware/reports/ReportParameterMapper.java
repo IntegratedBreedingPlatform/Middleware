@@ -46,20 +46,11 @@ public class ReportParameterMapper {
         }
     }
 
-    public void mapBasicStudyValues(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
+    public void mapBasicStudyValues(MeasurementVariable var, Map<String, Object> reportParamMap) {
         final TermId term = TermId.getById(var.getTermId());
 
-        switch (term) {
-            case STUDY_NAME:
-                reportParamMap.put(AbstractReporter.STUDY_NAME_REPORT_KEY, var.getValue());
-                break;
-            case STUDY_TITLE:
-                reportParamMap.put(AbstractReporter.STUDY_TITLE_REPORT_KEY, var.getValue());
-                break;
-            default:
-                // aside from the specified items above, no other terms are recognized as basic study values
-                break;
+        if (TermId.STUDY_NAME.equals(term)) {
+            reportParamMap.put(AbstractReporter.STUDY_NAME_REPORT_KEY, var.getValue());
         }
-
     }
 }
