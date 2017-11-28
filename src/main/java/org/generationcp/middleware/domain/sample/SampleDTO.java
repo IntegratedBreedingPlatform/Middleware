@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.sample;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -13,11 +14,13 @@ public class SampleDTO {
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
-	private Date samplingDate;
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
 	private List<Dataset> datasets;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+	private Date samplingDate;
 
 	public class Dataset {
 		private String name;
