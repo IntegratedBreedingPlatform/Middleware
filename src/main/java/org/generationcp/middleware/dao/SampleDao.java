@@ -1,14 +1,20 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,5 +111,69 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.createCriteria(Sample.class, "sample")
 				.add(Restrictions.in("sampleBusinessKey", sampleBks))
 				.list();
+	}
+
+	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid){
+		final List<Object[]> result =  this.getSession()
+
+			.createCriteria(Sample.class, "sample").createAlias("sample.plant", "plant")//
+			.createAlias("sample.sampleList", "sampleList", Criteria.LEFT_JOIN)//
+			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)//
+			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)//
+
+			.createAlias("plant.experiment", "experiment")//
+			.createAlias("experiment.experimentStocks", "experimentStocks")//
+			.createAlias("experimentStocks.stock", "stock")//
+			.createAlias("experiment.project", "project")//
+			.createAlias("project.relatedTos", "relatedTos")//
+			.createAlias("relatedTos.objectProject", "objectProject")//
+			.add(Restrictions.eq("stock.dbxrefId", gid))//
+			.addOrder(Order.desc("sample.sampleBusinessKey"))//
+
+			.setProjection(Projections.distinct(Projections.projectionList()//
+				.add(Projections.property("sampleList.listName"))//
+				.add(Projections.property("sample.sampleBusinessKey"))//
+				.add(Projections.property("experiment.plotId"))//
+				.add(Projections.property("plant.plantBusinessKey"))//
+				.add(Projections.property("dataset.datasetId"))//
+				.add(Projections.property("dataset.datasetName"))//
+
+				.add(Projections.property("objectProject.projectId"))//
+				.add(Projections.property("objectProject.name"))//
+				.add(Projections.property("objectProject.programUUID"))//
+				.add(Projections.property("objectProject.studyType"))))//
+
+			.list();//
+
+		final HashMap<String,SampleGermplasmDetailDTO> samplesMap = new HashMap<>();
+		for (final Object[] row : result) {
+			final SampleGermplasmDetailDTO sample;
+
+			final String sampleListName = (String) row[0];
+			final String sampleBk = (String) row[1];
+			final String plotId = (String) row[2];
+			final String plantBk = (String) row[3];
+			final Integer datasetId = (Integer) row[4];
+			final String datasetName = (String) row[5];
+			final Integer projectId = (Integer) row[6];
+			final String studyName = (String) row[7];
+			final String programUuid = (String) row[8];
+			final StudyType studyType = (StudyType) row[9];
+
+			if(samplesMap.containsKey(sampleBk)){
+				sample = samplesMap.get(sampleBk);
+				sample.addDataset(datasetId, datasetName);
+			}else{
+				sample = new SampleGermplasmDetailDTO();
+				sample.setSampleListName(sampleListName);
+				sample.setSampleBk(sampleBk);
+				sample.setPlotId(plotId);
+				sample.setPlantBk(plantBk);
+				sample.setStudy(new StudyReference(projectId, studyName, "", programUuid, studyType));
+				sample.addDataset(datasetId, datasetName);
+				samplesMap.put(sampleBk,sample);
+			}
+		}
+		return new ArrayList<>(samplesMap.values());
 	}
 }
