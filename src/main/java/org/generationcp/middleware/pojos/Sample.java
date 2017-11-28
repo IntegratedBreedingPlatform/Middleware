@@ -192,7 +192,7 @@ public class Sample implements Serializable {
 		return accMetadataSets;
 	}
 
-	public void setAccMetadataSets(List<AccMetadataSet> accMetadataSets) {
+	public void setAccMetadataSets(final List<AccMetadataSet> accMetadataSets) {
 		this.accMetadataSets = accMetadataSets;
 	}
 }
