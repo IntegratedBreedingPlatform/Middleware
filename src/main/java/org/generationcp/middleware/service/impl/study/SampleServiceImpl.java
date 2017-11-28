@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +126,13 @@ public class SampleServiceImpl implements SampleService {
 			final Plant plant = sample.getPlant();
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
+
+			for (final AccMetadataSet accMetadataSet : sample.getAccMetadataSets()) {
+				final SampleDTO.Dataset dataset = new SampleDTO().new Dataset();
+				dataset.setName(accMetadataSet.getDataset().getDatasetName());
+				dataset.setDatasetId(accMetadataSet.getDataset().getDatasetId());
+				dto.getDatasets().add(dataset);
+			}
 
 			listSampleDto.add(dto);
 		}

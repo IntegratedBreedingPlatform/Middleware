@@ -65,7 +65,7 @@ public class Sample implements Serializable {
 	@OneToOne(targetEntity = Plant.class, cascade = CascadeType.ALL)
 	private Plant plant;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sample_list")
 	private SampleList sampleList;
 
@@ -73,7 +73,6 @@ public class Sample implements Serializable {
 	@JoinColumn(name = "created_by")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private User createdBy;
-
 
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sample_id")

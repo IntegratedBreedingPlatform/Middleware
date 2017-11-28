@@ -6,7 +6,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SampleDTO {
 
@@ -17,7 +19,7 @@ public class SampleDTO {
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
-	private List<Dataset> datasets;
+	private Set<Dataset> datasets = new HashSet<>();
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
 	private Date samplingDate;
@@ -40,6 +42,29 @@ public class SampleDTO {
 
 		public void setDatasetId(final int datasetId) {
 			this.datasetId = datasetId;
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			if (this == o) {
+				return true;
+			}
+
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			final Dataset dataset = (Dataset) o;
+
+			return new EqualsBuilder().append(name, dataset.name).append(datasetId, dataset.datasetId)
+					.isEquals();
+		}
+
+		@Override
+		public int hashCode() {
+			return new HashCodeBuilder(17, 37).append(name)
+					.append(datasetId)
+					.toHashCode();
 		}
 	}
 
@@ -118,14 +143,14 @@ public class SampleDTO {
 
 	public void setSampleId(final Integer sampleId) { this.sampleId = sampleId;}
 
-	public List<Dataset> getDatasets() {
+	public Set<Dataset> getDatasets() {
 		if (datasets == null) {
-			return new ArrayList<>();
+			return new HashSet<>();
 		}
 		return datasets;
 	}
 
-	public void setDatasets(final List<Dataset> datasets) {
+	public void setDatasets(final Set<Dataset> datasets) {
 		this.datasets = datasets;
 	}
 
