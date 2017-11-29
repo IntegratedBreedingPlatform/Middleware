@@ -188,11 +188,6 @@ public class Germplasm implements Serializable {
 			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE  g.deleted = 0  AND g.grplce = 0 AND "
 					+ "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";
 
-	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
-			"SELECT CONVERT(LTRIM(REPLACE(UPPER(nval), :prefix, '')), SIGNED)+1 AS next_number " + "FROM names "
-					+ "INNER JOIN germplsm ON names.gid = germplsm.gid " + "WHERE names.nval like :prefixLike AND germplsm.deleted = 0 "
-					+ "ORDER BY next_number DESC LIMIT 1";
-
 	public static final String GET_BY_GID_WITH_METHOD_TYPE =
 			"SELECT {g.*}, {m.*} " + "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid "
 					+ "WHERE g.gid = :gid AND  g.deleted = 0  AND g.grplce = 0";
