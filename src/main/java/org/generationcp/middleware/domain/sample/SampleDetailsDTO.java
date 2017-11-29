@@ -39,6 +39,7 @@ public class SampleDetailsDTO implements Serializable {
 	private String displayDate;
 	private String entryNumber;
 	private String plotNumber;
+	private Integer sampleEntryNo;
 
 	public SampleDetailsDTO() {
 
@@ -276,5 +277,13 @@ public class SampleDetailsDTO implements Serializable {
 
 	public String getDisplayDate() {
 		return displayDate;
+	}
+
+	public Integer getSampleEntryNo() {
+		return sampleEntryNo;
+	}
+
+	public void setSampleEntryNo(final Integer sampleEntryNo) {
+		this.sampleEntryNo = sampleEntryNo;
 	}
 }
