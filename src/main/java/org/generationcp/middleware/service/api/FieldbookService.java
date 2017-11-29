@@ -81,11 +81,11 @@ public interface FieldbookService {
 			CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 * Retrieves all locations from central and local databases.
+	 * Retrieves all crop specific and program specific locations except for FIELD and BLOCK locations.
 	 *
 	 * @return List of location references
 	 */
-	List<Location> getAllLocations();
+	List<Location> getAllLocations(String programUUID);
 
 	/**
 	 * Gets the all breeding locations.

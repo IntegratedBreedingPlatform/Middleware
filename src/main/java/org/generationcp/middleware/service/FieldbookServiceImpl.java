@@ -136,24 +136,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getAllLocations() {
-		final Integer fieldLtypeFldId = this.getLocationDataManager()
+	public List<Location> getAllLocations(final String programUUID) {
+
+		final LocationDataManager locationDataManager = this.getLocationDataManager();
+
+		final Integer fieldLtypeFldId = locationDataManager
 				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-		final Integer blockLtypeFldId = this.getLocationDataManager()
+		final Integer blockLtypeFldId = locationDataManager
 				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
-		final List<Location> locList = this.getLocationDataManager().getAllLocations();
-		final List<Location> newLocation = new ArrayList<>();
+		List<Integer> locationTypesToExclude = new ArrayList<>();
+		locationTypesToExclude.add(fieldLtypeFldId);
+		locationTypesToExclude.add(blockLtypeFldId);
 
-		for (final Location loc : locList) {
-			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue()
-					|| blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()) {
-				continue;
-			}
-			newLocation.add(loc);
-		}
-
-		return newLocation;
+		return locationDataManager.getLocationsByUniqueIDAndExcludeLocationTypes(programUUID, locationTypesToExclude);
 	}
 
 	@Override
