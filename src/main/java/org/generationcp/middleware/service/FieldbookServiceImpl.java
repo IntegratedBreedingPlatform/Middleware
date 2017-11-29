@@ -179,6 +179,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public List<Location> getAllBreedingLocationsByProgramUUID(final String programUUID) {
+
+		return this.getLocationDataManager().getAllBreedingLocationsByUniqueID(programUUID);
+
+	}
+
+	@Override
 	public List<Location> getAllSeedLocations() {
 		final Integer seedLType = this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE,
 				LocationType.SSTORE.getCode());

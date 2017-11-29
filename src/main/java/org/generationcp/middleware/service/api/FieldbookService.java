@@ -95,6 +95,13 @@ public interface FieldbookService {
 	List<Location> getAllBreedingLocations();
 
 	/**
+	 * Gets all breeding type locations (crop specific and program specific locations).
+	 *
+	 * @return the all breeding locations
+	 */
+	List<Location> getAllBreedingLocationsByProgramUUID(String programUUID);
+
+	/**
 	 * Gets the all seed locations.
 	 *
 	 * @return the all seed locations
