@@ -721,7 +721,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
 			criteria.add(Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
-			if (locationTypesToExclude != null) {
+			if (locationTypesToExclude != null && !locationTypesToExclude.isEmpty()) {
 				criteria.add(Restrictions.not(Restrictions.in(LocationDAO.LTYPE, locationTypesToExclude)));
 			}
 			locations = criteria.list();
