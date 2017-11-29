@@ -85,15 +85,24 @@ public interface LocationDataManager {
 	long countAllLocations() throws MiddlewareQueryException;
 
 	/**
-	 * Returns the Location records with names matching the given parameter.
-	 *
+	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
+	 * locations (locations that match the specified program unique id).
 	 * @param programUUID
-	 *            - unique ID of the current program
-	 * @return List of Location POJOs
+	 * @return
 	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
 	 */
 	List<Location> getLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
+
+	/**
+	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
+	 * locations (locations that match the specified program unique id). This will also exclude the locations whose location type
+	 * is specified in locationTypesToExclude.
+	 * @param programUUID - unique ID of the current program
+	 * @param locationTypesToExclude - location types to exclude
+	 * @return
+	 */
+	List<Location> getLocationsByUniqueIDAndExcludeLocationTypes(String programUUID, List<Integer> locationTypesToExclude);
+
 
 	/**
 	 * Returns the number of Locations with names matching the given parameter.

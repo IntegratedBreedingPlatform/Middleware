@@ -710,6 +710,29 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return locations;
 	}
 
+	public List<Location> getByUniqueIDAndExcludeLocationTypes(final String programUUID, final List<Integer> locationTypesToExclude) {
+
+		List<Location> locations = new ArrayList<>();
+
+		if (programUUID == null || programUUID.isEmpty()) {
+			return locations;
+		}
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+			criteria.add(Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
+			if (locationTypesToExclude != null) {
+				criteria.add(Restrictions.not(Restrictions.in(LocationDAO.LTYPE, locationTypesToExclude)));
+			}
+			locations = criteria.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getByUniqueIDAndExcludeLocationTypes", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+
+		return locations;
+	}
+
 	public long countByUniqueID(final String programUUID) {
 		try {
 			if (programUUID != null) {
