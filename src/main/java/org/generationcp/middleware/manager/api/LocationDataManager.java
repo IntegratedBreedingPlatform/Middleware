@@ -28,7 +28,6 @@ import java.util.Map;
  * This is the API for managing Location information.
  *
  * @author Joyce Avestro
- *
  */
 public interface LocationDataManager {
 
@@ -36,13 +35,10 @@ public interface LocationDataManager {
 	 * Returns the germplasm records that were created at the locations with
 	 * names matching the given parameter.
 	 *
-	 * @param locationId
-	 *            - location id to search details from
-	 * @param start
-	 *            - the starting index of the sublist of results to be returned
-	 * @param numOfRows
-	 *            - the number of rows to be included in the sublist of results
-	 *            to be returned
+	 * @param locationId - location id to search details from
+	 * @param start      - the starting index of the sublist of results to be returned
+	 * @param numOfRows  - the number of rows to be included in the sublist of results
+	 *                   to be returned
 	 * @return List of Germplasm POJOs
 	 */
 	List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows);
@@ -51,21 +47,17 @@ public interface LocationDataManager {
 	 * Returns all Location information from central and local databases.
 	 *
 	 * @return All Locations
-	 * @
-	 *             the middleware query exception
+	 * @ the middleware query exception
 	 */
 	List<Location> getAllLocations();
 
 	/**
 	 * Returns all Local Locations.
 	 *
-	 * @param start
-	 *            - the starting index of the sublist of results to be returned
-	 * @param numOfRows
-	 *            - the number of rows to be included in the sublist of results
-	 *            to be returned
+	 * @param start     - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results
+	 *                  to be returned
 	 * @return All Locations based on the given start and numOfRows
-
 	 */
 	List<Location> getAllLocalLocations(int start, int numOfRows);
 
@@ -73,16 +65,15 @@ public interface LocationDataManager {
 	 * Returns number of all Locations.
 	 *
 	 * @return the number of all Locations
-
 	 */
 	long countAllLocations();
 
 	/**
 	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
 	 * locations (locations that match the specified program unique id).
+	 *
 	 * @param programUUID
 	 * @return
-
 	 */
 	List<Location> getLocationsByUniqueID(String programUUID);
 
@@ -90,7 +81,8 @@ public interface LocationDataManager {
 	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
 	 * locations (locations that match the specified program unique id). This will also exclude the locations whose location type
 	 * is specified in locationTypesToExclude.
-	 * @param programUUID - unique ID of the current program
+	 *
+	 * @param programUUID            - unique ID of the current program
 	 * @param locationTypesToExclude - location types to exclude
 	 * @return
 	 */
@@ -99,100 +91,72 @@ public interface LocationDataManager {
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
 	 *
-	 * @param name
-	 *            - search string for the name of the locations
-	 * @param op
-	 *            - can be EQUAL like LIKE
+	 * @param name - search string for the name of the locations
+	 * @param op   - can be EQUAL like LIKE
 	 * @return Number of Locations
-
 	 */
 	long countLocationsByUniqueID(String programUUID);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
 	 *
-	 * @param name
-	 *            - search string for the name of the locations
-	 * @param op
-	 *            - can be EQUAL like LIKE
-	 * @param programUUID
-	 *            - uniqueID of the current program
+	 * @param name        - search string for the name of the locations
+	 * @param op          - can be EQUAL like LIKE
+	 * @param programUUID - uniqueID of the current program
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByName(String name, Operation op, String programUUID);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
 	 *
-	 * @param name
-	 *            - search string for the name of the locations
-	 * @param op
-	 *            - can be EQUAL like LIKE
+	 * @param name - search string for the name of the locations
+	 * @param op   - can be EQUAL like LIKE
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByName(String name, Operation op);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
 	 *
-	 * @param name
-	 *            - search string for the name of the locations
-	 * @param start
-	 *            - the starting index of the sublist of results to be returned
-	 * @param numOfRows
-	 *            - the number of rows to be included in the sublist of results
-	 *            to be returned
-	 * @param op
-	 *            - can be EQUAL like LIKE
-	 * @param programUUID
-	 *            - uniqueID of the current program
+	 * @param name        - search string for the name of the locations
+	 * @param start       - the starting index of the sublist of results to be returned
+	 * @param numOfRows   - the number of rows to be included in the sublist of results
+	 *                    to be returned
+	 * @param op          - can be EQUAL like LIKE
+	 * @param programUUID - uniqueID of the current program
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op, String programUUID);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
 	 *
-	 * @param name
-	 *            - search string for the name of the locations
-	 * @param start
-	 *            - the starting index of the sublist of results to be returned
-	 * @param numOfRows
-	 *            - the number of rows to be included in the sublist of results
-	 *            to be returned
-	 * @param op
-	 *            - can be EQUAL like LIKE
+	 * @param name      - search string for the name of the locations
+	 * @param start     - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results
+	 *                  to be returned
+	 * @param op        - can be EQUAL like LIKE
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
 	 *
-	 * @param name
-	 *            - search string for the name of the locations
-	 * @param op
-	 *            - can be EQUAL like LIKE
-	 * @param programUUID
-	 *            - uniqueID of the current program
+	 * @param name        - search string for the name of the locations
+	 * @param op          - can be EQUAL like LIKE
+	 * @param programUUID - uniqueID of the current program
 	 * @return Number of Locations
-
 	 */
 	long countLocationsByName(String name, Operation op, String programUUID);
 
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
 	 *
-	 * @param name
-	 *            - search string for the name of the locations
-	 * @param op
-	 *            - can be EQUAL like LIKE
+	 * @param name - search string for the name of the locations
+	 * @param op   - can be EQUAL like LIKE
 	 * @return Number of Locations
-
 	 */
 	long countLocationsByName(String name, Operation op);
 
@@ -200,8 +164,7 @@ public interface LocationDataManager {
 	 * Returns all country records.
 	 *
 	 * @return List of Location POJOs
-	 * @
-	 *             the middleware query exception
+	 * @ the middleware query exception
 	 */
 	List<Country> getAllCountry();
 
@@ -209,10 +172,8 @@ public interface LocationDataManager {
 	 * Returns all the Location records with country matching the given
 	 * parameter. The data is retrieved from both local and central databases.
 	 *
-	 * @param country
-	 *            - search string for the country of the locations
+	 * @param country - search string for the country of the locations
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByCountry(Country country);
 
@@ -221,12 +182,9 @@ public interface LocationDataManager {
 	 * the given parameter. The data is retrieved from both local and central
 	 * databases.
 	 *
-	 * @param country
-	 *            - search string for the country of the locations
-	 * @param type
-	 *            - search string for the locations type
+	 * @param country - search string for the country of the locations
+	 * @param type    - search string for the locations type
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByCountryAndType(Country country, Integer type);
 
@@ -235,14 +193,10 @@ public interface LocationDataManager {
 	 * matching the given parameter. The data is retrieved from both local and
 	 * central databases.
 	 *
-	 * @param name
-	 *            the name
-	 * @param country
-	 *            the country
-	 * @param type
-	 *            the type
+	 * @param name    the name
+	 * @param country the country
+	 * @param type    the type
 	 * @return the locations by name country and type
-
 	 */
 	List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type);
 
@@ -250,15 +204,11 @@ public interface LocationDataManager {
 	 * Returns the Location records with country matching the given parameter.
 	 * The data is retrieved from both local and central databases.
 	 *
-	 * @param country
-	 *            - search string for the country of the locations
-	 * @param start
-	 *            - the starting index of the sublist of results to be returned
-	 * @param numOfRows
-	 *            - the number of rows to be included in the sublist of results
-	 *            to be returned
+	 * @param country   - search string for the country of the locations
+	 * @param start     - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results
+	 *                  to be returned
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByCountry(Country country, int start, int numOfRows);
 
@@ -266,11 +216,9 @@ public interface LocationDataManager {
 	 * Returns the number of Locations with countries matching the given
 	 * parameter. The data is retrieved from both local and central databases.
 	 *
-	 * @param country
-	 *            - search string for the country of the locations
+	 * @param country - search string for the country of the locations
 	 * @return Number of Locations
-	 * @
-	 *             the middleware query exception
+	 * @ the middleware query exception
 	 */
 	long countLocationsByCountry(Country country);
 
@@ -278,10 +226,8 @@ public interface LocationDataManager {
 	 * Returns the Location records with type matching the given parameter. The
 	 * data is retrieved from both local and central databases.
 	 *
-	 * @param type
-	 *            - search string for the type of the locations
+	 * @param type - search string for the type of the locations
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByType(Integer type);
 
@@ -289,12 +235,9 @@ public interface LocationDataManager {
 	 * Returns the Location records with type matching the given parameter. The
 	 * data is retrieved from both local and central databases.
 	 *
-	 * @param type
-	 *            - search string for the type of the locations
-	 * @param programUUID
-	 *            - unique id of the current program
+	 * @param type        - search string for the type of the locations
+	 * @param programUUID - unique id of the current program
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByType(Integer type, String programUUID);
 
@@ -302,15 +245,11 @@ public interface LocationDataManager {
 	 * Returns the Location records with type matching the given parameter. The
 	 * data is retrieved from both local and central databases.
 	 *
-	 * @param type
-	 *            - search string for the type of the locations
-	 * @param start
-	 *            - the starting index of the sublist of results to be returned
-	 * @param numOfRows
-	 *            - the number of rows to be included in the sublist of results
-	 *            to be returned
+	 * @param type      - search string for the type of the locations
+	 * @param start     - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results
+	 *                  to be returned
 	 * @return List of Location POJOs
-
 	 */
 	List<Location> getLocationsByType(Integer type, int start, int numOfRows);
 
@@ -318,10 +257,8 @@ public interface LocationDataManager {
 	 * Returns the number of Locations with types matching the given parameter.
 	 * The data is retrieved from both local and central databases.
 	 *
-	 * @param type
-	 *            - search string for the type of the locations
+	 * @param type - search string for the type of the locations
 	 * @return Number of Locations
-
 	 */
 	long countLocationsByType(Integer type);
 
@@ -329,22 +266,17 @@ public interface LocationDataManager {
 	 * Returns the number of Locations with types matching the given parameter.
 	 * The data is retrieved from both local and central databases.
 	 *
-	 * @param type
-	 *            - search string for the type of the locations
-	 * @param programUUID
-	 *            - unique id of the current program
+	 * @param type        - search string for the type of the locations
+	 * @param programUUID - unique id of the current program
 	 * @return Number of Locations
-
 	 */
 	long countLocationsByType(Integer type, String programUUID);
 
 	/**
 	 * Returns the udfld record identified by the given id.
 	 *
-	 * @param id
-	 *            - the id of the udfld record
+	 * @param id - the id of the udfld record
 	 * @return the Udflds POJO representing the record
-
 	 */
 	UserDefinedField getUserDefinedFieldByID(Integer id);
 
@@ -352,42 +284,33 @@ public interface LocationDataManager {
 	 * Returns the Map representation of <Code, UserDefinedField> of the given
 	 * tableType (ftable and ftype from the udflds table).
 	 *
-	 * @param tableType
-	 *            the table type
+	 * @param tableType the table type
 	 * @return the user defined field map of code by ud table type
-
 	 */
 	Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType tableType);
 
 	/**
 	 * Gets the user defined field id of code.
 	 *
-	 * @param tableType
-	 *            the table type
-	 * @param code
-	 *            the code
+	 * @param tableType the table type
+	 * @param code      the code
 	 * @return the user defined field id of code
-
 	 */
 	Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code);
 
 	/**
 	 * Returns the udfld records identified by the given tablename.
 	 *
-	 * @param tableName
-	 *            - the value of the ftable record
-	 * @param fieldType
-	 *            - the value of the ftype record
+	 * @param tableName - the value of the ftable record
+	 * @param fieldType - the value of the ftype record
 	 * @return the Udflds POJO representing the record
-
 	 */
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType);
 
 	/**
 	 * Returns the country record identified by the given id.
 	 *
-	 * @param id
-	 *            - id of the country record
+	 * @param id - id of the country record
 	 * @return the Country POJO representing the record
 	 */
 	Country getCountryById(Integer id);
@@ -395,119 +318,98 @@ public interface LocationDataManager {
 	/**
 	 * Returns the location record identified by the given id.
 	 *
-	 * @param id
-	 *            - id of the location record
+	 * @param id - id of the location record
 	 * @return the Location POJO representing the record
-
 	 */
 	Location getLocationByID(Integer id);
 
 	/**
 	 * Inserts a single {@code Location} object into the database.
 	 *
-	 * @param location
-	 *            - The {@code Location} object to be persisted to the database.
-	 *            Must be a valid {@code Location} object.
+	 * @param location - The {@code Location} object to be persisted to the database.
+	 *                 Must be a valid {@code Location} object.
 	 * @return Returns the id of the {@code Location} record inserted in the
-	 *         database. Returns the id of the newly-added Germplasm
-	 *         {@code Name}s.
-
+	 * database. Returns the id of the newly-added Germplasm
+	 * {@code Name}s.
 	 */
 	Integer addLocation(Location location);
 
 	/**
 	 * Inserts a single {@code Location} object into the database.
 	 *
-	 * @param locations
-	 *            - The {@code Location} object to be persisted to the database.
-	 *            Must be a valid {@code Location} object.
+	 * @param locations - The {@code Location} object to be persisted to the database.
+	 *                  Must be a valid {@code Location} object.
 	 * @return Returns the ids of the {@code Location} records inserted in the
-	 *         database.
-
+	 * database.
 	 */
 	List<Integer> addLocation(List<Location> locations);
 
 	/**
 	 * Adds location and locdes.
 	 *
-	 * @param location
-	 *            the location
-	 * @param locdes
-	 *            the locdes
+	 * @param location the location
+	 * @param locdes   the locdes
 	 * @return the integer
-
 	 */
 	int addLocationAndLocdes(Location location, Locdes locdes);
 
 	/**
 	 * Deletes a single {@code Location} object into the database.
 	 *
-	 * @param location
-	 *            - The {@code Location} object to be deleted from the database.
-	 *            Must be a valid {@code Location} object.
-
+	 * @param location - The {@code Location} object to be deleted from the database.
+	 *                 Must be a valid {@code Location} object.
 	 */
 	void deleteLocation(Location location);
 
 	/**
 	 * Get all breeding locations.
-	 *
+	 * <p/>
 	 * Return a List of Locations which represent the breeding locations stored
 	 * in the location table of IBDB.
 	 *
 	 * @return the all breeding locations
-
 	 */
 	List<Location> getAllBreedingLocations();
 
 	/**
 	 * Count all breeding locations.
-	 *
+	 * <p/>
 	 * Return the total count of Locations which represent the breeding
 	 * locations stored in the location table of IBDB.
 	 *
 	 * @return the long
-
 	 */
 	Long countAllBreedingLocations();
 
 	/**
 	 * Gets the locations by the given IDs.
 	 *
-	 * @param ids
-	 *            Location IDs
+	 * @param ids Location IDs
 	 * @return the corresponding Locations
-
 	 */
 	List<Location> getLocationsByIDs(List<Integer> ids);
 
 	/**
 	 * Gets all fields belonging to the given location.
 	 *
-	 * @param locationId
-	 *            the location id of the parent of the fields to return.
+	 * @param locationId the location id of the parent of the fields to return.
 	 * @return all field locations belonging to the given parent id.
-
 	 */
 	List<Location> getAllFieldLocations(int locationId);
 
 	/**
 	 * Gets all block belonging to the given field.
 	 *
-	 * @param fieldId
-	 *            the field id of the parent of the blocks to return.
+	 * @param fieldId the field id of the parent of the blocks to return.
 	 * @return all block locations belonging to the given parent id.
-
 	 */
 	List<Location> getAllBlockLocations(int fieldId);
 
 	/**
 	 * Gets the block information.
 	 *
-	 * @param blockId
-	 *            the block id to retrieve
+	 * @param blockId the block id to retrieve
 	 * @return the block information
-
 	 */
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
@@ -516,7 +418,6 @@ public interface LocationDataManager {
 	 * type = FIELD.
 	 *
 	 * @return the all fields
-
 	 */
 	List<Location> getAllFields();
 
@@ -543,17 +444,14 @@ public interface LocationDataManager {
 	 * Retrieves all locdes entries from both central and local by location id
 	 *
 	 * @return all locdes entries by location id
-
 	 */
 	List<Locdes> getLocdesByLocId(Integer locationId);
 
 	/**
 	 * Save or update the list of locdes object
 	 *
-	 * @param locationId
-	 *            id
+	 * @param locationId id
 	 * @param locdesList
-
 	 */
 	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList);
 
@@ -571,12 +469,11 @@ public interface LocationDataManager {
 	/**
 	 * Get all breeding locations filtered by programUUID plus it also returns
 	 * breeding locations that have no programUUID (common historical data)
-	 *
+	 * <p/>
 	 * Return a List of Locations which represent the breeding locations stored
 	 * in the location table of IBDB.
 	 *
-	 * @param programUUID
-	 *            - uniqueID of current program
+	 * @param programUUID - uniqueID of current program
 	 * @return the breeding locations for program
 	 */
 	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
@@ -587,35 +484,27 @@ public interface LocationDataManager {
 	 * Returns number of all Locations depending on the filters.
 	 *
 	 * @return the number of all Locations
-	 * @
-	 *             the middleware query exception
+	 * @ the middleware query exception
 	 */
 	long countLocationsByFilter(final Map<LocationFilters, Object> filters);
 
 	/**
 	 * Returns all Local Locations depending on the filters.
 	 *
-	 * @param pageNumber
-	 *            - the starting index of the sublist of results to be returned
-	 * @param pageSize
-	 *            - the number of rows to be included in the sublist of results
-	 *            to be returned
-	 * @param filters
-	 *            - the filters that to be included in the query
+	 * @param pageNumber - the starting index of the sublist of results to be returned
+	 * @param pageSize   - the number of rows to be included in the sublist of results
+	 *                   to be returned
+	 * @param filters    - the filters that to be included in the query
 	 * @return All Locations based on the given start and numOfRows
-
 	 */
 	List<LocationDetailsDto> getLocationsByFilter(final int pageNumber, final int pageSize, final Map<LocationFilters, Object> filters);
 
 	/**
 	 * Gets the user defined field id of name.
 	 *
-	 * @param tableType
-	 *            the table type
-	 * @param name
-	 *            the name
+	 * @param tableType the table type
+	 * @param name      the name
 	 * @return the user defined field id of code
-
 	 */
 	Integer getUserDefinedFieldIdOfName(UDTableType tableType, String name);
 
