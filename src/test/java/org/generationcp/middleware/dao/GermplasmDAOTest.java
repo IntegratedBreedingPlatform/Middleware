@@ -10,7 +10,11 @@
 
 package org.generationcp.middleware.dao;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -23,15 +27,15 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Lists;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
@@ -109,8 +113,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName());
 
-		final Germplasm childDerivativeGermplsm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Germplasm childDerivativeGermplsm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0,
+				0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName());
 
 		final List<Germplasm> results = this.dao.getChildren(parentGermplsm.getGid(), 'D');
@@ -126,9 +130,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final List<org.generationcp.middleware.pojos.Method> maintenanceMethods = this.methodDAO.getByType("MAN", 1, 1);
 
-		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, maintenanceMethods.get(0).getMid(), 0, 1, 1,
-						"MethodName", "LocationName");
+		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1,
+				0, 0, 1, maintenanceMethods.get(0).getMid(), 0, 1, 1, "MethodName", "LocationName");
 
 		this.germplasmDataDM.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName());
 
@@ -147,10 +150,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 
 		// Germplasm list
-		final GermplasmList germplasmList =
-				new GermplasmList(null, "Test Germplasm List " + 1, Long.valueOf(20141014), "LST", Integer.valueOf(1),
-						"Test Germplasm List", null, 1);
-		germplasmList.setProjectId(TEST_PROJECT_ID);
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + 1, Long.valueOf(20141014), "LST",
+				Integer.valueOf(1), "Test Germplasm List", null, 1);
+		germplasmList.setProjectId(GermplasmDAOTest.TEST_PROJECT_ID);
 		this.germplasmListDAO.save(germplasmList);
 
 		final ListDataProject listDataProject = new ListDataProject();
@@ -164,7 +166,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		listDataProject.setGroupName("grpName");
 		this.listDataProjectDAO.save(listDataProject);
 
-		final List<Germplasm> germplasmEntries = this.dao.getGermplasmParentsForStudy(TEST_PROJECT_ID);
+		final List<Germplasm> germplasmEntries = this.dao.getGermplasmParentsForStudy(GermplasmDAOTest.TEST_PROJECT_ID);
 
 		Assert.assertEquals(1, germplasmEntries.size());
 		Assert.assertEquals(germplasm.getGid(), germplasmEntries.get(0).getGid());
@@ -179,12 +181,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName());
 
-		final Germplasm childDerivativeGermplsm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Germplasm childDerivativeGermplsm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0,
+				0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName());
 
-		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 80, 0, 1, 1, "MethodName", "LocationName");
+		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1,
+				0, 0, 1, 80, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName());
 
 		final List<Germplasm> children = this.dao.getAllChildren(parentGermplsm.getGid());
@@ -394,9 +396,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer mParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
 
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
-						"LocationName");
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1,
+				GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
 		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 
 		Assert.assertTrue(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(mParentGID)).size() > 0);
@@ -410,21 +411,98 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String crossNamePrefix = "ABCDEFG";
 		final String existingGermplasmNameWithPrefix = crossNamePrefix + "1";
 
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix);
 
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-
-		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
-
-		this.germplasmDataDM.addGermplasmName(germplasmName);
-
-		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
-
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
 		Assert.assertEquals(
-				"Germplasm with name" + existingGermplasmNameWithPrefix + " is existing " + "so the next sequence number should be 2", "2",
+				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " is existing so the next sequence number should be 2", "2",
 				result);
+	}
 
+	@Test
+	public void testGetNextSequenceNumberForCrossNameWithEmptyPrefixSupplied() {
+		final Session mockSession = Mockito.mock(Session.class);
+		this.dao.setSession(mockSession);
+		this.dao.getNextSequenceNumberForCrossName("", null);
+		// Verify that no query was made if the prefix is empty
+		Mockito.verify(mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
+	}
+
+	@Test
+	public void testGetNextSequenceNumberForCrossNameWithSuffixSupplied() {
+		final String crossNamePrefix = "ABCDEFG";
+		final Integer lastCode = 99;
+		final String suffix = "-XYZ";
+		final String existingGermplasmNameWithPrefixAndSuffix = crossNamePrefix + lastCode + suffix;
+
+		// Also insert a name without the suffix to verify that the last code in sequence will not come from it
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefixAndSuffix);
+		this.insertGermplasmWithName(crossNamePrefix + "999");
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, suffix);
+		final Integer expectedNextCode = lastCode + 1;
+		Assert.assertEquals("Germplasm with name " + existingGermplasmNameWithPrefixAndSuffix
+				+ " is existing so the next sequence number should be " + expectedNextCode, expectedNextCode.toString(), result);
+	}
+
+	@Test
+	public void testGetNextSequenceNumberForCrossNameWithSpaceAfterPrefix() {
+
+		final String crossNamePrefix = "ABCDEFG";
+		final Integer lastCodeForPrefix = 9;
+		final String existingGermplasmNameWithPrefix = crossNamePrefix + lastCodeForPrefix;
+		final Integer lastCodeForPrefixWithSpace = 99;
+		final String existingGermplasmNameWithPrefixWithSpace = crossNamePrefix + " " + lastCodeForPrefixWithSpace;
+
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix);
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefixWithSpace);
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
+		final Integer nextCodeForPrefix = lastCodeForPrefix + 1;
+		Assert.assertEquals("Germplasm with prefix " + existingGermplasmNameWithPrefix
+				+ " is existing so the next sequence number should be " + nextCodeForPrefix, nextCodeForPrefix.toString(), result);
+
+		final String result2 = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix + " ", null);
+		final Integer nextCodeForPrefixWithSpace = lastCodeForPrefixWithSpace + 1;
+		Assert.assertEquals("Germplasm with prefix " + existingGermplasmNameWithPrefixWithSpace
+				+ " is existing so the next sequence number should be " + nextCodeForPrefixWithSpace, nextCodeForPrefixWithSpace.toString(),
+				result2);
+	}
+
+	@Test
+	public void testGetNextSequenceNumberForCrossNameForMixedCasePrefix() {
+
+		final String crossNamePrefix = "aBcDeFg";
+		final Integer lastCodeForMixedCasePrefix = 29;
+		final String nameWithMixedCasePrefix = crossNamePrefix + lastCodeForMixedCasePrefix;
+		final Integer lastCodeForUppercasePrefix = 19;
+		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
+
+		this.insertGermplasmWithName(nameWithMixedCasePrefix);
+		this.insertGermplasmWithName(nameWithUppercasePrefix);
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
+		final Integer nextCodeForPrefix = lastCodeForMixedCasePrefix + 1;
+		Assert.assertEquals("Germplasm with prefix " + nameWithMixedCasePrefix + " is existing so the next sequence number should be "
+				+ nextCodeForPrefix, nextCodeForPrefix.toString(), result);
+	}
+
+	@Test
+	public void testGetNextSequenceNumberForCrossNameForLowerCasePrefix() {
+
+		final String crossNamePrefix = "aBcDeFgHij";
+		final Integer lastCodeForLowercasePrefix = 49;
+		final String nameWithLowercasePrefix = crossNamePrefix.toLowerCase() + lastCodeForLowercasePrefix;
+		final Integer lastCodeForUppercasePrefix = 39;
+		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
+
+		this.insertGermplasmWithName(nameWithLowercasePrefix);
+		this.insertGermplasmWithName(nameWithUppercasePrefix);
+
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
+		final Integer nextCodeForPrefix = lastCodeForLowercasePrefix + 1;
+		Assert.assertEquals("Germplasm with prefix " + nameWithLowercasePrefix + " is existing so the next sequence number should be "
+				+ nextCodeForPrefix, nextCodeForPrefix.toString(), result);
 	}
 
 	@Test
@@ -433,25 +511,53 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String crossNamePrefix = "ABCDEFG";
 		final String existingGermplasmNameWithPrefix = crossNamePrefix + "1";
 
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
-
 		// Flag the germplasm as deleted
-		germplasm.setDeleted(true);
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix, true);
 
+		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
+		Assert.assertEquals(
+				"Germplasm with name" + existingGermplasmNameWithPrefix + " is deleted so the next sequence number should still be 1", "1",
+				result);
+
+	}
+
+	@Test
+	public void testBuildCrossNameRegularExpression() {
+		final String prefix = "QWERTY";
+		final StringBuilder sb = new StringBuilder();
+		this.dao.buildCrossNameRegularExpression(prefix, null, sb);
+		Assert.assertEquals("^(" + prefix + ")[0-9]+$", sb.toString());
+	}
+
+	@Test
+	public void testBuildCrossNameRegularExpressionWithSpaceAfterPrefix() {
+		final String prefix = "QWERTY ";
+		final StringBuilder sb = new StringBuilder();
+		this.dao.buildCrossNameRegularExpression(prefix, null, sb);
+		Assert.assertEquals("^(" + prefix + ")[0-9]+$", sb.toString());
+	}
+
+	@Test
+	public void testBuildCrossNameRegularExpressionWithSuffix() {
+		final String prefix = "QWERTY";
+		final String suffix = "-LTD";
+		final StringBuilder sb = new StringBuilder();
+		this.dao.buildCrossNameRegularExpression(prefix, suffix, sb);
+		Assert.assertEquals("^(" + prefix + ")[0-9]+(" + suffix + ")$", sb.toString());
+	}
+
+	private void insertGermplasmWithName(final String existingGermplasmNameWithPrefix, final boolean isDeleted) {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID,
+				1, 1, "MethodName", "LocationName");
+		germplasm.setDeleted(isDeleted);
 		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 
 		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
-		germplasmName.setNstat(1);
-
 		this.germplasmDataDM.addGermplasmName(germplasmName);
+	}
 
-		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
-
-		Assert.assertEquals(
-				"Germplasm with name" + existingGermplasmNameWithPrefix + " is deleted " + "so the next sequence number should still be 1",
-				"1", result);
-
+	private void insertGermplasmWithName(final String existingGermplasmNameWithPrefix) {
+		this.insertGermplasmWithName(existingGermplasmNameWithPrefix, false);
 	}
 
 	private void initializeGermplasms() {
@@ -463,15 +569,13 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer mParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
 
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
-						"LocationName");
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1,
+				GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
 		this.preferredName = germplasm.getPreferredName();
 		this.germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		final Germplasm mgMember = GermplasmTestDataInitializer
-				.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
-						"LocationName");
+		final Germplasm mgMember = GermplasmTestDataInitializer.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1,
+				GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
 	}
 

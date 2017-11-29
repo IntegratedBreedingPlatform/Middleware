@@ -10,6 +10,7 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -225,5 +226,10 @@ public class SampleServiceImpl implements SampleService {
 				foundPlotNumber = true;
 			}
 		}
+	}
+
+	@Override
+	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid) {
+		return this.sampleDao.getByGid(gid);
 	}
 }
