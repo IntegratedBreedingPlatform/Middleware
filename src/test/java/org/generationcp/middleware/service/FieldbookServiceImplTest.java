@@ -1,20 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -55,7 +51,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
@@ -123,8 +121,8 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
-		final Integer out = this.fieldbookServiceImpl.saveNurseryAdvanceGermplasmList(this.germplasms,
-				this.listDataItems, germplasmList, this.germplasmAttributes);
+		final Integer out = this.fieldbookServiceImpl
+				.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 
 		// Make sure a call to save various things occur.
@@ -144,10 +142,9 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveMeasurementsTrue() {
 		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer
-				.createMeasurementVariableList();
-		final List<MeasurementRow> observations = MeasurementRowTestDataInitializer.createMeasurementRowList(1,
-				"Test Name", "Test Value", new MeasurementVariable());
+		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
+		final List<MeasurementRow> observations =
+				MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
 		// Verify that the method is called
 		Mockito.verify(measurements).saveMeasurements(observations);
@@ -156,10 +153,9 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveMeasurementsFalse() {
 		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer
-				.createMeasurementVariableList();
-		final List<MeasurementRow> observations = MeasurementRowTestDataInitializer.createMeasurementRowList(1,
-				"Test Name", "Test Value", new MeasurementVariable());
+		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
+		final List<MeasurementRow> observations =
+				MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
 		// Verify that the method is never called
 		Mockito.verify(measurements, Mockito.times(0)).saveMeasurements(observations);
@@ -167,11 +163,9 @@ public class FieldbookServiceImplTest {
 
 	@Test
 	public void getLocationsByProgramUUID() {
-		final List<Location> locations = this.fieldbookServiceImpl
-				.getLocationsByProgramUUID(FieldbookServiceImplTest.PROGRAM_UUID);
+		final List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(FieldbookServiceImplTest.PROGRAM_UUID);
 
-		Mockito.verify(this.locationDataManager, Mockito.times(1))
-				.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID);
+		Mockito.verify(this.locationDataManager, Mockito.times(1)).getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID);
 		Assert.assertNotNull("The return locations list should not be null", locations);
 	}
 
@@ -192,7 +186,8 @@ public class FieldbookServiceImplTest {
 
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
-		Mockito.verify(experimentPropertySaver).saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(cValueId));
+		Mockito.verify(experimentPropertySaver)
+				.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(cValueId));
 
 	}
 
@@ -213,7 +208,8 @@ public class FieldbookServiceImplTest {
 
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
-		Mockito.verify(experimentPropertySaver).saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(value));
+		Mockito.verify(experimentPropertySaver)
+				.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(value));
 
 	}
 

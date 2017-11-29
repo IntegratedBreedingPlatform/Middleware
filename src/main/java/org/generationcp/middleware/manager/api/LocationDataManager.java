@@ -1,21 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2014, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
@@ -25,6 +20,9 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API for managing Location information.
@@ -46,20 +44,17 @@ public interface LocationDataManager {
 	 *            - the number of rows to be included in the sublist of results
 	 *            to be returned
 	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
 	 */
-	List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
-			throws MiddlewareQueryException;
+	List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows);
 
 	/**
 	 * Returns all Location information from central and local databases.
 	 *
 	 * @return All Locations
-	 * @throws MiddlewareQueryException
+	 * @
 	 *             the middleware query exception
 	 */
-	List<Location> getAllLocations() throws MiddlewareQueryException;
+	List<Location> getAllLocations();
 
 	/**
 	 * Returns all Local Locations.
@@ -70,28 +65,26 @@ public interface LocationDataManager {
 	 *            - the number of rows to be included in the sublist of results
 	 *            to be returned
 	 * @return All Locations based on the given start and numOfRows
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException;
+	List<Location> getAllLocalLocations(int start, int numOfRows);
 
 	/**
 	 * Returns number of all Locations.
 	 *
 	 * @return the number of all Locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	long countAllLocations() throws MiddlewareQueryException;
+	long countAllLocations();
 
 	/**
 	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
 	 * locations (locations that match the specified program unique id).
 	 * @param programUUID
 	 * @return
-	 * @throws MiddlewareQueryException
+
 	 */
-	List<Location> getLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
+	List<Location> getLocationsByUniqueID(String programUUID);
 
 	/**
 	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
@@ -103,7 +96,6 @@ public interface LocationDataManager {
 	 */
 	List<Location> getLocationsByUniqueIDAndExcludeLocationTypes(String programUUID, List<Integer> locationTypesToExclude);
 
-
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
 	 *
@@ -112,10 +104,9 @@ public interface LocationDataManager {
 	 * @param op
 	 *            - can be EQUAL like LIKE
 	 * @return Number of Locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	long countLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
+	long countLocationsByUniqueID(String programUUID);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
@@ -127,10 +118,9 @@ public interface LocationDataManager {
 	 * @param programUUID
 	 *            - uniqueID of the current program
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException;
+	List<Location> getLocationsByName(String name, Operation op, String programUUID);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
@@ -140,10 +130,9 @@ public interface LocationDataManager {
 	 * @param op
 	 *            - can be EQUAL like LIKE
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
+	List<Location> getLocationsByName(String name, Operation op);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
@@ -160,11 +149,9 @@ public interface LocationDataManager {
 	 * @param programUUID
 	 *            - uniqueID of the current program
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op, String programUUID)
-			throws MiddlewareQueryException;
+	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op, String programUUID);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
@@ -179,11 +166,9 @@ public interface LocationDataManager {
 	 * @param op
 	 *            - can be EQUAL like LIKE
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op)
-			throws MiddlewareQueryException;
+	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
@@ -195,10 +180,9 @@ public interface LocationDataManager {
 	 * @param programUUID
 	 *            - uniqueID of the current program
 	 * @return Number of Locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	long countLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException;
+	long countLocationsByName(String name, Operation op, String programUUID);
 
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
@@ -208,19 +192,18 @@ public interface LocationDataManager {
 	 * @param op
 	 *            - can be EQUAL like LIKE
 	 * @return Number of Locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
+	long countLocationsByName(String name, Operation op);
 
 	/**
 	 * Returns all country records.
 	 *
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
+	 * @
 	 *             the middleware query exception
 	 */
-	List<Country> getAllCountry() throws MiddlewareQueryException;
+	List<Country> getAllCountry();
 
 	/**
 	 * Returns all the Location records with country matching the given
@@ -229,10 +212,9 @@ public interface LocationDataManager {
 	 * @param country
 	 *            - search string for the country of the locations
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
+	List<Location> getLocationsByCountry(Country country);
 
 	/**
 	 * Returns all the Location records with country and location type matching
@@ -244,10 +226,9 @@ public interface LocationDataManager {
 	 * @param type
 	 *            - search string for the locations type
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException;
+	List<Location> getLocationsByCountryAndType(Country country, Integer type);
 
 	/**
 	 * Returns all the Location records with name, country and location type
@@ -261,11 +242,9 @@ public interface LocationDataManager {
 	 * @param type
 	 *            the type
 	 * @return the locations by name country and type
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type)
-			throws MiddlewareQueryException;
+	List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type);
 
 	/**
 	 * Returns the Location records with country matching the given parameter.
@@ -279,10 +258,9 @@ public interface LocationDataManager {
 	 *            - the number of rows to be included in the sublist of results
 	 *            to be returned
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException;
+	List<Location> getLocationsByCountry(Country country, int start, int numOfRows);
 
 	/**
 	 * Returns the number of Locations with countries matching the given
@@ -291,10 +269,10 @@ public interface LocationDataManager {
 	 * @param country
 	 *            - search string for the country of the locations
 	 * @return Number of Locations
-	 * @throws MiddlewareQueryException
+	 * @
 	 *             the middleware query exception
 	 */
-	long countLocationsByCountry(Country country) throws MiddlewareQueryException;
+	long countLocationsByCountry(Country country);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
@@ -303,10 +281,9 @@ public interface LocationDataManager {
 	 * @param type
 	 *            - search string for the type of the locations
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
+	List<Location> getLocationsByType(Integer type);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
@@ -317,10 +294,9 @@ public interface LocationDataManager {
 	 * @param programUUID
 	 *            - unique id of the current program
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException;
+	List<Location> getLocationsByType(Integer type, String programUUID);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
@@ -334,10 +310,9 @@ public interface LocationDataManager {
 	 *            - the number of rows to be included in the sublist of results
 	 *            to be returned
 	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException;
+	List<Location> getLocationsByType(Integer type, int start, int numOfRows);
 
 	/**
 	 * Returns the number of Locations with types matching the given parameter.
@@ -346,10 +321,9 @@ public interface LocationDataManager {
 	 * @param type
 	 *            - search string for the type of the locations
 	 * @return Number of Locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	long countLocationsByType(Integer type) throws MiddlewareQueryException;
+	long countLocationsByType(Integer type);
 
 	/**
 	 * Returns the number of Locations with types matching the given parameter.
@@ -360,10 +334,9 @@ public interface LocationDataManager {
 	 * @param programUUID
 	 *            - unique id of the current program
 	 * @return Number of Locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	long countLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException;
+	long countLocationsByType(Integer type, String programUUID);
 
 	/**
 	 * Returns the udfld record identified by the given id.
@@ -371,10 +344,9 @@ public interface LocationDataManager {
 	 * @param id
 	 *            - the id of the udfld record
 	 * @return the Udflds POJO representing the record
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
+	UserDefinedField getUserDefinedFieldByID(Integer id);
 
 	/**
 	 * Returns the Map representation of <Code, UserDefinedField> of the given
@@ -383,11 +355,9 @@ public interface LocationDataManager {
 	 * @param tableType
 	 *            the table type
 	 * @return the user defined field map of code by ud table type
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType tableType)
-			throws MiddlewareQueryException;
+	Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType tableType);
 
 	/**
 	 * Gets the user defined field id of code.
@@ -397,10 +367,9 @@ public interface LocationDataManager {
 	 * @param code
 	 *            the code
 	 * @return the user defined field id of code
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code) throws MiddlewareQueryException;
+	Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code);
 
 	/**
 	 * Returns the udfld records identified by the given tablename.
@@ -410,11 +379,9 @@ public interface LocationDataManager {
 	 * @param fieldType
 	 *            - the value of the ftype record
 	 * @return the Udflds POJO representing the record
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType)
-			throws MiddlewareQueryException;
+	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType);
 
 	/**
 	 * Returns the country record identified by the given id.
@@ -422,10 +389,8 @@ public interface LocationDataManager {
 	 * @param id
 	 *            - id of the country record
 	 * @return the Country POJO representing the record
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
 	 */
-	Country getCountryById(Integer id) throws MiddlewareQueryException;
+	Country getCountryById(Integer id);
 
 	/**
 	 * Returns the location record identified by the given id.
@@ -433,10 +398,9 @@ public interface LocationDataManager {
 	 * @param id
 	 *            - id of the location record
 	 * @return the Location POJO representing the record
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	Location getLocationByID(Integer id) throws MiddlewareQueryException;
+	Location getLocationByID(Integer id);
 
 	/**
 	 * Inserts a single {@code Location} object into the database.
@@ -447,10 +411,9 @@ public interface LocationDataManager {
 	 * @return Returns the id of the {@code Location} record inserted in the
 	 *         database. Returns the id of the newly-added Germplasm
 	 *         {@code Name}s.
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	Integer addLocation(Location location) throws MiddlewareQueryException;
+	Integer addLocation(Location location);
 
 	/**
 	 * Inserts a single {@code Location} object into the database.
@@ -460,10 +423,9 @@ public interface LocationDataManager {
 	 *            Must be a valid {@code Location} object.
 	 * @return Returns the ids of the {@code Location} records inserted in the
 	 *         database.
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
+	List<Integer> addLocation(List<Location> locations);
 
 	/**
 	 * Adds location and locdes.
@@ -473,10 +435,9 @@ public interface LocationDataManager {
 	 * @param locdes
 	 *            the locdes
 	 * @return the integer
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException;
+	int addLocationAndLocdes(Location location, Locdes locdes);
 
 	/**
 	 * Deletes a single {@code Location} object into the database.
@@ -484,10 +445,9 @@ public interface LocationDataManager {
 	 * @param location
 	 *            - The {@code Location} object to be deleted from the database.
 	 *            Must be a valid {@code Location} object.
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	void deleteLocation(Location location) throws MiddlewareQueryException;
+	void deleteLocation(Location location);
 
 	/**
 	 * Get all breeding locations.
@@ -496,10 +456,9 @@ public interface LocationDataManager {
 	 * in the location table of IBDB.
 	 *
 	 * @return the all breeding locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
+	List<Location> getAllBreedingLocations();
 
 	/**
 	 * Count all breeding locations.
@@ -508,10 +467,9 @@ public interface LocationDataManager {
 	 * locations stored in the location table of IBDB.
 	 *
 	 * @return the long
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	Long countAllBreedingLocations() throws MiddlewareQueryException;
+	Long countAllBreedingLocations();
 
 	/**
 	 * Gets the locations by the given IDs.
@@ -519,10 +477,9 @@ public interface LocationDataManager {
 	 * @param ids
 	 *            Location IDs
 	 * @return the corresponding Locations
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException;
+	List<Location> getLocationsByIDs(List<Integer> ids);
 
 	/**
 	 * Gets all fields belonging to the given location.
@@ -530,10 +487,9 @@ public interface LocationDataManager {
 	 * @param locationId
 	 *            the location id of the parent of the fields to return.
 	 * @return all field locations belonging to the given parent id.
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getAllFieldLocations(int locationId) throws MiddlewareQueryException;
+	List<Location> getAllFieldLocations(int locationId);
 
 	/**
 	 * Gets all block belonging to the given field.
@@ -541,10 +497,9 @@ public interface LocationDataManager {
 	 * @param fieldId
 	 *            the field id of the parent of the blocks to return.
 	 * @return all block locations belonging to the given parent id.
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getAllBlockLocations(int fieldId) throws MiddlewareQueryException;
+	List<Location> getAllBlockLocations(int fieldId);
 
 	/**
 	 * Gets the block information.
@@ -552,24 +507,22 @@ public interface LocationDataManager {
 	 * @param blockId
 	 *            the block id to retrieve
 	 * @return the block information
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException;
+	FieldmapBlockInfo getBlockInformation(int blockId);
 
 	/**
 	 * Retrieves all location entries from both central and local where location
 	 * type = FIELD.
 	 *
 	 * @return the all fields
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Location> getAllFields() throws MiddlewareQueryException;
+	List<Location> getAllFields();
 
-	List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException;
+	List<Location> getAllProvincesByCountry(Integer countryId);
 
-	List<Location> getAllProvinces() throws MiddlewareQueryException;
+	List<Location> getAllProvinces();
 
 	/**
 	 * get all location records filtered by programUUID
@@ -577,23 +530,22 @@ public interface LocationDataManager {
 	 * @param programUUID
 	 * @return list of locid
 	 */
-	List<Location> getProgramLocations(String programUUID) throws MiddlewareQueryException;
+	List<Location> getProgramLocations(String programUUID);
 
 	/**
 	 * delete all location records filtered by programUUID
 	 *
 	 * @param programUUID
 	 */
-	void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException;
+	void deleteProgramLocationsByUniqueId(String programUUID);
 
 	/**
 	 * Retrieves all locdes entries from both central and local by location id
 	 *
 	 * @return all locdes entries by location id
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<Locdes> getLocdesByLocId(Integer locationId) throws MiddlewareQueryException;
+	List<Locdes> getLocdesByLocId(Integer locationId);
 
 	/**
 	 * Save or update the list of locdes object
@@ -601,9 +553,9 @@ public interface LocationDataManager {
 	 * @param locationId
 	 *            id
 	 * @param locdesList
-	 * @throws MiddlewareQueryException
+
 	 */
-	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList) throws MiddlewareQueryException;
+	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList);
 
 	/**
 	 * get all seeding location records filtered by programUUID
@@ -630,15 +582,15 @@ public interface LocationDataManager {
 	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
 
 	List<LocationDetails> getFilteredLocations(Integer countryId, Integer locationType, String locationName, String programUUID);
-	
+
 	/**
 	 * Returns number of all Locations depending on the filters.
 	 *
 	 * @return the number of all Locations
-	 * @throws MiddlewareQueryException
+	 * @
 	 *             the middleware query exception
 	 */
-	long countLocationsByFilter(final Map<LocationFilters,Object> filters) throws MiddlewareQueryException;
+	long countLocationsByFilter(final Map<LocationFilters, Object> filters);
 
 	/**
 	 * Returns all Local Locations depending on the filters.
@@ -651,11 +603,9 @@ public interface LocationDataManager {
 	 * @param filters
 	 *            - the filters that to be included in the query
 	 * @return All Locations based on the given start and numOfRows
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize, final Map<LocationFilters, Object> filters)
-			throws MiddlewareQueryException;
+	List<LocationDetailsDto> getLocationsByFilter(final int pageNumber, final int pageSize, final Map<LocationFilters, Object> filters);
 
 	/**
 	 * Gets the user defined field id of name.
@@ -665,15 +615,14 @@ public interface LocationDataManager {
 	 * @param name
 	 *            the name
 	 * @return the user defined field id of code
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+
 	 */
-	Integer getUserDefinedFieldIdOfName(UDTableType tableType, String name) throws MiddlewareQueryException;
+	Integer getUserDefinedFieldIdOfName(UDTableType tableType, String name);
 
 	/**
 	 * Returns map with key locid with a Map whit additional info.
 	 *
 	 * @return Returns map with key locid with a Map whit additional info.
-	 * @throws MiddlewareQueryException the middleware query exception
+
 	 */
 }
