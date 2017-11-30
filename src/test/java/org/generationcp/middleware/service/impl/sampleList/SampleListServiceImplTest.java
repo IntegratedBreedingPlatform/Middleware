@@ -499,7 +499,9 @@ public class SampleListServiceImplTest {
 
 		final String preferredNameGid = "GID1";
 		final Integer ndExperimentId = 1;
-		final ObservationDto measurement = new ObservationDto(ndExperimentId, preferredNameGid, measurementVariableResults);
+		final Integer gid = 123;
+
+		final ObservationDto measurement = new ObservationDto(ndExperimentId, preferredNameGid, measurementVariableResults, gid);
 		observationDtos.add(measurement);
 		final Collection<Integer> experimentIds = CollectionUtils.collect(observationDtos, new Transformer() {
 
@@ -568,7 +570,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListService.getSampleLists(trialId)).thenReturn(list);
 		List<SampleListDTO> result = this.sampleListService.getSampleLists(trialId);
 		SampleListDTO dto = result.get(0);
-		Assert.assertEquals(result.size(), 1);
+		Assert.assertEquals(1, result.size());
 		Assert.assertNotNull(dto);
 		Assert.assertEquals(dto.getListId(), sampleListDTO.getListId());
 		Assert.assertEquals(dto.getListName(), sampleListDTO.getListName());
@@ -596,7 +598,7 @@ public class SampleListServiceImplTest {
 		SampleDetailsDTO result0 = result.get(0);
 		SampleDetailsDTO result1 = result.get(1);
 
-		Assert.assertEquals(result.size(), 2);
+		Assert.assertEquals(2, result.size());
 		Assert.assertNotNull(result0);
 		Assert.assertNotNull(result1);
 		Assert.assertEquals(result0.getEntryNo(), dto0.getEntryNo());
