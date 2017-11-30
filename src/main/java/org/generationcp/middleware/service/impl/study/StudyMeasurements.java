@@ -1,10 +1,6 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -13,6 +9,10 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class StudyMeasurements {
 
@@ -207,6 +207,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
 		createSQLQuery.addScalar("preferred_name", new StringType());
 		createSQLQuery.addScalar("value", new StringType());
+		createSQLQuery.addScalar("gid", new IntegerType());
 
 		createSQLQuery.setParameter("studyId", studyId);
 		createSQLQuery.setParameter("selectionVariableId", selectionVariableId);
@@ -226,7 +227,8 @@ public class StudyMeasurements {
 					final MeasurementDto measurementDto = new MeasurementDto(value);
 					measurementVariableResults.add(measurementDto);
 
-					final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);
+					final ObservationDto measurement =
+						new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults, (Integer) row[3]);
 					measurements.add(measurement);
 				}
 			}

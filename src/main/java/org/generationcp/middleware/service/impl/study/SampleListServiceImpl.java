@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Preconditions;
@@ -34,11 +33,12 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Repository
-@Transactional (propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRED)
 public class SampleListServiceImpl implements SampleListService {
 
 	private SampleListDao sampleListDao;
@@ -60,6 +60,8 @@ public class SampleListServiceImpl implements SampleListService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+
+
 	public SampleListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sampleListDao = new SampleListDao();
 		this.sampleListDao.setSession(sessionProvider.getSession());
@@ -79,11 +81,12 @@ public class SampleListServiceImpl implements SampleListService {
 		this.sampleListDao = sampleListDao;
 	}
 
-	public void setUserDao (final UserDAO userDao) {
+	public void setUserDao(final UserDAO userDao) {
 		this.userDao = userDao;
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public SampleList createSampleList(final SampleListDTO sampleListDTO) {
 
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
@@ -94,8 +97,6 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
-
-
 
 		try {
 			final SampleList sampleList = new SampleList();
@@ -134,11 +135,25 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
-
-			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(observationDtos);
+			final Collection<Integer> experimentIds = getExperimentIds(observationDtos);
+			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(experimentIds);
+			final Map<SampleSequence, Integer> maxSampleNameSequence = this.getMaxSequenceNumber(experimentIds);
 			final List<Sample> samples = new ArrayList<>();
 
 			for (final ObservationDto observationDto : observationDtos) {
+				/*maxSequence is the maximum number among samples in the same plot and for the same GID. If there is no sample for
+				plot/Gid, the sequence starts in 1.*/
+
+				final SampleSequence key = new SampleSequence(observationDto.getGid(), observationDto.getMeasurementId());
+				Integer maxSequence = maxSampleNameSequence.get(key);
+
+				if (maxSequence == null) {
+					maxSequence = 1;
+					maxSampleNameSequence.put(key, maxSequence);
+				}
+				else {
+					maxSequence++;
+				}
 
 				final BigInteger sampleNumber = new BigInteger(observationDto.getVariableMeasurements().get(0).getVariableValue());
 				Integer count = maxPlantNumbers.get(observationDto.getMeasurementId());
@@ -147,12 +162,16 @@ public class SampleListServiceImpl implements SampleListService {
 					count = 0;
 				}
 				for (double i = 0; i < sampleNumber.doubleValue(); i++) {
+
 					count++;
+					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
+					maxSequence++;
 					final Sample sample = this.sampleService
-						.buildSample(sampleListDTO.getCropName(), cropPrefix, count, observationDto.getDesignation(),
-							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
+						.buildSample(sampleListDTO.getCropName(), cropPrefix, count, sampleName, sampleListDTO.getSamplingDate(),
+							observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
+				maxSampleNameSequence.put(key, maxSequence--);
 			}
 
 			sampleList.setSamples(samples);
@@ -162,10 +181,26 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 	}
 
-	private Map<Integer, Integer> getMaxPlantNumber(final List<ObservationDto> observationDtos) {
+	private Map<Integer, Integer> getSampleNameSequence(final List<ObservationDto> observationDtos) {
 
-		@SuppressWarnings("unchecked")
-		final Collection<Integer> experimentIds = CollectionUtils.collect(observationDtos, new Transformer() {
+		final Map<Integer, Integer> map = new HashMap<>();
+		for (final ObservationDto observationDto : observationDtos) {
+			final Integer sequence = Integer.parseInt(observationDto.getDesignation()
+				.substring(observationDto.getDesignation().lastIndexOf(':'), observationDto.getDesignation().length()));
+			Integer mapSequence = map.get(observationDto.getGid());
+			if (mapSequence != null && mapSequence < sequence) {
+				map.put(observationDto.getGid(), sequence);
+			}
+		}
+		return map;
+	}
+
+	private Map<Integer, Integer> getMaxPlantNumber(final Collection<Integer> experimentIds) {
+		return this.plantDao.getMaxPlantNumber(experimentIds);
+	}
+
+	private Collection<Integer> getExperimentIds(final List<ObservationDto> observationDtos) {
+		return (Collection<Integer>) CollectionUtils.collect(observationDtos, new Transformer() {
 
 			@Override
 			public Object transform(final Object input) {
@@ -173,8 +208,10 @@ public class SampleListServiceImpl implements SampleListService {
 				return observationDto.getMeasurementId();
 			}
 		});
+	}
 
-		return this.plantDao.getMaxPlantNumber(experimentIds);
+	private Map<SampleSequence, Integer> getMaxSequenceNumber(final Collection<Integer> experimentIds) {
+		return this.plantDao.getMaxSequenceNumber(experimentIds);
 	}
 
 	/**
@@ -189,7 +226,8 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy,  final String programUUID) throws Exception {
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy, final String programUUID)
+		throws Exception {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
 		Preconditions.checkNotNull(createdBy);
@@ -308,7 +346,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		final SampleList uniqueSampleListName =
-				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
+			this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
 
 		if (uniqueSampleListName != null) {
 			throw new Exception("Folder name should be unique within the same directory");
@@ -374,7 +412,7 @@ public class SampleListServiceImpl implements SampleListService {
 	private List<Integer> getFolderIdsFromSampleList(final List<SampleList> listIds) {
 		final List<Integer> folderIdsToRetrieveFolderCount = new ArrayList<>();
 		for (final SampleList parentList : listIds) {
-			if(parentList.isFolder()) {
+			if (parentList.isFolder()) {
 				folderIdsToRetrieveFolderCount.add(parentList.getId());
 			}
 		}
@@ -437,7 +475,7 @@ public class SampleListServiceImpl implements SampleListService {
 		this.sampleService = sampleService;
 	}
 
-	public  void setSampleDao(final SampleDao sampleDao) {
+	public void setSampleDao(final SampleDao sampleDao) {
 		this.sampleDao = sampleDao;
 	}
 
