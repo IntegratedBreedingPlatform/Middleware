@@ -40,14 +40,14 @@ public class StudySaver extends Saver {
 		DmsProject project = null;
 
 		project = this.getProjectSaver().create(studyValues, studyType, description);
-			project.setProgramUUID(programUUID);
+		project.setProgramUUID(programUUID);
 
-			project = this.getProjectSaver().save(project);
-			this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
-			this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
-			if (saveStudyExperiment) {
-				this.saveStudyExperiment(project.getProjectId(), studyValues, cropPrefix);
-			}
+		project = this.getProjectSaver().save(project);
+		this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
+		this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
+		if (saveStudyExperiment) {
+			this.saveStudyExperiment(project.getProjectId(), studyValues, cropPrefix);
+		}
 		return project;
 
 	}
