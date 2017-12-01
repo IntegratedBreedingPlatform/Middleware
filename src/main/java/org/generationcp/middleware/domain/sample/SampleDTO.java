@@ -1,9 +1,14 @@
 package org.generationcp.middleware.domain.sample;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SampleDTO {
 
@@ -11,10 +16,57 @@ public class SampleDTO {
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
-	private Date samplingDate;
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
+	private Set<Dataset> datasets = new HashSet<>();
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+	private Date samplingDate;
+
+	public class Dataset {
+		private String name;
+		private int datasetId;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(final String name) {
+			this.name = name;
+		}
+
+		public int getDatasetId() {
+			return datasetId;
+		}
+
+		public void setDatasetId(final int datasetId) {
+			this.datasetId = datasetId;
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			if (this == o) {
+				return true;
+			}
+
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			final Dataset dataset = (Dataset) o;
+
+			return new EqualsBuilder().append(name, dataset.name).append(datasetId, dataset.datasetId)
+					.isEquals();
+		}
+
+		@Override
+		public int hashCode() {
+			return new HashCodeBuilder(17, 37).append(name)
+					.append(datasetId)
+					.toHashCode();
+		}
+	}
 
 	public SampleDTO() {
 	}
@@ -90,6 +142,17 @@ public class SampleDTO {
 	public Integer getSampleId() { return sampleId; }
 
 	public void setSampleId(final Integer sampleId) { this.sampleId = sampleId;}
+
+	public Set<Dataset> getDatasets() {
+		if (datasets == null) {
+			return new HashSet<>();
+		}
+		return datasets;
+	}
+
+	public void setDatasets(final Set<Dataset> datasets) {
+		this.datasets = datasets;
+	}
 
 	@Override
 	public boolean equals(final Object o) {

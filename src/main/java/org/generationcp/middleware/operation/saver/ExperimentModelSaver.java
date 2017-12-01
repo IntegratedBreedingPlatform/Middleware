@@ -19,7 +19,6 @@ import org.generationcp.middleware.domain.dms.Values;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProject;
@@ -38,7 +37,7 @@ public class ExperimentModelSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public void addExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) throws MiddlewareQueryException {
+	public void addExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) {
 		TermId myExperimentType = this.mapExperimentType(experimentType);
 		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
 
@@ -47,7 +46,7 @@ public class ExperimentModelSaver extends Saver {
 		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 	}
 
-	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) throws MiddlewareQueryException {
+	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) {
 		int experimentId =
 				this.getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
@@ -103,10 +102,10 @@ public class ExperimentModelSaver extends Saver {
 		return null;
 	}
 
-	private ExperimentModel create(int projectId, Values values, TermId expType, String cropPrefix) throws MiddlewareQueryException {
+	private ExperimentModel create(int projectId, Values values, TermId expType, String cropPrefix) {
 		ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(expType.getId());
-		experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
+		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, values.getVariableList()));
 
 		if (values.getLocationId() == null && values instanceof StudyValues) {
 			experimentModel.setGeoLocation(this.createNewGeoLocation());
@@ -136,47 +135,55 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
-	private Geolocation createNewGeoLocation() throws MiddlewareQueryException {
+	private Geolocation createNewGeoLocation() {
 		Geolocation location = new Geolocation();
 		location.setDescription("1");
 		this.getGeolocationDao().save(location);
 		return location;
 	}
 
-	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors)
-			throws MiddlewareQueryException {
+	protected List<ExperimentProperty> createTrialDesignExperimentProperties(ExperimentModel experimentModel, VariableList factors) {
+
+		List<ExperimentProperty> experimentProperties = new ArrayList<>();
+
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
 			for (Variable variable : factors.getVariables()) {
 				if (PhenotypicType.TRIAL_DESIGN == variable.getVariableType().getRole()) {
-					this.addProperty(experimentModel, variable);
+					experimentProperties.add(createTrialDesignProperty(experimentModel, variable));
 				}
 			}
 		}
 
-		return experimentModel.getProperties();
+		return experimentProperties;
 	}
 
-	private void addProperty(ExperimentModel experimentModel, Variable variable) throws MiddlewareQueryException {
-		if (experimentModel.getProperties() == null) {
-			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
+	protected ExperimentProperty createTrialDesignProperty(ExperimentModel experimentModel, Variable variable) {
+
+		ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(variable.getVariableType().getId());
+
+		if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			// If the variable is categorical, the variable's categorical value should be saved as categorical id.
+			experimentProperty.setValue(variable.getIdValue());
+		} else {
+			experimentProperty.setValue(variable.getValue());
 		}
-		ExperimentProperty property = new ExperimentProperty();
-		property.setExperiment(experimentModel);
-		property.setTypeId(variable.getVariableType().getId());
-		property.setValue(variable.getValue());
-		property.setRank(variable.getVariableType().getRank());
 
-		experimentModel.getProperties().add(property);
+		experimentProperty.setRank(variable.getVariableType().getRank());
+
+		return experimentProperty;
 	}
 
-	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
+
+	private void addExperimentProject(ExperimentModel experimentModel, int projectId) {
 		ExperimentProject exproj = new ExperimentProject();
 		exproj.setProjectId(projectId);
 		exproj.setExperiment(experimentModel);
 		this.getExperimentProjectDao().save(exproj);
 	}
 
-	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) throws MiddlewareQueryException {
+	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) {
 		ExperimentStock experimentStock = new ExperimentStock();
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
 		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
@@ -185,7 +192,7 @@ public class ExperimentModelSaver extends Saver {
 		return experimentStock;
 	}
 
-	public int moveStudyToNewGeolocation(int studyId) throws MiddlewareQueryException {
+	public int moveStudyToNewGeolocation(int studyId) {
 		List<DatasetReference> datasets = this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
 		List<Integer> ids = new ArrayList<>();
 		ids.add(studyId);

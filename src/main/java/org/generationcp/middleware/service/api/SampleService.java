@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -22,5 +23,7 @@ public interface SampleService {
 	SampleDetailsDTO getSampleObservation(final String sampleId);
 
 	Map<String, SampleDTO> getSamplesBySampleUID (final Set<String> sampleUIDs);
+
+	List<SampleGermplasmDetailDTO> getByGid(final Integer gid);
 
 }

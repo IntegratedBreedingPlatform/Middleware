@@ -1,9 +1,13 @@
 
 package org.generationcp.middleware.dao;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -26,17 +30,15 @@ import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SampleListDao.class);
 
-	protected static final String ROOT_FOLDER = "Samples";
+	protected static final Integer ROOT_FOLDER_ID = 1;
 	protected static final String LIST_NAME = "listName";
 	protected static final String PROGRAMUUID = "programUUID";
 	protected static final String SAMPLES = "samples";
@@ -46,27 +48,20 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
 	}
 
-	public SampleList getBySampleListName(final String sampleListName) {
-		final DetachedCriteria criteria = this.getSampleListName(sampleListName);
-		return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
-	}
-
-	private DetachedCriteria getSampleListName(final String sampleListName){
-		final DetachedCriteria criteria = DetachedCriteria.forClass(SampleList.class);
-		return criteria.add(Restrictions.like(SampleListDao.LIST_NAME, sampleListName));
-	}
-
 	public SampleList getRootSampleList() {
-		final DetachedCriteria criteria = this.getSampleListName(SampleListDao.ROOT_FOLDER);
+		final DetachedCriteria criteria = DetachedCriteria.forClass(SampleList.class);
+		criteria.add(Restrictions.eq("id", SampleListDao.ROOT_FOLDER_ID));
 		criteria.add(Restrictions.isNull(SampleListDao.PROGRAMUUID));
 		return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
 
-	public SampleList getParentSampleFolder(Integer id) {
+	public SampleList getParentSampleFolder(final Integer id) {
 		return this.getById(id);
 	}
+
 	/**
 	 * Find a SampleList given the parent folder ID and the sample list name
+	 *
 	 * @param sampleListName
 	 * @param parentId
 	 * @return SampleList, null when not found
@@ -82,40 +77,37 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			criteria.add(Restrictions.eq(SampleListDao.LIST_NAME, sampleListName));
 			criteria.add(Restrictions.eq("hierarchy", parent));
 			return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
-		} catch (Exception e) {
-			final String message = "Error with getSampleListByParentAndName(sampleListName=" + sampleListName + ", parentId= " + parentId
-				+ " ) query from SampleList: " + e.getMessage();
-			LOG.error(message, e);
+		} catch (final Exception e) {
+			final String message = "Error with getSampleListByParentAndName(sampleListName=" + sampleListName
+					+ ", parentId= " + parentId + " ) query from SampleList: " + e.getMessage();
+			SampleListDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message);
 		}
 	}
 
 	public List<SampleListDTO> getSampleLists(final Integer trialId) {
 
-		Criteria criteria = this.getSession().createCriteria(SampleList.class);
+		final Criteria criteria = this.getSession().createCriteria(SampleList.class);
 
-		ProjectionList projectionList = Projections.projectionList();
+		final ProjectionList projectionList = Projections.projectionList();
 		projectionList.add(Projections.distinct(Projections.property("id")), "listId");
-		projectionList.add(Projections.property(LIST_NAME), LIST_NAME);
+		projectionList.add(Projections.property(SampleListDao.LIST_NAME), SampleListDao.LIST_NAME);
 
-		criteria.createAlias(SAMPLES, SAMPLES)
-			.createAlias("samples.plant", "plant")
-			.createAlias("plant.experiment", "experiment")
-			.createAlias("experiment.project", "project")
-			.createAlias("project.relatedTos", "relatedTos")
-			.createAlias("relatedTos.objectProject", "objectProject")
-			.add(Restrictions.eq("objectProject.projectId", trialId))
-			.setProjection(projectionList)
-			.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class));
+		criteria.createAlias(SampleListDao.SAMPLES, SampleListDao.SAMPLES).createAlias("samples.plant", "plant")
+				.createAlias("plant.experiment", "experiment").createAlias("experiment.project", "project")
+				.createAlias("project.relatedTos", "relatedTos")
+				.createAlias("relatedTos.objectProject", "objectProject")
+				.add(Restrictions.eq("objectProject.projectId", trialId)).setProjection(projectionList)
+				.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class));
 
 		return criteria.list();
 	}
 
 	public List<SampleDetailsDTO> getSampleDetailsDTO(final Integer sampleListId) {
 
-		Criteria criteria = this.getSession().createCriteria(SampleList.class);
+		final Criteria criteria = this.getSession().createCriteria(SampleList.class);
 
-		ProjectionList projectionList = Projections.projectionList();
+		final ProjectionList projectionList = Projections.projectionList();
 
 		projectionList.add(Projections.property("stock.name"), "designation");
 		projectionList.add(Projections.property("properties.value"), "plotNumber");
@@ -128,18 +120,15 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
 		projectionList.add(Projections.property("stock.dbxrefId"), "gid");
 
-		criteria.createAlias(SAMPLES, "sample")
-			.createAlias("samples.plant", "plant")
-			.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
-			.createAlias("plant.experiment", "experiment")
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
-			.createAlias("experiment.properties", "properties")
-			.add(Restrictions.eq("id", sampleListId))
-			.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()))
-			.setProjection(projectionList)
-			.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class))
-		    .addOrder(Order.asc("sample.sampleId"));
+		criteria.createAlias(SampleListDao.SAMPLES, "sample").createAlias("samples.plant", "plant")
+				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
+				.createAlias("plant.experiment", "experiment")
+				.createAlias("experiment.experimentStocks", "experimentStocks")
+				.createAlias("experimentStocks.stock", "stock").createAlias("experiment.properties", "properties")
+				.add(Restrictions.eq("id", sampleListId))
+				.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId())).setProjection(projectionList)
+				.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class))
+				.addOrder(Order.asc("sample.sampleId"));
 
 		return criteria.list();
 	}
@@ -147,7 +136,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	public List<SampleList> getAllTopLevelLists(final String programUUID) {
 		final Criteria criteria;
 		try {
-			final Criterion topFolder = Restrictions.like("hierarchy.listName", SampleListDao.ROOT_FOLDER);
+			final Criterion topFolder = Restrictions.eq("hierarchy.id", SampleListDao.ROOT_FOLDER_ID);
 			final Criterion nullFolder = Restrictions.isNull("hierarchy");
 			criteria = this.getSession().createCriteria(SampleList.class);
 			criteria.createAlias("hierarchy", "hierarchy");
@@ -157,7 +146,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			criteria.addOrder(Order.asc("listName"));
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getAllTopLevelLists() query from SampleList: " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error with getAllTopLevelLists() query from SampleList: " + e.getMessage(), e);
 		}
 		return criteria.list();
 	}
@@ -165,10 +155,13 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	/**
 	 * Gets the germplasm list children.
 	 *
-	 * @param parentId the parent id
-	 * @param programUUID the program UUID
+	 * @param parentId
+	 *            the parent id
+	 * @param programUUID
+	 *            the program UUID
 	 * @return the sample list children
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
+	 * @throws MiddlewareQueryException
+	 *             the MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
 	public List<SampleList> getByParentFolderId(final Integer parentId, final String programUUID) {
@@ -182,14 +175,15 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByParentFolderId(parentId=" + parentId + ") query from SampleList: " + e.getMessage(),
-				e);
+			throw new MiddlewareQueryException("Error with getByParentFolderId(parentId=" + parentId
+					+ ") query from SampleList: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
 	/**
-	 * @param folderIds a group of folder ids for which we want to return children
+	 * @param folderIds
+	 *            a group of folder ids for which we want to return children
 	 * @return the resultant map which contains the folder meta data
 	 */
 	public Map<Integer, GermplasmFolderMetadata> getSampleFolderMetadata(final List<Integer> folderIds) {
@@ -200,8 +194,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		try {
 			final String folderMetaDataQuery = "SELECT parent.list_id AS listId, COUNT(child.list_id) AS numberOfChildren "
-				+ "FROM sample_list parent  LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
-				+ "WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
+					+ "FROM sample_list parent  LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
+					+ "WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
 			final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
 			setResultTransformer.setParameterList("folderIds", folderIds);
 			setResultTransformer.addScalar("listId", new IntegerType());
@@ -210,7 +204,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			list = setResultTransformer.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getSampleFolderMetadata(folderIds=" + folderIds.toString() + ") query from sample_list: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getSampleFolderMetadata(folderIds=" + folderIds.toString()
+					+ ") query from sample_list: " + e.getMessage(), e);
 		}
 		return Maps.uniqueIndex(list, new Function<GermplasmFolderMetadata, Integer>() {
 
@@ -242,7 +237,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByUserID(userID=" + userID + ") query from GermplasmList: " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error with getByUserID(userID=" + userID + ") query from GermplasmList: " + e.getMessage(), e);
 		}
 		return null;
 	}
