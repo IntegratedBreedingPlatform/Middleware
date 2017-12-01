@@ -25,7 +25,7 @@ import java.util.Comparator;
 /**
  * POJO for location details query.
  *
- * select locid, lname as location_name, c.isofull as country_full_name, labbr as location_abbreviation, ud.fname as location_type, ud.fdesc
+ * select locid, lname as location_name, c.isofull as country_full_name, l.labbr as location_abbreviation, ud.fname as location_type, ud.fdesc
  * as location_description from location l inner join cntry c on l.cntryid = c.cntryid inner join udflds ud on ud.fldno = l.ltype where
  * locid = 1
  *
@@ -105,6 +105,14 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	@Basic(optional = true)
 	@Column(name = "program_uuid")
 	private String programUUID;
+
+	@Basic(optional = true)
+	@Column(name = "cntry_name")
+	private String cntryName;
+
+	@Basic(optional = true)
+	@Column(name = "province_name")
+	private String provinceName;
 
 	public LocationDetails() {
 	}
@@ -254,7 +262,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.cntryid;
 	}
 
-	public void setCntryid(Integer cntryid) {
+	public void setCntryid(final Integer cntryid) {
 		this.cntryid = cntryid;
 	}
 
@@ -262,7 +270,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.ltype;
 	}
 
-	public void setLtype(Integer ltype) {
+	public void setLtype(final Integer ltype) {
 		this.ltype = ltype;
 	}
 
@@ -270,7 +278,23 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
+	}
+
+	public String getProvince() {
+		return provinceName;
+	}
+
+	public void setProvince(final String provinceName) {
+		this.provinceName = provinceName;
+	}
+
+	public String getCntryName() {
+		return cntryName;
+	}
+
+	public void setCntryName(final String cntryName) {
+		this.cntryName = cntryName;
 	}
 }
