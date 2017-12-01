@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -44,11 +37,19 @@ import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTra
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.util.DatasetUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -531,7 +532,7 @@ public class WorkbookSaver extends Saver {
 
 	}
 
-	private String generateTrialDatasetName(final String studyName, final StudyType studyType) {
+	private String generateTrialDatasetName(final String studyName) {
 		return studyName + "-ENVIRONMENT";
 	}
 
@@ -584,7 +585,7 @@ public class WorkbookSaver extends Saver {
 			}
 			final DmsProject study =
 					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
-							saveStudyExperiment, programUUID, cropPrefix, studyType);
+							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription());
 			studyId = study.getProjectId();
 		}
 		watch.stop();
@@ -607,24 +608,25 @@ public class WorkbookSaver extends Saver {
 				}
 				if (trialDatasetId == null) {
 					trialName =
-							this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName(), workbook.getStudyDetails()
-									.getStudyType());
+							this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
 					trialDatasetId =
-							this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName(), workbook
-									.getStudyDetails().getStudyType()), programUUID);
+							this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
 				}
 			} else {
 				trialName =
-						this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName(), workbook.getStudyDetails().getStudyType());
+						this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
 				trialDatasetId =
-						this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName(), workbook
-								.getStudyDetails().getStudyType()), programUUID);
+						this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
 			}
 		}
 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
+			final String trialDescription = (!workbook.getStudyDetails().getDescription().isEmpty() ?
+				this.generateTrialDatasetName(workbook.getStudyDetails().getDescription()) :
+				trialName);
 			final DatasetValues trialValues =
-					this.getDatasetValuesTransformer().transform(trialName, trialName, DataSetType.SUMMARY_DATA, trialMV, trialVariables);
+					this.getDatasetValuesTransformer().transform(trialName, trialDescription, DataSetType.SUMMARY_DATA, trialMV,
+						trialVariables);
 
 			if (workbook.isNursery() && (trialMV == null || trialMV.isEmpty() || this.getTrialInstanceFactor(trialMV) == null)) {
 				trialVariables.add(this.createOccVariableType(trialVariables.size() + 1,programUUID));
@@ -682,9 +684,12 @@ public class WorkbookSaver extends Saver {
 
 		if (datasetId == null) {
 			watch.restart("transform measurement effect dataset");
+			final String datasetDescription = (!workbook.getStudyDetails().getDescription().isEmpty() ?
+				this.generateMeasurementEffectDatasetName(workbook.getStudyDetails().getDescription()) :
+				datasetName);
 			final DatasetValues datasetValues =
 					this.getDatasetValuesTransformer()
-					.transform(datasetName, datasetName, DataSetType.PLOT_DATA, effectMV, effectVariables);
+					.transform(datasetName, datasetDescription, DataSetType.PLOT_DATA, effectMV, effectVariables);
 
 			watch.restart("save measurement effect dataset");
 			// fix for GCP-6436 start
@@ -1056,6 +1061,16 @@ public class WorkbookSaver extends Saver {
 		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
 		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
 		this.getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
+
+		final String description = workbook.getStudyDetails().getDescription();
+		this.updateStudyDescription(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset);
+		this.updateStudyDescription(description, study);
+		this.updateStudyDescription(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset);
+	}
+
+	private void updateStudyDescription(final String description, final DmsProject study) {
+		study.setDescription(description);
+		this.getDmsProjectDao().merge(study);
 	}
 
 	private int createMeansDatasetIfNecessary(final Workbook workbook, final int studyId, final List<MeasurementVariable> effectMV,
@@ -1067,8 +1082,9 @@ public class WorkbookSaver extends Saver {
 		if (datasetId == null) {
 			watch.restart("transform means dataset");
 			final String datasetName = this.generateMeansDatasetName(workbook.getStudyDetails().getStudyName());
+			final String datasetDescription = this.generateMeansDatasetName(workbook.getStudyDetails().getDescription());
 			final DatasetValues datasetValues =
-					this.getDatasetValuesTransformer().transform(datasetName, datasetName, DataSetType.MEANS_DATA, effectMV,
+					this.getDatasetValuesTransformer().transform(datasetName, datasetDescription, DataSetType.MEANS_DATA, effectMV,
 							effectVariables);
 
 			watch.restart("save means dataset");

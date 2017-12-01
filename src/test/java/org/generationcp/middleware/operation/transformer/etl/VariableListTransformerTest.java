@@ -147,7 +147,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 			case 1:
 				return studyDetails.getStudyName();
 			case 2:
-				return studyDetails.getTitle();
+				return studyDetails.getDescription();
 				/* case 3: return studyDetails.getPmKey(); */
 			case 4:
 				return studyDetails.getObjective();
@@ -262,7 +262,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	private StudyDetails createTestStudyDetails() {
 		StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyName("Study name");
-		studyDetails.setTitle("Study title");
+		studyDetails.setDescription("Study title");
 		/* studyDetails.setPmKey("123"); */
 		studyDetails.setObjective("Test transformer");
 		studyDetails.setStudyType(StudyType.T);

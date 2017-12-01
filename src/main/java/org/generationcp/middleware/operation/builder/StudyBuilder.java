@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -20,9 +22,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
 
 public class StudyBuilder extends Builder {
 
@@ -60,7 +59,8 @@ public class StudyBuilder extends Builder {
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
 		study.setStudyType(project.getStudyType());
-		
+		study.setDescription(project.getDescription());
+
 		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties(),
 				project.getProgramUUID());
 		VariableTypeList conditionVariableTypes = variableTypes.getFactors();
@@ -79,6 +79,7 @@ public class StudyBuilder extends Builder {
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
 		study.setStudyType(project.getStudyType());
+		study.setDescription(project.getDescription());
 
 		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
 				project.getProperties(),project.getProgramUUID());

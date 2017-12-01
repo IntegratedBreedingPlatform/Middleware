@@ -13,17 +13,20 @@ public class Dataset extends ParentDataset {
 	private List<Constant> constants;
 	private List<Factor> trialLevelFactor;
 	private List<TreatmentFactor> treatmentFactors;
+	private String description;
 
 	public Dataset() {
 		super();
 	}
 
-	public Dataset(String name, List<Condition> conditions, List<Factor> factors, List<Variate> variates) {
+	public Dataset(final String name, final List<Condition> conditions, final List<Factor> factors, final List<Variate> variates,
+		final String description) {
 		super();
 		this.name = name;
 		this.conditions = conditions;
 		this.factors = factors;
 		this.variates = variates;
+		this.description = description;
 	}
 
 	public Dataset(List<Factor> trialLevelFactor) {
@@ -85,5 +88,13 @@ public class Dataset extends ParentDataset {
 
 	public void setTreatmentFactors(List<TreatmentFactor> treatmentFactors) {
 		this.treatmentFactors = treatmentFactors;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 }

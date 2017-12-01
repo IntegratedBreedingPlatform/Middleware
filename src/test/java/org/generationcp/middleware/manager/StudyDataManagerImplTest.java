@@ -118,7 +118,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("The study name should be " + StudyTestDataInitializer.STUDY_NAME, StudyTestDataInitializer.STUDY_NAME,
 				study.getName());
 		Assert.assertEquals("The study description should be " + StudyTestDataInitializer.STUDY_DESCRIPTION,
-				StudyTestDataInitializer.STUDY_DESCRIPTION, study.getTitle());
+				StudyTestDataInitializer.STUDY_DESCRIPTION, study.getDescription());
 	}
 
 	@Test

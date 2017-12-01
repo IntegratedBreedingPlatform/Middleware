@@ -45,7 +45,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private static final String ENTRY = "ENTRY";
 	private static final String PLOT = "PLOT";
 	private static final String PROP_STUDY = "Study";
-	private static final String PROP_STUDY_TITLE = "Study Title";
+	private static final String PROP_STUDY_TITLE = "Study Description";
 
 	private static final String DBCV = "DBCV";
 	private static final String DBID = "DBID";
@@ -79,7 +79,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyType.N);
 		studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
-		studyDetails.setTitle(studyDetails.getStudyName() + " Description");
+		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
 
 		setUpWorkbook();
@@ -90,7 +90,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyType.T);
 		studyDetails.setStudyName("Test Trial " + new Random().nextInt(100));
-		studyDetails.setTitle(studyDetails.getStudyName() + " Description");
+		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
 
 		setUpWorkbook();
@@ -109,11 +109,6 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 			WorkbookBuilderIntegrationTest.PROP_STUDY, WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBCV,
 			WorkbookBuilderIntegrationTest.CHAR, studyDetails.getStudyName(), WorkbookBuilderIntegrationTest.STUDY,
 			PhenotypicType.STUDY, true));
-
-		conditions.add(this.createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE", "Study title - assigned (text)",
-			WorkbookBuilderIntegrationTest.PROP_STUDY_TITLE, WorkbookBuilderIntegrationTest.ASSIGNED,
-			WorkbookBuilderIntegrationTest.SCALE_TEXT, WorkbookBuilderIntegrationTest.CHAR, studyDetails.getTitle(),
-			WorkbookBuilderIntegrationTest.STUDY, PhenotypicType.STUDY, true));
 
 		workbook.setConditions(conditions);
 
@@ -218,7 +213,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(nurseryStudyDetails.getId());
 		Assert.assertEquals(studyId, nurseryStudyDetails.getId().intValue());
 		Assert.assertEquals(studyDetails.getStudyName(), nurseryStudyDetails.getStudyName());
-		Assert.assertEquals(studyDetails.getTitle(), nurseryStudyDetails.getTitle());
+		Assert.assertEquals(studyDetails.getDescription(), nurseryStudyDetails.getDescription());
 		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
 		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
 	}
@@ -245,7 +240,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(studyDetails.getId());
 		Assert.assertEquals(studyId, studyDetails.getId().intValue());
 		Assert.assertEquals(this.studyDetails.getStudyName(), studyDetails.getStudyName());
-		Assert.assertEquals(this.studyDetails.getTitle(), studyDetails.getTitle());
+		Assert.assertEquals(this.studyDetails.getDescription(), studyDetails.getDescription());
 		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
 		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
 
