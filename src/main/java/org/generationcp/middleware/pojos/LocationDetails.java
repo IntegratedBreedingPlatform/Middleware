@@ -282,11 +282,11 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		this.programUUID = programUUID;
 	}
 
-	public String getProvince() {
+	public String getProvinceName() {
 		return provinceName;
 	}
 
-	public void setProvince(final String provinceName) {
+	public void setProvinceName(final String provinceName) {
 		this.provinceName = provinceName;
 	}
 
