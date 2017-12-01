@@ -40,7 +40,7 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 		params.put("Fentry", lastEntry);
 		params.put("offset", offset);
 		params.put(PROGRAM_NAME_REPORT_KEY, args.get(PROGRAM_NAME_ARG_KEY));
-		params.put(AbstractReporter.STUDY_TITLE_REPORT_KEY, args.get(AbstractReporter.STUDY_TITLE_REPORT_KEY));
+
 		for (final MeasurementVariable var : studyConditions) {
 			parameterMapper.mapBasicStudyValues(var, params);
 

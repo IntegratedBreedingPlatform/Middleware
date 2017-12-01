@@ -1,15 +1,14 @@
 
 package org.generationcp.middleware.reports;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.util.List;
+import java.util.Map;
 
 public class MaizeTrialManifest extends AbstractDynamicReporter {
 
@@ -20,10 +19,10 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 	public static final String HARVEST_DATE_REPORT_KEY = "harvestDate";
 	public static final String DISTANCE_BETWEEN_ROWS_REPORT_KEY = "distanceBetweenRows";
 	public static final String NET_PLOT_LENGTH_REPORT_KEY = "netPlotLength";
-	protected static final String[] UNIQUE_REPORT_KEYS = Arrays.asList(DISTANCE_BETWEEN_STATIONS_REPORT_KEY,
-			ROWS_HARVESTED_REPORT_KEY, COLLABORATOR_REPORT_KEY, PLANTING_DATE_REPORT_KEY, HARVEST_DATE_REPORT_KEY,
-			DISTANCE_BETWEEN_ROWS_REPORT_KEY, NET_PLOT_LENGTH_REPORT_KEY).toArray(new String[0]);
-    public static final String MAIZE_MANIFEST_PROGRAM_KEY = "breedingProgram";
+	protected static final String[] UNIQUE_REPORT_KEYS =
+		new String[] {DISTANCE_BETWEEN_STATIONS_REPORT_KEY, ROWS_HARVESTED_REPORT_KEY, COLLABORATOR_REPORT_KEY, PLANTING_DATE_REPORT_KEY,
+			HARVEST_DATE_REPORT_KEY, DISTANCE_BETWEEN_ROWS_REPORT_KEY, NET_PLOT_LENGTH_REPORT_KEY};
+	public static final String MAIZE_MANIFEST_PROGRAM_KEY = "breedingProgram";
 
     protected ReportParameterMapper parameterMapper = new ReportParameterMapper();
 
