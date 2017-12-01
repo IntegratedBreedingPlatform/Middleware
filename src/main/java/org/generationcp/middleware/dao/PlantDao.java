@@ -1,10 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.pojos.Plant;
-import org.generationcp.middleware.service.impl.study.SampleSequence;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
@@ -24,20 +21,14 @@ public class PlantDao extends GenericDAO<Plant, Integer> {
 	not exist, returns 1.*/
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           1,"
-		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1))*1) AS max_sequence_no, " + " nde.nd_experiment_id AS nd_experiment_id"
+		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1))*1) AS max_sequence_no"
 		+ " FROM project p" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id"
 		+ " INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id"
 		+ " INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id"
 		+ " INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id"
 		+ " INNER JOIN stock st ON st.stock_id = es.stock_id INNER JOIN plant pl ON pl.nd_experiment_id = nde.nd_experiment_id"
-		+ " INNER JOIN sample s ON s.plant_id = pl.plant_id WHERE nde.nd_experiment_id IN (:experimentIds)"
-		+ " GROUP BY nde.nd_experiment_id, st.dbxref_id;";
-
-	public Plant getByPlantId(final String plantId) {
-		final DetachedCriteria criteria = DetachedCriteria.forClass(Plant.class);
-		criteria.add(Restrictions.eq("plantId", plantId));
-		return (Plant) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
-	}
+		+ " INNER JOIN sample s ON s.plant_id = pl.plant_id WHERE st.dbxref_id IN (:gids)"
+		+ " GROUP BY st.dbxref_id;";
 
 	public Map<Integer, Integer> getMaxPlantNumber(final Collection<Integer> experimentIds) {
 		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(PlantDao.MAX_PLANT_NUMBER_QUERY);
@@ -49,13 +40,12 @@ public class PlantDao extends GenericDAO<Plant, Integer> {
 
 	}
 
-	public Map<SampleSequence, Integer> getMaxSequenceNumber(final Collection<Integer> experimentIds) {
+	public Map<Integer, Integer> getMaxSequenceNumber(final Collection<Integer> gids) {
 		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(PlantDao.MAX_SEQUENCE_NUMBER_QUERY);
 		createSQLQuery.addScalar("gid", new StringType());
 		createSQLQuery.addScalar("max_sequence_no", new IntegerType());
-		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
 
-		createSQLQuery.setParameterList("experimentIds", experimentIds);
+		createSQLQuery.setParameterList("gids", gids);
 		return this.mapResultsToSampleSequence(createSQLQuery.list());
 	}
 
@@ -72,13 +62,13 @@ public class PlantDao extends GenericDAO<Plant, Integer> {
 	}
 
 
-	private Map<SampleSequence, Integer> mapResultsToSampleSequence(final List<Object[]> results) {
+	private Map<Integer, Integer> mapResultsToSampleSequence(final List<Object[]> results) {
 
-		final Map<SampleSequence, Integer> map = new HashMap<>();
+		final Map<Integer, Integer> map = new HashMap<>();
 		if (results != null && !results.isEmpty()) {
 
 			for (final Object[] row : results) {
-				map.put(new SampleSequence(Integer.valueOf((String) row[0]), (Integer) row[2]), (Integer) row[1]);
+				map.put(Integer.valueOf((String) row[0]), (Integer) row[1]);
 			}
 		}
 		return map;

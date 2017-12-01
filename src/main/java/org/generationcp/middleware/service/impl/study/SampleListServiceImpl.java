@@ -33,7 +33,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,15 +135,16 @@ public class SampleListServiceImpl implements SampleListService {
 
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
 			final Collection<Integer> experimentIds = getExperimentIds(observationDtos);
+			final Collection<Integer> gids = getGids(observationDtos);
 			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(experimentIds);
-			final Map<SampleSequence, Integer> maxSampleNameSequence = this.getMaxSequenceNumber(experimentIds);
+			final Map<Integer, Integer> maxSampleNameSequence = this.getMaxSequenceNumber(gids);
 			final List<Sample> samples = new ArrayList<>();
 
 			for (final ObservationDto observationDto : observationDtos) {
 				/*maxSequence is the maximum number among samples in the same plot and for the same GID. If there is no sample for
 				plot/Gid, the sequence starts in 1.*/
 
-				final SampleSequence key = new SampleSequence(observationDto.getGid(), observationDto.getMeasurementId());
+				final Integer key = observationDto.getGid();
 				Integer maxSequence = maxSampleNameSequence.get(key);
 
 				if (maxSequence == null) {
@@ -181,20 +181,6 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 	}
 
-	private Map<Integer, Integer> getSampleNameSequence(final List<ObservationDto> observationDtos) {
-
-		final Map<Integer, Integer> map = new HashMap<>();
-		for (final ObservationDto observationDto : observationDtos) {
-			final Integer sequence = Integer.parseInt(observationDto.getDesignation()
-				.substring(observationDto.getDesignation().lastIndexOf(':'), observationDto.getDesignation().length()));
-			Integer mapSequence = map.get(observationDto.getGid());
-			if (mapSequence != null && mapSequence < sequence) {
-				map.put(observationDto.getGid(), sequence);
-			}
-		}
-		return map;
-	}
-
 	private Map<Integer, Integer> getMaxPlantNumber(final Collection<Integer> experimentIds) {
 		return this.plantDao.getMaxPlantNumber(experimentIds);
 	}
@@ -210,8 +196,18 @@ public class SampleListServiceImpl implements SampleListService {
 		});
 	}
 
-	private Map<SampleSequence, Integer> getMaxSequenceNumber(final Collection<Integer> experimentIds) {
-		return this.plantDao.getMaxSequenceNumber(experimentIds);
+	private Collection<Integer> getGids(final List<ObservationDto> observationDtos) {
+		return (Collection<Integer>) CollectionUtils.collect(observationDtos, new Transformer() {
+
+			@Override
+			public Object transform(final Object input) {
+				final ObservationDto observationDto = (ObservationDto) input;
+				return observationDto.getGid();
+			}
+		});
+	}
+	private Map<Integer, Integer> getMaxSequenceNumber(final Collection<Integer> gids) {
+		return this.plantDao.getMaxSequenceNumber(gids);
 	}
 
 	/**
