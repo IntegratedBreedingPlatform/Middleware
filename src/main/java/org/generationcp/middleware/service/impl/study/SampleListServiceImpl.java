@@ -155,13 +155,13 @@ public class SampleListServiceImpl implements SampleListService {
 					maxSequence++;
 				}
 
-				final BigInteger sampleNumber = new BigInteger(observationDto.getVariableMeasurements().get(0).getVariableValue());
+				final BigInteger plantNumber = new BigInteger(observationDto.getVariableMeasurements().get(0).getVariableValue());
 				Integer count = maxPlantNumbers.get(observationDto.getMeasurementId());
 				if (count == null) {
 					// counter should be start in 1
 					count = 0;
 				}
-				for (double i = 0; i < sampleNumber.doubleValue(); i++) {
+				for (double i = 0; i < plantNumber.doubleValue(); i++) {
 
 					count++;
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
