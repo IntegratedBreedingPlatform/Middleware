@@ -20,7 +20,7 @@ public class PlantDao extends GenericDAO<Plant, Integer> {
 	/*This query returns the maximun sequence number included in sample name. It's the number after the : in the sample name. If : does
 	not exist, returns 1.*/
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
-		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           1,"
+		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           0,"
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1))*1) AS max_sequence_no"
 		+ " FROM project p" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id"
 		+ " INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id"
