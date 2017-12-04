@@ -137,19 +137,19 @@ public class SampleListServiceImpl implements SampleListService {
 			final Collection<Integer> experimentIds = getExperimentIds(observationDtos);
 			final Collection<Integer> gids = getGids(observationDtos);
 			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(experimentIds);
-			final Map<Integer, Integer> maxSampleNameSequence = this.getMaxSequenceNumber(gids);
+			final Map<Integer, Integer> maxSequenceNumberByGID = this.getMaxSequenceNumberByGID(gids);
 			final List<Sample> samples = new ArrayList<>();
 
 			for (final ObservationDto observationDto : observationDtos) {
-				/*maxSequence is the maximum number among samples in the same plot and for the same GID. If there is no sample for
-				plot/Gid, the sequence starts in 1.*/
+				/*maxSequence is the maximum number among samples in the same GID. If there is no sample for
+				Gid, the sequence starts in 1.*/
 
 				final Integer key = observationDto.getGid();
-				Integer maxSequence = maxSampleNameSequence.get(key);
+				Integer maxSequence = maxSequenceNumberByGID.get(key);
 
 				if (maxSequence == null) {
 					maxSequence = 1;
-					maxSampleNameSequence.put(key, maxSequence);
+					maxSequenceNumberByGID.put(key, maxSequence);
 				}
 				else {
 					maxSequence++;
@@ -171,7 +171,7 @@ public class SampleListServiceImpl implements SampleListService {
 							observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
-				maxSampleNameSequence.put(key, maxSequence--);
+				maxSequenceNumberByGID.put(key, maxSequence--);
 			}
 
 			sampleList.setSamples(samples);
@@ -206,7 +206,7 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 		});
 	}
-	private Map<Integer, Integer> getMaxSequenceNumber(final Collection<Integer> gids) {
+	private Map<Integer, Integer> getMaxSequenceNumberByGID(final Collection<Integer> gids) {
 		return this.plantDao.getMaxSequenceNumber(gids);
 	}
 
