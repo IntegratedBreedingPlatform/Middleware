@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.service.api;
@@ -28,14 +27,11 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
@@ -43,7 +39,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
@@ -66,8 +61,7 @@ public interface FieldbookService {
 	 *
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList,
-			CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Gets the field map info (entries, reps, plots and counts) of the given
@@ -77,15 +71,14 @@ public interface FieldbookService {
 	 *            the nursery id list
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList,
-			CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 * Retrieves all locations from central and local databases.
+	 * Retrieves all crop specific and program specific locations except for FIELD and BLOCK locations.
 	 *
 	 * @return List of location references
 	 */
-	List<Location> getAllLocations();
+	List<Location> getAllLocations(String programUUID);
 
 	/**
 	 * Gets the all breeding locations.
@@ -93,6 +86,13 @@ public interface FieldbookService {
 	 * @return the all breeding locations
 	 */
 	List<Location> getAllBreedingLocations();
+
+	/**
+	 * Gets all breeding type locations (crop specific and program specific locations).
+	 *
+	 * @return the all breeding locations
+	 */
+	List<Location> getAllBreedingLocationsByProgramUUID(String programUUID);
 
 	/**
 	 * Gets the all seed locations.
@@ -198,8 +198,7 @@ public interface FieldbookService {
 	 *            the role
 	 * @return the standard variable id by property scale method role
 	 */
-	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method,
-			PhenotypicType role);
+	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role);
 
 	/**
 	 * Gets the germplasm id by name.
@@ -361,8 +360,7 @@ public interface FieldbookService {
 	 *            the role
 	 * @return the distinct standard variable values
 	 */
-	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method,
-			PhenotypicType role);
+	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role);
 
 	/**
 	 * Get a standard variable given an id. After the first read, the variable
@@ -894,8 +892,7 @@ public interface FieldbookService {
 	 * @param list
 	 * @return
 	 */
-	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId,
-			List<ListDataProject> list, int userId);
+	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId);
 
 	void updateGermlasmListInfoStudy(int crossesListId, int studyId);
 
@@ -910,7 +907,7 @@ public interface FieldbookService {
 	/**
 	 * Counts the number of ListDataProject with a speficied
 	 * SystemDefinedEntryType.
-	 * 
+	 *
 	 * @param listId
 	 * @param systemDefinedEntryType
 	 * @return
@@ -989,7 +986,6 @@ public interface FieldbookService {
 	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
 
 	List<Location> getLocationsByProgramUUID(String programUUID);
-
 
 	/**
 	 * @param studyId id for the study Trial
