@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Plant;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.PlantService;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +44,7 @@ public class PlantServiceImpl implements PlantService {
 		final Plant plant = new Plant();
 
 		plant.setCreatedDate(new Date());
-		plant.setExperiment(this.experimentDao.getById(experimentId));
+		plant.setExperiment(new ExperimentModel(experimentId));
 		plant.setPlantBusinessKey(this.getPlantBusinessKey(cropPrefix));
 		plant.setPlantNumber(plantNumber);
 
