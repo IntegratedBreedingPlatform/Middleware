@@ -4,6 +4,7 @@ package org.generationcp.middleware.service.impl.study;
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -24,7 +26,6 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -93,9 +94,13 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
+		Preconditions.checkArgument(sampleListDTO.getListName().trim() != "", "The List Name must not be empty");
+		Preconditions.checkArgument(sampleListDTO.getListName().length()<100,"List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
 
-
+		if(StringUtils.isNotBlank(sampleListDTO.getDescription())){
+			Preconditions.checkArgument(sampleListDTO.getDescription().length()<255,"List Description must not exceed 255 characters");
+		}
 
 		try {
 			final SampleList sampleList = new SampleList();
@@ -157,8 +162,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 			sampleList.setSamples(samples);
 			return this.sampleListDao.save(sampleList);
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
+		} catch (MiddlewareQueryException e) {
+			throw new MiddlewareException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
 	}
 
