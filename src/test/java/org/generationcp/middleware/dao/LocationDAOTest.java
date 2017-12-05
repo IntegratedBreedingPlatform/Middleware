@@ -214,7 +214,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
 		Assert.assertEquals(cntryid, locationDetails.getCntryid().intValue());
 		Assert.assertEquals(programUUID, locationDetails.getProgramUUID());
-		Assert.assertEquals(country.getLname(), locationDetails.getCntryName());
+		Assert.assertEquals(country.getLname(), locationDetails.getCountryName());
 		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
 
 
