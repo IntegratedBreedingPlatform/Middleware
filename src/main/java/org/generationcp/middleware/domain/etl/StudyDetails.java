@@ -12,14 +12,14 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 public class StudyDetails implements Serializable {
 
@@ -31,8 +31,6 @@ public class StudyDetails implements Serializable {
 	private String programUUID;
 
 	private String studyName;
-
-	private String title;
 
 	private String objective;
 
@@ -61,14 +59,16 @@ public class StudyDetails implements Serializable {
 	// used to display "Add to New Study"
 	private String label;
 
+	private String description;
+
 	public StudyDetails() {
 
 	}
 
-	public StudyDetails(String studyName, String title, String pmKey, String objective, String startDate, String endDate,
+	public StudyDetails(String studyName, String description, String objective, String startDate, String endDate,
 			StudyType studyType, long parentFolderId, String trialDatasetName, String measurementDatasetName) {
 		this.studyName = studyName;
-		this.title = title;
+		this.description = description;
 		this.objective = objective;
 		this.startDate = startDate;
 		this.endDate = endDate;
@@ -80,10 +80,10 @@ public class StudyDetails implements Serializable {
 	}
 
 	// Used by getTrialObservationTable
-	public StudyDetails(Integer id, String studyName, String title, String objective, String startDate, String endDate,
+	public StudyDetails(Integer id, String studyName, String description, String objective, String startDate, String endDate,
 			StudyType studyType, String piName, String siteName, String piId, String siteId) {
 
-		this(studyName, title, objective, startDate, endDate, studyType, piName, siteName);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName);
 		this.id = id;
 		if (piId != null && NumberUtils.isNumber(piId)) {
 			this.piId = Double.valueOf(piId).intValue();
@@ -93,16 +93,16 @@ public class StudyDetails implements Serializable {
 		}
 	}
 
-	public StudyDetails(Integer id, String studyName, String title, String objective, String startDate, String endDate,
+	public StudyDetails(Integer id, String studyName, String description, String objective, String startDate, String endDate,
 			StudyType studyType, String piName, String siteName) {
 
-		this(studyName, title, objective, startDate, endDate, studyType, piName, siteName);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName);
 		this.id = id;
 	}
 
-	public StudyDetails(String studyName, String title, String objective, String startDate, String endDate, StudyType studyType,
+	public StudyDetails(String studyName, String description, String objective, String startDate, String endDate, StudyType studyType,
 			String piName, String siteName) {
-		this(studyName, title, null, objective, startDate, endDate, studyType, 0, null, null);
+		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null);
 		this.siteName = siteName;
 		this.setPiName(piName);
 	}
@@ -121,14 +121,6 @@ public class StudyDetails implements Serializable {
 
 	public void setStudyName(String studyName) {
 		this.studyName = studyName;
-	}
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public String getObjective() {
@@ -277,6 +269,14 @@ public class StudyDetails implements Serializable {
 		this.programUUID = programUUID;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -292,8 +292,9 @@ public class StudyDetails implements Serializable {
 		result = prime * result + (this.startDate == null ? 0 : this.startDate.hashCode());
 		result = prime * result + (this.studyName == null ? 0 : this.studyName.hashCode());
 		result = prime * result + (this.studyType == null ? 0 : this.studyType.hashCode());
-		result = prime * result + (this.title == null ? 0 : this.title.hashCode());
+		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
 		result = prime * result + (this.trialDatasetName == null ? 0 : this.trialDatasetName.hashCode());
+		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
 		return result;
 	}
 
@@ -374,11 +375,11 @@ public class StudyDetails implements Serializable {
 		if (this.studyType != other.studyType) {
 			return false;
 		}
-		if (this.title == null) {
-			if (other.title != null) {
+		if (this.description == null) {
+			if (other.description != null) {
 				return false;
 			}
-		} else if (!this.title.equals(other.title)) {
+		} else if (!this.description.equals(other.description)) {
 			return false;
 		}
 		if (this.trialDatasetName == null) {
@@ -386,6 +387,13 @@ public class StudyDetails implements Serializable {
 				return false;
 			}
 		} else if (!this.trialDatasetName.equals(other.trialDatasetName)) {
+			return false;
+		}
+		if (this.description == null) {
+			if (other.description != null) {
+				return false;
+			}
+		} else if (!this.description.equals(other.description)) {
 			return false;
 		}
 		return true;
@@ -399,8 +407,8 @@ public class StudyDetails implements Serializable {
 		builder.append(this.id);
 		builder.append(", studyName=");
 		builder.append(this.studyName);
-		builder.append(", title=");
-		builder.append(this.title);
+		builder.append(", description=");
+		builder.append(this.description);
 		builder.append(", objective=");
 		builder.append(this.objective);
 		builder.append(", startDate=");
@@ -425,6 +433,8 @@ public class StudyDetails implements Serializable {
 		builder.append(this.piId);
 		builder.append(", siteId=");
 		builder.append(this.siteId);
+		builder.append(", description=");
+		builder.append(this.description);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -433,7 +443,7 @@ public class StudyDetails implements Serializable {
 		Debug.println(indent, "StudyDetails: ");
 		Debug.println(indent + 3, "Id: " + this.id);
 		Debug.println(indent + 3, "Name: " + this.studyName);
-		Debug.println(indent + 3, "Title: " + this.title);
+		Debug.println(indent + 3, "Title: " + this.description);
 		Debug.println(indent + 3, "Objective: " + this.objective);
 		Debug.println(indent + 3, "Start Date: " + this.startDate);
 		Debug.println(indent + 3, "End Date: " + this.endDate);
@@ -446,6 +456,7 @@ public class StudyDetails implements Serializable {
 		Debug.println(indent + 3, "PI Name: " + this.piName);
 		Debug.println(indent + 3, "PI Id: " + this.piId);
 		Debug.println(indent + 3, "Site Id: " + this.siteId);
+		Debug.println(indent + 3, "Description: " + this.description);
 	}
 
 }

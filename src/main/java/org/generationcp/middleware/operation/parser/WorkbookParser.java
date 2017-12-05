@@ -284,7 +284,7 @@ public class WorkbookParser {
 		// get study details
 		final String study = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_NAME_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final String title = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TITLE_ROW_INDEX,
+		final String description = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TITLE_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 		final String pmKey = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.PMKEY_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
@@ -315,7 +315,7 @@ public class WorkbookParser {
 			this.errorMessages.add(new Message("error.blank.study.name"));
 		}
 
-		if (title == null || StringUtils.isEmpty(title)) {
+		if (description == null || StringUtils.isEmpty(description)) {
 			this.errorMessages.add(new Message("error.blank.study.title"));
 		}
 
@@ -365,7 +365,7 @@ public class WorkbookParser {
 		}
 
 		final StudyDetails studyDetails =
-				new StudyDetails(study, title, pmKey, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
+				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
 
 		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
 			this.currentRowZeroBased++;

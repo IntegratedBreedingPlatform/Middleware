@@ -108,7 +108,8 @@ class ObservationQuery {
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
 
 	public static final String OBSERVATIONS_FOR_SAMPLES = "SELECT \n" + "    nde.nd_experiment_id as nd_experiment_id,\n"
-		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value as value\n"
+		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value"
+		+ " as value, s.dbxref_id as gid"
 		+ " FROM \n" + "    project p \n" + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 		+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
 		+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"

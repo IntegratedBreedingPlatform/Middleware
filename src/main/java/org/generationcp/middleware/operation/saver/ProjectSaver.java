@@ -31,13 +31,12 @@ public class ProjectSaver extends Saver {
 		return projectDao.save(project);
 	}
 
-	public DmsProject create(StudyValues studyValues, final StudyType studyType) throws MiddlewareException {
+	public DmsProject create(StudyValues studyValues, final StudyType studyType, String description) {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			project = new DmsProject();
 			String name = this.getStringValue(studyValues, TermId.STUDY_NAME.getId());
-			String description = this.getStringValue(studyValues, TermId.STUDY_TITLE.getId());
 			project.setStudyType(studyType);
 			this.mapStudytoProject(name, description, project);
 		}

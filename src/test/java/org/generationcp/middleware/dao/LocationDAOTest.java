@@ -276,4 +276,63 @@ public class LocationDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(locationDetailsList.size(), locationWithNullProgramUUID.size() + locationsWithProgramUUID.size());
 
 	}
+
+	@Test
+	public void testGetByUniqueIDAndExcludeLocationTypes() {
+
+		final String programUUID = "hglghkk-527484-dgggt";
+		final int ltype = 405;
+		final String labbr = "ABCDEFG";
+		final String lname = "MyLocation";
+
+		// Country ID 1 = "Democratic Republic of Afghanistan"
+		final int cntryid = 1;
+		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
+		location.setCntryid(cntryid);
+
+		locationDAO.saveOrUpdate(location);
+
+		List<Location> result = locationDAO.getByUniqueIDAndExcludeLocationTypes(programUUID, new ArrayList<Integer>());
+
+		final Collection<Location> programSpecificLocations = Collections2.filter(result, new Predicate<Location>() {
+
+			@Override
+			public boolean apply(@Nullable final Location location) {
+				return programUUID.equals(location.getUniqueID());
+			}
+		});
+
+		// Verify that only one Location with programUUID ("hglghkk-527484-dgggt") is returned
+		Assert.assertTrue(programSpecificLocations.size() == 1);
+
+		final Collection<Location> cropSpecificLocations = Collections2.filter(result, new Predicate<Location>() {
+
+			@Override
+			public boolean apply(@Nullable final Location location) {
+				return null == location.getUniqueID();
+			}
+		});
+
+		// Verify that there are crop specific locations returned
+		Assert.assertTrue(!cropSpecificLocations.isEmpty());
+
+	}
+
+	@Test
+	public void testGetByUniqueIDAndExcludeLocationTypesExcludeCountryLocationType() {
+
+		// ltype 405 is "COUNTRY" location type
+		final int countryLocationType = 405;
+		List<Integer> excludeCountryType = new ArrayList<>();
+		excludeCountryType.add(countryLocationType);
+
+		final List<Location> resultWithoutCountryLocationType = locationDAO.getByUniqueIDAndExcludeLocationTypes("any-program-uuid", excludeCountryType);
+
+		for (Location location : resultWithoutCountryLocationType) {
+			// Verify that no country type locations are returned
+			Assert.assertFalse(location.getLtype().intValue() == countryLocationType);
+		}
+
+	}
+
 }

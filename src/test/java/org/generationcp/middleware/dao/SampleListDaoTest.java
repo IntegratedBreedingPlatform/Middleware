@@ -46,7 +46,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testCreateSampleList() {
-		final User user = this.userDao.getById(1);
+		final User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 
 		final Plant plant = PlantTestDataInitializer.createPlant();

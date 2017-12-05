@@ -336,9 +336,6 @@ public class ProjectPropertySaver {
 				if (variable.getTermId() == TermId.STUDY_NAME.getId()) {
 					project.setName(variable.getValue());
 					this.daoFactory.getDmsProjectDao().merge(project);
-				} else if (variable.getTermId() == TermId.STUDY_TITLE.getId()) {
-					project.setDescription(variable.getValue());
-					this.daoFactory.getDmsProjectDao().merge(project);
 				}
 			}
 		}

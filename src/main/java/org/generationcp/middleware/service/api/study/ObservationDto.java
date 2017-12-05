@@ -1,13 +1,13 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ObservationDto {
 
@@ -67,13 +67,13 @@ public class ObservationDto {
 		this.variableMeasurements = variableMeasurements;
 	}
 
-	public ObservationDto(Integer measurementId, String designation, List<MeasurementDto> variableResults) {
+	public ObservationDto(Integer measurementId, String designation, List<MeasurementDto> variableResults, Integer gid) {
 		this.measurementId = measurementId;
 		this.designation = designation;
 		this.variableMeasurements = variableResults;
 		this.trialInstance = null;
 		this.entryType = null;
-		this.gid = null;
+		this.gid = gid;
 		this.entryNo = null;
 		this.entryCode = null;
 		this.repetionNumber = null;

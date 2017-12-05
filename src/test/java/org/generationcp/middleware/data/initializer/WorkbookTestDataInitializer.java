@@ -281,7 +281,7 @@ public class WorkbookTestDataInitializer {
 					(studyType.equals(StudyType.N) ? WorkbookTestDataInitializer.NURSERY_NAME : WorkbookTestDataInitializer.TRIAL_NAME)
 							+ new Random().nextInt(10000));
 		}
-		details.setTitle(WorkbookTestDataInitializer.TITLE);
+		details.setDescription(WorkbookTestDataInitializer.TITLE);
 		details.setObjective(WorkbookTestDataInitializer.OBJECTIVE);
 		details.setStartDate(WorkbookTestDataInitializer.START_DATE);
 		details.setEndDate(WorkbookTestDataInitializer.END_DATE);

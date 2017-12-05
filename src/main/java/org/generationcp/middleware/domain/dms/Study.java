@@ -35,14 +35,17 @@ public class Study implements Serializable {
 
 	private StudyType studyType;
 
+	private String description;
+
 	public Study() {
 	}
 
-	public Study(final int id, final VariableList conditions, final VariableList constants, final StudyType studyType) {
+	public Study(final int id, final VariableList conditions, final VariableList constants, final StudyType studyType, final String description) {
 		this.id = id;
 		this.conditions = conditions;
 		this.constants = constants;
 		this.studyType = studyType;
+		this.description = description;
 	}
 
 	public int getId() {
@@ -57,8 +60,8 @@ public class Study implements Serializable {
 		return this.getDisplayValue(TermId.STUDY_NAME);
 	}
 
-	public String getTitle() {
-		return this.getDisplayValue(TermId.STUDY_TITLE);
+	public String getDescription() {
+		return this.description;
 	}
 
 	public String getObjective() {
@@ -138,7 +141,7 @@ public class Study implements Serializable {
 		Debug.println(indent, "Study: ");
 		Debug.println(indent + 3, "Id: " + this.getId());
 		Debug.println(indent + 3, "Name: " + this.getName());
-		Debug.println(indent + 3, "Title: " + this.getTitle());
+		Debug.println(indent + 3, "Title: " + this.getDescription());
 
 		Debug.println(indent + 3, "Conditions: ");
 		for (Variable condition : this.conditions.getVariables()) {
@@ -209,5 +212,9 @@ public class Study implements Serializable {
 
 	public void setStudyType(final StudyType studyType) {
 		this.studyType = studyType;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 }
