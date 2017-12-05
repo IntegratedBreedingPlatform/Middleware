@@ -405,43 +405,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<LocationDetails> getLocationDetails(final Integer locationId, final Integer start, final Integer numOfRows) {
-		try {
-
-			final StringBuilder query = new StringBuilder() //
-				.append("select l.lname as location_name,l.locid,l.ltype as ltype,") //
-				.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,") //
-				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,") //
-				.append(" ud.fname as location_type,") //
-				.append(" ud.fdesc as location_description, l.program_uuid,") //
-				.append(" c.isoabbr as cntry_name, province.lname AS province_name") //
-				.append(" from location l") //
-				.append(" left join georef g on l.locid = g.locid") //
-				.append(" left join cntry c on l.cntryid = c.cntryid") //
-				.append(" left join udflds ud on ud.fldno = l.ltype") //
-				.append(" ,location province");
-
-			if (locationId != null) {
-				query.append(" where l.locid = :id");
-				query.append(" AND province.locid = l.snl3id");
-
-				final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
-				sqlQuery.setParameter("id", locationId);
-				sqlQuery.setFirstResult(start);
-				sqlQuery.setMaxResults(numOfRows);
-				sqlQuery.addEntity(LocationDetails.class);
-
-				return sqlQuery.list();
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getLocationDetails", "id", String.valueOf(locationId), e.getMessage(),
-							LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return new ArrayList<>();
-	}
-
 	@Override
 	public Location saveOrUpdate(final Location location) {
 		try {
@@ -821,7 +784,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName,
 			final String programUUID) {
-
 		try {
 
 			final StringBuilder queryString = new StringBuilder()//

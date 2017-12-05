@@ -155,36 +155,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 	}
 
-	@Test
-	public void testGetLocationDetails() {
-
-		final String programUUID = "jahsdkajsd-78346-kjf364";
-		final int ltype = 405;
-		final String labbr = "ABCDEFG";
-		final String lname = "MyLocation";
-
-		// Country ID 1 = "Democratic Republic of Afghanistan"
-		final int cntryid = 1;
-		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
-		location.setCntryid(cntryid);
-
-		locationDAO.saveOrUpdate(location);
-
-		final List<LocationDetails> result = locationDAO.getLocationDetails(location.getLocid(), 0, Integer.MAX_VALUE);
-		final LocationDetails locationDetails = result.get(0);
-
-		Assert.assertEquals(lname, locationDetails.getLocationName());
-		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
-		Assert.assertEquals(ltype, locationDetails.getLtype().intValue());
-		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
-		Assert.assertEquals(cntryid, locationDetails.getCntryid().intValue());
-		Assert.assertEquals(programUUID, locationDetails.getProgramUUID());
-
-		Assert.assertEquals("COUNTRY", locationDetails.getLocationType());
-		Assert.assertEquals("-", locationDetails.getLocationDescription());
-		Assert.assertEquals("Democratic Republic of Afghanistan", locationDetails.getCountryFullName());
-
-	}
 
 	@Test
 	public void testGetFilteredLocations() {
