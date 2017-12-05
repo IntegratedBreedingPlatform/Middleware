@@ -108,7 +108,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	@Basic(optional = true)
 	@Column(name = "cntry_name")
-	private String cntryName;
+	private String countryName;
 
 	@Basic(optional = true)
 	@Column(name = "province_name")
@@ -290,11 +290,11 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		this.provinceName = provinceName;
 	}
 
-	public String getCntryName() {
-		return cntryName;
+	public String getCountryName() {
+		return countryName;
 	}
 
-	public void setCntryName(final String cntryName) {
-		this.cntryName = cntryName;
+	public void setCountryName(final String countryName) {
+		this.countryName = countryName;
 	}
 }
