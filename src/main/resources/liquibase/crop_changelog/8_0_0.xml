@@ -1,0 +1,39 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="cuenyad" id="v8.0.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'sample_list'
+						AND COLUMN_NAME = 'description'
+						AND COLUMN_TYPE='varchar(45)'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list CHANGE COLUMN description description  VARCHAR(255) NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v8.0.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'sample_list'
+						AND COLUMN_NAME = 'notes'
+						AND COLUMN_TYPE='varchar(45)'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list CHANGE COLUMN notes notes TEXT NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+</databaseChangeLog>
