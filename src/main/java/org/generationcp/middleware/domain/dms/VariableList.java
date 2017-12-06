@@ -112,7 +112,7 @@ public class VariableList implements Serializable {
 	public Variable findByLocalName(String localName) {
 		if (this.variables != null && localName != null) {
 			for (Variable variable : this.variables) {
-				if (localName.equals(variable.getVariableType().getLocalName())) {
+				if (localName.equalsIgnoreCase(variable.getVariableType().getLocalName())) {
 					return variable;
 				}
 			}
