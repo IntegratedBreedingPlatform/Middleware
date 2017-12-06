@@ -148,11 +148,8 @@ public class SampleListServiceImpl implements SampleListService {
 				Integer maxSequence = maxSequenceNumberByGID.get(key);
 
 				if (maxSequence == null) {
-					maxSequence = 1;
+					maxSequence = 0;
 					maxSequenceNumberByGID.put(key, maxSequence);
-				}
-				else {
-					maxSequence++;
 				}
 
 				final BigInteger sampleNumber = new BigInteger(observationDto.getVariableMeasurements().get(0).getVariableValue());
@@ -164,14 +161,16 @@ public class SampleListServiceImpl implements SampleListService {
 				for (double i = 0; i < sampleNumber.doubleValue(); i++) {
 
 					plantNumber++;
-					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 					maxSequence++;
+					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
+
 					final Sample sample = this.sampleService
 						.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, sampleName, sampleListDTO.getSamplingDate(),
 							observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
-				maxSequenceNumberByGID.put(key, maxSequence--);
+
+				maxSequenceNumberByGID.put(key, maxSequence);
 			}
 
 			sampleList.setSamples(samples);
