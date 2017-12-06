@@ -59,7 +59,7 @@ public class LocationTestDataInitializer {
 	}
 
 	public static List<Location> createLocationList(final int noOfLocations) {
-		final List<Location> locations = new ArrayList<Location>();
+		final List<Location> locations = new ArrayList<>();
 
 		for (int i = 1; i <= noOfLocations; i++) {
 			locations.add(
