@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
@@ -29,21 +28,21 @@ public class VariableList implements Serializable {
 	private List<Variable> variables = new ArrayList<Variable>();
 	private VariableTypeList variableTypes = null;
 
-	public void add(Variable variable) {
+	public void add(final Variable variable) {
 		this.variables.add(variable);
 	}
 
-	public void addAll(VariableList variableList) {
+	public void addAll(final VariableList variableList) {
 		this.variables.addAll(variableList.getVariables());
 	}
 
-	public Variable findById(TermId termId) {
+	public Variable findById(final TermId termId) {
 		return this.findById(termId.getId());
 	}
 
-	public Variable findById(int id) {
+	public Variable findById(final int id) {
 		if (this.variables != null) {
-			for (Variable variable : this.variables) {
+			for (final Variable variable : this.variables) {
 				if (variable.getVariableType().getId() == id) {
 					return variable;
 				}
@@ -56,14 +55,14 @@ public class VariableList implements Serializable {
 		return this.variables;
 	}
 
-	public void setVariables(List<Variable> variables) {
+	public void setVariables(final List<Variable> variables) {
 		this.variables = variables;
 	}
 
 	public VariableTypeList getVariableTypes() {
 		if (this.variableTypes == null) {
 			this.variableTypes = new VariableTypeList();
-			for (Variable variable : this.variables) {
+			for (final Variable variable : this.variables) {
 				this.variableTypes.add(variable.getVariableType());
 			}
 		}
@@ -72,7 +71,7 @@ public class VariableList implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("VariableList [variables=");
 		builder.append(this.variables);
 		builder.append("]");
@@ -87,16 +86,16 @@ public class VariableList implements Serializable {
 		return this;
 	}
 
-	public boolean containsValueByLocalName(String localName, String value) {
+	public boolean containsValueByLocalName(final String localName, final String value) {
 		boolean found = false;
-		Variable variable = this.findByLocalName(localName);
+		final Variable variable = this.findByLocalName(localName);
 		if (variable != null) {
 			found = this.strEquals(variable.getValue(), value);
 		}
 		return found;
 	}
 
-	private boolean strEquals(String s1, String s2) {
+	private boolean strEquals(final String s1, final String s2) {
 		if (s1 == null && s2 == null) {
 			return true;
 		}
@@ -109,9 +108,9 @@ public class VariableList implements Serializable {
 		return false;
 	}
 
-	public Variable findByLocalName(String localName) {
+	public Variable findByLocalName(final String localName) {
 		if (this.variables != null && localName != null) {
-			for (Variable variable : this.variables) {
+			for (final Variable variable : this.variables) {
 				if (localName.equalsIgnoreCase(variable.getVariableType().getLocalName())) {
 					return variable;
 				}
@@ -128,9 +127,9 @@ public class VariableList implements Serializable {
 		return this.variables == null || this.variables.isEmpty();
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		if (this.variables != null) {
-			for (Variable variable : this.variables) {
+			for (final Variable variable : this.variables) {
 				variable.print(indent);
 			}
 		}
