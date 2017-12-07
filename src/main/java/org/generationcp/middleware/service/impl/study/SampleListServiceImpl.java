@@ -11,7 +11,6 @@ import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -25,6 +24,7 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -100,8 +100,8 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(sampleListDTO.getListName().length()<100,"List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
 
-		if(StringUtils.isNotBlank(sampleListDTO.getDescription())){
-			Preconditions.checkArgument(sampleListDTO.getDescription().length()<255,"List Description must not exceed 255 characters");
+		if (StringUtils.isNotBlank(sampleListDTO.getDescription())) {
+			Preconditions.checkArgument(sampleListDTO.getDescription().length() < 255, "List Description must not exceed 255 characters");
 		}
 
 		try {
@@ -182,8 +182,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 			sampleList.setSamples(samples);
 			return this.sampleListDao.save(sampleList);
-		} catch (MiddlewareQueryException e) {
-			throw new MiddlewareException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
 	}
 
