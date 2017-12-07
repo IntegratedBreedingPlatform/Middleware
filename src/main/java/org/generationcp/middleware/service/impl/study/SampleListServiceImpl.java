@@ -60,8 +60,6 @@ public class SampleListServiceImpl implements SampleListService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-
-
 	public SampleListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sampleListDao = new SampleListDao();
 		this.sampleListDao.setSession(sessionProvider.getSession());
@@ -125,7 +123,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 			Preconditions.checkState(parent.isFolder(), "The parent id must not be a list");
 
-			if (this.sampleListDao.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId()) != null) {
+			if (null != this.sampleListDao
+				.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID())) {
 				throw new MiddlewareQueryException("List name should be unique within the same directory");
 			}
 
@@ -228,14 +227,13 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy, final String programUUID)
-		throws Exception {
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final User createdBy,
+		final String programUUID) {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
-		Preconditions.checkNotNull(createdBy);
+		Preconditions.checkNotNull(createdBy,"createdBy can not be empty");
 		Preconditions.checkNotNull(programUUID);
 		Preconditions.checkArgument(!folderName.isEmpty(), "folderName can not be empty");
-		Preconditions.checkArgument(!createdBy.isEmpty(), "createdBy can not be empty");
 		Preconditions.checkArgument(!programUUID.isEmpty(), "programUUID can not be empty");
 
 		final SampleList parentList;
@@ -246,26 +244,32 @@ public class SampleListServiceImpl implements SampleListService {
 
 		}
 		if (parentList == null) {
-			throw new Exception("Parent Folder does not exist");
+			Preconditions.checkArgument(false,"Parent Folder does not exist");
 		}
 
 		if (!parentList.isFolder()) {
-			throw new Exception("Specified parentID is not a folder");
+			Preconditions.checkArgument(false,"Specified parentID is not a folder");
 		}
 
-		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId()) != null) {
-			throw new Exception("Folder name should be unique within the same directory");
+		if (null != this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId(), programUUID)) {
+			Preconditions.checkArgument(false, "Folder name should be unique within the same directory");
 		}
-		final SampleList sampleFolder = new SampleList();
-		sampleFolder.setCreatedDate(new Date());
-		sampleFolder.setCreatedBy(this.userDao.getUserByUserName(createdBy));
-		sampleFolder.setDescription(null);
-		sampleFolder.setListName(folderName);
-		sampleFolder.setNotes(null);
-		sampleFolder.setHierarchy(parentList);
-		sampleFolder.setType(SampleListType.FOLDER);
-		sampleFolder.setProgramUUID(programUUID);
-		return this.sampleListDao.save(sampleFolder).getId();
+
+		try {
+			final SampleList sampleFolder = new SampleList();
+			sampleFolder.setCreatedDate(new Date());
+			sampleFolder.setCreatedBy(createdBy);
+			sampleFolder.setDescription(null);
+			sampleFolder.setListName(folderName);
+			sampleFolder.setNotes(null);
+			sampleFolder.setHierarchy(parentList);
+			sampleFolder.setType(SampleListType.FOLDER);
+			sampleFolder.setProgramUUID(programUUID);
+			return this.sampleListDao.save(sampleFolder).getId();
+
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in createSampleListFolder in SampleListServiceImpl: " + e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -278,7 +282,7 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @throws Exception
 	 */
 	@Override
-	public SampleList updateSampleListFolderName(final Integer folderId, final String newFolderName) throws Exception {
+	public SampleList updateSampleListFolderName(final Integer folderId, final String newFolderName) {
 		Preconditions.checkNotNull(folderId);
 		Preconditions.checkNotNull(newFolderName);
 		Preconditions.checkArgument(!newFolderName.isEmpty(), "newFolderName can not be empty");
@@ -286,24 +290,28 @@ public class SampleListServiceImpl implements SampleListService {
 		final SampleList folder = this.sampleListDao.getById(folderId);
 
 		if (folder == null) {
-			throw new Exception("Folder does not exist");
+			Preconditions.checkArgument(false, "Folder does not exist");
 		}
 
 		if (!SampleListType.FOLDER.equals(folder.getType())) {
-			throw new Exception("Specified folderID is not a folder");
+			Preconditions.checkArgument(false, "Specified folderID is not a folder");
 		}
 
 		if (folder.getHierarchy() == null) {
-			throw new Exception("Root folder name is not editable");
+			Preconditions.checkArgument(false, "Root folder name is not editable");
 		}
 
-		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId()) != null) {
-			throw new Exception("Folder name should be unique within the same directory");
+		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId(), folder.getProgramUUID())
+			!= null) {
+			Preconditions.checkArgument(false, "Folder name should be unique within the same directory");
 		}
 
 		folder.setListName(newFolderName);
-
-		return this.sampleListDao.saveOrUpdate(folder);
+		try {
+			return this.sampleListDao.saveOrUpdate(folder);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in updateSampleListFolderName in SampleListServiceImpl: " + e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -316,7 +324,7 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @return SampleList
 	 * @throws Exception
 	 */
-	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId) throws Exception {
+	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId) {
 		Preconditions.checkNotNull(sampleListId);
 		Preconditions.checkNotNull(newParentFolderId);
 		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), "Arguments can not have the same value");
@@ -324,11 +332,11 @@ public class SampleListServiceImpl implements SampleListService {
 		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
 
 		if (listToMove == null) {
-			throw new Exception("sampleList does not exist");
+			Preconditions.checkArgument(false,"sampleList does not exist");
 		}
 
 		if (listToMove.getHierarchy() == null) {
-			throw new Exception("Root folder can not me moved");
+			Preconditions.checkArgument(false,"Root folder can not me moved");
 		}
 
 		final SampleList newParentFolder;
@@ -340,27 +348,30 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (newParentFolder == null) {
-			throw new Exception("Specified newParentFolderId does not exist");
+			Preconditions.checkArgument(false,"Specified newParentFolderId does not exist");
 		}
 
 		if (!newParentFolder.isFolder()) {
-			throw new Exception("Specified newParentFolderId is not a folder");
+			Preconditions.checkArgument(false,"Specified newParentFolderId is not a folder");
 		}
 
 		final SampleList uniqueSampleListName =
-			this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
+			this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId,null);
 
 		if (uniqueSampleListName != null) {
-			throw new Exception("Folder name should be unique within the same directory");
+			Preconditions.checkArgument(false,"Folder name should be unique within the same directory");
 		}
 
 		if (isDescendant(listToMove, newParentFolder)) {
-			throw new Exception("You can not move list because are relatives with parent folder");
+			Preconditions.checkArgument(false,"You can not move list because are relatives with parent folder");
 		}
 
 		listToMove.setHierarchy(newParentFolder);
-
-		return this.sampleListDao.saveOrUpdate(listToMove);
+		try {
+			return this.sampleListDao.saveOrUpdate(listToMove);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in moveSampleList in SampleListServiceImpl: " + e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -371,23 +382,27 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @throws Exception
 	 */
 	@Override
-	public void deleteSampleListFolder(final Integer folderId) throws Exception {
+	public void deleteSampleListFolder(final Integer folderId) {
 		Preconditions.checkNotNull(folderId);
 		final SampleList folder = this.sampleListDao.getById(folderId);
 		if (folder == null) {
-			throw new Exception("Folder does not exist");
+			Preconditions.checkArgument(false, "Folder does not exist");
 		}
 		if (!folder.isFolder()) {
-			throw new Exception("Specified folderID is not a folder");
+			Preconditions.checkArgument(false, "Specified folderID is not a folder");
 		}
 
 		if (folder.getHierarchy() == null) {
-			throw new Exception("Root folder can not be deleted");
+			Preconditions.checkArgument(false, "Root folder can not be deleted");
 		}
 		if (folder.getChildren() != null && !folder.getChildren().isEmpty()) {
-			throw new Exception("Folder has children and cannot be deleted");
+			Preconditions.checkArgument(false, "Folder has children and cannot be deleted");
 		}
-		this.sampleListDao.makeTransient(folder);
+		try {
+			this.sampleListDao.makeTransient(folder);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in moveSampleList in SampleListServiceImpl: " + e.getMessage(), e);
+		}
 	}
 
 	@Override
