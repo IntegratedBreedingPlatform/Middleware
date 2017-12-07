@@ -76,7 +76,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		sampleList.setHierarchy(parent);
 		this.sampleListDao.save(sampleList);
 		final SampleList uSampleList = this.sampleListDao.getSampleListByParentAndName(sampleList.getListName(),
-				parent.getId());
+				parent.getId(),"c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 		Assert.assertEquals(sampleList.getId(), uSampleList.getId());
 		Assert.assertEquals(sampleList.getListName(), uSampleList.getListName());
 		Assert.assertEquals(sampleList.getDescription(), uSampleList.getDescription());
@@ -88,12 +88,12 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test(expected = NullPointerException.class)
 	public void testGetSampleListByParentAndNameNullSampleName() throws Exception {
-		this.sampleListDao.getSampleListByParentAndName(null, 1);
+		this.sampleListDao.getSampleListByParentAndName(null, 1,null);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testGetSampleListByParentAndNameNullParent() throws Exception {
-		this.sampleListDao.getSampleListByParentAndName("name", null);
+		this.sampleListDao.getSampleListByParentAndName("name", null,null);
 	}
 
 	@Test
