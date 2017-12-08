@@ -356,7 +356,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		final SampleList uniqueSampleListName =
-			this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId,null);
+			this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId, listToMove.getProgramUUID());
 
 		if (uniqueSampleListName != null) {
 			Preconditions.checkArgument(false,"Folder name should be unique within the same directory");
