@@ -423,7 +423,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 			if (locationId != null) {
 				query.append(" where l.locid = :id");
-				query.append(" AND province.locid = l.snl3id");
+				query.append(" AND province.locid = l.snl1id");
 
 				final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
 				sqlQuery.setParameter("id", locationId);
@@ -859,7 +859,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				.append(" ,location province ") //
 				.append(" WHERE (l.program_uuid = '").append(programUUID).append("'") //
 				.append(" or l.program_uuid is null) ") //
-				.append(" and province.locid = l.snl3id ");
+				.append(" and province.locid = l.snl1id ");
 
 			if (countryId != null) {
 				queryString.append(" AND c.cntryid = ");
@@ -922,7 +922,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ").append(" LEFT JOIN udflds ud on ud.fldno = l.ltype, ")
 					.append(" location province").append(createConditionWhereByFilter(filters));
 
-			sqlString.append(" and province.locid = l.snl3id ");
+			sqlString.append(" and province.locid = l.snl1id ");
 			sqlString.append(" ORDER BY l.locid ");
 
 			final SQLQuery query =
