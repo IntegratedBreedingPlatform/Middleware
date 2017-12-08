@@ -123,8 +123,10 @@ public class SampleListServiceImpl implements SampleListService {
 
 			Preconditions.checkState(parent.isFolder(), "The parent id must not be a list");
 
-			if (null != this.sampleListDao
-				.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID())) {
+			final SampleList uniqueSampleListName =
+				this.sampleListDao.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID());
+
+			if (uniqueSampleListName != null) {
 				throw new MiddlewareQueryException("List name should be unique within the same directory");
 			}
 
@@ -251,7 +253,10 @@ public class SampleListServiceImpl implements SampleListService {
 			Preconditions.checkArgument(false,"Specified parentID is not a folder");
 		}
 
-		if (null != this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId(), programUUID)) {
+		final SampleList uniqueSampleListName =
+			this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId(), programUUID);
+
+		if (uniqueSampleListName != null) {
 			Preconditions.checkArgument(false, "Folder name should be unique within the same directory");
 		}
 
@@ -301,8 +306,10 @@ public class SampleListServiceImpl implements SampleListService {
 			Preconditions.checkArgument(false, "Root folder name is not editable");
 		}
 
-		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId(), folder.getProgramUUID())
-			!= null) {
+		final SampleList uniqueSampleListName =
+			this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId(), folder.getProgramUUID());
+
+		if (uniqueSampleListName != null) {
 			Preconditions.checkArgument(false, "Folder name should be unique within the same directory");
 		}
 
