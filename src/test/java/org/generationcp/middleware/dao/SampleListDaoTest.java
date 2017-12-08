@@ -88,12 +88,12 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test(expected = NullPointerException.class)
 	public void testGetSampleListByParentAndNameNullSampleName() throws Exception {
-		this.sampleListDao.getSampleListByParentAndName(null, 1,null);
+		this.sampleListDao.getSampleListByParentAndName(null, 1,"c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testGetSampleListByParentAndNameNullParent() throws Exception {
-		this.sampleListDao.getSampleListByParentAndName("name", null,null);
+		this.sampleListDao.getSampleListByParentAndName("name", null,"c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 	}
 
 	@Test
