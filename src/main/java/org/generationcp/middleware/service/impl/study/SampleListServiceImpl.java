@@ -95,11 +95,12 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDTO.getListName().trim() != "", "The List Name must not be empty");
-		Preconditions.checkArgument(sampleListDTO.getListName().length()<100,"List Name must not exceed 100 characters");
+		Preconditions.checkArgument(sampleListDTO.getListName().length() <= 100, "List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
 
 		if (StringUtils.isNotBlank(sampleListDTO.getDescription())) {
-			Preconditions.checkArgument(sampleListDTO.getDescription().length() < 255, "List Description must not exceed 255 characters");
+			Preconditions
+				.checkArgument(sampleListDTO.getDescription().length() <= 255, "List Description must not exceed 255 " + "characters");
 		}
 
 		try {
@@ -123,8 +124,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 			Preconditions.checkState(parent.isFolder(), "The parent id must not be a list");
 
-			final SampleList uniqueSampleListName =
-				this.sampleListDao.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID());
+			final SampleList uniqueSampleListName = this.sampleListDao
+				.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID());
 
 			if (uniqueSampleListName != null) {
 				throw new MiddlewareQueryException("List name should be unique within the same directory");
