@@ -100,7 +100,12 @@ public class SampleListServiceImpl implements SampleListService {
 
 		if (StringUtils.isNotBlank(sampleListDTO.getDescription())) {
 			Preconditions
-				.checkArgument(sampleListDTO.getDescription().length() <= 255, "List Description must not exceed 255 " + "characters");
+				.checkArgument(sampleListDTO.getDescription().length() <= 255, "List Description must not exceed 255 characters");
+		}
+
+		if (StringUtils.isNotBlank(sampleListDTO.getNotes())) {
+			Preconditions
+				.checkArgument(sampleListDTO.getNotes().length() <= 65535 , "Notes must not exceed 65535 characters");
 		}
 
 		try {
