@@ -82,6 +82,13 @@ public interface GenotypicDataManager {
 	List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException;
 
 	/**
+	 * Get all the Germplasm names associated with a marker
+	 * @param markerId
+	 * @return
+	 */
+	List<Name> getGermplasmNamesByMarkerId(Integer markerId);
+
+	/**
 	 * Gets the Name record by the given name id.
 	 *
 	 * @param nId the name id to match
