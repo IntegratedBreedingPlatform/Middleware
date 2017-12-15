@@ -18,7 +18,6 @@ import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -125,14 +124,12 @@ public class SampleListServiceImpl implements SampleListService {
 				parent = this.sampleListDao.getParentSampleFolder(sampleListDTO.getParentId());
 			}
 
-			Preconditions.checkState(parent.isFolder(), "The parent id must not be a list");
+			Preconditions.checkArgument(parent.isFolder(), "The parent id must not be a list");
 
 			final SampleList uniqueSampleListName = this.sampleListDao.getSampleListByParentAndName(sampleListDTO.getListName(),
 					parent.getId(), sampleListDTO.getProgramUUID());
 
-			if (uniqueSampleListName != null) {
-				throw new MiddlewareQueryException("List name should be unique within the same directory");
-			}
+			Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 			sampleList.setHierarchy(parent);
 
@@ -251,20 +248,15 @@ public class SampleListServiceImpl implements SampleListService {
 			parentList = this.sampleListDao.getById(parentId);
 
 		}
-		if (parentList == null) {
-			throw new MiddlewareException("Parent Folder does not exist");
-		}
 
-		if (!parentList.isFolder()) {
-			throw new MiddlewareException("Specified parentID is not a folder");
-		}
+		Preconditions.checkArgument(parentList != null, "Parent Folder does not exist");
+		Preconditions.checkArgument(parentList.isFolder(), "Specified parentID is not a folder");
 
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId(), programUUID);
 
-		if (uniqueSampleListName != null) {
-			throw new MiddlewareException("Folder name should be unique within the same directory");
-		}
+		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
+
 		try {
 			final SampleList sampleFolder = new SampleList();
 			sampleFolder.setCreatedDate(new Date());
@@ -298,24 +290,14 @@ public class SampleListServiceImpl implements SampleListService {
 
 		final SampleList folder = this.sampleListDao.getById(folderId);
 
-		if (folder == null) {
-			throw new MiddlewareException("Folder does not exist");
-		}
-
-		if (!SampleListType.FOLDER.equals(folder.getType())) {
-			throw new MiddlewareException("Specified folderID is not a folder");
-		}
-
-		if (folder.getHierarchy() == null) {
-			throw new MiddlewareException("Root folder name is not editable");
-		}
+		Preconditions.checkArgument(folder != null, "Folder does not exist");
+		Preconditions.checkArgument(SampleListType.FOLDER.equals(folder.getType()), "Specified folderID is not a folder");
+		Preconditions.checkArgument(folder.getHierarchy() != null, "Root folder name is not editable");
 
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId(), folder.getProgramUUID());
 
-		if (uniqueSampleListName != null) {
-			throw new MiddlewareException("Folder name should be unique within the same directory");
-		}
+		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 		folder.setListName(newFolderName);
 		try {
@@ -343,13 +325,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
 
-		if (listToMove == null) {
-			throw new MiddlewareException("sampleList does not exist");
-		}
-
-		if (listToMove.getHierarchy() == null) {
-			throw new MiddlewareException("Root folder can not me moved");
-		}
+		Preconditions.checkArgument(listToMove != null, "sampleList does not exist");
+		Preconditions.checkArgument(listToMove.getHierarchy() != null, "Root folder can not me moved");
 
 		final SampleList newParentFolder;
 		if (0 == newParentFolderId) {
@@ -359,24 +336,15 @@ public class SampleListServiceImpl implements SampleListService {
 
 		}
 
-		if (newParentFolder == null) {
-			throw new MiddlewareException("Specified newParentFolderId does not exist");
-		}
-
-		if (!newParentFolder.isFolder()) {
-			throw new MiddlewareException("Specified newParentFolderId is not a folder");
-		}
+		Preconditions.checkArgument(newParentFolder != null, "Specified newParentFolderId does not exist");
+		Preconditions.checkArgument(newParentFolder.isFolder(), "Specified newParentFolderId is not a folder");
 
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId, listToMove.getProgramUUID());
 
-		if (uniqueSampleListName != null) {
-			throw new MiddlewareException("Folder name should be unique within the same directory");
-		}
-
-		if (this.isDescendant(listToMove, newParentFolder)) {
-			throw new MiddlewareException("You can not move list because are relatives with parent folder");
-		}
+		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
+		Preconditions.checkArgument(!this.isDescendant(listToMove, newParentFolder),
+				"You can not move list because are relatives with " + "parent folder");
 
 		listToMove.setHierarchy(newParentFolder);
 		try {
@@ -396,19 +364,13 @@ public class SampleListServiceImpl implements SampleListService {
 	public void deleteSampleListFolder(final Integer folderId) {
 		Preconditions.checkNotNull(folderId);
 		final SampleList folder = this.sampleListDao.getById(folderId);
-		if (folder == null) {
-			throw new MiddlewareException("Folder does not exist");
-		}
-		if (!folder.isFolder()) {
-			throw new MiddlewareException("Specified folderID is not a folder");
-		}
 
-		if (folder.getHierarchy() == null) {
-			throw new MiddlewareException("Root folder can not be deleted");
-		}
-		if (folder.getChildren() != null && !folder.getChildren().isEmpty()) {
-			throw new MiddlewareException("Folder has children and cannot be deleted");
-		}
+		Preconditions.checkArgument(folder != null, "Folder does not exist");
+		Preconditions.checkArgument(folder.isFolder(), "Specified folderID is not a folder");
+		Preconditions.checkArgument(folder.getHierarchy() != null, "Root folder can not be deleted");
+		Preconditions.checkArgument(folder.getChildren() == null || folder.getChildren().isEmpty(),
+				"Folder has children and cannot be deleted");
+
 		try {
 			this.sampleListDao.makeTransient(folder);
 		} catch (final HibernateException e) {
