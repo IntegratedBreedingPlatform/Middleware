@@ -114,6 +114,20 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 				studies.get(0).getName().startsWith(studyNameSearchKeyword));
 
 	}
+	
+	@Test
+	public void testGetStudiesByNameMatchesStartingWithWhenNameIsEmpty() {
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName("", 0, Integer.MAX_VALUE,
+				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
+		Assert.assertEquals("When study name is empty, STARTS WITH search should not return any record.", 0, studies.size());
+	}
+	
+	@Test
+	public void testGetStudiesByNameMatchesStartingWithWhenNameIsNull() {
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(null, 0, Integer.MAX_VALUE,
+				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
+		Assert.assertEquals("When study name is null, STARTS WITH search should not return any record.", 0, studies.size());
+	}
 
 	@Test
 	public void testGetStudiesByNameMatchesContaining() {
@@ -130,6 +144,20 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 			Assert.assertTrue("The returned Study name should contain " + studyNameSearchKeyword,
 					studyReference.getName().contains(studyNameSearchKeyword));
 		}
+	}
+	
+	@Test
+	public void testGetStudiesByNameMatchesContainingWhenNameIsEmpty() {
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName("", 0, Integer.MAX_VALUE,
+				StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
+		Assert.assertEquals("When study name is empty, CONTAINS search should not return any record.", 0, studies.size());
+	}
+	
+	@Test
+	public void testGetStudiesByNameMatchesContainingWhenNameIsNull() {
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(null, 0, Integer.MAX_VALUE,
+				StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
+		Assert.assertEquals("When study name is null, CONTAINS search should not return any record.", 0, studies.size());
 	}
 
 	@Test
@@ -182,6 +210,18 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID));
 
 	}
+	
+	@Test
+	public void testCountStudiesByNameMatchesStartingWithWhenNameIsEmpty() {
+		Assert.assertEquals("When study name is empty, STARTS WITH search should not return any record.", 0, this.studySearchDao.countStudiesByName("",
+				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID));
+	}
+	
+	@Test
+	public void testCountStudiesByNameMatchesStartingWithWhenNameIsNull() {
+		Assert.assertEquals("When study name is null, STARTS WITH search should not return any record.", 0, this.studySearchDao.countStudiesByName("",
+				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID));
+	}
 
 	@Test
 	public void testCountStudiesByNameMatchesContaining() {
@@ -192,6 +232,20 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 				this.studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_CONTAINING,
 						StudySearchDaoTest.PROGRAM_UUID));
 
+	}
+	
+	@Test
+	public void testCountStudiesByNameMatchesContainingWhenNameIsEmpty() {
+		Assert.assertEquals("When study name is empty, CONTAINS search should not return any record.", 0,
+				this.studySearchDao.countStudiesByName("", StudySearchMatchingOption.MATCHES_CONTAINING,
+						StudySearchDaoTest.PROGRAM_UUID));
+	}
+	
+	@Test
+	public void testCountStudiesByNameMatchesContainingWhenNameIsNull() {
+		Assert.assertEquals("When study name is null, CONTAINS search should not return any record.", 0,
+				this.studySearchDao.countStudiesByName(null, StudySearchMatchingOption.MATCHES_CONTAINING,
+						StudySearchDaoTest.PROGRAM_UUID));
 	}
 
 	@Test

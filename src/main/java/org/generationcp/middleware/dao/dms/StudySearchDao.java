@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -40,11 +41,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	private static final String UNION_DISTINCT = "  UNION DISTINCT";
 	private static final Logger LOG = LoggerFactory.getLogger(StudySearchDao.class);
 	private static final String NOT_IN_DELETED_STUDIES_QUERY = " AND p.deleted = 0 ";
-
+	
 	public long countStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption, final String programUUID) {
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select count(distinct p.project_id) " + this.getSearchByNameMainQuery(studySearchMatchingOption));
+					.createSQLQuery("select count(distinct p.project_id) " + this.getSearchByNameMainQuery(studySearchMatchingOption, name));
 
 			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
@@ -64,7 +65,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(
-					"select distinct p.project_id, p.name, p.description " + this.getSearchByNameMainQuery(studySearchMatchingOption));
+					"select distinct p.project_id, p.name, p.description " + this.getSearchByNameMainQuery(studySearchMatchingOption, name));
 
 			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
@@ -84,19 +85,19 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		return studyReferences;
 	}
 
-	private String getSearchByNameMainQuery(final StudySearchMatchingOption studySearchMatchingOption) {
+	private String getSearchByNameMainQuery(final StudySearchMatchingOption studySearchMatchingOption, final String name) {
 		return "from project p " + " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id" + " NOT IN ("
 				+ TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-				+ "where p.program_uuid = :programUUID AND p.name " + this.buildMatchCondition(studySearchMatchingOption)
+				+ "where p.program_uuid = :programUUID AND p.name " + this.buildMatchCondition(studySearchMatchingOption, name)
 				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
 
 	}
 
-	private String buildMatchCondition(final StudySearchMatchingOption studySearchMatchingOption) {
+	private String buildMatchCondition(final StudySearchMatchingOption studySearchMatchingOption, final String name) {
 
 		String condition = "";
 
-		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES) {
+		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES || name == null || name.isEmpty()) {
 			condition = "= :name";
 		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING
 				|| studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
