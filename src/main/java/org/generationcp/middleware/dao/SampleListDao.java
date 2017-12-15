@@ -64,10 +64,11 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	 *
 	 * @param sampleListName
 	 * @param parentId
+	 * @param programUUID
 	 * @return SampleList, null when not found
 	 * @throws Exception
 	 */
-	public SampleList getSampleListByParentAndName(final String sampleListName, final Integer parentId) {
+	public SampleList getSampleListByParentAndName(final String sampleListName, final Integer parentId, final String programUUID) {
 		Preconditions.checkNotNull(sampleListName);
 		Preconditions.checkNotNull(parentId);
 		try {
@@ -76,10 +77,11 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			final DetachedCriteria criteria = DetachedCriteria.forClass(SampleList.class);
 			criteria.add(Restrictions.eq(SampleListDao.LIST_NAME, sampleListName));
 			criteria.add(Restrictions.eq("hierarchy", parent));
+			criteria.add(Restrictions.eq(SampleListDao.PROGRAMUUID, programUUID));
 			return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 		} catch (final Exception e) {
-			final String message = "Error with getSampleListByParentAndName(sampleListName=" + sampleListName
-					+ ", parentId= " + parentId + " ) query from SampleList: " + e.getMessage();
+			final String message = "Error with getSampleListByParentAndName(sampleListName=" + sampleListName + ", parentId= " + parentId
+				+ " ) query from SampleList: " + e.getMessage();
 			SampleListDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message);
 		}

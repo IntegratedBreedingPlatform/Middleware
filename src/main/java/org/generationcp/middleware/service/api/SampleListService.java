@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.User;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,8 @@ public interface SampleListService {
 	 * @param createdBy
 	 * @param programUUID
 	 * @return SampleList (Saved Folder)
-	 * @throws Exception
 	 */
-	Integer createSampleListFolder(final String folderName, final Integer parentId,final String createdBy, final String programUUID) throws Exception;
+	Integer createSampleListFolder(final String folderName, final Integer parentId,final User createdBy, final String programUUID);
 
 	/**
 	 * Update sample list folder name
@@ -31,9 +31,8 @@ public interface SampleListService {
 	 * @param folderId
 	 * @param newFolderName
 	 * @return SampleList
-	 * @throws Exception
 	 */
-	SampleList updateSampleListFolderName(final Integer folderId, final String newFolderName) throws Exception;
+	SampleList updateSampleListFolderName(final Integer folderId, final String newFolderName);
 
 	/**
 	 * Move a folder to another folder
@@ -41,17 +40,15 @@ public interface SampleListService {
 	 * newParentFolderId folder must not contain another sample list or folder with the name that the one that needs to be moved
 	 * @param sampleListId
 	 * @param newParentFolderId
-	 * @throws Exception
 	 */
-	SampleList moveSampleList (final Integer sampleListId, final Integer newParentFolderId) throws Exception;
+	SampleList moveSampleList (final Integer sampleListId, final Integer newParentFolderId);
 
 	/**
 	 * Delete a folder
 	 * Folder ID must exist and it can not contain any child
 	 * @param folderId
-	 * @throws Exception
 	 */
-	void deleteSampleListFolder(final Integer folderId) throws Exception;
+	void deleteSampleListFolder(final Integer folderId);
 
 	List<SampleListDTO> getSampleLists(final Integer trialId);
 
