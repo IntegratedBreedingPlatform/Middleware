@@ -634,6 +634,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Target Project is not existing");
 		}
 
+		if (source.getProgramUUID() == null) {
+			throw new MiddlewareQueryException("Templates can't be moved");
+		}
+
 		try {
 
 			// disassociate the source project from any parent it had previously
