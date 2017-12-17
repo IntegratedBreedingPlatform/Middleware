@@ -5,6 +5,7 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
@@ -665,10 +666,7 @@ public class GermplasmGroupingServiceImplTest {
 		// Setup source germplasm which has SELHISFIX name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
-		final Name selHisFixNameOfParent = new Name(11);
-		selHisFixNameOfParent.setNstat(PREFERRED_CODE);
-		selHisFixNameOfParent.setNval("CML");
-		selHisFixNameOfParent.setTypeId(this.selHisFixNameCode.getFldno());
+		final Name selHisFixNameOfParent = NameTestDataInitializer.createName(11,  PREFERRED_CODE, "CML", this.selHisFixNameCode.getFldno());
 		advancedGermplasmSource.getNames().add(selHisFixNameOfParent);
 
 		// Setup advanced germplasm with a name given on advancing
@@ -676,10 +674,7 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid1(1);
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
-		final Name normalAdvancingNameOfChild = new Name(22);
-		normalAdvancingNameOfChild.setNstat(PREFERRED_CODE);
-		normalAdvancingNameOfChild.setNval("CML-1-1-1");
-		normalAdvancingNameOfChild.setTypeId(5);
+		final Name normalAdvancingNameOfChild = NameTestDataInitializer.createName(22,  PREFERRED_CODE, "CML-1-1-1", 5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Setup parent child relationship mock between the two via gpid2
@@ -700,10 +695,7 @@ public class GermplasmGroupingServiceImplTest {
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
-		final Name code1 = new Name(12);
-		code1.setNstat(NON_PREFERRED_CODE);
-		code1.setNval("CODE1");
-		code1.setTypeId(this.codedName1.getFldno());
+		final Name code1 = NameTestDataInitializer.createName(12,  NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
 		advancedGermplasmSource.getNames().add(code1);
 
 		// Setup advanced germplasm with a name given on advancing
@@ -732,22 +724,13 @@ public class GermplasmGroupingServiceImplTest {
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
-		final Name code1 = new Name(12);
-		code1.setNstat(NON_PREFERRED_CODE);
-		code1.setNval("CODE1");
-		code1.setTypeId(this.codedName1.getFldno());
+		final Name code1 = NameTestDataInitializer.createName(12,  NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
 		advancedGermplasmSource.getNames().add(code1);
 
-		final Name code2 = new Name(12);
-		code2.setNstat(NON_PREFERRED_CODE);
-		code2.setNval("CODE2");
-		code2.setTypeId(this.codedName2.getFldno());
+		final Name code2 = NameTestDataInitializer.createName(12,  NON_PREFERRED_CODE, "CODE2", this.codedName2.getFldno());
 		advancedGermplasmSource.getNames().add(code2);
 
-		final Name code3 = new Name(12);
-		code3.setNstat(NON_PREFERRED_CODE);
-		code3.setNval("CODE3");
-		code3.setTypeId(this.codedName3.getFldno());
+		final Name code3 = NameTestDataInitializer.createName(12,  NON_PREFERRED_CODE, "CODE3", this.codedName3.getFldno()); 
 		advancedGermplasmSource.getNames().add(code3);
 
 		// Setup advanced germplasm with a name given on advancing
