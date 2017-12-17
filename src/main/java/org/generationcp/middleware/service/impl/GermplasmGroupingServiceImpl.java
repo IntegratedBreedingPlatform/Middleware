@@ -246,13 +246,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 		return selectionHistoryNameType;
 	}
-
+	
 	@Override
-	public void copyCodedNames(final Germplasm germplasm) {
-		final Germplasm parent = this.germplasmDAO.getById(germplasm.getGpid2());
-		this.copyCodedName(germplasm, this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.CODED_NAME_1));
-		this.copyCodedName(germplasm, this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.CODED_NAME_2));
-		this.copyCodedName(germplasm, this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.CODED_NAME_3));
+	public void copyCodedNames(final Germplasm germplasm, final Germplasm sourceGermplasm) {
+		this.copyCodedName(germplasm, this.getSelectionHistory(sourceGermplasm, GermplasmGroupingServiceImpl.CODED_NAME_1));
+		this.copyCodedName(germplasm, this.getSelectionHistory(sourceGermplasm, GermplasmGroupingServiceImpl.CODED_NAME_2));
+		this.copyCodedName(germplasm, this.getSelectionHistory(sourceGermplasm, GermplasmGroupingServiceImpl.CODED_NAME_3));
 	}
 
 	private void copyCodedName(final Germplasm germplasm, final Name codedName) {
@@ -401,8 +400,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 							LOG.info("Assigning mgid {} from the oldest previous cross (gid {}).", oldestPreviousCrossWithMGID.getMgid(),
 									oldestPreviousCrossWithMGID.getGid());
 							cross.setMgid(oldestPreviousCrossWithMGID.getMgid());
-							// TODO extend to include coded names as well.
 							this.copySelectionHistoryForCross(cross, oldestPreviousCrossWithMGID);
+							this.copyCodedNames(cross, oldestPreviousCrossWithMGID);
 						} else {
 							LOG.info(
 									"Previous crosses exist but there is none with MGID. Starting a new group with mgid = gid of current cross.");

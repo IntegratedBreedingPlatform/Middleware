@@ -695,7 +695,7 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testCopyCodedNames() {
+	public void testCopyCodedNamesFromParent() {
 
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
@@ -717,11 +717,8 @@ public class GermplasmGroupingServiceImplTest {
 		normalAdvancingNameOfChild.setTypeId(5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
-		// Setup parent child relationship mock between the two via gpid2
-		Mockito.when(this.germplasmDAO.getById(advancedGermplasm.getGpid2())).thenReturn(advancedGermplasmSource);
-
 		// Invoke the service
-		this.germplasmGroupingService.copyCodedNames(advancedGermplasm);
+		this.germplasmGroupingService.copyCodedNames(advancedGermplasm, advancedGermplasmSource);
 
 		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
@@ -730,7 +727,7 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testCopyCodedNamesPriorityForSettingPreferredName() {
+	public void testCopyCodedNamesFromParentPriorityForSettingPreferredName() {
 
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
@@ -764,11 +761,8 @@ public class GermplasmGroupingServiceImplTest {
 		normalAdvancingNameOfChild.setTypeId(5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
-		// Setup parent child relationship mock between the two via gpid2
-		Mockito.when(this.germplasmDAO.getById(advancedGermplasm.getGpid2())).thenReturn(advancedGermplasmSource);
-
 		// Invoke the service
-		this.germplasmGroupingService.copyCodedNames(advancedGermplasm);
+		this.germplasmGroupingService.copyCodedNames(advancedGermplasm, advancedGermplasmSource);
 
 		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 4,
