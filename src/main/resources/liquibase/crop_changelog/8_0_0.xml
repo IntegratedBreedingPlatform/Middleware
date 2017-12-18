@@ -70,10 +70,11 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>
+			BMS-4468 (7_1_0.xml) should have also removed ACTIVE_STUDY(12960) from projectprop
+			We remove all STUDY_STATUS(8006) here
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			# BMS-4468 (7_1_0.xml) should have also removed ACTIVE_STUDY(12960) from projectprop
-			# We remove all STUDY_STATUS(8006) here
-
 			DELETE
 			FROM projectprop
 			WHERE variable_id = 8006;
