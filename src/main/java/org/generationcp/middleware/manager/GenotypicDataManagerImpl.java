@@ -121,6 +121,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
+	public List<Name> getGermplasmNamesByMarkerId(final Integer markerId) {
+		return this.getDatasetDao().getGermplasmNamesByMarkerId(markerId);
+	}
+
+	@Override
 	public Name getNameByNameId(Integer nId) throws MiddlewareQueryException {
 		return this.getNameDao().getNameByNameId(nId);
 	}

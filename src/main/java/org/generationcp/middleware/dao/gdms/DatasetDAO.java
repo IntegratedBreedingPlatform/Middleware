@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.hibernate.Criteria;
@@ -23,6 +24,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +64,27 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	private static final String COUNT_DATASET_NAMES_BY_QTL_ID =
 			"SELECT COUNT(DISTINCT CONCAT(dataset_name,'')) " + "FROM gdms_dataset gd " + "INNER JOIN "
 					+ "gdms_qtl gq ON gd.dataset_id = gq.dataset_id " + "WHERE gq.qtl_id = :qtlId ";
+
+	private static final String GET_GERMPLASM_NAMES_BY_MARKER_ID = "SELECT DISTINCT "
+		+ " n.nid nid,"
+		+ " n.gid germplasmId,"
+		+ " n.ntype typeId,"
+		+ " n.nstat nstat,"
+		+ " n.nuid userId,"
+		+ " n.nval nval,"
+		+ " n.nlocn locationId,"
+		+ " n.ndate ndate,"
+		+ " n.nref referenceId"
+		+ " FROM gdms_char_values gcv "
+		+ "   INNER JOIN sample s ON gcv.sample_id = s.sample_id "
+		+ "   INNER JOIN plant p ON s.plant_id = p.plant_id "
+		+ "   INNER JOIN nd_experiment nde ON p.nd_experiment_id = nde.nd_experiment_id "
+		+ "   INNER JOIN nd_experiment_stock ndes ON nde.nd_experiment_id = ndes.nd_experiment_id "
+		+ "   INNER JOIN stock st ON ndes.stock_id = st.stock_id "
+		+ "   INNER JOIN germplsm g ON g.gid = st.dbxref_id "
+		+ "   INNER JOIN names n ON n.gid = g.gid AND n.nstat = 1 "
+		+ " WHERE gcv.marker_id = :markerId "
+		+ " ORDER BY n.nval";
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatasetDAO.class);
 
@@ -258,4 +281,27 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
+	public List<Name> getGermplasmNamesByMarkerId(final Integer markerId) {
+		try {
+			if (markerId != null) {
+				Query query = this.getSession().createSQLQuery(DatasetDAO.GET_GERMPLASM_NAMES_BY_MARKER_ID)
+					.addScalar("nid")
+					.addScalar("germplasmId")
+					.addScalar("typeId")
+					.addScalar("nstat")
+					.addScalar("userId")
+					.addScalar("nval")
+					.addScalar("locationId")
+					.addScalar("ndate")
+					.addScalar("referenceId");
+				query.setParameter("markerId", markerId);
+				query.setResultTransformer(Transformers.aliasToBean(Name.class));
+				return query.list();
+			}
+			return new ArrayList<>();
+		} catch (HibernateException e) {
+			DatasetDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
 }

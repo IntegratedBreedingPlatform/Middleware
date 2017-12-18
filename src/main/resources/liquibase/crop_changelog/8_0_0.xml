@@ -6,6 +6,60 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+	<changeSet author="cuenyad" id="v8.0.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'sample_list'
+						AND COLUMN_NAME = 'description'
+						AND COLUMN_TYPE='varchar(45)'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list CHANGE COLUMN description description  VARCHAR(255) NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v8.0.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'sample_list'
+						AND COLUMN_NAME = 'notes'
+						AND COLUMN_TYPE='varchar(45)'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list CHANGE COLUMN notes notes TEXT NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v8.0.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+					WHERE
+					TABLE_NAME = 'sample_list'
+					AND CONSTRAINT_NAME = 'list_name_UNIQUE'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>update list_name_UNIQUE TABLE_CONSTRAINTS ADDING program_uuid</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list
+			DROP INDEX list_name_UNIQUE ,
+			ADD UNIQUE INDEX list_name_UNIQUE (list_name ASC, type ASC, hierarchy ASC, program_uuid ASC);
+		</sql>
+	</changeSet>
+
 	<changeSet author="nahuel" id="v8.0.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
