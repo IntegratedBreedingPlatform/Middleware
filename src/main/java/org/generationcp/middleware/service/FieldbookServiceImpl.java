@@ -460,7 +460,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
-						this.germplasmGroupingService.copyCodedNames(germplasm);
+						this.germplasmGroupingService.copyCodedNames(germplasm, this.getGermplasmDao().getById(germplasm.getGpid2()));
 					}
 
 					// set Lgid to GID if it's value was not set previously
