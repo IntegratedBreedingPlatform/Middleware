@@ -743,7 +743,7 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testCopyCodedNamesFromParent() {
+	public void testCopyCodedNames() {
 
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
@@ -757,10 +757,8 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid1(1);
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
-		final Name normalAdvancingNameOfChild = new Name(22);
-		normalAdvancingNameOfChild.setNstat(GermplasmGroupingServiceImplTest.PREFERRED_CODE);
-		normalAdvancingNameOfChild.setNval("CML-1-1-1");
-		normalAdvancingNameOfChild.setTypeId(5);
+		final Name normalAdvancingNameOfChild = NameTestDataInitializer.createName(22,
+				GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Invoke the service
@@ -775,7 +773,7 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testCopyCodedNamesFromParentPriorityForSettingPreferredName() {
+	public void testCopyCodedNamesPriorityForSettingPreferredName() {
 
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
@@ -797,10 +795,8 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid1(1);
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
-		final Name normalAdvancingNameOfChild = new Name(22);
-		normalAdvancingNameOfChild.setNstat(GermplasmGroupingServiceImplTest.PREFERRED_CODE);
-		normalAdvancingNameOfChild.setNval("CML-1-1-1");
-		normalAdvancingNameOfChild.setTypeId(5);
+		final Name normalAdvancingNameOfChild = NameTestDataInitializer.createName(22,
+				GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Invoke the service
