@@ -281,7 +281,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	private String stringify(final List<Integer> locationIds) {
-		final StringBuffer ids = new StringBuffer();
+		final StringBuilder ids = new StringBuilder();
 		boolean first = true;
 		for (final Integer locId : locationIds) {
 			if (!first) {

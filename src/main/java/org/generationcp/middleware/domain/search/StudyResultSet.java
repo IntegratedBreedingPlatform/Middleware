@@ -12,13 +12,12 @@
 package org.generationcp.middleware.domain.search;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 public interface StudyResultSet {
 
 	boolean hasMore();
 
-	StudyReference next() throws MiddlewareQueryException;
+	StudyReference next();
 
 	long size();
 }
