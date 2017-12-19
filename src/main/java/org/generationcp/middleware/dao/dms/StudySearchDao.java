@@ -59,6 +59,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		finalStudies.addAll(studiesMatchedByLocation);
 		finalStudies.addAll(studiesMatchedBySeason);
 		
+		// Get intersection of all search results
 		if (studyName != null && !studyName.isEmpty()) {
 			finalStudies.retainAll(studiesMatchedByName);
 		}
@@ -73,22 +74,6 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return finalStudies;
 		
-	}
-	public long countStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption, final String programUUID) {
-		try {
-			final SQLQuery query = this.getSession()
-					.createSQLQuery("select count(distinct p.project_id) " + this.getSearchByNameMainQuery(studySearchMatchingOption, name));
-
-			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
-			this.assignNameParameter(studySearchMatchingOption, query, name);
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			final String message = "Error in countStudiesByName=" + name + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
-			StudySearchDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -153,29 +138,6 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public long countStudiesByStartDate(final int startDate, final String programUUID) {
-		try {
-			String dateString = String.valueOf(startDate);
-			// pad LIKE wildcard characters
-			if (dateString.length() == 4) { // only year specified
-				dateString += "____";
-			} else if (dateString.length() == 6) { // only month and year
-				dateString += "__";
-			}
-			final SQLQuery query =
-					this.getSession().createSQLQuery("select count(distinct p.project_id) " + this.getSearchByStartDateMainQuery());
-
-			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
-			query.setParameter("compareDate", dateString);
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			final String message = "Error in countStudiesByStartDate=" + startDate + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
-			StudySearchDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<StudyReference> getStudiesByStartDate(final Integer startDate, final String programUUID) {
 
@@ -216,34 +178,6 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 				+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.variable_id = "
 				+ TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
 				+ "	WHERE p.program_uuid = :programUUID " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
-	}
-
-	public long countStudiesBySeason(final Season season, final String programUUID) {
-		try {
-			int valueId = 0;
-			if (season == Season.DRY) {
-				valueId = TermId.SEASON_DRY.getId();
-			} else if (season == Season.WET) {
-				valueId = TermId.SEASON_WET.getId();
-			}
-
-			if (valueId != 0) {
-				final SQLQuery query = this.getSession()
-						.createSQLQuery("SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id"
-								+ this.getSearchBySeasonAtEnvironmentLevelMainQuery() + StudySearchDao.UNION_DISTINCT
-								+ "  SELECT DISTINCT p.project_id " + this.getSearchBySeasonAtStudyLevelMainQuery() + ") projectlist");
-
-				query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
-				query.setParameter("seasonId", valueId);
-				return ((BigInteger) query.uniqueResult()).longValue();
-			}
-
-		} catch (final HibernateException e) {
-			final String message = "Error in countStudiesBySeason=" + season + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
-			StudySearchDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -299,22 +233,6 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.variable_id = "
 				+ TermId.SEASON_VAR.getId() + "  " + "WHERE  p.program_uuid = :programUUID AND pp.value = :seasonId "
 				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
-	}
-
-	public long countStudiesByLocationIds(final List<Integer> locationIds, final String programUUID) {
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id "
-					+ this.getSearchByLocationAtEnvironmentLevelMainQuery(locationIds) + StudySearchDao.UNION_DISTINCT
-					+ "  SELECT DISTINCT p.project_id " + this.getSearchByLocationAtStudyLevelMainQuery(locationIds) + ") locationList;");
-
-			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			final String message = "Error in countStudiesByLocationIds=" + locationIds + " in StudyDao: " + e.getMessage();
-			StudySearchDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
 	}
 
 	@SuppressWarnings("unchecked")

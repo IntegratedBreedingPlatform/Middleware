@@ -27,9 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class StudySearchDaoTest extends IntegrationTestBase {
 
-	private static final String TEST_STUDY_TO_DELETE = "TEST STUDY TO DELETE";
-	public static final int NO_OF_DRY_SEASON_STUDIES = 3;
-	public static final int NO_OF_WET_SEASON_STUDIES = 1;
 	public static final String TEST_TRIAL_NAME_1 = "1 Test Trial Sample";
 	public static final String TEST_TRIAL_NAME_2 = "2 Test Trial Sample";
 	public static final String TEST_TRIAL_NAME_3 = "3 Test Trial Sample";
@@ -56,21 +53,16 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	private FieldbookService fieldbookService;
 
 	private final String cropPrefix = "ABCD";
-
-	private long numberOfDrySeasonBeforeCreatingTestData = 0;
-	private long numberOfWetSeasoBeforeCreatingTestData = 0;
-
-	private Integer idOfTrialToDelete;
+	
+	private List<StudyReference> dryStudies = new ArrayList<>();
+	private List<StudyReference> wetStudies = new ArrayList<>();
+	
 
 	@Before
 	public void init() throws Exception {
 
 		this.studySearchDao = new StudySearchDao();
 		this.studySearchDao.setSession(this.sessionProvder.getSession());
-
-		this.numberOfDrySeasonBeforeCreatingTestData =
-				this.studySearchDao.countStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID);
-		this.numberOfWetSeasoBeforeCreatingTestData = this.studySearchDao.countStudiesBySeason(Season.WET, StudySearchDaoTest.PROGRAM_UUID);
 
 		this.createTestStudies();
 	}
@@ -172,121 +164,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudiesByNameNoMatch() {
-
-		final String studyNameSearchKeyword = "TestTrialSample";
-
-		Assert.assertEquals("No studies should be found, study count should be zero.", 0, this.studySearchDao
-				.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-
-	@Test
-	public void testCountStudiesByNameExactMatches() {
-
-		final String studyNameSearchKeyword = "1 Test Trial Sample";
-
-		Assert.assertEquals("Study count should be one.", 1, this.studySearchDao.countStudiesByName(studyNameSearchKeyword,
-				StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-
-	@Test
-	public void testCountStudiesByNameMatchesStartingWith() {
-
-		final String studyNameSearchKeyword = "1 Test";
-
-		Assert.assertEquals("Study count should be one.", 1, this.studySearchDao.countStudiesByName(studyNameSearchKeyword,
-				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-	
-	@Test
-	public void testCountStudiesByNameMatchesStartingWithWhenNameIsEmpty() {
-		Assert.assertEquals("When study name is empty, STARTS WITH search should not return any record.", 0, this.studySearchDao.countStudiesByName("",
-				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID));
-	}
-	
-	@Test
-	public void testCountStudiesByNameMatchesStartingWithWhenNameIsNull() {
-		Assert.assertEquals("When study name is null, STARTS WITH search should not return any record.", 0, this.studySearchDao.countStudiesByName("",
-				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID));
-	}
-
-	@Test
-	public void testCountStudiesByNameMatchesContaining() {
-
-		final String studyNameSearchKeyword = "Test Trial Sample";
-
-		Assert.assertEquals("Study count should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES, StudySearchDaoTest.NO_OF_TEST_STUDIES,
-				this.studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_CONTAINING,
-						StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-	
-	@Test
-	public void testCountStudiesByNameMatchesContainingWhenNameIsEmpty() {
-		Assert.assertEquals("When study name is empty, CONTAINS search should not return any record.", 0,
-				this.studySearchDao.countStudiesByName("", StudySearchMatchingOption.MATCHES_CONTAINING,
-						StudySearchDaoTest.PROGRAM_UUID));
-	}
-	
-	@Test
-	public void testCountStudiesByNameMatchesContainingWhenNameIsNull() {
-		Assert.assertEquals("When study name is null, CONTAINS search should not return any record.", 0,
-				this.studySearchDao.countStudiesByName(null, StudySearchMatchingOption.MATCHES_CONTAINING,
-						StudySearchDaoTest.PROGRAM_UUID));
-	}
-
-	@Test
-	public void testCountStudiesByNameExcludingDeletedStudies() throws Exception {
-		this.addStudyForDeletion();
-		final String studyNameSearchKeyword = "DELETE";
-		final long previousCount = this.studySearchDao.countStudiesByName(studyNameSearchKeyword,
-				StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
-		Assert.assertEquals("There should be 1 study with name containing " + studyNameSearchKeyword, 1, previousCount);
-
-		// Delete test study
-		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
-		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
-		flush();
-
-		Assert.assertEquals("Study count should be " + (previousCount - 1), previousCount - 1, this.studySearchDao
-				.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID));
-	}
-
-	@Test
-	public void testCountStudiesByLocationIds() {
-
-		final List<Integer> locationIds = new ArrayList<>();
-		locationIds.add(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID);
-
-		Assert.assertEquals("There should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES + " studies that are in Luxembourg",
-				StudySearchDaoTest.NO_OF_TEST_STUDIES,
-				this.studySearchDao.countStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-
-	@Test
-	public void testCountStudiesByLocationIdsExcludingDeletedStudies() throws Exception {
-		this.addStudyForDeletion();
-
-		final List<Integer> locationIds = new ArrayList<>();
-		locationIds.add(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID);
-		final long previousCount = this.studySearchDao.countStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID);
-		Assert.assertEquals("There should be " + (StudySearchDaoTest.NO_OF_TEST_STUDIES + 1) + " studies that are in Luxembourg",
-				StudySearchDaoTest.NO_OF_TEST_STUDIES + 1, previousCount);
-
-		// Delete test study
-		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
-		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
-		flush();
-
-		Assert.assertEquals("Study count should be " + (previousCount - 1), previousCount - 1,
-				this.studySearchDao.countStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID));
-	}
-
-	@Test
 	public void testGetStudiesByLocationIds() {
 
 		final List<Integer> locationIds = new ArrayList<>();
@@ -328,74 +205,28 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudiesBySeason() {
-
-		final long expectedActualDrySeasonCount =
-				this.numberOfDrySeasonBeforeCreatingTestData + StudySearchDaoTest.NO_OF_DRY_SEASON_STUDIES;
-		final long expectedActualWetSeasonCount = this.numberOfWetSeasoBeforeCreatingTestData + StudySearchDaoTest.NO_OF_WET_SEASON_STUDIES;
-
-		Assert.assertEquals(expectedActualDrySeasonCount,
-				this.studySearchDao.countStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID));
-		Assert.assertEquals(expectedActualWetSeasonCount,
-				this.studySearchDao.countStudiesBySeason(Season.WET, StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-
-	@Test
-	public void testCountStudiesBySeasonExcludingDeletedstudies() throws Exception {
-		this.addStudyForDeletion();
-
-		// +1 in dry season count for added study for deletion
-		final long previousDrySeasonCount = this.numberOfDrySeasonBeforeCreatingTestData + StudySearchDaoTest.NO_OF_DRY_SEASON_STUDIES + 1;
-		Assert.assertEquals(previousDrySeasonCount, this.studySearchDao.countStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID));
-
-		// Delete test study
-		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
-		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
-		flush();
-
-		Assert.assertEquals("Study count should be " + (previousDrySeasonCount - 1), previousDrySeasonCount - 1,
-				this.studySearchDao.countStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID));
-	}
-
-	@Test
 	public void testGetStudiesBySeason() {
-
-		final long expectedActualDrySeasonCount =
-				this.numberOfDrySeasonBeforeCreatingTestData + StudySearchDaoTest.NO_OF_DRY_SEASON_STUDIES;
-		final long expectedActualWetSeasonCount = this.numberOfWetSeasoBeforeCreatingTestData + StudySearchDaoTest.NO_OF_WET_SEASON_STUDIES;
 
 		final List<StudyReference> drySeasonStudyReferences =
 				this.studySearchDao.getStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID);
 		final List<StudyReference> wetSeasonStudyReferences =
 				this.studySearchDao.getStudiesBySeason(Season.WET, StudySearchDaoTest.PROGRAM_UUID);
 
-		Assert.assertEquals(expectedActualDrySeasonCount, drySeasonStudyReferences.size());
-		Assert.assertEquals(expectedActualWetSeasonCount, wetSeasonStudyReferences.size());
-
-		final List<String> drySeasonStudyNames = new ArrayList<>();
-		for (final StudyReference studyReference : drySeasonStudyReferences) {
-			drySeasonStudyNames.add(studyReference.getName());
+		for (final StudyReference study : this.dryStudies) {
+			Assert.assertTrue(drySeasonStudyReferences.contains(study));
 		}
-		final List<String> wetSeasonStudyNames = new ArrayList<>();
-		for (final StudyReference studyReference : wetSeasonStudyReferences) {
-			wetSeasonStudyNames.add(studyReference.getName());
+		
+		for (final StudyReference study : this.wetStudies) {
+			Assert.assertTrue(wetSeasonStudyReferences.contains(study));
 		}
-
-		Assert.assertTrue(StudySearchDaoTest.TEST_TRIAL_NAME_1 + " should be in Dry Season study list",
-				drySeasonStudyNames.contains(StudySearchDaoTest.TEST_TRIAL_NAME_1));
-		Assert.assertTrue(StudySearchDaoTest.TEST_TRIAL_NAME_3 + " should be in Dry Season study list",
-				drySeasonStudyNames.contains(StudySearchDaoTest.TEST_TRIAL_NAME_3));
-		Assert.assertTrue(StudySearchDaoTest.TEST_TRIAL_NAME_2 + " should be in Wet Season study list",
-				wetSeasonStudyNames.contains(StudySearchDaoTest.TEST_TRIAL_NAME_2));
 
 	}
 
 	@Test
 	public void testGetStudiesBySeasonExcludingDeletedStudies() throws UnpermittedDeletionException {
 
-		final long previousDrySeasonCount = this.numberOfDrySeasonBeforeCreatingTestData + StudySearchDaoTest.NO_OF_DRY_SEASON_STUDIES;
-
+		final long previousDrySeasonCount = this.dryStudies.size();
+		
 		List<StudyReference> drySeasonStudyReferences =
 				this.studySearchDao.getStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals(previousDrySeasonCount, drySeasonStudyReferences.size());
@@ -417,35 +248,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudiesByStartDate() {
-
-		Assert.assertEquals("There should be 3 studies created in the year 2020", 3,
-				this.studySearchDao.countStudiesByStartDate(2020, StudySearchDaoTest.PROGRAM_UUID));
-		Assert.assertEquals("There should be 2 studies created in January 2020 ", 2,
-				this.studySearchDao.countStudiesByStartDate(202001, StudySearchDaoTest.PROGRAM_UUID));
-		Assert.assertEquals("There should be 1 study created in December 1 2020 ", 1,
-				this.studySearchDao.countStudiesByStartDate(20201201, StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-
-	@Test
-	public void testCountStudiesByStartDateExcludingDeletedStudies() throws Exception {
-		this.addStudyForDeletion();
-
-		final long previousCount = this.studySearchDao.countStudiesByStartDate(2017, StudySearchDaoTest.PROGRAM_UUID);
-		Assert.assertEquals("There should be 1 study created in the year 2017", 1, previousCount);
-
-		// Delete test study
-		final Integer userId = this.fieldbookService.getStudy(this.idOfTrialToDelete).getUser();
-		this.fieldbookService.deleteStudy(this.idOfTrialToDelete, userId);
-		flush();
-
-		Assert.assertEquals("Study count should be " + (previousCount - 1), previousCount - 1,
-				this.studySearchDao.countStudiesByStartDate(2017, StudySearchDaoTest.PROGRAM_UUID));
-
-	}
-
-	@Test
 	public void testGetStudiesByStartDate() {
 
 		Assert.assertEquals("There should be 3 studies created in Year 2020", 3,
@@ -457,23 +259,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		Assert.assertEquals(StudySearchDaoTest.TEST_TRIAL_NAME_3, studies.get(0).getName());
 
-	}
-
-	@Test
-	public void testGetStudiesByStartDateExcludingDeletedStudies() throws UnpermittedDeletionException {
-		List<StudyReference> studies =
-				this.studySearchDao.getStudiesByStartDate(20201201, StudySearchDaoTest.PROGRAM_UUID);
-		Assert.assertEquals("There should be 1 study created in December 1 2020", 3,
-				this.studySearchDao.countStudiesByStartDate(2020, StudySearchDaoTest.PROGRAM_UUID));
-
-		// Delete test study
-		final StudyReference study = studies.get(0);
-		this.fieldbookService.deleteStudy(study.getId(), this.fieldbookService.getStudy(study.getId()).getUser());
-		flush();
-
-		// Check that deleted study is not retrieved
-		studies = this.studySearchDao.getStudiesByStartDate(20201201, StudySearchDaoTest.PROGRAM_UUID);
-		Assert.assertEquals("Deleted study should not be returned. ", 0, studies.size());
 	}
 
 	private void flush() {
@@ -498,42 +283,26 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());
+		this.dryStudies.add(studyReference1);
 
 		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_2, StudyType.T,
 				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference2.getId());
+		this.wetStudies.add(studyReference2);
 
 		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_3, StudyType.T,
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference3.getId());
+		this.dryStudies.add(studyReference3);
 
 		// This study has season and location variables at environment level
 		final StudyReference studyReference4 =
 				studyTestDataInitializer.addTestStudy(StudyType.T, StudySearchDaoTest.TEST_TRIAL_NAME_4, this.cropPrefix);
 		studyTestDataInitializer.addEnvironmentDataset(studyReference4.getId(),
 				String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), String.valueOf(TermId.SEASON_DRY.getId()));
-	}
-
-	private void addStudyForDeletion() throws Exception {
-
-		final WorkbenchTestDataUtil workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-		final Project project = workbenchTestDataUtil.createTestProjectData();
-		project.setUniqueID(StudySearchDaoTest.PROGRAM_UUID);
-
-		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl();
-		studyDataManager.setSessionProvider(this.sessionProvder);
-
-		final StudyTestDataInitializer studyTestDataInitializer =
-				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager);
-
-		// We need to add datasets to studies because search queries expect "Belongs to Study" record in project_relationship
-		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_TO_DELETE, StudyType.T,
-				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20170101",
-				this.cropPrefix);
-		studyTestDataInitializer.addTestDataset(studyReference1.getId());
-		this.idOfTrialToDelete = studyReference1.getId();
+		this.dryStudies.add(studyReference4);
 	}
 
 }
