@@ -11,9 +11,10 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -53,7 +54,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyReference> studiesMatchedBySeason = this.getStudiesBySeason(season, filter.getProgramUUID());
 		
 		
-		final List<StudyReference> finalStudies = new ArrayList<>();
+		final Set<StudyReference> finalStudies = new HashSet<>();
 		finalStudies.addAll(studiesMatchedByName);
 		finalStudies.addAll(studiesMatchedByDate);
 		finalStudies.addAll(studiesMatchedByLocation);
@@ -72,7 +73,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		if (season != null) {
 			finalStudies.retainAll(studiesMatchedBySeason);
 		}
-		return finalStudies;
+		return new ArrayList<>(finalStudies);
 		
 	}
 
