@@ -33,7 +33,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 
 		this.locationIds = this.getLocationIds(filter.getCountry());
 		this.index = 0;
-		
+
 		this.searchStudiesMatchingFilter(filter);
 	}
 
@@ -45,12 +45,11 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		}
 		return locationIds;
 	}
-	
+
 	private void searchStudiesMatchingFilter(final BrowseStudyQueryFilter filter) {
-		this.studyReferences  = this.getStudySearchDao().searchStudies(filter, this.locationIds);
+		this.studyReferences = this.getStudySearchDao().searchStudies(filter, this.locationIds);
 		this.size = this.studyReferences.size();
 	}
-	
 
 	@Override
 	public boolean hasMore() {
