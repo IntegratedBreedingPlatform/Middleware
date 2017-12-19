@@ -10,6 +10,7 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -23,6 +24,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +127,13 @@ public class SampleServiceImpl implements SampleService {
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
 
+			for (final AccMetadataSet accMetadataSet : sample.getAccMetadataSets()) {
+				final SampleDTO.Dataset dataset = new SampleDTO().new Dataset();
+				dataset.setName(accMetadataSet.getDataset().getDatasetName());
+				dataset.setDatasetId(accMetadataSet.getDataset().getDatasetId());
+				dto.getDatasets().add(dataset);
+			}
+
 			listSampleDto.add(dto);
 		}
 		return listSampleDto;
@@ -225,5 +234,10 @@ public class SampleServiceImpl implements SampleService {
 				foundPlotNumber = true;
 			}
 		}
+	}
+
+	@Override
+	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid) {
+		return this.sampleDao.getByGid(gid);
 	}
 }

@@ -1,18 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
-
-import java.io.Serializable;
-import java.util.Comparator;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -23,11 +19,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * POJO for location details query.
  *
- * select locid, lname as location_name, c.isofull as country_full_name, labbr as location_abbreviation, ud.fname as location_type, ud.fdesc
+ * select locid, lname as location_name, c.isofull as country_full_name, l.labbr as location_abbreviation, ud.fname as location_type, ud.fdesc
  * as location_description from location l inner join cntry c on l.cntryid = c.cntryid inner join udflds ud on ud.fldno = l.ltype where
  * locid = 1
  *
@@ -45,6 +43,19 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	public static final String GET_ALL = "getAllLocation";
 	public static final String COUNT_ALL = "countAllLocation";
+
+	public static final Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
+
+		@Override
+		public int compare(LocationDetails location1, LocationDetails location2) {
+			String locationName1 = location1.getLocationName().toUpperCase();
+			String locationName2 = location2.getLocationName().toUpperCase();
+
+			// ascending order
+			return locationName1.compareTo(locationName2);
+		}
+
+	};
 
 	@Id
 	@Basic(optional = false)
@@ -91,6 +102,18 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	@Column(name = "altitude")
 	private Double altitude;
 
+	@Basic(optional = true)
+	@Column(name = "program_uuid")
+	private String programUUID;
+
+	@Basic(optional = true)
+	@Column(name = "cntry_name")
+	private String countryName;
+
+	@Basic(optional = true)
+	@Column(name = "province_name")
+	private String provinceName;
+
 	public LocationDetails() {
 	}
 
@@ -98,8 +121,8 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		this.locid = locid;
 	}
 
-	public LocationDetails(Integer locid, String locationName, String countryFullName, String locationAbbreviation,
-			String locationType, String locationDescription) {
+	public LocationDetails(Integer locid, String locationName, String countryFullName, String locationAbbreviation, String locationType,
+			String locationDescription) {
 		super();
 		this.locid = locid;
 		this.locationName = locationName;
@@ -235,24 +258,11 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.locationName.compareTo(compareName);
 	}
 
-	public static Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
-
-		@Override
-		public int compare(LocationDetails location1, LocationDetails location2) {
-			String locationName1 = location1.getLocationName().toUpperCase();
-			String locationName2 = location2.getLocationName().toUpperCase();
-
-			// ascending order
-			return locationName1.compareTo(locationName2);
-		}
-
-	};
-
 	public Integer getCntryid() {
 		return this.cntryid;
 	}
 
-	public void setCntryid(Integer cntryid) {
+	public void setCntryid(final Integer cntryid) {
 		this.cntryid = cntryid;
 	}
 
@@ -260,7 +270,31 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.ltype;
 	}
 
-	public void setLtype(Integer ltype) {
+	public void setLtype(final Integer ltype) {
 		this.ltype = ltype;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
+	}
+
+	public String getProvinceName() {
+		return provinceName;
+	}
+
+	public void setProvinceName(final String provinceName) {
+		this.provinceName = provinceName;
+	}
+
+	public String getCountryName() {
+		return countryName;
+	}
+
+	public void setCountryName(final String countryName) {
+		this.countryName = countryName;
 	}
 }

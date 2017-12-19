@@ -35,21 +35,18 @@ public class StudySaver extends Saver {
 	 * and nd_experiment_project tables if saveStudyExperiment is true.
 	 */
 	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, boolean saveStudyExperiment,
-		final String programUUID, final String cropPrefix, final StudyType studyType) throws Exception {
+		final String programUUID, final String cropPrefix, final StudyType studyType, final String description) throws Exception {
 
 		DmsProject project = null;
-		try {
-			project = this.getProjectSaver().create(studyValues, studyType);
-			project.setProgramUUID(programUUID);
 
-			project = this.getProjectSaver().save(project);
-			this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
-			this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
-			if (saveStudyExperiment) {
-				this.saveStudyExperiment(project.getProjectId(), studyValues, cropPrefix);
-			}
-		} catch (Exception e) {
-			throw e;
+		project = this.getProjectSaver().create(studyValues, studyType, description);
+		project.setProgramUUID(programUUID);
+
+		project = this.getProjectSaver().save(project);
+		this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
+		this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
+		if (saveStudyExperiment) {
+			this.saveStudyExperiment(project.getProjectId(), studyValues, cropPrefix);
 		}
 		return project;
 

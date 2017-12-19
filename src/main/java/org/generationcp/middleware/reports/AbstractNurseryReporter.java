@@ -31,8 +31,8 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 
 		entries = ((Collection<MeasurementRow>) args.get(DATA_SOURCE_KEY)).toArray(entries);
 
-		final int firstEntry = Integer.valueOf(entries[0].getMeasurementData(TermId.ENTRY_NO.getId()).getValue());
-		final int lastEntry = Integer.valueOf(entries[entries.length - 1].getMeasurementData(TermId.ENTRY_NO.getId()).getValue());
+		final int firstEntry = Integer.parseInt(entries[0].getMeasurementData(TermId.ENTRY_NO.getId()).getValue());
+		final int lastEntry = Integer.parseInt(entries[entries.length - 1].getMeasurementData(TermId.ENTRY_NO.getId()).getValue());
 		final int offset = firstEntry - 1;
 
 		params.put("tid", args.get("studyId"));
@@ -42,7 +42,7 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 		params.put(PROGRAM_NAME_REPORT_KEY, args.get(PROGRAM_NAME_ARG_KEY));
 
 		for (final MeasurementVariable var : studyConditions) {
-			parameterMapper.mapBasicStudyValues(var, params, var.getValue());
+			parameterMapper.mapBasicStudyValues(var, params);
 
             parameterMapper.mapEnvironmentValue(var, params, var.getValue());
 		}
@@ -83,6 +83,8 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 						break;
 					case "PLOT_NO":
 						entry.setPlot(Integer.valueOf(dataItem.getValue()));
+						break;
+					default:
 						break;
 				}
 			}

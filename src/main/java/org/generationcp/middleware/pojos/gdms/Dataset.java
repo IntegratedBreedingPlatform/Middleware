@@ -94,7 +94,7 @@ public class Dataset implements Serializable {
 	@Column(name = "purpose_of_study")
 	private String purposeOfStudy;
 
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "dataset")
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "dataset", fetch = FetchType.LAZY)
 	private DatasetUsers datasetUsers;
 
 	@OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

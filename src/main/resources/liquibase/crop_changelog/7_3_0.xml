@@ -1,0 +1,43 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+	<changeSet author="vanina" id="v7.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="projectprop_study_title_bkp"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+
+			CREATE TABLE projectprop_study_title_bkp (
+			  projectprop_id INT(11) NOT NULL AUTO_INCREMENT,
+			  project_id     INT(11) NOT NULL,
+			  type_id        INT(11) NOT NULL,
+			  value          VARCHAR(255)     DEFAULT NULL,
+			  rank           INT(11) NOT NULL DEFAULT '0',
+			  variable_id    INT(11) NOT NULL,
+			  alias          VARCHAR(255)     DEFAULT NULL,
+			  PRIMARY KEY (projectprop_id),
+			  UNIQUE KEY projectprop_idx1  (project_id, type_id, rank, variable_id)
+			);
+
+			INSERT INTO projectprop_study_title_bkp (SELECT *
+			                                         FROM projectprop
+			                                         WHERE variable_id = 8007);
+
+			DELETE FROM projectprop
+			WHERE variable_id = 8007;
+			DELETE FROM cvterm_relationship
+			WHERE subject_id = 8007;
+			DELETE FROM cvterm
+			WHERE cvterm_id = 8007;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

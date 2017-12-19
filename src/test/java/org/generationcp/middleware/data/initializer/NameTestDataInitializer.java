@@ -31,8 +31,17 @@ public class NameTestDataInitializer {
 	public static List<Name> createNameList(final int count) {
 		final List<Name> names = new ArrayList<>();
 		for (int i = 1; i <= count; i++) {
-			names.add(createName(0, "DRVNM " + i));
+			names.add(NameTestDataInitializer.createName(0, "DRVNM " + i));
 		}
 		return names;
+	}
+
+	public static Name createName(final Integer nid, final Integer nstat, final String nval, final Integer typeId) {
+		final Name name = new Name();
+		name.setNid(nid);
+		name.setNstat(nstat);
+		name.setNval(nval);
+		name.setTypeId(typeId);
+		return name;
 	}
 }

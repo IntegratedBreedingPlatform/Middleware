@@ -39,6 +39,7 @@ public class SampleDetailsDTO implements Serializable {
 	private String displayDate;
 	private String entryNumber;
 	private String plotNumber;
+	private Integer sampleEntryNo;
 
 	public SampleDetailsDTO() {
 
@@ -112,13 +113,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public void setTakenBy(final String takenBy) {
-		if(takenBy != null) {
-			this.takenBy = takenBy;
-		}
-		else {
-			this.takenBy = "-";
-		}
-
+		this.takenBy = takenBy != null ? takenBy : "-";
 	}
 
 	public Date getSampleDate() {
@@ -127,12 +122,7 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setSampleDate(final Date sampleDate) {
 		this.sampleDate = sampleDate;
-		if (sampleDate != null) {
-			this.displayDate = dateFormat.format(sampleDate);
-		}
-		else{
-			this.displayDate = "-";
-		}
+		this.displayDate = sampleDate != null ? dateFormat.format(sampleDate) : "-";
 	}
 
 	public String getSampleType() {
@@ -276,5 +266,13 @@ public class SampleDetailsDTO implements Serializable {
 
 	public String getDisplayDate() {
 		return displayDate;
+	}
+
+	public Integer getSampleEntryNo() {
+		return sampleEntryNo;
+	}
+
+	public void setSampleEntryNo(final Integer sampleEntryNo) {
+		this.sampleEntryNo = sampleEntryNo;
 	}
 }

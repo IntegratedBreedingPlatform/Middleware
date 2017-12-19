@@ -241,7 +241,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		studyDetails.setStudyType(StudyType.N);
 		studyDetails.setStudyName("Test Nursery " + randomInt);
 		studyDetails.setObjective(studyDetails.getStudyName() + " Objective");
-		studyDetails.setTitle(studyDetails.getStudyName() + " Description");
+		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setStartDate("20151001");
 		studyDetails.setEndDate("20151031");
 		studyDetails.setParentFolderId(1);
@@ -262,11 +262,6 @@ public class DataSetupTest extends IntegrationTestBase {
 		conditions.add(this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME",
 				"Study - assigned (DBCV)", DataSetupTest.PROP_STUDY, DataSetupTest.ASSIGNED, DataSetupTest.DBCV,
 				DataSetupTest.CHAR, studyDetails.getStudyName(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
-
-		conditions.add(this.createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE",
-				"Study title - assigned (text)", DataSetupTest.PROP_STUDY_TITLE, DataSetupTest.ASSIGNED,
-				DataSetupTest.SCALE_TEXT, DataSetupTest.CHAR, studyDetails.getTitle(), DataSetupTest.STUDY,
-				PhenotypicType.STUDY, true));
 
 		conditions.add(
 				this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
@@ -400,7 +395,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		Assert.assertNotNull(nurseryStudyDetails.getId());
 
 		Assert.assertEquals(studyDetails.getStudyName(), nurseryStudyDetails.getStudyName());
-		Assert.assertEquals(studyDetails.getTitle(), nurseryStudyDetails.getTitle());
+		Assert.assertEquals(studyDetails.getDescription(), nurseryStudyDetails.getDescription());
 		Assert.assertEquals(studyDetails.getObjective(), nurseryStudyDetails.getObjective());
 		Assert.assertEquals(studyDetails.getStartDate(), nurseryStudyDetails.getStartDate());
 		Assert.assertEquals(studyDetails.getEndDate(), nurseryStudyDetails.getEndDate());

@@ -19,6 +19,7 @@ import java.util.Comparator;
  *
  * @author Mark Agarrado
  */
+//FIXME should be replaced by CharValueElement wherever is used in GDMS
 public class AllelicValueElement implements Serializable {
 
 	private static final long serialVersionUID = 1L;

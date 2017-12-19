@@ -46,6 +46,8 @@ public class ObservationDto {
 	private final List<MeasurementDto> variableMeasurements;
 
 	private final List<Pair<String, String>> additionalGermplasmDescriptors = new ArrayList<>();
+	
+	private final List<Pair<String, String>> additionalDesignFactors = new ArrayList<>();
 
 	private transient int hashCode;
 
@@ -65,13 +67,13 @@ public class ObservationDto {
 		this.variableMeasurements = variableMeasurements;
 	}
 
-	public ObservationDto(Integer measurementId, String designation, List<MeasurementDto> variableResults) {
+	public ObservationDto(Integer measurementId, String designation, List<MeasurementDto> variableResults, Integer gid) {
 		this.measurementId = measurementId;
 		this.designation = designation;
 		this.variableMeasurements = variableResults;
 		this.trialInstance = null;
 		this.entryType = null;
-		this.gid = null;
+		this.gid = gid;
 		this.entryNo = null;
 		this.entryCode = null;
 		this.repetionNumber = null;
@@ -150,9 +152,17 @@ public class ObservationDto {
 	public void additionalGermplasmDescriptor(final String name, final String value) {
 		this.additionalGermplasmDescriptors.add(new ImmutablePair<String, String>(name, value));
 	}
-
+	
 	public List<Pair<String, String>> getAdditionalGermplasmDescriptors() {
 		return this.additionalGermplasmDescriptors;
+	}
+	
+	public void additionalDesignFactor(final String name, final String value) {
+		this.additionalDesignFactors.add(new ImmutablePair<String, String>(name, value));
+	}
+
+	public List<Pair<String, String>> getAdditionalDesignFactors() {
+		return this.additionalDesignFactors;
 	}
 
 	@Override

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
@@ -18,7 +18,6 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -36,14 +35,14 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 
 /**
  * This is the API for retrieving Germplasm information.
- * 
+ *
  */
 public interface GermplasmDataManager {
 
 	/**
 	 * Searches for all germplasm records which matches the given name. It will match records having the following names: (1) the given name
 	 * as it is, (2) the name with standardization performed on it, and (3) name with spaces removed.
-	 * 
+	 *
 	 * @param name - search string for the name of the germplasm
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
@@ -55,7 +54,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Returns the number of germplasm records with any name matching the given parameter. It will count records having the following names:
 	 * (1) the given name as it is, (2) the name with standardization performed on it, and (3) name with spaces removed.
-	 * 
+	 *
 	 * @param name - search string for the name of the germplasm
 	 * @param op - can be EQUAL OR LIKE
 	 * @return number of germplasm records
@@ -64,7 +63,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the germplasm records that were created at the locations with names matching the given parameter.
-	 * 
+	 *
 	 * @param name - search string for the name of the locations
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
@@ -75,7 +74,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the number of germplasm records that were created at the locations with names matching the given parameter.
-	 * 
+	 *
 	 * @param name - search string for the name of the locations
 	 * @param op - can be EQUAL like LIKE
 	 * @return Number of Germplasms
@@ -84,9 +83,9 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Please use LocationDataManager.getAllCountry().
-	 * 
+	 *
 	 * Returns all country records.
-	 * 
+	 *
 	 * @return List of Location POJOs
 	 * @deprecated
 	 */
@@ -95,7 +94,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Retrieves all the Germplasm entries
-	 * 
+	 *
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return All the germplasms from the database instance satisfying the start and numOfRows parameters
@@ -104,7 +103,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the germplasm records that were created by the methods with names matching the given parameter.
-	 * 
+	 *
 	 * @param name - search string for the name of the methods
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
@@ -115,7 +114,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the number of germplasm records that were created by methods with names matching the given parameter.
-	 * 
+	 *
 	 * @param name - search string for the name of the methods
 	 * @param op - can be equal or like
 	 * @return number of germplasm records
@@ -124,7 +123,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the germplasm record identified by the given id.
-	 * 
+	 *
 	 * @param gid - id of the germplasm record to be retrieved
 	 * @return the Germplasm POJO representing the record
 	 */
@@ -132,7 +131,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its preferred name.
-	 * 
+	 *
 	 * @param gid - the id of the germplasm record to be retrieved
 	 * @return the Germplasm POJO representing the record
 	 */
@@ -141,7 +140,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its preferred name and preferred
 	 * abbreviation.
-	 * 
+	 *
 	 * @param gid - the id of the germplasm record to be retrieved
 	 * @return the Germplasm POJO representing the record
 	 */
@@ -149,7 +148,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the Name record identified by the given id.
-	 * 
+	 *
 	 * @param id - id of the name record
 	 * @return the Name POJO representing the record
 	 */
@@ -157,13 +156,13 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the names of the Germplasm identified by the gid parameter.
-	 * 
+	 *
 	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included in the
 	 * result.
-	 * 
+	 *
 	 * Results may also be filtered by type. The enum GermplasmNameType is used to specify the type of names to be included in the result.
 	 * If the given type is null, all names will be included in the result.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm
 	 * @param status - may be used to filter the results
 	 * @param type - may be used to filter the results
@@ -173,12 +172,12 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the names of the Germplasm identified by the gid parameter.
-	 * 
+	 *
 	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included except
 	 * deleted names
-	 * 
+	 *
 	 * Results may also be filtered by type list. These must be valid integer values
-	 * 
+	 *
 	 * @param gid the germplasm identifier
 	 * @param status the name status used to filter the results
 	 * @param type the type used to filter the results
@@ -188,7 +187,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the preferred name of the Germplasm identified by the gid parameter.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm
 	 * @return {@code Name} POJO of the Germplasm's preferred name. Returns
 	 */
@@ -196,7 +195,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the preferred abbreviation of the Germplasm identified by the gid parameter.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm
 	 * @return {@code Name} POJO of the Germplasm's preferred abbreviation. Returns {@code null} when no preferred abbreviation is found.
 	 */
@@ -204,7 +203,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the preferred ID of the Germplasm identified by the gid parameter.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm
 	 * @return {@code Name} POJO of the Germplasm's preferred ID. Returns {@code null} when no preferred ID is found.
 	 */
@@ -212,7 +211,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns a list of preferred IDs of the Germplasms associated with the Germplasm List identified by the listId parameter.
-	 * 
+	 *
 	 * @param listId - id of the Germplasm List
 	 * @return {@code Name} A list of POJOs of the Germplasms' preferred IDs. Returns an empty list when no preferred ID is found.
 	 */
@@ -220,7 +219,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the value (NVAL field) of preferred name of the Germplasm identified by the gid parameter.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm
 	 * @return Germplasm's preferred name as string. Returns
 	 */
@@ -228,7 +227,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the matching {@code Name} object given a Germplasm ID and a Name value.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm
 	 * @param nval - value of the Name to search
 	 * @param mode - can be normal, spaces removed, name standardized
@@ -238,7 +237,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Sets the specified Name as the specified Germplasm's new preferred Name.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm to be updated
 	 * @param newPrefName - new name to set as the preferred name
 	 * @return Returns the id of the updated {@code Germplasm} record
@@ -247,7 +246,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Sets the specified Abbreviation as the specified Germplasm's new preferred Abbreviation.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm to be updated
 	 * @param newPrefAbbrev - new abbreviation to set as the preferred abbreviation
 	 * @return Returns the id of the updated {@code Germplasm} record
@@ -256,7 +255,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Inserts a single {@code Name} object into the database.
-	 * 
+	 *
 	 * @param name - The {@code Name} object to be persisted to the database. Must be a valid {@code Name} object.
 	 * @return Returns the id of the newly-added Germplasm {@code Name}.
 	 */
@@ -264,7 +263,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Inserts a list of multiple {@code Name} objects into the database.
-	 * 
+	 *
 	 * @param names - A list of {@code Name} objects to be persisted to the database. {@code Name} objects must be valid.
 	 * @return Returns the id of the newly-added Germplasm {@code Name}s.
 	 */
@@ -272,7 +271,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Updates a single {@code Name} object in the database.
-	 * 
+	 *
 	 * @param name - The {@code Name} object to be updated in the database. Must be a valid {@code Name} object.
 	 * @return Returns the id of the updated Germplasm {@code Name}.
 	 */
@@ -280,22 +279,22 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Updates the database with multiple {@code Name} objects specified.
-	 * 
+	 *
 	 * @param names - A list of {@code Name} objects to be updated in the database. {@code Name} objects must be valid.
 	 * @return Returns the id of the updated Germplasm {@code Name}s.
 	 */
 	List<Integer> updateGermplasmName(List<Name> names);
-	
+
 	/**
 	 * Returns all the available attribute types
-	 * 
+	 *
 	 * @return List of UserDefinedField POJOs that contains all the attribute types
 	 */
 	List<UserDefinedField> getAllAttributesTypes();
 
 	/**
 	 * Returns all the attributes of the Germplasm identified by the given id.
-	 * 
+	 *
 	 * @param gid - id of the Germplasm
 	 * @return List of Atributs POJOs
 	 */
@@ -303,7 +302,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the list of attribute types identified by the given list of gids.
-	 * 
+	 *
 	 * @param gidList - list of GIDs
 	 * @return List of UserDefinedField POJOs that contains the attribute types and names for the given GIDs.
 	 */
@@ -311,7 +310,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns a Map of GIDs to the attribute values given an attribute type and a list of GIDs.
-	 * 
+	 *
 	 * @param attributeType - attribute type of the values to retrieve
 	 * @param gidList - list of GIDs
 	 * @return Map<Integer, String> - map of gids to their corresponding attribute values for the specified attribute type
@@ -320,7 +319,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the Method record identified by the id.
-	 * 
+	 *
 	 * @param id - id of the method record
 	 * @return the Method POJO representing the record
 	 */
@@ -328,21 +327,21 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method records.
-	 * 
+	 *
 	 * @return List of Method POJOs
 	 */
 	List<Method> getAllMethods();
 
 	/**
 	 * Returns all the method records ordered by method name.
-	 * 
+	 *
 	 * @return List of Method POJOs
 	 */
 	List<Method> getAllMethodsOrderByMname();
 
 	/**
 	 * Validates the naming rules configuration for the selected breeding method
-	 * 
+	 *
 	 * @param breedingMethod
 	 * @return true if the configurarion is present in the DB
 	 */
@@ -350,7 +349,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method records.
-	 * 
+	 *
 	 * @param programUUID - unique id of the current program
 	 * @return List of Method POJOs
 	 */
@@ -358,7 +357,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the number of Methods with type matching the given parameter. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param programUUID - unique id of the current program
 	 * @return Number of Methods matching the given type
 	 */
@@ -366,21 +365,21 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the all methods not generative.
-	 * 
+	 *
 	 * @return the all methods not generative
 	 */
 	List<Method> getAllMethodsNotGenerative();
 
 	/**
 	 * Returns count of all the method records.
-	 * 
+	 *
 	 * @return count of methods
 	 */
 	long countAllMethods();
 
 	/**
 	 * Returns all the method records matching the given type. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param type the type of the method
 	 * @return List of Method POJOs
 	 */
@@ -388,7 +387,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method records matching the given type. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param type the type of the method
 	 * @param programUUID - unique id of the current program
 	 * @return List of Method POJOs
@@ -397,7 +396,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the number of Methods with type matching the given parameter. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param type - search string for the methods
 	 * @param programUUID - unique id of the current program
 	 * @return Number of Methods matching the given type
@@ -407,7 +406,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Returns all the method records matching the given group and the methods having the 'G' group. Retrieves from both local and central
 	 * databases.
-	 * 
+	 *
 	 * @param group the group of the method
 	 * @return List of Method POJOs
 	 */
@@ -415,7 +414,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method records matching the given type. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param type the type of the method
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
@@ -425,7 +424,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the number of Methods with type matching the given parameter. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param type - search string for the methods
 	 * @return Number of Methods matching the given type
 	 */
@@ -433,7 +432,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method records matching the given group. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param group the group of the method
 	 * @return List of Method POJOs
 	 */
@@ -441,7 +440,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method records matching the given group. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param group the group of the method
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
@@ -451,7 +450,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method and type records matching the given group and type. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param group the group of the method
 	 * @param type the type of the method
 	 * @return List of Method POJOs
@@ -460,7 +459,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the method and type records matching the given group, type and name. Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param group the group of the method
 	 * @param type the type of the method
 	 * @param name the name of the method
@@ -470,9 +469,9 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the number of Methods with group matching the given parameter.
-	 * 
+	 *
 	 * Retrieves from both local and central databases.
-	 * 
+	 *
 	 * @param group - search string for the methods
 	 * @return Number of Methods matching the given group
 	 */
@@ -480,14 +479,14 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets list of cvterm records which are possible values of method classes.
-	 * 
+	 *
 	 * @return the method classes
 	 */
 	List<Term> getMethodClasses();
 
 	/**
 	 * Returns the udfld record identified by the given id.
-	 * 
+	 *
 	 * @param id - the id of the udfld record
 	 * @return the Udflds POJO representing the record
 	 */
@@ -495,7 +494,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the udfld records identified by the given tablename.
-	 * 
+	 *
 	 * @param tableName - the value of the ftable record
 	 * @param fieldType - the value of the ftype record
 	 * @return the Udflds POJO representing the record
@@ -504,16 +503,16 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Return the UserDefinedField using local field no
-	 * 
+	 *
 	 * @return
 	 */
 	UserDefinedField getUserDefinedFieldByLocalFieldNo(Integer lfldno);
 
 	/**
 	 * Please use LocationDataManager.getCountryById().
-	 * 
+	 *
 	 * Returns the country record identified by the given id.
-	 * 
+	 *
 	 * @param id - id of the country record
 	 * @return the Country POJO representing the record
 	 * @deprecated
@@ -523,9 +522,9 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Please use LocationDataManager.getLocationById().
-	 * 
+	 *
 	 * Returns the location record identified by the given id.
-	 * 
+	 *
 	 * @param id - id of the location record
 	 * @return the Location POJO representing the record
 	 * @deprecated
@@ -535,16 +534,16 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Updates the {@code Method} object into the database.
-	 * 
+	 *
 	 * @param method - The {@code Method} object to be persisted to the database. Must be a valid {@code Method} object.
 	 * @return Returns the updated {@code Method} record
-	 * 
+	 *
 	 */
 	Method editMethod(Method method);
 
 	/**
 	 * Inserts a single {@code Method} object into the database.
-	 * 
+	 *
 	 * @param method - The {@code Method} object to be persisted to the database. Must be a valid {@code Method} object.
 	 * @return Returns the id of the {@code Method} record inserted in the database.
 	 */
@@ -552,7 +551,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Inserts a list of {@code Method} objects into the database.
-	 * 
+	 *
 	 * @param methods - The list of {@code Method} objects to be persisted to the database. Must be valid {@code Method} objects.
 	 * @return Returns the ids of the {@code Method} records inserted in the database.
 	 */
@@ -560,14 +559,14 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Deletes a single {@code Method} object into the database.
-	 * 
+	 *
 	 * @param method - The {@code Method} object to be deleted from the database. Must be a valid {@code Method} object.
 	 */
 	void deleteMethod(Method method);
 
 	/**
 	 * Returns the Bibref record identified by the given id.
-	 * 
+	 *
 	 * @param id - id of the bibref record
 	 * @return the Bibref POJO representing the record
 	 */
@@ -575,7 +574,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Inserts a single {@code Bibref} (Bibliographic Reference) object into the database.
-	 * 
+	 *
 	 * @param bibref - The {@code Bibref} object to be persisted to the database. Must be a valid {@code Bibref} object.
 	 * @return Returns the id of the {@code Bibref} record inserted in the database.
 	 */
@@ -583,7 +582,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Stores in the database the given valid Attribute object.
-	 * 
+	 *
 	 * @param attribute the attribute
 	 * @return the id of {@code Attribute} records stored in the database
 	 */
@@ -591,7 +590,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Stores in the database all the given valid Attributes object contained in the parameter.
-	 * 
+	 *
 	 * @param attributes - List of Attribute objects
 	 * @return the ids of the Attribute records stored in the database
 	 */
@@ -599,7 +598,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a valid Attribute object, update the corresponding record in the database.
-	 * 
+	 *
 	 * @param attribute the attribute
 	 * @return Returns the id of the updated Germplasm {@code Attribute} record
 	 */
@@ -607,7 +606,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a List of valid Attribute objects, update their corresponding records in the database.
-	 * 
+	 *
 	 * @param attributes - List of Attribute objects
 	 * @return Returns the ids of the updated Germplasm {@code Attribute} record
 	 */
@@ -615,7 +614,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the attribute record identified by the given id.
-	 * 
+	 *
 	 * @param id the id
 	 * @return The attribute record corresponding to the given id.
 	 */
@@ -624,11 +623,11 @@ public interface GermplasmDataManager {
 	/**
 	 * Given the gid of the child germplasm, the gid of the parent germplasm and the progenitor number, this method makes the necessary
 	 * changes to save the relationship on the database.
-	 * 
+	 *
 	 * This method will either update the Germplasm record, to change the gpid1 or gpid2 fields (if the progenitor number given is 1 or 2),
 	 * or will either add or update the Progenitor record which represents this relationship. A new Progenitor record will be stored when
 	 * necessary.
-	 * 
+	 *
 	 * @param gid the gid
 	 * @param progenitorId the progenitor id
 	 * @param progenitorNumber the progenitor number
@@ -638,7 +637,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a valid Germplasm object, update the corresponding record in the database.
-	 * 
+	 *
 	 * @param germplasm the germplasm
 	 * @return Returns the id of the updated {@code Germplasm} record
 	 */
@@ -646,7 +645,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a List of valid Germplasm objects, update the corresponding records in the database.
-	 * 
+	 *
 	 * @param germplasms the germplasms
 	 * @return Returns the ids of the updated {@code Germplasm} records
 	 */
@@ -655,7 +654,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Given a valid Germplasm object with a matching valid Name object to be set as its preferred name, add a new Germplasm record and a
 	 * new Name record for the given parameters.
-	 * 
+	 *
 	 * @param germplasm the germplasm
 	 * @param preferredName the preferred name
 	 * @return the id of the {@code Germplasm} record added
@@ -664,12 +663,12 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
-	 * 
+	 *
 	 * The Name objects matching each Germplasm object in the map will be set as the preferred name of the Germplasm objects.
-	 * 
+	 *
 	 * Note that you need to assign temporary ids for the Germplasm objects so that they can serve as the keys for the Map. The function
 	 * will replace these temp ids with the correct ones for storing in the database.
-	 * 
+	 *
 	 * @param germplasmNameMap the germplasm name map
 	 * @return the ids of the {@code Germplasm} records added
 	 */
@@ -679,7 +678,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a UserDefinedField object, add new record for the given parameter.
-	 * 
+	 *
 	 * @param field - the UserDefinedField object
 	 * @return the id of the new UserDefinedField record added
 	 */
@@ -687,7 +686,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a list of UserDefinedField objects, add new records for the given parameter.
-	 * 
+	 *
 	 * @param fields - the list of UserDefinedField objects
 	 * @return the list of ids of the new UserDefinedField records added
 	 */
@@ -695,7 +694,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a Attribute object, add new record for the given parameter.
-	 * 
+	 *
 	 * @param attr - the Attribute object
 	 * @return the id of the new Attribute record added
 	 */
@@ -703,7 +702,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a list of Attribute objects, add new records for the given parameter.
-	 * 
+	 *
 	 * @param attrs - the list of Attribute objects
 	 * @return the id of the new Attribute record added
 	 */
@@ -711,7 +710,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the germplasm Id and name Id from the names table with the given germplasm names.
-	 * 
+	 *
 	 * @param germplasmNames the germplasm names
 	 * @param mode the mode
 	 * @return List of GidNidElement based on the specified list of germplasm names
@@ -720,11 +719,11 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Please use LocationDataManager.getAllBreedingLocations().
-	 * 
+	 *
 	 * Get all breeding locations.
-	 * 
+	 *
 	 * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
-	 * 
+	 *
 	 * @return the all breeding locations
 	 * @deprecated
 	 */
@@ -732,17 +731,17 @@ public interface GermplasmDataManager {
 	List<Location> getAllBreedingLocations();
 
 	/**
-	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix. Queries both
-	 * Database.LOCAL and Database.CENTRAL and returns the greater number.
-	 * 
+	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix and suffix
+	 *
 	 * @param prefix - String used as prefix for Germplasm Names querying
-	 * @return next available sequence number for a germplasm with given prefix.
+	 * @param suffix - String used as prefix for Germplasm Names querying
+	 * @return next available sequence number for a germplasm with given prefix and suffix
 	 */
-	String getNextSequenceNumberForCrossName(String prefix);
+	String getNextSequenceNumberForCrossName(String prefix, String suffix);
 
 	/**
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.
-	 * 
+	 *
 	 * @param gids the gids
 	 * @return the preferred ids by gi ds
 	 */
@@ -750,7 +749,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given the germplasm name and a location ID, returns list of all germplasm with specified name and location id.
-	 * 
+	 *
 	 * @param name - search string for the name of the germplasm
 	 * @param locationID the location id
 	 * @return List of Germplasm POJOs
@@ -759,7 +758,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its method type.
-	 * 
+	 *
 	 * @param gid - the id of the germplasm record to be retrieved
 	 * @return the Germplasm POJO representing the record
 	 */
@@ -767,7 +766,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a range of gid, return the list of all Germplasm.
-	 * 
+	 *
 	 * @param startGID - the start ID of the range of germplasm gids
 	 * @param endGID - the end ID of the range of germplasm gids
 	 * @return List of Germplasm POJOs
@@ -776,7 +775,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a List of GIDs, return the list of all Germplasm.
-	 * 
+	 *
 	 * @param gids the gids
 	 * @return the germplasms
 	 */
@@ -784,7 +783,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a List of GIDs, return the list of all Germplasm together with their PreferredName.
-	 * 
+	 *
 	 * @param gids the gids
 	 * @return the preferred names by gids
 	 */
@@ -797,15 +796,15 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a List of GIDs, return the list of gids mapped to their corresponding location name.
-	 * 
+	 *
 	 * @param gids the gids
 	 * @return Map<Integer, String> - map of gids to their corresponding location name
 	 */
 	Map<Integer, String> getLocationNamesByGids(List<Integer> gids);
-	
+
 	/**
 	 * Search for germplasms given a search term
-	 * 
+	 *
 	 * @param germplasmSearchParameter - contains all data needed for the germplasm search
 	 * @return List of Germplasms
 	 */
@@ -821,9 +820,9 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Please use LocationDataManager.getLocationsByIDs().
-	 * 
+	 *
 	 * Gets the locations by the given IDs.
-	 * 
+	 *
 	 * @param ids Location IDs
 	 * @return the corresponding Locations
 	 * @deprecated
@@ -833,7 +832,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the methods by IDs.
-	 * 
+	 *
 	 * @param ids the Method Ids
 	 * @return the methods corresponding to the given IDs
 	 */
@@ -843,7 +842,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Get gDates given GIDs.
-	 * 
+	 *
 	 * @param gids the gids
 	 * @return <gid, integerdatevalue>
 	 */
@@ -851,7 +850,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Get methods given GIDs.
-	 * 
+	 *
 	 * @param gids the gids
 	 * @return Map<gid, method>
 	 */
@@ -859,7 +858,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the method by code.
-	 * 
+	 *
 	 * @param code the code
 	 * @param programUUID - uniqueId of the current program
 	 * @return the method by code
@@ -868,7 +867,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the method by code.
-	 * 
+	 *
 	 * @param code the code
 	 * @return the method by code
 	 */
@@ -876,7 +875,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the method by name.
-	 * 
+	 *
 	 * @param name the code
 	 * @return the method by name
 	 */
@@ -884,7 +883,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the method by name.
-	 * 
+	 *
 	 * @param name the code
 	 * @param programUUID - uniqueID of the current program
 	 * @return the method by name
@@ -895,7 +894,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the list of favorite methods/locations
-	 * 
+	 *
 	 * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
 	 * @param programUUID - unique id of the program where the favorites location/method were created
 	 * @return list of ProgramFavorite
@@ -904,7 +903,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Gets the list of favorite methods/locations
-	 * 
+	 *
 	 * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
 	 * @param max - maximum number of records to return
 	 * @param programUUID - unique id of the program where the favorites location/method were created
@@ -914,7 +913,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * count favorite methods/locations
-	 * 
+	 *
 	 * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
 	 * @return count of ProgramFavorite list
 	 */
@@ -922,7 +921,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Saves the list of favorite methods/locations
-	 * 
+	 *
 	 * @param list of ProgramFavorite
 	 * @return none
 	 */
@@ -930,7 +929,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Saves a favorite method/location
-	 * 
+	 *
 	 * @param favorite to be saved
 	 * @return none
 	 */
@@ -938,7 +937,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Deletes a list of favorite methods/locations
-	 * 
+	 *
 	 * @param list of ProgramFavorite
 	 * @return none
 	 */
@@ -946,7 +945,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Deletes a favorite method/location
-	 * 
+	 *
 	 * @param favorite the code
 	 * @return none
 	 */
@@ -954,7 +953,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the maximum number in the sequence.
-	 * 
+	 *
 	 * @param prefix
 	 * @param suffix
 	 * @param count
@@ -964,7 +963,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * check if name and standardized version of it already exists.
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -972,7 +971,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * get all method records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 * @return list of mid
 	 */
@@ -980,7 +979,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * delete all method records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 */
 	void deleteProgramMethodsByUniqueId(String programUUID);
@@ -989,7 +988,7 @@ public interface GermplasmDataManager {
 	 * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes
 	 * in <b>linkedNodes</b> atribute, being the first node the female and the second one the male parent. The information is ultimately
 	 * stored in Germplasm beans, containing only gids and information about names. The key of the map is the gid.
-	 * 
+	 *
 	 * @param studyId The identifier for the study which parents will be retuned.
 	 * @return The parents for each germplasm in a study.
 	 */
@@ -997,14 +996,14 @@ public interface GermplasmDataManager {
 
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
-	 * 
+	 *
 	 * @param lgid
 	 */
 	Germplasm getGermplasmByLocalGid(Integer lgid);
 
 	/**
 	 * return list of name and it's permutation count.
-	 * 
+	 *
 	 * @param names list of names
 	 * @return list of name and it's number of permutations.
 	 */
@@ -1024,7 +1023,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Enables us to query the udflds table
-	 * 
+	 *
 	 * @param table the ftable value
 	 * @param type the ftype value
 	 * @param code we are looking for
@@ -1041,26 +1040,27 @@ public interface GermplasmDataManager {
 	Integer countSearchForGermplasm(GermplasmSearchParameter germplasmSearchParameter);
 
 	List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids);
-	
+
 	/**
 	 * Given a set of gids return the gid and all its parents including all their names.
-	 * 
+	 *
 	 * @param gids - the id of the germplasm record to be retrieved
 	 * @param numberOfLevels the number of levels to traverse. Be careful do not go crazy
 	 * @return a list of germplasms with all names populated in them
 	 */
 	List<Germplasm> getGermplasmWithAllNamesAndAncestry(Set<Integer> gids, int numberOfLevels);
 
-
 	/**
 	 * Returns the count of records that matched the gids in the specified list.
+	 *
 	 * @param gids - The list of gids to match for in the germplasm table
 	 * @return
 	 */
 	long countMatchGermplasmInList(Set<Integer> gids);
-	
+
 	/**
 	 * Returns map of list of names with given gids and ntype ids
+	 *
 	 * @param gids
 	 * @param ntypeIds
 	 * @return map of list of names with gid as key
@@ -1069,6 +1069,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the list of favorite methods in the current program
+	 *
 	 * @param mType
 	 * @param programUUID
 	 * @return list of favorite methods
@@ -1084,9 +1085,10 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList);
-	
+
 	/**
 	 * Returns the method codes specified in the set of integers
+	 *
 	 * @param methodIds
 	 * @return
 	 */

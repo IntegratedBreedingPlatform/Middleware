@@ -108,7 +108,8 @@ class ObservationQuery {
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
 
 	public static final String OBSERVATIONS_FOR_SAMPLES = "SELECT \n" + "    nde.nd_experiment_id as nd_experiment_id,\n"
-		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value as value\n"
+		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value"
+		+ " as value, s.dbxref_id as gid"
 		+ " FROM \n" + "    project p \n" + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 		+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
 		+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
@@ -122,9 +123,9 @@ class ObservationQuery {
 		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 
-	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
-			final String sortOrder) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
+	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+			final List<String> designFactors, final String sortBy, final String sortOrder) {
+		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -178,8 +179,8 @@ class ObservationQuery {
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n";
 	}
 
-	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + " AND nde.nd_experiment_id = :experiment_id \n"
+	String getSingleObservationQuery(final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors, final List<String> designFactors) {
+		return this.getObservationsMainQuery(traits, germplasmDescriptors, designFactors) + " AND nde.nd_experiment_id = :experiment_id \n"
 				+ getGroupingClause();
 	}
 
@@ -201,7 +202,7 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<MeasurementVariableDto> measurementVariables,  List<String> germplasmDescriptors) {
+	String getObservationsMainQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors, final List<String> designFactors) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("SELECT \n")
@@ -225,7 +226,7 @@ class ObservationQuery {
 		String traitClauseFormat =
 			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
-		for (MeasurementVariableDto measurementVariable : measurementVariables) {
+		for (MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
 			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
 				measurementVariable.getName(), measurementVariable.getName() + PHENOTYPE_ID));
 		}
@@ -233,8 +234,16 @@ class ObservationQuery {
 		if (!germplasmDescriptors.isEmpty()) {
 			String germplasmDescriptorClauseFormat =
 					"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s', \n";
-			for (String gpFactor : germplasmDescriptors) {
+			for (final String gpFactor : germplasmDescriptors) {
 				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+			}
+		}
+		
+		if (!designFactors.isEmpty()) {
+			String designFactorClauseFormat =
+					"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = ep.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
+			for (final String designFactor : designFactors) {
+				sqlBuilder.append(String.format(designFactorClauseFormat, designFactor, designFactor));
 			}
 		}
 

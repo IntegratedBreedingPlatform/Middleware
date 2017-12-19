@@ -708,13 +708,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException {
-		final String prefix = "IR";
-		Debug.println("Next number in sequence for prefix (" + prefix + ") is : "
-				+ this.germplasmDataManager.getNextSequenceNumberForCrossName(prefix));
-	}
-
-	@Test
 	public void testGetPreferredIdsByGIDs() throws MiddlewareQueryException {
 		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
 		final Map<Integer, String> results = this.germplasmDataManager.getPreferredIdsByGIDs(gids);

@@ -1,14 +1,8 @@
 
 package org.generationcp.middleware.service;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -16,8 +10,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -30,8 +22,13 @@ import org.generationcp.middleware.reports.ReporterFactory;
 import org.generationcp.middleware.service.api.ReportService;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperPrint;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
@@ -55,7 +52,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	}
 
 	@Override
-	public JasperPrint getPrintReport(final String code, final Integer studyId) throws MiddlewareException, JRException, IOException,
+	public JasperPrint getPrintReport(final String code, final Integer studyId) throws JRException, IOException,
 			BuildReportException {
 
 		final Reporter reporter = this.factory.createReporter(code);
@@ -67,7 +64,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 	@Override
 	public Reporter getStreamReport(final String code, final Integer studyId, final String programName, final OutputStream output)
-			throws MiddlewareException, JRException, IOException, BuildReportException {
+			throws JRException, IOException, BuildReportException {
 
 		final Reporter reporter = this.factory.createReporter(code);
 		final Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
@@ -81,9 +78,9 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 	@Override
 	public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName,
-			final OutputStream output) throws MiddlewareException, JRException, IOException, BuildReportException {
+			final OutputStream output) throws JRException, IOException, BuildReportException {
 		final Reporter reporter = this.factory.createReporter(code);
-		final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
+		final Map<String, Object> data = this.extractGermplasmListData();
 		data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
 		reporter.buildJRPrint(data);
@@ -98,7 +95,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 * @param studyId The study Id to which extract information from.
 	 * @return a Map containing information of the study.
 	 */
-	private Map<String, Object> extractFieldbookData(final Integer studyId, final boolean parentsInfoRequireed) throws MiddlewareException {
+	private Map<String, Object> extractFieldbookData(final Integer studyId, final boolean parentsInfoRequireed) {
 
 		final StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
 		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
@@ -123,11 +120,12 @@ public class ReportServiceImpl extends Service implements ReportService {
 		dataBeans.put(AbstractReporter.DATA_SOURCE_KEY, observations);
 		dataBeans.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, wb.getTrialObservations());
 		dataBeans.put("studyId", studyId);
+		dataBeans.put(AbstractReporter.STUDY_TITLE_REPORT_KEY, wb.getStudyDetails().getDescription());
 
 		return dataBeans;
 	}
 
-	protected Map<String, Object> extractGermplasmListData(final Integer germplasmListID) {
+	protected Map<String, Object> extractGermplasmListData() {
 		// currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
 		final Map<String, Object> params = new HashMap<>();
 		params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
@@ -259,12 +257,12 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 * @param studyId the id for the study which the observations belong to.
 	 * @param observations List of rows representing entries in a study, in which parent information will be appended
 	 */
-	protected void appendParentsInformation(final Integer studyId, final List<MeasurementRow> observations) throws MiddlewareQueryException {
+	protected void appendParentsInformation(final Integer studyId, final List<MeasurementRow> observations) {
 		// put germNodes extraction
 		final Map<Integer, GermplasmPedigreeTreeNode> germNodes = this.getGermplasmDataManager().getDirectParentsForStudy(studyId);
 
 		for (final MeasurementRow row : observations) {
-			final int gid = Integer.valueOf(row.getMeasurementDataValue("GID"));
+			final int gid = Integer.parseInt(row.getMeasurementDataValue("GID"));
 			final GermplasmPedigreeTreeNode germNode = germNodes.get(gid);
 
 			if (germNode == null || (germNode.getFemaleParent() == null && germNode.getMaleParent() == null)) {

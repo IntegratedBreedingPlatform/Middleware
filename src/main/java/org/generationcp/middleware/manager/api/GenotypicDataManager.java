@@ -82,6 +82,13 @@ public interface GenotypicDataManager {
 	List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException;
 
 	/**
+	 * Get all the Germplasm names associated with a marker
+	 * @param markerId
+	 * @return
+	 */
+	List<Name> getGermplasmNamesByMarkerId(Integer markerId);
+
+	/**
 	 * Gets the Name record by the given name id.
 	 *
 	 * @param nId the name id to match
@@ -345,28 +352,6 @@ public interface GenotypicDataManager {
 			throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves a list of allelic values (germplasm id, char_value, marker id) based on the specified dataset id from the char_values
-	 * table.
-	 *
-	 * @param datasetId - the dataset id matching the allelic values
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of allelic values based on the specified dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(Integer datasetId, int start, int numOfRows)
-			throws MiddlewareQueryException;
-
-	/**
-	 * Counts the allelic values based on the specified dataset id from the char_values table.
-	 *
-	 * @param datasetId the dataset id matching the allelic values
-	 * @return the number of allelic values from char_values table based on the specified dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException;
-
-	/**
 	 * Retrieves a list of allelic values (germplasm id, allele_bin_value, marker id) based on the specified dataset id from the
 	 * allele_values table.
 	 *
@@ -587,30 +572,6 @@ public interface GenotypicDataManager {
 	List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
-	 * Retrieve GIDs by markers and allele values.
-	 *
-	 * @param instance the instance
-	 * @param markerIdList the marker id list
-	 * @param alleleValueList the allele value list
-	 * @return the gid, datasetId, markerId, alleleValue by markers and allele values
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<AllelicValueElement> getAllelicValuesByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList,
-			List<String> alleleValueList) throws MiddlewareQueryException;
-
-	/**
-	 * Get AllelicValueElement(gid, markerId, datasetId, alleleValue(data)) by markers and allele values from both local and central
-	 * database.
-	 *
-	 * @param markerIdList the marker id list
-	 * @param alleleValueList the allele value list
-	 * @return the all gids by markers and allele values
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
-			throws MiddlewareQueryException;
-
-	/**
 	 * Gets the gids by markers and allele values.
 	 *
 	 * @param markerIdList the marker id list
@@ -747,15 +708,6 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the number of char values given a set of GIDs.
-	 *
-	 * @param gids - the GIDs to match
-	 * @return the number of char values matching the given GIDs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException;
 
 	/**
 	 * Gets int alleleValues for polymorphic markers retrieval given a list of GIDs Retrieves data from both central and local database
@@ -1831,12 +1783,8 @@ public interface GenotypicDataManager {
 	
 	// Added by Matthew to move GDMS SQL to middleware : services not heavily understood
 	
-	List<Object> getUniqueAccMetaDataSetByDatasetId(String datasetId);
-	
 	List<Object> getUniqueAccMetaDataSetByGids(List gids);
 
-	List<Object> getUniqueCharAllelesByDataset(String datasetId);
-	
 	List<QtlDetails> getAllQtlDetails();
 
 	// I have a feeling we may need to paginate this guy ..... see the other limited getAllQtl

@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 public interface StudyService {
@@ -42,14 +41,14 @@ public interface StudyService {
 	 * @param studyId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetails(Integer studyId) throws MiddlewareQueryException;
-
+	StudyDetailsDto getStudyDetails(Integer studyId);
+	
 	/**
 	 *
 	 * @param ids of the variables that i need to check data
 	 * @param studyId id for the study (Nursery / Trial)
 	 * @return the true if any id have data on the study
-	 * @throws MiddlewareQueryException
 	 */
-	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId) throws MiddlewareQueryException;
+	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId);
+
 }

@@ -59,7 +59,7 @@ public class ReportServiceImplTest {
 
 	@Test
 	public void testExtractGermplasmListData() {
-		final Map<String, Object> data = reportService.extractGermplasmListData(TEST_GERMPLASM_LIST_ID);
+		final Map<String, Object> data = reportService.extractGermplasmListData();
 		Assert.assertNotNull("Data extracter does not provide non null value for required report generation parameter",
 				data.get(AbstractReporter.STUDY_CONDITIONS_KEY));
 		Assert.assertNotNull("Data extracter does not provide non null value for required report generation parameter",
