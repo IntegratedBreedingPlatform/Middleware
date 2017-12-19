@@ -80,8 +80,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final String studyNameSearchKeyword = "TestTrialSample";
 
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
 
 		Assert.assertEquals("No studies should be found, study count should be zero.", 0, studies.size());
 
@@ -92,8 +91,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final String studyNameSearchKeyword = "1 Test Trial Sample";
 
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
 
 		Assert.assertEquals("Study count should be one.", 1, studies.size());
 		Assert.assertEquals("Searched keyword should exactly match the returned Study name", studyNameSearchKeyword,
@@ -106,8 +104,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final String studyNameSearchKeyword = "1 Test";
 
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
 
 		Assert.assertEquals("Study count should be one.", 1, studies.size());
 		Assert.assertTrue("The returned Study name should start with " + studyNameSearchKeyword,
@@ -117,15 +114,13 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetStudiesByNameMatchesStartingWithWhenNameIsEmpty() {
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName("", 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName("", StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("When study name is empty, STARTS WITH search should not return any record.", 0, studies.size());
 	}
 	
 	@Test
 	public void testGetStudiesByNameMatchesStartingWithWhenNameIsNull() {
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(null, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(null, StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("When study name is null, STARTS WITH search should not return any record.", 0, studies.size());
 	}
 
@@ -134,8 +129,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final String studyNameSearchKeyword = "Test Trial Sample";
 
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
 
 		Assert.assertEquals("Study count should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES, StudySearchDaoTest.NO_OF_TEST_STUDIES,
 				studies.size());
@@ -148,15 +142,13 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetStudiesByNameMatchesContainingWhenNameIsEmpty() {
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName("", 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName("", StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("When study name is empty, CONTAINS search should not return any record.", 0, studies.size());
 	}
 	
 	@Test
 	public void testGetStudiesByNameMatchesContainingWhenNameIsNull() {
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(null, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(null,	StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("When study name is null, CONTAINS search should not return any record.", 0, studies.size());
 	}
 
@@ -165,8 +157,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final String studyNameSearchKeyword = "1 Test Trial Sample";
 
-		List<StudyReference> studiesByName = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
+		List<StudyReference> studiesByName = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("Study count should be one.", 1, studiesByName.size());
 
 		// Delete test study
@@ -175,8 +166,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		flush();
 
 		// Check that deleted study is not retrieved
-		studiesByName = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE,
-				StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
+		studiesByName = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("Deleted study should not be returned. ", 0, studiesByName.size());
 
 	}
@@ -303,7 +293,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		locationIds.add(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID);
 
 		final List<StudyReference> studyReferences =
-				this.studySearchDao.getStudiesByLocationIds(locationIds, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID);
 
 		Assert.assertEquals("There should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES + " studies that are in Luxembourg",
 				StudySearchDaoTest.NO_OF_TEST_STUDIES, studyReferences.size());
@@ -316,7 +306,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		locationIds.add(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID);
 
 		List<StudyReference> studyReferences =
-				this.studySearchDao.getStudiesByLocationIds(locationIds, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID);
 		final Integer previousCount = studyReferences.size();
 		Assert.assertEquals("There should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES + " studies that are in Luxembourg",
 				StudySearchDaoTest.NO_OF_TEST_STUDIES, studyReferences.size());
@@ -327,7 +317,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		flush();
 
 		// Check that deleted study is not retrieved
-		studyReferences = this.studySearchDao.getStudiesByLocationIds(locationIds, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+		studyReferences = this.studySearchDao.getStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("Deleted study should not be returned. ", previousCount - 1, studyReferences.size());
 		for (final StudyReference study : studyReferences) {
 			if (studyToDelete.equals(study)) {
@@ -376,9 +366,9 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final long expectedActualWetSeasonCount = this.numberOfWetSeasoBeforeCreatingTestData + StudySearchDaoTest.NO_OF_WET_SEASON_STUDIES;
 
 		final List<StudyReference> drySeasonStudyReferences =
-				this.studySearchDao.getStudiesBySeason(Season.DRY, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID);
 		final List<StudyReference> wetSeasonStudyReferences =
-				this.studySearchDao.getStudiesBySeason(Season.WET, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesBySeason(Season.WET, StudySearchDaoTest.PROGRAM_UUID);
 
 		Assert.assertEquals(expectedActualDrySeasonCount, drySeasonStudyReferences.size());
 		Assert.assertEquals(expectedActualWetSeasonCount, wetSeasonStudyReferences.size());
@@ -407,7 +397,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final long previousDrySeasonCount = this.numberOfDrySeasonBeforeCreatingTestData + StudySearchDaoTest.NO_OF_DRY_SEASON_STUDIES;
 
 		List<StudyReference> drySeasonStudyReferences =
-				this.studySearchDao.getStudiesBySeason(Season.DRY, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals(previousDrySeasonCount, drySeasonStudyReferences.size());
 
 		// Delete test study
@@ -417,7 +407,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// Check that deleted study is not retrieved
 		drySeasonStudyReferences =
-				this.studySearchDao.getStudiesBySeason(Season.DRY, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesBySeason(Season.DRY, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("Deleted study should not be returned. ", previousDrySeasonCount - 1, drySeasonStudyReferences.size());
 		for (final StudyReference study : drySeasonStudyReferences) {
 			if (studyToDelete.equals(study)) {
@@ -459,10 +449,10 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public void testGetStudiesByStartDate() {
 
 		Assert.assertEquals("There should be 3 studies created in Year 2020", 3,
-				this.studySearchDao.getStudiesByStartDate(2020, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID).size());
+				this.studySearchDao.getStudiesByStartDate(2020, StudySearchDaoTest.PROGRAM_UUID).size());
 
 		final List<StudyReference> studies =
-				this.studySearchDao.getStudiesByStartDate(20201201, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesByStartDate(20201201, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("There should be 1 study created in December 1 2020", 1, studies.size());
 
 		Assert.assertEquals(StudySearchDaoTest.TEST_TRIAL_NAME_3, studies.get(0).getName());
@@ -472,7 +462,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesByStartDateExcludingDeletedStudies() throws UnpermittedDeletionException {
 		List<StudyReference> studies =
-				this.studySearchDao.getStudiesByStartDate(20201201, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+				this.studySearchDao.getStudiesByStartDate(20201201, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("There should be 1 study created in December 1 2020", 3,
 				this.studySearchDao.countStudiesByStartDate(2020, StudySearchDaoTest.PROGRAM_UUID));
 
@@ -482,7 +472,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		flush();
 
 		// Check that deleted study is not retrieved
-		studies = this.studySearchDao.getStudiesByStartDate(20201201, 0, Integer.MAX_VALUE, StudySearchDaoTest.PROGRAM_UUID);
+		studies = this.studySearchDao.getStudiesByStartDate(20201201, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("Deleted study should not be returned. ", 0, studies.size());
 	}
 

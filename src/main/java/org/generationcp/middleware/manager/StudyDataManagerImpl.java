@@ -168,7 +168,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		} else if (filter instanceof GidStudyQueryFilter) {
 			return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProvider);
 		} else if (filter instanceof BrowseStudyQueryFilter) {
-			return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, numOfRows, this.sessionProvider);
+			return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, this.sessionProvider);
 		}
 		return null;
 	}
