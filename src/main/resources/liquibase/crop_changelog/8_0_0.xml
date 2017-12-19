@@ -59,4 +59,26 @@
 			ADD UNIQUE INDEX list_name_UNIQUE (list_name ASC, type ASC, hierarchy ASC, program_uuid ASC);
 		</sql>
 	</changeSet>
+
+	<changeSet author="nahuel" id="v8.0.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*)
+						FROM projectprop
+						WHERE variable_id = 8006;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			BMS-4468 (7_1_0.xml) should have also removed ACTIVE_STUDY(12960) from projectprop
+			We remove all STUDY_STATUS(8006) here
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE
+			FROM projectprop
+			WHERE variable_id = 8006;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
