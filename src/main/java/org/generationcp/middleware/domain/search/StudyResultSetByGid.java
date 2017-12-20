@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.searcher.Searcher;
 
@@ -31,8 +30,7 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	private List<StudyReference> buffer;
 	private int bufIndex;
 
-	public StudyResultSetByGid(GidStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProvider)
-			throws MiddlewareQueryException {
+	public StudyResultSetByGid(GidStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProvider) {
 
 		super(sessionProvider);
 
@@ -45,7 +43,7 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 		this.bufIndex = 0;
 	}
 
-	private long countStudies(int gid) throws MiddlewareQueryException {
+	private long countStudies(int gid) {
 		return this.getStockDao().countStudiesByGid(gid);
 	}
 
@@ -55,7 +53,7 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	}
 
 	@Override
-	public StudyReference next() throws MiddlewareQueryException {
+	public StudyReference next() {
 		if (this.isEmptyBuffer()) {
 			this.fillBuffer();
 		}
@@ -67,7 +65,7 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 		return this.buffer == null || this.bufIndex >= this.buffer.size();
 	}
 
-	private void fillBuffer() throws MiddlewareQueryException {
+	private void fillBuffer() {
 		int start = this.currentRow - (int) this.countOfStudies;
 		this.buffer = this.getStockDao().getStudiesByGid(this.gid, start, this.numOfRows);
 		this.bufIndex = 0;

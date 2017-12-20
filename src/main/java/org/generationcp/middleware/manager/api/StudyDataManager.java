@@ -36,8 +36,6 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -60,9 +58,8 @@ public interface StudyDataManager {
 	 *
 	 * @param studyId the study's unique id
 	 * @return the study or null if not found
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Study getStudy(int studyId) throws MiddlewareException;
+	Study getStudy(int studyId);
 
 	/**
 	 * Gets the study.
@@ -70,18 +67,16 @@ public interface StudyDataManager {
 	 * @param studyId the study id
 	 * @param hasVariableType the has variable type
 	 * @return the study
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareException;
+	Study getStudy(int studyId, boolean hasVariableType);
 
 	/**
 	 * Gets the study id by name.
 	 *
 	 * @param studyName the study name
 	 * @return the study id by name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID) throws MiddlewareQueryException;
+	Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID);
 
 	/**
 	 * Returns list of root or top-level folders and studies.
@@ -106,9 +101,8 @@ public interface StudyDataManager {
 	 *
 	 * @param studyId The study id to match
 	 * @return List of DatasetReferences belonging to the study or empty list if none found. Never returns null.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
+	List<DatasetReference> getDatasetReferences(int studyId);
 
 	/**
 	 * Returns the DataSet corresponding to the given dataset ID. Retrieves from central if the given ID is positive, otherwise retrieves
@@ -116,9 +110,8 @@ public interface StudyDataManager {
 	 *
 	 * @param dataSetId the data set id
 	 * @return The DataSet matching the given ID or null if none found
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	DataSet getDataSet(int dataSetId) throws MiddlewareException;
+	DataSet getDataSet(int dataSetId);
 
 	/**
 	 * Gets the experiments given a dataset ID.
@@ -127,9 +120,8 @@ public interface StudyDataManager {
 	 * @param start The start index of the rows to retrieve
 	 * @param numOfRows The number of items to retrieve
 	 * @return List of Experiments associated to the dataset ID or empty list if none found
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareException;
+	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows);
 
 	/**
 	 * Gets the experiments.
@@ -139,18 +131,16 @@ public interface StudyDataManager {
 	 * @param numOfRows the num of rows
 	 * @param varTypeList the var type list
 	 * @return the experiments
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList) throws MiddlewareException;
+	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList);
 
 	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 *
 	 * @param dataSetId the data set id
 	 * @return the count
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countExperiments(int dataSetId) throws MiddlewareQueryException;
+	long countExperiments(int dataSetId);
 
 	/**
 	 * Returns the list of study references for a particular search filter.
@@ -159,18 +149,16 @@ public interface StudyDataManager {
 	 *        ParentFolderStudyQueryFilter.
 	 * @param numOfRows The number of rows to retrieve
 	 * @return The result set containing the matching studies
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException;
+	StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows);
 
 	/**
 	 * Returns the list of factors for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 *
 	 * @param studyId the study id
 	 * @return The factors of the study stored in a VariableTypeList
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareException;
+	VariableTypeList getAllStudyFactors(int studyId);
 
 	/**
 	 * Returns the list of variates for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves from
@@ -178,9 +166,8 @@ public interface StudyDataManager {
 	 *
 	 * @param studyId the study id
 	 * @return The variates of the study stored in a VariableTypeList
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareException;
+	VariableTypeList getAllStudyVariates(int studyId);
 
 	/**
 	 * Adds a study to the local database. Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment. Inserts
@@ -194,11 +181,9 @@ public interface StudyDataManager {
 	 * @param studyType
 	 * @param description
 	 * @return StudyReference corresponding to the newly-created Study
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
-		final String cropPrefix, final StudyType studyType, final String description)
-			throws MiddlewareQueryException;
+		final String cropPrefix, final StudyType studyType, final String description);
 
 	/**
 	 * Adds a dataset, dataset labels (factors and variate labels), and parent study association in the local database.
@@ -208,19 +193,16 @@ public interface StudyDataManager {
 	 * @param datasetValues the dataset values
 	 * @param programUUID the program UUID
 	 * @return DatasetReference corresponding to the newly-created DataSet
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID)
-			throws MiddlewareQueryException;
+	DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID);
 
 	/**
 	 * Add a new variable/column to the dataset.
 	 *
 	 * @param datasetId the dataset id
 	 * @param variableType the variable type
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addDataSetVariableType(int datasetId, DMSVariableType variableType) throws MiddlewareQueryException;
+	void addDataSetVariableType(int datasetId, DMSVariableType variableType);
 
 	/**
 	 * Adds an experiment row to the dataset.
@@ -230,9 +212,8 @@ public interface StudyDataManager {
 	 *        ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
 	 * @param cropPrefix
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues, final String cropPrefix) throws MiddlewareQueryException;
+	void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues, final String cropPrefix);
 
 	/**
 	 * Adds or updates experiment rows to the dataset.
@@ -242,10 +223,8 @@ public interface StudyDataManager {
 	 *        ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
 	 * @param plotCodePrefix
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues, String plotCodePrefix)
-			throws MiddlewareQueryException;
+	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues, String plotCodePrefix);
 
 	/**
 	 * Adds a Trial Environment. Accepts a variable list and sets up the trial environment data in the local database. It will throw an
@@ -253,9 +232,8 @@ public interface StudyDataManager {
 	 *
 	 * @param variableList the variable list
 	 * @return ID of the trial environment data created.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException;
+	int addTrialEnvironment(VariableList variableList);
 
 	/**
 	 * Adds a Stock entry. Accepts a variable list and sets up the stock data in the local database. It will throw an exception if the
@@ -263,9 +241,8 @@ public interface StudyDataManager {
 	 *
 	 * @param variableList the variable list
 	 * @return ID of the stock data created
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int addStock(VariableList variableList) throws MiddlewareQueryException;
+	int addStock(VariableList variableList);
 
 	/**
 	 * Returns a list of datasets based on the given type. Retrieves from central if the given ID is positive, otherwise retrieves from
@@ -274,9 +251,8 @@ public interface StudyDataManager {
 	 * @param studyId the study id
 	 * @param dataSetType the data set type
 	 * @return The list of datasets matching the dataSetType or empty list if non found.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareException;
+	List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType);
 
 	/**
 	 * Returns the number of experiments matching the given trial environment and variate. Counts from central if the given ID is positive,
@@ -285,9 +261,8 @@ public interface StudyDataManager {
 	 * @param trialEnvironmentId the trial environment id
 	 * @param variateVariableId the variate variable id
 	 * @return The count
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException;
+	long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId);
 
 	/**
 	 * Retrieves the trial environments belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise
@@ -295,9 +270,8 @@ public interface StudyDataManager {
 	 *
 	 * @param datasetId the dataset id
 	 * @return The trial environments
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareException;
+	TrialEnvironments getTrialEnvironmentsInDataset(int datasetId);
 
 	/**
 	 * Retrieves the stocks belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise retrieves from
@@ -305,9 +279,8 @@ public interface StudyDataManager {
 	 *
 	 * @param datasetId the dataset id
 	 * @return The stocks
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Stocks getStocksInDataset(int datasetId) throws MiddlewareException;
+	Stocks getStocksInDataset(int datasetId);
 
 	/**
 	 * Returns the number of stocks matching the given dataset ID, trial environment ID and variate ID. Counts from central if the given ID
@@ -317,9 +290,8 @@ public interface StudyDataManager {
 	 * @param trialEnvironmentId the trial environment id
 	 * @param variateStdVarId the variate std var id
 	 * @return The count
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
+	long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId);
 
 	/**
 	 * Returns the number of observations with value, matching the given dataset ID, trial environment ID and variate ID. Counts from
@@ -329,9 +301,8 @@ public interface StudyDataManager {
 	 * @param trialEnvironmentId the trial environment id
 	 * @param variateStdVarId the variate std var id
 	 * @return The count
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
+	long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId);
 
 	/**
 	 * Returns a single dataset belonging to the study with the given type. If there is more than one matching dataset, only one is
@@ -340,10 +311,9 @@ public interface StudyDataManager {
 	 * @param studyId the study id
 	 * @param type the type
 	 * @return the data set
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 
-	DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareException;
+	DataSet findOneDataSetByType(int studyId, DataSetType type);
 
 	/**
 	 * Light weight variant of {@link #findOneDataSetByType(int, DataSetType)} which does not load entire DataSet, just a DatasetReference.
@@ -361,18 +331,16 @@ public interface StudyDataManager {
 	 * Deletes the dataset matching the given ID.
 	 *
 	 * @param datasetId the dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteDataSet(int datasetId) throws MiddlewareQueryException;
+	void deleteDataSet(int datasetId);
 
 	/**
 	 * Deletes location matching the given dataset ID and location ID.
 	 *
 	 * @param datasetId the dataset id
 	 * @param locationId the location id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException;
+	void deleteExperimentsByLocation(int datasetId, int locationId);
 
 	/**
 	 * Retrieves the local name associated to the given project ID and standard variable ID.
@@ -380,9 +348,8 @@ public interface StudyDataManager {
 	 * @param projectId the project id
 	 * @param standardVariableId the standard variable id
 	 * @return The local name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException;
+	String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId);
 
 	/**
 	 * Retrieves the details of nursery and trial studies from the currently selected program. Returns the id, name, description, start
@@ -391,9 +358,8 @@ public interface StudyDataManager {
 	 *
 	 * @param programUUID of the currently selected program
 	 * @return The list of study details having the given study type from local and central
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) throws MiddlewareQueryException;
+	List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID);
 
 	/**
 	 * Checks if the name specified is an already existing project name.
@@ -401,9 +367,8 @@ public interface StudyDataManager {
 	 * @param name the name
 	 * @param programUUID the program UUID
 	 * @return true or false
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
+	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID);
 
 	/**
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
@@ -411,10 +376,9 @@ public interface StudyDataManager {
 	 * @param studyIdList the study id list
 	 * @param studyType Can be either StudyType.T (Trial) or StudyType.N (Nursery)
 	 * @return the FieldMapCount object containing the counts
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
-			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
+			CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
@@ -422,9 +386,8 @@ public interface StudyDataManager {
 	 * @param info the info
 	 * @param userId the user id
 	 * @param isNew the is new
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) throws MiddlewareQueryException;
+	void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew);
 
 	/**
 	 * Save Project Properties of the Project.
@@ -433,10 +396,9 @@ public interface StudyDataManager {
 	 * @param variableTypeList the variable type list
 	 * @param experimentValues the experiment values
 	 * @param locationIds the location ids
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues,
-			List<Integer> locationIds) throws MiddlewareQueryException;
+			List<Integer> locationIds);
 
 	/**
 	 * Retrieve all field map labels in the block of the specified trial instance id.
@@ -444,19 +406,17 @@ public interface StudyDataManager {
 	 * @param datasetId the dataset id
 	 * @param geolocationId the geolocation id
 	 * @return the all field maps in block by trial instance id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId,
-			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
+			CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Check if the given id is an existing study.
 	 *
 	 * @param id the id
 	 * @return true, if is study
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean isStudy(int id) throws MiddlewareQueryException;
+	boolean isStudy(int id);
 
 	/**
 	 * Adds a subFolder. Accepts a parentFolderId, the name and description of the folder. It will throw an exception if the parentFolderId
@@ -467,9 +427,8 @@ public interface StudyDataManager {
 	 * @param description the description
 	 * @param programUUID the program UUID
 	 * @return ID of the folder created
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int addSubFolder(int parentFolderId, String name, String description, String programUUID) throws MiddlewareQueryException;
+	int addSubFolder(int parentFolderId, String name, String description, String programUUID);
 
 	/**
 	 * Rename sub folder.
@@ -478,18 +437,16 @@ public interface StudyDataManager {
 	 * @param folderId the folder id
 	 * @param programUUID the program UUID
 	 * @return true, if successful
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean renameSubFolder(String newFolderName, int folderId, String programUUID) throws MiddlewareQueryException;
+	boolean renameSubFolder(String newFolderName, int folderId, String programUUID);
 
 	/**
 	 * Logically delete a folder by updating the folder's name and deleting its project relationships.
 	 *
 	 * @param id the id
 	 * @param programUUID the programUUID
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteEmptyFolder(int id, String programUUID) throws MiddlewareQueryException;
+	void deleteEmptyFolder(int id, String programUUID);
 
 	/**
 	 * checks if the folder is empty given the folder id.
@@ -505,18 +462,16 @@ public interface StudyDataManager {
 	 *
 	 * @param id the id
 	 * @return ID of the folder created
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	DmsProject getParentFolder(int id) throws MiddlewareQueryException;
+	DmsProject getParentFolder(int id);
 
 	/**
 	 * Returns the dms project. Accepts a project id.
 	 *
 	 * @param id the id
 	 * @return DmsProject referenced by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	DmsProject getProject(int id) throws MiddlewareQueryException;
+	DmsProject getProject(int id);
 
 	/**
 	 * Move dms project.
@@ -525,9 +480,8 @@ public interface StudyDataManager {
 	 * @param targetId the target id
 	 * @param isAStudy the is a study
 	 * @return true, if successful
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) throws MiddlewareQueryException;
+	boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy);
 
 	/**
 	 * Retrieves the study details of the given study type from from both selected DB instance ordered by db instance then study name.
@@ -536,9 +490,8 @@ public interface StudyDataManager {
 	 * @param start The start index of the rows to retrieve
 	 * @param numOfRows The number of items to retrieve
 	 * @return The list of study details having the given study type
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StudyDetails> getStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows) throws MiddlewareQueryException;
+	List<StudyDetails> getStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows);
 
 	/**
 	 * Gets the study details.
@@ -546,9 +499,8 @@ public interface StudyDataManager {
 	 * @param studyType the study type
 	 * @param id the id
 	 * @return the study details
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StudyDetails getStudyDetails(StudyType studyType, int id) throws MiddlewareQueryException;
+	StudyDetails getStudyDetails(StudyType studyType, int id);
 
 	/**
 	 * Retrieves the study details of the all nurseries and trials from both selected DB instance ordered by study name.
@@ -557,9 +509,8 @@ public interface StudyDataManager {
 	 * @param start The start index of the rows to retrieve
 	 * @param numOfRows The number of items to retrieve
 	 * @return The list of study details of Nurseries and Trials
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StudyDetails> getNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows) throws MiddlewareQueryException;
+	List<StudyDetails> getNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows);
 
 	/**
 	 * Retrieves all the study details of the given study type from both central and local ordered by db instance then study name.
@@ -567,9 +518,8 @@ public interface StudyDataManager {
 	 * @param studyType Can be any of the types defined in {@link StudyType}
 	 * @param programUUID unique ID of the currenly selected program
 	 * @return The list of study details having the given study type
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException;
+	List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID);
 
 	/**
 	 * Count all studies of the given study type from selected DB instance.
@@ -577,9 +527,8 @@ public interface StudyDataManager {
 	 * @param studyType Can be any of the types defined in {@link StudyType}
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details having the given study type
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException;
+	long countStudyDetails(StudyType studyType, String programUUID);
 
 	/**
 	 * Count all studies of the given study type from both central and local.
@@ -587,35 +536,31 @@ public interface StudyDataManager {
 	 * @param studyType Can be any of the types defined in {@link StudyType}
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details having the given study type
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException;
+	long countAllStudyDetails(StudyType studyType, String programUUID);
 
 	/**
 	 * Retrieves the study details of the all nurseries and trials from both central and local ordered by db instance then study name.
 	 *
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details of Nurseries and Trials
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException;
+	List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID);
 
 	/**
 	 * Count all nurseries and trials
 	 *
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details from the currently selected program
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException;
+	long countAllNurseryAndTrialStudyDetails(String programUUID);
 
 	/**
 	 * Retrieves the folder tree.
 	 *
 	 * @return the folder tree
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<FolderReference> getFolderTree() throws MiddlewareQueryException;
+	List<FolderReference> getFolderTree();
 
 	/**
 	 * Retrieves a flat list (no tree structuring) of all folders.
@@ -628,9 +573,8 @@ public interface StudyDataManager {
 	 * @param dataSetId the data set id
 	 * @param variateIds the variate ids
 	 * @return the int
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds);
 
 	/**
 	 * Gets the geolocation prop value.
@@ -638,27 +582,24 @@ public interface StudyDataManager {
 	 * @param stdVarId the std var id
 	 * @param studyId the study id
 	 * @return the geolocation prop value
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String getGeolocationPropValue(int stdVarId, int studyId) throws MiddlewareQueryException;
+	String getGeolocationPropValue(int stdVarId, int studyId);
 
 	/**
 	 * Gets the all field maps in block by block id.
 	 *
 	 * @param blockId the block id
 	 * @return List of all field maps in the block
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId) throws MiddlewareQueryException;
+	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId);
 
 	/**
 	 * Gets the folder name by id.
 	 *
 	 * @param folderId the folder id
 	 * @return the folder name by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
+	String getFolderNameById(Integer folderId);
 
 	/**
 	 * Check if study has measurement data.
@@ -666,9 +607,8 @@ public interface StudyDataManager {
 	 * @param datasetId
 	 * @param variateIds
 	 * @return
-	 * @throws MiddlewareQueryException
 	 */
-	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds);
 
 	/**
 	 * Count the number of variates with recorded data.
@@ -676,9 +616,8 @@ public interface StudyDataManager {
 	 * @param datasetId
 	 * @param variateIds
 	 * @return
-	 * @throws MiddlewareQueryException
 	 */
-	int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	int countVariatesWithData(int datasetId, List<Integer> variateIds);
 
 	/**
 	 * Check if study has measurement data.
@@ -688,10 +627,8 @@ public interface StudyDataManager {
 	 * @param plotNos list of plotNos
 	 * @param cvTermIds list of std var Ids
 	 * @return list of plotNo, stdVarId and phenoTypeId
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, List<Integer> plotNos, List<Integer> cvTermIds)
-			throws MiddlewareQueryException;
+	List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, List<Integer> plotNos, List<Integer> cvTermIds);
 
 	/**
 	 * Check if study has measurement data.
@@ -701,19 +638,16 @@ public interface StudyDataManager {
 	 * @param plotNo
 	 * @param cvTermIds list of std var Ids
 	 * @return list of plotNo, stdVarId and phenoTypeId
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, Integer plotNo, List<Integer> cvTermIds)
-			throws MiddlewareQueryException;
+	List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, Integer plotNo, List<Integer> cvTermIds);
 
 	/**
 	 * Save the Phenotype Outlier data
 	 *
 	 * @param phenotyleOutliers list of PhenotypeOutliers
 	 * @return none
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers) throws MiddlewareQueryException;
+	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers);
 
 	/**
 	 * Determines if the data for the specified Trial contains at least 2 replicates with values
@@ -722,29 +656,25 @@ public interface StudyDataManager {
 	 * @param locationId the location id
 	 * @param germplasmTermId the germplasm CVTerm id
 	 * @return true or false
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId, int germplasmTermId) throws MiddlewareQueryException;
+	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId, int germplasmTermId);
 
 	/**
 	 * Determines the {@link StudyType} for study identified by the provided studyId.
 	 *
 	 * @param studyId Identifier of the study to determine study type for.
 	 * @return {@link StudyType} of the study. Returns {@code null} if study type can not be determined for the given study.
-	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
-	StudyType getStudyType(int studyId) throws MiddlewareQueryException;
+	StudyType getStudyType(int studyId);
 
 	/**
 	 * Soft-delete all program studies
 	 *
 	 * @param programUUID Program UUID of the studies to be deleted
-	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
-	void deleteProgramStudies(String programUUID) throws MiddlewareQueryException;
+	void deleteProgramStudies(String programUUID);
 
-	List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows)
-			throws MiddlewareException;
+	List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows);
 
 	/**
 	 * Updates the rank or order of given variables as they ordered in the given list
@@ -752,7 +682,7 @@ public interface StudyDataManager {
 	 * @param datasetId - project Id of
 	 * @param variableIds - list of variable IDs in the order that they will be saved
 	 */
-	void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException;
+	void updateVariableOrdering(int datasetId, List<Integer> variableIds);
 
 	/**
 	 * Gets the geolocation id by project id and trial instance number.
@@ -760,19 +690,16 @@ public interface StudyDataManager {
 	 * @param projectId - study id or dataset id
 	 * @param trialInstanceNumber instance number
 	 * @return the geolocation id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
-			throws MiddlewareQueryException;
+	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber);
 
 	/**
 	 * Retrieves the trial instance number by geolocation id
 	 *
 	 * @param geolocationId
 	 * @return trial instance number
-	 * @throws MiddlewareQueryException
 	 */
-	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException;
+	public String getTrialInstanceNumberByGeolocationId(int geolocationId);
 
 	/**
 	 * Save the geolocation property given the geolocation id, type id and value
@@ -780,25 +707,22 @@ public interface StudyDataManager {
 	 * @param geolocationId
 	 * @param typeId
 	 * @param value
-	 * @throws MiddlewareQueryException
 	 */
-	public void saveGeolocationProperty(int geolocationId, int typeId, String value) throws MiddlewareQueryException;
+	public void saveGeolocationProperty(int geolocationId, int typeId, String value);
 
 	/**
 	 * Retrieves all DMS project names with no program uuid.
 	 *
-	 * @throws MiddlewareQueryException
 	 * @return list of DMS project names with no programUUID
 	 * @
 	 */
-	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException;
+	public List<String> getAllSharedProjectNames();
 
 	/**
 	 * Checks whether the specified locationIds exist in a given dataset
 	 *
 	 * @param locationIds list of location ids
 	 * @return
-	 * @throws MiddlewareQueryException
 	 */
 	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, DataSetType dataSetType, List<Integer> locationIds);
 
@@ -811,10 +735,8 @@ public interface StudyDataManager {
 	 * @param pageSize Page Size
 	 * @param pageNumber Page Number
 	 * @return List of StudySummary
-	 * @throws MiddlewareQueryException
 	 */
-	List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber)
-		throws MiddlewareQueryException;
+	List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
 
 	/**
 	 *
@@ -823,9 +745,8 @@ public interface StudyDataManager {
 	 * @param filters
 	 *            - the filters that to be included in the query
 	 * @return Number of programs
-	 * @throws MiddlewareQueryException
 	 */
-	Long countAllStudies(final Map<StudyFilters, String> filters) throws MiddlewareQueryException;
+	Long countAllStudies(final Map<StudyFilters, String> filters);
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
@@ -833,11 +754,11 @@ public interface StudyDataManager {
 
 	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId);
 
-	StudyMetadata getStudyMetadata (Integer studyId) throws MiddlewareQueryException;
+	StudyMetadata getStudyMetadata (Integer studyId);
 
-	Map<String, String> getGeolocationPropsAndValuesByStudy (Integer studyId) throws MiddlewareQueryException;
+	Map<String, String> getGeolocationPropsAndValuesByStudy (Integer studyId);
 
-	Map<String, String> getProjectPropsAndValuesByStudy (Integer studyId) throws MiddlewareQueryException;
+	Map<String, String> getProjectPropsAndValuesByStudy (Integer studyId);
 
 	Integer getProjectIdByStudyDbId(final Integer studyDbId);
 
