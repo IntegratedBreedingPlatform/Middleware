@@ -126,7 +126,7 @@ public class TrialEnvironmentBuilder extends Builder {
 	}
 
 	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
-			final List<Integer> experimentTypes) {
+			final List<Integer> experimentTypes, final String programUUID) {
 		final List<TrialEnvironment> trialEnvironments = new ArrayList<>();
 
 		final Set<Integer> allGids = new HashSet<>();
@@ -136,7 +136,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		}
 
 		// Step 1: Get Trial Environments for each GID
-		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentStockDao().getEnvironmentsOfGermplasms(allGids);
+		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentStockDao().getEnvironmentsOfGermplasms(allGids, programUUID);
 
 		// Step 2: Get the trial environment details
 		final Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();

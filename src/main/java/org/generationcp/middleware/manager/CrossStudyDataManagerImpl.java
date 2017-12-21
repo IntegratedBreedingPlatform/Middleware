@@ -80,8 +80,8 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 
 	@Override
 	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
-			final List<Integer> experimentTypes) {
-		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes);
+			final List<Integer> experimentTypes, final String programUUID) {
+		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes, programUUID);
 	}
 
 	@Override

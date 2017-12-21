@@ -54,7 +54,7 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(Set<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(final Set<Integer> gids, final String programUUID) throws MiddlewareQueryException {
 		Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<>();
 
 		if (gids.isEmpty()) {
@@ -65,13 +65,23 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 			germplasmEnvironments.put(gid, new HashSet<Integer>());
 		}
 
-		String sql =
+		final String sql =
 				"SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
 						+ "     INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
-						+ "     INNER JOIN stock s ON es.stock_id = s.stock_id AND s.dbxref_id IN (:gids) " + "ORDER BY s.dbxref_id ";
+						+ "     INNER JOIN stock s ON es.stock_id = s.stock_id AND s.dbxref_id IN (:gids) ";
+		final StringBuilder sb = new StringBuilder();
+		sb.append(sql);
+		if (programUUID != null) {
+			sb.append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ");
+			sb.append("INNER JOIN project p ON p.project_id = ep.project_id and p.program_uuid = :programUUID ");
+		}
+		sb.append(" ORDER BY s.dbxref_id ");
 		try {
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-
+			Query query = this.getSession().createSQLQuery(sb.toString());
+			query.setParameterList("gids", gids);
+			if (programUUID != null) {
+				query.setParameter("programUUID", programUUID);
+			}
 			List<Object[]> result = query.list();
 
 			for (Object[] row : result) {
@@ -85,7 +95,7 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getEnvironmentsOfGermplasms(" + gids + ") query on ExperimentStockDao: " + e.getMessage(),
+			this.logAndThrowException("Error at getEnvironmentsOfGermplasms(programUUID=" + programUUID +" ,gids=" + gids + ") query on ExperimentStockDao: " + e.getMessage(),
 					e);
 		}
 
