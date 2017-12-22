@@ -96,13 +96,13 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
-		Preconditions.checkArgument(sampleListDTO.getListName().trim() != "", "The List Name must not be empty");
+		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDTO.getListName()), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDTO.getListName().length() <= 100, "List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
 		Preconditions.checkArgument(
-				StringUtils.isNotBlank(sampleListDTO.getDescription()) && sampleListDTO.getDescription().length() <= 255,
+				StringUtils.isBlank(sampleListDTO.getDescription()) || sampleListDTO.getDescription().length() <= 255,
 				"List Description must not exceed 255 characters");
-		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDTO.getNotes()) && sampleListDTO.getNotes().length() <= 65535,
+		Preconditions.checkArgument(StringUtils.isBlank(sampleListDTO.getNotes()) || sampleListDTO.getNotes().length() <= 65535,
 				"Notes must not exceed 65535 characters");
 
 		try {
