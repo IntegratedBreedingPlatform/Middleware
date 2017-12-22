@@ -22,7 +22,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -163,27 +162,6 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 					+ e.getMessage(), e);
 		}
 		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Role> getRolesByProjectAndUser(Project project, User user) {
-		List<Role> roles = new ArrayList<>();
-		try {
-			if (project != null && user != null) {
-				Criteria criteria = this.getSession().createCriteria(ProjectUserRole.class);
-				criteria.add(Restrictions.eq("project", project));
-				criteria.add(Restrictions.eq("userId", user.getUserid()));
-				List<ProjectUserRole> projectUsers = criteria.list();
-
-				for (ProjectUserRole projectUser : projectUsers) {
-					roles.add(projectUser.getRole());
-				}
-			}
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getByProjectAndUser(project=" + project + ", user=" + user + ") query from Role: "
-					+ e.getMessage(), e);
-		}
-		return roles;
 	}
 
 	@SuppressWarnings("unchecked")

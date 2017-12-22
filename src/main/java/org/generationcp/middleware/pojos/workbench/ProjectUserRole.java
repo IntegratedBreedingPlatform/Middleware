@@ -56,25 +56,18 @@ public class ProjectUserRole implements Serializable {
 	@Column(name = "user_id")
 	private Integer userId;
 
-	/** The role. */
-	@OneToOne(optional = false)
-	@JoinColumn(name = "role_id")
-	private Role role;
-
 	public ProjectUserRole() {
 	}
 
-	public ProjectUserRole(Integer projectUserId, Project project, Integer userId, Role role) {
+	public ProjectUserRole(Integer projectUserId, Project project, Integer userId) {
 		this.projectUserId = projectUserId;
 		this.project = project;
 		this.userId = userId;
-		this.role = role;
 	}
 
-	public ProjectUserRole(Project project, User user, Role role) {
+	public ProjectUserRole(Project project, User user) {
 		this.project = project;
 		this.userId = user.getUserid();
-		this.role = role;
 	}
 
 	public Integer getProjectUserId() {
@@ -99,14 +92,6 @@ public class ProjectUserRole implements Serializable {
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
-	}
-
-	public Role getRole() {
-		return this.role;
-	}
-
-	public void setRole(Role role) {
-		this.role = role;
 	}
 
 	/*
@@ -150,8 +135,6 @@ public class ProjectUserRole implements Serializable {
 		builder.append(this.project);
 		builder.append(", userId=");
 		builder.append(this.userId);
-		builder.append(", role=");
-		builder.append(this.role);
 		builder.append("]");
 		return builder.toString();
 	}

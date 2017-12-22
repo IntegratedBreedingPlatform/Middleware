@@ -23,7 +23,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -121,14 +120,10 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		this.workbenchDataManager.addProject(program);
 
 		final List<ProjectUserRole> projectUserRoles = new ArrayList<ProjectUserRole>();
-		final List<Role> allRolesList = this.workbenchDataManager.getAllRoles();
-		for (final Role role : allRolesList) {
-			final ProjectUserRole projectUserRole = new ProjectUserRole();
-			projectUserRole.setUserId(workbenchUser.getUserid());
-			projectUserRole.setRole(role);
-			projectUserRole.setProject(program);
-			projectUserRoles.add(projectUserRole);
-		}
+		final ProjectUserRole projectUserRole = new ProjectUserRole();
+		projectUserRole.setUserId(workbenchUser.getUserid());
+		projectUserRole.setProject(program);
+		projectUserRoles.add(projectUserRole);
 		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
 		final User cropDBUser = workbenchUser.copy();

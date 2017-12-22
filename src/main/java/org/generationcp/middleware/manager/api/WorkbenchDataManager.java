@@ -10,6 +10,9 @@
 
 package org.generationcp.middleware.manager.api;
 
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
@@ -23,7 +26,6 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -38,9 +40,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
@@ -344,14 +343,6 @@ public interface WorkbenchDataManager {
 	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
 
 	/**
-	 * Updates all the project roles for a project.
-	 *
-	 * @param project - the project to use
-	 * @param newRoles - the new roles to add
-	 */
-	void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles);
-
-	/**
 	 * Registers a workbench dataset.
 	 *
 	 * @param dataset - the workbench dataset to save
@@ -501,10 +492,9 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param project the project
 	 * @param user the user
-	 * @param role the role of the user in the project
 	 * @return Returns the id of the {@code ProjectUserRole} record added
 	 */
-	Integer addProjectUserRole(Project project, User user, Role role);
+	Integer addProjectUserRole(Project project, User user);
 
 	/**
 	 * Adds a single workbench_project_user_role record.
@@ -721,69 +711,6 @@ public interface WorkbenchDataManager {
 	 * @return The WorkbenchRuntimeData
 	 */
 	WorkbenchRuntimeData getWorkbenchRuntimeData();
-
-	/**
-	 * Gets the role by id.
-	 *
-	 * @param id - the role id to match
-	 * @return the role matching the given id
-	 */
-	Role getRoleById(Integer id);
-
-	/**
-	 * Gets the role by name and workflow template.
-	 *
-	 * @param name - the role name to match
-	 * @param workflowTemplate - the workflow template to match
-	 * @return the role matching the given name and workflow template
-	 */
-	Role getRoleByNameAndWorkflowTemplate(String name, WorkflowTemplate workflowTemplate);
-
-	/**
-	 * Gets the roles by workflow template.
-	 *
-	 * @param workflowTemplate - the workflow template to match
-	 * @return the role matching the given workflow template
-	 */
-	List<Role> getRolesByWorkflowTemplate(WorkflowTemplate workflowTemplate);
-
-	/**
-	 * Gets the workflow template of the given role.
-	 *
-	 * @param role - the role to match
-	 * @return the workflow template matching the given role
-	 */
-	WorkflowTemplate getWorkflowTemplateByRole(Role role);
-
-	/**
-	 * Gets the roles given the project and user.
-	 *
-	 * @param project - the project to match
-	 * @param user - the user to match
-	 * @return the list of roles matching the given workflow template
-	 */
-	List<Role> getRolesByProjectAndUser(Project project, User user);
-
-	/**
-	 * Returns all records from the workbench_role table,.
-	 *
-	 * @return List of Role objects
-	 */
-	List<Role> getAllRoles();
-
-	/**
-	 * Returns all records from the workbench_role table, ordered by descending role_id.
-	 *
-	 * @return List of Role objects
-	 */
-	List<Role> getAllRolesDesc();
-
-	/**
-	 * Returns all records from the workbench_role table, ordered by ascending label_order.
-	 *
-	 * @return List of Role objects
-	 */
-	List<Role> getAllRolesOrderedByLabel();
 
 	/**
 	 * Get the workbench setting object.

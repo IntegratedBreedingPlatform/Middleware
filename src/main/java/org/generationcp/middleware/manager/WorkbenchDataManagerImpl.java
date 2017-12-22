@@ -10,6 +10,12 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -17,7 +23,6 @@ import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ProjectUserRoleDAO;
-import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.TemplateSettingDAO;
@@ -43,7 +48,6 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -67,12 +71,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Implementation of the WorkbenchDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -139,48 +137,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return projectUserInfoDao;
 	}
 
-	@Override
-	public void updateProjectsRolesForProject(final Project project, final List<ProjectUserRole> newRoles) {
-		final List<ProjectUserRole> oldRoles = this.getProjectUserRolesByProject(project);
-
-		final List<ProjectUserRole> toDeleteRoles = this.getUniqueUserRolesFrom(oldRoles, newRoles);
-		final List<ProjectUserRole> toAddRoles = this.getUniqueUserRolesFrom(newRoles, oldRoles);
-
-		this.deleteProjectUserRoles(toDeleteRoles);
-		this.addProjectUserRole(toAddRoles);
-	}
-
-	private List<ProjectUserRole> getUniqueUserRolesFrom(final List<ProjectUserRole> list1, final List<ProjectUserRole> list2) {
-		final List<ProjectUserRole> uniqueRoles = new ArrayList<>();
-		for (final ProjectUserRole role : list1) {
-			if (!this.projectRoleContains(role, list2)) {
-				uniqueRoles.add(role);
-			}
-		}
-		return uniqueRoles;
-	}
-
-	private boolean projectRoleContains(final ProjectUserRole oldRole, final List<ProjectUserRole> roles) {
-		for (final ProjectUserRole role : roles) {
-			if (oldRole.getUserId().equals(role.getUserId()) && oldRole.getRole().getRoleId().equals(role.getRole().getRoleId())) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private ProjectUserRoleDAO getProjectUserRoleDao() {
 		final ProjectUserRoleDAO projectUserRoleDao = new ProjectUserRoleDAO();
 		projectUserRoleDao.setSession(this.getCurrentSession());
 		return projectUserRoleDao;
-	}
-
-	private RoleDAO getRoleDao() {
-
-		final RoleDAO roleDao = new RoleDAO();
-		roleDao.setSession(this.getCurrentSession());
-		return roleDao;
 	}
 
 	private SecurityQuestionDAO getSecurityQuestionDao() {
@@ -684,11 +644,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer addProjectUserRole(final Project project, final User user, final Role role) {
+	public Integer addProjectUserRole(final Project project, final User user) {
 		final ProjectUserRole projectUserRole = new ProjectUserRole();
 		projectUserRole.setProject(project);
 		projectUserRole.setUserId(user.getUserid());
-		projectUserRole.setRole(role);
 		return this.addProjectUserRole(projectUserRole);
 	}
 
@@ -1032,50 +991,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public WorkbenchRuntimeData getWorkbenchRuntimeData() {
 		final List<WorkbenchRuntimeData> list = this.getWorkbenchRuntimeDataDao().getAll(0, 1);
 		return !list.isEmpty() ? list.get(0) : null;
-	}
-
-	@Override
-	public Role getRoleById(final Integer id) {
-		return this.getRoleDao().getById(id);
-	}
-
-	@Override
-	public Role getRoleByNameAndWorkflowTemplate(final String name, final WorkflowTemplate workflowTemplate) {
-		return this.getRoleDao().getByNameAndWorkflowTemplate(name, workflowTemplate);
-	}
-
-	@Override
-	public List<Role> getRolesByWorkflowTemplate(final WorkflowTemplate workflowTemplate) {
-		return this.getRoleDao().getByWorkflowTemplate(workflowTemplate);
-	}
-
-	@Override
-	public WorkflowTemplate getWorkflowTemplateByRole(final Role role) {
-		return role.getWorkflowTemplate();
-	}
-
-	@Override
-	public List<Role> getRolesByProjectAndUser(final Project project, final User user) {
-		return this.getProjectUserRoleDao().getRolesByProjectAndUser(project, user);
-	}
-
-	@Override
-	public List<Role> getAllRoles() {
-		return this.getRoleDao().getAll();
-	}
-
-	@Override
-	public List<Role> getAllRolesDesc() {
-		return this.getRoleDao().getAllRolesDesc();
-	}
-
-	@Override
-	public List<Role> getAllRolesOrderedByLabel() {
-		try {
-			return this.getRoleDao().getAllRolesOrderedByLabel();
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error encountered while getting all roles (sorted): " + e.getMessage(), e);
-		}
 	}
 
 	@Override
