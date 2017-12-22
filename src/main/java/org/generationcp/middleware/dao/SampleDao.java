@@ -66,7 +66,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				}
 			}
 
-		} catch (HibernateException he) {
+		} catch (final HibernateException he) {
 			throw new MiddlewareException(
 				"Unexpected error in executing getExperimentSampleMap(studyDbId = " + studyDbId + ") query: " + he.getMessage(), he);
 		}
@@ -74,11 +74,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	public Sample getBySampleBk(final String sampleBk){
-		Sample sample;
+		final Sample sample;
 		try {
 			sample = (Sample) this.getSession().createCriteria(Sample.class, "sample").add(Restrictions.eq("sampleBusinessKey", sampleBk))
 				.uniqueResult();
-		} catch (HibernateException he) {
+		} catch (final HibernateException he) {
 			throw new MiddlewareException(
 				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
 		}
