@@ -1,25 +1,25 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
@@ -50,7 +50,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
 		final Map<Integer, String> samplesMap = new HashMap<>();
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(SampleDao.SQL_SAMPLES_AND_EXPERIMENTS);
+			final SQLQuery query = this.getSession().createSQLQuery(SQL_SAMPLES_AND_EXPERIMENTS);
 
 			query.setParameter("studyId", studyDbId);
 			final List results = query.list();
@@ -62,7 +62,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				}
 			}
 
-		} catch (final HibernateException he) {
+		} catch (HibernateException he) {
 			throw new MiddlewareException(
 					"Unexpected error in executing getExperimentSampleMap(studyDbId = " + studyDbId + ") query: " + he.getMessage(), he);
 		}
@@ -74,7 +74,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		try {
 			sample = (Sample) this.getSession().createCriteria(Sample.class, "sample").add(Restrictions.eq("sampleBusinessKey", sampleBk))
 					.uniqueResult();
-		} catch (final HibernateException he) {
+		} catch (HibernateException he) {
 			throw new MiddlewareException(
 					"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
 		}
@@ -87,8 +87,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 		final List<Object[]> result = this.getSession().createCriteria(Sample.class, "sample").createAlias("sample.plant", "plant")
 				.createAlias("plant.experiment", "experiment").createAlias("experiment.experimentStocks", "experimentStocks")
-				.createAlias("experimentStocks.stock", "stock").add(Restrictions.in("sampleId", sampleIds)).setProjection(Projections
-						.projectionList().add(Projections.property("sample.sampleId")).add(Projections.property("stock.dbxrefId")))
+			.createAlias("experimentStocks.stock", "stock")
+			.add(Restrictions.in("sampleId", sampleIds))
+			.setProjection(Projections.projectionList()
+				.add(Projections.property("sample.sampleId"))
+				.add(Projections.property("stock.dbxrefId")))
 				.list();
 		for (final Object[] row : result) {
 			map.put((Integer) row[0], (Integer) row[1]);
@@ -105,9 +108,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		final List<Object[]> result = this.getSession()
 
 				.createCriteria(Sample.class, "sample").createAlias("sample.plant", "plant")//
-				.createAlias("sample.sampleList", "sampleList", CriteriaSpecification.LEFT_JOIN)//
-				.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)//
-				.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)//
+			.createAlias("sample.sampleList", "sampleList", Criteria.LEFT_JOIN)//
+			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)//
+			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)//
 
 				.createAlias("plant.experiment", "experiment")//
 				.createAlias("experiment.experimentStocks", "experimentStocks")//
@@ -116,7 +119,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.createAlias("project.relatedTos", "relatedTos")//
 				.createAlias("relatedTos.objectProject", "objectProject")//
 				.add(Restrictions.eq("stock.dbxrefId", gid))//
-				.add(Restrictions.ne("project." + DmsProjectDao.DELETED, true)).addOrder(Order.desc("sample.sampleBusinessKey"))//
+				.add(Restrictions.ne("project." + DmsProjectDao.DELETED, true))
+			.addOrder(Order.desc("sample.sampleBusinessKey"))//
 
 				.setProjection(Projections.distinct(Projections.projectionList()//
 						.add(Projections.property("sampleList.listName"))//
