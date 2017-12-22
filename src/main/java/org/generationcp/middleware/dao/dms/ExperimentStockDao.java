@@ -29,15 +29,19 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link ExperimentStock}.
  *
  */
 public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ExperimentStockDao.class);
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getExperimentIdsByStockIds(Collection<Integer> stockIds) throws MiddlewareQueryException {
+	public List<Integer> getExperimentIdsByStockIds(Collection<Integer> stockIds) {
 		try {
 			if (stockIds != null && !stockIds.isEmpty()) {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -47,14 +51,15 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getExperimentIdsByStockIds=" + stockIds + " query in ExperimentStockDao: " + e.getMessage(), e);
+			final String error = "Error in getExperimentIdsByStockIds=" + stockIds + " query in ExperimentStockDao: " + e.getMessage();
+			ExperimentStockDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
 		}
 		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(final Set<Integer> gids, final String programUUID) throws MiddlewareQueryException {
+	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(final Set<Integer> gids, final String programUUID) {
 		Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<>();
 
 		if (gids.isEmpty()) {
@@ -95,15 +100,16 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getEnvironmentsOfGermplasms(programUUID=" + programUUID +" ,gids=" + gids + ") query on ExperimentStockDao: " + e.getMessage(),
-					e);
+			final String error = "Error at getEnvironmentsOfGermplasms(programUUID=" + programUUID +" ,gids=" + gids + ") query on ExperimentStockDao: " + e.getMessage();
+			ExperimentStockDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
 		}
 
 		return germplasmEnvironments;
 
 	}
 
-	public long countStocksByDatasetId(int datasetId) throws MiddlewareQueryException {
+	public long countStocksByDatasetId(int datasetId) {
 
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(DISTINCT es.stock_id) FROM nd_experiment_project ep ")
@@ -117,9 +123,10 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 			return count.longValue();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at countStocksByDatasetId=" + datasetId + " query at ExperimentDao: " + e.getMessage(), e);
+			final String error = "Error at countStocksByDatasetId=" + datasetId + " query at ExperimentStockDao: " + e.getMessage();
+			ExperimentStockDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
 		}
-		return 0;
 	}
 
 }

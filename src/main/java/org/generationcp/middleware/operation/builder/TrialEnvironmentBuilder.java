@@ -42,7 +42,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public TrialEnvironments getTrialEnvironmentsInDataset(final int studyId, final int datasetId) throws MiddlewareException {
+	public TrialEnvironments getTrialEnvironmentsInDataset(final int studyId, final int datasetId) {
 		final DmsProject project = this.getDataSetBuilder().getTrialDataset(studyId);
 		final DataSet dataSet = this.getDataSetBuilder().build(project.getProjectId());
 		final Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
