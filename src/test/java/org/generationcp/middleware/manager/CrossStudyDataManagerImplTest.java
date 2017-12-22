@@ -110,7 +110,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 		// Include both traits and analysis variables
 		final List<Integer> experimentTypes = Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.AVERAGE_EXPERIMENT.getId());
-		final List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs, experimentTypes);
+		final List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs, experimentTypes, null);
 		for (final GermplasmPair pair : result) {
 			pair.print(IntegrationTestBase.INDENT);
 		}

@@ -93,9 +93,11 @@ public interface CrossStudyDataManager {
 	 *
 	 * @param germplasmPairs List of germplasm pairs of GIDs
 	 * @param experimentTypes - List of experiment type IDs to be included in query (can be for plot and/or analysis types)
+	 * @param programUUID - unique identifier for current program
 	 * @return List of TrialEnvironments corresponding to the list of Germplasm IDs
 	 */
-	List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final List<Integer> experimentTypes);
+	List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final List<Integer> experimentTypes,
+			final String programUUID);
 
 	/**
 	 * For each combination of trait, germplasm, and environment, the value observed is returned. If there was no observation for a
