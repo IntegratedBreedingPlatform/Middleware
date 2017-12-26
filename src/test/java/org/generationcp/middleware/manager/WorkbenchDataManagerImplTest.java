@@ -35,7 +35,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
@@ -332,36 +331,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		dataset.setCreationDate(new Date(System.currentTimeMillis()));
 		dataset.setProject(project);
 		return dataset;
-	}
-
-	@Test
-	public void testProjectUserRoles() {
-
-		final ProjectUserRole projUsrRole1 = new ProjectUserRole(this.commonTestProject, this.testUser1);
-		final ProjectUserRole projUsrRole2 = new ProjectUserRole(this.commonTestProject, this.testUser1);
-
-		final List<ProjectUserRole> projectUserRoles = new ArrayList<>();
-		projectUserRoles.add(projUsrRole1);
-		projectUserRoles.add(projUsrRole2);
-
-		final List<Integer> rolesAdded = this.workbenchDataManager.addProjectUserRole(projectUserRoles);
-		Assert.assertEquals(2, rolesAdded.size());
-
-		final long result = this.workbenchDataManager.countUsersByProjectId(this.commonTestProject.getProjectId());
-		Assert.assertEquals(1, result);
-
-		final List<Project> results = this.workbenchDataManager.getProjectsByUser(this.testUser1);
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
-
-		final List<ProjectUserRole> results2 = this.workbenchDataManager.getProjectUserRolesByProject(this.commonTestProject);
-		Assert.assertNotNull(results2);
-		Assert.assertTrue(!results2.isEmpty());
-
-		final List<User> users = this.workbenchDataManager.getUsersByProjectId(this.commonTestProject.getProjectId());
-		Assert.assertNotNull(users);
-		Assert.assertEquals(1, users.size());
-		Assert.assertEquals(this.testUser1, users.get(0));
 	}
 
 	@Test
@@ -825,7 +794,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		UserDto userDto = UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", "Breeder", "username");
 		final int id = this.workbenchDataManager.createUser(userDto);
 		final User user = this.workbenchDataManager.getUserById(id);
-		this.workbenchDataManager.addProjectUserRole(new ProjectUserRole(this.commonTestProject, user));
+		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
+//		this.workbenchDataManager.addProjectUserRole(new ProjectUserRole(this.commonTestProject, user));
 		
 		
 		List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());

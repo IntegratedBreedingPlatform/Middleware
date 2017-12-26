@@ -25,7 +25,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -488,35 +487,6 @@ public interface WorkbenchDataManager {
 	long countWorkbenchDatasetByName(String name, Operation op);
 
 	/**
-	 * Adds a single project user given a Project object, a User object, and a Role object.
-	 *
-	 * @param project the project
-	 * @param user the user
-	 * @return Returns the id of the {@code ProjectUserRole} record added
-	 */
-	Integer addProjectUserRole(Project project, User user);
-
-	/**
-	 * Adds a single workbench_project_user_role record.
-	 *
-	 * @param projectUserRole - the ProjectUserRole to save
-	 * @return Returns the id of the {@code ProjectUserRole} record added
-	 */
-	Integer addProjectUserRole(ProjectUserRole projectUserRole);
-
-	void deleteProjectUserRolesByProject(Project project);
-
-	void deleteProjectUserRoles(List<ProjectUserRole> oldRoles);
-
-	/**
-	 * Adds multiple workbench_project_user_role records.
-	 *
-	 * @param projectUserRoles - the records to add
-	 * @return Returns the ids of the {@code ProjectUserRole} records added
-	 */
-	List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles);
-
-	/**
 	 * Adds a project activity.
 	 *
 	 * @param projectActivity - the project activity
@@ -533,14 +503,6 @@ public interface WorkbenchDataManager {
 	List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList);
 
 	/**
-	 * Retrieves the workbench_project_user_role records based on the given project.
-	 *
-	 * @param project - the Project to match
-	 * @return the associated list of ProjectUser
-	 */
-	List<ProjectUserRole> getProjectUserRolesByProject(Project project);
-	
-	/**
 	 * Retrieves the user ids of the program members using the project id
 	 * 
 	 * @param projectId
@@ -549,35 +511,12 @@ public interface WorkbenchDataManager {
 	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
 	
 	/**
-	 * Deletes the given ProjectUserRole.
-	 *
-	 * @param projectUserRole - the ProjectUserRole to delete
-	 */
-	void deleteProjectUserRole(ProjectUserRole projectUserRole);
-
-	/**
 	 * Return a List of {@link User} records associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id
 	 * @return the List of {@link User} records
 	 */
 	List<User> getUsersByProjectId(Long projectId);
-
-	/**
-	 * Return a Map of {@link Person} records identified by {@link User} ids associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the Maps of {@link Person} records identified by {@link User} ids
-	 */
-	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
-
-	/**
-	 * Returns the number of {@link User} records associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the number of {@link User} records
-	 */
-	long countUsersByProjectId(Long projectId);
 
 	/**
 	 * Get the list of all installed central crop databases.

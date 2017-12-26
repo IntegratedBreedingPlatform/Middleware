@@ -22,7 +22,6 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.dao.ProjectUserRoleDAO;
 import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.TemplateSettingDAO;
@@ -47,7 +46,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -129,18 +127,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return projectDao;
 	}
 
+	//FIXME Do not expose this DAO
 	@Override
 	public ProjectUserInfoDAO getProjectUserInfoDao() {
 
 		final ProjectUserInfoDAO projectUserInfoDao = new ProjectUserInfoDAO();
 		projectUserInfoDao.setSession(this.getCurrentSession());
 		return projectUserInfoDao;
-	}
-
-	private ProjectUserRoleDAO getProjectUserRoleDao() {
-		final ProjectUserRoleDAO projectUserRoleDao = new ProjectUserRoleDAO();
-		projectUserRoleDao.setSession(this.getCurrentSession());
-		return projectUserRoleDao;
 	}
 
 	private SecurityQuestionDAO getSecurityQuestionDao() {
@@ -157,6 +150,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return toolConfigurationDao;
 	}
 
+	//FIXME Do not expose this DAO
 	@Override
 	public ToolDAO getToolDao() {
 
@@ -229,6 +223,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return templateSettingDAO;
 	}
 
+	//FIXME Do not expose this DAO
 	@Override
 	public StandardPresetDAO getStandardPresetDAO() {
 		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
@@ -263,7 +258,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<Project> getProjectsByUser(final User user) {
-		return this.getProjectUserRoleDao().getProjectsByUser(user);
+		return this.getProjectUserInfoDao().getProjectsByUser(user);
 	}
 
 	@Override
@@ -328,18 +323,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				this.deleteProjectActivity(projectActivity);
 			}
 
-			final List<ProjectUserRole> projectUsers = this.getProjectUserRolesByProject(project);
-			for (final ProjectUserRole projectUser : projectUsers) {
-				this.deleteProjectUserRole(projectUser);
-			}
-
 			final List<WorkbenchDataset> datasets =
 					this.getWorkbenchDatasetByProjectId(projectId, 0, (int) this.countWorkbenchDatasetByProjectId(projectId));
 			for (final WorkbenchDataset dataset : datasets) {
 				this.deleteWorkbenchDataset(dataset);
 			}
 
-			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId.intValue());
+			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId);
 			for (final ProjectUserInfo projectUserInfo : projectUserInfos) {
 				this.deleteProjectUserInfoDao(projectUserInfo);
 			}
@@ -644,105 +634,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer addProjectUserRole(final Project project, final User user) {
-		final ProjectUserRole projectUserRole = new ProjectUserRole();
-		projectUserRole.setProject(project);
-		projectUserRole.setUserId(user.getUserid());
-		return this.addProjectUserRole(projectUserRole);
-	}
-
-	@Override
-	public Integer addProjectUserRole(final ProjectUserRole projectUserRole) {
-
-		Integer idSaved = null;
-		try {
-
-			final ProjectUserRole recordSaved = this.getProjectUserRoleDao().saveOrUpdate(projectUserRole);
-			idSaved = recordSaved.getProjectUserId();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while saving ProjectUserRole: WorkbenchDataManager.addProjectUserRole(projectUserRole="
-							+ projectUserRole + "): " + e.getMessage(), e);
-		}
-
-		return idSaved;
-	}
-
-	@Override
-	public void deleteProjectUserRolesByProject(final Project project) {
-		// remove all previous roles
-		this.deleteProjectUserRoles(this.getProjectUserRolesByProject(project));
-	}
-
-	@Override
-	public void deleteProjectUserRoles(final List<ProjectUserRole> oldRoles) {
-		// remove all previous roles
-		try {
-			for (final ProjectUserRole projectUserRole : oldRoles) {
-				this.getCurrentSession().delete(projectUserRole);
-			}
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-					"Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUserRoles(oldRoles=" + oldRoles + "): "
-							+ e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public List<Integer> addProjectUserRole(final List<ProjectUserRole> projectUserRoles) {
-
-		final List<Integer> idsSaved = new ArrayList<>();
-		try {
-
-			final ProjectUserRoleDAO dao = this.getProjectUserRoleDao();
-
-			for (final ProjectUserRole projectUser : projectUserRoles) {
-				final ProjectUserRole recordSaved = dao.saveOrUpdate(projectUser);
-				idsSaved.add(recordSaved.getProjectUserId());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while saving ProjectUserRoles: WorkbenchDataManager.addProjectUserRoles(projectUserRoles="
-							+ projectUserRoles + "): " + e.getMessage(), e);
-		}
-
-		return idsSaved;
-	}
-
-	@Override
-	public List<ProjectUserRole> getProjectUserRolesByProject(final Project project) {
-		return this.getProjectUserRoleDao().getByProject(project);
-	}
-
-	@Override
-	public void deleteProjectUserRole(final ProjectUserRole projectUserRole) {
-
-		try {
-			this.getProjectUserRoleDao().makeTransient(projectUserRole);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-					"Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser=" + projectUserRole
-							+ "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public List<User> getUsersByProjectId(final Long projectId) {
-		return this.getProjectUserRoleDao().getUsersByProjectId(projectId);
-	}
-
-	@Override
-	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
-		return this.getProjectUserRoleDao().getPersonsByProjectId(projectId);
-	}
-
-	@Override
-	public long countUsersByProjectId(final Long projectId) {
-		return this.getProjectUserRoleDao().countUsersByProjectId(projectId);
+		return this.getProjectUserInfoDao().getUsersByProjectId(projectId);
 	}
 
 	@Override
@@ -779,7 +672,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return idSaved;
 	}
 
-	public List<ProjectUserInfo> getByProjectId(final Integer projectId) {
+	public List<ProjectUserInfo> getByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getByProjectId(projectId);
 
 	}
@@ -1464,7 +1357,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<Integer> getActiveUserIDsByProjectId(Long projectId) {
-		return this.getProjectUserRoleDao().getActiveUserIDsByProjectId(projectId);
+		return this.getProjectUserInfoDao().getActiveUserIDsByProjectId(projectId);
 	}
 
 }

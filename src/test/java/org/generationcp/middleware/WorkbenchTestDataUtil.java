@@ -114,7 +114,7 @@ public class WorkbenchTestDataUtil {
 		this.workbenchDataManager.insertOrUpdateUserInfo(userInfo);
 
 		ProjectUserInfo pui = new ProjectUserInfo();
-		pui.setProjectId(new Integer(Integer.parseInt(this.commonTestProject.getProjectId().toString())));
+		pui.setProject(this.commonTestProject);
 		pui.setUserId(this.commonTestProject.getUserId());
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);

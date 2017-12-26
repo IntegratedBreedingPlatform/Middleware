@@ -28,7 +28,6 @@ public class ProjectUserInfoDAOTest extends IntegrationTestBase {
 
 	private ProjectUserInfoDAO dao;
 	private UserDAO userDao;
-	private ProjectUserRoleDAO projectUserRoleDao;
 
 	@Before
 	public void setUp() throws Exception {
@@ -38,10 +37,8 @@ public class ProjectUserInfoDAOTest extends IntegrationTestBase {
 		this.dao.setSession(currentSession);
 
 		this.userDao = new UserDAO();
-		this.projectUserRoleDao = new ProjectUserRoleDAO();
 
 		this.userDao.setSession(currentSession);
-		this.projectUserRoleDao.setSession(currentSession);
 
 	}
 
@@ -50,12 +47,12 @@ public class ProjectUserInfoDAOTest extends IntegrationTestBase {
 		List<User> usersList = this.userDao.getAll();
 
 		int userId = usersList.get(0).getUserid();
-		int projectId = this.projectUserRoleDao.getProjectsByUser(usersList.get(0)).get(0).getProjectId().intValue();
+		Long projectId = this.dao.getProjectsByUser(usersList.get(0)).get(0).getProjectId();
 
 		ProjectUserInfo result = this.dao.getByProjectIdAndUserId(projectId, userId);
 
 		Assert.assertNotNull(result);
-		Debug.println(0, "testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
+		Debug.println(0, "testGetByProjectIdAndUserId RESULTS:" + result.getProject());
 		Debug.println(0, result.toString());
 	}
 }
