@@ -3,19 +3,21 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,20 +36,68 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ "        						WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n"
 			+ "GROUP BY nde.nd_experiment_id";
 
-	public Sample getBySampleId(final Integer sampleId) {
-		final DetachedCriteria criteria = DetachedCriteria.forClass(Sample.class);
-		criteria.add(Restrictions.eq("sampleId", sampleId));
-		return (Sample) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
+	@SuppressWarnings("unchecked")
+	public List<SampleDTO> getByPlotId(final String plotId) {
+
+
+		final List<Object[]> result = this.getSession().createCriteria(Sample.class, "sample")
+			.createAlias("sample.plant", "plant")
+			.createAlias("sample.sampleList", "sampleList")
+			.createAlias("sample.takenBy", "takenBy")
+			.createAlias("takenBy.person", "person")
+			.createAlias("plant.experiment", "experiment")
+			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
+			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
+			.setFetchMode("accMetadataSets", FetchMode.JOIN)
+			.setFetchMode("dataset", FetchMode.JOIN)
+			.add(Restrictions.eq("experiment.plotId", plotId))
+			.setProjection(Projections.distinct(Projections.projectionList().add(Projections.property("sampleId")) //row[0]
+				.add(Projections.property("sampleName")) //row[1]
+				.add(Projections.property("sampleBusinessKey")) //row[2]
+				.add(Projections.property("person.firstName")) //row[3]
+				.add(Projections.property("person.lastName")) //row[4]
+				.add(Projections.property("sampleList.listName")) //row[5]
+				.add(Projections.property("plant.plantNumber")) //row[6]
+				.add(Projections.property("plant.plantBusinessKey")) //row[7]
+				.add(Projections.property("dataset.datasetId")) //row[8]
+				.add(Projections.property("dataset.datasetName")) //row[9]
+			)).list();
+
+		return this.getSampleDTOS(result);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Sample> getByPlotId(final String plotId) {
-		return this.getSession()
-			.createCriteria(Sample.class, "sample")
-			.createAlias("sample.plant", "plant")
-			.createAlias("plant.experiment", "experiment")
-			.add(Restrictions.eq("experiment.plotId", plotId))
-			.list();
+	private List<SampleDTO> getSampleDTOS(final List<Object[]> result) {
+		final Map<Integer, SampleDTO> sampleDTOMap = new HashMap<>();
+		for (final Object[] row : result) {
+
+			final Integer sampleId = (Integer) row[0];
+			SampleDTO dto = sampleDTOMap.get(sampleId);
+			if (dto == null) {
+				dto = new SampleDTO();
+				dto.setSampleId(sampleId);
+				dto.setSampleName((String) row[1]);
+				dto.setSampleBusinessKey((String) row[2]);
+				dto.setTakenBy(row[3] + " " + row[4]);
+				dto.setSampleList((String) row[5]);
+				dto.setPlantNumber((Integer) row[6]);
+				dto.setPlantBusinessKey((String) row[7]);
+				dto.setDatasets(new HashSet<SampleDTO.Dataset>());
+			}
+
+			if (row[8] != null && row[9] != null) {
+				final SampleDTO.Dataset dataset;
+				dataset = new SampleDTO().new Dataset();
+				dataset.setDatasetId((Integer) row[8]);
+				dataset.setName((String) row[9]);
+				dto.getDatasets().add(dataset);
+			}
+
+			sampleDTOMap.put(sampleId, dto);
+		}
+
+		final ArrayList<SampleDTO> list = new ArrayList<>();
+		list.addAll(sampleDTOMap.values());
+		return list;
 	}
 
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
@@ -65,7 +115,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				}
 			}
 
-		} catch (HibernateException he) {
+		} catch (final HibernateException he) {
 			throw new MiddlewareException(
 				"Unexpected error in executing getExperimentSampleMap(studyDbId = " + studyDbId + ") query: " + he.getMessage(), he);
 		}
@@ -73,11 +123,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	public Sample getBySampleBk(final String sampleBk){
-		Sample sample;
+		final Sample sample;
 		try {
 			sample = (Sample) this.getSession().createCriteria(Sample.class, "sample").add(Restrictions.eq("sampleBusinessKey", sampleBk))
 				.uniqueResult();
-		} catch (HibernateException he) {
+		} catch (final HibernateException he) {
 			throw new MiddlewareException(
 				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
 		}
@@ -87,7 +137,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
 		final Map<Integer, Integer> map = new HashMap<>();
-
 		final List<Object[]> result =  this.getSession()
 			.createCriteria(Sample.class, "sample")
 			.createAlias("sample.plant", "plant")
@@ -106,11 +155,33 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Sample> getBySampleBks(final Set<String> sampleBks) {
-		return this.getSession()
-				.createCriteria(Sample.class, "sample")
-				.add(Restrictions.in("sampleBusinessKey", sampleBks))
-				.list();
+	public List<SampleDTO> getBySampleBks(final Set<String> sampleBks) {
+
+		final List<Object[]> result = this.getSession().createCriteria(Sample.class, "sample")
+			.createAlias("sample.plant", "plant")
+			.createAlias("sample.sampleList", "sampleList")
+			.createAlias("sample.takenBy", "takenBy")
+			.createAlias("takenBy.person", "person")
+			.createAlias("plant.experiment", "experiment")
+			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
+			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
+			.setFetchMode("accMetadataSets", FetchMode.JOIN)
+			.setFetchMode("dataset", FetchMode.JOIN)
+			.add(Restrictions.in("sampleBusinessKey", sampleBks))
+			.setProjection(Projections.distinct(Projections.projectionList().add(Projections.property("sampleId")) //row[0]
+				.add(Projections.property("sampleName")) //row[1]
+				.add(Projections.property("sampleBusinessKey")) //row[2]
+				.add(Projections.property("person.firstName")) //row[3]
+				.add(Projections.property("person.lastName")) //row[4]
+				.add(Projections.property("sampleList.listName")) //row[5]
+				.add(Projections.property("plant.plantNumber")) //row[6]
+				.add(Projections.property("plant.plantBusinessKey")) //row[7]
+				.add(Projections.property("dataset.datasetId")) //row[8]
+				.add(Projections.property("dataset.datasetName")) //row[9]
+			)).list();
+
+		return this.getSampleDTOS(result);
+
 	}
 
 	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid){

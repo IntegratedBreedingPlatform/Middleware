@@ -66,11 +66,11 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
-		Date createdDate, User takenBy) {
+	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
+		final Date createdDate, final User takenBy) {
 
 		final Sample sample = new Sample();
-		String localCropPrefix;
+		final String localCropPrefix;
 
 		if (cropPrefix == null) {
 			localCropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
@@ -102,41 +102,7 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> getSamples(final String plotId) {
-		final List<Sample> samples = this.sampleDao.getByPlotId(plotId);
-		return mapSampleToSampleDTO(samples);
-	}
-
-	private List<SampleDTO> mapSampleToSampleDTO(final List<Sample> samples) {
-		final List<SampleDTO> listSampleDto = new ArrayList<>();
-		for (final Sample sample : samples) {
-			final SampleDTO dto = new SampleDTO();
-			dto.setSampleId(sample.getSampleId());
-			dto.setSampleName(sample.getSampleName());
-			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
-			final User takenBy = sample.getTakenBy();
-			if (takenBy != null) {
-				final Person person = takenBy.getPerson();
-				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
-			}
-			dto.setSamplingDate(sample.getSamplingDate());
-			final SampleList sampleList = sample.getSampleList();
-			if (sampleList != null) {
-				dto.setSampleList(sampleList.getListName());
-			}
-			final Plant plant = sample.getPlant();
-			dto.setPlantNumber(plant.getPlantNumber());
-			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
-
-			for (final AccMetadataSet accMetadataSet : sample.getAccMetadataSets()) {
-				final SampleDTO.Dataset dataset = new SampleDTO().new Dataset();
-				dataset.setName(accMetadataSet.getDataset().getDatasetName());
-				dataset.setDatasetId(accMetadataSet.getDataset().getDatasetId());
-				dto.getDatasets().add(dataset);
-			}
-
-			listSampleDto.add(dto);
-		}
-		return listSampleDto;
+		return this.sampleDao.getByPlotId(plotId);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
@@ -147,11 +113,10 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs) {
-		final List<Sample> samplesByBk = this.sampleDao.getBySampleBks(sampleUIDs);
-		final List<SampleDTO> sampleDTOs = mapSampleToSampleDTO(samplesByBk);
+		final List<SampleDTO> sampleDTOs = this.sampleDao.getBySampleBks(sampleUIDs);
 		final Map<String, SampleDTO> mappedSampleDTOs = Maps.uniqueIndex(sampleDTOs, new Function<SampleDTO, String>() {
 
-			public String apply(SampleDTO from) {
+			public String apply(final SampleDTO from) {
 				return from.getSampleBusinessKey();
 			}
 		});
@@ -206,7 +171,7 @@ public class SampleServiceImpl implements SampleService {
 
 		for (final ProjectProperty projectProperty : projectProperties) {
 			//SEEDING_DATE
-			String value = projectProperty.getValue();
+			final String value = projectProperty.getValue();
 			if (StringUtils.isBlank(value)) {
 				continue;
 			}
@@ -225,9 +190,9 @@ public class SampleServiceImpl implements SampleService {
 	private void fillPlotNoByExperimentProperty(final List<ExperimentProperty> experimentProperty,
 		final SampleDetailsDTO sampleDetailsDTO) {
 		boolean foundPlotNumber = false;
-		Iterator<ExperimentProperty> experimentPropertyIterator = experimentProperty.iterator();
+		final Iterator<ExperimentProperty> experimentPropertyIterator = experimentProperty.iterator();
 		while (experimentPropertyIterator.hasNext() && !foundPlotNumber) {
-			ExperimentProperty properties = experimentPropertyIterator.next();
+			final ExperimentProperty properties = experimentPropertyIterator.next();
 			if (properties.getTypeId().equals(TermId.PLOT_NO.getId())) {
 				final Integer plotNumber = Integer.valueOf(properties.getValue());
 				sampleDetailsDTO.setPlotNo(plotNumber);
