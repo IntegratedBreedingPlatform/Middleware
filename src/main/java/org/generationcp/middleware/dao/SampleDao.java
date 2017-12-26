@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
@@ -65,7 +66,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				}
 			}
 
-		} catch (HibernateException he) {
+		} catch (final HibernateException he) {
 			throw new MiddlewareException(
 				"Unexpected error in executing getExperimentSampleMap(studyDbId = " + studyDbId + ") query: " + he.getMessage(), he);
 		}
@@ -73,11 +74,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	public Sample getBySampleBk(final String sampleBk){
-		Sample sample;
+		final Sample sample;
 		try {
 			sample = (Sample) this.getSession().createCriteria(Sample.class, "sample").add(Restrictions.eq("sampleBusinessKey", sampleBk))
 				.uniqueResult();
-		} catch (HibernateException he) {
+		} catch (final HibernateException he) {
 			throw new MiddlewareException(
 				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
 		}
@@ -128,6 +129,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("project.relatedTos", "relatedTos")//
 			.createAlias("relatedTos.objectProject", "objectProject")//
 			.add(Restrictions.eq("stock.dbxrefId", gid))//
+			.add(Restrictions.ne("project." + DmsProjectDao.DELETED, true))
+
 			.addOrder(Order.desc("sample.sampleBusinessKey"))//
 
 			.setProjection(Projections.distinct(Projections.projectionList()//
