@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet author="darla" id="v8.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_project_user_role"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_project_user_role"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_role"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_role"/>
+	</changeSet>
+	
+	
+</databaseChangeLog>
