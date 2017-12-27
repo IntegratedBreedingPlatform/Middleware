@@ -26,7 +26,7 @@ public class MeasurementData {
 	private static final String EMPTY_STRING = "";
 
 	public static final String MISSING_VALUE = "missing";
-	private boolean isCustomCategoricalValue;
+	public boolean isCustomCategoricalValue;
 	private String label;
 	private String value;
 	private String cValueId;
@@ -270,7 +270,7 @@ public class MeasurementData {
 		return data;
 	}
 
-	public boolean isCustomCategoricalValue() {
+	public boolean getIsCustomCategoricalValue() {
 		return this.isCustomCategoricalValue;
 	}
 
