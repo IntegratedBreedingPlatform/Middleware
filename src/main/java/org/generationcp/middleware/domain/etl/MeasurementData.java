@@ -26,7 +26,7 @@ public class MeasurementData {
 	private static final String EMPTY_STRING = "";
 
 	public static final String MISSING_VALUE = "missing";
-	public boolean isCustomCategoricalValue;
+	private boolean isCustomCategoricalValue;
 	private String label;
 	private String value;
 	private String cValueId;
