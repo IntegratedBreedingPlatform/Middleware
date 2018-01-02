@@ -12,9 +12,12 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -45,6 +48,13 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			+ "FROM workbench_project_user_info pu "
 			+ "INNER JOIN users u ON u.userid = pu.user_id "
 			+ "WHERE u.ustatus = 0 AND pu.project_id = :projectId"; 
+	
+	public static final String GET_PERSONS_BY_PROJECT_ID = "SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
+			+ "persons.lname "
+			+ "FROM persons "
+			+ "JOIN users ON users.personid = persons.personid "
+			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
+			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
 	
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjectsByUser(User user) {
@@ -135,5 +145,31 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			this.logAndThrowException("Error in getByProjectId(projectId = " + projectId + "):" + ex.getMessage(), ex);
 		}
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
+		final Map<Integer, Person> persons = new HashMap<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserInfoDAO.GET_PERSONS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] person = (Object[]) o;
+					final Integer userId = (Integer) person[0];
+					final Integer personId = (Integer) person[1];
+					final String firstName = (String) person[2];
+					final String middleName = (String) person[3];
+					final String lastName = (String) person[4];
+					final Person p = new Person(personId, firstName, middleName, lastName);
+					persons.put(userId, p);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+					+ e.getMessage(), e);
+		}
+		return persons;
 	}
 }

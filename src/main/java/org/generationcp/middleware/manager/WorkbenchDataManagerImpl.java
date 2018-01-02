@@ -637,6 +637,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public List<User> getUsersByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getUsersByProjectId(projectId);
 	}
+	
+	@Override
+	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
+		return this.getProjectUserInfoDao().getPersonsByProjectId(projectId);
+	}
 
 	@Override
 	public List<CropType> getInstalledCropDatabses() {

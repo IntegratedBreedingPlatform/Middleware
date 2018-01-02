@@ -517,6 +517,14 @@ public interface WorkbenchDataManager {
 	 * @return the List of {@link User} records
 	 */
 	List<User> getUsersByProjectId(Long projectId);
+	
+	/**
+	 * Return a Map of {@link Person} records identified by {@link User} ids associated with a {@link Project}.
+	 *
+	 * @param projectId - the project id
+	 * @return the Maps of {@link Person} records identified by {@link User} ids
+	 */
+	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
 
 	/**
 	 * Get the list of all installed central crop databases.
@@ -857,4 +865,5 @@ public interface WorkbenchDataManager {
 	 * @return the user matching the given project_uuid
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
+	
 }
