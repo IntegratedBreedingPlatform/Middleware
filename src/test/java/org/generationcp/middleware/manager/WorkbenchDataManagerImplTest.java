@@ -35,6 +35,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
@@ -793,10 +794,11 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		//Set up data
 		UserDto userDto = UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", "Breeder", "username");
 		final int id = this.workbenchDataManager.createUser(userDto);
-		final User user = this.workbenchDataManager.getUserById(id);
-		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
-//		this.workbenchDataManager.addProjectUserRole(new ProjectUserRole(this.commonTestProject, user));
-		
+		ProjectUserInfo pui = new ProjectUserInfo();
+		pui.setProject(this.commonTestProject);
+		pui.setUserId(id);
+		pui.setLastOpenDate(new Date());
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 		
 		List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 		Assert.assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
@@ -888,4 +890,113 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(lastName, updatedUser.getPerson().getLastName());
 		Assert.assertEquals(email, updatedUser.getPerson().getEmail());
 	}
+	
+	@Test
+	public void testGetUsersByProjectUUID() {
+		final String projectUUID = commonTestProject.getUniqueID();
+		
+		final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
+		Assert.assertEquals(this.testUser1.getUserid(), users.get(0).getUserId());
+	}
+	
+	@Test
+	public void testGetProjectUserInfoByProjectIdAndUserId() {
+		final ProjectUserInfo result = this.workbenchDataManager.getProjectUserInfoDao()
+				.getByProjectIdAndUserId(this.commonTestProject.getProjectId(), this.testUser1.getUserid());
+
+		Assert.assertNotNull(result);
+		Assert.assertEquals(result.getProject(), this.commonTestProject);
+		Assert.assertEquals(result.getUserId(), this.testUser1.getUserid());
+	}
+	
+	@Test
+	public void testGetProjectUserInfoByProjectId() {
+		final List<ProjectUserInfo> results = this.workbenchDataManager.getProjectUserInfoDao()
+				.getByProjectId(this.commonTestProject.getProjectId());
+
+		Assert.assertNotNull(results);
+		Assert.assertEquals(2, results.size());
+		final ProjectUserInfo userInfo1 = results.get(0);
+		Assert.assertEquals(userInfo1.getProject(), this.commonTestProject);
+		Assert.assertEquals(userInfo1.getUserId(), this.testUser1.getUserid());
+		final ProjectUserInfo userInfo2 = results.get(1);
+		Assert.assertEquals(userInfo2.getProject(), this.commonTestProject);
+		Assert.assertEquals(userInfo2.getUserId(), this.workbenchTestDataUtil.getTestUser2().getUserid());
+	}
+	
+	@Test
+	public void testGetUsersByProjectId() {
+		final List<User> results = this.workbenchDataManager.getUsersByProjectId(this.commonTestProject.getProjectId());
+
+		Assert.assertNotNull(results);
+		Assert.assertEquals(2, results.size());
+		final User userInfo1 = results.get(0);
+		Assert.assertEquals(userInfo1.getUserid(), this.testUser1.getUserid());
+		final User userInfo2 = results.get(1);
+		Assert.assertEquals(userInfo2.getUserid(), this.workbenchTestDataUtil.getTestUser2().getUserid());
+	}
+	
+	@Test
+	public void testGetPersonsByProjectId() {
+		final Map<Integer, Person> personsMap = this.workbenchDataManager.getPersonsByProjectId(this.commonTestProject.getProjectId());
+
+		Assert.assertNotNull(personsMap);
+		Assert.assertEquals(2, personsMap.keySet().size());
+		Assert.assertNotNull(personsMap.get(this.testUser1.getUserid()));
+		Assert.assertNotNull(personsMap.get(this.workbenchTestDataUtil.getTestUser2().getUserid()));
+	}
+	
+	@Test
+	public void testGetProjectsByProjectId() {
+		final List<Project> projects = this.workbenchDataManager.getProjectsByUser(this.testUser1);
+
+		Assert.assertNotNull(projects);
+		Assert.assertNotNull(projects.get(0));
+		Assert.assertEquals(projects.get(0), this.commonTestProject);
+	}
+	
+	@Test
+	public void testDeleteProjectDependencies() {
+		// Create new project - for deletion later
+		WorkbenchTestDataUtil workbenchUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+		workbenchUtil.setUpWorkbench();
+		final Project testProject = workbenchUtil.getCommonTestProject();
+		final Long id = testProject.getProjectId();
+		final TemplateSetting setting = new TemplateSetting();
+		setting.setProjectId(id.intValue());
+		setting.setName(testProject.getProjectName()+"-TEMPLATE");
+		setting.setIsDefault(false);
+		setting.setConfiguration("SOME CONFIG");
+		final Tool tool = new Tool();
+		tool.setToolId(1L);
+		setting.setTool(tool);
+		this.workbenchDataManager.addTemplateSetting(setting);
+		
+		// Check project dependencies exist before deleting
+		final List<ProjectActivity> projectActiviesBefore = this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
+		Assert.assertNotNull(projectActiviesBefore);
+		Assert.assertFalse(projectActiviesBefore.isEmpty());
+		final List<User> usersBefore = this.workbenchDataManager.getUsersByProjectId(id);
+		Assert.assertNotNull(usersBefore);
+		Assert.assertFalse(usersBefore.isEmpty());
+		final TemplateSetting settingFilter = new TemplateSetting();
+		settingFilter.setProjectId(id.intValue());
+		final List<TemplateSetting> templateSettingsBefore = this.workbenchDataManager.getTemplateSettings(settingFilter);
+		Assert.assertNotNull(templateSettingsBefore);
+		Assert.assertFalse(templateSettingsBefore.isEmpty());
+		
+		// Method to test
+		this.workbenchDataManager.deleteProjectDependencies(testProject);
+		
+		final List<ProjectActivity> projectActiviesAfter = this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
+		Assert.assertNotNull(projectActiviesAfter);
+		Assert.assertTrue(projectActiviesAfter.isEmpty());
+		final List<User> usersAfter = this.workbenchDataManager.getUsersByProjectId(id);
+		Assert.assertNotNull(usersAfter);
+		Assert.assertTrue(usersAfter.isEmpty());
+		final List<TemplateSetting> templateSettingsAfter = this.workbenchDataManager.getTemplateSettings(settingFilter);
+		Assert.assertNotNull(templateSettingsAfter);
+		Assert.assertTrue(templateSettingsAfter.isEmpty());
+	}
+	
 }
