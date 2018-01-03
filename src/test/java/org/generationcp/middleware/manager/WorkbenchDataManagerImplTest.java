@@ -38,7 +38,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -331,45 +330,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		dataset.setCreationDate(new Date(System.currentTimeMillis()));
 		dataset.setProject(project);
 		return dataset;
-	}
-
-	@Test
-	public void testAddToolConfiguration() {
-		final Long toolId = 1L;
-		final ToolConfiguration toolConfig = new ToolConfiguration();
-		final Tool tool = new Tool();
-		tool.setToolId(toolId);
-
-		toolConfig.setTool(tool);
-		toolConfig.setConfigKey("6th key");
-		toolConfig.setConfigValue("test value");
-
-		this.workbenchDataManager.addToolConfiguration(toolConfig);
-		Debug.println(IntegrationTestBase.INDENT, "testAddToolConfiguration(toolId=" + toolId + "): " + toolConfig);
-	}
-
-	@Test
-	public void testGetListOfToolConfigurationsByToolId() {
-		final Long toolId = 1L;
-		final List<ToolConfiguration> result = this.workbenchDataManager.getListOfToolConfigurationsByToolId(toolId);
-		Debug.println(IntegrationTestBase.INDENT, "testGetListOfToolConfigurationsByToolId(" + toolId + "): ");
-
-		if (result.isEmpty()) {
-			Debug.println(IntegrationTestBase.INDENT, "  No records found.");
-		} else {
-			for (final ToolConfiguration t : result) {
-				Debug.println(IntegrationTestBase.INDENT, t);
-			}
-		}
-	}
-
-	@Test
-	public void testGetToolConfigurationByToolIdAndConfigKey() {
-		final Long toolId = 1L;
-		final String configKey = "test";
-		final ToolConfiguration toolConfig = this.workbenchDataManager.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
-		Debug.println(IntegrationTestBase.INDENT,
-				"testGetToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey=" + configKey + "): " + toolConfig);
 	}
 
 	@Test

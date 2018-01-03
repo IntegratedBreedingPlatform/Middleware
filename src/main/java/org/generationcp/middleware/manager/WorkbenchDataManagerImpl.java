@@ -25,7 +25,6 @@ import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.TemplateSettingDAO;
-import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
@@ -48,7 +47,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -139,13 +137,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final SecurityQuestionDAO securityQuestionDao = new SecurityQuestionDAO();
 		securityQuestionDao.setSession(this.getCurrentSession());
 		return securityQuestionDao;
-	}
-
-	private ToolConfigurationDAO getToolConfigurationDao() {
-
-		final ToolConfigurationDAO toolConfigurationDao = new ToolConfigurationDAO();
-		toolConfigurationDao.setSession(this.getCurrentSession());
-		return toolConfigurationDao;
 	}
 
 	//FIXME Do not expose this DAO
@@ -719,58 +710,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public long countProjectActivitiesByProjectId(final Long projectId) {
 		return this.getProjectActivityDao().countByProjectId(projectId);
-	}
-
-	@Override
-	public Integer addToolConfiguration(final ToolConfiguration toolConfig) {
-		return this.addOrUpdateToolConfiguration(toolConfig, Operation.ADD);
-	}
-
-	@Override
-	public Integer updateToolConfiguration(final ToolConfiguration toolConfig) {
-		return this.addOrUpdateToolConfiguration(toolConfig, Operation.UPDATE);
-	}
-
-	private Integer addOrUpdateToolConfiguration(final ToolConfiguration toolConfig, final Operation op) {
-
-		Integer idSaved = null;
-		try {
-
-			final ToolConfiguration recordSaved = this.getToolConfigurationDao().saveOrUpdate(toolConfig);
-			idSaved = recordSaved.getConfigId();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while saving ToolConfiguration: WorkbenchDataManager.addOrUpdateToolConfiguration(toolConfig="
-							+ toolConfig + ", operation=" + op + "): " + e.getMessage(), e);
-		}
-		return idSaved;
-	}
-
-	@Override
-	public void deleteToolConfiguration(final ToolConfiguration toolConfig) {
-
-		try {
-
-			this.getToolConfigurationDao().makeTransient(toolConfig);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while deleting ToolConfiguration: WorkbenchDataManager.deleteToolConfiguration(toolConfig="
-							+ toolConfig + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public List<ToolConfiguration> getListOfToolConfigurationsByToolId(final Long toolId) {
-		return this.getToolConfigurationDao().getListOfToolConfigurationsByToolId(toolId);
-	}
-
-	@Override
-	public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(final Long toolId, final String configKey) {
-		return this.getToolConfigurationDao().getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
 	}
 
 	@Override

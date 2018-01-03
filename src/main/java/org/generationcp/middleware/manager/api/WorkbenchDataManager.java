@@ -28,7 +28,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -548,46 +547,6 @@ public interface WorkbenchDataManager {
 	 * @return the number of {@link ProjectActivity} records associated to the given project
 	 */
 	long countProjectActivitiesByProjectId(Long projectId);
-
-	/**
-	 * Adds the tool configuration.
-	 *
-	 * @param toolConfig - the tool config to add
-	 * @return Returns the id of the {@code ToolConfiguration} record added
-	 */
-	Integer addToolConfiguration(ToolConfiguration toolConfig);
-
-	/**
-	 * Update tool configuration.
-	 *
-	 * @param toolConfig - the tool config to update
-	 * @return Returns the id of the updated {@code ToolConfiguration} record
-	 */
-	Integer updateToolConfiguration(ToolConfiguration toolConfig);
-
-	/**
-	 * Delete tool configuration.
-	 *
-	 * @param toolConfig - the tool config to delete
-	 */
-	void deleteToolConfiguration(ToolConfiguration toolConfig);
-
-	/**
-	 * Gets the list of {@link ToolConfiguration} records by tool id.
-	 *
-	 * @param toolId - the tool id
-	 * @return the list of tool configurations by tool id
-	 */
-	List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId);
-
-	/**
-	 * Gets the {@link ToolConfiguration} by tool id and config key.
-	 *
-	 * @param toolId - the tool id
-	 * @param configKey - the config key
-	 * @return the tool configuration by tool id and config key
-	 */
-	ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey);
 
 	/**
 	 * Add a mapping between Workbench user record and the crop databse user record, if it does not already exist.
