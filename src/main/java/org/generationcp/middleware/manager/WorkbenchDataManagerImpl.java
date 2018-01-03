@@ -34,7 +34,6 @@ import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
 import org.generationcp.middleware.dao.WorkbenchSettingDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
-import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -58,7 +57,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
-import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.Util;
@@ -192,13 +190,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final WorkbenchSettingDAO workbenchSettingDao = new WorkbenchSettingDAO();
 		workbenchSettingDao.setSession(this.getCurrentSession());
 		return workbenchSettingDao;
-	}
-
-	private WorkflowTemplateDAO getWorkflowTemplateDao() {
-
-		final WorkflowTemplateDAO workflowTemplateDao = new WorkflowTemplateDAO();
-		workflowTemplateDao.setSession(this.getCurrentSession());
-		return workflowTemplateDao;
 	}
 
 	private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
@@ -380,21 +371,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			throw new MiddlewareQueryException(
 					"Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): " + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public List<WorkflowTemplate> getWorkflowTemplates() {
-		return this.getWorkflowTemplateDao().getAll();
-	}
-
-	@Override
-	public List<WorkflowTemplate> getWorkflowTemplateByName(final String name) {
-		return this.getWorkflowTemplateDao().getByName(name);
-	}
-
-	@Override
-	public List<WorkflowTemplate> getWorkflowTemplates(final int start, final int numOfRows) {
-		return this.getWorkflowTemplateDao().getAll(start, numOfRows);
 	}
 
 	@Override

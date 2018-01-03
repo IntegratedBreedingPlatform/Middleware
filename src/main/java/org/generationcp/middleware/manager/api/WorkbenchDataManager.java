@@ -36,7 +36,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
-import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 
@@ -140,30 +139,6 @@ public interface WorkbenchDataManager {
 	 * @param project - the project to delete dependencies
 	 */
 	void deleteProjectDependencies(Project project);
-
-	/**
-	 * Gets the workflow templates.
-	 *
-	 * @return the workflow templates
-	 */
-	List<WorkflowTemplate> getWorkflowTemplates();
-
-	/**
-	 * Gets the workflow templates.
-	 *
-	 * @param start - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @return the workflow templates
-	 */
-	List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows);
-
-	/**
-	 * Gets the workflow templates based on the given name.
-	 *
-	 * @param name - the name of the workflow template
-	 * @return the workflow templates
-	 */
-	List<WorkflowTemplate> getWorkflowTemplateByName(String name);
 
 	/**
 	 * Gets the tool DAO directly.

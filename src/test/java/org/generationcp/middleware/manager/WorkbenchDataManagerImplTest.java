@@ -43,7 +43,6 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
-import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.utils.test.Debug;
@@ -499,32 +498,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetWorkflowTemplateByName() {
-		final String name = "Manager";
-		final List<WorkflowTemplate> results = this.workbenchDataManager.getWorkflowTemplateByName(name);
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
-	}
-
-	@Test
-	public void testGetWorkflowTemplatesList() {
-		final List<WorkflowTemplate> results = this.workbenchDataManager.getWorkflowTemplates();
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
-	}
-
-	@Test
 	public void testDeletePerson() {
 		final Person person = this.workbenchTestDataUtil.createTestPersonData();
 		this.workbenchDataManager.addPerson(person);
 		this.workbenchDataManager.deletePerson(person);
-	}
-
-	@Test
-	public void testGetWorkflowTemplates() {
-		final List<WorkflowTemplate> results = this.workbenchDataManager.getWorkflowTemplates(0, 100);
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
