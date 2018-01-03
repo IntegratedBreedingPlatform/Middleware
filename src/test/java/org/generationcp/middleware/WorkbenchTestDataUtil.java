@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -16,7 +15,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -132,9 +130,6 @@ public class WorkbenchTestDataUtil {
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 
-		WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
-		workbenchRuntimeData.setUserId(1);
-		this.workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
 		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
 	}

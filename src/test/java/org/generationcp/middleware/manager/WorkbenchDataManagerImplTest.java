@@ -41,7 +41,6 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.utils.test.Debug;
@@ -449,12 +448,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final WorkbenchDataset readDataset = this.workbenchDataManager.getWorkbenchDatasetById(new Long(result));
 		Assert.assertNotNull(readDataset);
 		Assert.assertEquals(testDataset, readDataset);
-	}
-
-	@Test
-	public void testGetWorkbenchRuntimeData() {
-		final WorkbenchRuntimeData result = this.workbenchDataManager.getWorkbenchRuntimeData();
-		Assert.assertNotNull(result);
 	}
 
 	@Test

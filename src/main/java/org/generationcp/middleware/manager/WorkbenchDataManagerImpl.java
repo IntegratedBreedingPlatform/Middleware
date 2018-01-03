@@ -29,7 +29,6 @@ import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
-import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
 import org.generationcp.middleware.dao.WorkbenchSettingDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
@@ -51,7 +50,6 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
@@ -167,13 +165,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final WorkbenchDatasetDAO workbenchDatasetDao = new WorkbenchDatasetDAO();
 		workbenchDatasetDao.setSession(this.getCurrentSession());
 		return workbenchDatasetDao;
-	}
-
-	private WorkbenchRuntimeDataDAO getWorkbenchRuntimeDataDao() {
-
-		final WorkbenchRuntimeDataDAO workbenchRuntimeDataDao = new WorkbenchRuntimeDataDAO();
-		workbenchRuntimeDataDao.setSession(this.getCurrentSession());
-		return workbenchRuntimeDataDao;
 	}
 
 	private WorkbenchSettingDAO getWorkbenchSettingDao() {
@@ -781,29 +772,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(final Integer ibdbUserId, final Long projectId) {
 		return this.getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
-	}
-
-	@Override
-	public Integer updateWorkbenchRuntimeData(final WorkbenchRuntimeData workbenchRuntimeData) {
-
-		try {
-
-			this.getWorkbenchRuntimeDataDao().saveOrUpdate(workbenchRuntimeData);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while adding IbdbUserMap: WorkbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData="
-							+ workbenchRuntimeData + "): " + e.getMessage(), e);
-		}
-
-		return workbenchRuntimeData.getId();
-	}
-
-	@Override
-	public WorkbenchRuntimeData getWorkbenchRuntimeData() {
-		final List<WorkbenchRuntimeData> list = this.getWorkbenchRuntimeDataDao().getAll(0, 1);
-		return !list.isEmpty() ? list.get(0) : null;
 	}
 
 	@Override

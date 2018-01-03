@@ -31,7 +31,6 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
@@ -577,21 +576,6 @@ public interface WorkbenchDataManager {
 	 *         User ID matching the specified Workbench User ID and Project ID.
 	 */
 	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId);
-
-	/**
-	 * Save or update the specified {@link WorkbenchRuntimeData}.
-	 *
-	 * @param workbenchRuntimeData the workbench runtime data
-	 * @return Returns the id of the updated {@code WorkbenchRuntimeData} record
-	 */
-	Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData);
-
-	/**
-	 * Gets the workbench runtime data.
-	 *
-	 * @return The WorkbenchRuntimeData
-	 */
-	WorkbenchRuntimeData getWorkbenchRuntimeData();
 
 	/**
 	 * Get the workbench setting object.
