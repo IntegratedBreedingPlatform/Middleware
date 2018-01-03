@@ -25,7 +25,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
@@ -583,21 +582,6 @@ public interface WorkbenchDataManager {
 	 * @return The WorkbenchSetting
 	 */
 	WorkbenchSetting getWorkbenchSetting();
-
-	/**
-	 * Saves the specified SecurityQuestion object.
-	 *
-	 * @param securityQuestion - the Security Question object to be saved.
-	 */
-	void addSecurityQuestion(SecurityQuestion securityQuestion);
-
-	/**
-	 * Gets all the Security Questions associated with the specified User ID.
-	 *
-	 * @param userId - User ID of the user to get security questions.
-	 * @return - a {@code List} of {@code SecurityQuestion} objects associated with the given User.
-	 */
-	List<SecurityQuestion> getQuestionsByUserId(Integer userId);
 
 	/**
 	 * Gets the ProjectUserInfoDAO.

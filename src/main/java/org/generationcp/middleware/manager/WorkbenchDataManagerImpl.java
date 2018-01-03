@@ -22,7 +22,6 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.TemplateSettingDAO;
 import org.generationcp.middleware.dao.ToolDAO;
@@ -43,7 +42,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
@@ -128,13 +126,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final ProjectUserInfoDAO projectUserInfoDao = new ProjectUserInfoDAO();
 		projectUserInfoDao.setSession(this.getCurrentSession());
 		return projectUserInfoDao;
-	}
-
-	private SecurityQuestionDAO getSecurityQuestionDao() {
-
-		final SecurityQuestionDAO securityQuestionDao = new SecurityQuestionDAO();
-		securityQuestionDao.setSession(this.getCurrentSession());
-		return securityQuestionDao;
 	}
 
 	//FIXME Do not expose this DAO
@@ -787,32 +778,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return setting;
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered while getting workbench setting: " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void addSecurityQuestion(final SecurityQuestion securityQuestion) {
-
-		try {
-
-			this.getSecurityQuestionDao().saveOrUpdate(securityQuestion);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while adding Security Question: " + "WorkbenchDataManager.addSecurityQuestion(securityQuestion="
-							+ securityQuestion + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public List<SecurityQuestion> getQuestionsByUserId(final Integer userId) {
-		try {
-			return this.getSecurityQuestionDao().getByUserId(userId);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-					"Error encountered while getting Security Questions: " + "WorkbenchDataManager.getQuestionsByUserId(userId=" + userId
-							+ "): " + e.getMessage(), e);
 		}
 	}
 
