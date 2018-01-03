@@ -27,7 +27,6 @@ import org.generationcp.middleware.dao.TemplateSettingDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
-import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkbenchSettingDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
@@ -47,7 +46,6 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
@@ -149,13 +147,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final UserInfoDAO userInfoDao = new UserInfoDAO();
 		userInfoDao.setSession(this.getCurrentSession());
 		return userInfoDao;
-	}
-
-	private WorkbenchDatasetDAO getWorkbenchDatasetDao() {
-
-		final WorkbenchDatasetDAO workbenchDatasetDao = new WorkbenchDatasetDAO();
-		workbenchDatasetDao.setSession(this.getCurrentSession());
-		return workbenchDatasetDao;
 	}
 
 	private WorkbenchSettingDAO getWorkbenchSettingDao() {
@@ -285,12 +276,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 					this.getProjectActivitiesByProjectId(projectId, 0, (int) this.countProjectActivitiesByProjectId(projectId));
 			for (final ProjectActivity projectActivity : projectActivities) {
 				this.deleteProjectActivity(projectActivity);
-			}
-
-			final List<WorkbenchDataset> datasets =
-					this.getWorkbenchDatasetByProjectId(projectId, 0, (int) this.countWorkbenchDatasetByProjectId(projectId));
-			for (final WorkbenchDataset dataset : datasets) {
-				this.deleteWorkbenchDataset(dataset);
 			}
 
 			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId);
@@ -443,45 +428,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer addWorkbenchDataset(final WorkbenchDataset dataset) {
-
-		Integer workbenchDatasetSaved = null;
-		try {
-
-			final WorkbenchDataset datasetSaved = this.getWorkbenchDatasetDao().saveOrUpdate(dataset);
-			workbenchDatasetSaved = datasetSaved.getDatasetId().intValue();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while saving workbench dataset: WorkbenchDataManager.addWorkbenchDataset(dataset=" + dataset + "): "
-							+ e.getMessage(), e);
-		}
-
-		return workbenchDatasetSaved;
-	}
-
-	@Override
-	public WorkbenchDataset getWorkbenchDatasetById(final Long datasetId) {
-		return this.getWorkbenchDatasetDao().getById(datasetId);
-	}
-
-	@Override
-	public void deleteWorkbenchDataset(final WorkbenchDataset dataset) {
-
-		try {
-
-			this.getWorkbenchDatasetDao().makeTransient(dataset);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Cannot delete WorkbenchDataset: WorkbenchDataManager.deleteWorkbenchDataset(dataset=" + dataset + "):  " + e
-							.getMessage(), e);
-		}
-	}
-
-	@Override
 	public List<User> getAllUsers() {
 		return this.getUserDao().getAll();
 	}
@@ -560,26 +506,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getLastOpenedProject(final Integer userId) {
 		return this.getProjectDao().getLastOpenedProject(userId);
-	}
-
-	@Override
-	public List<WorkbenchDataset> getWorkbenchDatasetByProjectId(final Long projectId, final int start, final int numOfRows) {
-		return this.getWorkbenchDatasetDao().getByProjectId(projectId, start, numOfRows);
-	}
-
-	@Override
-	public long countWorkbenchDatasetByProjectId(final Long projectId) {
-		return this.getWorkbenchDatasetDao().countByProjectId(projectId);
-	}
-
-	@Override
-	public List<WorkbenchDataset> getWorkbenchDatasetByName(final String name, final Operation op, final int start, final int numOfRows) {
-		return this.getWorkbenchDatasetDao().getByName(name, op, start, numOfRows);
-	}
-
-	@Override
-	public long countWorkbenchDatasetByName(final String name, final Operation op) {
-		return this.getWorkbenchDatasetDao().countByName(name, op);
 	}
 
 	@Override

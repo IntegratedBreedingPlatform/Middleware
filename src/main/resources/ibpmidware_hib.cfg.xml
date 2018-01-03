@@ -57,7 +57,6 @@
         <!-- mapping for workbench schema -->
         <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.CropType"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchDataset"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Project"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectActivity"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>

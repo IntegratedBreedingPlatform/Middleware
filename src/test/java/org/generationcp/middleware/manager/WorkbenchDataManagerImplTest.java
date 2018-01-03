@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -40,7 +39,6 @@ import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.utils.test.Debug;
@@ -306,32 +304,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testWorkbenchDataset() {
-		final WorkbenchDataset dataset1 = this.createTestWorkbenchDataset(this.commonTestProject);
-		final Integer result = this.workbenchDataManager.addWorkbenchDataset(dataset1);
-		Assert.assertNotNull("Expected id of the newly added record in workbench_dataset", result);
-
-		final List<WorkbenchDataset> list =
-				this.workbenchDataManager.getWorkbenchDatasetByProjectId(this.commonTestProject.getProjectId(), 0, 10);
-		Assert.assertTrue(list.contains(dataset1));
-
-		final WorkbenchDataset dataset2 = this.createTestWorkbenchDataset(this.commonTestProject);
-		this.workbenchDataManager.addWorkbenchDataset(dataset2);
-
-		final long count = this.workbenchDataManager.countWorkbenchDatasetByProjectId(this.commonTestProject.getProjectId());
-		Assert.assertEquals(2, count);
-	}
-
-	private WorkbenchDataset createTestWorkbenchDataset(final Project project) {
-		final WorkbenchDataset dataset = new WorkbenchDataset();
-		dataset.setName("Test Dataset" + new Random().nextInt());
-		dataset.setDescription("Test Dataset Description");
-		dataset.setCreationDate(new Date(System.currentTimeMillis()));
-		dataset.setProject(project);
-		return dataset;
-	}
-
-	@Test
 	public void testCropType() {
 		final String cropName = "Coconut";
 		final CropType cropType = new CropType(cropName);
@@ -438,16 +410,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetUserById() {
 		final User user = this.workbenchDataManager.getUserById(this.testUser1.getUserid());
 		Assert.assertNotNull(user);
-	}
-
-	@Test
-	public void testGetWorkbenchDatasetById() {
-		final WorkbenchDataset testDataset = this.createTestWorkbenchDataset(this.commonTestProject);
-		final Integer result = this.workbenchDataManager.addWorkbenchDataset(testDataset);
-
-		final WorkbenchDataset readDataset = this.workbenchDataManager.getWorkbenchDatasetById(new Long(result));
-		Assert.assertNotNull(readDataset);
-		Assert.assertEquals(testDataset, readDataset);
 	}
 
 	@Test

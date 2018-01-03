@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
@@ -314,29 +313,6 @@ public interface WorkbenchDataManager {
 	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
 
 	/**
-	 * Registers a workbench dataset.
-	 *
-	 * @param dataset - the workbench dataset to save
-	 * @return Returns the id of the {@code WorkbenchDataset} record added
-	 */
-	Integer addWorkbenchDataset(WorkbenchDataset dataset);
-
-	/**
-	 * Gets the workbench dataset by id.
-	 *
-	 * @param datasetId the dataset id
-	 * @return the workench dataset matching the given id
-	 */
-	WorkbenchDataset getWorkbenchDatasetById(Long datasetId);
-
-	/**
-	 * Delete a workbench dataset.
-	 *
-	 * @param dataset the dataset to delete
-	 */
-	void deleteWorkbenchDataset(WorkbenchDataset dataset);
-
-	/**
 	 * Returns all the Workbench users.
 	 *
 	 * @return A {@code List} of all the {@code User}s in the Workbench database.
@@ -419,44 +395,6 @@ public interface WorkbenchDataManager {
 	 * @return the last Project opened by the given user
 	 */
 	Project getLastOpenedProject(Integer userId);
-
-	/**
-	 * Returns a list of {@link WorkbenchDataset} records by project id.
-	 *
-	 * @param projectId - the project id
-	 * @param start - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @return the list of {@link WorkbenchDataset}s
-	 */
-	List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows);
-
-	/**
-	 * Returns the number of {@link WorkbenchDataset} records by project id.
-	 *
-	 * @param projectId the project id
-	 * @return the number of {@link WorkbenchDataset} records
-	 */
-	long countWorkbenchDatasetByProjectId(Long projectId);
-
-	/**
-	 * Returns a list of {@link WorkbenchDataset} by name.
-	 *
-	 * @param name - the {@link WorkbenchDataset} name
-	 * @param op - the operator; EQUAL, LIKE
-	 * @param start - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @return the list of {@link WorkbenchDataset}
-	 */
-	List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, int start, int numOfRows);
-
-	/**
-	 * Returns the number of {@link WorkbenchDataset} by name.
-	 *
-	 * @param name - the {@link WorkbenchDataset} name
-	 * @param op - the operator; EQUAL, LIKE
-	 * @return the number of {@link WorkbenchDataset}
-	 */
-	long countWorkbenchDatasetByName(String name, Operation op);
 
 	/**
 	 * Adds a project activity.
