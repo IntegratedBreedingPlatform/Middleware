@@ -6,11 +6,18 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
+	<!-- Cannot drop workbench_project_user_role table because it is being used by "beta16-1" Liquibase script.
+		 Dropping the table causes a Liquibase error for new crops hence we just empty the table with the script below.
+	 -->
 	<changeSet author="darla" id="v8.1.0-1">
 		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="workbench_project_user_role"/>
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM workbench_project_user_role;
+			</sqlCheck>
 		</preConditions>
-		<dropTable cascadeConstraints="true"  tableName="workbench_project_user_role"/>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_project_user_role;
+		</sql>
 	</changeSet>
 	
 	<changeSet author="darla" id="v8.1.0-2">
