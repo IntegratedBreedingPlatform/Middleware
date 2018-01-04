@@ -62,5 +62,61 @@
 		<dropTable cascadeConstraints="true"  tableName="workbench_workflow_template"/>
 	</changeSet>
 	
+	<changeSet author="darla" id="v8.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_dataset"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_dataset"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-9">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_input"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_input"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-10">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_output"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_output"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-11">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_transform"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_transform"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-12">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_config"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_config"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-13">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_license_info"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_license_info"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-14">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_runtime_data"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_runtime_data"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-15">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_security_question"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_security_question"/>
+	</changeSet>
+	
 	
 </databaseChangeLog>
