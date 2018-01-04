@@ -111,13 +111,13 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 				return query.list();
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
 					+ e.getMessage(), e);
 		}
 		return userIDs;
 	}
 
-	public ProjectUserInfo getByProjectIdAndUserId(Long projectId, Integer userId) throws MiddlewareQueryException {
+	public ProjectUserInfo getByProjectIdAndUserId(Long projectId, Integer userId) {
 		try {
 			if (projectId != null && userId != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
@@ -126,14 +126,14 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 				return (ProjectUserInfo) criteria.uniqueResult();
 			}
 		} catch (HibernateException ex) {
-			this.logAndThrowException(
-					"Error in getByProjectIdAndUserId(projectId = " + projectId + ", userId = " + userId + "):" + ex.getMessage(), ex);
+			throw new MiddlewareQueryException("Error in getByProjectIdAndUserId(projectId = " + projectId + ", userId = " + userId + "):"
+					+ ex.getMessage(), ex);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ProjectUserInfo> getByProjectId(Long projectId) throws MiddlewareQueryException {
+	public List<ProjectUserInfo> getByProjectId(Long projectId) {
 		try {
 			if (projectId != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
@@ -142,7 +142,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException ex) {
-			this.logAndThrowException("Error in getByProjectId(projectId = " + projectId + "):" + ex.getMessage(), ex);
+			throw new MiddlewareQueryException("Error in getByProjectId(projectId = " + projectId + "):" + ex.getMessage(), ex);
 		}
 		return null;
 	}
@@ -167,7 +167,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+			throw new MiddlewareQueryException("Error in getPersonsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
 					+ e.getMessage(), e);
 		}
 		return persons;

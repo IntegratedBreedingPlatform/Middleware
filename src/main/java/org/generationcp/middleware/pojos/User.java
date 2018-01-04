@@ -350,19 +350,16 @@ public class User implements Serializable, BeanFormState {
 
 	@Override
 	public boolean isActive() {
-		// TODO Auto-generated method stub
 		return this.active;
 	}
 
 	@Override
 	public void setActive(Boolean val) {
-		// TODO Auto-generated method stub
 		this.active = val;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
 		return this.enabled;
 	}
 
