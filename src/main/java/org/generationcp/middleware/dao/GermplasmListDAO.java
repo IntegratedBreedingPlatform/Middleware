@@ -351,7 +351,14 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			criteria.add(Restrictions.or(topFolder, nullFolder));
 			criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
 
-			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
+			if (programUUID == null) {
+				final Criterion nullProgramUUID = Restrictions.isNull(GermplasmListDAO.PROGRAM_UUID);
+				criteria.add(nullProgramUUID);
+			} else {
+				final Criterion sameProgramUUID = Restrictions.eq(GermplasmListDAO.PROGRAM_UUID, programUUID);
+				criteria.add(sameProgramUUID);
+			}
+
 			this.hideSnapshotListTypes(criteria);
 
 			criteria.addOrder(Order.asc("name"));
