@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.interfaces;
 
+import org.generationcp.middleware.pojos.Germplasm;
+
 /**
  * 
  * @author Aldrin Batac
@@ -83,4 +85,5 @@ public interface GermplasmExportSource {
 	 */
 	Integer getGroupId();
 
+	String getNotes();
 }
