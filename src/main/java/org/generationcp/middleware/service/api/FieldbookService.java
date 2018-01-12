@@ -987,10 +987,4 @@ public interface FieldbookService {
 
 	List<Location> getLocationsByProgramUUID(String programUUID);
 
-	/**
-	 * @param studyId id for the study Trial
-	 * @return the true if the study has samples
-	 */
-	boolean hasSamples(final Integer studyId);
-
 }

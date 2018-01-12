@@ -35,6 +35,16 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ "        						WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n"
 			+ "GROUP BY nde.nd_experiment_id";
 
+	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample FROM project p INNER JOIN\n"
+			+ "    project_relationship pr ON p.project_id = pr.subject_project_id INNER JOIN\n"
+			+ "    nd_experiment_project ep ON pr.subject_project_id = ep.project_id INNER JOIN\n"
+			+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id INNER JOIN\n"
+			+ "    plant AS pl ON nde.nd_experiment_id = pl.nd_experiment_id INNER JOIN\n"
+			+ "    sample AS sp ON pl.plant_id = sp.sample_id WHERE p.project_id = (SELECT \n"
+			+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
+			+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
+			+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n" + "GROUP BY pl.nd_experiment_id";
+
 	public Sample getBySampleId(final Integer sampleId) {
 		final DetachedCriteria criteria = DetachedCriteria.forClass(Sample.class);
 		criteria.add(Restrictions.eq("sampleId", sampleId));
@@ -178,5 +188,19 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			}
 		}
 		return new ArrayList<>(samplesMap.values());
+	}
+
+	public boolean hasSamples(final Integer studyId) {
+		final List queryResults;
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(SQL_STUDY_HAS_SAMPLES);
+			query.setParameter("studyId", studyId);
+			queryResults = query.list();
+
+		} catch (final HibernateException he) {
+			throw new MiddlewareException("Unexpected error in executing hasSamples(studyId = " + studyId + ") query: " + he.getMessage(),
+					he);
+		}
+		return queryResults.isEmpty() ? false : true;
 	}
 }
