@@ -91,8 +91,6 @@ public class SampleListServiceImpl implements SampleListService {
 
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
-		Preconditions.checkArgument(sampleListDTO.getProgramUUID() != null, "The programUUID must not be null");
-
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");

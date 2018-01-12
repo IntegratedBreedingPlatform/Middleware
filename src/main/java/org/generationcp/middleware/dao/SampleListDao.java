@@ -140,11 +140,17 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		try {
 			final Criterion topFolder = Restrictions.eq("hierarchy.id", SampleListDao.ROOT_FOLDER_ID);
 			final Criterion nullFolder = Restrictions.isNull("hierarchy");
+			final Criterion sameProgramUUID = Restrictions.eq(SampleListDao.PROGRAMUUID, programUUID);
 			criteria = this.getSession().createCriteria(SampleList.class);
 			criteria.createAlias("hierarchy", "hierarchy");
 			criteria.add(Restrictions.or(topFolder, nullFolder));
 
-			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
+			if (programUUID != null){
+				criteria.add(sameProgramUUID);
+			}else {
+				criteria.add(Restrictions.isNull(SampleListDao.PROGRAMUUID));
+			}
+
 			criteria.addOrder(Order.asc("listName"));
 
 		} catch (final HibernateException e) {
