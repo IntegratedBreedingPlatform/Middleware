@@ -287,7 +287,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	}
 
 	public Integer getLocalRecordId() {
-		return this.id;
+		return this.localRecordId;
 	}
 
 	public void setLocalRecordId(final Integer localRecordId) {
