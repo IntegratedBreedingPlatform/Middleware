@@ -87,7 +87,7 @@ public class GermplasmNamingServiceImplTest {
 
 		String groupName = "ABH05";
 		int nextSequence = 100;
-		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(groupName)).thenReturn(nextSequence);
+		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(groupName, null)).thenReturn(nextSequence);
 
 		String expectedCodedName = groupName + nextSequence;
 
@@ -146,7 +146,7 @@ public class GermplasmNamingServiceImplTest {
 
 		String groupName = "ABH05";
 		int nextSequence = 100;
-		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(groupName)).thenReturn(nextSequence);
+		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(groupName, null)).thenReturn(nextSequence);
 
 		String expectedCodedName = groupName + nextSequence;
 

@@ -21,15 +21,15 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 		this.keySequenceRegisterDAO.setSession(sessionProvider.getSession());
 	}
 
-	public KeySequenceRegisterServiceImpl(Session session) {
+	public KeySequenceRegisterServiceImpl(final Session session) {
 		this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDAO.setSession(session);
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public int incrementAndGetNextSequence(String keyPrefix) {
-		return this.keySequenceRegisterDAO.incrementAndGetNextSequence(keyPrefix);
+	public int incrementAndGetNextSequence(final String keyPrefix, final String suffix) {
+		return this.keySequenceRegisterDAO.incrementAndGetNextSequence(keyPrefix, suffix);
 	}
 
 }

@@ -94,7 +94,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 					public Integer doInTransaction(TransactionStatus status) {
 						KeySequenceRegisterService keySequenceRegisterService =
 								new KeySequenceRegisterServiceImpl(SessionFactoryUtils.getSession(sessionFactory, false));
-						return keySequenceRegisterService.incrementAndGetNextSequence("CML");
+						return keySequenceRegisterService.incrementAndGetNextSequence("CML", null);
 					}
 				});
 			}

@@ -3,6 +3,7 @@ package org.generationcp.middleware.pojos;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -16,8 +17,15 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class KeySequenceRegister {
 
 	@Id
+	@GeneratedValue
+	@Column(name = "id", nullable = false)
+	private Integer id;
+	
 	@Column(name = "key_prefix", nullable = false)
 	private String keyPrefix;
+	
+	@Column(name = "suffix", nullable = true)
+	private String suffix;
 
 	@Column(name = "last_used_sequence", nullable = false)
 	private int lastUsedSequence;
@@ -29,9 +37,22 @@ public class KeySequenceRegister {
 	public KeySequenceRegister() {
 	}
 
-	public KeySequenceRegister(final String keyPrefix, final int lastUsedSequence) {
+	public KeySequenceRegister(final Integer id) {
+		this.id = id;
+	}
+	
+	public KeySequenceRegister(final String keyPrefix, final String suffix, final int lastUsedSequence) {
 		this.keyPrefix = keyPrefix;
+		this.suffix = suffix;
 		this.lastUsedSequence = lastUsedSequence;
+	}
+	
+	public KeySequenceRegister(final Integer id, final String keyPrefix, final String suffix, final int lastUsedSequence, final int optimisticLockNumber) {
+		this.id = id;
+		this.keyPrefix = keyPrefix;
+		this.suffix = suffix;
+		this.lastUsedSequence = lastUsedSequence;
+		this.optimisticLockNumber = optimisticLockNumber;
 	}
 
 	public String getKeyPrefix() {
@@ -60,7 +81,8 @@ public class KeySequenceRegister {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append(this.keyPrefix).append(this.lastUsedSequence).toString();
+		return new ToStringBuilder(this).append(this.id).append(this.keyPrefix).append(this.suffix).append(this.lastUsedSequence)
+				.toString();
 	}
 
 	@Override
@@ -69,12 +91,32 @@ public class KeySequenceRegister {
 			return false;
 		}
 		final KeySequenceRegister castOther = (KeySequenceRegister) other;
-		return new EqualsBuilder().append(this.keyPrefix, castOther.keyPrefix).isEquals();
+		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.keyPrefix).toHashCode();
+		return new HashCodeBuilder().append(this.id).toHashCode();
+	}
+
+	
+	public Integer getId() {
+		return id;
+	}
+
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	
+	public String getSuffix() {
+		return suffix;
+	}
+
+	
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
 	}
 
 }

@@ -4,14 +4,14 @@ package org.generationcp.middleware.service.api;
 public interface KeySequenceRegisterService {
 
 	/**
-	 * Finds next available sequence numbwe for a given keyPrefix and increments the last known sequence number in the key sequence
+	 * Finds next available sequence number for a given combination of keyPrefix suffix and increments the last known sequence number in the key sequence
 	 * registry.
 	 * 
 	 * <p>
 	 * <strong>Important notes regarding concurrency and thread safety:</strong>
 	 * 
 	 * <p>
-	 * Calling code must employ thread synchronizationat the appropriate level - usually the very top level entry point such as a controller
+	 * Calling code must employ thread synchronization at the appropriate level - usually the very top level entry point such as a controller
 	 * method or a Vaadin action. For example, in case of Germplasm naming (coding) the top level action that uses key sequence registry is
 	 * <strong>org.generationcp.breeding.manager.listmanager.dialog.AssignCodesDialog.assignCodes()</strong>. You can see that this method
 	 * calls the entire back-end processing logic in a synchronized code block, using AssignCodesDialog class as the lock object which means
@@ -21,8 +21,8 @@ public interface KeySequenceRegisterService {
 	 * <p>
 	 * Service does implement Hibernate based optimistic locking as ultimate mechanism to ensure that two threads never end up getting the
 	 * same sequence number from registry. If explicit thread synchronization is not done, in concurrent access situation, expect
-	 * <strong>HibernateOptimisticLockingFailureException</strong> to occur. This is a retriable exception. Callers can catch it and
+	 * <strong>HibernateOptimisticLockingFailureException</strong> to occur. This is a re-triable exception. Callers can catch it and
 	 * operation can be retried.
 	 */
-	int incrementAndGetNextSequence(String keyPrefix);
+	int incrementAndGetNextSequence(String keyPrefix, String suffix);
 }

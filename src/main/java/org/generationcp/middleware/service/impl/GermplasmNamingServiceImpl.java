@@ -59,7 +59,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		}
 
 		final List<Germplasm> groupMembers = this.germplasmDAO.getManagementGroupMembers(germplasm.getMgid());
-		final String nameWithSequence = groupName + this.keySequenceRegisterService.incrementAndGetNextSequence(groupName);
+		final String nameWithSequence = groupName + this.keySequenceRegisterService.incrementAndGetNextSequence(groupName, null);
 
 		// TODO performace tuning when processing large number of group members
 		for (final Germplasm member : groupMembers) {
