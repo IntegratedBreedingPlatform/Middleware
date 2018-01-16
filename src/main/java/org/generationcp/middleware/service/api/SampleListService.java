@@ -38,10 +38,12 @@ public interface SampleListService {
 	 * Move a folder to another folder
 	 * sampleListId must exist (could be a folder or a list), newParentFolderId must exist and must be a folder
 	 * newParentFolderId folder must not contain another sample list or folder with the name that the one that needs to be moved
+	 * isCropList set to true if the list will be moved to the crop list folder.
 	 * @param sampleListId
 	 * @param newParentFolderId
+	 * @param isCropList
 	 */
-	SampleList moveSampleList (final Integer sampleListId, final Integer newParentFolderId);
+	SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId, final boolean isCropList);
 
 	/**
 	 * Delete a folder

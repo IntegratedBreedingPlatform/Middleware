@@ -46,6 +46,7 @@ public class SampleListServiceImplTest {
 	public static final String ADMIN = "admin";
 	public static final String MAIZE = "maize";
 	public static final String PLOT_CODE_PREFIX = "AZDS";
+	public static final boolean IS_CROP_LIST = false;
 
 	@Mock
 	private HibernateSessionProvider session;
@@ -351,24 +352,24 @@ public class SampleListServiceImplTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testMoveSampleListNullSampleListId() throws Exception {
-		this.sampleListService.moveSampleList(null, 1);
+		this.sampleListService.moveSampleList(null, 1, IS_CROP_LIST);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testMoveSampleListNullParentFolderId() throws Exception {
-		this.sampleListService.moveSampleList(1, null);
+		this.sampleListService.moveSampleList(1, null, IS_CROP_LIST);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testMoveSampleListRecursiveRelationship() throws Exception {
-		this.sampleListService.moveSampleList(1, 1);
+		this.sampleListService.moveSampleList(1, 1, IS_CROP_LIST);
 	}
 
 	@Test(expected = Exception.class)
 	public void testMoveSampleListSampleListIdNotExist() throws Exception {
 		final Integer sampleListId = 1;
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(null);
-		this.sampleListService.moveSampleList(sampleListId, 2);
+		this.sampleListService.moveSampleList(sampleListId, 2, IS_CROP_LIST);
 	}
 
 	@Test(expected = Exception.class)
@@ -378,7 +379,7 @@ public class SampleListServiceImplTest {
 		rootFolder.setId(sampleListId);
 		rootFolder.setHierarchy(null);
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(rootFolder);
-		this.sampleListService.moveSampleList(sampleListId, 2);
+		this.sampleListService.moveSampleList(sampleListId, 2, IS_CROP_LIST);
 	}
 
 	@Test(expected = Exception.class)
@@ -393,7 +394,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(null);
 
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST);
 	}
 
 	@Test(expected = Exception.class)
@@ -411,7 +412,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
 
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST);
 
 	}
 
@@ -436,7 +437,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName(listName, folderId, null)).thenReturn(notUniqueSampleList);
 
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST);
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
@@ -458,7 +459,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName(listName, folderId, null)).thenReturn(null);
 
 		Mockito.when(this.sampleListDao.saveOrUpdate(sampleListToMove)).thenThrow(MiddlewareQueryException.class);
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST);
 	}
 
 	@Test(expected = Exception.class)
@@ -481,7 +482,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName(listName, folderId, "")).thenReturn(null);
 
 		Mockito.when(this.sampleListDao.saveOrUpdate(sampleListToMove)).thenThrow(MiddlewareQueryException.class);
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST);
 	}
 
 	@Test
