@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.junit.Assert;
@@ -20,6 +21,9 @@ import com.google.common.collect.Lists;
 
 public class GermplasmNamingServiceImplTest {
 
+	private static final String PREFIX = "ABH05";
+	private static final String SUFFIX = "CDE";
+
 	@Mock
 	private GermplasmDAO germplasmDAO;
 
@@ -31,10 +35,13 @@ public class GermplasmNamingServiceImplTest {
 
 	@InjectMocks
 	private GermplasmNamingServiceImpl service = new GermplasmNamingServiceImpl();
+	
+	private GermplasmNameSetting setting;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+		this.setting = this.createGermplasmNameSetting();
 	}
 
 	@Test
@@ -48,7 +55,7 @@ public class GermplasmNamingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getById(g1.getGid())).thenReturn(g1);
 
-		GermplasmGroupNamingResult result = this.service.applyGroupName(g1.getGid(), "ABH05", nameType, 0, 0);
+		GermplasmGroupNamingResult result = this.service.applyGroupName(g1.getGid(),this.setting, nameType, 0, 0);
 		Assert.assertEquals("Expected service to return with one validation message regarding germplasm not being fixed.", 1,
 				result.getMessages().size());
 		Assert.assertTrue("Expected service to return with validation regarding germplasm not being fixed.",
@@ -85,13 +92,12 @@ public class GermplasmNamingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getManagementGroupMembers(mgid)).thenReturn(Lists.newArrayList(g1, g2, g3));
 
-		String groupName = "ABH05";
 		int nextSequence = 100;
-		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(groupName, null)).thenReturn(nextSequence);
+		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(PREFIX, SUFFIX)).thenReturn(nextSequence);
 
-		String expectedCodedName = groupName + nextSequence;
+		String expectedCodedName = PREFIX + nextSequence;
 
-		GermplasmGroupNamingResult result = this.service.applyGroupName(g1.getGid(), groupName, codedNameType, 0, 0);
+		GermplasmGroupNamingResult result = this.service.applyGroupName(g1.getGid(), this.setting, codedNameType, 0, 0);
 		Assert.assertEquals("Expected service to return with 3 messages, one per group member.", 3, result.getMessages().size());
 
 		Assert.assertEquals("Expected germplasm g1 to have a coded name assigned as preferred name.", expectedCodedName,
@@ -144,13 +150,12 @@ public class GermplasmNamingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getManagementGroupMembers(mgid)).thenReturn(Lists.newArrayList(g1, g2, g3));
 
-		String groupName = "ABH05";
 		int nextSequence = 100;
-		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(groupName, null)).thenReturn(nextSequence);
+		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence(PREFIX, SUFFIX)).thenReturn(nextSequence);
 
-		String expectedCodedName = groupName + nextSequence;
+		String expectedCodedName = PREFIX + nextSequence;
 
-		GermplasmGroupNamingResult result = this.service.applyGroupName(g1.getGid(), groupName, codedNameType, 0, 0);
+		GermplasmGroupNamingResult result = this.service.applyGroupName(g1.getGid(), this.setting, codedNameType, 0, 0);
 		Assert.assertEquals("Expected service to return with 3 messages, one per group member.", 3, result.getMessages().size());
 
 		Assert.assertEquals("Expected germplasm g1 to have a coded name assigned as preferred name.", expectedCodedName,
@@ -167,6 +172,18 @@ public class GermplasmNamingServiceImplTest {
 				"Expected service to return with validation regarding germplasm g3 not assigned given name because it already has one with same type.",
 				result.getMessages().contains(
 						"Germplasm (gid: 3) already has existing name ExistingCodedNameOfG3 of type CODE1. Supplied name ABH05100 was not added."));
+	}
+	
+	private GermplasmNameSetting createGermplasmNameSetting() {
+		final GermplasmNameSetting setting = new GermplasmNameSetting();
+
+		setting.setPrefix(GermplasmNamingServiceImplTest.PREFIX);
+		setting.setSuffix(GermplasmNamingServiceImplTest.SUFFIX);
+		setting.setAddSpaceBetweenPrefixAndCode(true);
+		setting.setAddSpaceBetweenSuffixAndCode(true);
+		setting.setNumOfDigits(7);
+
+		return setting;
 	}
 
 }
