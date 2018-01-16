@@ -21,8 +21,11 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 			 * MySQL returns prefix matches with and without trailing spaces at the end
 			 */
 			criteria.add(Restrictions.sqlRestriction("length({alias}.key_prefix) = ? ", keyPrefix.length(), Hibernate.INTEGER));
+			// If the suffix parameter is null or empty, filter suffix values that are either null or empty in DB
 			if (suffix != null && !suffix.isEmpty()) {
 				criteria.add(Restrictions.eq("suffix", suffix));
+			} else {
+				criteria.add(Restrictions.or(Restrictions.isNull("suffix"), Restrictions.eq("suffix","")));
 			}
 			/*
 			 *  There can be multiple results (eg. same prefix but both null and empty string suffix will be returned from DB)
