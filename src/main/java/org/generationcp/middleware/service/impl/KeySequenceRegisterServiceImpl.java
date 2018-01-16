@@ -34,8 +34,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	
 	@Override
 	public int getNextSequence(String keyPrefix, String suffix) {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.keySequenceRegisterDAO.getNextSequence(keyPrefix, suffix);
 	}
 
 }
