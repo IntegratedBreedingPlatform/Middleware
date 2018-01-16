@@ -267,7 +267,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Override
 	public Integer getListDataId() {
-		return this.getLocalRecordId();
+		return this.id;
 	}
 
 
