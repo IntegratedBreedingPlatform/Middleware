@@ -38,6 +38,15 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		return null;
 	}
 	
+	public int getNextSequence(final String keyPrefix, final String suffix) {
+		final KeySequenceRegister keySequenceRegister = this.getByPrefixAndSuffix(keyPrefix, suffix);
+
+		if (keySequenceRegister != null) {
+			return keySequenceRegister.getLastUsedSequence() + 1;
+		} 
+		return 1;
+	}
+	
 	public int incrementAndGetNextSequence(final String keyPrefix, final String suffix) {
 
 		final KeySequenceRegister keySequenceRegister = this.getByPrefixAndSuffix(keyPrefix, suffix);

@@ -122,6 +122,82 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED3.intValue(),
 				retrievedKeyRegisterWithSpaceBeforeSuffix.getLastUsedSequence());
 	}
+	
+	@Test
+	public void testGetNextSequenceWithNoPrefix() {
+		// Save new records: 1) with null suffix 2) with empty string suffix
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister.setSuffix(KeySequenceRegisterDAOTest.SUFFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+
+		Assert.assertEquals(1, this.keySequenceRegisterDao.getNextSequence(null, KeySequenceRegisterDAOTest.SUFFIX));
+		Assert.assertEquals(1, this.keySequenceRegisterDao.getNextSequence("", KeySequenceRegisterDAOTest.SUFFIX));
+	}
+
+	@Test
+	public void testGetNextSequenceWithNoSuffix() {
+		// Save new records: 1) with null suffix 2) with empty string suffix
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+		final KeySequenceRegister keyRegister2 = new KeySequenceRegister();
+		keyRegister2.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister2.setSuffix("");
+		keyRegister2.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED2);
+		this.keySequenceRegisterDao.save(keyRegister2);
+
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED2.intValue() + 1, this.keySequenceRegisterDao.getNextSequence(KeySequenceRegisterDAOTest.PREFIX, null));
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED2.intValue() + 1, this.keySequenceRegisterDao.getNextSequence(KeySequenceRegisterDAOTest.PREFIX, ""));
+	}
+
+	@Test
+	public void testGetNextSequenceWithSpaceAfterPrefix() {
+		// Save new records: 1) one with space after prefix and 2)one without space after prefix
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+		final KeySequenceRegister keyRegister2 = new KeySequenceRegister();
+		keyRegister2.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX + " ");
+		keyRegister2.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED2);
+		this.keySequenceRegisterDao.save(keyRegister2);
+
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue() + 1, this.keySequenceRegisterDao.getNextSequence(KeySequenceRegisterDAOTest.PREFIX, null));
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED2.intValue() + 1, this.keySequenceRegisterDao.getNextSequence(KeySequenceRegisterDAOTest.PREFIX + " ", null));
+	}
+
+	@Test
+	public void testGetNextSequenceWithSuffixSpecified() {
+		Assert.assertNull(
+				this.keySequenceRegisterDao.getByPrefixAndSuffix(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX));
+
+		// Save new records: 1)one without suffix 2) one without suffix and 3) one with space before suffix
+		final KeySequenceRegister keyRegister1 = new KeySequenceRegister();
+		keyRegister1.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister1.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister1);
+
+		final KeySequenceRegister keyRegister2 = new KeySequenceRegister();
+		keyRegister2.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister2.setSuffix(KeySequenceRegisterDAOTest.SUFFIX);
+		keyRegister2.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED2);
+		this.keySequenceRegisterDao.save(keyRegister2);
+
+		final KeySequenceRegister keyRegister3 = new KeySequenceRegister();
+		keyRegister3.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister3.setSuffix(" " + KeySequenceRegisterDAOTest.SUFFIX);
+		keyRegister3.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED3);
+		this.keySequenceRegisterDao.save(keyRegister3);
+
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED2.intValue() + 1,
+				this.keySequenceRegisterDao.getNextSequence(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX));
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED3.intValue() + 1,
+				this.keySequenceRegisterDao.getNextSequence(KeySequenceRegisterDAOTest.PREFIX, " " + KeySequenceRegisterDAOTest.SUFFIX));
+	}
+
 
 	@Test
 	public void testIncrementAndGetNextSequenceWhenSequenceAlreadyExists() {

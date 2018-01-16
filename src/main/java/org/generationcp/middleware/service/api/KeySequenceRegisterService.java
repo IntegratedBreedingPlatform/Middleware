@@ -25,4 +25,10 @@ public interface KeySequenceRegisterService {
 	 * operation can be retried.
 	 */
 	int incrementAndGetNextSequence(String keyPrefix, String suffix);
+	
+	/**
+	 * Finds next available sequence number for a given combination of keyPrefix suffix in key sequence registry
+	 * 
+	 */
+	int getNextSequence(String keyPrefix, String suffix);
 }
