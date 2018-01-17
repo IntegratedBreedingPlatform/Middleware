@@ -1245,4 +1245,30 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
 
+	@Override
+	public List<Method> getAllNoBulkingMethods(final boolean filterOutGenerative) {
+		final List<Method> methodList = filterOutGenerative ?
+				this.getGermplasmDataManager().getAllMethodsNotBulkingNotGenerative() :
+				this.getGermplasmDataManager().getAllNoBulkingMethods();
+		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
+		return methodList;
+	}
+	
+	@Override
+	public List<Method> getFavoriteProjectNoBulkingMethods(final String programUUID) {
+		final List<ProgramFavorite> favList =
+				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, programUUID);
+		final List<Integer> ids = new ArrayList<>();
+		if (favList != null && !favList.isEmpty()) {
+			for (final ProgramFavorite fav : favList) {
+				ids.add(fav.getEntityId());
+			}
+		}
+		return this.getGermplasmDataManager().getNoBulkingMethodsByIdList(ids);
+	}
+
+	@Override
+	public List<Method> getAllGenerativeNoBulkingMethods(final String programUUID) {
+		return this.getGermplasmDataManager().getNoBulkingMethodsByType("GEN",programUUID);
+	}
 }

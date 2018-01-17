@@ -1094,4 +1094,31 @@ public interface GermplasmDataManager {
 	 */
 	List<String> getMethodCodeByMethodIds(Set<Integer> methodIds);
 
+	/**
+	 *
+	 * @return List of all no bulking methods
+	 */
+	List<Method> getAllNoBulkingMethods();
+
+	/**
+	 *
+	 * @param ids
+	 * @return List of all no-bulking methods for a list of ids
+	 */
+	List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids);
+
+	/**
+	 *
+	 * @return List of all no-bulking and no generative methods
+	 */
+	List<Method> getAllMethodsNotBulkingNotGenerative();
+
+	/**
+	 *
+	 * @param type
+	 * @param programUUID
+	 * @return List of all no-bulking methods given a type and a program
+	 */
+	List<Method> getNoBulkingMethodsByType(final String type, final String programUUID);
+
 }
