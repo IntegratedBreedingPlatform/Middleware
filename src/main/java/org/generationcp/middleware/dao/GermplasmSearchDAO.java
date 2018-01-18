@@ -103,17 +103,19 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n"
 						+ "              AND g.gpid2 <> 0 THEN nameOfMaleParent.nval \n" + "         ELSE '-' \n"
 						+ "       END                         AS `%s` \n", MALE_PARENT_PREFERRED_NAME));
-		selectClauseColumnsMap.put(GROUP_SOURCE_GID, String.format("g.gpid1 AS '%s' \n", GROUP_SOURCE_GID));
+		selectClauseColumnsMap.put(GROUP_SOURCE_GID, String.format(
+			" CASE \n WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL \n" + " AND g.gpid1 <> 0 THEN g.gpid1 \n ELSE '-' \n" + " END AS `%s` \n",
+			GROUP_SOURCE_GID));
 		selectClauseColumnsMap.put(GROUP_SOURCE_PREFERRED_NAME, String.format(
-				" CASE \n  WHEN g.gnpgs = -1 \n AND g.gpid1 IS NOT NULL \n"
-				+ " AND g.gpid1 <> 0 THEN groupSource.nval \n ELSE '-' \n"
+			" CASE \n  WHEN g.gnpgs = -1 \n AND g.gpid1 IS NOT NULL \n" + " AND g.gpid1 <> 0 THEN groupSource.nval \n ELSE '-' \n"
 				+ " END AS `%s` \n", GROUP_SOURCE_PREFERRED_NAME));
 
-		selectClauseColumnsMap.put(IMMEDIATE_SOURCE_GID, String.format("g.gpid2 AS '%s' \n", IMMEDIATE_SOURCE_GID));
+		selectClauseColumnsMap.put(IMMEDIATE_SOURCE_GID, String.format(
+			" CASE \n WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL \n" + " AND g.gpid2 <> 0 THEN g.gpid2 \n ELSE '-' \n" + " END AS `%s` \n",
+			IMMEDIATE_SOURCE_GID));
 		selectClauseColumnsMap.put(IMMEDIATE_SOURCE_PREFERRED_NAME, String.format(
-				" CASE \n WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL \n"
-				+ "	AND g.gpid2 <> 0 THEN immediateSource.nval \n"
-				+ "	ELSE '-' \n END AS `%s` \n",  IMMEDIATE_SOURCE_PREFERRED_NAME));
+			" CASE \n WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL \n" + "	AND g.gpid2 <> 0 THEN immediateSource.nval \n"
+				+ "	ELSE '-' \n END AS `%s` \n", IMMEDIATE_SOURCE_PREFERRED_NAME));
 
 	}
 
@@ -121,21 +123,20 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 	static {
 
-		fromClauseColumnsMap.put(PREFERRED_NAME, "LEFT JOIN `names` nameOfGermplasm \n" + "              ON g.gid = nameOfGermplasm.gid \n"
-			+ "                 AND nameOfGermplasm.nstat = 1 \n");
+		fromClauseColumnsMap.put(PREFERRED_NAME,
+			"LEFT JOIN names nameOfGermplasm ON g.gid = nameOfGermplasm.gid AND nameOfGermplasm.nstat = 1 \n");
 		fromClauseColumnsMap.put(PREFERRED_ID,
-			"LEFT JOIN `names` preferredIdOfGermplasm \n" + "              ON g.gid = preferredIdOfGermplasm.gid \n"
-				+ "                 AND preferredIdOfGermplasm.nstat = 8 \n");
+			"LEFT JOIN names preferredIdOfGermplasm ON g.gid = preferredIdOfGermplasm.gid AND preferredIdOfGermplasm.nstat = 8 \n");
 		fromClauseColumnsMap.put(FEMALE_PARENT_PREFERRED_NAME,
-			"LEFT JOIN `names` nameOfFemaleParent \n" + "              ON g.gpid1 = nameOfFemaleParent.gid \n"
-				+ "                 AND nameOfFemaleParent.nstat = 1 \n");
+			"LEFT JOIN names nameOfFemaleParent ON g.gpid1 = nameOfFemaleParent.gid AND nameOfFemaleParent.nstat = 1 \n");
 		fromClauseColumnsMap.put(MALE_PARENT_PREFERRED_NAME,
-			"LEFT JOIN `names` nameOfMaleParent \n" + "              ON g.gpid2 = nameOfMaleParent.gid \n"
-				+ "                 AND nameOfMaleParent.nstat = 1 \n");
+			"LEFT JOIN names nameOfMaleParent ON g.gpid2 = nameOfMaleParent.gid AND nameOfMaleParent.nstat = 1 \n");
 		fromClauseColumnsMap.put(GROUP_SOURCE_GID, " ");
-		fromClauseColumnsMap.put(GROUP_SOURCE_PREFERRED_NAME, "LEFT JOIN names groupSource ON g.gpid1 = groupSource.gid AND groupSource.nstat = 1 \n");
+		fromClauseColumnsMap.put(GROUP_SOURCE_PREFERRED_NAME,
+			"LEFT JOIN names groupSource ON g.gpid1 = groupSource.gid AND groupSource.nstat = 1 \n");
 		fromClauseColumnsMap.put(IMMEDIATE_SOURCE_GID, " ");
-		fromClauseColumnsMap.put(IMMEDIATE_SOURCE_PREFERRED_NAME,"LEFT JOIN names immediateSource ON g.gpid1 = immediateSource.gid AND immediateSource.nstat = 1 \n");
+		fromClauseColumnsMap.put(IMMEDIATE_SOURCE_PREFERRED_NAME,
+			"LEFT JOIN names immediateSource ON g.gpid1 = immediateSource.gid AND immediateSource.nstat = 1 \n");
 
 	}
 
