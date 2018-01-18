@@ -64,7 +64,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		final List<Germplasm> groupMembers = this.germplasmDAO.getManagementGroupMembers(germplasm.getMgid());
 		final String nameWithSequence = this.generateNextNameAndIncrementSequence(setting);
 
-		// TODO performace tuning when processing large number of group members
+		// TODO performance tuning when processing large number of group members
 		for (final Germplasm member : groupMembers) {
 			this.addName(member, nameWithSequence, nameType, userId, locationId, result);
 		}
@@ -72,7 +72,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		return result;
 	}
 
-	private int getNextNumberInSequence(final GermplasmNameSetting setting) {
+	int getNextNumberInSequence(final GermplasmNameSetting setting) {
 		
 		final String lastPrefixUsed = this.buildPrefixString(setting).toUpperCase();
 
@@ -96,7 +96,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		return 1;
 	}
 	
-	protected String buildPrefixString(final GermplasmNameSetting setting) {
+	String buildPrefixString(final GermplasmNameSetting setting) {
 		final String prefix = !StringUtils.isEmpty(setting.getPrefix()) ? setting.getPrefix().trim() : "";
 		if (setting.isAddSpaceBetweenPrefixAndCode()) {
 			return prefix + " ";
@@ -104,7 +104,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		return prefix;
 	}
 
-	protected String buildSuffixString(final GermplasmNameSetting setting, final String suffix) {
+	String buildSuffixString(final GermplasmNameSetting setting, final String suffix) {
 		if (suffix != null) {
 			if (setting.isAddSpaceBetweenSuffixAndCode()) {
 				return " " + suffix.trim();
@@ -114,7 +114,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		return "";
 	}
 	
-	protected String getNumberWithLeadingZeroesAsString(final Integer number, final GermplasmNameSetting setting) {
+	String getNumberWithLeadingZeroesAsString(final Integer number, final GermplasmNameSetting setting) {
 		final StringBuilder sb = new StringBuilder();
 		final String numberString = number.toString();
 		final Integer numOfDigits = setting.getNumOfDigits();
@@ -200,7 +200,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		return this.buildDesignationNameInSequence(nextNumberInSequence, setting);
 	}
 
-	private String buildDesignationNameInSequence(final Integer number, final GermplasmNameSetting setting) {
+	String buildDesignationNameInSequence(final Integer number, final GermplasmNameSetting setting) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(this.buildPrefixString(setting));
 		sb.append(this.getNumberWithLeadingZeroesAsString(number, setting));

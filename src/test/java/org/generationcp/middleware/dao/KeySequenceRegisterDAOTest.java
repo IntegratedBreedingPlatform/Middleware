@@ -28,7 +28,7 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetByPrefixAndSuffixWithNoPrefix() {
-		// Save new records: 1) with null suffix 2) with empty string suffix
+		// Save new record
 		final KeySequenceRegister keyRegister = new KeySequenceRegister();
 		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
 		keyRegister.setSuffix(KeySequenceRegisterDAOTest.SUFFIX);
