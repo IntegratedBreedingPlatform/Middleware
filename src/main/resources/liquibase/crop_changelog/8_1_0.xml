@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="clarysabel" id="v8.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='PLANT_NUMBER';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			insert  into `udflds`(`ftable`,`ftype`,`fcode`,`fname`,`ffmt`,`fdesc`,`lfldno`,`fuid`,`fdate`,`scaleid`) values
+				('ATRIBUTS','PASSPORT','PLANT_NUMBER','Plant Number','-','Plant Number of Advanced Germplasm',0,0,20180119,0);
+	    </sql>
+	</changeSet>
+
+</databaseChangeLog>
