@@ -130,27 +130,22 @@ public class VariableListTransformer extends Transformer {
 		}
 		List<MeasurementData> trialMD = mRow.getTrialDataList(trialHeaders);
 		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
+			int varTypeSize = varTypes.size();
+			for (int i = 0, l = varTypeSize; i < l; i++) {
+				DMSVariableType varType = varTypes.get(i);
 
-			if (trialMD.size() == variableTypeList.getVariableTypes().size()) {
-				List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
-				int varTypeSize = varTypes.size();
-				for (int i = 0, l = varTypeSize; i < l; i++) {
-					DMSVariableType varType = varTypes.get(i);
-
-					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT
-							|| varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {// include variate
-						String value = null;
-						for (MeasurementData data : trialMD) {
-							if (data.getMeasurementVariable().getTermId() == varTypes.get(i).getId()) {
-								value = data.getValue();
-							}
+				if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT
+						|| varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {// include variate
+					String value = null;
+					for (MeasurementData data : trialMD) {
+						if (data.getMeasurementVariable().getTermId() == varTypes.get(i).getId()) {
+							value = data.getValue();
 						}
-						Variable variable = new Variable(varType, value);
-						variableList.add(variable);
 					}
+					Variable variable = new Variable(varType, value);
+					variableList.add(variable);
 				}
-			} else {
-				throw new MiddlewareQueryException("Variables did not match the Measurements Row.");
 			}
 		}
 

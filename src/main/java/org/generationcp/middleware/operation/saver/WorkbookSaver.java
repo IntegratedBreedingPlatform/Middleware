@@ -442,6 +442,7 @@ public class WorkbookSaver extends Saver {
 					final TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations");
 					final VariableList geolocation =
 							this.getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
+					setVariableListValues(geolocation, workbook.getConditions());
 					if (geolocation != null && !geolocation.isEmpty()) {
 						final String trialInstanceNumber = this.getTrialInstanceNumber(geolocation);
 						if (WorkbookSaver.LOG.isDebugEnabled()) {
@@ -489,6 +490,14 @@ public class WorkbookSaver extends Saver {
 		}
 
 		return 0;
+	}
+
+	private void setVariableListValues(VariableList variableList, List<MeasurementVariable> measurementVariables) {
+		for(MeasurementVariable mvar: measurementVariables){
+			if(variableList.findById(mvar.getTermId()).getValue() == null){
+				variableList.findById(mvar.getTermId()).setValue(mvar.getValue());
+			}
+		}
 	}
 
 	private String getTrialInstanceNumber(final MeasurementRow row) {
@@ -969,7 +978,7 @@ public class WorkbookSaver extends Saver {
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 		if (trialVariableTypeList != null) {// multi-location
 			studyLocationId =
-					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariableTypeList, trialHeaders, trialVariatesMap,
+					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap,
 							false, programUUID);
 		} else {
 			studyLocationId =
@@ -997,6 +1006,7 @@ public class WorkbookSaver extends Saver {
 			// 2. trial experiments
 			if (trialVariableTypeList != null) {// multi-location
 				for (final Integer locationId : locationIds) {
+					setVariableListValues(trialVariatesMap.get(locationId), workbook.getConstants());
 					this.createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId), cropPrefix);
 				}
 			} else {
