@@ -264,6 +264,13 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.status;
 	}
 
+
+	@Override
+	public Integer getListDataId() {
+		return this.id;
+	}
+
+
 	public String getStatusString() {
 		// TODO: make internationalizable
 		if (this.getStatus().equals(0)) {
