@@ -157,6 +157,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		return workbook;
 	}
+	
+	@Override 
+	public Workbook parseWorkbook(org.apache.poi.ss.usermodel.Workbook excelWorkbook) throws WorkbookParserException {
+		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
+
+		final Workbook workbook = parser.parseFile(excelWorkbook, false);
+		return workbook;
+	}
 
 	@Override
 	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {

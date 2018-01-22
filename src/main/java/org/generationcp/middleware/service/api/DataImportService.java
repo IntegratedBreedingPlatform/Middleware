@@ -163,5 +163,7 @@ public interface DataImportService {
 	 */
 	void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID);
 
+	Workbook parseWorkbook(org.apache.poi.ss.usermodel.Workbook excelWorkbook) throws WorkbookParserException;
+
 
 }
