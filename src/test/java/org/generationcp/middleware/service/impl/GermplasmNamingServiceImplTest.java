@@ -352,7 +352,7 @@ public class GermplasmNamingServiceImplTest {
 		} catch (InvalidGermplasmNameSettingException e) {
 			Assert.fail("Not expecting InvalidGermplasmNameSettingException to be thrown but was thrown.");
 		}
-		Assert.assertEquals(GermplasmNamingServiceImplTest.PREFIX + " 000000" + NEXT_NUMBER_WITH_SPACE + " " +  GermplasmNamingServiceImplTest.SUFFIX, nextNameInSequence);
+		Assert.assertEquals(buildExpectedNextName(), nextNameInSequence);
 	}
 	
 	@Test
@@ -365,7 +365,11 @@ public class GermplasmNamingServiceImplTest {
 		} catch (InvalidGermplasmNameSettingException e) {
 			Assert.fail("Not expecting InvalidGermplasmNameSettingException to be thrown but was thrown.");
 		}
-		Assert.assertEquals(GermplasmNamingServiceImplTest.PREFIX + " 000000" + NEXT_NUMBER_WITH_SPACE + " " +  GermplasmNamingServiceImplTest.SUFFIX, nextNameInSequence);
+		Assert.assertEquals(this.buildExpectedNextName(), nextNameInSequence);
+	}
+
+	private String buildExpectedNextName() {
+		return GermplasmNamingServiceImplTest.PREFIX + " 000000" + NEXT_NUMBER_WITH_SPACE + " " +  GermplasmNamingServiceImplTest.SUFFIX;
 	}
 
 	@Test
@@ -393,8 +397,8 @@ public class GermplasmNamingServiceImplTest {
 			Assert.fail("Expecting InvalidGermplasmNameSettingException to be thrown but was not.");
 		} catch (InvalidGermplasmNameSettingException e) {
 			Assert.assertEquals(
-					"The starting sequence number specified will generate conflict with already existing cross codes. Please change your starting sequence number greater than "
-							+ (GermplasmNamingServiceImplTest.NEXT_NUMBER_WITH_SPACE - 1) + ".",
+					"Starting sequence number should be higher than or equal to next name in the sequence: "
+							+ this.buildExpectedNextName() + ".",
 					e.getMessage());
 		}
 	}

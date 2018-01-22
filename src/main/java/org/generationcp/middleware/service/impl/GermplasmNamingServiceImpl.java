@@ -182,9 +182,10 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		final Integer optionalStartNumber = setting.getStartNumber();
 
 		if (optionalStartNumber != null && optionalStartNumber > 0 && nextNumberInSequence > optionalStartNumber) {
+			final String nextName = this.buildDesignationNameInSequence(nextNumberInSequence, setting);
 			final String invalidStatingNumberErrorMessage =
-					"The starting sequence number specified will generate conflict with already existing cross codes. Please change your starting sequence number greater than "
-							+ (nextNumberInSequence - 1) + ".";
+					"Starting sequence number should be higher than or equal to next name in the sequence: "
+							+ nextName + ".";
 			throw new InvalidGermplasmNameSettingException(invalidStatingNumberErrorMessage);
 		}
 
