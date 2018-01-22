@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware.interfaces;
 
-import org.generationcp.middleware.pojos.Germplasm;
-
 /**
  * 
  * @author Aldrin Batac
