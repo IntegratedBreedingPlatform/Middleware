@@ -908,8 +908,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		} else {
 			// get local variable name of the trial instance number
 			String trialInstanceHeader = null;
-			final List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
-			for (final MeasurementVariable mvar : trialFactors) {
+			final List<MeasurementVariable> trialVariables = workbook.getTrialFactors();
+			trialVariables.addAll(workbook.getConditions());
+			for (final MeasurementVariable mvar : trialVariables) {
 				final Integer varId = ontologyDataManager
 						.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
 				if (varId != null) {
