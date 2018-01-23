@@ -313,7 +313,6 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @return SampleList
 	 * @throws Exception
 	 */
-	@SuppressWarnings("null")
 	@Override
 	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId, final boolean isCropList) {
 		Preconditions.checkNotNull(sampleListId);
@@ -332,6 +331,9 @@ public class SampleListServiceImpl implements SampleListService {
 			newParentFolder = this.sampleListDao.getById(newParentFolderId);
 		}
 
+		Preconditions.checkArgument(newParentFolder != null, "Specified newParentFolderId does not exist");
+		Preconditions.checkArgument(newParentFolder.isFolder(), "Specified newParentFolderId is not a folder");
+
 		// if the list is moved to the crop list, set the program uuid to null so that
 		// it will be accessible to all programs of the same crop.
 		if (isCropList) {
@@ -340,9 +342,6 @@ public class SampleListServiceImpl implements SampleListService {
 			// else, just inherit the program uuid of the parent folder.
 			listToMove.setProgramUUID(newParentFolder.getProgramUUID());
 		}
-
-		Preconditions.checkArgument(newParentFolder != null, "Specified newParentFolderId does not exist");
-		Preconditions.checkArgument(newParentFolder.isFolder(), "Specified newParentFolderId is not a folder");
 
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId, listToMove.getProgramUUID());
