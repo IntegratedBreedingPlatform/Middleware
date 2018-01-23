@@ -1,6 +1,6 @@
 package org.generationcp.middleware.domain.inventory;
 
-import org.generationcp.middleware.domain.oms.Term;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -167,6 +167,22 @@ public class GermplasmInventory implements Serializable {
 
 	public void setTotalAvailableBalance(Double totalAvailableBalance) {
 		this.totalAvailableBalance = totalAvailableBalance;
+	}
+
+	public String getAvailable() {
+		if (this.getDistinctScaleCountForGermplsm() == 0) {
+			return "-";
+		} else if (this.getDistinctScaleCountForGermplsm() == 1) {
+			StringBuilder available = new StringBuilder();
+			available.append(this.getTotalAvailableBalance());
+
+			if (!StringUtils.isEmpty(this.getScaleForGermplsm())) {
+				available.append(" " + this.getScaleForGermplsm());
+			}
+			return available.toString();
+		} else {
+			return MIXED;
+		}
 	}
 
 	public Integer getScaleIdForGermplsm() {
