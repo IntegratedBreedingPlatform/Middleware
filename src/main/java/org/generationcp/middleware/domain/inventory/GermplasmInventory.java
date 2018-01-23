@@ -170,20 +170,19 @@ public class GermplasmInventory implements Serializable {
 	}
 
 	public String getAvailable() {
-		StringBuilder available = new StringBuilder();
 		if (this.getDistinctScaleCountForGermplsm() == 0) {
 			return "-";
 		} else if (this.getDistinctScaleCountForGermplsm() == 1) {
+			StringBuilder available = new StringBuilder();
 			available.append(this.getTotalAvailableBalance());
 
 			if (!StringUtils.isEmpty(this.getScaleForGermplsm())) {
 				available.append(" " + this.getScaleForGermplsm());
 			}
-
+			return available.toString();
 		} else {
-			available.append(MIXED);
+			return MIXED;
 		}
-		return available.toString();
 	}
 
 	public Integer getScaleIdForGermplsm() {
