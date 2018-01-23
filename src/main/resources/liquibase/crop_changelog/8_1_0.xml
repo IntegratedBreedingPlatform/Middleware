@@ -6,7 +6,22 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="darla" id="v8.1.0-1">
+	<changeSet author="vanina" id="v8.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT count(1)
+					FROM location
+					WHERE ltype = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET ltype=410 WHERE ltype=0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v8.1.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*)
@@ -19,14 +34,14 @@
 		<dropPrimaryKey tableName="key_sequence_register"/>
 	</changeSet>
 	
-	<changeSet author="darla" id="v8.1.0-2">
+	<changeSet author="darla" id="v8.1.0-3">
         <preConditions onFail="MARK_RAN">
 			<indexExists tableName="key_sequence_register" indexName="key_prefix_unique" columnNames="key_prefix"/>
 		</preConditions>
     	<dropIndex indexName="key_prefix_unique" tableName="key_sequence_register"/>
 	</changeSet>
 	
-	<changeSet author="darla" id="v8.1.0-3">
+	<changeSet author="darla" id="v8.1.0-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*)
