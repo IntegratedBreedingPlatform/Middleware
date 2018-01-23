@@ -204,10 +204,6 @@ public class VariableListTransformer extends Transformer {
 
 		List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
 
-		if (!Objects.equals(measurementVariableList.size(), varTypes.size())) {
-			throw new MiddlewareQueryException("Variables did not match the Measurement Variable List.");
-		}
-
 		for (MeasurementVariable measurementVariable : measurementVariableList) {
 			String value = measurementVariable.getValue();
 			for (DMSVariableType varType : varTypes) {

@@ -494,8 +494,9 @@ public class WorkbookSaver extends Saver {
 
 	private void setVariableListValues(VariableList variableList, List<MeasurementVariable> measurementVariables) {
 		for(MeasurementVariable mvar: measurementVariables){
-			if(variableList.findById(mvar.getTermId()).getValue() == null){
-				variableList.findById(mvar.getTermId()).setValue(mvar.getValue());
+			Variable variable = variableList.findById(mvar.getTermId());
+			if( variable != null && variable .getValue() == null){
+				variable.setValue(mvar.getValue());
 			}
 		}
 	}
@@ -970,7 +971,7 @@ public class WorkbookSaver extends Saver {
 		final VariableTypeList trialVariables = variableTypeMap.get(TRIALVARIABLES);
 		final VariableTypeList effectVariables = variableTypeMap.get(EFFECTVARIABLE);
 		final List<MeasurementVariable> trialMV = measurementVariableMap.get(TRIALMV);
-
+		removeConditionsVariables(effectVariables, workbook.getConstants());
 		// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
 		// create locations (entries to nd_geolocation) and associate to observations
 		final int studyLocationId/* = DEFAULT_GEOLOCATION_ID */;
@@ -1022,6 +1023,24 @@ public class WorkbookSaver extends Saver {
 			this.createMeasurementEffectExperiments(measurementDatasetId, effectVariables, workbook.getObservations(), trialHeaders,
 				cropPrefix);
 		}
+	}
+
+	private void removeConditionsVariables(VariableTypeList trialVariables, List<MeasurementVariable> constants) {
+		List<DMSVariableType> variableTypes = new ArrayList<>();
+		for(DMSVariableType varType: trialVariables.getVariableTypes()) {
+			boolean isConstant = false;
+			for(MeasurementVariable mvar: constants){
+				if(varType.getId() == mvar.getTermId()) {
+					isConstant = true;
+					break;
+				}
+			}
+			if(!isConstant) {
+				variableTypes.add(varType);
+			}
+		}
+		trialVariables.setVariableTypes(variableTypes);
+		
 	}
 
 	private boolean checkIfHasExistingStudyExperiment(final int studyId) {
