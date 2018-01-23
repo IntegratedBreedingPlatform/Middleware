@@ -83,4 +83,7 @@ public interface GermplasmExportSource {
 	 */
 	Integer getGroupId();
 
+	String getNotes();
+
+	Integer getListDataId();
 }

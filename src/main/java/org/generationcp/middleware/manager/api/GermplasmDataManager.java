@@ -1094,4 +1094,20 @@ public interface GermplasmDataManager {
 	 */
 	List<String> getMethodCodeByMethodIds(Set<Integer> methodIds);
 
+
+	/**
+	 * Given a List of GIDs, return a Map of GIDs to PreferredName.
+	 *
+	 * @param gids the gids
+	 * @return the preferred names by gids
+	 */
+	Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids);
+
+	/**
+	 * Given a List of GIDs, return a Map of GIDs to PreferredName.
+	 *
+	 * @param gids the gids
+	 * @return the preferred names by gids
+	 */
+	Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids);
 }
