@@ -948,8 +948,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
 				// check import type first
 				final List<Integer> variateIds = new ArrayList<Integer>();
-				// check at least one variate
-				variateIds.add(workbook.getVariates().get(0).getTermId());
+				// check all variates
+				for(MeasurementVariable mvar: workbook.getVariates()){
+					variateIds.add(mvar.getTermId());
+				}
+				
 				final int numberOfVariatesData = this.getPhenotypeDao()
 						.countVariatesDataOfStudy(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(),
 								variateIds);
