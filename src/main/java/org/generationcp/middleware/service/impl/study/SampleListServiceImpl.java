@@ -310,11 +310,13 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @param sampleListId
 	 * @param newParentFolderId
 	 * @param isCropList
+	 * @param programUUID
 	 * @return SampleList
 	 * @throws Exception
 	 */
 	@Override
-	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId, final boolean isCropList) {
+	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId, final boolean isCropList,
+			final String programUUID) {
 		Preconditions.checkNotNull(sampleListId);
 		Preconditions.checkNotNull(newParentFolderId);
 		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), "Arguments can not have the same value");
@@ -339,8 +341,8 @@ public class SampleListServiceImpl implements SampleListService {
 		if (isCropList) {
 			listToMove.setProgramUUID(null);
 		} else {
-			// else, just inherit the program uuid of the parent folder.
-			listToMove.setProgramUUID(newParentFolder.getProgramUUID());
+			// else, just set the current programUUID
+			listToMove.setProgramUUID(programUUID);
 		}
 
 		final SampleList uniqueSampleListName =
