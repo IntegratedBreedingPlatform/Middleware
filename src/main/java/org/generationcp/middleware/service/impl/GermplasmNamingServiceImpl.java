@@ -3,12 +3,15 @@ package org.generationcp.middleware.service.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
@@ -45,7 +48,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public GermplasmGroupNamingResult applyGroupName(final Integer gid, final String groupName, final UserDefinedField nameType,
+	public GermplasmGroupNamingResult applyGroupName(final Integer gid, final GermplasmNameSetting setting, final UserDefinedField nameType,
 			final Integer userId, final Integer locationId) {
 
 		GermplasmGroupNamingResult result = new GermplasmGroupNamingResult();
@@ -59,15 +62,76 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		}
 
 		final List<Germplasm> groupMembers = this.germplasmDAO.getManagementGroupMembers(germplasm.getMgid());
-		final String nameWithSequence = groupName + this.keySequenceRegisterService.incrementAndGetNextSequence(groupName);
+		final String nameWithSequence = this.generateNextNameAndIncrementSequence(setting);
 
-		// TODO performace tuning when processing large number of group members
+		// TODO performance tuning when processing large number of group members
 		for (final Germplasm member : groupMembers) {
 			this.addName(member, nameWithSequence, nameType, userId, locationId, result);
 		}
 
 		return result;
 	}
+
+	int getNextNumberInSequence(final GermplasmNameSetting setting) {
+		
+		final String lastPrefixUsed = this.buildPrefixString(setting).toUpperCase();
+
+		if (!lastPrefixUsed.isEmpty()) {
+			final String suffix = this.buildSuffixString(setting, setting.getSuffix());
+			return this.keySequenceRegisterService.getNextSequence(lastPrefixUsed, suffix);
+		}
+
+		return 1;
+	}
+	
+	private int getNextNumberInSequenceAndIncrement(final GermplasmNameSetting setting) {
+		
+		final String lastPrefixUsed = this.buildPrefixString(setting).toUpperCase();
+
+		if (!lastPrefixUsed.isEmpty()) {
+			final String suffix = this.buildSuffixString(setting, setting.getSuffix());
+			return this.keySequenceRegisterService.incrementAndGetNextSequence(lastPrefixUsed, suffix);
+		}
+
+		return 1;
+	}
+	
+	String buildPrefixString(final GermplasmNameSetting setting) {
+		final String prefix = !StringUtils.isEmpty(setting.getPrefix()) ? setting.getPrefix().trim() : "";
+		if (setting.isAddSpaceBetweenPrefixAndCode()) {
+			return prefix + " ";
+		}
+		return prefix;
+	}
+
+	String buildSuffixString(final GermplasmNameSetting setting, final String suffix) {
+		if (suffix != null) {
+			if (setting.isAddSpaceBetweenSuffixAndCode()) {
+				return " " + suffix.trim();
+			}
+			return suffix.trim();
+		}
+		return "";
+	}
+	
+	String getNumberWithLeadingZeroesAsString(final Integer number, final GermplasmNameSetting setting) {
+		final StringBuilder sb = new StringBuilder();
+		final String numberString = number.toString();
+		final Integer numOfDigits = setting.getNumOfDigits();
+
+		if (numOfDigits != null && numOfDigits > 0) {
+			final int numOfZerosNeeded = numOfDigits - numberString.length();
+			if (numOfZerosNeeded > 0) {
+				for (int i = 0; i < numOfZerosNeeded; i++) {
+					sb.append("0");
+				}
+			}
+
+		}
+		sb.append(number);
+		return sb.toString();
+	}
+
 
 	private void addName(final Germplasm germplasm, final String groupName, final UserDefinedField nameType, final Integer userId,
 			final Integer locationId, final GermplasmGroupNamingResult result) {
@@ -109,5 +173,42 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 			result.addMessage(String.format("Germplasm (gid: %s) already has existing name %s of type %s. Supplied name %s was not added.",
 					germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
 		}
+	}
+
+	@Override
+	public String getNextNameInSequence(final GermplasmNameSetting setting) throws InvalidGermplasmNameSettingException {
+		Integer nextNumberInSequence = this.getNextNumberInSequence(setting);
+
+		final Integer optionalStartNumber = setting.getStartNumber();
+
+		if (optionalStartNumber != null && optionalStartNumber > 0 && nextNumberInSequence > optionalStartNumber) {
+			final String nextName = this.buildDesignationNameInSequence(nextNumberInSequence, setting);
+			final String invalidStatingNumberErrorMessage =
+					"Starting sequence number should be higher than or equal to next name in the sequence: "
+							+ nextName + ".";
+			throw new InvalidGermplasmNameSettingException(invalidStatingNumberErrorMessage);
+		}
+
+		if (optionalStartNumber != null && nextNumberInSequence < optionalStartNumber) {
+			nextNumberInSequence = optionalStartNumber;
+		}
+
+		return this.buildDesignationNameInSequence(nextNumberInSequence, setting);
+	}
+	
+	private String generateNextNameAndIncrementSequence(final GermplasmNameSetting setting) {
+		Integer nextNumberInSequence = this.getNextNumberInSequenceAndIncrement(setting);
+		return this.buildDesignationNameInSequence(nextNumberInSequence, setting);
+	}
+
+	String buildDesignationNameInSequence(final Integer number, final GermplasmNameSetting setting) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(this.buildPrefixString(setting));
+		sb.append(this.getNumberWithLeadingZeroesAsString(number, setting));
+
+		if (!StringUtils.isEmpty(setting.getSuffix())) {
+			sb.append(this.buildSuffixString(setting, setting.getSuffix()));
+		}
+		return sb.toString();
 	}
 }
