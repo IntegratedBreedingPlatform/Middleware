@@ -77,20 +77,8 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		final String lastPrefixUsed = this.buildPrefixString(setting).toUpperCase();
 
 		if (!lastPrefixUsed.isEmpty()) {
-			final String suffix = this.buildSuffixString(setting, setting.getSuffix());
+			final String suffix = this.buildSuffixString(setting);
 			return this.keySequenceRegisterService.getNextSequence(lastPrefixUsed, suffix);
-		}
-
-		return 1;
-	}
-	
-	private int getNextNumberInSequenceAndIncrement(final GermplasmNameSetting setting) {
-		
-		final String lastPrefixUsed = this.buildPrefixString(setting).toUpperCase();
-
-		if (!lastPrefixUsed.isEmpty()) {
-			final String suffix = this.buildSuffixString(setting, setting.getSuffix());
-			return this.keySequenceRegisterService.incrementAndGetNextSequence(lastPrefixUsed, suffix);
 		}
 
 		return 1;
@@ -104,7 +92,8 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		return prefix;
 	}
 
-	String buildSuffixString(final GermplasmNameSetting setting, final String suffix) {
+	String buildSuffixString(final GermplasmNameSetting setting) {
+		final String suffix = setting.getSuffix();
 		if (suffix != null) {
 			if (setting.isAddSpaceBetweenSuffixAndCode()) {
 				return " " + suffix.trim();
@@ -197,7 +186,14 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 	
 	private String generateNextNameAndIncrementSequence(final GermplasmNameSetting setting) {
-		Integer nextNumberInSequence = this.getNextNumberInSequenceAndIncrement(setting);
+		Integer nextNumberInSequence = this.getNextNumberInSequence(setting);
+		final Integer optionalStartNumber = setting.getStartNumber();
+		if (optionalStartNumber != null && nextNumberInSequence < optionalStartNumber) {
+			nextNumberInSequence = optionalStartNumber;
+		}
+		this.keySequenceRegisterService.saveLastSequenceUsed(this.buildPrefixString(setting).toUpperCase(),
+				this.buildSuffixString(setting).toUpperCase(), nextNumberInSequence);
+
 		return this.buildDesignationNameInSequence(nextNumberInSequence, setting);
 	}
 
@@ -207,7 +203,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		sb.append(this.getNumberWithLeadingZeroesAsString(number, setting));
 
 		if (!StringUtils.isEmpty(setting.getSuffix())) {
-			sb.append(this.buildSuffixString(setting, setting.getSuffix()));
+			sb.append(this.buildSuffixString(setting));
 		}
 		return sb.toString();
 	}

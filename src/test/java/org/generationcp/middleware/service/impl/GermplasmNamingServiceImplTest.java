@@ -220,7 +220,7 @@ public class GermplasmNamingServiceImplTest {
 	public void testBuildSuffixStringDefault() {
 		final GermplasmNameSetting setting = new GermplasmNameSetting();
 		setting.setSuffix("  B   ");
-		final String suffix = this.service.buildSuffixString(setting, setting.getSuffix());
+		final String suffix = this.service.buildSuffixString(setting);
 		Assert.assertEquals("B", suffix);
 	}
 
@@ -229,7 +229,7 @@ public class GermplasmNamingServiceImplTest {
 		final GermplasmNameSetting setting = new GermplasmNameSetting();
 		setting.setSuffix("   B   ");
 		setting.setAddSpaceBetweenSuffixAndCode(true);
-		final String suffix = this.service.buildSuffixString(setting, setting.getSuffix());
+		final String suffix = this.service.buildSuffixString(setting);
 		Assert.assertEquals(" B", suffix);
 	}
 	
