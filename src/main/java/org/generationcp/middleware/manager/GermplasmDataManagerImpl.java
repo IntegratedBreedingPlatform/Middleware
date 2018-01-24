@@ -1522,4 +1522,26 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getAttributeDao().getAttributeTypes();
 	}
 
+	/**
+	 * @return List of all no bulking methods
+	 */
+	@Override
+	public List<Method> getAllNoBulkingMethods() {
+		return this.getMethodDao().getAllNoBulkingMethods();
+	}
+
+	@Override
+	public List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids) {
+		return this.getMethodDao().getNoBulkingMethodsByIdList(ids);
+	}
+
+	@Override
+	public List<Method> getAllMethodsNotBulkingNotGenerative() {
+		return this.getMethodDao().getAllMethodsNotBulkingNotGenerative();
+	}
+
+	@Override
+	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) {
+		return this.getMethodDao().getNoBulkingMethodsByType(type, programUUID);
+	}
 }

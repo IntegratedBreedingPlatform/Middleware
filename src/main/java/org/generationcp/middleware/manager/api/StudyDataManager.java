@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
@@ -778,5 +779,12 @@ public interface StudyDataManager {
 	 * @return ProjectProperty
 	 */
 	ProjectProperty getByVariableIdAndProjectID (final DmsProject project, final int variableId);
+
+	/**
+	 *
+	 * @param studyId
+	 * @return a map of experiments ids with a list of it sampled plants
+	 */
+	Map<Integer, List<PlantDTO>> getSampledPlants (final Integer studyId);
 
 }
