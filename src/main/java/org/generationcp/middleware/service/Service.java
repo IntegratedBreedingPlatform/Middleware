@@ -140,10 +140,6 @@ public abstract class Service extends DatabaseBroker {
 		return new GermplasmDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
-	protected final GermplasmListManager getGermplasmListManager() {
-		return new GermplasmListManagerImpl(this.sessionProvider, this.databaseName);
-	}
-
 	protected final InventoryDataManager getInventoryDataManager() {
 		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
@@ -202,10 +198,6 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final StudyDestroyer getStudyDestroyer() {
 		return new StudyDestroyer(this.sessionProvider);
-	}
-
-	protected final ListDataProjectSaver getListDataProjectSaver() {
-		return new ListDataProjectSaver(this.sessionProvider);
 	}
 
 	protected final NameBuilder getNameBuilder() {
