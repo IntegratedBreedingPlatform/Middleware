@@ -21,4 +21,48 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="darla" id="v8.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'key_sequence_register'
+						AND COLUMN_NAME = 'id'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<dropPrimaryKey tableName="key_sequence_register"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-3">
+        <preConditions onFail="MARK_RAN">
+			<indexExists tableName="key_sequence_register" indexName="key_prefix_unique" columnNames="key_prefix"/>
+		</preConditions>
+    	<dropIndex indexName="key_prefix_unique" tableName="key_sequence_register"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'key_sequence_register'
+						AND COLUMN_NAME = 'id'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'key_sequence_register'
+						AND COLUMN_NAME = 'suffix'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE key_sequence_register ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+			ALTER TABLE key_sequence_register ADD COLUMN suffix VARCHAR(50) AFTER key_prefix;
+			ALTER TABLE key_sequence_register ADD CONSTRAINT key_sequence_register_uk1 UNIQUE (key_prefix,suffix);
+		</sql>
+	</changeSet>
+	
 </databaseChangeLog>
