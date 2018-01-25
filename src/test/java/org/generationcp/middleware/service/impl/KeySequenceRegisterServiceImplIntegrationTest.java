@@ -107,6 +107,20 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		final int nextSequence = keySequenceRegisterService.getNextSequence(PREFIX, SUFFIX);
 		Assert.assertEquals(LAST_SEQUENCE_USED + 1, nextSequence);
 	}
+	
+	@Test
+	public void testSaveLastSequenceUsed() {
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterServiceImplIntegrationTest.PREFIX);
+		keyRegister.setSuffix(KeySequenceRegisterServiceImplIntegrationTest.SUFFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+		
+		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
+		final Integer newLastSequenceUsed = 51;
+		keySequenceRegisterService.saveLastSequenceUsed(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, KeySequenceRegisterServiceImplIntegrationTest.SUFFIX, newLastSequenceUsed);
+		Assert.assertEquals(newLastSequenceUsed + 1, keySequenceRegisterService.getNextSequence(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, KeySequenceRegisterServiceImplIntegrationTest.SUFFIX));
+	}
 
 	/**
 	 * Represents a vaadin component like class which is an example client of the service under test.

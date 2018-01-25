@@ -256,5 +256,65 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 		Assert.assertNotNull(retrievedKeyRegister);
 		Assert.assertEquals(1, retrievedKeyRegister.getLastUsedSequence());
 	}
+	
+	@Test
+	public void testSaveLastSequenceUsedWhenSequenceNotYetExists() {
+		Assert.assertNull(
+				this.keySequenceRegisterDao.getByPrefixAndSuffix(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX));
+		
+		final Integer lastSequenceUsed = 16;
+		// Expecting a record to be saved with specified last sequence #
+		this.keySequenceRegisterDao.saveLastSequenceUsed(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX,
+				lastSequenceUsed);
+
+		final KeySequenceRegister retrievedKeyRegister =
+				this.keySequenceRegisterDao.getByPrefixAndSuffix(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX);
+		Assert.assertNotNull(retrievedKeyRegister);
+		Assert.assertEquals(lastSequenceUsed.intValue(), retrievedKeyRegister.getLastUsedSequence());
+	}
+	
+	@Test
+	public void testSaveLastSequenceUsedWhenSequenceAlreadyExists() {
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister.setSuffix(KeySequenceRegisterDAOTest.SUFFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+		final KeySequenceRegister existingKeyRegister =
+				this.keySequenceRegisterDao.getByPrefixAndSuffix(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX);
+		Assert.assertNotNull(existingKeyRegister);
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), existingKeyRegister.getLastUsedSequence());
+		
+		final Integer lastSequenceUsed = 16;
+		// Expecting record to be updated with specified last sequence #
+		this.keySequenceRegisterDao.saveLastSequenceUsed(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX,
+				lastSequenceUsed);
+		final KeySequenceRegister retrievedKeyRegister =
+				this.keySequenceRegisterDao.getByPrefixAndSuffix(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX);
+		Assert.assertNotNull(retrievedKeyRegister);
+		Assert.assertEquals(lastSequenceUsed.intValue(), retrievedKeyRegister.getLastUsedSequence());
+	}
+	
+	@Test
+	public void testSaveLastSequenceUsedWhenSequenceNumberSpecifiedIsLessThanLastSequenceNumberSaved() {
+		final KeySequenceRegister keyRegister = new KeySequenceRegister();
+		keyRegister.setKeyPrefix(KeySequenceRegisterDAOTest.PREFIX);
+		keyRegister.setSuffix(KeySequenceRegisterDAOTest.SUFFIX);
+		keyRegister.setLastUsedSequence(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED);
+		this.keySequenceRegisterDao.save(keyRegister);
+		final KeySequenceRegister existingKeyRegister =
+				this.keySequenceRegisterDao.getByPrefixAndSuffix(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX);
+		Assert.assertNotNull(existingKeyRegister);
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), existingKeyRegister.getLastUsedSequence());
+		
+		final Integer lastSequenceUsed = KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue() - 1 ;
+		// Expecting record to retain the saved last sequence # since specified start number is smaller
+		this.keySequenceRegisterDao.saveLastSequenceUsed(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX,
+				lastSequenceUsed);
+		final KeySequenceRegister retrievedKeyRegister =
+				this.keySequenceRegisterDao.getByPrefixAndSuffix(KeySequenceRegisterDAOTest.PREFIX, KeySequenceRegisterDAOTest.SUFFIX);
+		Assert.assertNotNull(retrievedKeyRegister);
+		Assert.assertEquals(KeySequenceRegisterDAOTest.LAST_SEQUENCE_USED.intValue(), retrievedKeyRegister.getLastUsedSequence());
+	}
 
 }

@@ -21,6 +21,16 @@
 		</sql>
 	</changeSet>
 
+    <changeSet author="clarysabel" id="v8.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='PLANT_NUMBER';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			insert  into `udflds`(`ftable`,`ftype`,`fcode`,`fname`,`ffmt`,`fdesc`,`lfldno`,`fuid`,`fdate`,`scaleid`) values
+				('ATRIBUTS','PASSPORT','PLANT_NUMBER','Plant Number','-','Plant Number of Advanced Germplasm',0,0,20180119,0);
+	    </sql>
+	</changeSet>
+
 	<changeSet author="darla" id="v8.1.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
