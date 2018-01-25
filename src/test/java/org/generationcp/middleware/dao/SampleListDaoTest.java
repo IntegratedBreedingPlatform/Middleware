@@ -106,13 +106,28 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		final List<SampleList> topLevelLists = this.sampleListDao.getAllTopLevelLists(sampleList.getProgramUUID());
 
-		final SampleList sampleListFolder = SampleListTestDataInitializer.createSampleListFolder(user);
-		sampleListFolder.setHierarchy(parent);
-		this.sampleListDao.save(sampleListFolder);
-		final List<SampleList> updatedTopLevelLists = this.sampleListDao
-				.getAllTopLevelLists(sampleList.getProgramUUID());
+		Assert.assertTrue(topLevelLists.contains(sampleList));
+		for (SampleList list : topLevelLists) {
+			Assert.assertNotNull(list.getProgramUUID());
+		}
+	}
 
-		Assert.assertEquals(topLevelLists.size(), updatedTopLevelLists.size() - 1);
+	@Test
+	public void testGetAllTopLevelListsProgramUUIDIsNull() {
+		final User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
+		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
+		sampleList.setProgramUUID(null);
+		final SampleList parent = this.sampleListDao.getRootSampleList();
+		sampleList.setHierarchy(parent);
+		this.sampleListDao.save(sampleList);
+
+		final List<SampleList> topLevelLists = this.sampleListDao.getAllTopLevelLists(null);
+
+		Assert.assertTrue(topLevelLists.contains(sampleList));
+		for (SampleList list : topLevelLists) {
+			Assert.assertNull(list.getProgramUUID());
+		}
+
 	}
 
 	@Test
