@@ -43,6 +43,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
@@ -1178,4 +1179,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return this.getProjectPropertyDao().getByStandardVariableId(project, variableId);
 	}
 
+	@Override
+	public Map<Integer, List<PlantDTO>> getSampledPlants(final Integer studyId) {
+		return this.getExperimentDao().getSampledPlants(studyId);
+	}
 }

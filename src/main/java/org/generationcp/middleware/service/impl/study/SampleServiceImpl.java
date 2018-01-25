@@ -240,4 +240,10 @@ public class SampleServiceImpl implements SampleService {
 	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid) {
 		return this.sampleDao.getByGid(gid);
 	}
+
+	@Override
+	public Boolean studyHasSamples(final Integer studyId) {
+		return this.sampleDao.hasSamples(studyId);
+	}
+
 }

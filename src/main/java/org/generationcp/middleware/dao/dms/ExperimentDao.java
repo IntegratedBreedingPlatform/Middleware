@@ -14,11 +14,14 @@ package org.generationcp.middleware.dao.dms;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.hibernate.Criteria;
@@ -27,12 +30,38 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link ExperimentModel}.
  *
  */
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
+
+	private final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
+			" experiment.nd_experiment_id, " + //
+			" plant.plant_id," + //
+			" plant.plant_no " + //
+			" FROM nd_experiment experiment " + //
+			" INNER JOIN nd_experiment_project ep ON (ep.nd_experiment_id = experiment.nd_experiment_id) " + //
+			" INNER JOIN project_relationship pr ON (pr.subject_project_id = ep.project_id) " + //
+			" INNER JOIN project p ON (p.project_id = pr.subject_project_id) " + //
+			" INNER JOIN plant plant ON (plant.nd_experiment_id = experiment.nd_experiment_id) " + //
+			" INNER JOIN (SELECT " + //
+			" plant_id, " + //
+			" count(*) q " + //
+			" FROM sample " + //
+			" GROUP BY plant_id " + //
+			" HAVING count(*) > 0) sbp " + //
+			" ON (sbp.plant_id = plant.plant_id) " + //
+			" WHERE p.project_id = (SELECT p.project_id " + //
+			" FROM project_relationship pr " + //
+			" INNER JOIN project p ON p.project_id = pr.subject_project_id " + //
+			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
+
+	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
+
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(Collection<Integer> geolocationIds) throws MiddlewareQueryException {
@@ -191,8 +220,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// Delete experiments
 			Query statement =
 					this.getSession()
-					.createSQLQuery(
-							"DELETE e, ep, es, epheno, pheno, eprop " + "FROM nd_experiment e "
+					.createSQLQuery("DELETE e, ep, es, epheno, pheno, eprop " + "FROM nd_experiment e "
 									+ "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
 									+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
 									+ "LEFT JOIN nd_experiment_phenotype epheno ON e.nd_experiment_id = epheno.nd_experiment_id "
@@ -288,5 +316,35 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			this.logAndThrowException("Error at checkIfPlotIdExists=" + plotIds + " query at ExperimentDao: " + e.getMessage(), e);
 		}
 		return true;
+	}
+
+	public Map<Integer, List<PlantDTO>> getSampledPlants (final Integer studyId) {
+		final Map<Integer, List<PlantDTO>> map = new HashMap<>();
+		try {
+			SQLQuery query = this.getSession().createSQLQuery(SQL_GET_SAMPLED_PLANTS_BY_STUDY);
+			query.setParameter("studyId", studyId);
+			final List results = query.list();
+
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
+				if (result != null) {
+					final PlantDTO plantDTO = new PlantDTO();
+					plantDTO.setId((Integer) result[1]);
+					plantDTO.setPlantNo(String.valueOf(result[2]));
+					final Integer experimentId = (Integer) result[0];
+					if (map.containsKey(experimentId)) {
+						map.get(experimentId).add(plantDTO);
+					} else {
+						final List<PlantDTO> plantDTOs = new ArrayList<>();
+						plantDTOs.add(plantDTO);
+						map.put(experimentId, plantDTOs);
+					}
+				}
+			}
+		} catch (HibernateException e) {
+			ExperimentDao.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+		return map;
 	}
 }
