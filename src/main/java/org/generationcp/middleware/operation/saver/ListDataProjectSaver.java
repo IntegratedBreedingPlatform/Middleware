@@ -21,8 +21,8 @@ public class ListDataProjectSaver {
 		// does nothing
 	}
 
-	public ListDataProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
-		this.daoFactory = new Saver(sessionProviderForLocal);
+	public ListDataProjectSaver(HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new Saver(sessionProvider);
 	}
 
 	public ListDataProjectSaver(Saver saver) {
