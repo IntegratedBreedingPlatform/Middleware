@@ -45,6 +45,9 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 public class StandardVariableBuilder extends Builder {
 
 	private static final String DATA_TYPE_NUMERIC = "N";
@@ -319,17 +322,23 @@ public class StandardVariableBuilder extends Builder {
 	 * @return a map with Property names (In UPPERCASE) as keys and a list of StandardVariable as Value
 	 */
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headerNames, final String programUUID) {
+		// Trim all header names
+		final List<String> headerNamesTrimmed = Lists.transform(headerNames, new Function<String, String>() {
+			public String apply(String s) {
+				return s.trim();
+			}
+		});
 
 		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<>();
-		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
+		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<>();
 
 		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.alias equals input name (eg. REP)
-		standardVariableIdsWithTypeInProjects = this.getStandardVariableIdsWithTypeForProjectProperties(headerNames);
+		standardVariableIdsWithTypeInProjects = this.getStandardVariableIdsWithTypeForProjectProperties(headerNamesTrimmed);
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
 		// Exclude header items with result from step 1
 		final List<String> headerNamesNotFoundInProjectProperty = new ArrayList<>();
-		for (final String name : headerNames) {
+		for (final String name : headerNamesTrimmed) {
 
 			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
 					.get(name.toUpperCase()).keySet().isEmpty()) {
@@ -346,7 +355,7 @@ public class StandardVariableBuilder extends Builder {
 
 		// Exclude header items with result from step 2
 		final List<String> headerNamesNotFoundInProjectPropAndTerms = new ArrayList<>();
-		for (final String name : headerNames) {
+		for (final String name : headerNamesTrimmed) {
 
 			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
 					.get(name.toUpperCase()).keySet().isEmpty()) {
@@ -357,7 +366,7 @@ public class StandardVariableBuilder extends Builder {
 
 		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsForTraits(headerNamesNotFoundInProjectPropAndTerms));
 
-		for (final String name : headerNames) {
+		for (final String name : headerNamesTrimmed) {
 			final String upperName = name.toUpperCase();
 			final Map<Integer, VariableType> varIdsWithType = standardVariableIdsWithTypeInProjects.get(upperName);
 
