@@ -33,8 +33,15 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	}
 	
 	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
 	public int getNextSequence(String keyPrefix, String suffix) {
 		return this.keySequenceRegisterDAO.getNextSequence(keyPrefix, suffix);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void saveLastSequenceUsed(String keyPrefix, String suffix, Integer lastSequenceUsed) {
+		this.keySequenceRegisterDAO.saveLastSequenceUsed(keyPrefix, suffix, lastSequenceUsed);
 	}
 
 }
