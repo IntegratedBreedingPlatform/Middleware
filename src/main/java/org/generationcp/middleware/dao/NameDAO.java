@@ -11,13 +11,8 @@
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -32,8 +27,12 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Name}.
@@ -513,4 +512,59 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return mapCountWithName;
 	}
 
+	public Map<Integer, String> getSourcePreferredNamesByGids(final List<Integer> gids) {
+		final Map<Integer, String> map;
+
+		if (gids == null || gids.isEmpty()) {
+			return new HashMap<>();
+		}
+
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_GROUP_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
+			query.setParameterList("gids", gids);
+
+			map = createGidAndPreferredNameMap(query.list());
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+		return map;
+
+	}
+
+	public Map<Integer, String> getImmediatePreferredNamesByGids(final List<Integer> gids) {
+		final Map<Integer, String> map;
+
+		if (gids == null || gids.isEmpty()) {
+			return new HashMap<>();
+		}
+
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_IMMEDIATE_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
+			query.setParameterList("gids", gids);
+
+			map = createGidAndPreferredNameMap(query.list());
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return map;
+	}
+
+	private Map<Integer, String> createGidAndPreferredNameMap(final List<Object> list) {
+		final Map<Integer, String> map = new HashMap<>();
+
+		for (final Object result : list) {
+			final Object[] resultArray = (Object[]) result;
+			final Integer gid = (Integer) resultArray[0];
+			final String name = (String) resultArray[1];
+			map.put(gid, name);
+		}
+		return map;
+	}
 }

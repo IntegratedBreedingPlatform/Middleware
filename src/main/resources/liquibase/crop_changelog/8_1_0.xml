@@ -1,0 +1,78 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="vanina" id="v8.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT count(1)
+					FROM location
+					WHERE ltype = 0;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET ltype=410 WHERE ltype=0;
+		</sql>
+	</changeSet>
+
+    <changeSet author="clarysabel" id="v8.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='PLANT_NUMBER';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			insert  into `udflds`(`ftable`,`ftype`,`fcode`,`fname`,`ffmt`,`fdesc`,`lfldno`,`fuid`,`fdate`,`scaleid`) values
+				('ATRIBUTS','PASSPORT','PLANT_NUMBER','Plant Number','-','Plant Number of Advanced Germplasm',0,0,20180119,0);
+	    </sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v8.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'key_sequence_register'
+						AND COLUMN_NAME = 'id'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<dropPrimaryKey tableName="key_sequence_register"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-3">
+        <preConditions onFail="MARK_RAN">
+			<indexExists tableName="key_sequence_register" indexName="key_prefix_unique" columnNames="key_prefix"/>
+		</preConditions>
+    	<dropIndex indexName="key_prefix_unique" tableName="key_sequence_register"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'key_sequence_register'
+						AND COLUMN_NAME = 'id'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'key_sequence_register'
+						AND COLUMN_NAME = 'suffix'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE key_sequence_register ADD id INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+			ALTER TABLE key_sequence_register ADD COLUMN suffix VARCHAR(50) AFTER key_prefix;
+			ALTER TABLE key_sequence_register ADD CONSTRAINT key_sequence_register_uk1 UNIQUE (key_prefix,suffix);
+		</sql>
+	</changeSet>
+	
+</databaseChangeLog>

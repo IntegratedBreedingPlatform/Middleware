@@ -12,7 +12,6 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -473,7 +472,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			query.setParameter("programUUID", programUUID);
 			return query.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException(this.getLogExceptionMessage("getAllMethod", "", null, e.getMessage(), "Method"), e);
+			this.logAndThrowException(this.getLogExceptionMessage("getFavoriteMethodsByMethodType", "", null, e.getMessage(), "Method"), e);
 		}
 		return new ArrayList<Method>();
 	}
@@ -488,5 +487,72 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 
 		methodsCodes.addAll(query.list());
 		return methodsCodes;
+	}
+
+	public List<Method> getAllNoBulkingMethods() throws MiddlewareQueryException {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(Method.class);
+			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
+			criteria.addOrder(Order.asc("mname"));
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("getAllNoBulkingMethods", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getAllNoBulkingMethods", "", null, e.getMessage(), "Method"),
+					e);
+		}
+	}
+
+	public List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids) throws MiddlewareQueryException {
+		if (!ids.isEmpty()) {
+			try {
+
+				final Criteria criteria = this.getSession().createCriteria(Method.class);
+				criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
+				criteria.add(Restrictions.in("mid", ids));
+				return criteria.list();
+
+			} catch (final HibernateException e) {
+				MethodDAO.LOG.error(this.getLogExceptionMessage("getNoBulkingMethodsByIdList", "", null, e.getMessage(), "Method"), e);
+				throw new MiddlewareQueryException(
+						this.getLogExceptionMessage("getNoBulkingMethodsByIdList", "", null, e.getMessage(), "Method"), e);
+			}
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
+	public List<Method> getAllMethodsNotBulkingNotGenerative() throws MiddlewareQueryException {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(Method.class);
+			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
+			criteria.add(Restrictions.ne("mtype", "GEN"));
+			criteria.addOrder(Order.asc("mname"));
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("getAllMethodsNotBulkingNotGenerative", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getAllMethodsNotBulkingNotGenerative", "", null, e.getMessage(), "Method"), e);
+		}
+	}
+
+	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) throws MiddlewareQueryException {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(Method.class);
+			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
+			criteria.add(Restrictions.eq("mtype", type));
+			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
+			criteria.addOrder(Order.asc("mname"));
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("getNoBulkingMethodsByType", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getNoBulkingMethodsByType", "", null, e.getMessage(), "Method"),
+					e);
+		}
 	}
 }

@@ -139,7 +139,7 @@ public class Saver extends DatabaseBroker {
 		return new GeolocationPropertySaver(this.sessionProvider);
 	}
 
-	protected final StudyDataManager getStudyDataManager() {
+	protected StudyDataManager getStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider);
 	}
 
