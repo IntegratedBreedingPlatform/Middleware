@@ -74,5 +74,12 @@
 			ALTER TABLE key_sequence_register ADD CONSTRAINT key_sequence_register_uk1 UNIQUE (key_prefix,suffix);
 		</sql>
 	</changeSet>
+	<changeSet id="v8.1.0-1" author="nahuel">
+		<sql>
+			DELETE
+			FROM location
+			WHERE ltype = 410;
+		</sql>
+	</changeSet>
 	
 </databaseChangeLog>

@@ -53,7 +53,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final List<Location> programOneLocations =
 				LocationDAOTest.locationDAO.getBreedingLocationsByUniqueID(LocationDAOTest.PROGRAM_UUID1);
 		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID1,
-				programOneLocations.size() > 0);
+				programOneLocations.size() == 19);
 
 		/*
 		 * For program 2, verify there are breeding locations returned
