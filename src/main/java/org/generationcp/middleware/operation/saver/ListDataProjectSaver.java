@@ -17,23 +17,27 @@ public class ListDataProjectSaver {
 
 	private Saver daoFactory;
 
-	public ListDataProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
-		this.daoFactory = new Saver(sessionProviderForLocal);
+	public ListDataProjectSaver() {
+		// does nothing
 	}
 
-	public ListDataProjectSaver(Saver daoFactory) {
-		this.daoFactory = daoFactory;
+	public ListDataProjectSaver(HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new Saver(sessionProvider);
+	}
+
+	public ListDataProjectSaver(Saver saver) {
+		this.daoFactory = saver;
 	}
 
 	public int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> listDatas,
-			int userId) throws MiddlewareQueryException {
+			int userId, String programUUID, int listStatus) {
 
 		boolean isAdvanced = type == GermplasmListType.ADVANCED || GermplasmListType.isCrosses(type);
 		GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
 		boolean isCreate = snapList == null;
 
 		if (isCreate) {
-			snapList = this.createInitialGermplasmList(projectId, originalListId, type);
+			snapList = this.createInitialGermplasmList(projectId, type, programUUID, listStatus);
 		}
 
 		if (originalListId != null) {
@@ -59,15 +63,13 @@ public class ListDataProjectSaver {
 		return snapList.getId();
 	}
 
-	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type)
-			throws MiddlewareQueryException {
+	protected GermplasmList createInitialGermplasmList(int projectId, GermplasmListType type, String programUUID, int listStatus) {
 
-		DmsProject project = this.daoFactory.getStudyDataManager().getProject(projectId);
 		GermplasmList snapList = new GermplasmList();
 		snapList.setProjectId(projectId);
-		snapList.setProgramUUID(project.getProgramUUID());
+		snapList.setProgramUUID(programUUID);
 		snapList.setDate(Util.getCurrentDateAsLongValue());
-		snapList.setStatus(1);
+		snapList.setStatus(listStatus);
 		snapList.setType(type.name());
 		snapList.setParent(null);
 		Long dateLong = Long.valueOf(System.currentTimeMillis());

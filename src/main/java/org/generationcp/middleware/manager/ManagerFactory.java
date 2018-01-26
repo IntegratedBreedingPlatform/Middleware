@@ -38,6 +38,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
@@ -303,4 +304,6 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public DatasetService getDatasetService() {return new DatasetServiceImpl(this.sessionProvider); }
+
+	public ListDataProjectSaver getListDataProjectSaver() {return new ListDataProjectSaver(this.sessionProvider); }
 }

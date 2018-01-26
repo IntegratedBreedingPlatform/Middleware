@@ -64,4 +64,19 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 			return 1;
 		}
 	}
+	
+	public void saveLastSequenceUsed(final String keyPrefix, final String suffix, final Integer lastSequence) {
+
+		final KeySequenceRegister keySequenceRegister = this.getByPrefixAndSuffix(keyPrefix, suffix);
+
+		if (keySequenceRegister != null) {
+			final Integer lastUsedSequence = keySequenceRegister.getLastUsedSequence();
+			if (lastSequence > lastUsedSequence){
+				keySequenceRegister.setLastUsedSequence(lastSequence);
+				this.getSession().update(keySequenceRegister);
+			}
+		} else {
+			this.getSession().save(new KeySequenceRegister(keyPrefix, suffix, lastSequence));
+		}
+	}
 }

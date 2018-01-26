@@ -22,15 +22,19 @@ import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataI
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
+import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -87,6 +91,12 @@ public class FieldbookServiceImplTest {
 	LocationDataManager locationDataManager;
 
 	@Mock
+	GermplasmListManager germplasmListManager;
+
+	@Mock
+	ListDataProjectSaver listDataProjectSaver;
+
+	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
@@ -106,6 +116,8 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 		this.fieldbookServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
 		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
+		this.fieldbookServiceImpl.setListDataProjectSaver(this.listDataProjectSaver);
+		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
 		Mockito.doReturn(this.criteria).when(this.session).createCriteria(UserDefinedField.class);
@@ -210,6 +222,29 @@ public class FieldbookServiceImplTest {
 
 		Mockito.verify(experimentPropertySaver)
 				.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(value));
+
+	}
+
+	@Test
+	public void testSaveOrUpdateListDataProject() {
+
+		final Integer originalListId = 1;
+		final int projectId = 2;
+		final int userId = 3;
+		final GermplasmList originalGermplasmList = new GermplasmList();
+		originalGermplasmList.setId(originalListId);
+		originalGermplasmList.setProgramUUID(PROGRAM_UUID);
+		originalGermplasmList.setStatus(101);
+
+		Mockito.when(this.germplasmListManager.getGermplasmListById(originalListId)).thenReturn(originalGermplasmList);
+
+
+		this.fieldbookServiceImpl.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, new ArrayList<ListDataProject>(),
+				userId);
+
+		Mockito.verify(listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
+				new ArrayList<ListDataProject>(), userId, originalGermplasmList.getProgramUUID(), originalGermplasmList.getStatus());
+
 
 	}
 
