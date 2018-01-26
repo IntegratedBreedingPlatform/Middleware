@@ -36,7 +36,9 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -49,6 +51,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -245,6 +248,27 @@ public class FieldbookServiceImplTest {
 		Mockito.verify(listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
 				new ArrayList<ListDataProject>(), userId, originalGermplasmList.getProgramUUID(), originalGermplasmList.getStatus());
 
+
+	}
+
+	@Test
+	public void testGetAllLocations() {
+
+		final Integer blockTypeId = 99;
+
+		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode()))
+				.thenReturn(blockTypeId);
+
+		this.fieldbookServiceImpl.getAllLocations(PROGRAM_UUID);
+
+		final ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+		Mockito.verify(this.locationDataManager).getLocationsByUniqueIDAndExcludeLocationTypes(Mockito.eq(PROGRAM_UUID), captor.capture());
+
+		final List<Integer> excludeList = captor.getValue();
+
+		// Make sure that only BLOCK Location Type is excluded from all locations list
+		Assert.assertTrue(excludeList.size() == 1);
+		Assert.assertTrue(excludeList.contains(blockTypeId));
 
 	}
 
