@@ -1094,4 +1094,47 @@ public interface GermplasmDataManager {
 	 */
 	List<String> getMethodCodeByMethodIds(Set<Integer> methodIds);
 
+	/**
+	 *
+	 * @return List of all no bulking methods
+	 */
+	List<Method> getAllNoBulkingMethods();
+
+	/**
+	 *
+	 * @param ids
+	 * @return List of all no-bulking methods for a list of ids
+	 */
+	List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids);
+
+	/**
+	 *
+	 * @return List of all no-bulking and no generative methods
+	 */
+	List<Method> getAllMethodsNotBulkingNotGenerative();
+
+	/**
+	 *
+	 * @param type
+	 * @param programUUID
+	 * @return List of all no-bulking methods given a type and a program
+	 */
+	List<Method> getNoBulkingMethodsByType(final String type, final String programUUID);
+
+
+	/**
+	 * Given a List of GIDs, return a Map of GIDs to PreferredName.
+	 *
+	 * @param gids the gids
+	 * @return the preferred names by gids
+	 */
+	Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids);
+
+	/**
+	 * Given a List of GIDs, return a Map of GIDs to PreferredName.
+	 *
+	 * @param gids the gids
+	 * @return the preferred names by gids
+	 */
+	Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids);
 }

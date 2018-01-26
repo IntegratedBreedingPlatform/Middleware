@@ -164,6 +164,10 @@
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+    <bean id="listDataProjectSaver" class="org.generationcp.middleware.operation.saver.ListDataProjectSaver">
+        <constructor-arg ref="cropSessionProvider"/>
+    </bean>
+
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>

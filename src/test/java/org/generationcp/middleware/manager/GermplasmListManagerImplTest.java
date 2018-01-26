@@ -863,7 +863,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		this.studyId = this.createNurseryTestData();
 		//this.testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, 0);
-		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.NURSERY, listId, listDataProjects, userId);
+		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.NURSERY, listId, listDataProjects, userId, "", 1);
 
 		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
 

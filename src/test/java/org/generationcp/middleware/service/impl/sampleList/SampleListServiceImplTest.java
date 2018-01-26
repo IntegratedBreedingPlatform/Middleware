@@ -1,11 +1,4 @@
-
 package org.generationcp.middleware.service.impl.sampleList;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
@@ -41,11 +34,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class SampleListServiceImplTest {
 
 	public static final String ADMIN = "admin";
 	public static final String MAIZE = "maize";
 	public static final String PLOT_CODE_PREFIX = "AZDS";
+	public static final boolean IS_CROP_LIST = false;
+	public static final String PROGRAM_UUID = "3973084-9234894-sasdk-93921";
 
 	@Mock
 	private HibernateSessionProvider session;
@@ -96,29 +97,29 @@ public class SampleListServiceImplTest {
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderFolderNull() throws Exception {
 		final User createdBy = new User();
-		this.sampleListService.createSampleListFolder(null, 1, createdBy, "programUUID");
+		this.sampleListService.createSampleListFolder(null, 1, createdBy, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderParentIdNull() throws Exception {
 		final User createdBy = new User();
-		this.sampleListService.createSampleListFolder("name", null, createdBy, "programUUID");
+		this.sampleListService.createSampleListFolder("name", null, createdBy, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderCreatedByNull() throws Exception {
-		this.sampleListService.createSampleListFolder("name", 1, null, "programUUID");
+		this.sampleListService.createSampleListFolder("name", 1, null, PROGRAM_UUID);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateSampleListFolderFolderNameEmpty() throws Exception {
 		final User createdBy = new User();
-		this.sampleListService.createSampleListFolder("", 1, createdBy, "programUUID");
+		this.sampleListService.createSampleListFolder("", 1, createdBy, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderCreatedByEmpty() throws Exception {
-		this.sampleListService.createSampleListFolder("4", 1, null, "programUUID");
+		this.sampleListService.createSampleListFolder("4", 1, null, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
@@ -126,7 +127,7 @@ public class SampleListServiceImplTest {
 		final User createdBy = new User();
 		createdBy.setUserid(org.mockito.Matchers.anyInt());
 		Mockito.when(this.sampleListDao.getById(1)).thenReturn(null);
-		this.sampleListService.createSampleListFolder("4", 1, createdBy, "programUUID");
+		this.sampleListService.createSampleListFolder("4", 1, createdBy, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
@@ -136,7 +137,7 @@ public class SampleListServiceImplTest {
 		final SampleList parentFolder = new SampleList();
 		Mockito.when(this.sampleListDao.getById(1)).thenReturn(parentFolder);
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName("4", 1, null)).thenReturn(notUniqueValue);
-		this.sampleListService.createSampleListFolder("4", 1, createdBy, "programUUID");
+		this.sampleListService.createSampleListFolder("4", 1, createdBy, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
@@ -150,7 +151,7 @@ public class SampleListServiceImplTest {
 		sampleFolder.setId(1);
 		sampleFolder.setType(SampleListType.FOLDER);
 		Mockito.when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleFolder);
-		this.sampleListService.createSampleListFolder("4", 1, createdBy, "programUUID");
+		this.sampleListService.createSampleListFolder("4", 1, createdBy, PROGRAM_UUID);
 	}
 
 	@Test
@@ -165,7 +166,7 @@ public class SampleListServiceImplTest {
 		sampleFolder.setId(1);
 		sampleFolder.setType(SampleListType.FOLDER);
 		Mockito.when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleFolder);
-		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, createdBy, "programUUID");
+		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, createdBy, PROGRAM_UUID);
 		MatcherAssert.assertThat(sampleFolder.getId(), Matchers.equalTo(savedObject));
 	}
 
@@ -178,7 +179,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getById(1)).thenReturn(parentFolder);
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName("4", 1, null)).thenReturn(null);
 		Mockito.when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenThrow(MiddlewareQueryException.class);
-		this.sampleListService.createSampleListFolder("4", 1, createdBy, "programUUID");
+		this.sampleListService.createSampleListFolder("4", 1, createdBy, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -351,24 +352,24 @@ public class SampleListServiceImplTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testMoveSampleListNullSampleListId() throws Exception {
-		this.sampleListService.moveSampleList(null, 1);
+		this.sampleListService.moveSampleList(null, 1, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testMoveSampleListNullParentFolderId() throws Exception {
-		this.sampleListService.moveSampleList(1, null);
+		this.sampleListService.moveSampleList(1, null, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testMoveSampleListRecursiveRelationship() throws Exception {
-		this.sampleListService.moveSampleList(1, 1);
+		this.sampleListService.moveSampleList(1, 1, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
 	public void testMoveSampleListSampleListIdNotExist() throws Exception {
 		final Integer sampleListId = 1;
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(null);
-		this.sampleListService.moveSampleList(sampleListId, 2);
+		this.sampleListService.moveSampleList(sampleListId, 2, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
@@ -378,7 +379,7 @@ public class SampleListServiceImplTest {
 		rootFolder.setId(sampleListId);
 		rootFolder.setHierarchy(null);
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(rootFolder);
-		this.sampleListService.moveSampleList(sampleListId, 2);
+		this.sampleListService.moveSampleList(sampleListId, 2, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
@@ -393,7 +394,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(null);
 
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
@@ -411,7 +412,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
 
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST, PROGRAM_UUID);
 
 	}
 
@@ -436,7 +437,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName(listName, folderId, null)).thenReturn(notUniqueSampleList);
 
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
@@ -458,7 +459,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName(listName, folderId, null)).thenReturn(null);
 
 		Mockito.when(this.sampleListDao.saveOrUpdate(sampleListToMove)).thenThrow(MiddlewareQueryException.class);
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST, PROGRAM_UUID);
 	}
 
 	@Test(expected = Exception.class)
@@ -481,7 +482,58 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.sampleListDao.getSampleListByParentAndName(listName, folderId, "")).thenReturn(null);
 
 		Mockito.when(this.sampleListDao.saveOrUpdate(sampleListToMove)).thenThrow(MiddlewareQueryException.class);
-		this.sampleListService.moveSampleList(sampleListId, folderId);
+		this.sampleListService.moveSampleList(sampleListId, folderId, IS_CROP_LIST, PROGRAM_UUID);
+	}
+
+	@Test()
+	public void testMoveSampleListMoveToMoveProgramSampleListToCropListsFolder() throws Exception {
+		final Integer sampleListId = 1;
+		final String listName = "NAME";
+		final SampleList sampleListToMove = new SampleList();
+		sampleListToMove.setId(sampleListId);
+		sampleListToMove.setHierarchy(new SampleList());
+		sampleListToMove.setListName(listName);
+		sampleListToMove.setProgramUUID(PROGRAM_UUID);
+
+		final Integer folderId = 2;
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setType(SampleListType.FOLDER);
+
+		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
+
+		this.sampleListService.moveSampleList(sampleListId, folderId, true, PROGRAM_UUID);
+
+		Assert.assertNull("The programUUID should be null because the sample list was moved to the crop list",
+				sampleListToMove.getProgramUUID());
+		Assert.assertEquals(folder, sampleListToMove.getHierarchy());
+	}
+
+	@Test()
+	public void testMoveSampleListMoveToMoveCropSampleListToProgramListFolder() throws Exception {
+		final Integer sampleListId = 1;
+		final String listName = "NAME";
+		final SampleList sampleListToMove = new SampleList();
+		sampleListToMove.setId(sampleListId);
+		sampleListToMove.setHierarchy(new SampleList());
+		sampleListToMove.setListName(listName);
+		sampleListToMove.setProgramUUID(null);
+
+		final Integer folderId = 2;
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setType(SampleListType.FOLDER);
+		folder.setProgramUUID(PROGRAM_UUID);
+
+		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
+
+		this.sampleListService.moveSampleList(sampleListId, folderId, false, PROGRAM_UUID);
+
+		Assert.assertEquals("The sample list should inherit the programUUID of its parent folder.", PROGRAM_UUID,
+				sampleListToMove.getProgramUUID());
+		Assert.assertEquals(folder, sampleListToMove.getHierarchy());
 	}
 
 	@Test
@@ -528,8 +580,9 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.study.getName()).thenReturn("Maizing_Trial");
 		Mockito.when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
 		Mockito.when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
-		Mockito.when(this.sampleService.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1,
-				preferredNameGid, Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
+		Mockito.when(this.sampleService
+				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, preferredNameGid,
+						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		Mockito.when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleList);
 		final SampleList rootSampleList = new SampleList();
 		rootSampleList.setType(SampleListType.FOLDER);

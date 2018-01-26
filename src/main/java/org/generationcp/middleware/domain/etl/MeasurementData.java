@@ -185,7 +185,7 @@ public class MeasurementData {
 		return this.getDisplayValue(true);
 	}
 
-	public String getDisplayValue(boolean showDescription) {
+	public String getDisplayValue(final boolean showDescription) {
 		if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getPossibleValues() != null
 				&& !this.getMeasurementVariable().getPossibleValues().isEmpty()) {
 
@@ -226,7 +226,7 @@ public class MeasurementData {
 
 		final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
 
-		if ((null == this.cValueId ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(value)) {
+		if ((this.cValueId == null ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(value)) {
 			// If the categorical value id and value are empty, just return a CategoricalDisplayValue with empty
 			// id, name and description.
 			return new CategoricalDisplayValue("", "", "", false);
@@ -270,7 +270,7 @@ public class MeasurementData {
 		return data;
 	}
 
-	public boolean isCustomCategoricalValue() {
+	public boolean getIsCustomCategoricalValue() {
 		return this.isCustomCategoricalValue;
 	}
 
@@ -343,7 +343,7 @@ public class MeasurementData {
 		if (this.getMeasurementVariable().getDataTypeId() != null
 				&& this.getMeasurementVariable().getDataTypeId().intValue() == DataType.CATEGORICAL_VARIABLE.getId()
 				&& this.getMeasurementVariable().getPossibleValues() != null && StringUtils.isNotBlank(this.value)) {
-			for (ValueReference valueReference : this.getMeasurementVariable().getPossibleValues()) {
+			for (final ValueReference valueReference : this.getMeasurementVariable().getPossibleValues()) {
 				if (valueReference.getName().equalsIgnoreCase(this.value)) {
 					return true;
 				}
@@ -374,7 +374,7 @@ public class MeasurementData {
 	 * 
 	 * @param value
 	 */
-	public void setOldValue(String value) {
+	public void setOldValue(final String value) {
 		this.oldValue = value;
 	}
 

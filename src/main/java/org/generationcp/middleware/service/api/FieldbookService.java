@@ -988,9 +988,26 @@ public interface FieldbookService {
 	List<Location> getLocationsByProgramUUID(String programUUID);
 
 	/**
-	 * @param studyId id for the study Trial
-	 * @return the true if the study has samples
+	 *
+	 * @param filterOutGenerative
+	 * @return all no-bulking methods filtering by type = 'GEN' when filterOutGenerative is true
 	 */
-	boolean hasSamples(final Integer studyId);
+	List<Method> getAllNoBulkingMethods(boolean filterOutGenerative);
+
+	/**
+	 * Gets the favorite project methods.
+	 *
+	 * @param programUUID
+	 *            - unique id of program
+	 * @return the no bulking favorite project methods
+	 */
+	List<Method> getFavoriteProjectNoBulkingMethods(final String programUUID);
+
+	/**
+	 *
+	 * @param programUUID
+	 * @return All generative and no bulking method
+	 */
+	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
 }

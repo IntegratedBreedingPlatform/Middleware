@@ -71,7 +71,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String TYPE_ID = "typeId";
 	private static final String PROJECT_ID = "projectId";
 	private static final String VARIABLE_ID = "variableId";
-	private static final String DELETED = "deleted";
+	public static final String DELETED = "deleted";
 	private static final int DELETED_STUDY = 1;
 
 	private static final int START_DATE = TermId.START_DATE.getId();
@@ -223,53 +223,53 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";
 
-	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
+	public List<Reference> getRootFolders(final String programUUID, final List<StudyType> studyTypes) {
 		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyTypes);
 	}
 
-	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID, List<StudyType> studyTypes) {
+	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID, final List<StudyType> studyTypes) {
 
-		List<Reference> childrenNodes = new ArrayList<>();
-		
+		final List<Reference> childrenNodes = new ArrayList<>();
+
 		if (studyTypes == null || studyTypes.isEmpty()) {
 			throw new MiddlewareQueryException("Missing required parameter. At least one study type must be specified.");
 		}
 
 		try {
-			Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER);
+			final Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER);
 			query.setParameter("folderId", folderId);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-			
-			List<String> stydyTypeIds = new ArrayList<>();
-			for (StudyType studyType : studyTypes) {
+
+			final List<String> stydyTypeIds = new ArrayList<>();
+			for (final StudyType studyType : studyTypes) {
 				stydyTypeIds.add(studyType.getName());
 			}
 			query.setParameterList("studyTypeIds", stydyTypeIds);
 
-			List<Object[]> list = query.list();
+			final List<Object[]> list = query.list();
 
-			for (Object[] row : list) {
+			for (final Object[] row : list) {
 				// project.id
-				Integer id = (Integer) row[0];
+				final Integer id = (Integer) row[0];
 				// project.name
-				String name = (String) row[1];
+				final String name = (String) row[1];
 				// project.description
-				String description = (String) row[2];
+				final String description = (String) row[2];
 				// non-zero if a study, else a folder
-				Integer isStudy = ((Integer) row[3]);
+				final Integer isStudy = ((Integer) row[3]);
 				// project.program_uuid
-				String projectUUID = (String) row[4];
-				
+				final String projectUUID = (String) row[4];
+
 				if (isStudy == 1) {
-					String studyTypeRaw = (String) row[5];				
-					StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeByName(studyTypeRaw) : null;
+					final String studyTypeRaw = (String) row[5];
+					final StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeByName(studyTypeRaw) : null;
 					childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyType));
 				} else {
 					childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 				}
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error retrieving study folder tree, folderId=" + folderId + " programUUID=" + programUUID + ":" + e.getMessage(), e);
 		}
 
@@ -277,18 +277,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DatasetReference> getDatasetNodesByStudyId(Integer studyId) {
+	public List<DatasetReference> getDatasetNodesByStudyId(final Integer studyId) {
 
-		List<DatasetReference> datasetReferences = new ArrayList<>();
+		final List<DatasetReference> datasetReferences = new ArrayList<>();
 
 		try {
 
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
 
-			ProjectionList projectionList = Projections.projectionList();
+			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property(DmsProjectDao.PROJECT_ID));
 			projectionList.add(Projections.property("name"));
 			projectionList.add(Projections.property("description"));
@@ -297,16 +297,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			criteria.addOrder(Order.asc("name"));
 
-			List<Object[]> list = criteria.list();
+			final List<Object[]> list = criteria.list();
 
-			for (Object[] row : list) {
-				Integer id = (Integer) row[0]; // project.id
-				String name = (String) row[1]; // project.name
-				String description = (String) row[2]; // project.description
+			for (final Object[] row : list) {
+				final Integer id = (Integer) row[0]; // project.id
+				final String name = (String) row[1]; // project.name
+				final String description = (String) row[2]; // project.description
 				datasetReferences.add(new DatasetReference(id, name, description));
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getDatasetNodesByStudyId query from Project: " + e.getMessage(), e);
 		}
 
@@ -314,9 +314,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getStudiesByName(String name) {
+	public List<DmsProject> getStudiesByName(final String name) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
@@ -324,30 +324,30 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			return criteria.list();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getStudiesByName=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getStudiesByUserIds(Collection<Integer> userIds) {
-		List<Object> userIdStrings = new ArrayList<>();
+	public List<DmsProject> getStudiesByUserIds(final Collection<Integer> userIds) {
+		final List<Object> userIdStrings = new ArrayList<>();
 		if (userIds != null && !userIds.isEmpty()) {
-			for (Integer userId : userIds) {
+			for (final Integer userId : userIds) {
 				userIdStrings.add(userId.toString());
 			}
 		}
 		return this.getStudiesByStudyProperty(TermId.STUDY_UID.getId(), Restrictions.in("p.value", userIdStrings));
 	}
 
-	public List<DmsProject> getStudiesByStartDate(Integer startDate) {
+	public List<DmsProject> getStudiesByStartDate(final Integer startDate) {
 		return this.getStudiesByStudyProperty(TermId.START_DATE.getId(), Restrictions.eq("p.value", startDate.toString()));
 	}
 
-	private List<DmsProject> getStudiesByStudyProperty(Integer studyPropertyId, Criterion valueExpression) {
+	private List<DmsProject> getStudiesByStudyProperty(final Integer studyPropertyId, final Criterion valueExpression) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("properties", "p");
 			criteria.add(Restrictions.eq("p.typeId", studyPropertyId));
 			criteria.add(valueExpression);
@@ -357,17 +357,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			return criteria.list();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId
 					+ " in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getStudiesByIds(Collection<Integer> projectIds) {
+	public List<DmsProject> getStudiesByIds(final Collection<Integer> projectIds) {
 		try {
 			if (projectIds != null && !projectIds.isEmpty()) {
-				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 				criteria.add(Restrictions.in(DmsProjectDao.PROJECT_ID, projectIds));
 				criteria.createAlias("relatedTos", "pr");
 				criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
@@ -375,30 +375,30 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 				return criteria.list();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getStudiesByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getDatasetsByStudy(Integer studyId) {
+	public List<DmsProject> getDatasetsByStudy(final Integer studyId) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
 			criteria.setProjection(Projections.property("pr.subjectProject"));
 			return criteria.list();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
-	public DmsProject getParentStudyByDataset(Integer datasetId) {
+	public DmsProject getParentStudyByDataset(final Integer datasetId) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.subjectProject.projectId", datasetId));
@@ -407,25 +407,25 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			return (DmsProject) criteria.uniqueResult();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getParentStudyByDataset= " + datasetId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
-	public List<DmsProject> getStudyAndDatasetsById(Integer projectId) {
-		Set<DmsProject> projects = new HashSet<>();
+	public List<DmsProject> getStudyAndDatasetsById(final Integer projectId) {
+		final Set<DmsProject> projects = new HashSet<>();
 
-		DmsProject project = this.getById(projectId);
+		final DmsProject project = this.getById(projectId);
 		if (project != null) {
 			projects.add(project);
 
-			DmsProject parent = this.getParentStudyByDataset(projectId);
+			final DmsProject parent = this.getParentStudyByDataset(projectId);
 			if (parent != null) {
 				projects.add(parent);
 
 			} else {
-				List<DmsProject> datasets = this.getDatasetsByStudy(projectId);
+				final List<DmsProject> datasets = this.getDatasetsByStudy(projectId);
 				if (datasets != null && !datasets.isEmpty()) {
 					projects.addAll(datasets);
 				}
@@ -435,23 +435,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>(projects);
 	}
 
-	public List<DmsProject> getByIds(Collection<Integer> projectIds) {
-		List<DmsProject> studyNodes = new ArrayList<>();
+	public List<DmsProject> getByIds(final Collection<Integer> projectIds) {
+		final List<DmsProject> studyNodes = new ArrayList<>();
 		try {
 			if (projectIds != null && !projectIds.isEmpty()) {
-				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 				criteria.add(Restrictions.in(DmsProjectDao.PROJECT_ID, projectIds));
 				criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 
 				return criteria.list();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyNodes;
 	}
 
-	public List<DmsProject> getProjectsByFolder(Integer folderId, int start, int numOfRows) {
+	public List<DmsProject> getProjectsByFolder(final Integer folderId, final int start, final int numOfRows) {
 		List<DmsProject> projects = new ArrayList<>();
 		if (folderId == null) {
 			return projects;
@@ -459,32 +459,32 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		try {
 			// Get projects by folder
-			Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
+			final Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
 			query.setParameter("folderId", folderId);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
-			List<Integer> projectIds = query.list();
+			final List<Integer> projectIds = query.list();
 			projects = this.getByIds(projectIds);
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getProjectsByFolder query from Project: " + e.getMessage(), e);
 		}
 
 		return projects;
 	}
 
-	public long countProjectsByFolder(Integer folderId) {
+	public long countProjectsByFolder(final Integer folderId) {
 		long count = 0;
 		if (folderId == null) {
 			return count;
 		}
 
 		try {
-			Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
+			final Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
 			query.setParameter("folderId", folderId);
-			List<Object[]> list = query.list();
+			final List<Object[]> list = query.list();
 			count = list.size();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in countProjectsByFolder(" + folderId + ") query in DmsProjectDao: " + e.getMessage(), e);
 		}
 
@@ -492,9 +492,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getDataSetsByStudyAndProjectProperty(int studyId, int variable, String value) {
+	public List<DmsProject> getDataSetsByStudyAndProjectProperty(final int studyId, final int variable, final String value) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
@@ -506,17 +506,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			return criteria.list();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException(
 					"Error in getDataSetsByProjectProperty(" + variable + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
 
-	public List<StudyReference> getStudiesByTrialEnvironments(List<Integer> environmentIds) {
-		List<StudyReference> studies = new ArrayList<>();
+	public List<StudyReference> getStudiesByTrialEnvironments(final List<Integer> environmentIds) {
+		final List<StudyReference> studies = new ArrayList<>();
 		try {
-			String sql =
+			final String sql =
 					"SELECT p.project_id, p.name, p.description, count(DISTINCT e.nd_geolocation_id)" + " FROM project p"
 							+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = "
 							+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep"
@@ -524,46 +524,46 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 							+ " INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
 							+ " WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id)"
 							+ " AND e.nd_geolocation_id IN (:environmentIds)" + " GROUP BY p.project_id, p.name, p.description";
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("environmentIds", environmentIds);
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
+			final Query query = this.getSession().createSQLQuery(sql).setParameterList("environmentIds", environmentIds);
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
 				studies.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], ((BigInteger) row[3]).intValue()));
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException(
 					"Error in getStudiesByTrialEnvironments=" + environmentIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studies;
 	}
 
-	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID, TermId relationship) {
+	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID, final TermId relationship) {
 		try {
-			String sql =
+			final String sql =
 					"SELECT s.project_id FROM project s " + " WHERE name = :name AND program_uuid = :program_uuid"
 							+ " AND EXISTS (SELECT 1 FROM project_relationship pr WHERE pr.subject_project_id = s.project_id "
 							+ "   AND pr.type_id = " + relationship.getId() + ") "
 							+ "	AND s.deleted !=  " + DELETED_STUDY
 							+ " LIMIT 1";
 
-			Query query =
+			final Query query =
 					this.getSession().createSQLQuery(sql).setParameter("name", name).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			return (Integer) query.uniqueResult();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getStudyIdByName=" + name + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
-	public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID) {
+	public List<StudyDetails> getAllStudyDetails(final StudyType studyType, final String programUUID) {
 		return this.getAllStudyDetails(studyType, programUUID, -1, -1);
 	}
 
-	public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows) {
-		List<StudyDetails> studyDetails = new ArrayList<>();
+	public List<StudyDetails> getAllStudyDetails(final StudyType studyType, final String programUUID, final int start, final int numOfRows) {
+		final List<StudyDetails> studyDetails = new ArrayList<>();
 
-		StringBuilder sqlString = new StringBuilder().append(
+		final StringBuilder sqlString = new StringBuilder().append(
 			"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
 			.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
 			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ")
@@ -595,11 +595,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		List<Object[]> list = null;
 
 		try {
-			Query query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
+			final Query query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 				.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id").addScalar("piId")
 				.addScalar("siteId").setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			list = query.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 
@@ -607,69 +607,69 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return studyDetails;
 		}
 
-		for (Object[] row : list) {
-			String name = (String) row[0];
-			String title = (String) row[1];
-			String objective = (String) row[2];
-			String startDate = (String) row[3];
-			String endDate = (String) row[4];
-			String piName = (String) row[5];
-			String siteName = (String) row[6];
-			Integer id = (Integer) row[7];
-			String piId = (String) row[8];
-			String siteId = (String) row[9];
+		for (final Object[] row : list) {
+			final String name = (String) row[0];
+			final String title = (String) row[1];
+			final String objective = (String) row[2];
+			final String startDate = (String) row[3];
+			final String endDate = (String) row[4];
+			final String piName = (String) row[5];
+			final String siteName = (String) row[6];
+			final Integer id = (Integer) row[7];
+			final String piId = (String) row[8];
+			final String siteId = (String) row[9];
 
-			StudyDetails study =
+			final StudyDetails study =
 				new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
 			studyDetails.add(study);
 		}
 		return studyDetails;
 	}
 
-	public StudyType getStudyType(int studyId) {
+	public StudyType getStudyType(final int studyId) {
 		try {
-			SQLQuery query = this.getSession().createSQLQuery("SELECT p.study_type FROM project p " + " WHERE p.project_id = :projectId ");
+			final SQLQuery query = this.getSession().createSQLQuery("SELECT p.study_type FROM project p " + " WHERE p.project_id = :projectId ");
 			query.setParameter(DmsProjectDao.PROJECT_ID, studyId);
 
-			Object queryResult = query.uniqueResult();
+			final Object queryResult = query.uniqueResult();
 			if (queryResult != null) {
 				return StudyType.getStudyTypeByName((String) queryResult);
 			}
 			return null;
-		} catch (HibernateException he) {
+		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				String.format("Hibernate error in getting study type for a studyId %s. Cause: %s", studyId, he.getCause().getMessage()),
 				he);
 		}
 	}
 
-	public StudyDetails getStudyDetails(StudyType studyType, int studyId) {
+	public StudyDetails getStudyDetails(final StudyType studyType, final int studyId) {
 		StudyDetails studyDetails = null;
 		try {
 
-			Query query =
+			final Query query =
 					this.getSession().createSQLQuery(STUDY_DETAILS_SQL).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
 					.addScalar("piId").addScalar("siteId").addScalar("folderId").addScalar("programUUID");
 
 			query.setParameter("studyId", studyId);
 
-			List<Object[]> list = query.list();
+			final List<Object[]> list = query.list();
 
 			if (list != null && !list.isEmpty()) {
-				for (Object[] row : list) {
-					String name = (String) row[0];
-					String title = (String) row[1];
-					String objective = (String) row[2];
-					String startDate = (String) row[3];
-					String endDate = (String) row[4];
-					String piName = (String) row[5];
-					String siteName = (String) row[6];
-					Integer id = (Integer) row[7];
-					String piId = (String) row[8];
-					String siteId = (String) row[9];
-					Integer folderId = (Integer) row[10];
-					String programUUID = (String) row[11];
+				for (final Object[] row : list) {
+					final String name = (String) row[0];
+					final String title = (String) row[1];
+					final String objective = (String) row[2];
+					final String startDate = (String) row[3];
+					final String endDate = (String) row[4];
+					final String piName = (String) row[5];
+					final String siteName = (String) row[6];
+					final Integer id = (Integer) row[7];
+					final String piId = (String) row[8];
+					final String siteId = (String) row[9];
+					final Integer folderId = (Integer) row[10];
+					final String programUUID = (String) row[11];
 
 					studyDetails =
 							new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
@@ -678,15 +678,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				}
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getTrialObservationTable() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyDetails;
 	}
 
-	public long countAllStudyDetails(StudyType studyType, String programUUID) {
+	public long countAllStudyDetails(final StudyType studyType, final String programUUID) {
 		try {
-			StringBuilder sqlString =
+			final StringBuilder sqlString =
 					new StringBuilder()
 			.append("SELECT COUNT(1) ")
 			.append("FROM project p ")
@@ -716,26 +716,26 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
 			.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
-			Query query = this.getSession().createSQLQuery(sqlString.toString()).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
+			final Query query = this.getSession().createSQLQuery(sqlString.toString()).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
 			return ((BigInteger) query.uniqueResult()).longValue();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in countAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return 0;
 
 	}
 
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID) {
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(final String programUUID) {
 		return this.getAllNurseryAndTrialStudyDetails(programUUID, 0, -1);
 	}
 
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows) {
-		List<StudyDetails> studyDetails = new ArrayList<>();
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(final String programUUID, final int start, final int numOfRows) {
+		final List<StudyDetails> studyDetails = new ArrayList<>();
 		try {
 
-			StringBuilder sqlString = new StringBuilder().append(
+			final StringBuilder sqlString = new StringBuilder().append(
 				"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
 				.append(
 					"ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, p.study_type AS "
@@ -770,25 +770,25 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				sqlString.append(" LIMIT " + start + "," + numOfRows);
 			}
 
-			Query query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
+			final Query query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 				.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
 				.addScalar("studyType").addScalar("piId").addScalar("siteId").setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
-			List<Object[]> list = query.list();
+			final List<Object[]> list = query.list();
 
 			if (list != null && !list.isEmpty()) {
-				for (Object[] row : list) {
-					String name = (String) row[0];
-					String title = (String) row[1];
-					String objective = (String) row[2];
-					String startDate = (String) row[3];
-					String endDate = (String) row[4];
-					String piName = (String) row[5];
-					String siteName = (String) row[6];
-					Integer id = (Integer) row[7];
-					String studyTypeId = (String) row[8];
-					String piId = (String) row[9];
-					String siteId = (String) row[10];
+				for (final Object[] row : list) {
+					final String name = (String) row[0];
+					final String title = (String) row[1];
+					final String objective = (String) row[2];
+					final String startDate = (String) row[3];
+					final String endDate = (String) row[4];
+					final String piName = (String) row[5];
+					final String siteName = (String) row[6];
+					final Integer id = (Integer) row[7];
+					final String studyTypeId = (String) row[8];
+					final String piId = (String) row[9];
+					final String siteId = (String) row[10];
 
 					studyDetails.add(
 						new StudyDetails(id, name, title, objective, startDate, endDate, StudyType.getStudyTypeByName(studyTypeId), piName,
@@ -796,17 +796,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				}
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getAllNurseryAndTrialStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyDetails;
 
 	}
 
-	public long countAllNurseryAndTrialStudyDetails(String programUUID) {
+	public long countAllNurseryAndTrialStudyDetails(final String programUUID) {
 		try {
 
-			StringBuilder sqlString =
+			final StringBuilder sqlString =
 					new StringBuilder()
 			.append("SELECT COUNT(1) ")
 			.append("FROM project p ")
@@ -842,11 +842,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
 			.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
-			Query query = this.getSession().createSQLQuery(sqlString.toString()).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
+			final Query query = this.getSession().createSQLQuery(sqlString.toString()).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
 			return ((BigInteger) query.uniqueResult()).longValue();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in countAllNurseryAndTrialStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return 0;
@@ -860,10 +860,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * @
 	 */
 
-	public List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) {
-		List<StudyNode> studyNodes = new ArrayList<>();
+	public List<StudyNode> getAllNurseryAndTrialStudyNodes(final String programUUID) {
+		final List<StudyNode> studyNodes = new ArrayList<>();
 
-		StringBuilder sqlString =
+		final StringBuilder sqlString =
 				new StringBuilder().append("SELECT DISTINCT p.project_id AS id ").append("        , p.name AS name ")
 				.append("        , p.description AS description ").append("        , ppStartDate.value AS startDate ")
 				.append("        , p.study_type AS studyType ").append("        , gpSeason.value AS season ")
@@ -882,12 +882,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		List<Object[]> list = null;
 
 		try {
-			Query query =
+			final Query query =
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("id").addScalar("name").addScalar("description")
 					.addScalar("startDate").addScalar("studyType").addScalar("season")
 					.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			list = query.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in getAllStudyNodes() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 
@@ -895,15 +895,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return studyNodes;
 		}
 
-		for (Object[] row : list) {
-			Integer id = (Integer) row[0];
-			String name = (String) row[1];
-			String description = (String) row[2];
-			String startDate = (String) row[3];
-			String studyTypeStr = (String) row[4];
-			String seasonStr = (String) row[5];
+		for (final Object[] row : list) {
+			final Integer id = (Integer) row[0];
+			final String name = (String) row[1];
+			final String description = (String) row[2];
+			final String startDate = (String) row[3];
+			final String studyTypeStr = (String) row[4];
+			final String seasonStr = (String) row[5];
 
-			Season season = Season.getSeason(seasonStr);
+			final Season season = Season.getSeason(seasonStr);
 			studyNodes.add(new StudyNode(id, name, description, startDate, StudyType.getStudyTypeByName(studyTypeStr), season));
 
 		}
@@ -912,18 +912,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) {
+	public boolean checkIfProjectNameIsExistingInProgram(final String name, final String programUUID) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
 			criteria.add(Restrictions.eq("programUUID", programUUID));
 
-			List list = criteria.list();
+			final List list = criteria.list();
 			if (list != null && !list.isEmpty()) {
 				return true;
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in checkIfProjectNameIsExisting=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 
@@ -931,102 +931,102 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<FolderReference> getAllFolders() {
-		List<FolderReference> folders = new ArrayList<>();
+		final List<FolderReference> folders = new ArrayList<>();
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_ALL_FOLDERS);
-			List<Object[]> result = query.list();
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_ALL_FOLDERS);
+			final List<Object[]> result = query.list();
 			if (result != null && !result.isEmpty()) {
-				for (Object[] row : result) {
+				for (final Object[] row : result) {
 					folders.add(new FolderReference((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3]));
 				}
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error at getAllFolders, query at DmsProjectDao: " + e.getMessage(), e);
 		}
 		return folders;
 	}
 
-	public List<Integer> getAllProgramStudiesAndFolders(String programUUID) {
+	public List<Integer> getAllProgramStudiesAndFolders(final String programUUID) {
 		List<Integer> projectIds = null;
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_ALL_PROGRAM_STUDIES_AND_FOLDERS);
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_ALL_PROGRAM_STUDIES_AND_FOLDERS);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			projectIds = query.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error at getAllProgramStudiesAndFolders, query at DmsProjectDao: " + e.getMessage(), e);
 		}
 		return projectIds;
 	}
 
 	public List<ValueReference> getDistinctProjectNames() {
-		List<ValueReference> results = new ArrayList<>();
+		final List<ValueReference> results = new ArrayList<>();
 		try {
-			String sql = "SELECT DISTINCT name FROM project ";
-			SQLQuery query = this.getSession().createSQLQuery(sql);
-			List<String> list = query.list();
+			final String sql = "SELECT DISTINCT name FROM project ";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			final List<String> list = query.list();
 			if (list != null && !list.isEmpty()) {
-				for (String row : list) {
+				for (final String row : list) {
 					results.add(new ValueReference(row, row));
 				}
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getDistinctProjectNames() query from Project " + e.getMessage(), e);
 		}
 		return results;
 	}
 
 	public List<ValueReference> getDistinctProjectDescriptions() {
-		List<ValueReference> results = new ArrayList<>();
+		final List<ValueReference> results = new ArrayList<>();
 		try {
-			String sql = "SELECT DISTINCT description FROM project ";
-			SQLQuery query = this.getSession().createSQLQuery(sql);
-			List<String> list = query.list();
+			final String sql = "SELECT DISTINCT description FROM project ";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			final List<String> list = query.list();
 			if (list != null && !list.isEmpty()) {
-				for (String row : list) {
+				for (final String row : list) {
 					results.add(new ValueReference(row, row));
 				}
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
 		}
 		return results;
 	}
 
-	public Integer getProjectIdByStudyDbId(int studyDbId) {
+	public Integer getProjectIdByStudyDbId(final int studyDbId) {
 		try {
-			Query query = this.getSession().createSQLQuery(GET_PROJECTID_BY_STUDYDBID);
+			final Query query = this.getSession().createSQLQuery(GET_PROJECTID_BY_STUDYDBID);
 			query.setParameter("studyDbId", studyDbId);
 			return (Integer) query.uniqueResult();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
 
-	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) {
+	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID) {
 		try {
-			String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid";
-			Query query = this.getSession().createSQLQuery(sql);
+			final String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid";
+			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameter("name", name);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-			List<Integer> list = query.list();
+			final List<Integer> list = query.list();
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
 		}
 		return null;
 	}
 
 	public List<String> getAllSharedProjectNames() {
-		List<String> results = new ArrayList<>();
+		final List<String> results = new ArrayList<>();
 		try {
-			String sql = "SELECT name FROM project WHERE program_uuid is null";
-			SQLQuery query = this.getSession().createSQLQuery(sql);
+			final String sql = "SELECT name FROM project WHERE program_uuid is null";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			return query.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getAllSharedProjectNames()" + e.getMessage(), e);
 		}
 		return results;
@@ -1086,10 +1086,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria;
 	}
 
-	public StudyMetadata getStudyMetadata(Integer studyId) {
+	public StudyMetadata getStudyMetadata(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID);
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID);
 			query.addScalar("studyDbId");
 			query.addScalar("trialOrNurseryId");
 			query.addScalar("studyName");
@@ -1102,10 +1102,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("deleted");
 			query.addScalar("locationID");
 			query.setParameter("studyId", studyId);
-			Object result = query.uniqueResult();
+			final Object result = query.uniqueResult();
 			if (result != null) {
-				Object[] row = (Object[]) result;
-				StudyMetadata studyMetadata = new StudyMetadata();
+				final Object[] row = (Object[]) result;
+				final StudyMetadata studyMetadata = new StudyMetadata();
 				studyMetadata.setStudyDbId(studyId);
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
@@ -1123,7 +1123,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			} else {
 				return null;
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			final String message = "Error with getStudyMetadata() query from study: " + studyId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);

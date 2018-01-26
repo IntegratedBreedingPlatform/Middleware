@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,6 +18,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for names table.
@@ -45,6 +44,18 @@ public class Name implements Serializable {
 	public static final String GET_PREFERRED_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
 
 	public static final String GET_PREFERRED_NAME_IDS_BY_GIDS = "SELECT gid, nid " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
+
+	public static final String GET_GROUP_SOURCE_PREFERRED_NAME_IDS_BY_GIDS = "SELECT g.gid,\n" + "    CASE   \n"
+		+ " WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL AND g.gpid1 <> 0 THEN n.nval \n"
+		+ " ELSE '-'   \n END AS 'NVAL'\n"
+		+ " FROM germplsm g LEFT JOIN names n  ON g.gpid1 = n.gid AND n.nstat = 1 \n "
+		+ "WHERE \n g.gid IN (:gids)";
+
+	public static final String GET_IMMEDIATE_SOURCE_PREFERRED_NAME_IDS_BY_GIDS = "SELECT g.gid,\n" + "    CASE   \n"
+		+ " WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL AND g.gpid2 <> 0 THEN n.nval \n"
+		+ " ELSE '-'  \n END AS 'NVAL'\n"
+		+ "FROM germplsm g LEFT JOIN names n  ON g.gpid2 = n.gid AND n.nstat = 1  \n "
+		+ "WHERE \n g.gid IN (:gids)";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
