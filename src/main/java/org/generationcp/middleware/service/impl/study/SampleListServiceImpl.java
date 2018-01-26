@@ -1,13 +1,6 @@
-
 package org.generationcp.middleware.service.impl.study;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +30,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Preconditions;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
@@ -91,16 +89,13 @@ public class SampleListServiceImpl implements SampleListService {
 
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
-		Preconditions.checkArgument(sampleListDTO.getProgramUUID() != null, "The programUUID must not be null");
-
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
 		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDTO.getListName()), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDTO.getListName().length() <= 100, "List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDTO.getCreatedDate(), "The Created Date must not be empty");
-		Preconditions.checkArgument(
-				StringUtils.isBlank(sampleListDTO.getDescription()) || sampleListDTO.getDescription().length() <= 255,
+		Preconditions.checkArgument(StringUtils.isBlank(sampleListDTO.getDescription()) || sampleListDTO.getDescription().length() <= 255,
 				"List Description must not exceed 255 characters");
 		Preconditions.checkArgument(StringUtils.isBlank(sampleListDTO.getNotes()) || sampleListDTO.getNotes().length() <= 65535,
 				"Notes must not exceed 65535 characters");
@@ -126,15 +121,16 @@ public class SampleListServiceImpl implements SampleListService {
 
 			Preconditions.checkArgument(parent.isFolder(), "The parent id must not be a list");
 
-			final SampleList uniqueSampleListName = this.sampleListDao.getSampleListByParentAndName(sampleListDTO.getListName(),
-					parent.getId(), sampleListDTO.getProgramUUID());
+			final SampleList uniqueSampleListName = this.sampleListDao
+					.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID());
 
 			Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 			sampleList.setHierarchy(parent);
 
-			final List<ObservationDto> observationDtos = this.studyMeasurements.getSampleObservations(sampleListDTO.getStudyId(),
-					sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());
+			final List<ObservationDto> observationDtos = this.studyMeasurements
+					.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(),
+							sampleListDTO.getSelectionVariableId());
 
 			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
 
@@ -174,9 +170,9 @@ public class SampleListServiceImpl implements SampleListService {
 					maxSequence++;
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 
-					final Sample sample = this.sampleService.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, sampleName,
-							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user,
-							sampleListDTO.getCreatedDate(), takenBy);
+					final Sample sample = this.sampleService
+							.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, sampleName, sampleListDTO.getSamplingDate(),
+									observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
 
@@ -313,12 +309,14 @@ public class SampleListServiceImpl implements SampleListService {
 	 *
 	 * @param sampleListId
 	 * @param newParentFolderId
+	 * @param isCropList
+	 * @param programUUID
 	 * @return SampleList
 	 * @throws Exception
 	 */
-	@SuppressWarnings("null")
 	@Override
-	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId) {
+	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId, final boolean isCropList,
+			final String programUUID) {
 		Preconditions.checkNotNull(sampleListId);
 		Preconditions.checkNotNull(newParentFolderId);
 		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), "Arguments can not have the same value");
@@ -333,11 +331,19 @@ public class SampleListServiceImpl implements SampleListService {
 			newParentFolder = this.sampleListDao.getRootSampleList();
 		} else {
 			newParentFolder = this.sampleListDao.getById(newParentFolderId);
-
 		}
 
 		Preconditions.checkArgument(newParentFolder != null, "Specified newParentFolderId does not exist");
 		Preconditions.checkArgument(newParentFolder.isFolder(), "Specified newParentFolderId is not a folder");
+
+		// if the list is moved to the crop list, set the program uuid to null so that
+		// it will be accessible to all programs of the same crop.
+		if (isCropList) {
+			listToMove.setProgramUUID(null);
+		} else {
+			// else, just set the current programUUID
+			listToMove.setProgramUUID(programUUID);
+		}
 
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId, listToMove.getProgramUUID());
@@ -368,8 +374,8 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(folder != null, "Folder does not exist");
 		Preconditions.checkArgument(folder.isFolder(), "Specified folderID is not a folder");
 		Preconditions.checkArgument(folder.getHierarchy() != null, "Root folder can not be deleted");
-		Preconditions.checkArgument(folder.getChildren() == null || folder.getChildren().isEmpty(),
-				"Folder has children and cannot be deleted");
+		Preconditions
+				.checkArgument(folder.getChildren() == null || folder.getChildren().isEmpty(), "Folder has children and cannot be deleted");
 
 		try {
 			this.sampleListDao.makeTransient(folder);
