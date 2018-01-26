@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
-	private final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
+	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
 			" experiment.nd_experiment_id, " + //
 			" plant.plant_id," + //
 			" plant.plant_no " + //
