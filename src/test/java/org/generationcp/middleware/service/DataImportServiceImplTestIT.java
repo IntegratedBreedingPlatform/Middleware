@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
+import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -168,6 +169,20 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		Debug.println(IntegrationTestBase.INDENT, "Created study:" + id);
+	}
+	
+	@Test
+	public void testParseWorkbookDescriptionSheet() throws WorkbookParserException {
+		final String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
+		final File file = new File(fileLocation);
+		final WorkbookParser parser = new WorkbookParser(WorkbookParser.DEFAULT_MAX_ROW_LIMIT);
+		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
+		final Workbook workbook = this.dataImportService.parseWorkbookDescriptionSheet(excelWorkbook);
+		Assert.assertNotNull(workbook.getConditions());
+		Assert.assertNotNull(workbook.getConstants());
+		Assert.assertNotNull(workbook.getFactors());
+		Assert.assertNotNull(workbook.getVariates());
+		Assert.assertNull(workbook.getObservations());
 	}
 
 	// Daniel V

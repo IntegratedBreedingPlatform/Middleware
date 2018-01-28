@@ -159,9 +159,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 	
 	@Override 
-	public Workbook parseWorkbook(org.apache.poi.ss.usermodel.Workbook excelWorkbook) throws WorkbookParserException {
+	public Workbook parseWorkbookDescriptionSheet(org.apache.poi.ss.usermodel.Workbook excelWorkbook) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
-
+		//Only parses the description sheet. 
 		final Workbook workbook = parser.parseFile(excelWorkbook, false);
 		return workbook;
 	}
