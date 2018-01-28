@@ -35,4 +35,14 @@ public class ValueReferenceTestDataInitializer {
 		}
 		return valueReferenceList;
 	}
+	
+	public static List<ValueReference> createPossibleValues() {
+		final List<ValueReference> possibleValues = new ArrayList<>();
+		possibleValues.add(new ValueReference(1, "1", ""));
+		possibleValues.add(new ValueReference(2, "2", ""));
+		possibleValues.add(new ValueReference(3, "3", ""));
+		possibleValues.add(new ValueReference(4, "4", ""));
+		possibleValues.add(new ValueReference(5, "5", ""));
+		return possibleValues;
+	}
 }

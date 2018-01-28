@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -55,5 +56,20 @@ public class MeasurementVariableTestDataInitializer {
 		variable.setDataTypeId(dataTypeId);
 		variable.setVariableType(VariableType.TRAIT);
 		return variable;
+	}
+	
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
+			final PhenotypicType phenotypicType, final int dataTypeId) {
+		final StandardVariable stdvar = StandardVariableTestDataInitializer.createStandardVariableTestData(name, phenotypicType);
+		stdvar.setPhenotypicType(phenotypicType);
+		stdvar.setId(termId);
+		final MeasurementVariable var = new MeasurementVariable(termId, stdvar.getName(), stdvar.getDescription(),
+				stdvar.getScale().getName(), stdvar.getMethod().getName(), stdvar.getProperty().getName(),
+				stdvar.getDataType().getName(), "", stdvar.getPhenotypicType().getLabelList().get(0));
+		var.setRole(phenotypicType);
+		var.setDataTypeId(stdvar.getDataType().getId());
+		var.setFactor(false);
+		var.setOperation(null);
+		return var;
 	}
 }
