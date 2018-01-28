@@ -23,6 +23,8 @@ import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -130,7 +132,34 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
-
+	
+	@Test 
+	public void testRemoveConstantsVariables() {
+		Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, "TEST STUDY", 1, true);
+		VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConstants(), 1);
+		Assert.assertTrue("The variable type list should have contents.", variableTypeList.getVariableTypes().size()>0);
+		WorkbookSaverTest.workbookSaver.removeConstantsVariables(variableTypeList, workbook.getConstants());
+		Assert.assertEquals("All the variable should be removed.", variableTypeList.getVariableTypes().size(), 0);
+	}
+	
+	@Test
+	public void testSetVariableListValues() {
+		Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, "TEST STUDY", 1, true);
+		WorkbookTestDataInitializer.setTrialObservations(workbook);
+		VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConditions(), 1);
+		VariableList variableList = WorkbookSaverTest.workbookSaver.getVariableListTransformer().transformTrialEnvironment(workbook.getTrialObservation(0), variableTypeList);
+		
+		for(Variable variable: variableList.getVariables()){
+			//set values to null to check if the values are really set properly
+			variable.setValue(null);
+		}
+		WorkbookSaverTest.workbookSaver.setVariableListValues(variableList, workbook.getConditions());
+		
+		for(Variable variable: variableList.getVariables()){
+			Assert.assertNotNull(variable.getValue());
+		}	
+	}
+	
 	@Test
 	public void testPropagationOfTrialFactorsWOTrialVariablesAndTrialFactor() {
 		VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);

@@ -492,11 +492,13 @@ public class WorkbookSaver extends Saver {
 		return 0;
 	}
 
-	private void setVariableListValues(VariableList variableList, List<MeasurementVariable> measurementVariables) {
-		for(MeasurementVariable mvar: measurementVariables){
-			Variable variable = variableList.findById(mvar.getTermId());
-			if( variable != null && variable .getValue() == null){
-				variable.setValue(mvar.getValue());
+	void setVariableListValues(VariableList variableList, List<MeasurementVariable> measurementVariables) {
+		if(measurementVariables != null) {
+			for(MeasurementVariable mvar: measurementVariables){
+				Variable variable = variableList.findById(mvar.getTermId());
+				if( variable != null && variable .getValue() == null){
+					variable.setValue(mvar.getValue());
+				}
 			}
 		}
 	}
@@ -1026,7 +1028,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	//The constants are not needed in the creation of stocks, means experiments, and measurement effects experiments so we need to remove it
-	private void removeConstantsVariables(VariableTypeList effectVariables, List<MeasurementVariable> constants) {
+	void removeConstantsVariables(VariableTypeList effectVariables, List<MeasurementVariable> constants) {
 		
 		List<DMSVariableType> variableTypes = new ArrayList<>();
 		for(DMSVariableType varType: effectVariables.getVariableTypes()) {
