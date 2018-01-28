@@ -180,7 +180,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			throws WorkbookParserException {
 
 		// perform validations on the parsed data that require db access
-		final List<Message> messages = new LinkedList<Message>();
+		final List<Message> messages = new LinkedList<>();
 
 		final Set<Integer> factorsTermIds = getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
@@ -376,7 +376,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	protected List<Message> validateMeasurementVariableName(final List<MeasurementVariable> allVariables) {
-		final List<Message> messages = new ArrayList<Message>();
+		final List<Message> messages = new ArrayList<>();
 
 		messages.addAll(this.validateMeasurmentVariableNameLengths(allVariables));
 		messages.addAll(this.validateMeasurmentVariableNameCharacters(allVariables));
@@ -385,7 +385,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	protected List<Message> validateMeasurmentVariableNameLengths(final List<MeasurementVariable> variableList) {
-		final List<Message> messages = new ArrayList<Message>();
+		final List<Message> messages = new ArrayList<>();
 
 		for (final MeasurementVariable mv : variableList) {
 			if (mv.getName().length() > DataImportServiceImpl.MAX_VARIABLE_NAME_LENGTH) {
@@ -397,7 +397,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	protected List<Message> validateMeasurmentVariableNameCharacters(final List<MeasurementVariable> variableList) {
-		final List<Message> messages = new ArrayList<Message>();
+		final List<Message> messages = new ArrayList<>();
 
 		for (final MeasurementVariable mv : variableList) {
 			if (!mv.getName().matches("^[^0-9][\\w\\d%]*$")) {
@@ -409,7 +409,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private List<Message> checkForEmptyRequiredVariables(final Workbook workbook) {
-		final List<Message> returnVal = new ArrayList<Message>();
+		final List<Message> returnVal = new ArrayList<>();
 
 		final List<MeasurementVariable> requiredMeasurementVariables = this.retrieveRequiredMeasurementVariables(workbook);
 
@@ -433,7 +433,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	private List<MeasurementVariable> retrieveRequiredMeasurementVariables(final Workbook workbook) {
 		// current implem leverages the setting of the required variable in earlier checks
-		final List<MeasurementVariable> returnVal = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> returnVal = new ArrayList<>();
 
 		for (final MeasurementVariable measurementVariable : workbook.getAllVariables()) {
 			if (measurementVariable.isRequired()) {
@@ -470,12 +470,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	private void checkForDuplicateVariableNames(final Workbook workbook, final List<Message> messages, final String programUUID)
 			throws WorkbookParserException {
-		final List<List<MeasurementVariable>> workbookVariables = new ArrayList<List<MeasurementVariable>>();
+		final List<List<MeasurementVariable>> workbookVariables = new ArrayList<>();
 		workbookVariables.add(workbook.getConditions());
 		workbookVariables.add(workbook.getFactors());
 		workbookVariables.add(workbook.getConstants());
 		workbookVariables.add(workbook.getVariates());
-		final Map<String, MeasurementVariable> variableNameMap = new HashMap<String, MeasurementVariable>();
+		final Map<String, MeasurementVariable> variableNameMap = new HashMap<>();
 		for (final List<MeasurementVariable> variableList : workbookVariables) {
 
 			for (final MeasurementVariable measurementVariable : variableList) {
@@ -527,7 +527,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	private Map<String, List<MeasurementVariable>> checkForDuplicates(final List<MeasurementVariable> workbookVariables,
 			final boolean isVariate) {
-		final Map<String, List<MeasurementVariable>> stdVarMap = new LinkedHashMap<String, List<MeasurementVariable>>();
+		final Map<String, List<MeasurementVariable>> stdVarMap = new LinkedHashMap<>();
 		for (final MeasurementVariable measurementVariable : workbookVariables) {
 			// need to retrieve standard variable because of synonyms
 			final Integer standardVariableId = this.getOntologyDataManager()
@@ -542,7 +542,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			}
 			List<MeasurementVariable> vars = stdVarMap.get(key);
 			if (vars == null) {
-				vars = new ArrayList<MeasurementVariable>();
+				vars = new ArrayList<>();
 				stdVarMap.put(key, vars);
 			}
 			vars.add(measurementVariable);
@@ -589,7 +589,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private void checkForInvalidLabel(final Workbook workbook, final List<Message> messages) throws WorkbookParserException {
-		final List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variableList = new ArrayList<>();
 		variableList.addAll(workbook.getFactors());
 		variableList.addAll(workbook.getConditions());
 
@@ -782,7 +782,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public Map<String, List<Message>> validateProjectOntology(final Workbook workbook, final String programUUID) {
-		final Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
+		final Map<String, List<Message>> errors = new HashMap<>();
 
 		final Set<Integer> factorsTermIds = getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
@@ -863,7 +863,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public Map<String, List<Message>> validateProjectData(final Workbook workbook, final String programUUID) {
-		final Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
+		final Map<String, List<Message>> errors = new HashMap<>();
 
 		this.checkForExistingTrialInstance(workbook, errors, programUUID);
 
@@ -922,14 +922,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				}
 			}
 			// get and check if trialInstanceNumber already exists
-			final Set<String> locationIds = new LinkedHashSet<String>();
+			final Set<String> locationIds = new LinkedHashSet<>();
 
 			int maxNumOfIterations = 100000;
 			final int observationCount = workbook.getObservations().size();
 			if (observationCount < maxNumOfIterations) {
 				maxNumOfIterations = observationCount;
 			}
-			final List<String> duplicateTrialInstances = new ArrayList<String>();
+			final List<String> duplicateTrialInstances = new ArrayList<>();
 			final boolean isMeansDataImport =
 					workbook.getImportType() != null && workbook.getImportType() == DataSetType.MEANS_DATA.getId();
 			for (int i = 0; i < maxNumOfIterations; i++) {
@@ -947,7 +947,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			boolean hasDuplicateTrialInstances = false;
 			if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
 				// check import type first
-				final List<Integer> variateIds = new ArrayList<Integer>();
+				final List<Integer> variateIds = new ArrayList<>();
 				// check all variates
 				for(MeasurementVariable mvar: workbook.getVariates()){
 					variateIds.add(mvar.getTermId());

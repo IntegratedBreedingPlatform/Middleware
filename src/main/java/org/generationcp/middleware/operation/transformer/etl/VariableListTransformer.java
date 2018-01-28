@@ -3,7 +3,6 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -94,7 +93,7 @@ public class VariableListTransformer extends Transformer {
 
 	public List<Integer> transformStockIndexes(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders)
 			throws MiddlewareQueryException {
-		List<Integer> variableIndexesList = new ArrayList<Integer>();
+		List<Integer> variableIndexesList = new ArrayList<>();
 
 		if (mRow == null) {
 			return variableIndexesList;

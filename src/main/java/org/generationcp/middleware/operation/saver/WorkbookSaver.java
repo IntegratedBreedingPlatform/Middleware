@@ -169,8 +169,8 @@ public class WorkbookSaver extends Saver {
 
 		// GCP-6091 start
 		final int studyLocationId;
-		final List<Integer> locationIds = new ArrayList<Integer>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<Integer, VariableList>();
+		final List<Integer> locationIds = new ArrayList<>();
+		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 
 		// get the trial and measurement dataset id to use in deletion of experiments
 		Integer trialDatasetId = workbook.getTrialDatasetId();
@@ -433,7 +433,7 @@ public class WorkbookSaver extends Saver {
 		} else {
 			observations = workbook.getObservations();
 		}
-		final Map<String, Long> locationMap = new HashMap<String, Long>();
+		final Map<String, Long> locationMap = new HashMap<>();
 		if (observations != null) {
 			for (final MeasurementRow row : observations) {
 				geolocationId = row.getLocationId();
@@ -720,7 +720,7 @@ public class WorkbookSaver extends Saver {
 			final List<String> trialHeaders) {
 		final Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
 
-		List<Integer> variableIndexesList = new ArrayList<Integer>();
+		List<Integer> variableIndexesList = new ArrayList<>();
 		// we get the indexes so that in the next rows we dont need to compare anymore per row
 		if (workbook.getObservations() != null && !workbook.getObservations().isEmpty()) {
 			final MeasurementRow row = workbook.getObservations().get(0);
