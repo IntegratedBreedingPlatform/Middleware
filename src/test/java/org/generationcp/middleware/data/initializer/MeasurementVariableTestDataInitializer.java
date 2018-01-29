@@ -26,7 +26,8 @@ public class MeasurementVariableTestDataInitializer {
 		return measurementVar;
 	}
 
-	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String value) {
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
+			final String value) {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(termId);
 		measurementVar.setName(name);
@@ -47,9 +48,10 @@ public class MeasurementVariableTestDataInitializer {
 		return measurementVar;
 	}
 
-	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
-			final String scale, final String method, final String property, final String dataType, final String value,
-			final String label, final int dataTypeId, final PhenotypicType role) {
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
+			final String description, final String scale, final String method, final String property,
+			final String dataType, final String value, final String label, final int dataTypeId,
+			final PhenotypicType role) {
 		final MeasurementVariable variable = new MeasurementVariable(termId, name, description, scale, method, property,
 				dataType, value, label);
 		variable.setRole(role);
@@ -57,10 +59,11 @@ public class MeasurementVariableTestDataInitializer {
 		variable.setVariableType(VariableType.TRAIT);
 		return variable;
 	}
-	
+
 	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
 			final PhenotypicType phenotypicType, final int dataTypeId) {
-		final StandardVariable stdvar = StandardVariableTestDataInitializer.createStandardVariableTestData(name, phenotypicType);
+		final StandardVariable stdvar = StandardVariableTestDataInitializer.createStandardVariableTestData(name,
+				phenotypicType);
 		stdvar.setPhenotypicType(phenotypicType);
 		stdvar.setId(termId);
 		final MeasurementVariable var = new MeasurementVariable(termId, stdvar.getName(), stdvar.getDescription(),
