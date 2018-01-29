@@ -313,6 +313,11 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	}
 
 	@Override
+	public Integer getListDataId() {
+		return this.getListDataProjectId();
+	}
+
+	@Override
 	public String toString() {
 		final StringBuffer sb = new StringBuffer("ListDataProject{");
 		sb.append("listDataProjectId=").append(this.listDataProjectId);

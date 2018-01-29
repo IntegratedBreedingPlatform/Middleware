@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
@@ -17,17 +16,19 @@ public interface SampleListService {
 	/**
 	 * Create a sample list folder
 	 * Sample List folder name must be unique across the elements in the parent folder
+	 *
 	 * @param folderName
 	 * @param parentId
 	 * @param createdBy
 	 * @param programUUID
 	 * @return SampleList (Saved Folder)
 	 */
-	Integer createSampleListFolder(final String folderName, final Integer parentId,final User createdBy, final String programUUID);
+	Integer createSampleListFolder(final String folderName, final Integer parentId, final User createdBy, final String programUUID);
 
 	/**
 	 * Update sample list folder name
 	 * New folder name should be unique across the elements in the parent folder
+	 *
 	 * @param folderId
 	 * @param newFolderName
 	 * @return SampleList
@@ -38,14 +39,19 @@ public interface SampleListService {
 	 * Move a folder to another folder
 	 * sampleListId must exist (could be a folder or a list), newParentFolderId must exist and must be a folder
 	 * newParentFolderId folder must not contain another sample list or folder with the name that the one that needs to be moved
-	 * @param sampleListId
+	 * isCropList set to true if the list will be moved to the crop list folder.
+	 *  @param sampleListId
 	 * @param newParentFolderId
+	 * @param isCropList
+	 * @param programUUID
 	 */
-	SampleList moveSampleList (final Integer sampleListId, final Integer newParentFolderId);
+	SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId, final boolean isCropList,
+			final String programUUID);
 
 	/**
 	 * Delete a folder
 	 * Folder ID must exist and it can not contain any child
+	 *
 	 * @param folderId
 	 */
 	void deleteSampleListFolder(final Integer folderId);
@@ -55,6 +61,7 @@ public interface SampleListService {
 	SampleList getSampleList(final Integer sampleListId);
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
+
 	/**
 	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
 	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
@@ -70,9 +77,9 @@ public interface SampleListService {
 	 * in batchSize) to reduce the load in instances where there is a large volume of child folders to be retrieved. Though retrieval is by
 	 * batch, this method still returns all of the child folders as a single list.
 	 *
-	 * @param parentId - the ID of the parent to retrieve the child lists
+	 * @param parentId    - the ID of the parent to retrieve the child lists
 	 * @param programUUID - the program UUID of the program where to retrieve the child lists
-	 * @param batchSize - the number of records to be retrieved per iteration
+	 * @param batchSize   - the number of records to be retrieved per iteration
 	 * @return Returns a List of SampleList POJOs for the child lists
 	 */
 	List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize);
@@ -80,12 +87,12 @@ public interface SampleListService {
 	/**
 	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
 	 * This helps avoiding the need to query metadata in a loop for each folder
+	 *
 	 * @param sampleLists ids for which we should retrieve metadata
 	 */
 	Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists);
 
 	/**
-	 *
 	 * @param listId - the list Id
 	 * @return - List of SampleList POJOs
 	 */

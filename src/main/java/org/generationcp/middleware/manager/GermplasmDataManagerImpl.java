@@ -1442,6 +1442,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids) {
+		return this.getNameDao().getSourcePreferredNamesByGids(gids);
+
+	}
+
+	@Override
+	public Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids) {
+		return this.getNameDao().getImmediatePreferredNamesByGids(gids);
+	}
+
+	@Override
 	public long countMatchGermplasmInList(final Set<Integer> gids) {
 		return this.getGermplasmDao().countMatchGermplasmInList(gids);
 	}
@@ -1511,4 +1522,26 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getAttributeDao().getAttributeTypes();
 	}
 
+	/**
+	 * @return List of all no bulking methods
+	 */
+	@Override
+	public List<Method> getAllNoBulkingMethods() {
+		return this.getMethodDao().getAllNoBulkingMethods();
+	}
+
+	@Override
+	public List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids) {
+		return this.getMethodDao().getNoBulkingMethodsByIdList(ids);
+	}
+
+	@Override
+	public List<Method> getAllMethodsNotBulkingNotGenerative() {
+		return this.getMethodDao().getAllMethodsNotBulkingNotGenerative();
+	}
+
+	@Override
+	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) {
+		return this.getMethodDao().getNoBulkingMethodsByType(type, programUUID);
+	}
 }

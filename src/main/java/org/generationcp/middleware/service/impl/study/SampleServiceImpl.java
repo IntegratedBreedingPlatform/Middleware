@@ -13,8 +13,6 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -24,14 +22,12 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -66,11 +62,11 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
-		Date createdDate, User takenBy) {
+	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
+		final Date createdDate, final User takenBy) {
 
 		final Sample sample = new Sample();
-		String localCropPrefix;
+		final String localCropPrefix;
 
 		if (cropPrefix == null) {
 			localCropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
@@ -102,60 +98,24 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> getSamples(final String plotId) {
-		final List<Sample> samples = this.sampleDao.getByPlotId(plotId);
-		return mapSampleToSampleDTO(samples);
-	}
-
-	private List<SampleDTO> mapSampleToSampleDTO(final List<Sample> samples) {
-		final List<SampleDTO> listSampleDto = new ArrayList<>();
-		for (final Sample sample : samples) {
-			final SampleDTO dto = new SampleDTO();
-			dto.setSampleId(sample.getSampleId());
-			dto.setSampleName(sample.getSampleName());
-			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
-			final User takenBy = sample.getTakenBy();
-			if (takenBy != null) {
-				final Person person = takenBy.getPerson();
-				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
-			}
-			dto.setSamplingDate(sample.getSamplingDate());
-			final SampleList sampleList = sample.getSampleList();
-			if (sampleList != null) {
-				dto.setSampleList(sampleList.getListName());
-			}
-			final Plant plant = sample.getPlant();
-			dto.setPlantNumber(plant.getPlantNumber());
-			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
-
-			for (final AccMetadataSet accMetadataSet : sample.getAccMetadataSets()) {
-				final SampleDTO.Dataset dataset = new SampleDTO().new Dataset();
-				dataset.setName(accMetadataSet.getDataset().getDatasetName());
-				dataset.setDatasetId(accMetadataSet.getDataset().getDatasetId());
-				dto.getDatasets().add(dataset);
-			}
-
-			listSampleDto.add(dto);
-		}
-		return listSampleDto;
+		return this.sampleDao.getByPlotId(plotId);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
 		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
 
-		return getSampleDetailsDTO(sample);
+		return this.getSampleDetailsDTO(sample);
 	}
 
 	@Override
 	public Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs) {
-		final List<Sample> samplesByBk = this.sampleDao.getBySampleBks(sampleUIDs);
-		final List<SampleDTO> sampleDTOs = mapSampleToSampleDTO(samplesByBk);
-		final Map<String, SampleDTO> mappedSampleDTOs = Maps.uniqueIndex(sampleDTOs, new Function<SampleDTO, String>() {
+		final List<SampleDTO> sampleDTOs = this.sampleDao.getBySampleBks(sampleUIDs);
+		return Maps.uniqueIndex(sampleDTOs, new Function<SampleDTO, String>() {
 
-			public String apply(SampleDTO from) {
+			public String apply(final SampleDTO from) {
 				return from.getSampleBusinessKey();
 			}
 		});
-		return mappedSampleDTOs;
 	}
 
 	private SampleDetailsDTO getSampleDetailsDTO(final Sample sample) {
@@ -167,7 +127,7 @@ public class SampleServiceImpl implements SampleService {
 		final ExperimentModel experiment = sample.getPlant().getExperiment();
 		final DmsProject objectProject = experiment.getProject().getRelatedTos().get(0).getObjectProject();
 		final Integer studyId = objectProject.getProjectId();
-		final String takenBy = sample.getTakenBy() != null ? sample.getTakenBy().getPerson().getDisplayName() : null;
+		final String takenBy = (sample.getTakenBy() != null) ? sample.getTakenBy().getPerson().getDisplayName() : null;
 		final String plotId = experiment.getPlotId();
 		final String studyName = objectProject.getName();
 		final StockModel stock = experiment.getExperimentStocks().get(0).getStock();
@@ -184,9 +144,9 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setDesignation(stock.getName());
 		samplesDetailsDto.setPlantNo(sample.getPlant().getPlantNumber());
 
-		fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
-		fillProjectProperties(objectProject.getProperties(), samplesDetailsDto);
-		fillLocationByGeoLocationProperties(experiment.getGeoLocation().getProperties(), samplesDetailsDto);
+		this.fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
+		this.fillProjectProperties(objectProject.getProperties(), samplesDetailsDto);
+		this.fillLocationByGeoLocationProperties(experiment.getGeoLocation().getProperties(), samplesDetailsDto);
 
 		return samplesDetailsDto;
 	}
@@ -206,7 +166,7 @@ public class SampleServiceImpl implements SampleService {
 
 		for (final ProjectProperty projectProperty : projectProperties) {
 			//SEEDING_DATE
-			String value = projectProperty.getValue();
+			final String value = projectProperty.getValue();
 			if (StringUtils.isBlank(value)) {
 				continue;
 			}
@@ -225,9 +185,9 @@ public class SampleServiceImpl implements SampleService {
 	private void fillPlotNoByExperimentProperty(final List<ExperimentProperty> experimentProperty,
 		final SampleDetailsDTO sampleDetailsDTO) {
 		boolean foundPlotNumber = false;
-		Iterator<ExperimentProperty> experimentPropertyIterator = experimentProperty.iterator();
+		final Iterator<ExperimentProperty> experimentPropertyIterator = experimentProperty.iterator();
 		while (experimentPropertyIterator.hasNext() && !foundPlotNumber) {
-			ExperimentProperty properties = experimentPropertyIterator.next();
+			final ExperimentProperty properties = experimentPropertyIterator.next();
 			if (properties.getTypeId().equals(TermId.PLOT_NO.getId())) {
 				final Integer plotNumber = Integer.valueOf(properties.getValue());
 				sampleDetailsDTO.setPlotNo(plotNumber);
@@ -240,4 +200,10 @@ public class SampleServiceImpl implements SampleService {
 	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid) {
 		return this.sampleDao.getByGid(gid);
 	}
+
+	@Override
+	public Boolean studyHasSamples(final Integer studyId) {
+		return this.sampleDao.hasSamples(studyId);
+	}
+
 }
