@@ -17,4 +17,19 @@ public class ProjectTestDataInitializer {
 		project.setCropType(new CropType("maize"));
 		return project;
 	}
+	
+	public static Project createProject(final long projectId, final String projectName) {
+		final Project project = new Project();
+		project.setProjectId(projectId);
+		project.setProjectName(projectName);
+		return project;
+	}
+	
+	public static Project createProjectWithCropType() {
+		final Project workbenchProject = new Project();
+		workbenchProject.setCropType(new CropType(CropType.CropEnum.MAIZE.name()));
+		workbenchProject.setProjectId(1L);
+		return workbenchProject;
+	}
+
 }
