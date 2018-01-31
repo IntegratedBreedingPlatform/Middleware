@@ -31,5 +31,13 @@ public class ProjectTestDataInitializer {
 		workbenchProject.setProjectId(1L);
 		return workbenchProject;
 	}
+	
+	public static Project getProject(final String programUuid) {
+		final Project project = new Project();
+		project.setProjectId(1L);
+		project.setProjectName("Project Name");
+		project.setUniqueID(programUuid);
+		return project;
+	}
 
 }
