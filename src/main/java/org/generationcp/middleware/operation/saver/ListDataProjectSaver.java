@@ -100,7 +100,7 @@ public class ListDataProjectSaver {
 		}
 	}
 
-	public void updateGermlasmListInfoStudy(final int crossesListId, final int studyId) throws MiddlewareQueryException {
+	public void updateGermlasmListInfoStudy(final int crossesListId, final int studyId) {
 		final GermplasmList crossesList = this.daoFactory.getGermplasmListDAO().getById(crossesListId);
 		if (crossesList != null) {
 			crossesList.setProjectId(studyId);
@@ -117,7 +117,7 @@ public class ListDataProjectSaver {
 		snapList.setListRef(null);
 	}
 
-	private GermplasmList getGermplasmList(final int projectId, final GermplasmListType type) throws MiddlewareQueryException {
+	private GermplasmList getGermplasmList(final int projectId, final GermplasmListType type) {
 		GermplasmList gList = null;
 		final List<GermplasmList> tempList = this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (tempList != null && !tempList.isEmpty()) {
@@ -126,7 +126,7 @@ public class ListDataProjectSaver {
 		return gList;
 	}
 
-	private void prepareListDataProjectForSaving(final ListDataProject listDataProject, final GermplasmList snapList) throws MiddlewareQueryException {
+	private void prepareListDataProjectForSaving(final ListDataProject listDataProject, final GermplasmList snapList) {
 		listDataProject.setList(snapList);
 		if (listDataProject.getCheckType() == null) {
 			listDataProject.setCheckType(0);
