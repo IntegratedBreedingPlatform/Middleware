@@ -1,8 +1,4 @@
-
 package org.generationcp.middleware.operation.saver;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -13,6 +9,9 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ListDataProjectSaver {
 
 	private Saver daoFactory;
@@ -21,20 +20,20 @@ public class ListDataProjectSaver {
 		// does nothing
 	}
 
-	public ListDataProjectSaver(HibernateSessionProvider sessionProvider) {
+	public ListDataProjectSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new Saver(sessionProvider);
 	}
 
-	public ListDataProjectSaver(Saver saver) {
+	public ListDataProjectSaver(final Saver saver) {
 		this.daoFactory = saver;
 	}
 
-	public int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> listDatas,
-			int userId) {
+	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId, final List<ListDataProject> listDatas,
+			final int userId) {
 
-		boolean isAdvanced = type == GermplasmListType.ADVANCED || GermplasmListType.isCrosses(type);
+		final boolean isAdvanced = type == GermplasmListType.ADVANCED || GermplasmListType.isCrosses(type);
 		GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
-		boolean isCreate = snapList == null;
+		final boolean isCreate = snapList == null;
 
 		if (isCreate) {
 			snapList = this.createInitialGermplasmList(projectId, type);
@@ -54,7 +53,7 @@ public class ListDataProjectSaver {
 		}
 
 		if (listDatas != null) {
-			for (ListDataProject listDataProject : listDatas) {
+			for (final ListDataProject listDataProject : listDatas) {
 				this.prepareListDataProjectForSaving(listDataProject, snapList);
 				this.daoFactory.getListDataProjectDAO().save(listDataProject);
 			}
@@ -63,25 +62,25 @@ public class ListDataProjectSaver {
 		return snapList.getId();
 	}
 
-	protected GermplasmList createInitialGermplasmList(int projectId, GermplasmListType type) {
+	protected GermplasmList createInitialGermplasmList(final int projectId, final GermplasmListType type) {
 
-		DmsProject project = this.daoFactory.getStudyDataManager().getProject(projectId);
-		GermplasmList snapList = new GermplasmList();
+		final DmsProject project = this.daoFactory.getStudyDataManager().getProject(projectId);
+		final GermplasmList snapList = new GermplasmList();
 		snapList.setProjectId(projectId);
 		snapList.setProgramUUID(project.getProgramUUID());
 		snapList.setDate(Util.getCurrentDateAsLongValue());
 		snapList.setStatus(1);
 		snapList.setType(type.name());
 		snapList.setParent(null);
-		Long dateLong = Long.valueOf(System.currentTimeMillis());
-		String name = type.name() + "-" + dateLong;
+		final Long dateLong = Long.valueOf(System.currentTimeMillis());
+		final String name = type.name() + "-" + dateLong;
 		snapList.setName(name);
 		snapList.setDescription(name);
 
 		return snapList;
 	}
 
-	protected void updateGermplasmListInfo(GermplasmList germplasmList, int originalListId, int userId) {
+	protected void updateGermplasmListInfo(final GermplasmList germplasmList, final int originalListId, final int userId) {
 
 		final GermplasmList originalGermplasmList = this.daoFactory.getGermplasmListDAO().getById(originalListId);
 
@@ -101,15 +100,15 @@ public class ListDataProjectSaver {
 		}
 	}
 
-	public void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException {
-		GermplasmList crossesList = this.daoFactory.getGermplasmListDAO().getById(crossesListId);
+	public void updateGermlasmListInfoStudy(final int crossesListId, final int studyId) throws MiddlewareQueryException {
+		final GermplasmList crossesList = this.daoFactory.getGermplasmListDAO().getById(crossesListId);
 		if (crossesList != null) {
 			crossesList.setProjectId(studyId);
 		}
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(crossesList);
 	}
 
-	private void setDefaultGermplasmListInfo(GermplasmList snapList, int userId) {
+	private void setDefaultGermplasmListInfo(final GermplasmList snapList, final int userId) {
 		snapList.setListLocation(null);
 		snapList.setUserId(userId);
 		snapList.setNotes(null);
@@ -118,16 +117,16 @@ public class ListDataProjectSaver {
 		snapList.setListRef(null);
 	}
 
-	private GermplasmList getGermplasmList(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+	private GermplasmList getGermplasmList(final int projectId, final GermplasmListType type) throws MiddlewareQueryException {
 		GermplasmList gList = null;
-		List<GermplasmList> tempList = this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		final List<GermplasmList> tempList = this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (tempList != null && !tempList.isEmpty()) {
 			gList = tempList.get(0);
 		}
 		return gList;
 	}
 
-	private void prepareListDataProjectForSaving(ListDataProject listDataProject, GermplasmList snapList) throws MiddlewareQueryException {
+	private void prepareListDataProjectForSaving(final ListDataProject listDataProject, final GermplasmList snapList) throws MiddlewareQueryException {
 		listDataProject.setList(snapList);
 		if (listDataProject.getCheckType() == null) {
 			listDataProject.setCheckType(0);
@@ -176,8 +175,7 @@ public class ListDataProjectSaver {
 
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting List Data Project: ListDataProjectSaver.deleteListDataProject(listDataProject="
-							+ listDataProject + "): " + e.getMessage(),
-					e);
+							+ listDataProject + "): " + e.getMessage(), e);
 		}
 
 	}
@@ -197,8 +195,7 @@ public class ListDataProjectSaver {
 
 			throw new MiddlewareQueryException(
 					"Error encountered while saving List Data Project: ListDataProjectSaver.updateListDataProject(listDataProjects="
-							+ listDataProjects + "): " + e.getMessage(),
-					e);
+							+ listDataProjects + "): " + e.getMessage(), e);
 		}
 
 		return idGermplasmListDataSaved;

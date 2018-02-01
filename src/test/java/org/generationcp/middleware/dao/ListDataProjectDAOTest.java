@@ -54,7 +54,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void beforeTest() {
-		
+
 		this.listDataProjectDAO = new ListDataProjectDAO();
 		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvder);
 		this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
@@ -176,11 +176,11 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		final Integer listId = this.testListDataProject.getList().getId();
 		final List<ListDataProject> listDataProjects = this.middlewareFieldbookService.getListDataProject(listId);
 
-		List<Integer> gids = Lists.transform(listDataProjects, new Function<ListDataProject, Integer>() {
+		final List<Integer> gids = Lists.transform(listDataProjects, new Function<ListDataProject, Integer>() {
 
 			@Nullable
 			@Override
-			public Integer apply(@Nullable ListDataProject listDataProject) {
+			public Integer apply(@Nullable final ListDataProject listDataProject) {
 				return listDataProject.getGermplasmId();
 			}
 		});
@@ -198,7 +198,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		final Integer listId = this.testListDataProject.getList().getId();
 		final List<ListDataProject> listDataProjects = this.middlewareFieldbookService.getListDataProject(listId);
 
-		for (ListDataProject listDataProject : listDataProjects) {
+		for (final ListDataProject listDataProject : listDataProjects) {
 			Assert.assertNotNull(this.listDataProjectDAO.getByListIdAndGid(listId, listDataProject.getGermplasmId()));
 		}
 	}
@@ -209,7 +209,8 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		Assert.assertNull(this.listDataProjectDAO.getByListIdAndGid(listId, this.parentGermplasm.getGid()));
 	}
 
-	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final long noOfTestEntries, final long noOfCheckEntries) {
+	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final long noOfTestEntries,
+			final long noOfCheckEntries) {
 
 		final List<ListDataProject> listDataProjects = new ArrayList<>();
 		for (int i = 0; i < noOfCheckEntries; i++) {

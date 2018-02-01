@@ -87,12 +87,12 @@ public class ListDataProjectSaverTest {
 		final ListDataProjectSaver dataSaver = Mockito.spy(new ListDataProjectSaver(daoFactory));
 		final GermplasmList crossesList = new GermplasmList();
 		final GermplasmListDAO germplasmListDao = Mockito.mock(GermplasmListDAO.class);
-		Integer crossesListId = 5;
+		final Integer crossesListId = 5;
 		Mockito.when(daoFactory.getGermplasmListDAO()).thenReturn(germplasmListDao);
 
 		Mockito.when(germplasmListDao.getById(crossesListId)).thenReturn(crossesList);
 
-		Integer studyId = 15;
+		final Integer studyId = 15;
 		dataSaver.updateGermlasmListInfoStudy(crossesListId, studyId);
 		Assert.assertEquals("The study Id in the crosses germplasm should be the same as what we set " + studyId, studyId,
 				crossesList.getProjectId());
@@ -104,16 +104,16 @@ public class ListDataProjectSaverTest {
 		final ListDataProjectSaver dataSaver = Mockito.spy(new ListDataProjectSaver(daoFactory));
 
 		final ListDataProjectDAO listDataProjectDAO = Mockito.mock(ListDataProjectDAO.class);
-		List<Integer> germplasmList = new ArrayList<>();
+		final List<Integer> germplasmList = new ArrayList<>();
 		germplasmList.add(1);
 		final Integer listId = 5;
 
-		ListDataProject listDataProject1 = new ListDataProject();
+		final ListDataProject listDataProject1 = new ListDataProject();
 		listDataProject1.setEntryId(1);
-		ListDataProject listDataProject2 = new ListDataProject();
+		final ListDataProject listDataProject2 = new ListDataProject();
 		listDataProject2.setEntryId(2);
 
-		List<ListDataProject> listDataProjects = new ArrayList<>();
+		final List<ListDataProject> listDataProjects = new ArrayList<>();
 		listDataProjects.add(listDataProject2);
 
 		Mockito.when(listDataProjectDAO.getByListIdAndGid(listId, 1)).thenReturn(listDataProject1);
@@ -151,14 +151,14 @@ public class ListDataProjectSaverTest {
 		final int newGermplasmListId = 2;
 		final int userId = 99;
 		final List<ListDataProject> listDataProjectList = new ArrayList<ListDataProject>();
-		ListDataProject listDataProject = new ListDataProject();
+		final ListDataProject listDataProject = new ListDataProject();
 		listDataProjectList.add(listDataProject);
 
 		Mockito.doAnswer(new Answer() {
 
 			@Override
 			public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-				GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
+				final GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
 				germplasmList.setId(newGermplasmListId);
 				return null;
 			}
@@ -194,14 +194,14 @@ public class ListDataProjectSaverTest {
 		final int newGermplasmListId = 2;
 		final int userId = 99;
 		final List<ListDataProject> listDataProjectList = new ArrayList<ListDataProject>();
-		ListDataProject listDataProject = new ListDataProject();
+		final ListDataProject listDataProject = new ListDataProject();
 		listDataProjectList.add(listDataProject);
 
 		Mockito.doAnswer(new Answer() {
 
 			@Override
 			public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-				GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
+				final GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
 				germplasmList.setId(newGermplasmListId);
 				return null;
 			}
@@ -242,7 +242,7 @@ public class ListDataProjectSaverTest {
 
 			@Override
 			public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-				GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
+				final GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
 				germplasmList.setId(newGermplasmListId);
 				return null;
 			}
@@ -279,14 +279,14 @@ public class ListDataProjectSaverTest {
 		final int snapShotListId = 1;
 		final int projectId = 1;
 		final List<ListDataProject> listDataProjectList = new ArrayList<ListDataProject>();
-		ListDataProject listDataProject = new ListDataProject();
+		final ListDataProject listDataProject = new ListDataProject();
 		listDataProjectList.add(listDataProject);
 
 		Mockito.doAnswer(new Answer() {
 
 			@Override
 			public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-				GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
+				final GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
 				germplasmList.setId(snapShotListId);
 				return null;
 			}
@@ -323,21 +323,21 @@ public class ListDataProjectSaverTest {
 		final int projectId = 1;
 		final int userId = 99;
 		final List<ListDataProject> listDataProjectList = new ArrayList<ListDataProject>();
-		ListDataProject listDataProject = new ListDataProject();
+		final ListDataProject listDataProject = new ListDataProject();
 		listDataProjectList.add(listDataProject);
 
 		Mockito.doAnswer(new Answer() {
 
 			@Override
 			public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-				GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
+				final GermplasmList germplasmList = (GermplasmList) invocationOnMock.getArguments()[0];
 				germplasmList.setId(snapShotListId);
 				return null;
 			}
 		}).when(germplasmListDAO).saveOrUpdate(Mockito.any(GermplasmList.class));
 
-		List<GermplasmList> tempList = new ArrayList<>();
-		GermplasmList snapList = new GermplasmList();
+		final List<GermplasmList> tempList = new ArrayList<>();
+		final GermplasmList snapList = new GermplasmList();
 		snapList.setId(snapShotListId);
 		tempList.add(snapList);
 
