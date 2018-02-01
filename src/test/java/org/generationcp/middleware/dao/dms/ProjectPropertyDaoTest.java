@@ -12,7 +12,6 @@ package org.generationcp.middleware.dao.dms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +20,8 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.util.Debug;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ProjectPropertyDaoTest extends IntegrationTestBase {
@@ -38,14 +35,14 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	public static final String REP_NO = "REP_NO";
 	public static final String SITE_SOIL_PH = "SITE_SOIL_PH";
 	public static final String SITE_SOIL_PH_TERMID = "9999";
-	private static ProjectPropertyDao dao;
+	private static ProjectPropertyDao projectPropDao;
 	private static CVTermDao cvTermDao;
 
 	@Before
 	public void setUp() throws Exception {
 
-		dao = new ProjectPropertyDao();
-		dao.setSession(this.sessionProvder.getSession());
+		projectPropDao = new ProjectPropertyDao();
+		projectPropDao.setSession(this.sessionProvder.getSession());
 		cvTermDao = new CVTermDao();
 		cvTermDao.setSession(this.sessionProvder.getSession());
 
@@ -57,7 +54,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		final List<String> propertyNames = new ArrayList<String>();
 		propertyNames.add(TRIAL_INSTANCE);
 
-		final Map<String, Map<Integer, VariableType>> results = this.dao.getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
+		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(propertyNames);
 
 		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsValue(VariableType.ENVIRONMENT_DETAIL));
 		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsKey(TermId.TRIAL_INSTANCE_FACTOR.getId()));
@@ -68,7 +65,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final List<Object[]> objectToConvert = this.createObjectToConvert();
 
-		final Map<String, Map<Integer, VariableType>> results = dao.convertToVariablestandardVariableIdsWithTypeMap(objectToConvert);
+		final Map<String, Map<Integer, VariableType>> results = projectPropDao.convertToVariablestandardVariableIdsWithTypeMap(objectToConvert);
 
 		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsValue(VariableType.ENVIRONMENT_DETAIL));
 		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsKey(TermId.TRIAL_INSTANCE_FACTOR.getId()));
@@ -90,7 +87,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariableIdsWithTypeByPropertyNamesVariableIsObsolete() throws Exception {
+	public void testGetStandardVariableIdsWithTypeByAliasWhenVariableIsObsolete() throws Exception {
 
 		final List<String> propertyNames = Arrays.asList(TRIAL_INSTANCE);
 
@@ -99,11 +96,10 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		cvTermDao.saveOrUpdate(trialInstanceTerm);
 		this.sessionProvder.getSession().flush();
 
-		final Map<String, Map<Integer, VariableType>> results = this.dao.getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
+		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(propertyNames);
 
 		// The TRIAL_INSTANCE variable is obsolete so the result should be empty
 		Assert.assertTrue(results.isEmpty());
-
 	}
 
 	private List<Object[]> createObjectToConvert() {

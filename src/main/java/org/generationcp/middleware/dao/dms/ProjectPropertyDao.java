@@ -43,14 +43,14 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	/**
 	 *
-	 * @param propertyNames
+	 * @param variableNames
 	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(final List<String> propertyNames)
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames)
 			 {
 
-		final List<String> propertyNamesInUpperCase = Lists.transform(propertyNames, new Function<String, String>() {
+		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, new Function<String, String>() {
 
 			public String apply(String s) {
 				return s.toUpperCase();
@@ -64,17 +64,23 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 						.add(Projections.property("alias"))
 						.add(Projections.property("variableId"))
 						.add(Projections.property("typeId"))));
-				criteria.add(Restrictions.in("typeId", VariableType.ids()));
-				criteria.add(Restrictions.in("alias", propertyNames));
+				
+				/* Exclude variables used as condition such that variable type in projectprop "Study Detail" as "Study Detail" 
+				 * is not one of the standard categorizations in Ontology Mapping so it will lead to variable being unmapped
+				 */
+				final List<Integer> variableTypes = VariableType.ids();
+				variableTypes.remove(VariableType.STUDY_DETAIL.getId());
+				criteria.add(Restrictions.in("typeId", variableTypes));
+				
+				criteria.add(Restrictions.in("alias", variableNames));
 				criteria.createAlias("property.variable", "variable").add(Restrictions.eq("variable.isObsolete", 0));
-
 				List<Object[]> results = criteria.list();
 				return convertToVariablestandardVariableIdsWithTypeMap(results);
 			}
 		} catch (HibernateException e) {
 			this.logAndThrowException(
 					"Error in getStandardVariableIdsWithTypeByPropertyNames="
-							+ propertyNames + " in ProjectPropertyDao: "
+							+ variableNames + " in ProjectPropertyDao: "
 							+ e.getMessage(), e);
 		}
 
