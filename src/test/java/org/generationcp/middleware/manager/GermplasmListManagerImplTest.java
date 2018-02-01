@@ -211,7 +211,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		final Integer[] gids = this.germplasmTestDataGenerator
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, GERMPLASM_PREFERRED_NAME_PREFIX, this.parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, "ABCD");
+		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, "ABCD", false);
 
 		return nurseryId;
 	}

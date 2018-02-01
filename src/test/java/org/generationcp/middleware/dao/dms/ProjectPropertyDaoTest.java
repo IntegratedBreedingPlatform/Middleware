@@ -15,14 +15,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.DataSetupTest;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
@@ -37,6 +45,21 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	public static final String SITE_SOIL_PH_TERMID = "9999";
 	private static ProjectPropertyDao projectPropDao;
 	private static CVTermDao cvTermDao;
+	
+	@Autowired
+	private GermplasmDataManager germplasmManager;
+	
+	@Autowired
+	private DataImportService dataImportService;
+	
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private FieldbookService middlewareFieldbookService;
+	
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+	private DataSetupTest dataSetupTest;
 
 	@Before
 	public void setUp() throws Exception {
@@ -45,6 +68,13 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		projectPropDao.setSession(this.sessionProvder.getSession());
 		cvTermDao = new CVTermDao();
 		cvTermDao.setSession(this.sessionProvder.getSession());
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
+		}
+		this.dataSetupTest = new DataSetupTest();
+		this.dataSetupTest.setDataImportService(this.dataImportService);
+		this.dataSetupTest.setGermplasmListManager(this.germplasmListManager);
+		this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
 
 	}
 
@@ -89,17 +119,38 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStandardVariableIdsWithTypeByAliasWhenVariableIsObsolete() throws Exception {
 
-		final List<String> propertyNames = Arrays.asList(TRIAL_INSTANCE);
+		final List<String> aliases = Arrays.asList(TRIAL_INSTANCE);
 
 		final CVTerm trialInstanceTerm = cvTermDao.getByName(TRIAL_INSTANCE);
 		trialInstanceTerm.setIsObsolete(true);
 		cvTermDao.saveOrUpdate(trialInstanceTerm);
 		this.sessionProvder.getSession().flush();
 
-		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(propertyNames);
+		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(aliases);
 
 		// The TRIAL_INSTANCE variable is obsolete so the result should be empty
 		Assert.assertTrue(results.isEmpty());
+	}
+	
+	@Test
+	public void testGetStandardVariableIdsWithTypeByAliasExcludeStudyDetail() throws Exception {
+		// Seed two nurseries: 1)with LOCATION_NAME used as "Study Detail" and 2) with LOCATION_NAME used as "Environment Detail"
+		this.createNurseryTestData(true);
+		this.createNurseryTestData(false);
+		
+		final List<String> aliases = Arrays.asList(DataSetupTest.LOCATION_NAME);
+		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(aliases);
+		Assert.assertNotNull(results);
+		Assert.assertFalse(results.isEmpty());
+		for (final String alias : aliases) {
+			final Map<Integer, VariableType> variableMap = results.get(alias);
+			for (final VariableType variableType : variableMap.values()) {
+				Assert.assertFalse(VariableType.STUDY_DETAIL.equals(variableType));
+				if (DataSetupTest.LOCATION_NAME.equals(alias)) {
+					Assert.assertTrue(VariableType.ENVIRONMENT_DETAIL.equals(variableType));
+				}
+			}
+		}
 	}
 
 	private List<Object[]> createObjectToConvert() {
@@ -116,6 +167,20 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		objectToConvert.add(new Object[] {SITE_SOIL_PH, Integer.valueOf(SITE_SOIL_PH_TERMID), VariableType.TRAIT.getId()});
 
 		return objectToConvert;
+	}
+	
+	private int createNurseryTestData(final boolean locationIsStudyDetail) {
+		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
+		final String cropPrefix = "BJ06";
+		Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+
+		final Integer[] gids = this.germplasmTestDataGenerator
+				.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX,
+						parentGermplasm);
+
+		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix, locationIsStudyDetail);
+
+		return nurseryId;
 	}
 
 }
