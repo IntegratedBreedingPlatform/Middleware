@@ -233,17 +233,12 @@ public class FieldbookServiceImplTest {
 		final int userId = 3;
 		final GermplasmList originalGermplasmList = new GermplasmList();
 		originalGermplasmList.setId(originalListId);
-		originalGermplasmList.setProgramUUID(PROGRAM_UUID);
-		originalGermplasmList.setStatus(101);
-
-		Mockito.when(this.germplasmListManager.getGermplasmListById(originalListId)).thenReturn(originalGermplasmList);
-
 
 		this.fieldbookServiceImpl.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, new ArrayList<ListDataProject>(),
 				userId);
 
 		Mockito.verify(listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
-				new ArrayList<ListDataProject>(), userId, originalGermplasmList.getProgramUUID(), originalGermplasmList.getStatus());
+				new ArrayList<ListDataProject>(), userId);
 
 
 	}

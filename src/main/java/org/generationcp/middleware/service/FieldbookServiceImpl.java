@@ -1139,11 +1139,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId,
 			final List<ListDataProject> listDatas, final int userId) {
 
-		// Get the original germplasm list so that we can inherit its programUUID and list status
-		final GermplasmList originalGermplasmList = this.germplasmListManager.getGermplasmListById(originalListId);
-
-		return this.listDataProjectSaver.saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId,
-				originalGermplasmList.getProgramUUID(), originalGermplasmList.getStatus());
+		return this.listDataProjectSaver.saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
 
 	}
 

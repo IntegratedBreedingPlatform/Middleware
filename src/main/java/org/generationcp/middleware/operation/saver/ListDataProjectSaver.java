@@ -30,14 +30,14 @@ public class ListDataProjectSaver {
 	}
 
 	public int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> listDatas,
-			int userId, String programUUID, int listStatus) {
+			int userId) {
 
 		boolean isAdvanced = type == GermplasmListType.ADVANCED || GermplasmListType.isCrosses(type);
 		GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
 		boolean isCreate = snapList == null;
 
 		if (isCreate) {
-			snapList = this.createInitialGermplasmList(projectId, type, programUUID, listStatus);
+			snapList = this.createInitialGermplasmList(projectId, type);
 		}
 
 		if (originalListId != null) {
@@ -63,13 +63,14 @@ public class ListDataProjectSaver {
 		return snapList.getId();
 	}
 
-	protected GermplasmList createInitialGermplasmList(int projectId, GermplasmListType type, String programUUID, int listStatus) {
+	protected GermplasmList createInitialGermplasmList(int projectId, GermplasmListType type) {
 
+		DmsProject project = this.daoFactory.getStudyDataManager().getProject(projectId);
 		GermplasmList snapList = new GermplasmList();
 		snapList.setProjectId(projectId);
-		snapList.setProgramUUID(programUUID);
+		snapList.setProgramUUID(project.getProgramUUID());
 		snapList.setDate(Util.getCurrentDateAsLongValue());
-		snapList.setStatus(listStatus);
+		snapList.setStatus(1);
 		snapList.setType(type.name());
 		snapList.setParent(null);
 		Long dateLong = Long.valueOf(System.currentTimeMillis());
@@ -80,18 +81,21 @@ public class ListDataProjectSaver {
 		return snapList;
 	}
 
-	private void updateGermplasmListInfo(GermplasmList germplasmList, int originalListId, int userId) throws MiddlewareQueryException {
-		GermplasmList origList = this.daoFactory.getGermplasmListDAO().getById(originalListId);
-		if (origList != null) {
-			germplasmList.setListLocation(origList.getListLocation());
-			germplasmList.setUserId(origList.getUserId());
-			germplasmList.setNotes(origList.getNotes());
-			germplasmList.setsDate(origList.getsDate());
-			germplasmList.seteDate(origList.geteDate());
-			germplasmList.setName(origList.getName());
-			germplasmList.setUserId(origList.getUserId());
-			germplasmList.setDescription(origList.getDescription());
+	protected void updateGermplasmListInfo(GermplasmList germplasmList, int originalListId, int userId) {
+
+		final GermplasmList originalGermplasmList = this.daoFactory.getGermplasmListDAO().getById(originalListId);
+
+		if (originalGermplasmList != null) {
+			germplasmList.setListLocation(originalGermplasmList.getListLocation());
+			germplasmList.setUserId(originalGermplasmList.getUserId());
+			germplasmList.setNotes(originalGermplasmList.getNotes());
+			germplasmList.setsDate(originalGermplasmList.getsDate());
+			germplasmList.seteDate(originalGermplasmList.geteDate());
+			germplasmList.setName(originalGermplasmList.getName());
+			germplasmList.setDescription(originalGermplasmList.getDescription());
 			germplasmList.setListRef(originalListId);
+			germplasmList.setProgramUUID(originalGermplasmList.getProgramUUID());
+			germplasmList.setStatus(originalGermplasmList.getStatus());
 		} else {
 			this.setDefaultGermplasmListInfo(germplasmList, userId);
 		}
