@@ -139,5 +139,11 @@
 		<dropTable cascadeConstraints="true"  tableName="schema_version"/>
 	</changeSet>
 	
+	<changeSet author="mderamos" id="v8.1.1-19">
+		<preConditions onFail="MARK_RAN">
+				<tableExists tableName="template_setting" schemaName="workbench"/>
+		</preConditions>
+		<dropTable tableName="template_setting" schemaName="workbench"/>
+	</changeSet>
 	
 </databaseChangeLog>

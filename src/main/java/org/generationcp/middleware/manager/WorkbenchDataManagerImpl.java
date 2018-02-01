@@ -23,7 +23,6 @@ import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
-import org.generationcp.middleware.dao.TemplateSettingDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
@@ -41,7 +40,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
@@ -117,7 +115,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return projectDao;
 	}
 
-	//FIXME Do not expose this DAO
 	@Override
 	public ProjectUserInfoDAO getProjectUserInfoDao() {
 
@@ -126,7 +123,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return projectUserInfoDao;
 	}
 
-	//FIXME Do not expose this DAO
 	@Override
 	public ToolDAO getToolDao() {
 
@@ -171,14 +167,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return workbenchSidebarCategoryLinkDAO;
 	}
 
-	private TemplateSettingDAO getTemplateSettingDao() {
-
-		final TemplateSettingDAO templateSettingDAO = new TemplateSettingDAO();
-		templateSettingDAO.setSession(this.getCurrentSession());
-		return templateSettingDAO;
-	}
-
-	//FIXME Do not expose this DAO
 	@Override
 	public StandardPresetDAO getStandardPresetDAO() {
 		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
@@ -281,15 +269,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId);
 			for (final ProjectUserInfo projectUserInfo : projectUserInfos) {
 				this.deleteProjectUserInfoDao(projectUserInfo);
-			}
-
-			// remove template settings per project
-			final TemplateSetting setting = new TemplateSetting();
-			setting.setProjectId(projectId.intValue());
-
-			final List<TemplateSetting> templateSettings = this.getTemplateSettings(setting);
-			for (final TemplateSetting templateSetting : templateSettings) {
-				this.deleteTemplateSetting(templateSetting);
 			}
 
 		} catch (final Exception e) {
@@ -796,112 +775,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	public void setInstallationDirectory(final String installationDirectory) {
 		this.installationDirectory = installationDirectory;
-	}
-
-	@Override
-	public List<TemplateSetting> getTemplateSettings(final TemplateSetting templateSettingFilter) {
-		return this.getTemplateSettingDao().get(templateSettingFilter);
-	}
-
-	@Override
-	public Integer addTemplateSetting(final TemplateSetting templateSetting) {
-
-		try {
-
-			// Save if non-existing
-			if (this.getTemplateSettings(templateSetting).isEmpty()) {
-
-				this.updateIsDefaultOfSameProjectAndToolTemplateSetting(templateSetting);
-				this.getTemplateSettingDao().save(templateSetting);
-
-			} else {
-				throw new MiddlewareQueryException("Template setting already exists.");
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while adding Template Setting: " + "WorkbenchDataManager.addTemplateSetting(templateSetting="
-							+ templateSetting + "): " + e.getMessage(), e);
-		}
-		return templateSetting.getTemplateSettingId();
-	}
-
-	@Override
-	public void updateTemplateSetting(final TemplateSetting templateSetting) {
-
-		try {
-
-			this.updateIsDefaultOfSameProjectAndToolTemplateSetting(templateSetting);
-			this.getTemplateSettingDao().merge(templateSetting);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Cannot update TemplateSeting: WorkbenchDataManager.updateTemplateSetting(templateSetting=" + templateSetting + "): "
-							+ e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * If the new template setting's isDefault == true, set all others with the same project id and tool to isDefault = false
-	 */
-	private void updateIsDefaultOfSameProjectAndToolTemplateSetting(final TemplateSetting templateSetting) {
-		if (templateSetting.isDefault()) {
-			final TemplateSetting templateSettingFilter =
-					new TemplateSetting(null, templateSetting.getProjectId(), null, templateSetting.getTool(), null, null);
-
-			final List<TemplateSetting> sameProjectAndToolSettings = this.getTemplateSettings(templateSettingFilter);
-
-			if (!sameProjectAndToolSettings.isEmpty()) {
-				for (final TemplateSetting setting : sameProjectAndToolSettings) {
-					if (!setting.getTemplateSettingId().equals(templateSetting.getTemplateSettingId()) && setting.isDefault()) {
-						setting.setIsDefault(Boolean.FALSE);
-						this.getTemplateSettingDao().merge(setting);
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public void deleteTemplateSetting(final TemplateSetting templateSetting) {
-
-		try {
-
-			this.getTemplateSettingDao().makeTransient(templateSetting);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(templateSetting=" + templateSetting + "): "
-							+ e.getMessage(), e);
-		}
-
-	}
-
-	@Override
-	public void deleteTemplateSetting(final Integer id) {
-
-		try {
-
-			final TemplateSetting templateSettingsFilter = new TemplateSetting(id, null, null, null, null, null);
-			templateSettingsFilter.setIsDefaultToNull();
-			final List<TemplateSetting> settings = this.getTemplateSettings(templateSettingsFilter);
-
-			if (settings.size() == 1) {
-				this.getTemplateSettingDao().makeTransient(settings.get(0));
-			} else {
-				throw new MiddlewareQueryException(
-						"Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(id=" + id + ")");
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(id=" + id + "): " + e.getMessage(), e);
-		}
-
 	}
 
 	@Override

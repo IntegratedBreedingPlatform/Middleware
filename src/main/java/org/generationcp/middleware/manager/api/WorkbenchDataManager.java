@@ -25,7 +25,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
@@ -557,42 +556,6 @@ public interface WorkbenchDataManager {
 	 * @return the all workbench sidebar links by category id
 	 */
 	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category);
-
-	/**
-	 * Gets the template settings.
-	 *
-	 * @param templateSettingFilter the template setting filter. Fill only the values to filter. Set all other values to null.
-	 * @return the template settings
-	 */
-	List<TemplateSetting> getTemplateSettings(TemplateSetting templateSettingFilter);
-
-	/**
-	 * Adds the template setting.
-	 *
-	 * @param templateSetting the template setting
-	 */
-	Integer addTemplateSetting(TemplateSetting templateSetting);
-
-	/**
-	 * Update template setting.
-	 *
-	 * @param templateSetting the template setting
-	 */
-	void updateTemplateSetting(TemplateSetting templateSetting);
-
-	/**
-	 * Delete template setting.
-	 *
-	 * @param templateSetting the template setting
-	 */
-	void deleteTemplateSetting(TemplateSetting templateSetting);
-
-	/**
-	 * Delete template setting with the given id.
-	 *
-	 * @param id the template setting id to delete
-	 */
-	void deleteTemplateSetting(Integer id);
 
 	/**
 	 * Returns the project last accessed regardless of user.
