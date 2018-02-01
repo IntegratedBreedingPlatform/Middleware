@@ -6,10 +6,144 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
-	<changeSet author="mderamos" id="v8.1.1-1">
+	<!-- Cannot drop workbench_project_user_role table because it is being used by "beta16-1" Liquibase script.
+		 Dropping the table causes a Liquibase error for new crops hence we just empty the table with the script below.
+	 -->
+	<changeSet author="darla" id="v8.1.1-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM workbench_project_user_role;
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_project_user_role;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'workbench_project_user_role' AND CONSTRAINT_NAME='fk_project_user_role_1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+	    <dropForeignKeyConstraint baseTableName="workbench_project_user_role" constraintName="fk_project_user_role_1"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'workbench_project_user_role' AND CONSTRAINT_NAME='fk_project_user_role_2' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+	    <dropForeignKeyConstraint baseTableName="workbench_project_user_role" constraintName="fk_project_user_role_2"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-4">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_role"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_role"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-5">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_project_workflow_step"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_project_workflow_step"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_workflow_step_tool"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_workflow_step_tool"/>
+	</changeSet>
+
+    <changeSet author="darla" id="v8.1.1-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_workflow_template_step"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_workflow_template_step"/>
+	</changeSet>
+		
+	<changeSet author="darla" id="v8.1.1-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_workflow_step"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_workflow_step"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-9">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_workflow_template"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_workflow_template"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-10">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_dataset"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_dataset"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-11">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_input"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_input"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-12">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_output"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_output"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-13">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_transform"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_transform"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-14">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_config"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_config"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-15">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_tool_license_info"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_tool_license_info"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-16">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_runtime_data"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_runtime_data"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-17">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_security_question"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_security_question"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v8.1.1-18">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="schema_version"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="schema_version"/>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="v8.1.1-19">
 		<preConditions onFail="MARK_RAN">
 				<tableExists tableName="template_setting" schemaName="workbench"/>
 		</preConditions>
 		<dropTable tableName="template_setting" schemaName="workbench"/>
 	</changeSet>
+	
 </databaseChangeLog>
