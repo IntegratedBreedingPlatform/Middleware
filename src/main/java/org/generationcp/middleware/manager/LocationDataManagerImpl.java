@@ -82,14 +82,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getLocationsByUniqueIDAndExcludeLocationTypes(final String programUUID,
-			final List<Integer> locationTypesToExclude) {
-		final List<Location> locations = new ArrayList<>();
-		locations.addAll(this.getLocationDao().getByUniqueIDAndExcludeLocationTypes(programUUID, locationTypesToExclude));
-		return locations;
-	}
-
-	@Override
 	public long countLocationsByUniqueID(final String programUUID) {
 		return this.countAllByMethod(this.getLocationDao(), "countByUniqueID", new Object[] {programUUID}, new Class[] {String.class});
 	}

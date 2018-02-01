@@ -251,27 +251,6 @@ public class FieldbookServiceImplTest {
 
 	}
 
-	@Test
-	public void testGetAllLocations() {
-
-		final Integer blockTypeId = 99;
-
-		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode()))
-				.thenReturn(blockTypeId);
-
-		this.fieldbookServiceImpl.getAllLocations(PROGRAM_UUID);
-
-		final ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-		Mockito.verify(this.locationDataManager).getLocationsByUniqueIDAndExcludeLocationTypes(Mockito.eq(PROGRAM_UUID), captor.capture());
-
-		final List<Integer> excludeList = captor.getValue();
-
-		// Make sure that only BLOCK Location Type is excluded from all locations list
-		Assert.assertTrue(excludeList.size() == 1);
-		Assert.assertTrue(excludeList.contains(blockTypeId));
-
-	}
-
 	private List<Pair<Germplasm, List<Name>>> createGermplasms() {
 		final List<Pair<Germplasm, List<Name>>> germplasms = new ArrayList<>();
 		final Name name = new Name();
