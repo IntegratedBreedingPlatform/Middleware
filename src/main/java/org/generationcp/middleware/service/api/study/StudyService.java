@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
 
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 public interface StudyService {
@@ -51,4 +53,7 @@ public interface StudyService {
 	 */
 	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId);
 
+	List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO);
+
+	long countPhenotypes(PhenotypeSearchRequestDTO requestDTO);
 }
