@@ -14,6 +14,7 @@ import java.util.List;
 
 public class ListDataProjectSaver {
 
+	public static final int DEFAULT_ACTIVE = 1;
 	private Saver daoFactory;
 
 	public ListDataProjectSaver() {
@@ -69,7 +70,8 @@ public class ListDataProjectSaver {
 		snapList.setProjectId(projectId);
 		snapList.setProgramUUID(project.getProgramUUID());
 		snapList.setDate(Util.getCurrentDateAsLongValue());
-		snapList.setStatus(1);
+		// Set the status to the default list status (1 - active)
+		snapList.setStatus(DEFAULT_ACTIVE);
 		snapList.setType(type.name());
 		snapList.setParent(null);
 		final Long dateLong = Long.valueOf(System.currentTimeMillis());
