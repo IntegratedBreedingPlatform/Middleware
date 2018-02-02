@@ -66,11 +66,14 @@ public class User implements Serializable, BeanFormState {
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 
 	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.name, users.ustatus, person.pemail\n"
-			+ "FROM users JOIN workbench_project_user_role pu ON users.userid = pu.user_id,\n" + "persons person,\n"
-			+ "workbench_project pp,\n" + "workbench_role role\n" + "WHERE pp.project_uuid = :project_uuid  \n"
-			+ "and person.personid=users.personid\n" + "and role.role_id = pu.role_id\n"
-			+ "and pu.project_id = pp.project_id GROUP BY users.userid";
+		"SELECT users.userid, users.uname, person.fname, person.lname, role.role, users.ustatus, person.pemail \n"
+		+ "FROM users \n"
+		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
+		+ "INNER JOIN persons person ON person.personid = users.personid \n "
+		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
+		+ "INNER JOIN users_roles role ON role.userid = users.userid "
+		+ "WHERE pp.project_uuid = :project_uuid \n "
+		+ "GROUP BY users.userid";
 
 	public static final String GET_USERS_ASSOCIATED_TO_STUDY = "SELECT DISTINCT \n"
 			+ "  person.personid AS personId, \n"
@@ -347,19 +350,16 @@ public class User implements Serializable, BeanFormState {
 
 	@Override
 	public boolean isActive() {
-		// TODO Auto-generated method stub
 		return this.active;
 	}
 
 	@Override
 	public void setActive(Boolean val) {
-		// TODO Auto-generated method stub
 		this.active = val;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
 		return this.enabled;
 	}
 

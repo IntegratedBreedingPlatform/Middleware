@@ -31,8 +31,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -175,16 +173,8 @@ public class DataSetupTest extends IntegrationTestBase {
 		program.setLastOpenDate(new Date(System.currentTimeMillis()));
 		this.workbenchDataManager.addProject(program);
 
-		final List<ProjectUserRole> projectUserRoles = new ArrayList<ProjectUserRole>();
-		final List<Role> allRolesList = this.workbenchDataManager.getAllRoles();
-		for (final Role role : allRolesList) {
-			final ProjectUserRole projectUserRole = new ProjectUserRole();
-			projectUserRole.setUserId(workbenchUser.getUserid());
-			projectUserRole.setRole(role);
-			projectUserRole.setProject(program);
-			projectUserRoles.add(projectUserRole);
-		}
-		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
+		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
+//		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
 		final User cropDBUser = workbenchUser.copy();
 		final Person cropDBPerson = person.copy();
@@ -198,7 +188,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		ibdbUserMap.setIbdbUserId(cropDBUser.getUserid());
 		this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
 
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program.getProjectId().intValue(),
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program,
 				workbenchUser.getUserid());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
 
