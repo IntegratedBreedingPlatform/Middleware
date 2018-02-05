@@ -1,10 +1,12 @@
 package org.generationcp.middleware.service.api.phenotype;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@AutoProperty
 public class PhenotypeSearchDTO {
 	private String observationUnitDbId;
 	private String observationUnitName;

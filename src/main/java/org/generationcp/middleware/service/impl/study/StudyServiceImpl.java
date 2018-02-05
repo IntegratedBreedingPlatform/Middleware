@@ -591,6 +591,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 		StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
 		List<Integer> cvTermIds = requestDTO.getCvTermIds();
+
+		if (requestDTO.getStudyDbId() != null) {
+			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
+		}
+
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
 		}
@@ -604,6 +609,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
 			sqlQuery.setParameterList("cvTermIds", cvTermIds);
+		}
+
+		if (requestDTO.getStudyDbId() != null) {
+			sqlQuery.setParameter("studyDbId", requestDTO.getStudyDbId());
 		}
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")

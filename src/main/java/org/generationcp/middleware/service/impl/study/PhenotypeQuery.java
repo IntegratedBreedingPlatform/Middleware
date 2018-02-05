@@ -39,6 +39,8 @@ public class PhenotypeQuery {
 		+ "WHERE 1 = 1 " //
 		; //
 
+	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id = :studyDbId ";
+
 	public static final String PHENOTYPE_SEARCH_OBSERVATION_FILTER = " AND exists(SELECT 1 " //
 		+ " FROM nd_experiment_phenotype ndeph " //
 		+ "   INNER JOIN phenotype ph ON ndeph.phenotype_id = ph.phenotype_id " //
