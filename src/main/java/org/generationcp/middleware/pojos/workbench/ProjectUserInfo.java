@@ -19,6 +19,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -42,8 +44,9 @@ public class ProjectUserInfo implements Serializable {
 	@Column(name = "user_info_id")
 	private Integer userInfoId;
 
-	@Column(name = "project_id")
-	private Integer projectId;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
 	@Column(name = "user_id")
 	private Integer userId;
@@ -55,13 +58,13 @@ public class ProjectUserInfo implements Serializable {
 	public ProjectUserInfo() {
 	}
 
-	public ProjectUserInfo(Integer projectId, Integer userId) {
-		this.setProjectId(projectId);
+	public ProjectUserInfo(final Project project, Integer userId) {
+		this.setProject(project);
 		this.setUserId(userId);
 	}
 
-	public ProjectUserInfo(Integer projectId, Integer userId, Date lastOpenDate) {
-		this.setProjectId(projectId);
+	public ProjectUserInfo(final Project project, Integer userId, Date lastOpenDate) {
+		this.setProject(project);
 		this.setUserId(userId);
 		this.setLastOpenDate(lastOpenDate);
 	}
@@ -103,8 +106,8 @@ public class ProjectUserInfo implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ProjectUserInfo [projectUserId=");
 		builder.append(this.getUserInfoId());
-		builder.append(", projectId=");
-		builder.append(this.getProjectId());
+		builder.append(", project=");
+		builder.append(this.getProject());
 		builder.append(", userId=");
 		builder.append(this.getUserId());
 		builder.append(", lastOpenDate=");
@@ -121,12 +124,12 @@ public class ProjectUserInfo implements Serializable {
 		this.userInfoId = userInfoId;
 	}
 
-	public Integer getProjectId() {
-		return this.projectId;
+	public Project getProject() {
+		return this.project;
 	}
 
-	public void setProjectId(Integer projectId) {
-		this.projectId = projectId;
+	public void setProject(final Project project) {
+		this.project = project;
 	}
 
 	public Integer getUserId() {
