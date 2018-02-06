@@ -52,15 +52,17 @@ public class PhenotypeQuery {
 		;
 
 	public static final String PHENOTYPE_SEARCH_OBSERVATIONS = "SELECT " //
-		+ "  ndeph.nd_experiment_id, " //
-		+ "  ndeph.nd_experiment_phenotype_id, " //
-		+ "  cvt.cvterm_id, " //
-		+ "  cvt.name, " //
-		+ "  ph.value " //
+		+ "  ndeph.nd_experiment_id as expid, " //
+		+ "  ndeph.nd_experiment_phenotype_id as nd_exp_phen_id, " //
+		+ "  cvt.cvterm_id as cvterm_id, " //
+		+ "  cvt.name as cvterm_name, " //
+		+ "  ph.value as value , " //
+		+ "  cvp.value as crop_ontology_id "
 		+ "FROM " //
 		+ "  nd_experiment_phenotype ndeph" //
 		+ "  INNER JOIN phenotype ph ON ndeph.phenotype_id = ph.phenotype_id " //
 		+ "  INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
+		+ "  LEFT JOIN cvtermprop cvp on (cvp.cvterm_id = cvt.cvterm_id and cvp.type_id = 1226)"
 		+ "WHERE ndeph.nd_experiment_id in (:ndExperimentIds)" //
 		;
 

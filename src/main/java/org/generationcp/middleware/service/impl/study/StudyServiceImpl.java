@@ -637,6 +637,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				observationUnit.setObservationUnitDbId((String) row[1]); // plot_id
 				observationUnit.setObservationUnitName((String) row[2]);
 				observationUnit.setObservationLevel((String) row[3]);
+				observationUnit.setObservationLevels("1");
 				observationUnit.setPlantNumber((String) row[4]);
 				observationUnit.setGermplasmDbId((String) row[5]);
 				observationUnit.setGermplasmName((String) row[6]);
@@ -665,12 +666,21 @@ public class StudyServiceImpl extends Service implements StudyService {
 			// Get observations (Traits)
 			final SQLQuery observationsQuery = this.getCurrentSession().createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS);
 			observationsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
+			observationsQuery.addScalar("expid").addScalar("nd_exp_phen_id").addScalar("cvterm_id")
+					.addScalar("cvterm_name", new StringType()).
+					addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType());
 			List<Object[]> observationResults = observationsQuery.list();
 
 			for (final Object[] result : observationResults) {
 				Integer ndExperimentId = (Integer) result[0];
 
 				PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
+				final String variableId = (result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
+				observation.setObservationVariableDbId(variableId);
+				observation.setObservationVariableName((String) result[3]);
+				observation.setObservationTimeStamp("");
+				observation.setSeason("");
+				observation.setCollector("");
 				observation.setObservationDbId((Integer) result[1]);
 				observation.setValue((String) result[4]);
 
@@ -693,10 +703,18 @@ public class StudyServiceImpl extends Service implements StudyService {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
 		}
 
+		if (requestDTO.getStudyDbId() != null) {
+			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
+		}
+
 		final SQLQuery query = this.getCurrentSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
 
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
 			query.setParameterList("cvTermIds", cvTermIds);
+		}
+
+		if (requestDTO.getStudyDbId() != null) {
+			query.setParameter("studyDbId", requestDTO.getStudyDbId());
 		}
 
 		return ((BigInteger) query.uniqueResult()).longValue();
