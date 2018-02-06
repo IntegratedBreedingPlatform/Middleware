@@ -455,7 +455,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertTrue(aculcoLoc.getGeoref().getLon() == 90.5);
 			Assert.assertTrue(aculcoLoc.getGeoref().getAlt() == 2080);
 
-			// test LocationDAO.getLocationDetails()
 			List<LocationDetails> locationDetails = this.manager.getLocationDetailsByLocId(aculcoLoc.getLocid(), 0, Integer.MAX_VALUE);
 
 			locationDetails.get(0).getLongitude();

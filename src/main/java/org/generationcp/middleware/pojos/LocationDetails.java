@@ -114,6 +114,10 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	@Column(name = "province_name")
 	private String provinceName;
 
+	@Basic(optional = true)
+	@Column(name = "province_id")
+	private Integer provinceId;
+
 	public LocationDetails() {
 	}
 
@@ -296,5 +300,13 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	public void setCountryName(final String countryName) {
 		this.countryName = countryName;
+	}
+
+	public Integer getProvinceId() {
+		return provinceId;
+	}
+
+	public void setProvinceId(final Integer provinceId) {
+		this.provinceId = provinceId;
 	}
 }

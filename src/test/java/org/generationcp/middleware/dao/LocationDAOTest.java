@@ -176,13 +176,14 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final List<LocationDetails> result = locationDAO.getLocationDetails(location.getLocid(), 0, Integer.MAX_VALUE);
 		final LocationDetails locationDetails = result.get(0);
 		final Location province = locationDAO.getById(provinceId);
-		
+
 		Assert.assertEquals(lname, locationDetails.getLocationName());
 		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
 		Assert.assertEquals(ltype, locationDetails.getLtype().intValue());
 		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
 		Assert.assertEquals(cntryid, locationDetails.getCntryid().intValue());
 		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
+		Assert.assertEquals(provinceId, locationDetails.getProvinceId().intValue());
 		Assert.assertEquals(programUUID, locationDetails.getProgramUUID());
 
 		Assert.assertEquals("COUNTRY", locationDetails.getLocationType());
@@ -204,7 +205,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
 		location.setCntryid(cntryid);
 		// Province Badakhshan
-		location.setSnl1id(1001);
+		final int provinceId = 1001;
+		location.setSnl1id(provinceId);
 
 		locationDAO.saveOrUpdate(location);
 		final Location province = locationDAO.getById(1001);
@@ -221,6 +223,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(programUUID, locationDetails.getProgramUUID());
 		Assert.assertEquals(country.getLname(), locationDetails.getCountryName());
 		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
+		Assert.assertEquals(provinceId, locationDetails.getProvinceId().intValue());
 
 
 		Assert.assertEquals("COUNTRY", locationDetails.getLocationType());
