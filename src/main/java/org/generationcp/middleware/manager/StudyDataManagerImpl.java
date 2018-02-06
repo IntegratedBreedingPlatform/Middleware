@@ -1183,4 +1183,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Map<Integer, List<PlantDTO>> getSampledPlants(final Integer studyId) {
 		return this.getExperimentDao().getSampledPlants(studyId);
 	}
+
+	@Override
+	public Map<String, Integer> getMappedEnvironmentInstances(final Integer studyId) {
+		final List<Geolocation> geolocations = this.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		final Map<String, Integer> map = new HashMap<>();
+		for (final Geolocation geolocation : geolocations) {
+			map.put(geolocation.getDescription(), geolocation.getLocationId());
+		}
+		return map;
+	}
 }
