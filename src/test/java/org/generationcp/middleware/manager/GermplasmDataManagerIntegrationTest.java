@@ -27,6 +27,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -63,6 +64,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	public static final String separator = "-";
@@ -96,6 +102,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private ProgramFavoriteTestDataInitializer programFavoriteTestDataInitializer;
+
+	private UserDefinedFieldDAO userDefinedFieldDAO;
 
 	@Before
 	public void setUp() throws Exception {
@@ -133,6 +141,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			this.transactionDAO.setSession(this.sessionProvder.getSession());
 		}
 
+		if (this.userDefinedFieldDAO == null) {
+			this.userDefinedFieldDAO = new UserDefinedFieldDAO();
+			this.userDefinedFieldDAO.setSession(this.sessionProvder.getSession());
+		}
 
 		// Make sure a seed User(1) is present in the crop db otherwise add one
 		User user = this.userDataManager.getUserById(1);
@@ -1220,4 +1232,84 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
+	public void testGetAttributeValue(){
+		final String attributeVal = "TEST_ATTRIBUTE";
+		final Germplasm germplasm = createGermplasm();
+		assertThat(germplasm.getGid(),is(notNullValue()));
+
+		final Germplasm germplasmDB = this.germplasmDAO.getById(germplasm.getGid());
+		assertThat(germplasm, is(equalTo(germplasmDB)));
+		assertThat(germplasmDB,is(notNullValue()));
+
+		final UserDefinedField userdefinedField = createUserdefinedField("ATRIBUTS","TEST_ATT");
+		assertThat(userdefinedField.getFldno(),is(notNullValue()));
+
+		final UserDefinedField userdefinedFieldDB =this.userDefinedFieldDAO.getById(userdefinedField.getFldno());
+		assertThat(userdefinedFieldDB,is(notNullValue()));
+		assertThat(userdefinedField, is(equalTo(userdefinedFieldDB)));
+
+		final Attribute attr = createAttribute(germplasmDB, userdefinedFieldDB,attributeVal);
+		assertThat(attr.getAid(),is(notNullValue()));
+
+		final Attribute attrDB = this.germplasmDataManager.getAttributeById(attr.getAid());
+		assertThat(attrDB,is(notNullValue()));
+		assertThat(attr, is(equalTo(attrDB)));
+
+
+		final String attributeValue = this.germplasmDataManager.getAttributeValue(germplasmDB.getGid(), userdefinedField.getFcode());
+		assertThat(attributeValue,is(notNullValue()));
+		assertThat(attributeVal,is(attributeValue));
+	}
+
+	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
+		final Attribute attr = new Attribute();
+		attr.setAid(1);
+		attr.setGermplasmId(germplasm.getGid());
+		attr.setTypeId(userDefinedField.getFldno());
+		attr.setUserId(1);
+		attr.setAval(aval);
+		attr.setLocationId(0);
+		attr.setReferenceId(null);
+		attr.setAdate(20180206);
+
+		this.germplasmDataManager.addAttribute(attr);
+		return attr;
+	}
+
+	private UserDefinedField createUserdefinedField(final String ftable, final String fcode) {
+		final UserDefinedField usdl = new UserDefinedField();
+		usdl.setFtable(ftable);
+		usdl.setFtype("PASSPORT");
+		usdl.setFcode(fcode);
+		usdl.setFname("Test");
+		usdl.setFfmt(separator);
+		usdl.setFdesc(separator);
+		usdl.setLfldno(0);
+		usdl.setLfldno(0);
+		usdl.setFuid(0);
+		usdl.setFdate(20180206);
+		usdl.setScaleid(0);
+
+		this.userDefinedFieldDAO.save(usdl);
+		return usdl;
+	}
+
+	private Germplasm createGermplasm(){
+		final Germplasm germplasm = new Germplasm();
+		germplasm.setGid(1166066);
+		germplasm.setMethodId(31);
+		germplasm.setGnpgs(-1);
+		germplasm.setGrplce(-1);
+		germplasm.setGpid1(0);
+		germplasm.setGpid2(0);
+		germplasm.setUserId(1);
+		germplasm.setLgid(0);
+		germplasm.setLocationId(0);
+		germplasm.setGdate(20180206);
+		germplasm.setReferenceId(0);
+
+		this.germplasmDAO.save(germplasm);
+		return germplasm;
+	}
 }
