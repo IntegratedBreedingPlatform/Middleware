@@ -61,6 +61,8 @@ public class StudyDetails implements Serializable {
 
 	private String description;
 
+	private String studyUpdate;
+
 	public StudyDetails() {
 
 	}
@@ -459,4 +461,11 @@ public class StudyDetails implements Serializable {
 		Debug.println(indent + 3, "Description: " + this.description);
 	}
 
+	public String getStudyUpdate() {
+		return studyUpdate;
+	}
+
+	public void setStudyUpdate(final String studyUpdate) {
+		this.studyUpdate = studyUpdate;
+	}
 }

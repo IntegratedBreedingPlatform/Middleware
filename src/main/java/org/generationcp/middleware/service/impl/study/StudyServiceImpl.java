@@ -166,11 +166,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 		StringBuffer sql = new StringBuffer()
 		.append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ")
 		.append("	p.program_uuid AS programUUID, p.study_type AS studyType, ppObjective.value AS objective, ")
-		.append("	ppStartDate.value AS startDate, ppEndDate.value AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason.value AS season ")
+		.append("	p.start_date AS startDate, p.end_date AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason"
+			+ ".value AS season ")
 		.append(" FROM project p ")
 		.append("  LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id AND ppObjective.type_id = ").append(TermId.STUDY_OBJECTIVE.getId())
-		.append("  LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id AND ppStartDate.type_id = ").append(TermId.START_DATE.getId())
-		.append("  LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id AND ppEndDate.type_id = ").append(TermId.END_DATE.getId())
 		.append("  LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.type_id = ").append(TermId.PI_NAME.getId())
 		.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ").append(TermId.TRIAL_LOCATION.getId())
 		.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ").append(TermId.SEASON_VAR_TEXT.getId())
@@ -592,11 +591,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private String getYearFromStudy(final int studyIdentifier) {
 		final DmsProject project = new DmsProject();
 		project.setProjectId(studyIdentifier);
-		final ProjectProperty projectProperty = this.studyDataManager.getByVariableIdAndProjectID(project, TermId.START_DATE.getId());
-		if (projectProperty != null) {
-			return projectProperty.getValue().substring(0, 4);
-		}
-		return "";
+		return project.getStartDate().substring(0, 4);
+
 	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {

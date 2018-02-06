@@ -100,6 +100,15 @@ public class DmsProject implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private StudyType studyType;
 
+	@Column(name = "start_date")
+	private String startDate;
+
+	@Column(name = "end_date")
+	private String endDate;
+
+	@Column(name = "study_update")
+	private String studyUpdate;
+
 	public DmsProject() {
 		super();
 	}
@@ -174,6 +183,34 @@ public class DmsProject implements Serializable {
 
 	public void setStudyType(final StudyType studyType) {
 		this.studyType = studyType;
+	}
+
+	public void setDeleted(final boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public String getStartDate() {
+		return this.startDate;
+	}
+
+	public void setStartDate(final String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return this.endDate;
+	}
+
+	public void setEndDate(final String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getStudyUpdate() {
+		return this.studyUpdate;
+	}
+
+	public void setStudyUpdate(final String studyUpdate) {
+		this.studyUpdate = studyUpdate;
 	}
 
 	@Override

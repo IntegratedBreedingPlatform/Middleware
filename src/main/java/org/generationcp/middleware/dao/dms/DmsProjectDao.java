@@ -74,7 +74,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public static final String DELETED = "deleted";
 	private static final int DELETED_STUDY = 1;
 
-	private static final int START_DATE = TermId.START_DATE.getId();
+	//private static final int START_DATE = TermId.START_DATE.getId();
 
 	/**
 	 * Type of study is stored in projectprops table.
@@ -140,12 +140,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         WHEN '" + StudyType.T.getName() + "'   THEN pmain.name "
 		+ "         ELSE '' "
 		+ "     END AS trialName, "
-		+ "     MAX(IF(pProp.variable_id = " + TermId.START_DATE.getId() + ", "
-		+ "         pProp.value, "
-		+ "         NULL)) AS startDate, "
-		+ "     MAX(IF(pProp.variable_id = " + TermId.END_DATE.getId() + ", "
-		+ "         pProp.value, "
-		+ "         NULL)) AS endDate, "
+		+ "     MAX(proj.start_date) AS startDate, "
+		+ "     MAX(proj.end_date) AS endDate, "
 		+ "     pmain.deleted, "
 		+ "     CASE pmain.study_type "
 		+ "         WHEN '" + StudyType.N.getName()	+ "'         THEN "
@@ -199,8 +195,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   p.name                     AS name, \n"
 		+ "   p.description              AS title, \n"
 		+ "   ppObjective.value          AS objective, \n"
-		+ "   ppStartDate.value          AS startDate, \n"
-		+ "   ppEndDate.value            AS endDate, \n"
+		+ "   p.start_date      		 AS startDate, \n"
+		+ "   p.end_date		         AS endDate, \n"
 		+ "   ppPI.value                 AS piName, \n"
 		+ "   gpSiteName.value           AS siteName, \n"
 		+ "   p.project_id               AS id, \n"
@@ -213,8 +209,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
 		+ "   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id "
 		+ "AND ppObjective.variable_id = " + TermId.STUDY_OBJECTIVE.getId() + " \n"
-		+ "   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id AND ppStartDate.variable_id = " + TermId.START_DATE.getId() + " \n"
-		+ "   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id AND ppEndDate.variable_id = " + TermId.END_DATE.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
 		+ "   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id \n"
@@ -342,7 +336,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<DmsProject> getStudiesByStartDate(final Integer startDate) {
-		return this.getStudiesByStudyProperty(TermId.START_DATE.getId(), Restrictions.eq("p.value", startDate.toString()));
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("startDate", startDate.toString()));
+		criteria.createAlias("relatedTos", "pr");
+		criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
+		criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+
+		return criteria.list();
 	}
 
 	private List<DmsProject> getStudiesByStudyProperty(final Integer studyPropertyId, final Criterion valueExpression) {
@@ -564,15 +564,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyDetails> studyDetails = new ArrayList<>();
 
 		final StringBuilder sqlString = new StringBuilder().append(
-			"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
-			.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
+			"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, p.start_date AS startDate, ")
+			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
 			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ")
 			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
 			.append("                   AND ppObjective.variable_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ")
-			.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-			.append("                   AND ppStartDate.variable_id =  ").append(TermId.START_DATE.getId()).append(" ")
-			.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-			.append("                   AND ppEndDate.variable_id =  ").append(TermId.END_DATE.getId()).append(" ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
@@ -693,15 +689,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
 			.append("                   AND ppObjective.variable_id =  ")
 			.append(TermId.STUDY_OBJECTIVE.getId())
-			.append(" ")
-			.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-			.append("                   AND ppStartDate.variable_id =  ")
-			.append(TermId.START_DATE.getId())
-			.append(" ")
-			.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-			.append("                   AND ppEndDate.variable_id =  ")
-			.append(TermId.END_DATE.getId())
-			.append(" ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ")
 			.append(TermId.PI_NAME.getId())
@@ -736,20 +723,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 
 			final StringBuilder sqlString = new StringBuilder().append(
-				"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
+				"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, p.start_date AS startDate, ")
 				.append(
-					"ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, p.study_type AS "
+					"p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, p.study_type AS "
 						+ "studyType ")
 				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ")
 				.append(" LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
 				.append(" AND ppObjective.variable_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ")
 				// 8030
-				.append(" LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-				.append(" AND ppStartDate.variable_id =  ").append(TermId.START_DATE.getId()).append(" ")
-				// 8050
-				.append(" LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-				.append(" AND ppEndDate.variable_id =  ").append(TermId.END_DATE.getId()).append(" ")
-				// 8060
 				.append(" LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 				.append(" AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 				// 8100
@@ -815,16 +796,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append(TermId.STUDY_OBJECTIVE.getId())
 			.append(" ")
 			// 8030
-			.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-			.append("                   AND ppStartDate.variable_id =  ")
-			.append(TermId.START_DATE.getId())
-			.append(" ")
-			// 8050
-			.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-			.append("                   AND ppEndDate.variable_id =  ")
-			.append(TermId.END_DATE.getId())
-			.append(" ")
-			// 8060
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ")
 			.append(TermId.PI_NAME.getId())
@@ -865,11 +836,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		final StringBuilder sqlString =
 				new StringBuilder().append("SELECT DISTINCT p.project_id AS id ").append("        , p.name AS name ")
-				.append("        , p.description AS description ").append("        , ppStartDate.value AS startDate ")
+				.append("        , p.description AS description ").append("        , p.start_date AS startDate ")
 				.append("        , p.study_type AS studyType ").append("        , gpSeason.value AS season ")
 				.append("FROM project p  ")
-				.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-				.append("                   AND ppStartDate.variable_id =  ").append(TermId.START_DATE.getId()).append(" ")
 				.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
 				.append("   INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
 				.append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")

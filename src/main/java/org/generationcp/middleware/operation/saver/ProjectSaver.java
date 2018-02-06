@@ -19,6 +19,9 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.util.Util;
+
+import java.text.ParseException;
 
 public class ProjectSaver extends Saver {
 
@@ -31,13 +34,26 @@ public class ProjectSaver extends Saver {
 		return projectDao.save(project);
 	}
 
-	public DmsProject create(StudyValues studyValues, final StudyType studyType, String description) {
+	public DmsProject create(StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
+		final String endDate, String studyUpdate) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			project = new DmsProject();
 			String name = this.getStringValue(studyValues, TermId.STUDY_NAME.getId());
 			project.setStudyType(studyType);
+			if (startDate.contains("-")) {
+				project.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
+			} else {
+				project.setStartDate(startDate);
+			}
+			project.setStudyUpdate(Util.getCurrentDateAsStringValue(Util.DATE_AS_NUMBER_FORMAT));
+
+			if (endDate.contains("-")) {
+				project.setEndDate(Util.convertDate(endDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
+			} else {
+				project.setEndDate(endDate);
+			}
 			this.mapStudytoProject(name, description, project);
 		}
 

@@ -37,6 +37,12 @@ public class Study implements Serializable {
 
 	private String description;
 
+	private String startDate;
+
+	private String endDate;
+
+	private String studyUpdate;
+
 	public Study() {
 	}
 
@@ -77,11 +83,11 @@ public class Study implements Serializable {
 	}
 
 	public Integer getStartDate() {
-		return this.getDisplayValueAsInt(TermId.START_DATE);
+		return Integer.valueOf(this.startDate);
 	}
 
 	public Integer getEndDate() {
-		return this.getDisplayValueAsInt(TermId.END_DATE);
+		return Integer.valueOf(this.endDate);
 	}
 
 	public Integer getUser() {
@@ -216,5 +222,21 @@ public class Study implements Serializable {
 
 	public void setDescription(final String description) {
 		this.description = description;
+	}
+
+	public void setStartDate(final String startDate) {
+		this.startDate = startDate;
+	}
+
+	public void setEndDate(final String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getStudyUpdate() {
+		return this.studyUpdate;
+	}
+
+	public void setStudyUpdate(final String studyUpdate) {
+		this.studyUpdate = studyUpdate;
 	}
 }

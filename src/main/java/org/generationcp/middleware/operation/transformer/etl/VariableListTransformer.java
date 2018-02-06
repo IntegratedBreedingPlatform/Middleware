@@ -240,12 +240,6 @@ public class VariableListTransformer extends Transformer {
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective",
 							studyDetails.getObjective(), rank, programUUID, PhenotypicType.STUDY);
-			rank =
-					this.addVariableIfNecessary(variables, variableTypeList, TermId.START_DATE, "START_DATE", "Start date",
-							studyDetails.getStartDate(), rank, programUUID, PhenotypicType.STUDY);
-			rank =
-					this.addVariableIfNecessary(variables, variableTypeList, TermId.END_DATE, "END_DATE", "End date",
-							studyDetails.getEndDate(), rank, programUUID, PhenotypicType.STUDY);
 		}
 		return variables.sort();
 	}

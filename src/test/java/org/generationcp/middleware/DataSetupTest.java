@@ -263,19 +263,10 @@ public class DataSetupTest extends IntegrationTestBase {
 				"Study - assigned (DBCV)", DataSetupTest.PROP_STUDY, DataSetupTest.ASSIGNED, DataSetupTest.DBCV,
 				DataSetupTest.CHAR, studyDetails.getStudyName(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
-		conditions.add(
-				this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
-						DataSetupTest.PROP_START_DATE, DataSetupTest.ASSIGNED, DataSetupTest.DATE, DataSetupTest.CHAR,
-						studyDetails.getStartDate(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
-
 		conditions.add(this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE",
 				"Objective - described (text)", DataSetupTest.PROP_OBJECTIVE, DataSetupTest.DESCRIBED,
 				DataSetupTest.SCALE_TEXT, DataSetupTest.CHAR, studyDetails.getObjective(), DataSetupTest.STUDY,
 				PhenotypicType.STUDY, true));
-
-		conditions.add(this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)",
-				DataSetupTest.PROP_END_DATE, DataSetupTest.ASSIGNED, DataSetupTest.DATE, DataSetupTest.CHAR,
-				studyDetails.getEndDate(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		workbook.setConditions(conditions);
 

@@ -39,11 +39,13 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.DatasetUtil;
 import org.generationcp.middleware.util.TimerWatch;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -585,7 +587,9 @@ public class WorkbookSaver extends Saver {
 			}
 			final DmsProject study =
 					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
-							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription());
+							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription(),
+						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails()
+							.getStudyUpdate());
 			studyId = study.getProjectId();
 		}
 		watch.stop();
@@ -1036,7 +1040,7 @@ public class WorkbookSaver extends Saver {
 		return list;
 	}
 
-	public void saveWorkbookVariables(final Workbook workbook) {
+	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
 		this.getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(),
 				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
 		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
@@ -1063,12 +1067,34 @@ public class WorkbookSaver extends Saver {
 		this.getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
 
 		final String description = workbook.getStudyDetails().getDescription();
-		this.updateStudyDescription(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset);
-		this.updateStudyDescription(description, study);
-		this.updateStudyDescription(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset);
+		final String startDate = workbook.getStudyDetails().getStartDate();
+		final String endDate = workbook.getStudyDetails().getEndDate();
+
+		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset);
+		this.updateStudyDetails(description, startDate, endDate, study);
+		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset);
 	}
 
-	private void updateStudyDescription(final String description, final DmsProject study) {
+	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study)
+		throws ParseException {
+		if (startDate.contains("-")) {
+			study.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
+		} else {
+			study.setStartDate(startDate);
+		}
+		study.setStudyUpdate(Util.getCurrentDateAsStringValue(Util.DATE_AS_NUMBER_FORMAT));
+
+		if (endDate.contains("-")) {
+			study.setEndDate(Util.convertDate(endDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
+		} else {
+			study.setEndDate(endDate);
+		}
+
+		this.updateStudyDetails(description, study);
+	}
+
+
+	private void updateStudyDetails(final String description, final DmsProject study) {
 		study.setDescription(description);
 		this.getDmsProjectDao().merge(study);
 	}

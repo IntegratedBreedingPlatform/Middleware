@@ -226,8 +226,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ " WHERE "
 			+ "     pp.project_id = :studyId "
 			+ "         AND pp.variable_id NOT IN ("
-			+ TermId.START_DATE.getId() + " , "
-			+ TermId.END_DATE.getId() + ", "
 			+ TermId.SEASON_VAR.getId() + ", "
 			+ TermId.LOCATION_ID.getId() + ") "
 			+ "         AND pp.variable_id NOT IN (SELECT  "

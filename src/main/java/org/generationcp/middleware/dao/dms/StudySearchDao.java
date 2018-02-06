@@ -177,9 +177,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	private String getSearchByStartDateMainQuery() {
 		return "from project p "
-				+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.variable_id = "
-				+ TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
-				+ "	WHERE p.program_uuid = :programUUID " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+				+ "	WHERE p.start_date LIKE :compareDate  AND p.program_uuid = :programUUID " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
 	}
 
 	@SuppressWarnings("unchecked")
