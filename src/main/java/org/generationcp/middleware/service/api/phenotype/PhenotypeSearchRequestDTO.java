@@ -7,6 +7,8 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 
 	private List<Integer> cvTermIds;
 	private List<String> studyDbIds;
+	private Integer page;
+	private Integer pageSize;
 
 	public List<String> getStudyDbIds() {
 		return studyDbIds;
@@ -16,6 +18,21 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 		this.studyDbIds = studyDbIds;
 	}
 
+	public Integer getPage() {
+		return page;
+	}
+
+	public void setPage(final Integer page) {
+		this.page = page;
+	}
+
+	public Integer getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(final Integer pageSize) {
+		this.pageSize = pageSize;
+	}
 
 	public List<Integer> getCvTermIds() {
 		return cvTermIds;
