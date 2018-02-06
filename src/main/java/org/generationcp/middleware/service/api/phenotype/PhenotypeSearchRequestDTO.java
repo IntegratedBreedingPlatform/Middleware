@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PhenotypeSearchRequestDTO implements Serializable {
 
-	private List<Integer> cvTermIds;
+	private List<String> cvTermIds;
 	private List<String> studyDbIds;
 	private Integer page;
 	private Integer pageSize;
@@ -34,11 +34,11 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 		this.pageSize = pageSize;
 	}
 
-	public List<Integer> getCvTermIds() {
+	public List<String> getCvTermIds() {
 		return cvTermIds;
 	}
 
-	public void setCvTermIds(List<Integer> cvTermIds) {
+	public void setCvTermIds(List<String> cvTermIds) {
 		this.cvTermIds = cvTermIds;
 	}
 }
