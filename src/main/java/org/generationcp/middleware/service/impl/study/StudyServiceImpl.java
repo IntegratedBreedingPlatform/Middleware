@@ -592,7 +592,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		List<Integer> cvTermIds = requestDTO.getCvTermIds();
 
-		if (requestDTO.getStudyDbId() != null) {
+		if (requestDTO.getStudyDbIds() != null) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
@@ -611,8 +611,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 			sqlQuery.setParameterList("cvTermIds", cvTermIds);
 		}
 
-		if (requestDTO.getStudyDbId() != null) {
-			sqlQuery.setParameter("studyDbId", requestDTO.getStudyDbId());
+		if (requestDTO.getStudyDbIds() != null) {
+			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
 		}
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
@@ -703,7 +703,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
 		}
 
-		if (requestDTO.getStudyDbId() != null) {
+		if (requestDTO.getStudyDbIds() != null) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
@@ -713,8 +713,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 			query.setParameterList("cvTermIds", cvTermIds);
 		}
 
-		if (requestDTO.getStudyDbId() != null) {
-			query.setParameter("studyDbId", requestDTO.getStudyDbId());
+		if (requestDTO.getStudyDbIds() != null) {
+			query.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
 		}
 
 		return ((BigInteger) query.uniqueResult()).longValue();

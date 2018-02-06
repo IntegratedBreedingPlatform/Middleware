@@ -6,16 +6,16 @@ import java.util.List;
 public class PhenotypeSearchRequestDTO implements Serializable {
 
 	private List<Integer> cvTermIds;
+	private List<String> studyDbIds;
 
-	private Integer studyDbId;
-
-	public Integer getStudyDbId() {
-		return studyDbId;
+	public List<String> getStudyDbIds() {
+		return studyDbIds;
 	}
 
-	public void setStudyDbId(final Integer studyDbId) {
-		this.studyDbId = studyDbId;
+	public void setStudyDbIds(final List<String> studyDbIds) {
+		this.studyDbIds = studyDbIds;
 	}
+
 
 	public List<Integer> getCvTermIds() {
 		return cvTermIds;
