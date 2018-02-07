@@ -36,7 +36,9 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -49,6 +51,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -233,17 +236,12 @@ public class FieldbookServiceImplTest {
 		final int userId = 3;
 		final GermplasmList originalGermplasmList = new GermplasmList();
 		originalGermplasmList.setId(originalListId);
-		originalGermplasmList.setProgramUUID(PROGRAM_UUID);
-		originalGermplasmList.setStatus(101);
-
-		Mockito.when(this.germplasmListManager.getGermplasmListById(originalListId)).thenReturn(originalGermplasmList);
-
 
 		this.fieldbookServiceImpl.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, new ArrayList<ListDataProject>(),
 				userId);
 
 		Mockito.verify(listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
-				new ArrayList<ListDataProject>(), userId, originalGermplasmList.getProgramUUID(), originalGermplasmList.getStatus());
+				new ArrayList<ListDataProject>(), userId);
 
 
 	}
