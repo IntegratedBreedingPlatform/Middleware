@@ -1183,4 +1183,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Map<Integer, List<PlantDTO>> getSampledPlants(final Integer studyId) {
 		return this.getExperimentDao().getSampledPlants(studyId);
 	}
+
+	@Override
+	public boolean isVariableUsedInOtherPrograms(final String variableId, final String variableValue, final String programUUID) {
+
+		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
+
+	}
 }

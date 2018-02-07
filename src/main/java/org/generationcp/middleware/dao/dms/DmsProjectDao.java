@@ -1129,4 +1129,44 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	/**
+	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
+	 * @param variableId - The term id of the variable (e.g. 8190 to look for variable LOCATION_NAME_ID)
+	 * @param variableValue - The value of the variable (e.g. 101 which is the location name id of the location "India")
+	 * @param programUUID
+	 * @return
+	 *
+	 */
+	public boolean isVariableUsedInOtherPrograms(final String variableId, final String variableValue, final String programUUID) {
+		Preconditions.checkNotNull(variableId);
+		Preconditions.checkNotNull(variableValue);
+
+		// Check if the variable is used in projectprop and nd_experumentprop tables
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT CASE WHEN\n"
+				+ "            (EXISTS( SELECT project.* FROM\n"
+				+ "                    projectprop INNER JOIN\n"
+				+ "                    project ON project.project_id = projectprop.project_id WHERE\n"
+				+ "                    projectprop.variable_id = :variableId AND projectprop.value = :variableValue\n"
+				+ "                        AND project.program_uuid <> :programUUID)) = 1 "
+				+ "						OR "
+				+ "				(EXISTS( SELECT \n"
+				+ "                    project.* FROM project\n"
+				+ "                        INNER JOIN\n"
+				+ "                    nd_experiment_project ON project.project_id = nd_experiment_project.project_id\n"
+				+ "                        INNER JOIN\n"
+				+ "                    nd_experiment ON nd_experiment.nd_experiment_id = nd_experiment_project.nd_experiment_id\n"
+				+ "                        INNER JOIN\n"
+				+ "                    nd_geolocationprop ON nd_experiment.nd_geolocation_id = nd_geolocationprop.nd_geolocation_id"
+				+ "                WHERE nd_geolocationprop.type_id = :variableId\n"
+				+ "                        AND nd_geolocationprop.value = :variableValue\n"
+				+ "                        AND project.program_uuid <> :programUUID)) = 1 THEN 1 ELSE 0\n"
+				+ "    END;");
+		query.setParameter("variableId", variableId);
+		query.setParameter("variableValue", variableValue);
+		query.setParameter("programUUID", programUUID);
+
+		return ((BigInteger) query.uniqueResult()).intValue() != 0;
+
+	}
 }

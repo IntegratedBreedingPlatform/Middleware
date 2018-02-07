@@ -787,4 +787,14 @@ public interface StudyDataManager {
 	 */
 	Map<Integer, List<PlantDTO>> getSampledPlants (final Integer studyId);
 
+	/**
+	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
+	 * @param variableId - The term id of the variable (e.g. 8190 to look for variable LOCATION_NAME_ID)
+	 * @param variableValue - The value of the variable (e.g. 101 which is the location name id of the location "India")
+	 * @param programUUID
+	 * @return
+	 *
+	 */
+	boolean isVariableUsedInOtherPrograms(final String variableId, final String variableValue, final String programUUID);
+
 }

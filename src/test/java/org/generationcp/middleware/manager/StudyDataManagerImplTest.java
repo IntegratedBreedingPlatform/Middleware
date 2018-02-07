@@ -23,11 +23,17 @@ import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Values;
+import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -36,6 +42,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
@@ -47,6 +54,11 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
@@ -589,4 +601,77 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
 		Assert.assertFalse("The folder should not be empty", isEmpty);
 	}
+
+	@Test
+	public void testIsVariableUsedInOtherProgramsVariableExistsInProjectProp() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+
+		// Create projectproperty record
+		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
+
+		Assert.assertTrue(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
+	@Test
+	public void testIsVariableUsedInOtherProgramsVariableExistsInGeolocationProp() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+		dmsVariableType.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+
+		// Create nd_geolocation and nd_geolocation prop records
+		final VariableList variableList = new VariableList();
+		final Variable variable = new Variable();
+		variable.setVariableType(dmsVariableType);
+		variable.setValue(locationNameIdValue);
+		variableList.add(variable);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+
+		// Create experiment record
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setProject(project);
+		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		experimentModel.setGeoLocation(geolocation);
+		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
+
+		// Create experimentproject record
+		final ExperimentProject experimentProject = new ExperimentProject();
+		experimentProject.setExperiment(experimentModel);
+		experimentProject.setProjectId(project.getProjectId());
+		this.manager.getExperimentProjectDao().save(experimentProject);
+
+		Assert.assertTrue(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
 }
