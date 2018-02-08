@@ -26,7 +26,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -51,12 +50,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -584,140 +581,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return !queryResults.isEmpty();
 	}
 
-	// TODO Move to DAO
 	@Override
 	public List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO) {
-
-		StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
-
-		List<String> cvTermIds = requestDTO.getCvTermIds();
-
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
-			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
-		}
-
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
-		}
-
-		final SQLQuery sqlQuery = this.getCurrentSession().createSQLQuery(queryString.toString());
-
-		if (pageNumber != null && pageSize != null) {
-			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
-			sqlQuery.setMaxResults(pageSize);
-		}
-
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			sqlQuery.setParameterList("cvTermIds", cvTermIds);
-		}
-
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
-			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
-		}
-
-		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
-			.addScalar("observationLevel").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
-			.addScalar("germplasmName").addScalar("studyDbId", new StringType()).addScalar("studyName").addScalar("programName")
-			.addScalar("FieldMapRow").addScalar("FieldMapCol").addScalar("plotNumber", new StringType())
-			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
-			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
-			.addScalar("entryNumber", new StringType());
-
-		List<Object[]> results = sqlQuery.list();
-
-		final Map<Integer, PhenotypeSearchDTO> observationUnitsByNdExpId = new LinkedHashMap<>();
-
-		if (results != null && !results.isEmpty()) {
-
-			// Process ObservationUnits (Measurement row)
-			for (final Object[] row : results) {
-				final PhenotypeSearchDTO observationUnit = new PhenotypeSearchDTO();
-
-				Integer ndExperimentId = (Integer) row[0];
-				observationUnit.setObservationUnitDbId((String) row[1]); // plot_id
-				observationUnit.setObservationUnitName((String) row[2]);
-				observationUnit.setObservationLevel((String) row[3]);
-				observationUnit.setObservationLevels("1");
-				observationUnit.setPlantNumber((String) row[4]);
-				observationUnit.setGermplasmDbId((String) row[5]);
-				observationUnit.setGermplasmName((String) row[6]);
-				observationUnit.setStudyDbId((String) row[7]);
-				observationUnit.setStudyName((String) row[8]);
-				observationUnit.setProgramName((String) row[9]);
-				final String x = (String) row[15]; // ROW
-				final String y = (String) row[16]; // COL
-				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					observationUnit.setX((String) row[10]); // fieldMapRow
-					observationUnit.setY((String) row[11]); // fieldMapCol
-				}
-				observationUnit.setX(x);
-				observationUnit.setY(y);
-				observationUnit.setPlotNumber((String) row[12]);
-				observationUnit.setBlockNumber((String) row[13]);
-				observationUnit.setReplicate((String) row[14]);
-				observationUnit.setStudyLocationDbId((String) row[17]);
-				observationUnit.setStudyLocation((String) row[18]);
-				observationUnit.setEntryType((String) row[19]);
-				observationUnit.setEntryNumber((String) row[20]);
-
-				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
-			}
-
-			// Get observations (Traits)
-			final SQLQuery observationsQuery = this.getCurrentSession().createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS);
-			observationsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
-			observationsQuery.addScalar("expid").addScalar("nd_exp_phen_id").addScalar("cvterm_id")
-					.addScalar("cvterm_name", new StringType()).
-					addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType());
-			List<Object[]> observationResults = observationsQuery.list();
-
-			for (final Object[] result : observationResults) {
-				Integer ndExperimentId = (Integer) result[0];
-
-				PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
-				final String variableId = (result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
-				observation.setObservationVariableDbId(variableId);
-				observation.setObservationVariableName((String) result[3]);
-				observation.setObservationTimeStamp("");
-				observation.setSeason("");
-				observation.setCollector("");
-				observation.setObservationDbId((Integer) result[1]);
-				observation.setValue((String) result[4]);
-
-				PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
-				// TODO solve duplicate nd_experiment_phenotype_id
-				observationUnit.getObservations().add(observation);
-			}
-		}
-
-		return new ArrayList<>(observationUnitsByNdExpId.values());
+		return this.getPhenotypeDao().searchPhenotypes(pageSize, pageNumber, requestDTO);
 	}
 
-	// TODO Move to DAO
 	@Override
 	public long countPhenotypes(PhenotypeSearchRequestDTO requestDTO) {
-		StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
-
-		List<String> cvTermIds = requestDTO.getCvTermIds();
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
-		}
-
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
-			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
-		}
-
-		final SQLQuery query = this.getCurrentSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
-
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			query.setParameterList("cvTermIds", cvTermIds);
-		}
-
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
-			query.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
-		}
-
-		return ((BigInteger) query.uniqueResult()).longValue();
+		return this.getPhenotypeDao().countPhenotypes(requestDTO);
 	}
 
 	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {
