@@ -121,23 +121,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getAllLocations(final String programUUID) {
-
-		final LocationDataManager locationDataManager = this.getLocationDataManager();
-
-		final Integer fieldLtypeFldId =
-				locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-		final Integer blockLtypeFldId =
-				locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
-
-		final List<Integer> locationTypesToExclude = new ArrayList<>();
-		locationTypesToExclude.add(fieldLtypeFldId);
-		locationTypesToExclude.add(blockLtypeFldId);
-
-		return locationDataManager.getLocationsByUniqueIDAndExcludeLocationTypes(programUUID, locationTypesToExclude);
-	}
-
-	@Override
 	public List<Location> getLocationsByProgramUUID(final String programUUID) {
 		return this.getLocationDataManager().getLocationsByUniqueID(programUUID);
 	}
@@ -481,12 +464,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	 * Saves germplasm list crosses types. ListData items are always added to
 	 * the database, before saving the germplasm list.
 	 *
-	 * @param listDataItems
-	 *            the list data to add - the key of the Map is the germplasm
-	 *            associated to the germplasm list data value
-	 * @param germplasmList
-	 *            the germplasm list to add
-	 *
+	 * @param listDataItems the list data to add - the key of the Map is the germplasm
+	 *                      associated to the germplasm list data value
+	 * @param germplasmList the germplasm list to add
 	 * @return The id of the newly-created germplasm list
 	 */
 	@Override
@@ -547,8 +527,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public GermplasmList getGermplasmListByName(final String name, final String programUUID) {
-		final List<GermplasmList> germplasmLists =
-				germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
+		final List<GermplasmList> germplasmLists = germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
 		if (!germplasmLists.isEmpty()) {
 			return germplasmLists.get(0);
 		}
@@ -1139,11 +1118,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId,
 			final List<ListDataProject> listDatas, final int userId) {
 
-		// Get the original germplasm list so that we can inherit its programUUID and list status
-		final GermplasmList originalGermplasmList = this.germplasmListManager.getGermplasmListById(originalListId);
-
-		return this.listDataProjectSaver.saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId,
-				originalGermplasmList.getProgramUUID(), originalGermplasmList.getStatus());
+		return this.listDataProjectSaver.saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
 
 	}
 
@@ -1252,7 +1227,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
-	
+
 	@Override
 	public List<Method> getFavoriteProjectNoBulkingMethods(final String programUUID) {
 		final List<ProgramFavorite> favList =
@@ -1268,13 +1243,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Method> getAllGenerativeNoBulkingMethods(final String programUUID) {
-		return this.getGermplasmDataManager().getNoBulkingMethodsByType("GEN",programUUID);
+		return this.getGermplasmDataManager().getNoBulkingMethodsByType("GEN", programUUID);
 	}
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
-
 
 	void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
 		this.germplasmListManager = germplasmListManager;

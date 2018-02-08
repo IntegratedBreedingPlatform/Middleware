@@ -57,23 +57,13 @@
         <!-- mapping for workbench schema -->
         <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.CropType"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchDataset"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Project"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectActivity"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserRole"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.Role"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.UserRole"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowStep"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.UserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.TemplateSetting"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink"/>
