@@ -35,21 +35,21 @@ public class ProjectSaver extends Saver {
 	}
 
 	public DmsProject create(StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
-		final String endDate, String studyUpdate) throws ParseException {
+		final String endDate) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			project = new DmsProject();
 			String name = this.getStringValue(studyValues, TermId.STUDY_NAME.getId());
 			project.setStudyType(studyType);
-			if (startDate.contains("-")) {
+			if (startDate != null && startDate.contains("-")) {
 				project.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 			} else {
 				project.setStartDate(startDate);
 			}
 			project.setStudyUpdate(Util.getCurrentDateAsStringValue(Util.DATE_AS_NUMBER_FORMAT));
 
-			if (endDate.contains("-")) {
+			if (endDate != null && endDate.contains("-")) {
 				project.setEndDate(Util.convertDate(endDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 			} else {
 				project.setEndDate(endDate);

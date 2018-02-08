@@ -146,13 +146,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (startDate != null) {
 			try {
-				String dateString = String.valueOf(startDate);
-				// pad LIKE wildcard characters
-				if (dateString.length() == 4) { // only year specified
-					dateString += "____";
-				} else if (dateString.length() == 6) { // only month and year
-					dateString += "__";
-				}
+				String dateString = String.valueOf(startDate) + "%";
 
 				final SQLQuery query = this.getSession()
 						.createSQLQuery("select distinct p.project_id, p.name, p.description " + this.getSearchByStartDateMainQuery());
@@ -177,7 +171,8 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	private String getSearchByStartDateMainQuery() {
 		return "from project p "
-				+ "	WHERE p.start_date LIKE :compareDate  AND p.program_uuid = :programUUID " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+				+ "	WHERE p.start_date LIKE :compareDate AND p.program_uuid = :programUUID " + StudySearchDao
+			.NOT_IN_DELETED_STUDIES_QUERY;
 	}
 
 	@SuppressWarnings("unchecked")

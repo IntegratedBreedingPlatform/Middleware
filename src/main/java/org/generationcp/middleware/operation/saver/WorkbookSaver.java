@@ -588,8 +588,7 @@ public class WorkbookSaver extends Saver {
 			final DmsProject study =
 					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
 							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription(),
-						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails()
-							.getStudyUpdate());
+						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate());
 			studyId = study.getProjectId();
 		}
 		watch.stop();

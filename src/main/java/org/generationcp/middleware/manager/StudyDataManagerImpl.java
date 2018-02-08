@@ -177,12 +177,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
 		final String programUUID, final String cropPrefix, final StudyType studyType, final String description, final String startDate,
-		final String endDate, final String studyUpdate) {
+		final String endDate) {
 
 		try {
 
 			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID,
-					cropPrefix, studyType, description, startDate, endDate, studyUpdate);
+					cropPrefix, studyType, description, startDate, endDate);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 

@@ -40,9 +40,9 @@ public class StudyTestDataInitializer {
 	private static final String TEST_FOLDER_NAME = "TEST_FOLDER_NAME";
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 	public static final String DATASET_NAME = "DATA SET NAME";
-	private static final String STUDY_UPDATE = "20160606";
-	private static final String START_DATE = "20160606";
-	private static final String END_DATE = "20160606";
+	private static final String STUDY_UPDATE = "20160608";
+	public static final String START_DATE = "20160606";
+	public static final String END_DATE = "20160606";
 	public static int DATASET_ID = 255;
 
 	private final StudyDataManagerImpl studyDataManager;
@@ -90,7 +90,7 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix,
-			studyType, description, startDate, endDate, studyUpdate);
+			studyType, description, startDate, endDate );
 	}
 
 	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId, final String startDate, final String cropPrefix) throws Exception {
@@ -113,8 +113,8 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), cropPrefix,
-			studyType, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
-				.END_DATE, StudyTestDataInitializer.STUDY_UPDATE);
+			studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
+				.END_DATE);
 	}
 	
 	private StudyValues createStudyValues(final VariableList variableList) throws Exception {
