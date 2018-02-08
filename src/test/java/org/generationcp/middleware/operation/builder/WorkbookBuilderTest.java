@@ -13,8 +13,10 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -334,17 +336,18 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final List<MeasurementVariable> measurementVariableLists = new ArrayList<MeasurementVariable>();
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVariableLists.add(measurementVar);
-		this.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, false, true);
+		Set set = new HashSet<>(measurementVariableLists);
+		this.workbookBuilder.setMeasurementVarRoles(set, false, true);
 		for (final MeasurementVariable var : measurementVariableLists) {
 			Assert.assertEquals("Should have a phenotype role of variate since its not a factor", var.getRole(), PhenotypicType.VARIATE);
 		}
 
-		this.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, true, true);
+		this.workbookBuilder.setMeasurementVarRoles(set, true, true);
 		for (final MeasurementVariable var : measurementVariableLists) {
 			Assert.assertEquals("Should have a phenotype role of STUDY", var.getRole(), PhenotypicType.STUDY);
 		}
 
-		this.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, true, false);
+		this.workbookBuilder.setMeasurementVarRoles(set, true, false);
 		for (final MeasurementVariable var : measurementVariableLists) {
 			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
 		}
@@ -392,7 +395,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final VariableList trialEnvironmentVariables =
 				this.transformMeasurementVariablesToVariableList(trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
 
-		final List<MeasurementVariable> result =
+		final Set<MeasurementVariable> result =
 				this.workbookBuilder.buildConditionVariables(conditionVariables, trialEnvironmentVariables, true);
 
 		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;

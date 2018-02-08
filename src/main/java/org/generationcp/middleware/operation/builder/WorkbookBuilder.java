@@ -152,12 +152,12 @@ public class WorkbookBuilder extends Builder {
 		final VariableList trialEnvironmentVariables = this.getTrialEnvironmentVariableList(trialDataSet);
 		// FIXME : I think we are reducing to traits, but difficult to understand
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
-		final List<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables, isTrial);
+		final Set<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables, isTrial);
 		final List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
-		final List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
+		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
-		final List<MeasurementVariable> variates = this.buildVariates(variables, constants);
-		final List<MeasurementVariable> expDesignVariables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variates = this.buildVariates(variables, new ArrayList<>(constants));
+		final List<MeasurementVariable> expDesignVariables = new ArrayList<>();
 
 		// Nursery case
 		if (!isTrial) {
@@ -233,7 +233,7 @@ public class WorkbookBuilder extends Builder {
 						this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
 
 					expDesignVariables.add(measurementVariable);
-					this.setValueInCondition(conditions, value, stdVariableId);
+					this.setValueInCondition(new ArrayList<MeasurementVariable>(conditions), value, stdVariableId);
 				}
 			}
 		}
@@ -241,8 +241,8 @@ public class WorkbookBuilder extends Builder {
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
 		workbook.setVariates(variates);
-		workbook.setConditions(conditions);
-		workbook.setConstants(constants);
+		workbook.setConditions(new ArrayList<>(conditions));
+		workbook.setConstants(new ArrayList<>(constants));
 		workbook.setTreatmentFactors(treatmentFactors);
 		workbook.setExperimentalDesignVariables(expDesignVariables);
 
@@ -295,10 +295,10 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	protected List<MeasurementVariable> buildConditionVariables(VariableList studyConditionVariables,
+	protected Set<MeasurementVariable> buildConditionVariables(VariableList studyConditionVariables,
 			VariableList trialEnvironmentVariables, boolean isTrial) {
 		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorizing
-		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(studyConditionVariables, true, true);
+		final Set<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(studyConditionVariables, true, true);
 		if (isTrial) {
 			// for Trials, conditions and trial environment variables are combined
 			conditions.addAll(this.buildStudyMeasurementVariables(trialEnvironmentVariables, true, false));
@@ -401,8 +401,8 @@ public class WorkbookBuilder extends Builder {
 
 		final List<MeasurementVariable> factors = this.buildFactors(variables, !isNursery);
 		List<MeasurementVariable> variates = this.buildVariates(variables);
-		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(study.getConditions(), true, true);
-		final List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(study.getConstants(), false, true);
+		final Set<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(study.getConditions(), true, true);
+		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(study.getConstants(), false, true);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
 		if (dataSetId != null) {
 			this.setTreatmentFactorValues(treatmentFactors, dataSetId);
@@ -491,11 +491,11 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 
-		variates = this.removeConstantsFromVariates(variates, constants);
+		variates = this.removeConstantsFromVariates(variates, new ArrayList<MeasurementVariable>(constants));
 		workbook.setFactors(factors);
 		workbook.setVariates(variates);
-		workbook.setConditions(conditions);
-		workbook.setConstants(constants);
+		workbook.setConditions(new ArrayList<MeasurementVariable>(conditions));
+		workbook.setConstants(new ArrayList<MeasurementVariable>(constants));
 		workbook.setTreatmentFactors(treatmentFactors);
 		workbook.setExperimentalDesignVariables(experimentalDesignVariables);
 		return workbook;
@@ -713,15 +713,15 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	private List<MeasurementVariable> buildStudyMeasurementVariables(final VariableList variableList, final boolean isFactor,
+	private Set<MeasurementVariable> buildStudyMeasurementVariables(final VariableList variableList, final boolean isFactor,
 			final boolean isStudy) {
-		final List<MeasurementVariable> measurementVariableLists =
+		final Set<MeasurementVariable> measurementVariableLists =
 				this.getMeasurementVariableTransformer().transform(variableList, isFactor, isStudy);
 		this.setMeasurementVarRoles(measurementVariableLists, isFactor, isStudy);
 		return measurementVariableLists;
 	}
 
-	protected void setMeasurementVarRoles(final List<MeasurementVariable> measurementVariableLists, final boolean isFactor,
+	protected void setMeasurementVarRoles(final Set<MeasurementVariable> measurementVariableLists, final boolean isFactor,
 			final boolean isStudy) {
 		PhenotypicType role = null;
 		if (!isFactor) {

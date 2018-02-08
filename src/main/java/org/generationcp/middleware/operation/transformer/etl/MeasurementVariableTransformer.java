@@ -2,7 +2,9 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -65,16 +67,18 @@ public class MeasurementVariableTransformer extends Transformer {
 		return measurementVariable;
 	}
 
-	public List<MeasurementVariable> transform(final VariableList variableList, final boolean isFactor, final boolean isStudy) {
+	public Set<MeasurementVariable> transform(final VariableList variableList, final boolean isFactor, final boolean isStudy) {
 
-		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		final Set<MeasurementVariable> measurementVariables = new HashSet<>();
 
 		if (variableList != null && !variableList.isEmpty()) {
 			for (final Variable variable : variableList.getVariables()) {
 				final DMSVariableType dmsVariableType = variable.getVariableType();
 				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, !isStudy);
 				measurementVariable.setValue(variable.getDisplayValue());
-				measurementVariables.add(measurementVariable);
+				if (!measurementVariables.contains(measurementVariable)) {
+					measurementVariables.add(measurementVariable);
+				}
 			}
 		}
 
