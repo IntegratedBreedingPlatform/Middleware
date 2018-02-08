@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -140,8 +141,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         WHEN '" + StudyType.T.getName() + "'   THEN pmain.name "
 		+ "         ELSE '' "
 		+ "     END AS trialName, "
-		+ "     MAX(proj.start_date) AS startDate, "
-		+ "     MAX(proj.end_date) AS endDate, "
+		+ "     MAX(pmain.start_date) AS startDate, "
+		+ "     MAX(pmain.end_date) AS endDate, "
 		+ "     pmain.deleted, "
 		+ "     CASE pmain.study_type "
 		+ "         WHEN '" + StudyType.N.getName()	+ "'         THEN "
@@ -203,7 +204,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   ppPIid.value               AS piId, \n"
 		+ "   gpSiteId.value             AS siteId, \n"
 		+ "   ppFolder.object_project_id AS folderId, \n"
-		+ "   p.program_uuid             AS programUUID \n"
+		+ "   p.program_uuid             AS programUUID, \n"
+		+ "	  p.study_update 			 AS studyUpdate "
 		+ " FROM \n"
 		+ "   project p \n"
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
@@ -616,7 +618,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final String siteId = (String) row[9];
 
 			final StudyDetails study =
-				new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
+				new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId, Util.getCurrentDateAsStringValue());
 			studyDetails.add(study);
 		}
 		return studyDetails;
@@ -646,7 +648,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 					this.getSession().createSQLQuery(STUDY_DETAILS_SQL).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("piId").addScalar("siteId").addScalar("folderId").addScalar("programUUID");
+					.addScalar("piId").addScalar("siteId").addScalar("folderId").addScalar("programUUID").addScalar("studyUpdate");
 
 			query.setParameter("studyId", studyId);
 
@@ -666,9 +668,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final String siteId = (String) row[9];
 					final Integer folderId = (Integer) row[10];
 					final String programUUID = (String) row[11];
+					final String studyUpdate = (String) row[12];
 
 					studyDetails =
-							new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
+							new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId,
+								studyUpdate);
 					studyDetails.setParentFolderId(folderId.longValue());
 					studyDetails.setProgramUUID(programUUID);
 				}
@@ -773,7 +777,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 					studyDetails.add(
 						new StudyDetails(id, name, title, objective, startDate, endDate, StudyType.getStudyTypeByName(studyTypeId), piName,
-							siteName, piId, siteId));
+							siteName, piId, siteId, Util.getCurrentDateAsStringValue()));
 				}
 			}
 

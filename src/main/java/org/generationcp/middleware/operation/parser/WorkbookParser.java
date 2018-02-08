@@ -365,7 +365,7 @@ public class WorkbookParser {
 		}
 
 		final StudyDetails studyDetails =
-				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
+				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null, Util.getCurrentDateAsStringValue());
 
 		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
 			this.currentRowZeroBased++;

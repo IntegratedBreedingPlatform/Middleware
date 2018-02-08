@@ -68,7 +68,7 @@ public class StudyDetails implements Serializable {
 	}
 
 	public StudyDetails(String studyName, String description, String objective, String startDate, String endDate,
-			StudyType studyType, long parentFolderId, String trialDatasetName, String measurementDatasetName) {
+			StudyType studyType, long parentFolderId, String trialDatasetName, String measurementDatasetName, String studyUpdate) {
 		this.studyName = studyName;
 		this.description = description;
 		this.objective = objective;
@@ -79,13 +79,14 @@ public class StudyDetails implements Serializable {
 		this.trialDatasetName = trialDatasetName;
 		this.measurementDatasetName = measurementDatasetName;
 		this.label = studyName;
+		this.studyUpdate = studyUpdate;
 	}
 
 	// Used by getTrialObservationTable
 	public StudyDetails(Integer id, String studyName, String description, String objective, String startDate, String endDate,
-			StudyType studyType, String piName, String siteName, String piId, String siteId) {
+			StudyType studyType, String piName, String siteName, String piId, String siteId, String studyUpdate) {
 
-		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate);
 		this.id = id;
 		if (piId != null && NumberUtils.isNumber(piId)) {
 			this.piId = Double.valueOf(piId).intValue();
@@ -96,15 +97,15 @@ public class StudyDetails implements Serializable {
 	}
 
 	public StudyDetails(Integer id, String studyName, String description, String objective, String startDate, String endDate,
-			StudyType studyType, String piName, String siteName) {
+			StudyType studyType, String piName, String siteName, String studyUpdate) {
 
-		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate);
 		this.id = id;
 	}
 
 	public StudyDetails(String studyName, String description, String objective, String startDate, String endDate, StudyType studyType,
-			String piName, String siteName) {
-		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null);
+			String piName, String siteName, String studyUpdate) {
+		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null, studyUpdate);
 		this.siteName = siteName;
 		this.setPiName(piName);
 	}

@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +66,7 @@ public class StudyValuesTransformerTest extends IntegrationTestBase {
 	private StudyDetails createStudyDetailsTestData() {
 		StudyDetails studyDetails =
 				new StudyDetails("pheno_t7", "Phenotyping trials of the Population 114", "To evaluate the Population 114", "20130805",
-						"20130805", StudyType.N, 1, "This is a TrialDataSetName", "This is a measurementDatasetName");
+						"20130805", StudyType.N, 1, "This is a TrialDataSetName", "This is a measurementDatasetName", Util.getCurrentDateAsStringValue());
 		return studyDetails;
 	}
 
