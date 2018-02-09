@@ -1142,13 +1142,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		Preconditions.checkNotNull(variableId);
 		Preconditions.checkNotNull(variableValue);
 
-		// Check if the variable is used in projectprop and nd_experumentprop tables
+		// Check if the variable is used in trial level and/or environment level of studies except for the specified programUUID.
 		final SQLQuery query = this.getSession().createSQLQuery("SELECT CASE WHEN\n"
 				+ "            (EXISTS( SELECT project.* FROM\n"
 				+ "                    projectprop INNER JOIN\n"
 				+ "                    project ON project.project_id = projectprop.project_id WHERE\n"
 				+ "                    projectprop.variable_id = :variableId AND projectprop.value = :variableValue\n"
-				+ "                        AND project.program_uuid <> :programUUID)) = 1 "
+				+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 "
 				+ "						OR "
 				+ "				(EXISTS( SELECT \n"
 				+ "                    project.* FROM project\n"
@@ -1160,7 +1160,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "                    nd_geolocationprop ON nd_experiment.nd_geolocation_id = nd_geolocationprop.nd_geolocation_id"
 				+ "                WHERE nd_geolocationprop.type_id = :variableId\n"
 				+ "                        AND nd_geolocationprop.value = :variableValue\n"
-				+ "                        AND project.program_uuid <> :programUUID)) = 1 THEN 1 ELSE 0\n"
+				+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 THEN 1 ELSE 0\n"
 				+ "    END;");
 		query.setParameter("variableId", variableId);
 		query.setParameter("variableValue", variableValue);

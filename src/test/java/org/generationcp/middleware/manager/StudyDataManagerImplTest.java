@@ -603,7 +603,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInOtherProgramsVariableExistsInProjectProp() {
+	public void testIsVariableUsedInOtherProgramsVariableExistsInStudyLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -630,7 +630,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInOtherProgramsVariableExistsInGeolocationProp() {
+	public void testIsVariableUsedInOtherProgramsVariableExistsInTrialEnvironmentLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
