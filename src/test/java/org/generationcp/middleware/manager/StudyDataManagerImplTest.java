@@ -227,8 +227,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
 		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
 
-		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(),
-				this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+		final List<Reference> childrenNodes = this.manager
+				.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertTrue("The id of the subFolder should be " + subFolderID, subFolderID == childrenNodes.get(0).getId());
@@ -242,7 +242,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final int newSize = this.manager.getAllFolders().size();
 		// We only assert that there are two folders added.
-		Assert.assertEquals("The new size should be equal to the original size + 2", originalSize+2, newSize);
+		Assert.assertEquals("The new size should be equal to the original size + 2", originalSize + 2, newSize);
 	}
 
 	@Test
@@ -314,7 +314,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
 		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
-		final List<StudyDetails> updatedNurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+		final List<StudyDetails> updatedNurseryStudyDetails =
+				this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
 		Assert.assertEquals("The size after adding new nursery should be equal to the size before adding a new nursery + 1",
 				sizeAfterAddingNewNursery, sizeBeforeAddingNewNursery + 1);
@@ -353,21 +354,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetFolderTree() throws MiddlewareQueryException {
 		List<FolderReference> tree = this.manager.getFolderTree();
-		int sizeBefore = tree.size();
+		final int sizeBefore = tree.size();
 		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		tree = this.manager.getFolderTree();
-		int newSize = tree.size();
+		final int newSize = tree.size();
 		//Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
-		Assert.assertTrue("The new size should be equal the  size before + the newly added folder", newSize == (sizeBefore+1));
+		Assert.assertTrue("The new size should be equal the  size before + the newly added folder", newSize == (sizeBefore + 1));
 	}
 
 	@Test
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
-				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+		final FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
 
@@ -397,9 +399,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals(
 					"Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + resultTrialInstance.getPlantingOrder() + " instead.",
 					FieldMapDataUtil.PLANTING_ORDER, resultTrialInstance.getPlantingOrder().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got "
-					+ resultTrialInstance.getMachineRowCapacity() + " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY,
-					resultTrialInstance.getMachineRowCapacity().intValue());
+			Assert.assertEquals(
+					"Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + resultTrialInstance.getMachineRowCapacity()
+							+ " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY, resultTrialInstance.getMachineRowCapacity().intValue());
 			Assert.assertEquals(
 					"Expected " + StudyDataManagerImplTest.BLOCK_NAME + " but got " + resultTrialInstance.getBlockName() + " instead.",
 					StudyDataManagerImplTest.BLOCK_NAME, resultTrialInstance.getBlockName());
@@ -420,9 +422,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
-				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+		final FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
@@ -485,7 +488,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
 		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
-		final List<StudyDetails> updatedTrialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+		final List<StudyDetails> updatedTrialStudyDetails =
+				this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewTrial = updatedTrialStudyDetails.size();
 		Assert.assertEquals("The size after adding new trial should be equal to the size before adding a new trial + 1",
 				sizeAfterAddingNewTrial, sizeBeforeAddingNewTrial + 1);
@@ -501,7 +505,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> newStudyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
-		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy, sizeBeforeAddingNewStudy + 2);
+		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy,
+				sizeBeforeAddingNewStudy + 2);
 	}
 
 	@Test
@@ -625,7 +630,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertTrue(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
@@ -653,7 +659,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
@@ -699,7 +706,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getExperimentProjectDao().save(experimentProject);
 
 		Assert.assertTrue(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
@@ -746,7 +754,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getExperimentProjectDao().save(experimentProject);
 
 		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 

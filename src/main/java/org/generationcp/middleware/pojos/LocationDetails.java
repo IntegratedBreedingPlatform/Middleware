@@ -24,7 +24,7 @@ import java.util.Comparator;
 
 /**
  * POJO for location details query.
- *
+ * <p>
  * select locid, lname as location_name, c.isofull as country_full_name, l.labbr as location_abbreviation, ud.fname as location_type, ud.fdesc
  * as location_description from location l inner join cntry c on l.cntryid = c.cntryid inner join udflds ud on ud.fldno = l.ltype where
  * locid = 1
