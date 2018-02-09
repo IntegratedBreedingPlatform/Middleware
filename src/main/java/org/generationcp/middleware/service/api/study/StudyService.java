@@ -53,7 +53,20 @@ public interface StudyService {
 	 */
 	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId);
 
-	List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO);
+	/**
+	 * Retrieves Phenotypes given certain search parameters
+	 * specified in https://brapi.docs.apiary.io/#reference/phenotypes/phenotype-search V1.1
+	 * @param pageSize
+	 * @param pageNumber
+	 * @param requestDTO
+	 * @return List of phenotypes
+	 */
+	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
 
-	long countPhenotypes(PhenotypeSearchRequestDTO requestDTO);
+	/**
+	 * Retrieves a count of how many phenotypes match with the search parameters
+	 * @param requestDTO
+	 * @return Number of phenotypes
+	 */
+	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
 }

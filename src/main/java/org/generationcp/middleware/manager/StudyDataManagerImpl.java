@@ -1185,7 +1185,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<String, Integer> getMappedEnvironmentInstances(final Integer studyId) {
+	public Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId) {
 		final List<Geolocation> geolocations = this.getGeolocationDao().getEnvironmentGeolocations(studyId);
 		final Map<String, Integer> map = new HashMap<>();
 		for (final Geolocation geolocation : geolocations) {

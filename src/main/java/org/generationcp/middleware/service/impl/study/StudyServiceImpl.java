@@ -582,12 +582,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO) {
+	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
 		return this.getPhenotypeDao().searchPhenotypes(pageSize, pageNumber, requestDTO);
 	}
 
 	@Override
-	public long countPhenotypes(PhenotypeSearchRequestDTO requestDTO) {
+	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
 		return this.getPhenotypeDao().countPhenotypes(requestDTO);
 	}
 

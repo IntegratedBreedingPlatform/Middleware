@@ -897,10 +897,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return phenotypes;
 	}
 
-	public List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO) {
-		StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
+	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
+		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
-		List<String> cvTermIds = requestDTO.getCvTermIds();
+		final List<String> cvTermIds = requestDTO.getCvTermIds();
 
 		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
@@ -933,7 +933,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 				.addScalar("entryNumber", new StringType());
 
-		List<Object[]> results = sqlQuery.list();
+		final List<Object[]> results = sqlQuery.list();
 
 		final Map<Integer, PhenotypeSearchDTO> observationUnitsByNdExpId = new LinkedHashMap<>();
 
@@ -943,7 +943,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			for (final Object[] row : results) {
 				final PhenotypeSearchDTO observationUnit = new PhenotypeSearchDTO();
 
-				Integer ndExperimentId = (Integer) row[0];
+				final Integer ndExperimentId = (Integer) row[0];
 				observationUnit.setObservationUnitDbId((String) row[1]); // plot_id
 				observationUnit.setObservationUnitName((String) row[2]);
 				observationUnit.setObservationLevel((String) row[3]);
@@ -979,12 +979,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			observationsQuery.addScalar("expid").addScalar("nd_exp_phen_id").addScalar("cvterm_id")
 					.addScalar("cvterm_name", new StringType()).
 					addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType());
-			List<Object[]> observationResults = observationsQuery.list();
+			final List<Object[]> observationResults = observationsQuery.list();
 
 			for (final Object[] result : observationResults) {
-				Integer ndExperimentId = (Integer) result[0];
+				final Integer ndExperimentId = (Integer) result[0];
 
-				PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
+				final PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
 				final String variableId = (result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
 				observation.setObservationVariableDbId(variableId);
 				observation.setObservationVariableName((String) result[3]);
@@ -994,7 +994,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observation.setObservationDbId((Integer) result[1]);
 				observation.setValue((String) result[4]);
 
-				PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
+				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
 				// TODO solve duplicate nd_experiment_phenotype_id
 				observationUnit.getObservations().add(observation);
 			}
@@ -1003,10 +1003,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return new ArrayList<>(observationUnitsByNdExpId.values());
 	}
 
-	public long countPhenotypes(PhenotypeSearchRequestDTO requestDTO) {
-		StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
+	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
+		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
-		List<String> cvTermIds = requestDTO.getCvTermIds();
+		final List<String> cvTermIds = requestDTO.getCvTermIds();
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
 		}

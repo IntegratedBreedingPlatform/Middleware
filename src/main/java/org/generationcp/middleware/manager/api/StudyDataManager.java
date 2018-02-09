@@ -787,6 +787,6 @@ public interface StudyDataManager {
 	 */
 	Map<Integer, List<PlantDTO>> getSampledPlants (final Integer studyId);
 
-	Map<String, Integer> getMappedEnvironmentInstances (final Integer studyId);
+	Map<String, Integer> getInstanceGeolocationIdsMap (final Integer studyId);
 
 }
