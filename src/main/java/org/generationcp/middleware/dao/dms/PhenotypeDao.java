@@ -954,11 +954,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setStudyDbId((String) row[7]);
 				observationUnit.setStudyName((String) row[8]);
 				observationUnit.setProgramName((String) row[9]);
-				final String x = (String) row[15]; // ROW
-				final String y = (String) row[16]; // COL
+				String x = (String) row[15]; // ROW
+				String y = (String) row[16]; // COL
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					observationUnit.setX((String) row[10]); // fieldMapRow
-					observationUnit.setY((String) row[11]); // fieldMapCol
+					x = (String) row[10]; // fieldMapRow
+					y = (String) row[11]; // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
