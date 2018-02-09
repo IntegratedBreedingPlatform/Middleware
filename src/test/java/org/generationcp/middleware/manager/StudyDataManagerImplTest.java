@@ -120,7 +120,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
 				this.locationManager);
-		
+
 		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
 	}
 
@@ -630,6 +630,34 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testIsVariableUsedInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+		project.setDeleted(true);
+
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+
+		// Create projectproperty record
+		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
+
+		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
+	@Test
 	public void testIsVariableUsedInOtherProgramsVariableExistsInTrialEnvironmentLevel() {
 
 		// Create project record
@@ -658,7 +686,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setProject(project);
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
@@ -667,9 +694,58 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final ExperimentProject experimentProject = new ExperimentProject();
 		experimentProject.setExperiment(experimentModel);
 		experimentProject.setProjectId(project.getProjectId());
+		experimentProject.setExperimentProjectId(1);
+		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
 		this.manager.getExperimentProjectDao().save(experimentProject);
 
 		Assert.assertTrue(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
+	@Test
+	public void testIsVariableUsedInOtherProgramsVariableExistsInTrialEnvironmentLevelStudyIsDeleted() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+		project.setDeleted(true);
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+		dmsVariableType.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+
+		// Create nd_geolocation and nd_geolocation prop records
+		final VariableList variableList = new VariableList();
+		final Variable variable = new Variable();
+		variable.setVariableType(dmsVariableType);
+		variable.setValue(locationNameIdValue);
+		variableList.add(variable);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+
+		// Create experiment record
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		experimentModel.setGeoLocation(geolocation);
+		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
+
+		// Create experimentproject record
+		final ExperimentProject experimentProject = new ExperimentProject();
+		experimentProject.setExperiment(experimentModel);
+		experimentProject.setProjectId(project.getProjectId());
+		experimentProject.setExperimentProjectId(1);
+		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
+		this.manager.getExperimentProjectDao().save(experimentProject);
+
+		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
