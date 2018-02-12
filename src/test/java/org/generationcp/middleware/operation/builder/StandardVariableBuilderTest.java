@@ -33,6 +33,9 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 public class StandardVariableBuilderTest extends IntegrationTestBase {
 
 	private static final int TRIAL_INSTANCE_PROPERTY_ID = 2100;
@@ -239,11 +242,18 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final List<String> headers = this.createLocalVariableNamesOfProjectTestData();
 		final Map<String, List<StandardVariable>> stdVars = standardVariableBuilder.getStandardVariablesInProjects(headers, null);
 		assertNotNull(stdVars);
-		assertEquals(headers.size(), stdVars.size());
+		
+		final List<String> headerNamesTrimmed = Lists.transform(headers, new Function<String, String>() {
+			public String apply(String s) {
+				return s.trim();
+			}
+		});
+		assertEquals(headerNamesTrimmed.size(), stdVars.size());
 		for (final String header : stdVars.keySet()) {
-			assertTrue(headers.contains(header));
+			assertTrue(headerNamesTrimmed.contains(header));
 			final List<StandardVariable> headerStandardVariables = stdVars.get(header);
 			assertNotNull(headerStandardVariables);
+			assertTrue(!headerStandardVariables.isEmpty());
 			for (final StandardVariable standardVariable : headerStandardVariables) {
 				if ("TRIAL_INSTANCE".equals(header)) {
 					assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
@@ -315,7 +325,8 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 
 	private List<String> createLocalVariableNamesOfProjectTestData() {
 		final List<String> headers = new ArrayList<>();
-		headers.add("TRIAL_INSTANCE");
+		// Put a trailing space at the end. Should still be retrieved
+		headers.add("TRIAL_INSTANCE ");
 		headers.add("ENTRY_NO");
 		headers.add("PLOT_NO");
 		return headers;
