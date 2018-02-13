@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -401,6 +402,7 @@ public class WorkbookSaver extends Saver {
 			}
 		}
 		VariableList geolocation = this.getVariableListTransformer().transformTrialEnvironment(trialMV, trialVariables);
+		this.setVariableListValues(geolocation, trialMV);
 		Integer studyLocationId = null;
 
 		// GCP-8092 Nurseries will always have a unique geolocation, no more
@@ -519,6 +521,19 @@ public class WorkbookSaver extends Saver {
 				final Variable variable = variableList.findById(mvar.getTermId());
 				if (variable != null && variable.getValue() == null) {
 					variable.setValue(mvar.getValue());
+				}
+				this.setCategoricalVariableValues(mvar, variable);
+			}
+		}
+	}
+	
+	//Sets the value of categorical variables to the key of the possible value instead of its name
+	void setCategoricalVariableValues(final MeasurementVariable mvar, final Variable variable) {
+		if (variable != null && mvar.getPossibleValues() != null && !mvar.getPossibleValues().isEmpty()) {
+			for (final ValueReference possibleValue : mvar.getPossibleValues()) {
+				if (possibleValue.getName().equalsIgnoreCase(mvar.getValue())) {
+					variable.setValue(possibleValue.getKey());
+					break;
 				}
 			}
 		}
