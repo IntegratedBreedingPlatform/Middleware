@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
+import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -165,6 +167,16 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		for (final Variable variable : variableList.getVariables()) {
 			Assert.assertNotNull(variable.getValue());
 		}
+	}
+	
+	@Test
+	public void testSetCategoricalVariableValues() {
+		MeasurementVariable mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(1001, "1");
+		mvar.setPossibleValues(ValueReferenceTestDataInitializer.createPossibleValues());
+		Variable variable  = new Variable();
+		WorkbookSaverTest.workbookSaver.setCategoricalVariableValues(mvar, variable);
+		Assert.assertNotNull(variable.getValue());
+		Assert.assertEquals("1", variable.getValue());
 	}
 
 	@Test
