@@ -65,32 +65,32 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term getTermById(int termId) throws MiddlewareQueryException {
+	public Term getTermById(int termId) {
 		return this.getTermBuilder().get(termId);
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(int stdVariableId, String programUUID) throws MiddlewareException {
+	public StandardVariable getStandardVariable(int stdVariableId, String programUUID) {
 		return this.getStandardVariableBuilder().create(stdVariableId, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds, String programUUID) throws MiddlewareException {
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds, String programUUID) {
 		return this.getStandardVariableBuilder().create(standardVariableIds, programUUID);
 	}
 
 	@Override
-	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) {
 		return this.getStandardVariableBuilder().getStandardVariableSummaries(standardVariableIds);
 	}
 
 	@Override
-	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException {
+	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) {
 		return this.getStandardVariableBuilder().getStandardVariableSummary(standardVariableId);
 	}
 
 	@Override
-	public void addStandardVariable(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException {
+	public void addStandardVariable(StandardVariable stdVariable, String programUUID) {
 
 		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
@@ -139,7 +139,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
+	public void addStandardVariable(List<StandardVariable> stdVariableList) {
 
 		try {
 			for (StandardVariable stdVariable : stdVariableList) {
@@ -152,7 +152,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException {
+	public void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) {
 		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
 			throw new MiddlewareQueryException(String.format(
@@ -216,19 +216,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	 */
 	@Deprecated
 	@Override
-	public Term addMethod(String name, String definition) throws MiddlewareQueryException {
+	public Term addMethod(String name, String definition) {
 		return this.addTerm(name, definition, CvId.METHODS);
 	}
 
 	@Override
-	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) throws MiddlewareException {
-		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) {
+		Set<StandardVariable> standardVariables = new HashSet<>();
 		standardVariables.addAll(this.getStandardVariablesByNameOrSynonym(nameOrSynonym, programUUID));
 		return standardVariables;
 	}
 
-	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) throws MiddlewareException {
-		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) {
+		Set<StandardVariable> standardVariables = new HashSet<>();
 		List<Integer> stdVarIds = this.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
 		for (Integer stdVarId : stdVarIds) {
 			standardVariables.add(this.getStandardVariable(stdVarId, programUUID));
@@ -237,18 +237,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term findMethodById(int id) throws MiddlewareQueryException {
+	public Term findMethodById(int id) {
 		return this.getMethodBuilder().findMethodById(id);
 	}
 
 	@Override
-	public Term findMethodByName(String name) throws MiddlewareQueryException {
+	public Term findMethodByName(String name) {
 		return this.getMethodBuilder().findMethodByName(name);
 	}
 
 	@Override
-	public StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method, String programUUID)
-			throws MiddlewareException {
+	public StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method, String programUUID) {
 		Term termProperty, termScale, termMethod;
 		Integer propertyId = null, scaleId = null, methodId = null;
 
@@ -272,19 +271,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+	public List<Term> getAllTermsByCvId(CvId cvId) {
 		return this.getTermBuilder().getTermsByCvId(cvId);
 	}
 
 	@Override
-	public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+	public long countTermsByCvId(CvId cvId) {
 		return this.getCvTermDao().countTermsByCvId(cvId);
 	}
 
 	@Override
-	public List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException {
-		List<Term> methodTerms = new ArrayList<Term>();
-		Set<Integer> methodIds = new HashSet<Integer>();
+	public List<Term> getMethodsForTrait(Integer traitId) {
+		List<Term> methodTerms = new ArrayList<>();
+		Set<Integer> methodIds = new HashSet<>();
 		List<Integer> localMethodIds = this.getCvTermDao().findMethodTermIdsByTrait(traitId);
 		if (localMethodIds != null) {
 			methodIds.addAll(localMethodIds);
@@ -296,9 +295,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException {
-		List<Term> scaleTerms = new ArrayList<Term>();
-		Set<Integer> scaleIds = new HashSet<Integer>();
+	public List<Term> getScalesForTrait(Integer traitId) {
+		List<Term> scaleTerms = new ArrayList<>();
+		Set<Integer> scaleIds = new HashSet<>();
 		List<Integer> localMethodIds = this.getCvTermDao().findScaleTermIdsByTrait(traitId);
 		if (localMethodIds != null) {
 			scaleIds.addAll(localMethodIds);
@@ -310,12 +309,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+	public Term findTermByName(String name, CvId cvId) {
 		return this.getTermBuilder().findTermByName(name, cvId);
 	}
 
 	@Override
-	public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {
+	public Term addTerm(String name, String definition, CvId cvId) {
 		Term term = this.findTermByName(name, cvId);
 
 		if (term != null) {
@@ -338,7 +337,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void updateTerm(Term term) throws MiddlewareException {
+	public void updateTerm(Term term) {
 
 		if (term == null) {
 			return;
@@ -365,7 +364,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 
 	@Override
-	public List<Term> getDataTypes() throws MiddlewareQueryException {
+	public List<Term> getDataTypes() {
 		List<Integer> dataTypeIds =
 				Arrays.asList(TermId.CLASS.getId(), TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId(),
 						TermId.NUMERIC_DBID_VARIABLE.getId(), TermId.CHARACTER_DBID_VARIABLE.getId(), TermId.CHARACTER_VARIABLE.getId(),
@@ -375,10 +374,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, String programUUID, int start,
-			int numOfRows) throws MiddlewareException {
+			int numOfRows) {
 
-		TreeMap<String, StandardVariable> standardVariables = new TreeMap<String, StandardVariable>();
-		List<Integer> localStdVariableIds = new ArrayList<Integer>();
+		TreeMap<String, StandardVariable> standardVariables = new TreeMap<>();
+		List<Integer> localStdVariableIds = new ArrayList<>();
 
 		localStdVariableIds = this.getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
 
@@ -399,16 +398,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID)
-			throws MiddlewareException {
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID) {
 		return this.getStandardVariableBuilder().getStandardVariablesInProjects(headers, programUUID);
 	}
 
 	@Override
-	public List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException {
-		List<Term> terms = new ArrayList<Term>();
-		List<CVTerm> cvTerms = new ArrayList<CVTerm>();
-		List<Integer> termIds = new ArrayList<Integer>();
+	public List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) {
+		List<Term> terms = new ArrayList<>();
+		List<CVTerm> cvTerms = new ArrayList<>();
+		List<Integer> termIds = new ArrayList<>();
 
 		termIds = this.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
 		for (Integer id : termIds) {
@@ -421,7 +419,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException {
+	public Term addProperty(String name, String definition, int isA) {
 
 		Term term = this.findTermByName(name, CvId.PROPERTIES);
 
@@ -449,7 +447,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareException {
+	public Term addOrUpdateTerm(String name, String definition, CvId cvId) {
 
 		try {
 
@@ -464,7 +462,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void addOrUpdateCropOntologyID(Property property, String cropOntologyID) throws MiddlewareQueryException {
+	public void addOrUpdateCropOntologyID(Property property, String cropOntologyID) {
 		assert !StringUtils.isEmpty(cropOntologyID);
 
 		try {
@@ -478,8 +476,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
-			throws MiddlewareException {
+	public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId) {
 		try {
 			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
 			this.saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
@@ -490,7 +487,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareException {
+	public Term updateTermAndRelationship(Term term, int typeId, int objectId) {
 
 		Term updatedTerm = null;
 
@@ -511,7 +508,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return updatedTerm;
 	}
 
-	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareException {
+	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) {
 		Term term = this.findTermByName(name, cvId);
 
 		// If term is not existing, add
@@ -530,7 +527,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         this.getTermRelationshipSaver().save(subjectId, typeId, objectId);
     }
 
-    private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareException {
+    private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) {
 		Term typeTerm = this.getTermById(typeId);
 		if (typeTerm != null) {
 			CVTermRelationship cvRelationship = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
@@ -548,7 +545,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Property getProperty(int termId) throws MiddlewareQueryException {
+	public Property getProperty(int termId) {
 		Property property = new Property();
 
 		property.setTerm(this.getTermBuilder().getTermOfProperty(termId, CvId.PROPERTIES.getId()));
@@ -560,7 +557,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Property getProperty(String name) throws MiddlewareQueryException {
+	public Property getProperty(String name) {
 		Property property = new Property();
 
 		property.setTerm(this.findTermByName(name, CvId.PROPERTIES));
@@ -573,24 +570,24 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public long countIsAOfProperties() throws MiddlewareQueryException {
+	public long countIsAOfProperties() {
 		long count = 0;
 		count += this.getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
 		return count;
 	}
 
 	@Override
-	public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException {
+	public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) {
 		return this.getTraitGroupBuilder().getAllTraitGroupsHierarchy(includePropertiesAndVariables);
 	}
 
 	@Override
-	public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException {
+	public List<Term> getTermsByIds(List<Integer> ids) {
 		return this.getTermBuilder().getTermsByIds(ids);
 	}
 
 	@Override
-	public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException {
+	public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) {
 		Term term = this.findTermByName(name, CvId.IBDB_TERMS);
 
 		if (term != null) {
@@ -614,8 +611,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException {
-		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+	public Set<StandardVariable> getAllStandardVariables(String programUUID) {
+		Set<StandardVariable> standardVariables = new HashSet<>();
 		List<Term> terms = this.getAllTermsByCvId(CvId.VARIABLES);
 		for (Term term : terms) {
 			standardVariables.add(this.getStandardVariable(term.getId(), programUUID));
@@ -625,8 +622,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId,
-			String programUUID) throws MiddlewareException {
-		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+			String programUUID) {
+		List<StandardVariable> standardVariables = new ArrayList<>();
 
 		if (traitClassId != null) {
 			standardVariables.addAll(this.getStandardVariablesOfTraitClass(traitClassId, programUUID));
@@ -642,11 +639,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return standardVariables;
 	}
 
-	private List<StandardVariable> getStandardVariablesOfTraitClass(Integer traitClassId, String programUUID) throws MiddlewareException {
-		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+	private List<StandardVariable> getStandardVariablesOfTraitClass(Integer traitClassId, String programUUID) {
+		List<StandardVariable> standardVariables = new ArrayList<>();
 		List<PropertyReference> properties = this.getCvTermDao().getPropertiesOfTraitClass(traitClassId);
 
-		List<Integer> propertyIds = new ArrayList<Integer>();
+		List<Integer> propertyIds = new ArrayList<>();
 		for (PropertyReference property : properties) {
 			propertyIds.add(property.getId());
 		}
@@ -667,12 +664,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+	public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) {
 		return this.getStandardVariableBuilder().getIdByTermId(cvTermId, termId);
 	}
 
 	@Override
-	public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareException {
+	public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) {
 
 		standardVariable.setProperty(this.getTermBuilder().findOrSaveTermByName(standardVariable.getProperty().getName(), CvId.PROPERTIES));
 		standardVariable.setScale(this.getTermBuilder().findOrSaveTermByName(standardVariable.getScale().getName(), CvId.SCALES));
@@ -699,7 +696,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareException {
+	public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) {
 
 		try {
 
@@ -712,7 +709,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void deleteStandardVariableLocalConstraints(int standardVariableId) throws MiddlewareQueryException {
+	public void deleteStandardVariableLocalConstraints(int standardVariableId) {
 
 		try {
 
@@ -727,7 +724,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException {
+	public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) {
 
 		if (variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
 			throw new MiddlewareException(
@@ -749,7 +746,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException {
+	public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) {
 
 		if (enumeration.getId() == null && variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
 			throw new MiddlewareException("Error in saveOrUpdateStandardVariableEnumeration(). "
@@ -777,7 +774,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	}
 
-	private Integer getEnumerationCvId(StandardVariable variable) throws MiddlewareQueryException {
+	private Integer getEnumerationCvId(StandardVariable variable) {
 
 		// Check if cv entry of enumeration already exists
 		// Add cv entry of the standard variable if none found
@@ -791,7 +788,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
+	public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) {
 
 		try {
 
@@ -805,7 +802,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
+	public void deleteTerm(int cvTermId, CvId cvId) {
 
 		try {
 
@@ -831,7 +828,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException {
+	public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) {
 
 		try {
 			if (this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
@@ -855,7 +852,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 	}
 
-	private void validateTermRelationshipsForDeletion(int cvTermId) throws MiddlewareQueryException {
+	private void validateTermRelationshipsForDeletion(int cvTermId) {
 
 		if (this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
 			if (this.getCvTermDao().getById(this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv()
@@ -873,7 +870,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	}
 
-	private void deleteCvTermRelationship(int subjectId, int typeId) throws MiddlewareException {
+	private void deleteCvTermRelationship(int subjectId, int typeId) {
 		Term typeTerm = this.getTermById(typeId);
 		if (typeTerm != null) {
 			CVTermRelationship cvRelationship = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
@@ -884,7 +881,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
+	public List<Property> getAllPropertiesWithTraitClass() {
 		List<Property> properties = this.getCvTermDao().getAllPropertiesWithTraitClass();
 		Collections.sort(properties, new Comparator<Property>() {
 
@@ -897,7 +894,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
+	public void deleteStandardVariable(int stdVariableId) {
 		VariableCache.removeFromCache(stdVariableId);
 
 		try {
@@ -909,7 +906,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method) throws MiddlewareQueryException {
+	public Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method) {
 
 		Integer propertyId = this.findTermIdByName(property, CvId.PROPERTIES);
 		Integer scaleId = this.findTermIdByName(scale, CvId.SCALES);
@@ -919,14 +916,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId)
-			throws MiddlewareQueryException {
+	public Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId) {
 
 		return this.getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 
 	}
 
-	private Integer findTermIdByName(String name, CvId cvType) throws MiddlewareQueryException {
+	private Integer findTermIdByName(String name, CvId cvType) {
 		Term term = this.findTermByName(name, cvType);
 		if (term != null) {
 			return term.getId();
@@ -935,18 +931,18 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
+	public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) {
 		return this.getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
 	}
 
 	@Override
-	public List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException {
+	public List<NameSynonym> getSynonymsOfTerm(Integer termId) {
 		List<CVTermSynonym> synonyms = this.getNameSynonymBuilder().findSynonyms(termId);
 		return this.getNameSynonymBuilder().create(synonyms);
 	}
 
 	@Override
-	public boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException {
+	public boolean isSeedAmountVariable(String variateProperty) {
 		boolean isSeedAmountVar = false;
 
 		if ("INVENTORY AMOUNT".equalsIgnoreCase(variateProperty)) {
@@ -970,12 +966,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getCVIdByName(String name) throws MiddlewareQueryException {
+	public Integer getCVIdByName(String name) {
 		return this.getCvDao().getIdByName(name);
 	}
 
 	@Override
-	public Term findTermByName(String name, int cvId) throws MiddlewareQueryException {
+	public Term findTermByName(String name, int cvId) {
 		return this.getTermBuilder().findTermByName(name, cvId);
 	}
 

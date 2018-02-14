@@ -39,18 +39,19 @@ import java.util.Map;
  */
 public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
+	private static final String TYPE_ID = "typeId";
 	private static final Logger LOG = LoggerFactory.getLogger(ProjectPropertyDao.class);
 
 	/**
 	 *
-	 * @param propertyNames
+	 * @param variableNames
 	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(final List<String> propertyNames)
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames)
 			 {
 
-		final List<String> propertyNamesInUpperCase = Lists.transform(propertyNames, new Function<String, String>() {
+		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, new Function<String, String>() {
 
 			public String apply(String s) {
 				return s.toUpperCase();
@@ -63,33 +64,39 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 					.setProjection(Projections.distinct(Projections.projectionList()
 						.add(Projections.property("alias"))
 						.add(Projections.property("variableId"))
-						.add(Projections.property("typeId"))));
-				criteria.add(Restrictions.in("typeId", VariableType.ids()));
-				criteria.add(Restrictions.in("alias", propertyNames));
+						.add(Projections.property(TYPE_ID))));
+				
+				/* Exclude variables used as condition such that variable type in projectprop "Study Detail" as "Study Detail" 
+				 * is not one of the standard categorizations in Ontology Mapping so it will lead to variable being unmapped
+				 */
+				final List<Integer> variableTypes = VariableType.ids();
+				variableTypes.remove(VariableType.STUDY_DETAIL.getId());
+				criteria.add(Restrictions.in(TYPE_ID, variableTypes));
+				
+				criteria.add(Restrictions.in("alias", variableNames));
 				criteria.createAlias("property.variable", "variable").add(Restrictions.eq("variable.isObsolete", 0));
-
 				List<Object[]> results = criteria.list();
 				return convertToVariablestandardVariableIdsWithTypeMap(results);
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getStandardVariableIdsWithTypeByPropertyNames="
-							+ propertyNames + " in ProjectPropertyDao: "
-							+ e.getMessage(), e);
+			final String message =
+					"Error in getStandardVariableIdsWithTypeByPropertyNames=" + variableNames + " in ProjectPropertyDao: " + e.getMessage();
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
-		return new HashMap<String, Map<Integer, VariableType>>();
+		return new HashMap<>();
 	}
 
 	protected Map<String, Map<Integer, VariableType>> convertToVariablestandardVariableIdsWithTypeMap(List<Object[]> queryResult) {
 
-		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
+		final Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<>();
 
 		for (final Object[] row : queryResult) {
 			final String alias = (String) row[0];
 			final Integer variableId = (Integer) row[1];
 			final Integer typeId = (Integer) row[2];
-			Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap();
+			Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap<>();
 
 			if (standardVariableIdsWithTypeInProjects.containsKey(alias.toUpperCase())) {
 				stdVarIdKeyTypeValueList = standardVariableIdsWithTypeInProjects.get(alias.toUpperCase());
@@ -137,7 +144,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public List<ProjectProperty> getByTypeAndValue(int typeId, String value) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.eq(TYPE_ID, typeId));
 			criteria.add(Restrictions.eq("value", value));
 			return criteria.list();
 
@@ -196,6 +203,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return variableIds;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<ProjectProperty> getByProjectId(final Integer projectId) {
 		List<ProjectProperty> list;
 		DmsProject dmsProject = new DmsProject();
@@ -214,6 +222,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return list;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		Map<String, String> geoProperties = new HashMap<>();

@@ -16,14 +16,14 @@ public class ValueReferenceTestDataInitializer {
 
 	public ValueReference createValueReference(final int id, final String name) {
 		final ValueReference valueReference = new ValueReference(id, name);
-		valueReference.setProgramUUID(DUMMY_PROGRAM_UUID);
+		valueReference.setProgramUUID(ValueReferenceTestDataInitializer.DUMMY_PROGRAM_UUID);
 		valueReference.setDescription(name);
 		return valueReference;
 	}
 
 	public ValueReference createValueReference(final int id, final String name, final String description) {
 		final ValueReference valueReference = new ValueReference(id, name);
-		valueReference.setProgramUUID(DUMMY_PROGRAM_UUID);
+		valueReference.setProgramUUID(ValueReferenceTestDataInitializer.DUMMY_PROGRAM_UUID);
 		valueReference.setDescription(description);
 		return valueReference;
 	}
@@ -34,5 +34,15 @@ public class ValueReferenceTestDataInitializer {
 			valueReferenceList.add(this.createValueReference(i, "Name " + i));
 		}
 		return valueReferenceList;
+	}
+
+	public static List<ValueReference> createPossibleValues() {
+		final List<ValueReference> possibleValues = new ArrayList<>();
+		possibleValues.add(new ValueReference(1, "1", ""));
+		possibleValues.add(new ValueReference(2, "2", ""));
+		possibleValues.add(new ValueReference(3, "3", ""));
+		possibleValues.add(new ValueReference(4, "4", ""));
+		possibleValues.add(new ValueReference(5, "5", ""));
+		return possibleValues;
 	}
 }
