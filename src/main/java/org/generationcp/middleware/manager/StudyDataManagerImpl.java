@@ -11,8 +11,11 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -40,7 +43,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
@@ -76,10 +78,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -504,7 +504,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, null);
 			}
 			if (experimentValues != null && !experimentValues.isEmpty()) {
-				this.updateExperimentValues(experimentValues, project.getProjectId(), locationIds);
+				this.updateExperimentValues(experimentValues, project.getProjectId());
 			}
 
 		} catch (final Exception e) {
@@ -513,8 +513,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 	}
 
-	private void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId,
-			final List<Integer> locationIds) {
+	private void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId) {
 
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
@@ -528,13 +527,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
-		List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
+		List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
-		fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
-
-		final int blockId = this.getBlockId(fieldMapInfos);
-		final FieldmapBlockInfo blockInfo = this.locationDataManager.getBlockInformation(blockId);
-		this.updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo, true);
+		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
 		//		 Filter those belonging to the given geolocationId
 		for (final FieldMapInfo fieldMapInfo : fieldMapInfos) {
@@ -550,12 +545,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
 
-		List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
+		List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
 
-		fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
-
-		final FieldmapBlockInfo blockInfo = this.locationDataManager.getBlockInformation(blockId);
-		this.updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
+		this.updateFieldMapWithBlockInformation(fieldMapInfos);
 
 		return fieldMapInfos;
 	}
@@ -678,10 +670,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		// check if folder has no children
 		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, studyTypes);
-		if (children == null || children.isEmpty()) {
-			return true;
-		}
-		return false;
+		return (children == null || children.isEmpty());
 	}
 
 	@Override
@@ -872,39 +861,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 	}
 
-	private Integer getBlockId(final List<FieldMapInfo> infos) {
-		if (infos == null) {
-			return null;
-		}
-		for (final FieldMapInfo info : infos) {
-			if (info == null || info.getDatasets() == null) {
-				continue;
-			}
-			for (final FieldMapDatasetInfo dataset : info.getDatasets()) {
-				final Integer blockId = this.getBlockId(dataset);
-				if (blockId != null) {
-					return blockId;
-				}
-			}
-		}
-		return null;
+	private void updateFieldMapWithBlockInformation(final List<FieldMapInfo> infos) {
+		this.updateFieldMapWithBlockInformation(infos, false);
 	}
 
-	private Integer getBlockId(final FieldMapDatasetInfo dataset) {
-		if (dataset != null && dataset.getTrialInstances() != null) {
-			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-				return trial.getBlockId();
-			}
-		}
-		return null;
-	}
-
-	private void updateFieldMapWithBlockInformation(final List<FieldMapInfo> infos, final FieldmapBlockInfo blockInfo) {
-		this.updateFieldMapWithBlockInformation(infos, blockInfo, false);
-	}
-
-	protected void updateFieldMapWithBlockInformation(final List<FieldMapInfo> infos, final FieldmapBlockInfo blockInfo,
-			final boolean isGetLocation) {
+	protected void updateFieldMapWithBlockInformation(final List<FieldMapInfo> infos, final boolean isGetLocation) {
 		if (infos == null) {
 			return;
 		}
@@ -936,7 +897,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	private void updateFieldMapInfoWithBlockInfo(final List<FieldMapInfo> fieldMapInfos) {
-		this.updateFieldMapWithBlockInformation(fieldMapInfos, null, true);
+		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 	}
 
 	private String getLocationName(final Map<Integer, String> locationMap, final Integer id) {
