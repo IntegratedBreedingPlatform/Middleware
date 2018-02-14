@@ -1076,14 +1076,14 @@ public class WorkbookSaver extends Saver {
 
 	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study)
 		throws ParseException {
-		if (startDate.contains("-")) {
+		if (startDate != null && startDate.contains("-")) {
 			study.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 		} else {
 			study.setStartDate(startDate);
 		}
 		study.setStudyUpdate(Util.getCurrentDateAsStringValue(Util.DATE_AS_NUMBER_FORMAT));
 
-		if (endDate.contains("-")) {
+		if (endDate != null && endDate.contains("-")) {
 			study.setEndDate(Util.convertDate(endDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 		} else {
 			study.setEndDate(endDate);
