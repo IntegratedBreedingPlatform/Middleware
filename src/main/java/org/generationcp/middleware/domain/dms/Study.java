@@ -87,7 +87,7 @@ public class Study implements Serializable {
 	}
 
 	public Integer getEndDate() {
-		return (this.endDate != null && this.endDate.isEmpty() ? null : Integer.valueOf(this.endDate));
+		return (this.endDate != null && !this.endDate.isEmpty() ? Integer.valueOf(this.endDate): null);
 	}
 
 	public Integer getUser() {
