@@ -83,4 +83,8 @@ public enum StudyType {
 	public static List<StudyType> trials() {
 		return Lists.newArrayList(T, OYT, RYT, OFT);
 	}
+
+	public static List<StudyType> allStudies() {
+		return Lists.newArrayList(N, HB, PN, CN, T, OYT, RYT, OFT, S, E);
+	}
 } 
