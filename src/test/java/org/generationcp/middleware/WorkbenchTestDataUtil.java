@@ -1,11 +1,11 @@
 
 package org.generationcp.middleware;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -14,11 +14,13 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class WorkbenchTestDataUtil {
 
+	@Autowired
 	private final WorkbenchDataManager workbenchDataManager;
 	private Project commonTestProject;
 	private User testUser1, testUser2;
@@ -60,10 +62,11 @@ public class WorkbenchTestDataUtil {
 		user.setPersonid(1);
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
+		user.setRoles(Arrays.asList(new UserRole(user, "ADMIN")));
 		return user;
 	}
 
-	public Project createTestProjectData() throws MiddlewareQueryException {
+	public Project createTestProjectData() {
 		Project project = new Project();
 		project.setUserId(1);
 		int uniqueId = new Random().nextInt(10000);
@@ -85,7 +88,7 @@ public class WorkbenchTestDataUtil {
 		return projectActivity;
 	}
 
-	public void setUpWorkbench() throws MiddlewareQueryException {
+	public void setUpWorkbench() {
 		this.testPerson1 = this.createTestPersonData();
 		this.workbenchDataManager.addPerson(this.testPerson1);
 		this.testPerson2 = this.createTestPersonData();
@@ -109,25 +112,29 @@ public class WorkbenchTestDataUtil {
 		this.workbenchDataManager.addProjectActivity(this.testProjectActivity2);
 
 		UserInfo userInfo = new UserInfo();
+		//TODO check if this is needed since we are hardcoding to user id 3
 		userInfo.setUserId(3);
 		userInfo.setLoginCount(5);
 		this.workbenchDataManager.insertOrUpdateUserInfo(userInfo);
 
+		// Save test users 1 and 2 as members of test program
 		ProjectUserInfo pui = new ProjectUserInfo();
-		pui.setProjectId(new Integer(Integer.parseInt(this.commonTestProject.getProjectId().toString())));
+		pui.setProject(this.commonTestProject);
 		pui.setUserId(this.commonTestProject.getUserId());
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
+		
+		pui = new ProjectUserInfo();
+		pui.setProject(this.commonTestProject);
+		pui.setUserId(this.testUser2.getUserid());
+		pui.setLastOpenDate(new Date());
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 
-		WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
-		workbenchRuntimeData.setUserId(1);
-		this.workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
 		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
-
 	}
 
-	public Project getCommonTestProject() throws MiddlewareQueryException {
+	public Project getCommonTestProject() {
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.createTestProjectData();
 		}
@@ -143,6 +150,13 @@ public class WorkbenchTestDataUtil {
 			this.testUser1 = this.createTestUserData();
 		}
 		return this.testUser1;
+	}
+	
+	public User getTestUser2() {
+		if (this.testUser2 == null) {
+			this.testUser2 = this.createTestUserData();
+		}
+		return this.testUser2;
 	}
 	
 	public UserDto createTestUserDTO(Integer userId){

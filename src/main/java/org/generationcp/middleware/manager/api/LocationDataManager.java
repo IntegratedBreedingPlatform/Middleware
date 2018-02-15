@@ -78,17 +78,6 @@ public interface LocationDataManager {
 	List<Location> getLocationsByUniqueID(String programUUID);
 
 	/**
-	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
-	 * locations (locations that match the specified program unique id). This will also exclude the locations whose location type
-	 * is specified in locationTypesToExclude.
-	 *
-	 * @param programUUID            - unique ID of the current program
-	 * @param locationTypesToExclude - location types to exclude
-	 * @return
-	 */
-	List<Location> getLocationsByUniqueIDAndExcludeLocationTypes(String programUUID, List<Integer> locationTypesToExclude);
-
-	/**
 	 * Returns the number of Locations with names matching the given parameter.
 	 *
 	 * @param name - search string for the name of the locations
