@@ -643,7 +643,7 @@ public class WorkbookSaver extends Saver {
 			final DmsProject study =
 					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
 							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription(),
-						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate());
+						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails().getObjective());
 			studyId = study.getProjectId();
 		}
 		watch.stop();
@@ -1174,13 +1174,15 @@ public class WorkbookSaver extends Saver {
 		final String description = workbook.getStudyDetails().getDescription();
 		final String startDate = workbook.getStudyDetails().getStartDate();
 		final String endDate = workbook.getStudyDetails().getEndDate();
+		final String objective = workbook.getStudyDetails().getObjective();
 
-		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset);
-		this.updateStudyDetails(description, startDate, endDate, study);
-		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset);
+		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset, objective);
+		this.updateStudyDetails(description, startDate, endDate, study, objective);
+		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset, objective);
 	}
 
-	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study)
+	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study,
+		final String objective)
 		throws ParseException {
 		if (startDate != null && startDate.contains("-")) {
 			study.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
@@ -1195,12 +1197,13 @@ public class WorkbookSaver extends Saver {
 			study.setEndDate(endDate);
 		}
 
-		this.updateStudyDetails(description, study);
+		this.updateStudyDetails(description, study, objective);
 	}
 
 
-	private void updateStudyDetails(final String description, final DmsProject study) {
+	private void updateStudyDetails(final String description, final DmsProject study, final String objective) {
 		study.setDescription(description);
+		study.setObjective(objective);
 		this.getDmsProjectDao().merge(study);
 	}
 

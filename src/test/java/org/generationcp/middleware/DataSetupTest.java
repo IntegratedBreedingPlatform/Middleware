@@ -255,11 +255,6 @@ public class DataSetupTest extends IntegrationTestBase {
 				"Study - assigned (DBCV)", DataSetupTest.PROP_STUDY, DataSetupTest.ASSIGNED, DataSetupTest.DBCV,
 				DataSetupTest.CHAR, studyDetails.getStudyName(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
-		conditions.add(this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE",
-				"Objective - described (text)", DataSetupTest.PROP_OBJECTIVE, DataSetupTest.DESCRIBED,
-				DataSetupTest.SCALE_TEXT, DataSetupTest.CHAR, studyDetails.getObjective(), DataSetupTest.STUDY,
-				PhenotypicType.STUDY, true));
-
 		if (locationIsStudyDetail) {
 			conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
 					LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,

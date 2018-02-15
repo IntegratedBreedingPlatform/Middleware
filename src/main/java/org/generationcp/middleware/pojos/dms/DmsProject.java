@@ -109,6 +109,9 @@ public class DmsProject implements Serializable {
 	@Column(name = "study_update")
 	private String studyUpdate;
 
+	@Column(name = "objective")
+	private String objective;
+
 	public DmsProject() {
 		super();
 	}
@@ -211,6 +214,14 @@ public class DmsProject implements Serializable {
 
 	public void setStudyUpdate(final String studyUpdate) {
 		this.studyUpdate = studyUpdate;
+	}
+
+	public String getObjective() {
+		return this.objective;
+	}
+
+	public void setObjective(final String objective) {
+		this.objective = objective;
 	}
 
 	@Override

@@ -213,7 +213,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final String uniqueId = this.commonTestProject.getUniqueID();
 		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
-		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
+		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 
 		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(),
 				this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
@@ -333,7 +333,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetParentFolder() throws MiddlewareQueryException {
 		final String uniqueId = "001";
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
-		final int id = this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
+		final int id = this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 		final DmsProject proj = this.manager.getParentFolder(id);
 		Assert.assertEquals("The folder names should be equal", project.getName(), proj.getName());
 	}
@@ -585,7 +585,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testIsFolderEmptyFalse() {
 		final String uniqueId = this.commonTestProject.getUniqueID();
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
-		this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
+		this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
 		Assert.assertFalse("The folder should not be empty", isEmpty);
 	}

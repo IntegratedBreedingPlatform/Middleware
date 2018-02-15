@@ -43,6 +43,8 @@ public class Study implements Serializable {
 
 	private String studyUpdate;
 
+	private String objective;
+
 	public Study() {
 	}
 
@@ -71,7 +73,7 @@ public class Study implements Serializable {
 	}
 
 	public String getObjective() {
-		return this.getDisplayValue(TermId.STUDY_OBJECTIVE);
+		return this.objective;
 	}
 
 	public Integer getPrimaryInvestigator() {
@@ -238,5 +240,13 @@ public class Study implements Serializable {
 
 	public void setStudyUpdate(final String studyUpdate) {
 		this.studyUpdate = studyUpdate;
+	}
+
+	public StudyType getStudyType() {
+		return this.studyType;
+	}
+
+	public void setObjective(final String objective) {
+		this.objective = objective;
 	}
 }

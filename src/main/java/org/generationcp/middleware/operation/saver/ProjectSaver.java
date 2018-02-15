@@ -35,7 +35,7 @@ public class ProjectSaver extends Saver {
 	}
 
 	public DmsProject create(StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
-		final String endDate) throws ParseException {
+		final String endDate, final String objective) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
@@ -54,13 +54,13 @@ public class ProjectSaver extends Saver {
 			} else {
 				project.setEndDate(endDate);
 			}
-			this.mapStudytoProject(name, description, project);
+			this.mapStudytoProject(name, description, project, objective);
 		}
 
 		return project;
 	}
 
-	private void mapStudytoProject(String name, String description, DmsProject project) throws MiddlewareException {
+	private void mapStudytoProject(String name, String description, DmsProject project, final String objective) throws MiddlewareException {
 		StringBuffer errorMessage = new StringBuffer("");
 
 		if (name != null && !name.equals("")) {
@@ -71,6 +71,12 @@ public class ProjectSaver extends Saver {
 
 		if (description != null && !description.equals("")) {
 			project.setDescription(description);
+		} else {
+			errorMessage.append("\nprojectKey is null");
+		}
+
+		if (objective != null && !objective.equals("")) {
+			project.setObjective(objective);
 		} else {
 			errorMessage.append("\nprojectKey is null");
 		}
@@ -88,10 +94,10 @@ public class ProjectSaver extends Saver {
 	/**
 	 * Saves a folder. Creates an entry in project and project_relationship
 	 */
-	public DmsProject saveFolder(int parentId, String name, String description, String programUUID) throws Exception {
+	public DmsProject saveFolder(int parentId, String name, String description, String programUUID, final String objective) throws Exception {
 		DmsProject project = new DmsProject();
 		project.setProgramUUID(programUUID);
-		this.mapStudytoProject(name, description, project);
+		this.mapStudytoProject(name, description, project, objective);
 
 		try {
 			project = this.save(project);

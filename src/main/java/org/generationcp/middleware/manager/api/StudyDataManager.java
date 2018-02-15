@@ -181,11 +181,12 @@ public interface StudyDataManager {
 	 * @param cropPrefix
 	 * @param studyType
 	 * @param description
+	 * @param objective
 	 * @return StudyReference corresponding to the newly-created Study
 	 */
 	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
-		final String cropPrefix, final StudyType studyType, final String description, final String startDate,
-		final String endDate);
+		final String cropPrefix, final StudyType studyType, final String description, final String startDate, final String endDate,
+		final String objective);
 
 	/**
 	 * Adds a dataset, dataset labels (factors and variate labels), and parent study association in the local database.
@@ -428,9 +429,10 @@ public interface StudyDataManager {
 	 * @param name the name
 	 * @param description the description
 	 * @param programUUID the program UUID
+	 * @param objective
 	 * @return ID of the folder created
 	 */
-	int addSubFolder(int parentFolderId, String name, String description, String programUUID);
+	int addSubFolder(int parentFolderId, String name, String description, String programUUID, final String objective);
 
 	/**
 	 * Rename sub folder.

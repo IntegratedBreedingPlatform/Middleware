@@ -36,9 +36,9 @@ public class StudySaver extends Saver {
 	 */
 	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, boolean saveStudyExperiment,
 		final String programUUID, final String cropPrefix, final StudyType studyType, final String description, final String startDate,
-		final String endDate) throws Exception {
+		final String endDate, final String objective) throws Exception {
 
-		DmsProject project = this.getProjectSaver().create(studyValues, studyType, description, startDate, endDate);
+		DmsProject project = this.getProjectSaver().create(studyValues, studyType, description, startDate, endDate, objective);
 
 		project.setProgramUUID(programUUID);
 

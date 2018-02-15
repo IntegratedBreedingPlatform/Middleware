@@ -195,7 +195,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String STUDY_DETAILS_SQL = " SELECT DISTINCT \n"
 		+ "   p.name                     AS name, \n"
 		+ "   p.description              AS title, \n"
-		+ "   ppObjective.value          AS objective, \n"
+		+ "   p.objective                AS objective, \n"
 		+ "   p.start_date      		 AS startDate, \n"
 		+ "   p.end_date		         AS endDate, \n"
 		+ "   ppPI.value                 AS piName, \n"
@@ -209,8 +209,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " FROM \n"
 		+ "   project p \n"
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
-		+ "   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id "
-		+ "AND ppObjective.variable_id = " + TermId.STUDY_OBJECTIVE.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
 		+ "   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id \n"
@@ -566,11 +564,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyDetails> studyDetails = new ArrayList<>();
 
 		final StringBuilder sqlString = new StringBuilder().append(
-			"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, p.start_date AS startDate, ")
+			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
 			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ")
-			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-			.append("                   AND ppObjective.variable_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
@@ -690,9 +686,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					new StringBuilder()
 			.append("SELECT COUNT(1) ")
 			.append("FROM project p ")
-			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-			.append("                   AND ppObjective.variable_id =  ")
-			.append(TermId.STUDY_OBJECTIVE.getId())
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ")
 			.append(TermId.PI_NAME.getId())
@@ -727,14 +720,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 
 			final StringBuilder sqlString = new StringBuilder().append(
-				"SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, p.start_date AS startDate, ")
+				"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 				.append(
 					"p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, p.study_type AS "
 						+ "studyType ")
 				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ")
-				.append(" LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-				.append(" AND ppObjective.variable_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ")
-				// 8030
 				.append(" LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 				.append(" AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 				// 8100
@@ -795,11 +785,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					new StringBuilder()
 			.append("SELECT COUNT(1) ")
 			.append("FROM project p ")
-			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-			.append("                   AND ppObjective.variable_id =  ")
-			.append(TermId.STUDY_OBJECTIVE.getId())
 			.append(" ")
-			// 8030
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ")
 			.append(TermId.PI_NAME.getId())
