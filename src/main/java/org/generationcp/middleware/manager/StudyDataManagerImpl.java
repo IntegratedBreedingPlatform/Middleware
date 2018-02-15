@@ -1126,7 +1126,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean isVariableUsedInOtherPrograms(final String variableId, final String variableValue, final String programUUID) {
+	public boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(final String variableId, final String variableValue, final String programUUID) {
 
 		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
 

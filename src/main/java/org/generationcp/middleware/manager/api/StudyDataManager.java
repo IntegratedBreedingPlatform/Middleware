@@ -791,6 +791,6 @@ public interface StudyDataManager {
 	 * @param programUUID
 	 * @return
 	 */
-	boolean isVariableUsedInOtherPrograms(final String variableId, final String variableValue, final String programUUID);
+	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(final String variableId, final String variableValue, final String programUUID);
 
 }

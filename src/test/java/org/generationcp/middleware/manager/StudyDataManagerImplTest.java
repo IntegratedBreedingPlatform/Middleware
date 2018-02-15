@@ -601,7 +601,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInOtherProgramsVariableExistsInStudyLevel() {
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -622,14 +622,14 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertTrue(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
-				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
 	@Test
-	public void testIsVariableUsedInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -651,14 +651,14 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
-				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
 	@Test
-	public void testIsVariableUsedInOtherProgramsVariableExistsInTrialEnvironmentLevel() {
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -698,14 +698,14 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
 		this.manager.getExperimentProjectDao().save(experimentProject);
 
-		Assert.assertTrue(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
-				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
 	@Test
-	public void testIsVariableUsedInOtherProgramsVariableExistsInTrialEnvironmentLevelStudyIsDeleted() {
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevelStudyIsDeleted() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -746,9 +746,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
 		this.manager.getExperimentProjectDao().save(experimentProject);
 
-		Assert.assertFalse(this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
-				this.manager.isVariableUsedInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
