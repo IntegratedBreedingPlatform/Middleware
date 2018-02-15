@@ -72,13 +72,11 @@ public class ProjectSaver extends Saver {
 		if (description != null && !description.equals("")) {
 			project.setDescription(description);
 		} else {
-			errorMessage.append("\nprojectKey is null");
+			errorMessage.append("\ndescription is null");
 		}
 
 		if (objective != null && !objective.equals("")) {
 			project.setObjective(objective);
-		} else {
-			errorMessage.append("\nprojectKey is null");
 		}
 
 		if (errorMessage.length() > 0) {
