@@ -216,7 +216,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
 					"Error retrieving study folder tree, folderId=" + folderId + " programUUID=" + programUUID + ":" + e.getMessage(), e);
 		}
 
@@ -254,7 +255,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getDatasetNodesByStudyId query from Project: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDatasetNodesByStudyId query from Project: " + e.getMessage(), e);
 		}
 
 		return datasetReferences;
@@ -272,10 +274,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStudiesByName=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudiesByName=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 
-		return new ArrayList<>();
 	}
 
 	public List<DmsProject> getStudiesByUserIds(final Collection<Integer> userIds) {
@@ -305,10 +307,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId
-					+ " in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId
+							+ " in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<>();
 	}
 
 	public List<DmsProject> getStudiesByIds(final Collection<Integer> projectIds) {
@@ -323,7 +326,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStudiesByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudiesByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
@@ -338,9 +342,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<>();
 	}
 
 	public DmsProject getParentStudyByDataset(final Integer datasetId) {
@@ -355,9 +359,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return (DmsProject) criteria.uniqueResult();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getParentStudyByDataset= " + datasetId + " query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error in getParentStudyByDataset= " + datasetId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
 	public List<DmsProject> getStudyAndDatasetsById(final Integer projectId) {
@@ -393,7 +398,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyNodes;
 	}
@@ -414,7 +420,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			projects = this.getByIds(projectIds);
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getProjectsByFolder query from Project: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getProjectsByFolder query from Project: " + e.getMessage(), e);
 		}
 
 		return projects;
@@ -432,7 +439,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<Object[]> list = query.list();
 			count = list.size();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in countProjectsByFolder(" + folderId + ") query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countProjectsByFolder(" + folderId + ") query in DmsProjectDao: " + e.getMessage(),
+					e);
 		}
 
 		return count;
@@ -454,10 +463,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
 					"Error in getDataSetsByProjectProperty(" + variable + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<>();
 	}
 
 	public List<StudyReference> getStudiesByTrialEnvironments(final List<Integer> environmentIds) {
@@ -477,7 +486,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
 					"Error in getStudiesByTrialEnvironments=" + environmentIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studies;
@@ -494,9 +504,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return (Integer) query.uniqueResult();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStudyIdByName=" + name + " query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudyIdByName=" + name + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
 	public List<StudyDetails> getAllStudyDetails(final StudyType studyType, final String programUUID) {
@@ -545,7 +554,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 							.addScalar("piId").addScalar("siteId").setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			list = query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 
 		if (list == null || list.isEmpty()) {
@@ -583,6 +592,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 			return null;
 		} catch (final HibernateException he) {
+			LOG.error(he.getMessage(), he);
 			throw new MiddlewareQueryException(
 					String.format("Hibernate error in getting study type for a studyId %s. Cause: %s", studyId, he.getCause().getMessage()),
 					he);
@@ -625,7 +635,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getTrialObservationTable() query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getTrialObservationTable() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyDetails;
 	}
@@ -655,9 +666,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in countAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return 0;
 
 	}
 
@@ -730,7 +741,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getAllNurseryAndTrialStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getAllNurseryAndTrialStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyDetails;
 
@@ -768,9 +780,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in countAllNurseryAndTrialStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countAllNurseryAndTrialStudyDetails() query in DmsProjectDao: " + e.getMessage(),
+					e);
 		}
-		return 0;
 
 	}
 
@@ -807,7 +820,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 							.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			list = query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getAllStudyNodes() query in DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getAllStudyNodes() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 
 		if (list == null || list.isEmpty()) {
@@ -843,7 +857,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in checkIfProjectNameIsExisting=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error in checkIfProjectNameIsExisting=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 
 		return false;
@@ -861,7 +876,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getAllFolders, query at DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at getAllFolders, query at DmsProjectDao: " + e.getMessage(), e);
 		}
 		return folders;
 	}
@@ -873,7 +889,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			projectIds = query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getAllProgramStudiesAndFolders, query at DmsProjectDao: " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at getAllProgramStudiesAndFolders, query at DmsProjectDao: " + e.getMessage(), e);
 		}
 		return projectIds;
 	}
@@ -890,7 +907,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getDistinctProjectNames() query from Project " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDistinctProjectNames() query from Project " + e.getMessage(), e);
 		}
 		return results;
 	}
@@ -907,7 +925,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
 		}
 		return results;
 	}
@@ -934,21 +953,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return list.get(0);
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
 		}
 		return null;
 	}
 
 	public List<String> getAllSharedProjectNames() {
-		final List<String> results = new ArrayList<>();
 		try {
 			final String sql = "SELECT name FROM project WHERE program_uuid is null";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			return query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getAllSharedProjectNames()" + e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getAllSharedProjectNames()" + e.getMessage(), e);
 		}
-		return results;
 	}
 
 	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> filters, final Integer pageSize, final Integer pageNumber) {
