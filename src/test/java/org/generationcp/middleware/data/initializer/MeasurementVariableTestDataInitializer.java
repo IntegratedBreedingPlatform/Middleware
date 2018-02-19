@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -25,7 +26,8 @@ public class MeasurementVariableTestDataInitializer {
 		return measurementVar;
 	}
 
-	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String value) {
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
+			final String value) {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(termId);
 		measurementVar.setName(name);
@@ -46,14 +48,31 @@ public class MeasurementVariableTestDataInitializer {
 		return measurementVar;
 	}
 
-	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
-			final String scale, final String method, final String property, final String dataType, final String value,
-			final String label, final int dataTypeId, final PhenotypicType role) {
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
+			final String description, final String scale, final String method, final String property,
+			final String dataType, final String value, final String label, final int dataTypeId,
+			final PhenotypicType role) {
 		final MeasurementVariable variable = new MeasurementVariable(termId, name, description, scale, method, property,
 				dataType, value, label);
 		variable.setRole(role);
 		variable.setDataTypeId(dataTypeId);
 		variable.setVariableType(VariableType.TRAIT);
 		return variable;
+	}
+
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name,
+			final PhenotypicType phenotypicType, final int dataTypeId) {
+		final StandardVariable stdvar = StandardVariableTestDataInitializer.createStandardVariableTestData(name,
+				phenotypicType);
+		stdvar.setPhenotypicType(phenotypicType);
+		stdvar.setId(termId);
+		final MeasurementVariable var = new MeasurementVariable(termId, stdvar.getName(), stdvar.getDescription(),
+				stdvar.getScale().getName(), stdvar.getMethod().getName(), stdvar.getProperty().getName(),
+				stdvar.getDataType().getName(), "", stdvar.getPhenotypicType().getLabelList().get(0));
+		var.setRole(phenotypicType);
+		var.setDataTypeId(stdvar.getDataType().getId());
+		var.setFactor(false);
+		var.setOperation(null);
+		return var;
 	}
 }

@@ -29,7 +29,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
 /**
@@ -603,7 +602,7 @@ public interface OntologyDataManager {
 	 * dataType, and storedIn info. Otherwise, it will throw an exception.
 	 *
 	 * @param stdVariable the std variable
-	 * @param programUUID TODO
+	 * @param programUUID
 
 	 */
 	void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) ;

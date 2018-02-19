@@ -16,8 +16,6 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -47,6 +45,10 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 @TransactionConfiguration(defaultRollback = false)
 public class DataSetupTest extends IntegrationTestBase {
 
+	private static final String LOCATION_NAME_PROP = "Location name";
+
+	private static final String LOCATION = "LOCATION";
+
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetupTest.class);
 
 	@Autowired
@@ -71,11 +73,11 @@ public class DataSetupTest extends IntegrationTestBase {
 
 	public static final int NUMBER_OF_GERMPLASM = 20;
 	public static final String GERMPLSM_PREFIX = "GP-VARIETY-";
+	public static final String LOCATION_NAME = "LOCATION_NAME";
 
 	private static final String PROP_BREEDING_METHOD = "Breeding Method";
 	private static final String PROP_INSTITUTE = "Institute";
 	private static final String PROP_STUDY = "Study";
-	private static final String PROP_STUDY_TITLE = "Study Title";
 	private static final String PROP_START_DATE = "Start Date";
 	private static final String PROP_END_DATE = "End Date";
 	private static final String PROP_OBJECTIVE = "Study Objective";
@@ -118,12 +120,12 @@ public class DataSetupTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void setUpBasicTestData() throws MiddlewareException {
+	public void setUpBasicTestData() {
 		final String programUUID = this.createWorkbenchProgram();
 		this.createNursery(programUUID, cropPrefix);
 	}
 
-	private String createWorkbenchProgram() throws MiddlewareQueryException {
+	private String createWorkbenchProgram() {
 
 		final Person person = new Person();
 		person.setInstituteId(1);
@@ -195,16 +197,16 @@ public class DataSetupTest extends IntegrationTestBase {
 		return program.getUniqueID();
 	}
 
-	private void createNursery(final String programUUID, final String cropPrefix) throws MiddlewareException {
+	private void createNursery(final String programUUID, final String cropPrefix) {
 
 		// Create Germplasm
 		final Integer[] gids = this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM,
 				DataSetupTest.GERMPLSM_PREFIX);
 
-		this.createNurseryForGermplasm(programUUID, gids, cropPrefix);
+		this.createNurseryForGermplasm(programUUID, gids, cropPrefix, false);
 	}
 
-	public int createNurseryForGermplasm(final String programUUID, final Integer[] gids, final String cropPrefix) {
+	public int createNurseryForGermplasm(final String programUUID, final Integer[] gids, final String cropPrefix, final boolean locationIsStudyDetail) {
 		final int randomInt = new Random().nextInt(100);
 
 		// Germplasm list
@@ -266,6 +268,16 @@ public class DataSetupTest extends IntegrationTestBase {
 		conditions.add(this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)",
 				DataSetupTest.PROP_END_DATE, DataSetupTest.ASSIGNED, DataSetupTest.DATE, DataSetupTest.CHAR,
 				studyDetails.getEndDate(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
+		
+		if (locationIsStudyDetail) {
+			conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
+					LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
+					"Default Breeding Location",  DataSetupTest.STUDY, PhenotypicType.STUDY, true));
+		} else {
+			conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
+					LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
+					"Default Breeding Location", DataSetupTest.STUDY, PhenotypicType.TRIAL_ENVIRONMENT, true));
+		} 
 
 		workbook.setConditions(conditions);
 

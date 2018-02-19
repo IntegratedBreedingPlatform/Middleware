@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -36,6 +37,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
@@ -47,6 +49,9 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
@@ -108,7 +113,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
 				this.locationManager);
-		
+
 		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
 	}
 
@@ -215,8 +220,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
 		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
 
-		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(),
-				this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+		final List<Reference> childrenNodes = this.manager
+				.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertTrue("The id of the subFolder should be " + subFolderID, subFolderID == childrenNodes.get(0).getId());
@@ -230,7 +235,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final int newSize = this.manager.getAllFolders().size();
 		// We only assert that there are two folders added.
-		Assert.assertEquals("The new size should be equal to the original size + 2", originalSize+2, newSize);
+		Assert.assertEquals("The new size should be equal to the original size + 2", originalSize + 2, newSize);
 	}
 
 	@Test
@@ -302,7 +307,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
 		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
-		final List<StudyDetails> updatedNurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+		final List<StudyDetails> updatedNurseryStudyDetails =
+				this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
 		Assert.assertEquals("The size after adding new nursery should be equal to the size before adding a new nursery + 1",
 				sizeAfterAddingNewNursery, sizeBeforeAddingNewNursery + 1);
@@ -341,21 +347,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetFolderTree() throws MiddlewareQueryException {
 		List<FolderReference> tree = this.manager.getFolderTree();
-		int sizeBefore = tree.size();
+		final int sizeBefore = tree.size();
 		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		tree = this.manager.getFolderTree();
-		int newSize = tree.size();
+		final int newSize = tree.size();
 		//Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
-		Assert.assertTrue("The new size should be equal the  size before + the newly added folder", newSize == (sizeBefore+1));
+		Assert.assertTrue("The new size should be equal the  size before + the newly added folder", newSize == (sizeBefore + 1));
 	}
 
 	@Test
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
-				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+		final FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
 
@@ -369,7 +376,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			fieldMapBlockInfo.setFieldId(trialInstance.getFieldId());
 
 			Mockito.when(locationDataManager.getBlockInformation(trialInstance.getBlockId())).thenReturn(fieldMapBlockInfo);
-			this.manager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, true);
+			this.manager.updateFieldMapWithBlockInformation(infos, true);
 
 			final FieldMapTrialInstanceInfo resultTrialInstance =
 					infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
@@ -385,9 +392,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals(
 					"Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + resultTrialInstance.getPlantingOrder() + " instead.",
 					FieldMapDataUtil.PLANTING_ORDER, resultTrialInstance.getPlantingOrder().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got "
-					+ resultTrialInstance.getMachineRowCapacity() + " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY,
-					resultTrialInstance.getMachineRowCapacity().intValue());
+			Assert.assertEquals(
+					"Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + resultTrialInstance.getMachineRowCapacity()
+							+ " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY, resultTrialInstance.getMachineRowCapacity().intValue());
 			Assert.assertEquals(
 					"Expected " + StudyDataManagerImplTest.BLOCK_NAME + " but got " + resultTrialInstance.getBlockName() + " instead.",
 					StudyDataManagerImplTest.BLOCK_NAME, resultTrialInstance.getBlockName());
@@ -408,9 +415,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
-				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+		final FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
@@ -420,7 +428,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		try {
 			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
-			this.manager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
+			this.manager.updateFieldMapWithBlockInformation(infos, false);
 
 			Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
 			Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
@@ -473,7 +481,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
 		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
-		final List<StudyDetails> updatedTrialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+		final List<StudyDetails> updatedTrialStudyDetails =
+				this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewTrial = updatedTrialStudyDetails.size();
 		Assert.assertEquals("The size after adding new trial should be equal to the size before adding a new trial + 1",
 				sizeAfterAddingNewTrial, sizeBeforeAddingNewTrial + 1);
@@ -489,7 +498,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> newStudyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
-		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy, sizeBeforeAddingNewStudy + 2);
+		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy,
+				sizeBeforeAddingNewStudy + 2);
 	}
 
 	@Test
@@ -589,4 +599,157 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
 		Assert.assertFalse("The folder should not be empty", isEmpty);
 	}
+
+	@Test
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevel() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+
+		// Create projectproperty record
+		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
+
+		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
+	@Test
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+		project.setDeleted(true);
+
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+
+		// Create projectproperty record
+		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
+
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
+	@Test
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevel() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+		dmsVariableType.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+
+		// Create nd_geolocation and nd_geolocation prop records
+		final VariableList variableList = new VariableList();
+		final Variable variable = new Variable();
+		variable.setVariableType(dmsVariableType);
+		variable.setValue(locationNameIdValue);
+		variableList.add(variable);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+
+		// Create experiment record
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		experimentModel.setGeoLocation(geolocation);
+		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
+
+		// Create experimentproject record
+		final ExperimentProject experimentProject = new ExperimentProject();
+		experimentProject.setExperiment(experimentModel);
+		experimentProject.setProjectId(project.getProjectId());
+		experimentProject.setExperimentProjectId(1);
+		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
+		this.manager.getExperimentProjectDao().save(experimentProject);
+
+		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
+	@Test
+	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevelStudyIsDeleted() {
+
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		final String locationNameIdValue = "999999";
+		project.setName("projectName");
+		project.setDescription("projectDescription");
+		project.setProgramUUID(programUUID);
+		project.setDeleted(true);
+		this.manager.getDmsProjectDao().save(project);
+
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		dmsVariableType.setLocalName("LOCATION_NAME_ID");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setStandardVariable(this.manager.getStandardVariableBuilder().create(TermId.LOCATION_ID.getId(), programUUID));
+		dmsVariableType.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+
+		// Create nd_geolocation and nd_geolocation prop records
+		final VariableList variableList = new VariableList();
+		final Variable variable = new Variable();
+		variable.setVariableType(dmsVariableType);
+		variable.setValue(locationNameIdValue);
+		variableList.add(variable);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+
+		// Create experiment record
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
+		experimentModel.setGeoLocation(geolocation);
+		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
+
+		// Create experimentproject record
+		final ExperimentProject experimentProject = new ExperimentProject();
+		experimentProject.setExperiment(experimentModel);
+		experimentProject.setProjectId(project.getProjectId());
+		experimentProject.setExperimentProjectId(1);
+		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
+		this.manager.getExperimentProjectDao().save(experimentProject);
+
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+
+	}
+
 }
