@@ -105,11 +105,6 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 
 		// Conditions
 		final List<MeasurementVariable> conditions = new ArrayList<>();
-		conditions.add(this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)",
-			WorkbookBuilderIntegrationTest.PROP_STUDY, WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBCV,
-			WorkbookBuilderIntegrationTest.CHAR, studyDetails.getStudyName(), WorkbookBuilderIntegrationTest.STUDY,
-			PhenotypicType.STUDY, true));
-
 		workbook.setConditions(conditions);
 
 		// Constants

@@ -181,11 +181,12 @@ public interface StudyDataManager {
 	 * @param studyType
 	 * @param description
 	 * @param objective
+	 * @param name
 	 * @return StudyReference corresponding to the newly-created Study
 	 */
 	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
 		final String cropPrefix, final StudyType studyType, final String description, final String startDate, final String endDate,
-		final String objective);
+		final String objective, final String name);
 
 	/**
 	 * Adds a dataset, dataset labels (factors and variate labels), and parent study association in the local database.

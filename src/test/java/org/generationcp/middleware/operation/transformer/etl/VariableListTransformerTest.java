@@ -126,41 +126,6 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		}
 	}
 
-	@Test
-	public void testTransformStudyDetails() throws Exception {
-		StudyDetails studyDetails = this.createTestStudyDetails();
-		Debug.println(TestOutputFormatter.INDENT, "Input studyDetails");
-		studyDetails.print(TestOutputFormatter.INDENT);
-
-		VariableList variables = VariableListTransformerTest.transformer.transformStudyDetails(studyDetails, null);
-
-		Assert.assertNotNull(variables);
-
-		for (Variable v : variables.getVariables()) {
-			Assert.assertEquals(v.getValue(), this.getStudyDetailValue(v.getVariableType().getRank(), studyDetails));
-			v.print(TestOutputFormatter.INDENT);
-		}
-	}
-
-	private String getStudyDetailValue(int rank, StudyDetails studyDetails) {
-		switch (rank) {
-			case 1:
-				return studyDetails.getStudyName();
-			case 2:
-				return studyDetails.getDescription();
-				/* case 3: return studyDetails.getPmKey(); */
-			case 4:
-				return studyDetails.getObjective();
-			case 5:
-				return Integer.toString(studyDetails.getStudyType().getId());
-			case 6:
-				return studyDetails.getStartDate();
-			case 7:
-				return studyDetails.getEndDate();
-		}
-		return null;
-	}
-
 	private MeasurementRow createMeasurementRowTestData(VariableTypeList varTypeList) {
 		MeasurementRow row = new MeasurementRow();
 		row.setDataList(new ArrayList<MeasurementData>());

@@ -934,14 +934,7 @@ public class Workbook {
 	}
 
 	public String getStudyName() {
-		if (this.getStudyConditions() != null) {
-			for (final MeasurementVariable condition : this.getStudyConditions()) {
-				if (condition.getTermId() == TermId.STUDY_NAME.getId()) {
-					return condition.getValue();
-				}
-			}
-		}
-		return null;
+		return this.studyDetails.getStudyName();
 	}
 
 	/**

@@ -14,7 +14,6 @@ package org.generationcp.middleware.operation.saver;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -35,12 +34,12 @@ public class ProjectSaver extends Saver {
 	}
 
 	public DmsProject create(StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
-		final String endDate, final String objective) throws ParseException {
+		final String endDate, final String objective, final String name) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			project = new DmsProject();
-			String name = this.getStringValue(studyValues, TermId.STUDY_NAME.getId());
+			project.setName(name);
 			project.setStudyType(studyType);
 			if (startDate != null && startDate.contains("-")) {
 				project.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));

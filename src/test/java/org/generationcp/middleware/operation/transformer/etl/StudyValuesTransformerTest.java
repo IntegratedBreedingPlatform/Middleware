@@ -49,7 +49,7 @@ public class StudyValuesTransformerTest extends IntegrationTestBase {
 		VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
 		StudyValues studyVal =
-				StudyValuesTransformerTest.transformer.transform(germplasmId, locationId, studyDetails, measurementVariables, varTypeList);
+				StudyValuesTransformerTest.transformer.transform(germplasmId, locationId, measurementVariables, varTypeList);
 
 		VariableList result = studyVal.getVariableList();
 

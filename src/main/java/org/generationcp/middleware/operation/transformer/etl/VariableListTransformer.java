@@ -224,22 +224,6 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	public VariableList transformStudyDetails(final StudyDetails studyDetails, final VariableTypeList variableTypeList)
-			throws MiddlewareException {
-
-		final VariableList variables = new VariableList();
-		final String programUUID = studyDetails.getProgramUUID();
-
-		if (studyDetails != null) {
-
-			int rank = 1;
-			rank =
-					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name",
-							studyDetails.getStudyName(), rank, programUUID, PhenotypicType.STUDY);
-		}
-		return variables.sort();
-	}
-
 	private int addVariableIfNecessary(final VariableList variables, final VariableTypeList variableTypeList,
 			final TermId termId, final String localName, final String localDescription, final String value,
 			final int rank, final String programUUID, final PhenotypicType role) throws MiddlewareException {

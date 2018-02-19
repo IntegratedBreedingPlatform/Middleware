@@ -64,6 +64,7 @@ public class StudyBuilder extends Builder {
 		study.setEndDate(project.getEndDate());
 		study.setStudyUpdate(project.getStudyUpdate());
 		study.setObjective(project.getObjective());
+		study.setName(project.getName());
 
 		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties(),
 				project.getProgramUUID());

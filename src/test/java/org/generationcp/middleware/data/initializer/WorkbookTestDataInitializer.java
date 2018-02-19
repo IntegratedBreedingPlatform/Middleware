@@ -344,11 +344,6 @@ public class WorkbookTestDataInitializer {
 			final String studyName) {
 		final List<MeasurementVariable> conditions = WorkbookTestDataInitializer.createConditions(withTrial, trialNo, locationId);
 
-		conditions.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY NAME", "Study name",
-				WorkbookTestDataInitializer.NAME, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.STUDY,
-				WorkbookTestDataInitializer.CHAR, studyName, WorkbookTestDataInitializer.STUDY, TermId.CHARACTER_VARIABLE.getId(),
-				PhenotypicType.STUDY, false));
-
 		return conditions;
 	}
 

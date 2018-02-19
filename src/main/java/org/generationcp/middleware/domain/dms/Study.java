@@ -27,6 +27,8 @@ public class Study implements Serializable {
 
 	private int id;
 
+	private String name;
+
 	private VariableList conditions;
 
 	private VariableList constants;
@@ -65,7 +67,11 @@ public class Study implements Serializable {
 	}
 
 	public String getName() {
-		return this.getDisplayValue(TermId.STUDY_NAME);
+		return this.name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	public String getDescription() {

@@ -84,26 +84,19 @@ public class StudyTestDataInitializer {
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
 
-		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), studyName, 1);
-		typeList.add(variable.getVariableType());
-		variableList.add(variable);
-
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix,
-			studyType, description, startDate, endDate, objective);
+			studyType, description, startDate, endDate, objective, studyName);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId, final String startDate, final String cropPrefix) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId,
+		final String startDate, final String cropPrefix) throws Exception {
 
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
 
-		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), studyName, 1);
-		typeList.add(variable.getVariableType());
-		variableList.add(variable);
-
-		variable = this.createVariable(TermId.LOCATION_ID.getId(), locationId, 5, PhenotypicType.STUDY);
+		Variable variable = this.createVariable(TermId.LOCATION_ID.getId(), locationId, 5, PhenotypicType.STUDY);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
@@ -115,7 +108,7 @@ public class StudyTestDataInitializer {
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), cropPrefix,
 			studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
-				.END_DATE, StudyTestDataInitializer.OBJECTIVE);
+				.END_DATE, StudyTestDataInitializer.OBJECTIVE, studyName);
 	}
 	
 	private StudyValues createStudyValues(final VariableList variableList) throws Exception {

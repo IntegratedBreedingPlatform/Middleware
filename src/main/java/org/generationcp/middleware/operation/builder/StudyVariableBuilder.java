@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -23,6 +21,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+
+import java.util.List;
 
 public class StudyVariableBuilder extends Builder {
 
@@ -68,9 +68,7 @@ public class StudyVariableBuilder extends Builder {
 			return variable;
 		}
 
-		if (variableType.getId() == TermId.STUDY_NAME.getId()) {
-			variable.setValue(project.getName());
-		} else if (variableType.getId() == TermId.STUDY_TITLE.getId()) {
+		if (variableType.getId() == TermId.STUDY_TITLE.getId()) {
 			variable.setValue(project.getDescription());
 		} else {
 			String projectPropValue = getPropertyValue(variableType.getId(), project.getProperties());

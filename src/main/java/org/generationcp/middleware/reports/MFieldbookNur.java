@@ -23,8 +23,8 @@ public class MFieldbookNur extends AbstractDynamicReporter {
 	}
 
 	@Override
-	public Map<String, Object> buildJRParams(Map<String, Object> args) {
-		Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(Map<String, Object> args, String studyName) {
+		Map<String, Object> params = super.buildJRParams(args, studyName);
 		// add more specific parameters here
 		return params;
 	}

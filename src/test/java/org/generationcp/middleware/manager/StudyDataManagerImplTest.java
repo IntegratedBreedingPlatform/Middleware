@@ -144,15 +144,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllStudyVariates() throws Exception {
-		final VariableTypeList variates = this.manager.getAllStudyVariates(this.studyReference.getId());
-		Assert.assertNotNull(variates);
-		final DMSVariableType studyName = variates.findById(TermId.STUDY_NAME.getId());
-		Assert.assertEquals("The study name should be " + StudyTestDataInitializer.STUDY_NAME, StudyTestDataInitializer.STUDY_NAME,
-				studyName.getLocalName());
-	}
-
-	@Test
 	public void testGetStudiesByFolder() throws Exception {
 		final StudyResultSet resultSet = this.manager.searchStudies(new ParentFolderStudyQueryFilter(1), 5);
 		// We are sure that the result set will return at least one study, the study that we added in the setup
@@ -292,14 +283,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DataSet dataset = this.manager.findOneDataSetByType(this.studyReference.getId(), dataSetType);
 		Assert.assertEquals("Dataset's name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
 				dataset.getName());
-	}
-
-	@Test
-	public void testGetLocalNameByStandardVariableId() throws Exception {
-		final Integer standardVariableId = TermId.STUDY_NAME.getId();
-		final String localName = this.manager.getLocalNameByStandardVariableId(this.studyReference.getId(), standardVariableId);
-		Assert.assertEquals("The local name should be " + StudyTestDataInitializer.STUDY_NAME, StudyTestDataInitializer.STUDY_NAME,
-				localName);
 	}
 
 	@Test

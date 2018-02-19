@@ -58,7 +58,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Reporter reporter = this.factory.createReporter(code);
 		final Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
 
-		return reporter.buildJRPrint(dataBeans);
+		return reporter.buildJRPrint(dataBeans, (String) dataBeans.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 
 	}
 
@@ -70,7 +70,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
 		dataBeans.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
-		reporter.buildJRPrint(dataBeans);
+		reporter.buildJRPrint(dataBeans, (String) dataBeans.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 		reporter.asOutputStream(output);
 
 		return reporter;
@@ -83,7 +83,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Map<String, Object> data = this.extractGermplasmListData();
 		data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
-		reporter.buildJRPrint(data);
+		reporter.buildJRPrint(data, (String) data.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 		reporter.asOutputStream(output);
 
 		return reporter;
@@ -121,6 +121,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		dataBeans.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, wb.getTrialObservations());
 		dataBeans.put("studyId", studyId);
 		dataBeans.put(AbstractReporter.STUDY_TITLE_REPORT_KEY, wb.getStudyDetails().getDescription());
+		dataBeans.put(AbstractReporter.STUDY_NAME_REPORT_KEY, wb.getStudyDetails().getStudyName());
 
 		return dataBeans;
 	}
@@ -130,6 +131,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Map<String, Object> params = new HashMap<>();
 		params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
 		params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
+		params.put(AbstractReporter.STUDY_NAME_REPORT_KEY, StringUtils.EMPTY);
 		return params;
 	}
 

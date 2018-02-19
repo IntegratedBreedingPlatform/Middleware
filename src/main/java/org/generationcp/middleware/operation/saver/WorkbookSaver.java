@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -629,8 +622,7 @@ public class WorkbookSaver extends Saver {
 				studyVariables.add(this.createOccVariableType(studyVariables.size() + 1, programUUID));
 			}
 
-			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId,
-					workbook.getStudyDetails(), studyMV, studyVariables);
+			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId, studyMV, studyVariables);
 
 			watch.restart("save study");
 
@@ -643,7 +635,8 @@ public class WorkbookSaver extends Saver {
 			final DmsProject study =
 					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
 							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription(),
-						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails().getObjective());
+						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails().getObjective(),
+						workbook.getStudyDetails().getStudyName());
 			studyId = study.getProjectId();
 		}
 		watch.stop();
