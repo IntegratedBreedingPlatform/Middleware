@@ -10,25 +10,32 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
+import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
+import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class CvTermDaoTest extends IntegrationTestBase {
 
@@ -36,6 +43,9 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	private static CVTermDao dao;
 	private static CVTermRelationshipDao cvTermRelationshipDao;
 	private static CvTermSynonymDao cvTermSynonymDao;
+	
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
 
 	@Before
 	public void setUp() throws Exception {
@@ -75,7 +85,21 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(term.getName(), cvTerm.getName());
 		Assert.assertEquals(term.getDefinition(), cvTerm.getDefinition());
 	}
-
+	
+	@Test
+	public void testGetVariablesByType() throws Exception {
+		final int previousVariablesSize = dao.getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId()), null).size();
+		
+		Term propertyTerm = this.ontologyDataManager.findTermByName("Grain yield", CvId.PROPERTIES);
+		Term scaleTerm = this.ontologyDataManager.findTermByName("g", CvId.SCALES);
+		Term methodTerm = this.ontologyDataManager.findTermByName("Counting", CvId.METHODS);
+		Term dataType = this.ontologyDataManager.getTermById(TermId.NUMERIC_VARIABLE.getId());
+		StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable(propertyTerm, scaleTerm, methodTerm, dataType);
+		this.ontologyDataManager.addStandardVariable(standardVariable, UUID.randomUUID().toString());
+		
+		final int variablesSize = dao.getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId()), null).size();
+		Assert.assertEquals(previousVariablesSize + 1, variablesSize);
+	}
 	@Test
 	public void testGetByNameAndCvId() throws Exception {
 
@@ -105,8 +129,8 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStandardVariableIdsWithTypeByProperties() {
 
-		final CVTerm standardVariableTerm = this.createTerm("testTerm1", CvId.VARIABLES.getId());
-		final CVTerm propertyTerm = this.createTerm("testTermProperty", CvId.PROPERTIES.getId());
+		final CVTerm standardVariableTerm = CVTermTestDataInitializer.createTerm("testTerm1", CvId.VARIABLES.getId());
+		final CVTerm propertyTerm = CVTermTestDataInitializer.createTerm("testTermProperty", CvId.PROPERTIES.getId());
 		dao.save(standardVariableTerm);
 		dao.save(propertyTerm);
 		cvTermRelationshipDao.save(standardVariableTerm.getCvTermId(), TermId.HAS_PROPERTY.getId(), propertyTerm.getCvTermId());
@@ -134,9 +158,9 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStandardVariableIdsWithTypeByPropertiesVariableIsObsolete() {
 
-		final CVTerm standardVariableTerm = this.createTerm("testTerm1", CvId.VARIABLES.getId());
+		final CVTerm standardVariableTerm = CVTermTestDataInitializer.createTerm("testTerm1", CvId.VARIABLES.getId());
 		standardVariableTerm.setIsObsolete(true);
-		final CVTerm propertyTerm = this.createTerm("testTermProperty", CvId.PROPERTIES.getId());
+		final CVTerm propertyTerm = CVTermTestDataInitializer.createTerm("testTermProperty", CvId.PROPERTIES.getId());
 		dao.save(standardVariableTerm);
 		dao.save(propertyTerm);
 		cvTermRelationshipDao.save(standardVariableTerm.getCvTermId(), TermId.HAS_PROPERTY.getId(), propertyTerm.getCvTermId());
@@ -162,7 +186,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		final String standardVariableName = "testTerm1";
 		final String variableSynonym = "testTermSynonym";
 
-		final CVTerm standardVariableTerm = this.createTerm(standardVariableName, CvId.VARIABLES.getId());
+		final CVTerm standardVariableTerm = CVTermTestDataInitializer.createTerm(standardVariableName, CvId.VARIABLES.getId());
 		standardVariableTerm.setIsObsolete(false);
 		dao.save(standardVariableTerm);
 
@@ -198,7 +222,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		final String standardVariableName = "testTerm1";
 		final String variableSynonym = "testTermSynonym";
 
-		final CVTerm variableTerm = this.createTerm(standardVariableName, CvId.VARIABLES.getId());
+		final CVTerm variableTerm = CVTermTestDataInitializer.createTerm(standardVariableName, CvId.VARIABLES.getId());
 		variableTerm.setIsObsolete(true);
 		dao.save(variableTerm);
 
@@ -217,17 +241,4 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertTrue(result.isEmpty());
 
 	}
-
-	private CVTerm createTerm(final String name, final Integer cvId) {
-
-		CVTerm term = new CVTerm();
-		term.setName(name);
-		term.setDefinition("Test description");
-		term.setCv(cvId);
-		term.setIsObsolete(false);
-		term.setIsRelationshipType(false);
-
-		return term;
-	}
-
 }
