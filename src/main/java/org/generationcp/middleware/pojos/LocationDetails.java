@@ -24,7 +24,7 @@ import java.util.Comparator;
 
 /**
  * POJO for location details query.
- *
+ * <p>
  * select locid, lname as location_name, c.isofull as country_full_name, l.labbr as location_abbreviation, ud.fname as location_type, ud.fdesc
  * as location_description from location l inner join cntry c on l.cntryid = c.cntryid inner join udflds ud on ud.fldno = l.ltype where
  * locid = 1
@@ -113,6 +113,10 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	@Basic(optional = true)
 	@Column(name = "province_name")
 	private String provinceName;
+
+	@Basic(optional = true)
+	@Column(name = "province_id")
+	private Integer provinceId;
 
 	public LocationDetails() {
 	}
@@ -296,5 +300,13 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	public void setCountryName(final String countryName) {
 		this.countryName = countryName;
+	}
+
+	public Integer getProvinceId() {
+		return provinceId;
+	}
+
+	public void setProvinceId(final Integer provinceId) {
+		this.provinceId = provinceId;
 	}
 }

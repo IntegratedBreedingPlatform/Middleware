@@ -74,13 +74,6 @@ public interface FieldbookService {
 	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 * Retrieves all crop specific and program specific locations except for FIELD and BLOCK locations.
-	 *
-	 * @return List of location references
-	 */
-	List<Location> getAllLocations(String programUUID);
-
-	/**
 	 * Gets the all breeding locations.
 	 *
 	 * @return the all breeding locations

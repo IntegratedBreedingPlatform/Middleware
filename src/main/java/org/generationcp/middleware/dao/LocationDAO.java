@@ -408,18 +408,14 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	public List<LocationDetails> getLocationDetails(final Integer locationId, final Integer start, final Integer numOfRows) {
 		try {
 
-			final StringBuilder query = new StringBuilder() //
-				.append("select l.lname as location_name,l.locid,l.ltype as ltype,") //
-				.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,") //
-				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,") //
-				.append(" ud.fname as location_type,") //
-				.append(" ud.fdesc as location_description, l.program_uuid,") //
-				.append(" c.isoabbr as cntry_name, province.lname AS province_name") //
-				.append(" from location l") //
-				.append(" left join georef g on l.locid = g.locid") //
-				.append(" left join cntry c on l.cntryid = c.cntryid") //
-				.append(" left join udflds ud on ud.fldno = l.ltype") //
-				.append(" ,location province");
+			final StringBuilder query = new StringBuilder().append("select l.lname as location_name,l.locid,l.ltype as ltype,")
+					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
+					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
+					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid,")
+					.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" from location l").append(" left join georef g on l.locid = g.locid")
+					.append(" left join cntry c on l.cntryid = c.cntryid").append(" left join udflds ud on ud.fldno = l.ltype")
+					.append(" ,location province");
 
 			if (locationId != null) {
 				query.append(" where l.locid = :id");
@@ -730,8 +726,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			}
 			locations = criteria.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getByUniqueIDAndExcludeLocationTypes", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getByUniqueIDAndExcludeLocationTypes", "", null, e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 
 		return locations;
@@ -847,19 +843,15 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 		try {
 
-			final StringBuilder queryString = new StringBuilder()//
-				.append("SELECT l.lname as location_name,l.locid,l.ltype as ltype,")//
-				.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")//
-				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,") //
-				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid") //
-				.append(" ,c.isoabbr as cntry_name, province.lname AS province_name") //
-				.append(" FROM location l").append(" LEFT JOIN georef g on l.locid = g.locid") //
-				.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid") //
-				.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype") //
-				.append(" ,location province ") //
-				.append(" WHERE (l.program_uuid = '").append(programUUID).append("'") //
-				.append(" or l.program_uuid is null) ") //
-				.append(" and province.locid = l.snl1id ");
+			final StringBuilder queryString = new StringBuilder().append("SELECT l.lname as location_name,l.locid,l.ltype as ltype,")
+					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
+					.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
+					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid")
+					.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
+					.append(" FROM location l").append(" LEFT JOIN georef g on l.locid = g.locid")
+					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid").append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
+					.append(" ,location province ").append(" WHERE (l.program_uuid = '").append(programUUID).append("'")
+					.append(" or l.program_uuid is null) ").append(" and province.locid = l.snl1id ");
 
 			if (countryId != null) {
 				queryString.append(" AND c.cntryid = ");
