@@ -337,9 +337,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		try {
 			StringBuilder queryString =
-					new StringBuilder().append("SELECT cvt.cvterm_id, cvt.name, cvt.definition ").append("FROM cvterm cvt ")
-					.append("INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id ")
-					.append("             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) ");
+					new StringBuilder().append("SELECT cvtrm.cvterm_id, cvtrm.name, cvtrm.definition FROM cvterm cvtrm ") 
+							.append("INNER JOIN cvterm_relationship cvrel ON cvrel.subject_id = cvtrm.cvterm_id AND cvrel.type_id = 1220 and cvrel.object_id IN ")
+							.append("(SELECT cvt.cvterm_id FROM cvterm cvt ") 
+							.append("INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id ") 
+							.append("AND cvr.type_id = 1105 AND cvr.object_id IN (:types)) ");
 			if (storedIn != null) {
 				queryString.append("INNER JOIN cvterm_relationship stored_in ON cvr.subject_id = stored_in.subject_id ").append(
 						"AND stored_in.type_id = 1044 AND stored_in.object_id = :storedIn ");
