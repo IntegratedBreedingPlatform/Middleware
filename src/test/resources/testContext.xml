@@ -37,7 +37,6 @@
 		class="org.generationcp.middleware.manager.WorkbenchDataManagerImpl"
 		destroy-method="close">
 		<constructor-arg ref="workbenchSessionProvider" />
-		<property name="installationDirectory" value="${workbench.installation_dir}" />
 	</bean>
 
 	<bean id="workbenchSessionProvider"
