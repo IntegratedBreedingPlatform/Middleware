@@ -217,6 +217,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public Workbook getStudyDataSet(final int id, final StudyType studyType) {
+		final Workbook workbook = this.getWorkbookBuilder().create(id, studyType);
+		this.setOrderVariableByRank(workbook);
+		return workbook;
+	}
+
+	@Override
 	public boolean loadAllObservations(final Workbook workbook) {
 		if (workbook.getObservations() == null || workbook.getObservations().isEmpty() && workbook.getStudyDetails() != null
 				&& workbook.getStudyDetails().getId() != null) {

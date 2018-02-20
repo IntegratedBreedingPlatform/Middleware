@@ -1003,4 +1003,17 @@ public interface FieldbookService {
 	 */
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
+
+	/**
+	 * Gets the data set.
+	 *
+	 * @param id
+	 *            the id
+	 * @param studyType
+	 *            the StudyType
+	 * @return the data set
+	 */
+
+	Workbook getStudyDataSet(final int id, final StudyType studyType);
+
 }
