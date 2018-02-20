@@ -1306,19 +1306,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Germplasm createGermplasm() {
-		final Germplasm germplasm = new Germplasm();
-		germplasm.setGid(1166066);
-		germplasm.setMethodId(31);
-		germplasm.setGnpgs(-1);
-		germplasm.setGrplce(-1);
-		germplasm.setGpid1(0);
-		germplasm.setGpid2(0);
-		germplasm.setUserId(1);
-		germplasm.setLgid(0);
-		germplasm.setLocationId(0);
-		germplasm.setGdate(20180206);
-		germplasm.setReferenceId(0);
-
+		final Germplasm germplasm = new Germplasm(1166066,31,-1,0,0,1,0,20180206,0,new Name(12));
 		this.germplasmDAO.save(germplasm);
 		return germplasm;
 	}
