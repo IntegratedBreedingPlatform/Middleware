@@ -28,7 +28,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
@@ -512,13 +511,6 @@ public interface WorkbenchDataManager {
 	 *         User ID matching the specified Workbench User ID and Project ID.
 	 */
 	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId);
-
-	/**
-	 * Get the workbench setting object.
-	 *
-	 * @return The WorkbenchSetting
-	 */
-	WorkbenchSetting getWorkbenchSetting();
 
 	/**
 	 * Gets the ProjectUserInfoDAO.
