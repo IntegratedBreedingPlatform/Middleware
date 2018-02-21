@@ -26,6 +26,7 @@ public enum ToolName {
 	BV_GXE("breeding_gxe"),
 	BV_META_ANALYSIS("bv_meta_analysis"),
 	DATASET_IMPORTER("dataset_importer"), 
+	FIELDBOOK_WEB("fieldbook_web"),
 	GDMS("gdms"), 
 	GERMPLASM_BROWSER("germplasm_browser"),
 	GERMPLASM_IMPORT("germplasm_import"), 
