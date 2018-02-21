@@ -82,10 +82,9 @@ public interface StudyDataManager {
 	 * Returns list of root or top-level folders and studies.
 	 *
 	 * @param programUUID program's unique id
-	 * @param studyTypes  specify types of studies to filter. Must not be null or empty.
 	 * @return List of Folder POJOs or empty list if none found
 	 */
-	List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes);
+	List<Reference> getRootFolders(String programUUID);
 
 	/**
 	 * Returns list of children of a folder given its ID.
@@ -94,7 +93,7 @@ public interface StudyDataManager {
 	 * @param programUUID unique id of the program
 	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
 	 */
-	List<Reference> getChildrenOfFolder(int folderId, String programUUID, List<StudyType> studyTypes);
+	List<Reference> getChildrenOfFolder(int folderId, String programUUID);
 
 	/**
 	 * Returns the list of DataSet references for a specific study.

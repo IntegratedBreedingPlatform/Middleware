@@ -11,11 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -78,8 +75,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -132,13 +131,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Reference> getRootFolders(final String programUUID, final List<StudyType> studyTypes) {
-		return this.getDmsProjectDao().getRootFolders(programUUID, studyTypes);
+	public List<Reference> getRootFolders(final String programUUID) {
+		return this.getDmsProjectDao().getRootFolders(programUUID);
 	}
 
 	@Override
-	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID, final List<StudyType> studyTypes) {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypes);
+	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID) {
+		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID);
 	}
 
 	@Override
