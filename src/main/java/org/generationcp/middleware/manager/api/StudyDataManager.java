@@ -454,9 +454,8 @@ public interface StudyDataManager {
 	 *
 	 * @param id          the id
 	 * @param programUUID the programUUID
-	 * @param studyTypes  list of StudyType
 	 */
-	boolean isFolderEmpty(int id, String programUUID, List<StudyType> studyTypes);
+	boolean isFolderEmpty(int id, String programUUID);
 
 	/**
 	 * Returns the parent folder of the project. Accepts a project id.
