@@ -207,7 +207,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetRootFolders() throws Exception {
 		final List<Reference> rootFolders =
-				this.manager.getRootFolders(this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+				this.manager.getRootFolders(this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(rootFolders);
 		Assert.assertFalse("Root folders should not be empty because it contains the templates for Nursery and Trial.",
 				rootFolders.isEmpty());
@@ -221,7 +221,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
 
 		final List<Reference> childrenNodes = this.manager
-				.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+				.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertTrue("The id of the subFolder should be " + subFolderID, subFolderID == childrenNodes.get(0).getId());
@@ -466,10 +466,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.studyTDI.createFolderTestData(uniqueId);
 		this.studyTDI.addTestStudy(uniqueId, cropPrefix);
 
-		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
+		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
 		final int sizeBeforeDelete = programStudiesAndFolders.size();
 		this.manager.deleteProgramStudies(uniqueId);
-		programStudiesAndFolders = this.manager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
+		programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
 		final int sizeAfterDelete = programStudiesAndFolders.size();
 
 		Assert.assertTrue("The size after the delete should be less than the size before.", sizeAfterDelete < sizeBeforeDelete);
