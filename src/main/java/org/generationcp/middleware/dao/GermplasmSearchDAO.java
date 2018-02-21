@@ -512,6 +512,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		germplasm.setFemaleParentPreferredName(getValueOfAddedColumns(FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
 		germplasm.setMaleParentPreferredID(getValueOfAddedColumns(MALE_PARENT_ID, row, addedColumnsPropertyIds));
 		germplasm.setMaleParentPreferredName(getValueOfAddedColumns(MALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds));
+		germplasm.setGroupSourceGID(getValueOfAddedColumns(GROUP_SOURCE_GID, row, addedColumnsPropertyIds));
+		germplasm.setGroupSourcePreferredName(getValueOfAddedColumns(GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds));
+		germplasm.setImmediateSourceGID(getValueOfAddedColumns(IMMEDIATE_SOURCE_GID, row, addedColumnsPropertyIds));
+		germplasm.setImmediateSourcePreferredName(getValueOfAddedColumns(IMMEDIATE_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds));
 		germplasm.setAttributeTypesValueMap(createAttributeTypesValueMap(row, addedColumnsPropertyIds, attributeTypesMap));
 
 		return germplasm;

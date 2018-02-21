@@ -26,7 +26,7 @@ public class PhenotypeQuery {
 		+ "  (SELECT l.lname FROM nd_geolocationprop gp INNER JOIN location l ON l.locid = gp.value WHERE gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS studyLocation, " //
 		+ "  (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, " //
 		+ "  s.uniquename AS entryNumber " //
-		+ "FROM " //
+		+ " FROM " //
 		+ "  project plotdata_project " //
 		+ "  INNER JOIN nd_experiment_project ep ON plotdata_project.project_id = ep.project_id " //
 		+ "  INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id " //
@@ -38,7 +38,7 @@ public class PhenotypeQuery {
 		+ "  INNER JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = ep.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = ep.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
-		+ "WHERE 1 = 1 " //
+		+ " WHERE 1 = 1 " //
 		; //
 
 	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id in (:studyDbIds) ";
@@ -57,12 +57,12 @@ public class PhenotypeQuery {
 		+ "  cvt.name as cvterm_name, " //
 		+ "  ph.value as value , " //
 		+ "  cvp.value as crop_ontology_id "
-		+ "FROM " //
+		+ " FROM " //
 		+ "  nd_experiment_phenotype ndeph" //
 		+ "  INNER JOIN phenotype ph ON ndeph.phenotype_id = ph.phenotype_id " //
 		+ "  INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
 		+ "  LEFT JOIN cvtermprop cvp on (cvp.cvterm_id = cvt.cvterm_id and cvp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() + ")"
-		+ "WHERE ndeph.nd_experiment_id in (:ndExperimentIds)" //
+		+ " WHERE ndeph.nd_experiment_id in (:ndExperimentIds)" //
 		;
 
 

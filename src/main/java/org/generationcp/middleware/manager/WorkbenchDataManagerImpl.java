@@ -26,7 +26,6 @@ import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
-import org.generationcp.middleware.dao.WorkbenchSettingDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -44,7 +43,6 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
@@ -69,8 +67,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	private HibernateSessionProvider sessionProvider;
 
 	private Project currentlastOpenedProject;
-
-	private String installationDirectory;
 
 	public WorkbenchDataManagerImpl() {
 		super();
@@ -143,13 +139,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final UserInfoDAO userInfoDao = new UserInfoDAO();
 		userInfoDao.setSession(this.getCurrentSession());
 		return userInfoDao;
-	}
-
-	private WorkbenchSettingDAO getWorkbenchSettingDao() {
-
-		final WorkbenchSettingDAO workbenchSettingDao = new WorkbenchSettingDAO();
-		workbenchSettingDao.setSession(this.getCurrentSession());
-		return workbenchSettingDao;
 	}
 
 	private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
@@ -671,22 +660,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public WorkbenchSetting getWorkbenchSetting() {
-		try {
-			final List<WorkbenchSetting> list = this.getWorkbenchSettingDao().getAll();
-			final WorkbenchSetting setting = list.isEmpty() ? null : list.get(0);
-
-			if (setting != null && this.installationDirectory != null) {
-				setting.setInstallationDirectory(this.installationDirectory);
-			}
-
-			return setting;
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error encountered while getting workbench setting: " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public UserInfo getUserInfo(final int userId) {
 		try {
 			return this.getUserInfoDao().getUserInfoByUserId(userId);
@@ -767,14 +740,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(final WorkbenchSidebarCategory category) {
 		return this.getWorkbenchSidebarCategoryLinkDao().getAllWorkbenchSidebarLinksByCategoryId(category, 0, Integer.MAX_VALUE);
-	}
-
-	public String getInstallationDirectory() {
-		return this.installationDirectory;
-	}
-
-	public void setInstallationDirectory(final String installationDirectory) {
-		this.installationDirectory = installationDirectory;
 	}
 
 	@Override
