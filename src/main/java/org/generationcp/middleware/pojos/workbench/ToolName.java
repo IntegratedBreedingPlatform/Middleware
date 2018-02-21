@@ -11,47 +11,75 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * The name of tools (e.g. germplasm_browser, study_browser).
+ * The name of tools (e.g. germplasm_browser, study_browser) as stored in workbench_tool table in Workbench Database
  *
  */
 public enum ToolName {
-	// Execute:
-	// SELECT name FROM workbench_tool ORDER BY path, name
-	// in the database to get an organized list of names
-	// some tools have more than one name and it will be
-	// easier for us to group them here
+	BM_LIST_MANAGER_MAIN("bm_list_manager_main"), 
+	BREEDING_VIEW("breeding_view"), 
+	BV_SSA("breeding_view_wb"), 
+	BV_GXE("breeding_gxe"),
+	BV_META_ANALYSIS("bv_meta_analysis"),
+	DATASET_IMPORTER("dataset_importer"), 
+	GDMS("gdms"), 
+	GERMPLASM_BROWSER("germplasm_browser"),
+	GERMPLASM_IMPORT("germplasm_import"), 
+	GERMPLASM_LIST_BROWSER("germplasm_list_browser"),
+	MAIN_HEAD_TO_HEAD_BROWSER("germplasm_mainheadtohead"), 
+	MIGRATOR("migrator"),
+	NURSERY_MANAGER_FIELDBOOK_WEB("nursery_manager_fieldbook_web"), 
+	ONTOLOGY_MANAGER("ontology_manager"),
+	QUERY_FOR_ADAPTED_GERMPLASM("query_for_adapted_germplasm"), 
+	STUDY_BROWSER("study_browser"), 
+	STUDY_BROWSER_WITH_ID("study_browser_with_id"),
+	TRAIT_DONOR_QUERY("trait_donor_query"), 
+	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web")
+	;
 
-	// Breeding Planner native app
-	BREEDING_PLANNER
+	private final String name;
 
-	// BreedingView native app
-	, breeding_view
+	ToolName(final String name) {
+		this.name = name;
+	}
 
-	// MBDT native app
-	, mbdt
+	public String getName() {
+		return this.name;
+	}
 
-	// OptiMAS native app
-	, optimas
+	public static boolean isCorrectTool(final String name) {
+		for (ToolName tool : ToolName.values()) {
+			if (tool.getName().equals(name)) {
+				return true;
+			}
+		}
 
-	// BreedingManager webapp
-	, BM_LIST_MANAGER, BM_LIST_MANAGER_MAIN, CROSSING_MANAGER, GERMPLASM_IMPORT, LIST_MANAGER, NURSERY_TEMPLATE_WIZARD
+		return false;
+	}
+	
+	public static boolean isURLAccessibleTool(final String name) {
+		final List<ToolName> workbenchTools = Arrays.asList(BV_SSA, BV_META_ANALYSIS, BV_GXE);
+		final List<ToolName> toolsWithURL = new ArrayList<>(Arrays.asList(ToolName.values()));
+		toolsWithURL.removeAll(workbenchTools);
+		for (ToolName tool : toolsWithURL) {
+			if (tool.getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-	// DatasetImporter webapp
-	, DATASET_IMPORTER
+	public static ToolName equivalentToolEnum(final String name) {
+		for (ToolName tool : ToolName.values()) {
+			if (tool.getName().equals(name)) {
+				return tool;
+			}
+		}
 
-	// fieldbook web apps
-	, FIELDBOOK_WEB, NURSERY_MANAGER_FIELDBOOK_WEB, TRIAL_MANAGER_FIELDBOOK_WEB, ONTOLOGY_BROWSER_FIELDBOOK_WEB
-
-	// GDMS webapp
-	, GDMS
-
-	// GermplasmStudyBrowser webapp
-	, GERMPLASM_BROWSER, GERMPLASM_LIST_BROWSER, GERMPLASM_HEADTOHEAD, GERMPLASM_MAINHEADTOHEAD, QUERY_FOR_ADAPTED_GERMPLASM, STUDY_BROWSER, STUDY_BROWSER_WITH_ID
-
-	// ibpwebservice webapp
-	, IBPWEBSERVICE
-
-	// not needed anymore?
-	, GERMPLASM_PHENOTYPIC
+		return null;
+	}
 }
