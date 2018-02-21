@@ -63,7 +63,7 @@ public class DmsProjectDaoTest {
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
 
-		List<Reference> result = this.dao.getRootFolders(PROG_UUID, StudyType.nurseriesAndTrials());
+		List<Reference> result = this.dao.getRootFolders(PROG_UUID);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(mockQueryResult.size(), result.size());
 
@@ -88,22 +88,22 @@ public class DmsProjectDaoTest {
 
 	@Test(expected = MiddlewareQueryException.class)
 	public void testNullStudyTypeParameter1() {
-		this.dao.getRootFolders(PROG_UUID, null);
+		this.dao.getRootFolders(PROG_UUID);
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
 	public void testEmptyStudyTypeParameter1() {
-		this.dao.getRootFolders(PROG_UUID, new ArrayList<StudyType>());
+		this.dao.getRootFolders(PROG_UUID);
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
 	public void testNullStudyTypeParameter2() {
-		this.dao.getChildrenOfFolder(1, PROG_UUID, null);
+		this.dao.getChildrenOfFolder(1, PROG_UUID);
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
 	public void testEmptyStudyTypeParameter2() {
-		this.dao.getChildrenOfFolder(1, PROG_UUID, new ArrayList<StudyType>());
+		this.dao.getChildrenOfFolder(1, PROG_UUID);
 	}
 
 	@Test
