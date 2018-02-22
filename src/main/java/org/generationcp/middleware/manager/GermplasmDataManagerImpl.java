@@ -1544,4 +1544,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) {
 		return this.getMethodDao().getNoBulkingMethodsByType(type, programUUID);
 	}
+
+	@Override
+	public String getAttributeValue(final Integer gid, final String attributeName) {
+		final Attribute attribute = this.getAttributeDao().getAttribute(gid, attributeName);
+		if (attribute == null) {
+			return "";
+		} else {
+			return attribute.getAval();
+		}
+	}
 }

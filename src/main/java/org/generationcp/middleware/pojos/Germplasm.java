@@ -455,6 +455,30 @@ public class Germplasm implements Serializable {
 	@Transient
 	private Map<String, String> attributeTypesValueMap = new HashMap<>();
 
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String groupSourcePreferredName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String groupSourceGID = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String immediateSourcePreferredName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String immediateSourceGID = null;
+
 	public Germplasm() {
 		super();
 		this.deleted = false;
@@ -875,5 +899,37 @@ public class Germplasm implements Serializable {
 			throw new NullArgumentException("attributeTypesValueMap must not be null");
 		}
 		this.attributeTypesValueMap = attributeTypesValueMap;
+	}
+
+	public String getGroupSourcePreferredName() {
+		return groupSourcePreferredName;
+	}
+
+	public void setGroupSourcePreferredName(String groupSourcePreferredName) {
+		this.groupSourcePreferredName = groupSourcePreferredName;
+	}
+
+	public String getGroupSourceGID() {
+		return groupSourceGID;
+	}
+
+	public void setGroupSourceGID(String groupSourceGID) {
+		this.groupSourceGID = groupSourceGID;
+	}
+
+	public String getImmediateSourcePreferredName() {
+		return immediateSourcePreferredName;
+	}
+
+	public void setImmediateSourcePreferredName(String immediateSourcePreferredName) {
+		this.immediateSourcePreferredName = immediateSourcePreferredName;
+	}
+
+	public String getImmediateSourceGID() {
+		return immediateSourceGID;
+	}
+
+	public void setImmediateSourceGID(String immediateSourceGID) {
+		this.immediateSourceGID = immediateSourceGID;
 	}
 }
