@@ -12,5 +12,27 @@
 		</preConditions>
 		<dropTable cascadeConstraints="true"  tableName="workbench_setting"/>
 	</changeSet>
-	
+	<changeSet author="cuenyad" id="v8.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) = 0 FROM workbench_tool where group_name="study_manager_fieldbook_web";
+			</sqlCheck>
+		</preConditions>
+		<comment>Adding Manager Study</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_tool (tool_id, name, group_name, title, version, tool_type, path)
+			VALUES ("32", "study_manager_fieldbook_web", "study_manager_fieldbook_web", "Fieldbook Web - Study Manager", "8.2", "WEB", "Fieldbook/TrialManager");
+		</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v8.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM workbench_sidebar_category_link where tool_name="study_manager_fieldbook_web";
+			</sqlCheck>
+		</preConditions>
+		<comment>Adding Manager Study</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category_link (sidebar_category_link_id, tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title) VALUES ('20', 'study_manager_fieldbook_web', '1', 'manage_trials', 'Manage Studies');
+		</sql>
+	</changeSet>
 </databaseChangeLog>
