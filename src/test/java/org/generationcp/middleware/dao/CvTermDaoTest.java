@@ -87,9 +87,10 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testGetVariablesByType() throws Exception {
+	public void testGetVariablesByTypeForNumericVariable() throws Exception {
 		final int previousVariablesSize = dao.getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId()), null).size();
 		
+		//Add Numeric Variable
 		Term propertyTerm = this.ontologyDataManager.findTermByName("Grain yield", CvId.PROPERTIES);
 		Term scaleTerm = this.ontologyDataManager.findTermByName("g", CvId.SCALES);
 		Term methodTerm = this.ontologyDataManager.findTermByName("Counting", CvId.METHODS);
@@ -100,6 +101,23 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		final int variablesSize = dao.getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId()), null).size();
 		Assert.assertEquals(previousVariablesSize + 1, variablesSize);
 	}
+	
+	@Test
+	public void testGetVariablesByTypeForCharacterVariable() throws Exception {
+		final int previousVariablesSize = dao.getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId()), null).size();
+		
+		//Add Character Variable
+		Term propertyTerm = this.ontologyDataManager.findTermByName("Grain yield", CvId.PROPERTIES);
+		Term scaleTerm = this.ontologyDataManager.findTermByName("Text", CvId.SCALES);
+		Term methodTerm = this.ontologyDataManager.findTermByName("Counting", CvId.METHODS);
+		Term dataType = this.ontologyDataManager.getTermById(TermId.CHARACTER_VARIABLE.getId());
+		StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable(propertyTerm, scaleTerm, methodTerm, dataType);
+		this.ontologyDataManager.addStandardVariable(standardVariable, UUID.randomUUID().toString());
+		
+		final int variablesSize = dao.getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId()), null).size();
+		Assert.assertEquals(previousVariablesSize + 1, variablesSize);
+	}
+	
 	@Test
 	public void testGetByNameAndCvId() throws Exception {
 
