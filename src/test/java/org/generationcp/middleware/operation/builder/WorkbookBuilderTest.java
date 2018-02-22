@@ -396,7 +396,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				this.transformMeasurementVariablesToVariableList(trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
 
 		final Set<MeasurementVariable> result =
-				this.workbookBuilder.buildConditionVariables(conditionVariables, trialEnvironmentVariables, true);
+				this.workbookBuilder.buildConditionVariables(conditionVariables, trialEnvironmentVariables);
 
 		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;
 		for (MeasurementVariable measurementVariable : result) {
