@@ -107,7 +107,7 @@ public class WorkbookBuilder extends Builder {
 
 		final Monitor monitor = MonitorFactory.start("Build Workbook");
 
-		final boolean isTrial = studyType == StudyType.T;
+		final boolean isTrial = StudyType.trials().contains(studyType);
 		final Workbook workbook = new Workbook();
 
 		/**
@@ -152,15 +152,15 @@ public class WorkbookBuilder extends Builder {
 		final VariableList trialEnvironmentVariables = this.getTrialEnvironmentVariableList(trialDataSet);
 		// FIXME : I think we are reducing to traits, but difficult to understand
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
-		final Set<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables, isTrial);
-		final List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
+		final Set<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables);
+		final List<MeasurementVariable> factors = this.buildFactors(variables);
 		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		final List<MeasurementVariable> variates = this.buildVariates(variables, new ArrayList<>(constants));
 		final List<MeasurementVariable> expDesignVariables = new ArrayList<>();
 
 		// Nursery case
-		if (!isTrial) {
+		if (!isTrial) {//TODO VERIFICAR ESTO
 			// remove OCC from nursery level conditions for nursery cause its duplicating becuase its being added in conditions and factors
 			// FIXME : redesign dataset or filter earlier
 			final Iterator<MeasurementVariable> iter = conditions.iterator();
@@ -296,13 +296,11 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	protected Set<MeasurementVariable> buildConditionVariables(VariableList studyConditionVariables,
-			VariableList trialEnvironmentVariables, boolean isTrial) {
+			VariableList trialEnvironmentVariables) {
 		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorizing
 		final Set<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(studyConditionVariables, true, true);
-		if (isTrial) {
 			// for Trials, conditions and trial environment variables are combined
 			conditions.addAll(this.buildStudyMeasurementVariables(trialEnvironmentVariables, true, false));
-		}
 		return conditions;
 	}
 
@@ -399,7 +397,7 @@ public class WorkbookBuilder extends Builder {
 			this.getStudyDataManager().getExperiments(dataSetId, 0, Integer.MAX_VALUE, variables);
 		}
 
-		final List<MeasurementVariable> factors = this.buildFactors(variables, !isNursery);
+		final List<MeasurementVariable> factors = this.buildFactors(variables);
 		List<MeasurementVariable> variates = this.buildVariates(variables);
 		final Set<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(study.getConditions(), true, true);
 		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(study.getConstants(), false, true);
@@ -777,7 +775,7 @@ public class WorkbookBuilder extends Builder {
 		return treatmentFactors;
 	}
 
-	private List<MeasurementVariable> buildFactors(final VariableTypeList variables, final boolean isTrial) {
+	private List<MeasurementVariable> buildFactors(final VariableTypeList variables) {
 		List<MeasurementVariable> factors = new ArrayList<>();
 		final VariableTypeList factorList = new VariableTypeList();
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
