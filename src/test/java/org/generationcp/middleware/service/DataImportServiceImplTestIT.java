@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
+	public static final int CURRENT_IBDB_USER_ID = 1;
 	@Autowired
 	private DataImportService dataImportService;
 
@@ -181,7 +182,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 		final String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
 		final File file = new File(fileLocation);
-		final Workbook workbook = this.dataImportService.parseWorkbook(file);
+		final Workbook workbook = this.dataImportService.parseWorkbook(file, CURRENT_IBDB_USER_ID);
 		workbook.print(IntegrationTestBase.INDENT);
 
 		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID,
@@ -195,7 +196,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final File file = new File(fileLocation);
 		final WorkbookParser parser = new WorkbookParser(WorkbookParser.DEFAULT_MAX_ROW_LIMIT);
 		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
-		final Workbook workbook = this.dataImportService.parseWorkbookDescriptionSheet(excelWorkbook);
+		final Workbook workbook = this.dataImportService.parseWorkbookDescriptionSheet(excelWorkbook, CURRENT_IBDB_USER_ID);
 		Assert.assertNotNull(workbook.getConditions());
 		Assert.assertNotNull(workbook.getConstants());
 		Assert.assertNotNull(workbook.getFactors());
@@ -256,7 +257,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 				.getFile();
 		final File file = new File(fileLocation);
 		try {
-			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID);
+			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID, CURRENT_IBDB_USER_ID);
 		} catch (final WorkbookParserException e) {
 			Assert.fail("Unable to correctly parse Nursery workbook with no trial condition");
 		} catch (final MiddlewareException e) {
@@ -270,7 +271,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 				.getResource("org/generationcp/middleware/service/test/GCP5802SevenFieldsMissing.xls").getFile();
 		final File file = new File(fileLocation);
 		try {
-			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID);
+			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID, CURRENT_IBDB_USER_ID);
 		} catch (final WorkbookParserException e) {
 
 			final List<Message> messages = e.getErrorMessages();
@@ -293,7 +294,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final String fileLocation = this.getClass().getClassLoader().getResource(qualifiedFilename).getFile();
 		try {
 			final File file = new File(fileLocation);
-			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID);
+			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID, CURRENT_IBDB_USER_ID);
 		} catch (final WorkbookParserException e) {
 			final List<Message> messages = e.getErrorMessages();
 

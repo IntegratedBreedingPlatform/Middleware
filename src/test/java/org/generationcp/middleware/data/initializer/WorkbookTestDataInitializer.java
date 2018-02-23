@@ -152,6 +152,7 @@ public class WorkbookTestDataInitializer {
 	private static final String PLANT_HEIGHT_MEAN = "PLANT_HEIGHT_MEAN";
 	public static final int PLANT_HEIGHT_UNIT_ERRORS_ID = 18210;
 	public static final int PLANT_HEIGHT_MEAN_ID = 18180;
+	private static final String CREATED_BY = "1";
 
 	public Workbook createWorkbook(final StudyType studyType) {
 		final Workbook workbook = new Workbook();
@@ -287,7 +288,7 @@ public class WorkbookTestDataInitializer {
 		details.setEndDate(WorkbookTestDataInitializer.END_DATE);
 		details.setParentFolderId(WorkbookTestDataInitializer.FOLDER_ID);
 		details.setStudyType(studyType);
-
+		details.setCreatedBy(WorkbookTestDataInitializer.CREATED_BY);
 		workbook.setStudyDetails(details);
 	}
 

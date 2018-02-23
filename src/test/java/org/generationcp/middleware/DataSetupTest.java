@@ -237,6 +237,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		studyDetails.setStartDate("20151001");
 		studyDetails.setEndDate("20151031");
 		studyDetails.setParentFolderId(1);
+		studyDetails.setCreatedBy("1");
 		workbook.setStudyDetails(studyDetails);
 
 		// Conditions

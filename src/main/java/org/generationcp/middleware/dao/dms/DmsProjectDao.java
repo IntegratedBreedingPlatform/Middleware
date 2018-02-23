@@ -192,7 +192,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   gpSiteId.value             AS siteId, \n"
 		+ "   ppFolder.object_project_id AS folderId, \n"
 		+ "   p.program_uuid             AS programUUID, \n"
-		+ "	  p.study_update 			 AS studyUpdate "
+		+ "	  p.study_update 			 AS studyUpdate, \n"
+		+ "	  p.created_by               AS createdBy "
 		+ " FROM \n"
 		+ "   project p \n"
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
@@ -313,16 +314,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException("Error in getStudiesByName=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 
-	}
-
-	public List<DmsProject> getStudiesByUserIds(final Collection<Integer> userIds) {
-		final List<Object> userIdStrings = new ArrayList<>();
-		if (userIds != null && !userIds.isEmpty()) {
-			for (final Integer userId : userIds) {
-				userIdStrings.add(userId.toString());
-			}
-		}
-		return this.getStudiesByStudyProperty(TermId.STUDY_UID.getId(), Restrictions.in("p.value", userIdStrings));
 	}
 
 	public List<DmsProject> getStudiesByStartDate(final Integer startDate) {
@@ -560,7 +551,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final StringBuilder sqlString = new StringBuilder().append(
 			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ")
+			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy ").append("FROM project p ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
@@ -586,7 +577,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 							.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-							.addScalar("piId").addScalar("siteId").setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
+							.addScalar("piId").addScalar("siteId").addScalar("createdBy").setParameter(DmsProjectDao.PROGRAM_UUID,
+						programUUID);
 			list = query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
@@ -607,9 +599,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Integer id = (Integer) row[7];
 			final String piId = (String) row[8];
 			final String siteId = (String) row[9];
+			final String createdBy = (String) row[10];
 
 			final StudyDetails study =
-				new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId, Util.getCurrentDateAsStringValue());
+				new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId, Util
+					.getCurrentDateAsStringValue(), createdBy);
 			studyDetails.add(study);
 		}
 		return studyDetails;
@@ -641,7 +635,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 					this.getSession().createSQLQuery(STUDY_DETAILS_SQL).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("piId").addScalar("siteId").addScalar("folderId").addScalar("programUUID").addScalar("studyUpdate");
+					.addScalar("piId").addScalar("siteId").addScalar("folderId").addScalar("programUUID").addScalar("studyUpdate")
+						.addScalar("createdBy");
 
 			query.setParameter("studyId", studyId);
 
@@ -662,10 +657,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final Integer folderId = (Integer) row[10];
 					final String programUUID = (String) row[11];
 					final String studyUpdate = (String) row[12];
+					final String createdBy = (String) row[13];
 
 					studyDetails =
 							new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId,
-								studyUpdate);
+								studyUpdate, createdBy);
 					studyDetails.setParentFolderId(folderId.longValue());
 					studyDetails.setProgramUUID(programUUID);
 				}
@@ -723,7 +719,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.append(
 					"p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, p.study_type AS "
 						+ "studyType ")
-				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ").append("FROM project p ")
+				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy ").append("FROM project p ")
 				.append(" LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 				.append(" AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 				// 8100
@@ -747,7 +743,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 							.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-							.addScalar("studyType").addScalar("piId").addScalar("siteId")
+							.addScalar("studyType").addScalar("piId").addScalar("siteId").addScalar("createdBy")
 							.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
 			final List<Object[]> list = query.list();
@@ -765,10 +761,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final String studyTypeId = (String) row[8];
 					final String piId = (String) row[9];
 					final String siteId = (String) row[10];
+					final String createdBy =  (String) row[11];
 
 					studyDetails.add(
 						new StudyDetails(id, name, title, objective, startDate, endDate, StudyType.getStudyTypeByName(studyTypeId), piName,
-							siteName, piId, siteId, Util.getCurrentDateAsStringValue()));
+							siteName, piId, siteId, Util.getCurrentDateAsStringValue(), createdBy));
 				}
 			}
 

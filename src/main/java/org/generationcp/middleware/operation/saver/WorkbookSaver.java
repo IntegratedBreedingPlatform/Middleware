@@ -636,7 +636,7 @@ public class WorkbookSaver extends Saver {
 					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
 							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription(),
 						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails().getObjective(),
-						workbook.getStudyDetails().getStudyName());
+						workbook.getStudyDetails().getStudyName(), workbook.getStudyDetails().getCreatedBy());
 			studyId = study.getProjectId();
 		}
 		watch.stop();
@@ -1168,15 +1168,21 @@ public class WorkbookSaver extends Saver {
 		final String startDate = workbook.getStudyDetails().getStartDate();
 		final String endDate = workbook.getStudyDetails().getEndDate();
 		final String objective = workbook.getStudyDetails().getObjective();
+		final String createdBy = workbook.getStudyDetails().getCreatedBy();
 
 		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset, objective);
-		this.updateStudyDetails(description, startDate, endDate, study, objective);
+		this.updateStudyDetails(description, startDate, endDate, study, objective, createdBy);
 		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset, objective);
 	}
 
 	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study,
-		final String objective)
+		final String objective, final String createdBy)
 		throws ParseException {
+
+		if (study.getCreatedBy() == null) {
+			study.setCreatedBy(createdBy);
+		}
+
 		if (startDate != null && startDate.contains("-")) {
 			study.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 		} else {

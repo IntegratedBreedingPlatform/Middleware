@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class PhenotypeDaoTest extends IntegrationTestBase {
 
+	public static final int CURRENT_IBDB_USER_ID = 1;
 	private PhenotypeDao dao;
 
 	@Autowired
@@ -67,7 +68,7 @@ public class PhenotypeDaoTest extends IntegrationTestBase {
 		if (!this.testDataLoaded) {
 			String fileLocation = PhenotypeDaoTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
 			File file = new File(fileLocation);
-			Workbook workbook = this.dataImportService.parseWorkbook(file);
+			Workbook workbook = this.dataImportService.parseWorkbook(file, CURRENT_IBDB_USER_ID);
 			workbook.print(IntegrationTestBase.INDENT);
 
 			int studyId = this.dataImportService.saveDataset(workbook, null, cropPrefix);

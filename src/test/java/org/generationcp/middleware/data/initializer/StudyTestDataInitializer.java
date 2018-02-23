@@ -44,6 +44,7 @@ public class StudyTestDataInitializer {
 	public static final String START_DATE = "20160606";
 	public static final String END_DATE = "20160606";
 	private static final String OBJECTIVE = "OBJ1";
+	private static final String CREATED_BY = "1";
 	public static int DATASET_ID = 255;
 
 	private final StudyDataManagerImpl studyDataManager;
@@ -75,11 +76,11 @@ public class StudyTestDataInitializer {
 	
 	public StudyReference addTestStudy(final StudyType studyType, final String studyName, final String cropPrefix) throws Exception {
 		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
-			.END_DATE, StudyTestDataInitializer.STUDY_UPDATE, StudyTestDataInitializer.OBJECTIVE);
+			.END_DATE, StudyTestDataInitializer.OBJECTIVE, StudyTestDataInitializer.CREATED_BY);
 	}
 
 	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType, final String cropPrefix,
-		final String description, final String startDate, final String endDate, final String studyUpdate, final String objective) throws
+		final String description, final String startDate, final String endDate, final String objective, final String createdBy) throws
 		Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
@@ -87,7 +88,7 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix,
-			studyType, description, startDate, endDate, objective, studyName);
+			studyType, description, startDate, endDate, objective, studyName, createdBy);
 	}
 
 	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId,
@@ -108,7 +109,7 @@ public class StudyTestDataInitializer {
 
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), cropPrefix,
 			studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
-				.END_DATE, StudyTestDataInitializer.OBJECTIVE, studyName);
+				.END_DATE, StudyTestDataInitializer.OBJECTIVE, studyName, StudyTestDataInitializer.CREATED_BY);
 	}
 	
 	private StudyValues createStudyValues(final VariableList variableList) throws Exception {

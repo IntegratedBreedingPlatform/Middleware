@@ -34,13 +34,14 @@ public class ProjectSaver extends Saver {
 	}
 
 	public DmsProject create(StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
-		final String endDate, final String objective, final String name) throws ParseException {
+		final String endDate, final String objective, final String name, final String createdBy) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			project = new DmsProject();
 			project.setName(name);
 			project.setStudyType(studyType);
+			project.setCreatedBy(createdBy);
 			if (startDate != null && startDate.contains("-")) {
 				project.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 			} else {

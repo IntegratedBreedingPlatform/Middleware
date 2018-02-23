@@ -81,6 +81,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
+		studyDetails.setCreatedBy("1");
 
 		setUpWorkbook();
 	}
@@ -92,6 +93,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		studyDetails.setStudyName("Test Trial " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
+		studyDetails.setCreatedBy("1");
 
 		setUpWorkbook();
 	}

@@ -228,7 +228,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyName("Study name");
 		studyDetails.setDescription("Study title");
-		/* studyDetails.setPmKey("123"); */
+		studyDetails.setCreatedBy("1");
 		studyDetails.setObjective("Test transformer");
 		studyDetails.setStudyType(StudyType.T);
 		studyDetails.setStartDate("20000101");

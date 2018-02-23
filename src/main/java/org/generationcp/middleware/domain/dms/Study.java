@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Contains the details of a study - id, conditions and constants.
@@ -46,6 +47,8 @@ public class Study implements Serializable {
 	private String studyUpdate;
 
 	private String objective;
+
+	private String createdBy;
 
 	public Study() {
 	}
@@ -99,12 +102,9 @@ public class Study implements Serializable {
 	}
 
 	public Integer getUser() {
-		return this.getDisplayValueAsInt(TermId.STUDY_UID);
+		return Integer.valueOf(this.getCreatedBy());
 	}
 
-	public Integer getCreationDate() {
-		return this.getDisplayValueAsInt(TermId.CREATION_DATE);
-	}
 
 	public String getDisplayValue(TermId termId) {
 		String value = null;
@@ -118,7 +118,7 @@ public class Study implements Serializable {
 		return value;
 	}
 
-	public Integer getDisplayValueAsInt(TermId termId) {
+	private Integer getDisplayValueAsInt(TermId termId) {
 		Integer value = null;
 		String strValue = this.getDisplayValue(termId);
 		if (strValue != null && !"".equals(strValue)) {
@@ -147,10 +147,6 @@ public class Study implements Serializable {
 		this.constants = constants;
 	}
 
-	public VariableTypeList getConstantVariableTypes() {
-		return this.constants.getVariableTypes().sort();
-	}
-
 	public void print(int indent) {
 		Debug.println(indent, "Study: ");
 		Debug.println(indent + 3, "Id: " + this.getId());
@@ -166,41 +162,6 @@ public class Study implements Serializable {
 		for (Variable constant : this.constants.getVariables()) {
 			constant.print(indent + 6);
 		}
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (this.conditions == null ? 0 : this.conditions.hashCode());
-		result = prime * result + (this.constants == null ? 0 : this.constants.hashCode());
-		result = prime * result + this.id;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Study)) {
-			return false;
-		}
-		Study other = (Study) obj;
-		return this.getId() == other.getId();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Study [id=");
-		builder.append(this.id);
-		builder.append(", conditions=");
-		builder.append(this.conditions);
-		builder.append(", constants=");
-		builder.append(this.constants);
-		builder.append("]");
-		return builder.toString();
 	}
 
 	public VariableTypeList getVariableTypesByPhenotypicType(PhenotypicType pheotypicType) {
@@ -254,5 +215,45 @@ public class Study implements Serializable {
 
 	public void setObjective(final String objective) {
 		this.objective = objective;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Study))
+			return false;
+		final Study study = (Study) o;
+		return this.getId() == study.getId() && Objects.equals(this.getName(), study.getName()) && Objects
+			.equals(this.getConditions(), study.getConditions()) && Objects.equals(this.getConstants(), study.getConstants()) && Objects
+			.equals(this.getProgramUUID(), study.getProgramUUID()) && this.getStudyType() == study.getStudyType() && Objects
+			.equals(this.getDescription(), study.getDescription()) && Objects.equals(this.getStartDate(), study.getStartDate()) && Objects
+			.equals(this.getEndDate(), study.getEndDate()) && Objects.equals(this.getStudyUpdate(), study.getStudyUpdate()) && Objects
+			.equals(this.getObjective(), study.getObjective()) && Objects.equals(this.getCreatedBy(), study.getCreatedBy());
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects
+			.hash(this.getId(), this.getName(), this.getConditions(), this.getConstants(), this.getProgramUUID(), this.getStudyType(), this.getDescription(), this
+					.getStartDate(),
+				this.getEndDate(), this.getStudyUpdate(), this.getObjective(), this.getCreatedBy());
+	}
+
+	@Override
+	public String toString() {
+		return "Study{" + "id=" + id + ", name='" + name + '\'' + ", conditions=" + conditions + ", constants=" + constants
+			+ ", programUUID='" + programUUID + '\'' + ", studyType=" + studyType + ", description='" + description + '\'' + ", startDate='"
+			+ startDate + '\'' + ", endDate='" + endDate + '\'' + ", studyUpdate='" + studyUpdate + '\'' + ", objective='" + objective
+			+ '\'' + ", createdBy='" + createdBy + '\'' + '}';
 	}
 }

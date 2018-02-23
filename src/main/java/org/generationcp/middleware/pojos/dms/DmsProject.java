@@ -112,6 +112,10 @@ public class DmsProject implements Serializable {
 	@Column(name = "objective")
 	private String objective;
 
+
+	@Column(name = "created_by")
+	private String createdBy;
+
 	public DmsProject() {
 		super();
 	}
@@ -222,6 +226,16 @@ public class DmsProject implements Serializable {
 
 	public void setObjective(final String objective) {
 		this.objective = objective;
+	}
+
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		if (this.createdBy == null || this.createdBy.isEmpty()) {
+			this.createdBy = createdBy;
+		}
 	}
 
 	@Override
