@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 public class PhenotypeQuery {
 
@@ -38,7 +39,7 @@ public class PhenotypeQuery {
 		+ "  INNER JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = ep.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = ep.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
-		+ " WHERE 1 = 1 " //
+		+ " WHERE plotdata_project.name LIKE '%PLOTDATA' " //
 		; //
 
 	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id in (:studyDbIds) ";
@@ -47,6 +48,11 @@ public class PhenotypeQuery {
 		+ " FROM nd_experiment_phenotype ndeph " //
 		+ "   INNER JOIN phenotype ph ON ndeph.phenotype_id = ph.phenotype_id " //
 		+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
+		+ "   INNER JOIN nd_experiment_project ndep ON ndeph.nd_experiment_id = ndep.nd_experiment_id " //
+		+ "   INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
+		+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
+		+ "                             AND pp.variable_id = ph.observable_id " //
+		+ "                             AND pp.type_id = " + VariableType.TRAIT.getId() //
 		+ " WHERE ndeph.nd_experiment_id = nde.nd_experiment_id AND cvt.cvterm_id in (:cvTermIds))" //
 		;
 
@@ -61,8 +67,13 @@ public class PhenotypeQuery {
 		+ "  nd_experiment_phenotype ndeph" //
 		+ "  INNER JOIN phenotype ph ON ndeph.phenotype_id = ph.phenotype_id " //
 		+ "  INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
+		+ "  INNER JOIN nd_experiment_project ndep ON ndeph.nd_experiment_id = ndep.nd_experiment_id " //
+		+ "  INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
+		+ "  INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
+		+ "                            AND pp.variable_id = ph.observable_id " //
+		+ "                            AND pp.type_id = " + VariableType.TRAIT.getId() //
 		+ "  LEFT JOIN cvtermprop cvp on (cvp.cvterm_id = cvt.cvterm_id and cvp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() + ")"
-		+ " WHERE ndeph.nd_experiment_id in (:ndExperimentIds)" //
+		+ " WHERE ndeph.nd_experiment_id in (:ndExperimentIds) " //
 		;
 
 
