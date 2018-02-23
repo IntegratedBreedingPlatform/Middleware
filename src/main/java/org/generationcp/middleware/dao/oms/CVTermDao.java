@@ -332,26 +332,17 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return terms;
 	}
 
-	public List<CVTerm> getVariablesByType(List<Integer> types, Integer storedIn) {
+	public List<CVTerm> getVariablesByType(List<Integer> types) {
 		List<CVTerm> terms = new ArrayList<>();
 
 		try {
 			StringBuilder queryString =
-					new StringBuilder().append("SELECT cvtrm.cvterm_id, cvtrm.name, cvtrm.definition FROM cvterm cvtrm ") 
-							.append("INNER JOIN cvterm_relationship cvrel ON cvrel.subject_id = cvtrm.cvterm_id AND cvrel.type_id = " +TermId.HAS_SCALE.getId() + " and cvrel.object_id IN ")
-							.append("(SELECT cvt.cvterm_id FROM cvterm cvt ") 
-							.append("INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id ") 
-							.append("AND cvr.type_id = " + TermId.HAS_TYPE.getId() + " AND cvr.object_id IN (:types)) ");
-			if (storedIn != null) {
-				queryString.append("INNER JOIN cvterm_relationship stored_in ON cvr.subject_id = stored_in.subject_id ").append(
-						"AND stored_in.type_id = " +TermId.STORED_IN.getId() + " AND stored_in.object_id = :storedIn ");
-			}
-
+					new StringBuilder().append("SELECT variable.cvterm_id, variable.name, variable.definition FROM cvterm variable ")
+									   .append("INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = variable.cvterm_id AND hasScale.type_id = " + TermId.HAS_SCALE.getId() + " ")
+									   .append("INNER JOIN cvterm_relationship numericScale ON hasScale.object_id = numericScale.subject_id  AND numericScale.type_id = " + TermId.HAS_TYPE.getId() +" AND numericScale.object_id IN (:types)");
+			
 			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("types", types);
-			if (storedIn != null) {
-				query.setParameter("storedIn", storedIn);
-			}
 
 			List<Object[]> list = query.list();
 

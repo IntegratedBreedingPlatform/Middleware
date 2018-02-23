@@ -44,7 +44,7 @@ public class TraitBuilder extends Builder {
 
 		// Get locationCount, germplasmCount, observationCount, minValue, maxValue
 		// Retrieve traits environments
-		variableTerms.addAll(this.getCvTermDao().getVariablesByType(TraitBuilder.NUMERIC_VARIABLE_TYPE, null));
+		variableTerms.addAll(this.getCvTermDao().getVariablesByType(TraitBuilder.NUMERIC_VARIABLE_TYPE));
 		variableIds.addAll(this.getVariableIds(variableTerms));
 		numericTraitInfoList.addAll(this.getPhenotypeDao().getNumericTraitInfoList(environmentIds, variableIds));
 
@@ -76,7 +76,7 @@ public class TraitBuilder extends Builder {
 		List<CVTerm> variableTerms = new ArrayList<CVTerm>();
 
 		// Get character variable terms
-		variableTerms.addAll(this.getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId()), null));
+		variableTerms.addAll(this.getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId())));
 
 		// Get location, germplasm and observation counts
 		List<TraitInfo> traitInfoList = this.getTraitCounts(this.getVariableIds(variableTerms), environmentIds);
