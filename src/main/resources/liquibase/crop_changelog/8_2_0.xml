@@ -58,8 +58,8 @@
 				    p.START_DATE = substr(PP.VALUE, 1, 8)
 				WHERE
 				    pp.variable_id = 8050
-				        AND p.name NOT LIKE '%-ENVIRONMENT'
-				        AND p.name NOT LIKE '%-PLOTDATA';
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
 
 			UPDATE project p
 				        INNER JOIN
@@ -68,8 +68,8 @@
 				    p.END_DATE = substr(PP.VALUE, 1, 8)
 				WHERE
 				    pp.variable_id = 8060
-				        AND p.name NOT LIKE '%-ENVIRONMENT'
-				        AND p.name NOT LIKE '%-PLOTDATA';
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
 
 			UPDATE project p
 				        INNER JOIN
@@ -78,8 +78,8 @@
 				    p.STUDY_UPDATE = substr(PP.VALUE, 1, 8)
 				WHERE
 				    pp.variable_id = 8009
-				        AND p.name NOT LIKE '%-ENVIRONMENT'
-				        AND p.name NOT LIKE '%-PLOTDATA';
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
 
 			DELETE FROM projectprop
 			WHERE variable_id = 8050;
@@ -138,8 +138,8 @@
 				    p.objective = PP.VALUE
 				WHERE
 				    pp.variable_id = 8030
-				        AND p.name NOT LIKE '%-ENVIRONMENT'
-				        AND p.name NOT LIKE '%-PLOTDATA';
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
 
 			DELETE FROM projectprop
 			WHERE variable_id = 8030;
@@ -216,8 +216,8 @@
 				    p.created_by = PP.VALUE
 				WHERE
 				    pp.variable_id = 8020
-				        AND p.name NOT LIKE '%-ENVIRONMENT'
-				        AND p.name NOT LIKE '%-PLOTDATA';
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
 
 			DELETE FROM projectprop
 			WHERE variable_id = 8020;
