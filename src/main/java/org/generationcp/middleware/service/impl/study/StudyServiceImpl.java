@@ -25,6 +25,8 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.Service;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -577,6 +579,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		return !queryResults.isEmpty();
+	}
+
+	@Override
+	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
+		return this.getPhenotypeDao().searchPhenotypes(pageSize, pageNumber, requestDTO);
+	}
+
+	@Override
+	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
+		return this.getPhenotypeDao().countPhenotypes(requestDTO);
 	}
 
 	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {

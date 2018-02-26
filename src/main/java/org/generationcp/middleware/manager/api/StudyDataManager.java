@@ -793,4 +793,6 @@ public interface StudyDataManager {
 	 */
 	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(final String variableId, final String variableValue, final String programUUID);
 
+	Map<String, Integer> getInstanceGeolocationIdsMap (final Integer studyId);
+
 }

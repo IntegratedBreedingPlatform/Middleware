@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
 
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 public interface StudyService {
@@ -51,4 +53,20 @@ public interface StudyService {
 	 */
 	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId);
 
+	/**
+	 * Retrieves Phenotypes given certain search parameters
+	 * specified in https://brapi.docs.apiary.io/#reference/phenotypes/phenotype-search V1.1
+	 * @param pageSize
+	 * @param pageNumber
+	 * @param requestDTO
+	 * @return List of phenotypes
+	 */
+	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
+
+	/**
+	 * Retrieves a count of how many phenotypes match with the search parameters
+	 * @param requestDTO
+	 * @return Number of phenotypes
+	 */
+	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
 }
