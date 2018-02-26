@@ -15,7 +15,7 @@ public class PhenotypeSearchObservationDTO {
 		return observationDbId;
 	}
 
-	public void setObservationDbId(Integer observationDbId) {
+	public void setObservationDbId(final Integer observationDbId) {
 		this.observationDbId = observationDbId;
 	}
 
@@ -23,7 +23,7 @@ public class PhenotypeSearchObservationDTO {
 		return observationVariableDbId;
 	}
 
-	public void setObservationVariableDbId(String observationVariableDbId) {
+	public void setObservationVariableDbId(final String observationVariableDbId) {
 		this.observationVariableDbId = observationVariableDbId;
 	}
 
@@ -31,7 +31,7 @@ public class PhenotypeSearchObservationDTO {
 		return observationVariableName;
 	}
 
-	public void setObservationVariableName(String observationVariableName) {
+	public void setObservationVariableName(final String observationVariableName) {
 		this.observationVariableName = observationVariableName;
 	}
 
@@ -39,7 +39,7 @@ public class PhenotypeSearchObservationDTO {
 		return observationTimeStamp;
 	}
 
-	public void setObservationTimeStamp(String observationTimeStamp) {
+	public void setObservationTimeStamp(final String observationTimeStamp) {
 		this.observationTimeStamp = observationTimeStamp;
 	}
 
@@ -47,7 +47,7 @@ public class PhenotypeSearchObservationDTO {
 		return season;
 	}
 
-	public void setSeason(String season) {
+	public void setSeason(final String season) {
 		this.season = season;
 	}
 
@@ -55,7 +55,7 @@ public class PhenotypeSearchObservationDTO {
 		return collector;
 	}
 
-	public void setCollector(String collector) {
+	public void setCollector(final String collector) {
 		this.collector = collector;
 	}
 
@@ -63,7 +63,7 @@ public class PhenotypeSearchObservationDTO {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 

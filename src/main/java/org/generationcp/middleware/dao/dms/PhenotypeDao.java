@@ -988,9 +988,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final String variableId = (result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
 				observation.setObservationVariableDbId(variableId);
 				observation.setObservationVariableName((String) result[3]);
-				observation.setObservationTimeStamp("");
-				observation.setSeason("");
-				observation.setCollector("");
+				observation.setObservationTimeStamp(StringUtils.EMPTY);
+				observation.setSeason(StringUtils.EMPTY);
+				observation.setCollector(StringUtils.EMPTY);
 				observation.setObservationDbId((Integer) result[1]);
 				observation.setValue((String) result[4]);
 
