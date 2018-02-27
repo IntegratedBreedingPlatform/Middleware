@@ -1127,6 +1127,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId) {
+		final List<Geolocation> geolocations = this.getGeolocationDao().getEnvironmentGeolocations(studyId);
+		final Map<String, Integer> map = new HashMap<>();
+		for (final Geolocation geolocation : geolocations) {
+			map.put(geolocation.getDescription(), geolocation.getLocationId());
+		}
+		return map;
+	}
+
+	@Override
 	public boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(final String variableId, final String variableValue, final String programUUID) {
 
 		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);

@@ -89,4 +89,19 @@ public class StandardVariableTestDataInitializer {
 				StandardVariableTestDataInitializer.DUMMY_DATATYPE_DEF));
 		return standardVariable;
 	}
+	
+	public static StandardVariable createStandardVariable(Term property, Term scale, Term method, Term dataType) throws Exception {
+
+		StandardVariable standardVariable = new StandardVariable();
+
+		standardVariable.setName("TestVariable" + new Random().nextLong());
+		standardVariable.setDescription("For unit testing purposes");
+		standardVariable.setProperty(property);
+		standardVariable.setScale(scale);
+		standardVariable.setMethod(method);
+		standardVariable.setDataType(dataType);
+		standardVariable.setPhenotypicType(PhenotypicType.VARIATE);
+
+		return standardVariable;
+	}
 }

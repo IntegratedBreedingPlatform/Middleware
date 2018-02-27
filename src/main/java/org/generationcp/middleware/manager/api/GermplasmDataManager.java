@@ -1137,4 +1137,12 @@ public interface GermplasmDataManager {
 	 * @return the preferred names by gids
 	 */
 	Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids);
+
+	/**
+	 *
+	 * @param gid
+	 * @param attributeName
+	 * @return Attribute value that matches with attribute name and gid
+	 */
+	String getAttributeValue (final Integer gid, final String attributeName);
 }
