@@ -587,7 +587,7 @@ public class WorkbookBuilder extends Builder {
 						measurementData = new MeasurementData(factor.getName(), plotId, isEditable, dataType, factor);
 					} else {
 						measurementData =
-							new MeasurementData(factor.getName(), null, isEditable, dataType, factor.getTermId(), factor);
+							new MeasurementData(factor.getName(), null, isEditable, dataType, factor);
 					}
 					measurementDataList.add(measurementData);
 				}
