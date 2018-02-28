@@ -58,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilderTest.class);
@@ -132,7 +131,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		}
 		Assert.assertFalse("Expected no error but got one", hasError);
 	}
-
+	
+	@Ignore
 	@Test
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
@@ -167,7 +167,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		}
 		return false;
 	}
-
+	
+	@Ignore
 	@Test
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
@@ -314,9 +315,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 			}
 			final Variable variable = this.createVariable(measurementVariable, value);
 			variableList.add(variable);
-			if (count == measurementVariableList.size()) {
-				variable.setCustomValue(true);
-			}
 		}
 		return variableList;
 	}
@@ -345,7 +343,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		measurementVariableList.add(this.getMeasurementVariable(TermId.PLOT_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.SITE_SOIL_PH, false));
 		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.CRUST, false));
-		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.CUSTOM_VARIATE, false));
 		return measurementVariableList;
 	}
 
@@ -354,14 +351,17 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	private StandardVariable getStandardVariable(final int id) throws MiddlewareException {
-		return this.standardVariableBuilder.create(id, "1234567");
+		StandardVariable standardVariable = this.standardVariableBuilder.create(id, "1234567");
+		standardVariable.setPhenotypicType(PhenotypicType.VARIATE);
+		return standardVariable;
 	}
 
 	private DMSVariableType transformMeasurementVariable(final MeasurementVariable measurementVariable,
 			final StandardVariable standardVariable) {
 		return new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
 	}
-
+	
+	@Ignore
 	@Test
 	public void testRemoveTrialDatasetVariables() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
@@ -408,7 +408,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
 		}
 	}
-
+	
+	@Ignore
 	@Test
 	public void testBuildTrialObservations() {
 
@@ -430,7 +431,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		Assert.assertTrue(this.isTermIdExists(TermId.TRIAL_LOCATION.getId(), result.get(0).getDataList()));
 
 	}
-
+	
+	@Ignore
 	@Test
 	public void testBuildConditionVariablesOnTrial() {
 		//final int noOfObservations, final StudyType studyType, final String studyName, final int trialNo, final boolean hasMultipleLocations
@@ -529,7 +531,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 			this.workbookBuilder.createMeasurementVariable(stdVariable, localNameProjectProp, value, minRange, maxRange, varType);
 		Assert.assertNotNull(measurementVariable);
 		Assert.assertEquals(stdVariable.getId(), measurementVariable.getTermId());
-		Assert.assertEquals(localNameProjectProp.getValue(), measurementVariable.getName());
+		Assert.assertEquals(localNameProjectProp.getAlias(), measurementVariable.getName());
 		Assert.assertEquals(stdVariable.getDescription(), measurementVariable.getDescription());
 		Assert.assertEquals(stdVariable.getProperty().getName(), measurementVariable.getProperty());
 		Assert.assertEquals(stdVariable.getScale().getName(), measurementVariable.getScale());
