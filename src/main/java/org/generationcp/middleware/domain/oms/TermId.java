@@ -32,7 +32,6 @@ public enum TermId {
 
 	// Study Fields
 	, PM_KEY(8040), STUDY_TITLE(8007), PI_ID(8110), PI_NAME(8100)
-	//, STUDY_UID(8020)
 	, STUDY_INSTITUTE(8080)
 	, CREATION_DATE(8048) // NOTE: Used this field for assigning variable creation date to property
 	, LAST_UPDATE_DATE(8049) // TODO: Update ID as per final cvterm id assigned officially.

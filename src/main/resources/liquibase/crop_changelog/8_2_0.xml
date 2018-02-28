@@ -8,19 +8,17 @@
 
 	<changeSet author="vanina" id="v8.2.0-1">
 	<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="project" columnName="start_date"/>
-			</not>
-			<and>
-				<not>
-					<columnExists tableName="project" columnName="end_date"/>
-				</not>
-			</and>
-			<and>
-				<not>
-					<columnExists tableName="project" columnName="study_update"/>
-				</not>
-			</and>
+		<and>
+		    <not>
+		        <columnExists tableName="project" columnName="start_date"/>
+		    </not>
+		    <not>
+		        <columnExists tableName="project" columnName="end_date"/>
+		    </not>
+		    <not>
+		        <columnExists tableName="project" columnName="study_update"/>
+		    </not>
+		</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 				ALTER TABLE project
