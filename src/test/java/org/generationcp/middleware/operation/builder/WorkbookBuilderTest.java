@@ -12,14 +12,19 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.MeasurementDataTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
+import org.generationcp.middleware.data.initializer.VariableListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -224,7 +229,61 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 			Assert.assertEquals("Measurement data value should be empty", "", measurementData.getValue());
 		}
 	}
-
+	
+	@Test
+	public void testAddMeasurementDataForFactors() {
+		List<MeasurementVariable> factorList = new ArrayList<>(Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(), "CROSS")));
+		VariableList factors = VariableListTestDataInitializer.createVariableList();
+		List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList );
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
+		Assert.assertEquals(factors.getVariables().get(0).getValue(), measurementData.getValue());
+		Assert.assertNull(measurementData.getcValueId());
+	}
+	
+	@Test
+	public void testAddMeasurementDataForFactorsForCategoricalVariable() {
+		List<MeasurementVariable> factorList = new ArrayList<>(Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(), "CROSS")));
+		VariableList factors = VariableListTestDataInitializer.createVariableListWithCategoricalVariable();
+		List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList );
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
+		Assert.assertEquals(factors.getVariables().get(0).getValue(), measurementData.getValue());
+		Assert.assertEquals(factors.getVariables().get(0).getValue(), measurementData.getcValueId());
+	}
+	
+	@Test
+	public void testAddMeasurementDataForFactorsNotFound() {
+		List<MeasurementVariable> factorList = new ArrayList<>(Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(), TermId.CROSS.name(), "CROSS")));
+		VariableList factors = new VariableList();
+		List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList );
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
+		Assert.assertEquals("", measurementData.getValue());
+		Assert.assertNull(measurementData.getcValueId());
+	}
+	
+	@Test
+	public void testAddMeasurementDataForFactorsNotFoundPlotId() {
+		List<MeasurementVariable> factorList = new ArrayList<>(Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.PLOT_ID.getId(), TermId.PLOT_ID.name(), "PLOT")));
+		Experiment experiment = new Experiment();
+		experiment.setPlotId("plot id 1");
+		VariableList factors = new VariableList();
+		List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, experiment, factors, measurementDataList );
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.PLOT_ID.name(), measurementData.getLabel());
+		Assert.assertEquals(experiment.getPlotId(), measurementData.getValue());
+		Assert.assertNull(measurementData.getcValueId());
+	}
+	
 	@Test
 	public void testPopulateMeasurementData() throws MiddlewareException {
 		final List<MeasurementVariable> measurementVariableList = this.createMeasurementVariableList();

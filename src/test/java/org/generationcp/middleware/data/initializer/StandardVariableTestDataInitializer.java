@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 
 public class StandardVariableTestDataInitializer {
 	private static final int DUMMY_PROPERTY_ID = 10;
@@ -103,5 +104,15 @@ public class StandardVariableTestDataInitializer {
 		standardVariable.setPhenotypicType(PhenotypicType.VARIATE);
 
 		return standardVariable;
+	}
+	
+	public static StandardVariable createStandardVariableWithCategoricalDataType(int id, String name) {
+
+		final StandardVariable stdVariable = StandardVariableTestDataInitializer.createStandardVariable();
+		stdVariable.setId(id);
+		stdVariable.setName(name);
+		stdVariable.setDescription(name + " Description");
+		stdVariable.setDataType(new Term(TermId.CATEGORICAL_VARIABLE.getId(), "Categorical variable", "variable with categorical values"));
+		return stdVariable;
 	}
 }

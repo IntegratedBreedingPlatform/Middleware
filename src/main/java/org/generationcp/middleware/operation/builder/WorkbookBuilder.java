@@ -547,51 +547,9 @@ public class WorkbookBuilder extends Builder {
 					}
 				}
 			}
-			for (final MeasurementVariable factor : factorList) {
-				boolean found = false;
-				for (final Variable variable : factors.getVariables()) {
-					if (factor.getTermId() == variable.getVariableType().getStandardVariable().getId()) {
-						found = true;
-						if (isTrial && variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
-							|| PhenotypicType.TRIAL_ENVIRONMENT != variable.getVariableType().getRole()) {
-
-							final boolean isEditable =
-								NonEditableFactors.isEditable(variable.getVariableType().getStandardVariable().getId());
-							final String dataType =
-								this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId());
-							final String localName = variable.getVariableType().getLocalName();
-
-							final MeasurementData measurementData;
-
-							if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
-								.getId()) {
-								final Integer id = NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
-
-								measurementData =
-									new MeasurementData(localName, variable.getActualValue(), isEditable, dataType, id, factor);
-							} else {
-								measurementData = new MeasurementData(localName, variable.getValue(), isEditable, dataType, factor);
-							}
-							measurementDataList.add(measurementData);
-							break;
-						}
-					}
-				}
-				if (!found) {
-					final boolean isEditable = NonEditableFactors.isEditable(factor.getTermId());
-					final String dataType = this.getDataType(factor.getDataTypeId());
-					final MeasurementData measurementData;
-
-					if (factor.getTermId() == TermId.PLOT_ID.getId()) {
-						final String plotId = experiment.getPlotId();
-						measurementData = new MeasurementData(factor.getName(), plotId, isEditable, dataType, factor);
-					} else {
-						measurementData =
-							new MeasurementData(factor.getName(), null, isEditable, dataType, factor);
-					}
-					measurementDataList.add(measurementData);
-				}
-			}
+			
+			addMeasurementDataForFactors(factorList, isTrial, experiment, factors, measurementDataList);
+			
 			measurementDataList.add(this.getMeasurementDataWithSample(samplesMap, experimentId));
 
 			this.populateMeasurementData(variateList, variates, measurementDataList);
@@ -604,6 +562,54 @@ public class WorkbookBuilder extends Builder {
 		}
 
 		return observations;
+	}
+
+	void addMeasurementDataForFactors(final List<MeasurementVariable> factorList, final boolean isTrial,
+			final Experiment experiment, final VariableList factors, final List<MeasurementData> measurementDataList) {
+		for (final MeasurementVariable factor : factorList) {
+			boolean found = false;
+			for (final Variable variable : factors.getVariables()) {
+				if (factor.getTermId() == variable.getVariableType().getStandardVariable().getId()) {
+					found = true;
+					if (isTrial && variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
+						|| PhenotypicType.TRIAL_ENVIRONMENT != variable.getVariableType().getRole()) {
+						final boolean isEditable =
+							NonEditableFactors.isEditable(variable.getVariableType().getStandardVariable().getId());
+						final String dataType =
+							this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId());
+						final String localName = variable.getVariableType().getLocalName();
+
+						final MeasurementData measurementData;
+
+						if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
+							.getId()) {
+							final Integer id = NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+
+							measurementData =
+								new MeasurementData(localName, variable.getActualValue(), isEditable, dataType, id, factor);
+						} else {
+							measurementData = new MeasurementData(localName, variable.getValue(), isEditable, dataType, factor);
+						}
+						measurementDataList.add(measurementData);
+						break;
+					}
+				}
+			}
+			if (!found) {
+				final boolean isEditable = NonEditableFactors.isEditable(factor.getTermId());
+				final String dataType = this.getDataType(factor.getDataTypeId());
+				final MeasurementData measurementData;
+
+				if (factor.getTermId() == TermId.PLOT_ID.getId()) {
+					final String plotId = experiment.getPlotId();
+					measurementData = new MeasurementData(factor.getName(), plotId, isEditable, dataType, factor);
+				} else {
+					measurementData =
+						new MeasurementData(factor.getName(), null, isEditable, dataType, factor);
+				}
+				measurementDataList.add(measurementData);
+			}
+		}
 	}
 
 	/**
@@ -654,9 +660,14 @@ public class WorkbookBuilder extends Builder {
 									this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()), variate);
 					measurementData.setPhenotypeId(variable.getPhenotypeId());
 					measurementData.setAccepted(true);
+//					System.out.println("------------");
+//					System.out.println(this.isCategoricalVariate(variable) );
+//					System.out.println(variable.isCustomValue());
+//					System.out.println(NumberUtils.isNumber(variable.getValue()));
 					if (this.isCategoricalVariate(variable) && !variable.isCustomValue() && NumberUtils.isNumber(variable.getValue())) {
 						// we set the cValue id if the isCustomValue flag is false, since this is an id of the valid value
 						// we check if its a number to be sure
+//						System.out.println("cval");
 						measurementData.setcValueId(variable.getValue());
 					}
 					measurementDataList.add(measurementData);
@@ -673,6 +684,8 @@ public class WorkbookBuilder extends Builder {
 
 	protected boolean isCategoricalVariate(final Variable variable) {
 		final StandardVariable stdVar = variable.getVariableType().getStandardVariable();
+//		System.out.println(PhenotypicType.VARIATE == stdVar.getPhenotypicType());
+//		System.out.println(stdVar.getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId());
 		return PhenotypicType.VARIATE == stdVar.getPhenotypicType() && stdVar.getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId();
 	}
 
