@@ -95,7 +95,7 @@ public class StudyDetails implements Serializable {
 		if ((piId != null) && NumberUtils.isNumber(piId)) {
 			this.piId = Double.valueOf(piId).intValue();
 		}
-		if ((siteId != null) && NumberUtils.isNumber(siteId)) {
+		if (siteId != null && NumberUtils.isNumber(siteId)) {
 			this.siteId = Double.valueOf(siteId).intValue();
 		}
 	}

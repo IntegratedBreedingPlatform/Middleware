@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="vanina" id="v8.2.0-1">
+	<changeSet author="vanina" id="v8.3.0-1">
 	<preConditions onFail="MARK_RAN">
 		<and>
 		    <not>
@@ -53,7 +53,7 @@
 				        INNER JOIN
 				    projectprop pp ON p.project_id = pp.project_id
 				SET
-				    p.START_DATE = substr(PP.VALUE, 1, 8)
+				    p.START_DATE = substr(pp.VALUE, 1, 8)
 				WHERE
 				    pp.variable_id = 8050
 				        AND p.name NOT LIKE '%-ENVIRONMENT%'
@@ -63,7 +63,7 @@
 				        INNER JOIN
 				    projectprop pp ON p.project_id = pp.project_id
 				SET
-				    p.END_DATE = substr(PP.VALUE, 1, 8)
+				    p.END_DATE = substr(pp.VALUE, 1, 8)
 				WHERE
 				    pp.variable_id = 8060
 				        AND p.name NOT LIKE '%-ENVIRONMENT%'
@@ -73,7 +73,7 @@
 				        INNER JOIN
 				    projectprop pp ON p.project_id = pp.project_id
 				SET
-				    p.STUDY_UPDATE = substr(PP.VALUE, 1, 8)
+				    p.STUDY_UPDATE = substr(pp.VALUE, 1, 8)
 				WHERE
 				    pp.variable_id = 8009
 				        AND p.name NOT LIKE '%-ENVIRONMENT%'
@@ -102,7 +102,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v8.2.0-2">
+	<changeSet author="vanina" id="v8.3.0-2">
 	<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="project" columnName="objective"/>
@@ -133,7 +133,7 @@
 				        INNER JOIN
 				    projectprop pp ON p.project_id = pp.project_id
 				SET
-				    p.objective = PP.VALUE
+				    p.objective = pp.VALUE
 				WHERE
 				    pp.variable_id = 8030
 				        AND p.name NOT LIKE '%-ENVIRONMENT%'
@@ -148,7 +148,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v8.2.0-3">
+	<changeSet author="vanina" id="v8.3.0-3">
 	<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="projectprop_name_bkp"/>
@@ -180,7 +180,7 @@
 		</sql>
 	</changeSet>
 
-		<changeSet author="vanina" id="v8.2.0-4">
+		<changeSet author="vanina" id="v8.3.0-4">
 	<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="project" columnName="created_by"/>
@@ -211,7 +211,7 @@
 				        INNER JOIN
 				    projectprop pp ON p.project_id = pp.project_id
 				SET
-				    p.created_by = PP.VALUE
+				    p.created_by = pp.VALUE
 				WHERE
 				    pp.variable_id = 8020
 				        AND p.name NOT LIKE '%-ENVIRONMENT%'
