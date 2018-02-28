@@ -90,10 +90,11 @@ public class StandardVariableTestDataInitializer {
 				StandardVariableTestDataInitializer.DUMMY_DATATYPE_DEF));
 		return standardVariable;
 	}
-	
-	public static StandardVariable createStandardVariable(Term property, Term scale, Term method, Term dataType) throws Exception {
 
-		StandardVariable standardVariable = new StandardVariable();
+	public static StandardVariable createStandardVariable(final Term property, final Term scale, final Term method,
+			final Term dataType) throws Exception {
+
+		final StandardVariable standardVariable = new StandardVariable();
 
 		standardVariable.setName("TestVariable" + new Random().nextLong());
 		standardVariable.setDescription("For unit testing purposes");
@@ -105,14 +106,15 @@ public class StandardVariableTestDataInitializer {
 
 		return standardVariable;
 	}
-	
-	public static StandardVariable createStandardVariableWithCategoricalDataType(int id, String name) {
+
+	public static StandardVariable createStandardVariableWithCategoricalDataType(final int id, final String name) {
 
 		final StandardVariable stdVariable = StandardVariableTestDataInitializer.createStandardVariable();
 		stdVariable.setId(id);
 		stdVariable.setName(name);
 		stdVariable.setDescription(name + " Description");
-		stdVariable.setDataType(new Term(TermId.CATEGORICAL_VARIABLE.getId(), "Categorical variable", "variable with categorical values"));
+		stdVariable.setDataType(new Term(TermId.CATEGORICAL_VARIABLE.getId(), "Categorical variable",
+				"variable with categorical values"));
 		return stdVariable;
 	}
 }
