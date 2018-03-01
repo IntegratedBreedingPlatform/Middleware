@@ -31,7 +31,7 @@ public enum TermId {
 	, IBDB_CLASS(1001), ONTOLOGY_TRAIT_CLASS(1330), ONTOLOGY_RESEARCH_CLASS(1045), GENERAL_TRAIT_CLASS(8580)
 
 	// Study Fields
-	, PM_KEY(8040), STUDY_TITLE(8007), PI_ID(8110), PI_NAME(8100)
+	, PM_KEY(8040), PI_ID(8110), PI_NAME(8100)
 	, STUDY_INSTITUTE(8080)
 	, CREATION_DATE(8048) // NOTE: Used this field for assigning variable creation date to property
 	, LAST_UPDATE_DATE(8049) // TODO: Update ID as per final cvterm id assigned officially.
