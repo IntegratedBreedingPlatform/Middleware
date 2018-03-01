@@ -24,16 +24,16 @@ import java.text.ParseException;
 
 public class ProjectSaver extends Saver {
 
-	public ProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
+	public ProjectSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public DmsProject save(DmsProject project) throws MiddlewareQueryException {
-		DmsProjectDao projectDao = this.getDmsProjectDao();
+	public DmsProject save(final DmsProject project) throws MiddlewareQueryException {
+		final DmsProjectDao projectDao = this.getDmsProjectDao();
 		return projectDao.save(project);
 	}
 
-	public DmsProject create(StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
+	public DmsProject create(final StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
 		final String endDate, final String objective, final String name, final String createdBy) throws ParseException {
 		DmsProject project = null;
 
@@ -60,8 +60,8 @@ public class ProjectSaver extends Saver {
 		return project;
 	}
 
-	private void mapStudytoProject(String name, String description, DmsProject project, final String objective) throws MiddlewareException {
-		StringBuffer errorMessage = new StringBuffer("");
+	private void mapStudytoProject(final String name, final String description, final DmsProject project, final String objective) throws MiddlewareException {
+		final StringBuffer errorMessage = new StringBuffer("");
 
 		if (name != null && !name.equals("")) {
 			project.setName(name);
@@ -85,14 +85,14 @@ public class ProjectSaver extends Saver {
 
 	}
 
-	private String getStringValue(StudyValues studyValues, int termId) {
+	private String getStringValue(final StudyValues studyValues, final int termId) {
 		return studyValues.getVariableList().findById(termId).getValue();
 	}
 
 	/**
 	 * Saves a folder. Creates an entry in project and project_relationship
 	 */
-	public DmsProject saveFolder(int parentId, String name, String description, String programUUID, final String objective) throws Exception {
+	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) throws Exception {
 		DmsProject project = new DmsProject();
 		project.setProgramUUID(programUUID);
 		this.mapStudytoProject(name, description, project, objective);
@@ -100,7 +100,7 @@ public class ProjectSaver extends Saver {
 		try {
 			project = this.save(project);
 			this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, false);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw e;
 		}
 		return project;

@@ -241,8 +241,8 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
 		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
 
-		int measurementDataSetId = this.workbookBuilder.getMeasurementDataSetId(studyId, studyDetails.getStudyName());
-		Workbook workbookCompleteDataset = this.workbookBuilder.getDataSetBuilder().buildCompleteDataset(measurementDataSetId, true);
+		final int measurementDataSetId = this.workbookBuilder.getMeasurementDataSetId(studyId, studyDetails.getStudyName());
+		final Workbook workbookCompleteDataset = this.workbookBuilder.getDataSetBuilder().buildCompleteDataset(measurementDataSetId, true);
 
 		Assert.assertTrue(workbookCompleteDataset.getObservations().size() > 0);
 	}

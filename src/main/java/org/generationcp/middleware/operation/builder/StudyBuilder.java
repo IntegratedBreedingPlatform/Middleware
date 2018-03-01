@@ -27,24 +27,24 @@ public class StudyBuilder extends Builder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyBuilder.class);
 	
-	public StudyBuilder(HibernateSessionProvider sessionProviderForLocal) {
+	public StudyBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public Study createStudy(int studyId) throws MiddlewareException {
+	public Study createStudy(final int studyId) throws MiddlewareException {
 		Study study = null;
-		DmsProject project = this.getDmsProjectDao().getById(studyId);
+		final DmsProject project = this.getDmsProjectDao().getById(studyId);
 		if (project != null) {
 			study = this.createStudy(project);
 		}
 		return study;
 	}
 
-	public Study createStudy(int studyId, boolean hasVariabletype) throws MiddlewareException {
-		Monitor monitor = MonitorFactory.start("Build Study");
+	public Study createStudy(final int studyId, final boolean hasVariabletype) throws MiddlewareException {
+		final Monitor monitor = MonitorFactory.start("Build Study");
 		try {
 			Study study = null;
-			DmsProject project = this.getDmsProjectDao().getById(studyId);
+			final DmsProject project = this.getDmsProjectDao().getById(studyId);
 			if (project != null) {
 				study = this.createStudy(project, hasVariabletype);
 			}
@@ -54,8 +54,8 @@ public class StudyBuilder extends Builder {
 		}
 	}
 
-	public Study createStudy(DmsProject project) throws MiddlewareException {
-		Study study = new Study();
+	public Study createStudy(final DmsProject project) throws MiddlewareException {
+		final Study study = new Study();
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
 		study.setStudyType(project.getStudyType());
@@ -67,12 +67,12 @@ public class StudyBuilder extends Builder {
 		study.setName(project.getName());
 		study.setCreatedBy(project.getCreatedBy());
 
-		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties(),
+		final VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties(),
 				project.getProgramUUID());
-		VariableTypeList conditionVariableTypes = variableTypes.getFactors();
-		VariableTypeList constantVariableTypes = variableTypes.getVariates();
+		final VariableTypeList conditionVariableTypes = variableTypes.getFactors();
+		final VariableTypeList constantVariableTypes = variableTypes.getVariates();
 
-		Experiment experiment = this.getExperimentBuilder().buildOne(project.getProjectId(), TermId.STUDY_EXPERIMENT, variableTypes);
+		final Experiment experiment = this.getExperimentBuilder().buildOne(project.getProjectId(), TermId.STUDY_EXPERIMENT, variableTypes);
 
 		study.setConditions(this.getStudyVariableBuilder().create(project, experiment, conditionVariableTypes));
 		study.setConstants(this.getStudyVariableBuilder().create(project, experiment, constantVariableTypes));
@@ -80,8 +80,8 @@ public class StudyBuilder extends Builder {
 		return study;
 	}
 
-	public Study createStudy(DmsProject project, boolean hasVariableType) throws MiddlewareException {
-		Study study = new Study();
+	public Study createStudy(final DmsProject project, final boolean hasVariableType) throws MiddlewareException {
+		final Study study = new Study();
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
 		study.setStudyType(project.getStudyType());
@@ -92,12 +92,12 @@ public class StudyBuilder extends Builder {
 		study.setCreatedBy(project.getCreatedBy());
 		study.setName(project.getName());
 
-		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
+		final VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
 				project.getProperties(),project.getProgramUUID());
-		VariableTypeList conditionVariableTypes = variableTypes.getFactors();
-		VariableTypeList constantVariableTypes = variableTypes.getVariates();
+		final VariableTypeList conditionVariableTypes = variableTypes.getFactors();
+		final VariableTypeList constantVariableTypes = variableTypes.getVariates();
 
-		Experiment experiment =
+		final Experiment experiment =
 				this.getExperimentBuilder().buildOne(project.getProjectId(), TermId.STUDY_EXPERIMENT, variableTypes, hasVariableType);
 
 		study.setConditions(this.getStudyVariableBuilder().create(project, experiment, conditionVariableTypes, hasVariableType));

@@ -252,8 +252,8 @@ public class StudyTestDataInitializer {
 		return this.gid;
 	}
 
-	public Integer addTestLocation(String locationName){
-		Location location = new Location();
+	public Integer addTestLocation(final String locationName){
+		final Location location = new Location();
 		location.setCntryid(1);
 		location.setLabbr("");
 		location.setLname(locationName);

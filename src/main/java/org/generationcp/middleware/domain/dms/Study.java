@@ -65,7 +65,7 @@ public class Study implements Serializable {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -106,7 +106,7 @@ public class Study implements Serializable {
 	}
 
 
-	public String getDisplayValue(TermId termId) {
+	public String getDisplayValue(final TermId termId) {
 		String value = null;
 		Variable variable = this.conditions.findById(termId);
 		if (variable == null) {
@@ -118,9 +118,9 @@ public class Study implements Serializable {
 		return value;
 	}
 
-	private Integer getDisplayValueAsInt(TermId termId) {
+	private Integer getDisplayValueAsInt(final TermId termId) {
 		Integer value = null;
-		String strValue = this.getDisplayValue(termId);
+		final String strValue = this.getDisplayValue(termId);
 		if (strValue != null && !"".equals(strValue)) {
 			value = Integer.parseInt(strValue);
 		}
@@ -131,7 +131,7 @@ public class Study implements Serializable {
 		return this.conditions.sort();
 	}
 
-	public void setConditions(VariableList conditions) {
+	public void setConditions(final VariableList conditions) {
 		this.conditions = conditions;
 	}
 
@@ -143,32 +143,32 @@ public class Study implements Serializable {
 		return this.constants.sort();
 	}
 
-	public void setConstants(VariableList constants) {
+	public void setConstants(final VariableList constants) {
 		this.constants = constants;
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "Study: ");
 		Debug.println(indent + 3, "Id: " + this.getId());
 		Debug.println(indent + 3, "Name: " + this.getName());
 		Debug.println(indent + 3, "Title: " + this.getDescription());
 
 		Debug.println(indent + 3, "Conditions: ");
-		for (Variable condition : this.conditions.getVariables()) {
+		for (final Variable condition : this.conditions.getVariables()) {
 			condition.print(indent + 6);
 		}
 
 		Debug.println(indent + 3, "Constants: ");
-		for (Variable constant : this.constants.getVariables()) {
+		for (final Variable constant : this.constants.getVariables()) {
 			constant.print(indent + 6);
 		}
 	}
 
-	public VariableTypeList getVariableTypesByPhenotypicType(PhenotypicType pheotypicType) {
-		VariableTypeList filteredFactors = new VariableTypeList();
-		VariableTypeList factors = this.getConditionVariableTypes();
+	public VariableTypeList getVariableTypesByPhenotypicType(final PhenotypicType pheotypicType) {
+		final VariableTypeList filteredFactors = new VariableTypeList();
+		final VariableTypeList factors = this.getConditionVariableTypes();
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (DMSVariableType factor : factors.getVariableTypes()) {
+			for (final DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getPhenotypicType() == pheotypicType) {
 					filteredFactors.add(factor);
 				}
@@ -181,7 +181,7 @@ public class Study implements Serializable {
 		return programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 

@@ -403,9 +403,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public String getLocalNameByStandardVariableId(final Integer projectId, final Integer standardVariableId) {
-		DmsProject dmsProject = new DmsProject();
+		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(projectId);
-		ProjectProperty projectProperty = getProjectPropertyDao().getByStandardVariableId(dmsProject, standardVariableId);
+		final ProjectProperty projectProperty = getProjectPropertyDao().getByStandardVariableId(dmsProject, standardVariableId);
 		return (projectProperty == null) ? null : projectProperty.getAlias();
 	}
 
@@ -415,11 +415,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
-			CrossExpansionProperties crossExpansionProperties) {
-		List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
-		for (Integer studyId : studyIdList) {
-			FieldMapInfo fieldMapInfo = new FieldMapInfo();
+	public List<FieldMapInfo> getFieldMapInfoOfStudy(final List<Integer> studyIdList, final StudyType studyType,
+			final CrossExpansionProperties crossExpansionProperties) {
+		final List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
+		for (final Integer studyId : studyIdList) {
+			final FieldMapInfo fieldMapInfo = new FieldMapInfo();
 
 			fieldMapInfo.setFieldbookId(studyId);
 			fieldMapInfo.setFieldbookName(this.getDmsProjectDao().getById(studyId).getName());
@@ -441,32 +441,32 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return fieldMapInfos;
 	}
 
-	private void setPedigree(List<FieldMapDatasetInfo> fieldMapDatasetInfos, CrossExpansionProperties crossExpansionProperties,
-			Map<Integer, String> pedigreeStringMap) {
+	private void setPedigree(final List<FieldMapDatasetInfo> fieldMapDatasetInfos, final CrossExpansionProperties crossExpansionProperties,
+			final Map<Integer, String> pedigreeStringMap) {
 		//TODO: Caching of the pedigree string is just a temporary fix. This must be properly fixed.
-		for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
-			List<FieldMapTrialInstanceInfo> trialInstances = fieldMapDatasetInfo.getTrialInstances();
+		for (final FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
+			final List<FieldMapTrialInstanceInfo> trialInstances = fieldMapDatasetInfo.getTrialInstances();
 			if (trialInstances == null || trialInstances.isEmpty()) {
 				continue;
 			}
-			for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
-				List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
-				for (FieldMapLabel label : labels) {
+			for (final FieldMapTrialInstanceInfo trialInstance : trialInstances) {
+				final List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
+				for (final FieldMapLabel label : labels) {
 					this.setPedigree(label, crossExpansionProperties, pedigreeStringMap);
 				}
 			}
 		}
 	}
 
-	private void setPedigree(FieldMapLabel label, CrossExpansionProperties crossExpansionProperties,
-			Map<Integer, String> pedigreeStringMap) {
+	private void setPedigree(final FieldMapLabel label, final CrossExpansionProperties crossExpansionProperties,
+			final Map<Integer, String> pedigreeStringMap) {
 
 		final Integer gid = label.getGid();
 		final String cachedPedigreeString = pedigreeStringMap.get(gid);
 		if (StringUtils.isNotBlank(cachedPedigreeString)) {
 			label.setPedigree(cachedPedigreeString);
 		} else {
-			String pedigree = this.pedigreeService.getCrossExpansion(gid, crossExpansionProperties);
+			final String pedigree = this.pedigreeService.getCrossExpansion(gid, crossExpansionProperties);
 			label.setPedigree(pedigree);
 			pedigreeStringMap.put(gid, pedigree);
 		}
@@ -528,7 +528,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
-		List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
+		final List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
@@ -546,7 +546,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
 
-		List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
+		final List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos);
 
@@ -1082,22 +1082,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<InstanceMetadata> getInstanceMetadata(int studyId) {
+	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
 		return this.getGeolocationDao().getInstanceMetadata(studyId);
 	}
 
 	@Override
-	public Phenotype getPhenotypeById(int phenotypeId) {
+	public Phenotype getPhenotypeById(final int phenotypeId) {
 		return getPhenotypeDao().getById(phenotypeId);
 	}
 
 	@Override
-	public void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId) {
+	public void saveOrUpdatePhenotypeValue(final int experimentId, final int variableId, final String value, final Phenotype existingPhenotype, final int dataTypeId) {
 		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId);
 	}
 
 	@Override
-	public StudyMetadata getStudyMetadata(Integer studyId) {
+	public StudyMetadata getStudyMetadata(final Integer studyId) {
 		return this.getDmsProjectDao().getStudyMetadata(studyId);
 	}
 

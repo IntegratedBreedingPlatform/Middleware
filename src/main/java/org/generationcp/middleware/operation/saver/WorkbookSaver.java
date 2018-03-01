@@ -626,7 +626,7 @@ public class WorkbookSaver extends Saver {
 
 			watch.restart("save study");
 
-			StudyType studyType;
+			final StudyType studyType;
 			if (workbook.isNursery()) {
 				studyType = StudyType.N;
 			} else {

@@ -26,7 +26,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
  */
 public class StudySaver extends Saver {
 
-	public StudySaver(HibernateSessionProvider sessionProviderForLocal) {
+	public StudySaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
@@ -34,7 +34,7 @@ public class StudySaver extends Saver {
 	 * Saves a study. Creates an entry in project, projectprop and project_relationship tables (default) Creates an entry in nd_experiment
 	 * and nd_experiment_project tables if saveStudyExperiment is true.
 	 */
-	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, boolean saveStudyExperiment,
+	public DmsProject saveStudy(final int parentId, final VariableTypeList variableTypeList, final StudyValues studyValues, final boolean saveStudyExperiment,
 		final String programUUID, final String cropPrefix, final StudyType studyType, final String description, final String startDate,
 		final String endDate, final String objective, final String name, final String createdBy) throws Exception {
 
@@ -59,7 +59,7 @@ public class StudySaver extends Saver {
 	public void saveStudyExperiment(final int projectId, final StudyValues values, final String cropPrefix) throws Exception {
 		try {
 			this.getExperimentModelSaver().addExperiment(projectId, ExperimentType.STUDY_INFORMATION, values, cropPrefix);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw e;
 		}
 	}
