@@ -38,7 +38,7 @@ public interface Reporter {
 	 * 
 	 * @return Map of parameters for a JarperPrint
 	 */
-	Map<String, Object> buildJRParams(Map<String, Object> args);
+	Map<String, Object> buildJRParams(Map<String, Object> args, String studyName);
 
 	/**
 	 * Creates a JarperPrint using beans and raw data passed in to this method. Concrete classes need to define the extraction process.
@@ -47,7 +47,7 @@ public interface Reporter {
 	 * @return The processed JasperPrint (template + data)
 	 * @throws JRException when method cannot create a valid JasperPrint with current inputs.
 	 */
-	JasperPrint buildJRPrint(Map<String, Object> args) throws JRException;
+	JasperPrint buildJRPrint(Map<String, Object> args, String studyName) throws JRException;
 
 	/**
 	 * Retrieves the name of the jasper file to be used for constructing this report. The extension '.jasper' in the name is optional, but

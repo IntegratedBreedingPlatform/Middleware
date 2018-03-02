@@ -47,22 +47,22 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	@Test
 	public void testTransformStock() throws Exception {
 		Debug.println(TestOutputFormatter.INDENT, "testTransformStock");
-		VariableTypeList variableTypeList = this.createVariableTypeListTestData();
-		MeasurementRow measurementRow = this.createMeasurementRowTestData(variableTypeList);
-		List<String> trialHeaders = this.getTrialHeaders(variableTypeList);
+		final VariableTypeList variableTypeList = this.createVariableTypeListTestData();
+		final MeasurementRow measurementRow = this.createMeasurementRowTestData(variableTypeList);
+		final List<String> trialHeaders = this.getTrialHeaders(variableTypeList);
 		Debug.println(TestOutputFormatter.INDENT, "Input MeasurmentRow");
 		measurementRow.print(TestOutputFormatter.INDENT);
 		Debug.println(TestOutputFormatter.INDENT, "Input VariableTypeList");
 		variableTypeList.print(TestOutputFormatter.INDENT);
 
-		VariableList stocks = VariableListTransformerTest.transformer.transformStock(measurementRow, variableTypeList, trialHeaders);
+		final VariableList stocks = VariableListTransformerTest.transformer.transformStock(measurementRow, variableTypeList, trialHeaders);
 
 		Assert.assertNotNull(stocks);
-		VariableList result = this.getStockResult(variableTypeList);
+		final VariableList result = this.getStockResult(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 		int i = 0;
 		Debug.println(TestOutputFormatter.INDENT, "Output:");
-		for (Variable stock : stocks.getVariables()) {
+		for (final Variable stock : stocks.getVariables()) {
 			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
 			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
 			stock.print(TestOutputFormatter.INDENT);
@@ -73,23 +73,23 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	@Test
 	public void transformTrialEnvironment() throws Exception {
 		Debug.println(TestOutputFormatter.INDENT, "transformTrialEnvironment");
-		VariableTypeList variableTypeList = this.createVariableTypeListTestData();
-		MeasurementRow measurementRow = this.createMeasurementRowTestData(variableTypeList);
-		List<String> trialHeaders = this.getTrialHeaders(variableTypeList);
+		final VariableTypeList variableTypeList = this.createVariableTypeListTestData();
+		final MeasurementRow measurementRow = this.createMeasurementRowTestData(variableTypeList);
+		final List<String> trialHeaders = this.getTrialHeaders(variableTypeList);
 		Debug.println(TestOutputFormatter.INDENT, "Input MeasurmentRow");
 		measurementRow.print(TestOutputFormatter.INDENT);
 		Debug.println(TestOutputFormatter.INDENT, "Input VariableTypeList");
 		variableTypeList.print(TestOutputFormatter.INDENT);
 
-		VariableList stocks =
+		final VariableList stocks =
 				VariableListTransformerTest.transformer.transformTrialEnvironment(measurementRow, variableTypeList, trialHeaders);
 
 		Assert.assertNotNull(stocks);
-		VariableList result = this.getStockResult2(variableTypeList);
+		final VariableList result = this.getStockResult2(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 		int i = 0;
 		Debug.println(TestOutputFormatter.INDENT, "Output:");
-		for (Variable stock : stocks.getVariables()) {
+		for (final Variable stock : stocks.getVariables()) {
 			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
 			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
 			stock.print(TestOutputFormatter.INDENT);
@@ -100,25 +100,25 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	@Test
 	public void transformTrialEnvironment2() throws Exception {
 		Debug.println(TestOutputFormatter.INDENT, "testTransformTrialEnvironment 2");
-		List<MeasurementVariable> mVarList = this.createMeasurementVariableListTestData();
-		VariableTypeList variableTypeList = this.createVariableTypeListTestData();
+		final List<MeasurementVariable> mVarList = this.createMeasurementVariableListTestData();
+		final VariableTypeList variableTypeList = this.createVariableTypeListTestData();
 
 		Debug.println(TestOutputFormatter.INDENT, "Input MeasurementVariables");
 		mVarList.toString();
 		Debug.println(TestOutputFormatter.INDENT, "Input VariableTypeList");
 		variableTypeList.print(TestOutputFormatter.INDENT);
 
-		VariableList stocks = VariableListTransformerTest.transformer.transformTrialEnvironment(mVarList, variableTypeList);
+		final VariableList stocks = VariableListTransformerTest.transformer.transformTrialEnvironment(mVarList, variableTypeList);
 		Assert.assertNotNull(stocks);
 
-		VariableList result = this.getStockResult2(variableTypeList);
+		final VariableList result = this.getStockResult2(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 
 		Debug.println(TestOutputFormatter.INDENT, stocks.toString());
 
 		int i = 0;
 		Debug.println(TestOutputFormatter.INDENT, "Output:");
-		for (Variable stock : stocks.getVariables()) {
+		for (final Variable stock : stocks.getVariables()) {
 			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
 			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
 			stock.print(TestOutputFormatter.INDENT);
@@ -126,48 +126,13 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		}
 	}
 
-	@Test
-	public void testTransformStudyDetails() throws Exception {
-		StudyDetails studyDetails = this.createTestStudyDetails();
-		Debug.println(TestOutputFormatter.INDENT, "Input studyDetails");
-		studyDetails.print(TestOutputFormatter.INDENT);
-
-		VariableList variables = VariableListTransformerTest.transformer.transformStudyDetails(studyDetails, null);
-
-		Assert.assertNotNull(variables);
-
-		for (Variable v : variables.getVariables()) {
-			Assert.assertEquals(v.getValue(), this.getStudyDetailValue(v.getVariableType().getRank(), studyDetails));
-			v.print(TestOutputFormatter.INDENT);
-		}
-	}
-
-	private String getStudyDetailValue(int rank, StudyDetails studyDetails) {
-		switch (rank) {
-			case 1:
-				return studyDetails.getStudyName();
-			case 2:
-				return studyDetails.getDescription();
-				/* case 3: return studyDetails.getPmKey(); */
-			case 4:
-				return studyDetails.getObjective();
-			case 5:
-				return Integer.toString(studyDetails.getStudyType().getId());
-			case 6:
-				return studyDetails.getStartDate();
-			case 7:
-				return studyDetails.getEndDate();
-		}
-		return null;
-	}
-
-	private MeasurementRow createMeasurementRowTestData(VariableTypeList varTypeList) {
-		MeasurementRow row = new MeasurementRow();
+	private MeasurementRow createMeasurementRowTestData(final VariableTypeList varTypeList) {
+		final MeasurementRow row = new MeasurementRow();
 		row.setDataList(new ArrayList<MeasurementData>());
 
 		int i = 0;
-		for (DMSVariableType varType : varTypeList.getVariableTypes()) {
-			MeasurementData data = new MeasurementData(varType.getLocalName(), "value" + i);
+		for (final DMSVariableType varType : varTypeList.getVariableTypes()) {
+			final MeasurementData data = new MeasurementData(varType.getLocalName(), "value" + i);
 			row.getDataList().add(data);
 			i++;
 		}
@@ -176,7 +141,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	}
 
 	private VariableTypeList createVariableTypeListTestData() {
-		VariableTypeList list = new VariableTypeList();
+		final VariableTypeList list = new VariableTypeList();
 
 		list.add(new DMSVariableType("FACTOR1", "FACTOR 1", this.createVariable(PhenotypicType.GERMPLASM), 1));
 		list.add(new DMSVariableType("FACTOR2", "FACTOR 2", this.createVariable(PhenotypicType.DATASET), 2));
@@ -192,10 +157,10 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		return list;
 	}
 
-	public List<String> getTrialHeaders(VariableTypeList list) {
-		List<String> trialHeaders = new ArrayList<String>();
+	public List<String> getTrialHeaders(final VariableTypeList list) {
+		final List<String> trialHeaders = new ArrayList<String>();
 		if (list != null && list.size() > 0) {
-			for (DMSVariableType var : list.getVariableTypes()) {
+			for (final DMSVariableType var : list.getVariableTypes()) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.equals(var.getStandardVariable().getPhenotypicType())) {
 					trialHeaders.add(var.getLocalName());
 				}
@@ -204,10 +169,10 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		return trialHeaders;
 	}
 
-	private VariableList getStockResult(VariableTypeList varTypeList) {
-		VariableList list = new VariableList();
+	private VariableList getStockResult(final VariableTypeList varTypeList) {
+		final VariableList list = new VariableList();
 		int i = 0;
-		for (DMSVariableType varType : varTypeList.getVariableTypes()) {
+		for (final DMSVariableType varType : varTypeList.getVariableTypes()) {
 			if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
 				list.add(new Variable(varType, "value" + i));
 			}
@@ -216,10 +181,10 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		return list;
 	}
 
-	private VariableList getStockResult2(VariableTypeList varTypeList) {
-		VariableList list = new VariableList();
+	private VariableList getStockResult2(final VariableTypeList varTypeList) {
+		final VariableList list = new VariableList();
 		int i = 0;
-		for (DMSVariableType varType : varTypeList.getVariableTypes()) {
+		for (final DMSVariableType varType : varTypeList.getVariableTypes()) {
 			if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT) {
 				list.add(new Variable(varType, "value" + i));
 			}
@@ -228,8 +193,8 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		return list;
 	}
 
-	private StandardVariable createVariable(PhenotypicType phenotypicType) {
-		StandardVariable stdvar = new StandardVariable();
+	private StandardVariable createVariable(final PhenotypicType phenotypicType) {
+		final StandardVariable stdvar = new StandardVariable();
 		if (phenotypicType != null) {
 			stdvar.setPhenotypicType(phenotypicType);
 		}
@@ -237,7 +202,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	}
 
 	private List<MeasurementVariable> createMeasurementVariableListTestData() {
-		List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
 
 		mVarList.add(new MeasurementVariable("FACTOR1", "Name of Principal Investigator", "DBCV", "ASSIGNED", "PERSON", "C", "value0",
 				"STUDY"));
@@ -260,10 +225,10 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	}
 
 	private StudyDetails createTestStudyDetails() {
-		StudyDetails studyDetails = new StudyDetails();
+		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyName("Study name");
 		studyDetails.setDescription("Study title");
-		/* studyDetails.setPmKey("123"); */
+		studyDetails.setCreatedBy("1");
 		studyDetails.setObjective("Test transformer");
 		studyDetails.setStudyType(StudyType.T);
 		studyDetails.setStartDate("20000101");

@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.*;
 
 public class PhenotypeDaoTest {
 
+	public static final int CURRENT_IBDB_USER_ID = 1;
 	private PhenotypeDao dao;
 
 	@Mock
@@ -154,7 +155,7 @@ public class PhenotypeDaoTest {
 				"studyLocationRow1", // row[18]
 				"entryTypeRow1", // row[19]
 				"entryNumberRow1", // row[20]
-			}, // 
+			}, //
 			new Object[] { //
 				2, // row[0]
 				"setObservationUnitDbId2", // row[1]
@@ -177,7 +178,7 @@ public class PhenotypeDaoTest {
 				"studyLocationRow2", // row[18]
 				"entryTypeRow2", // row[19]
 				"entryNumberRow2", // row[20]
-			} // 
+			} //
 		});
 	}
 

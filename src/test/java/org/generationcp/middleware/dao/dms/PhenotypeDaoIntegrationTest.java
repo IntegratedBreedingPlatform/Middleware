@@ -42,6 +42,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private static final String FIELDBOOK_FILE_IBD_VALID = "Trial457-3-1_Valid_IBD.xls";
 	private static final String FIELDBOOK_FILE_CATVARIATES_ONLY = "FieldbookFile_CategoricalVariatesOnly.xls";
+	private static final Integer CREATED_BY = 1;
 	private Map<Integer, Map<String, Object>> studies = new HashMap<Integer, Map<String, Object>>();
 	private boolean testDataLoaded = false;
 
@@ -67,7 +68,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		if (!this.testDataLoaded) {
 			String fileLocation = PhenotypeDaoIntegrationTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
 			File file = new File(fileLocation);
-			Workbook workbook = this.dataImportService.parseWorkbook(file);
+			Workbook workbook = this.dataImportService.parseWorkbook(file, PhenotypeDaoIntegrationTest.CREATED_BY);
 			workbook.print(IntegrationTestBase.INDENT);
 
 			int studyId = this.dataImportService.saveDataset(workbook, null, cropPrefix);
