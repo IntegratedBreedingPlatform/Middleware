@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
+import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.NamingConfiguration;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
@@ -975,6 +977,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Integer> getActiveUserIDsByProjectId(Long projectId) {
 		return this.getProjectUserInfoDao().getActiveUserIDsByProjectId(projectId);
+	}
+
+	@Override
+	public NamingConfiguration getNamingConfigurationByName(String name) {
+		final NamingConfigurationDAO namingConfigurationDAO = new NamingConfigurationDAO();
+		namingConfigurationDAO.setSession(this.getCurrentSession());
+		return namingConfigurationDAO.getByName(name);
 	}
 
 }

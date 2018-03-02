@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.NamingConfiguration;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
@@ -660,5 +661,11 @@ public interface WorkbenchDataManager {
 	 * @return the user matching the given project_uuid
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
-	
+
+	/**
+	 * Gets the NamingConfiguration matching the given name
+	 * @param name
+	 * @return the NamingConfiguration
+	 */
+	NamingConfiguration getNamingConfigurationByName(String name);
 }

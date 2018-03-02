@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="aldrin" id="v8.3.0-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="naming_config"/>
+            </not>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            CREATE TABLE `workbench`.`naming_config` (
+            `id` INT NOT NULL,
+            `name` VARCHAR(255) NOT NULL,
+            `type` VARCHAR(255) NOT NULL,
+            `prefix` VARCHAR(255) NULL,
+            `suffix` VARCHAR(255) NULL,
+            `count` VARCHAR(255) NULL,
+            `separator` VARCHAR(255) NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE INDEX `naming_id_UNIQUE` (`id` ASC),
+            UNIQUE INDEX `name_UNIQUE` (`name` ASC));
+        </sql>
+    </changeSet>
+    <changeSet author="aldrin" id="v8.3.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from `workbench`.`naming_config` where `name` = 'CODE 1';</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO `workbench`.`naming_config` (`id`, `name`, `type`, `prefix`, `suffix`, `count`, `separator`)
+            VALUES (1,'CODE 1','GERMPLASM','CML','','[SEQUENCE]','');
+        </sql>
+    </changeSet>
+    <changeSet author="aldrin" id="v8.3.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from `workbench`.`naming_config` where `name` = 'CODE 2';</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO `workbench`.`naming_config` (`id`, `name`, `type`, `prefix`, `suffix`, `count`, `separator`)
+            VALUES (2,'CODE 2','GERMPLASM','CML','','[SEQUENCE]','');
+        </sql>
+    </changeSet>
+    <changeSet author="aldrin" id="v8.3.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count(*) from `workbench`.`naming_config` where `name` = 'CODE 3';</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO `workbench`.`naming_config` (`id`, `name`, `type`, `prefix`, `suffix`, `count`, `separator`)
+            VALUES (3,'CODE 3','GERMPLASM','CML','','[SEQUENCE]','');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
