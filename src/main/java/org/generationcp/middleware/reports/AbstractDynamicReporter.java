@@ -52,7 +52,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 	List<String> columnHeaders = null;
 
 	@Override
-	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException {
+	public JasperPrint buildJRPrint(Map<String, Object> args, String studyName) throws JRException {
 
 		Map<String, Object> jrParams = null;
 		JRDataSource jrDataSource = null;
@@ -60,7 +60,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 		Collection<?> collectionDataSource = null;
 
 		if (null != args) {
-			jrParams = this.buildJRParams(args);
+			jrParams = this.buildJRParams(args, studyName);
 			this.setFileName(this.buildOutputFileName(jrParams));
 
 			if (args.containsKey("dataSource")) {
@@ -243,8 +243,8 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> buildJRParams(Map<String, Object> args) {
-		Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(Map<String, Object> args, String studyName) {
+		Map<String, Object> params = super.buildJRParams(args, studyName);
 
 		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
 
@@ -252,9 +252,6 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 			switch (var.getName()) {
 				case "SITE_NAME":
 					params.put("site", var.getValue());
-					break;
-				case "STUDY_NAME":
-					params.put("nursery", var.getValue());
 					break;
 				case "CROP_SEASON":
 					params.put("season", var.getValue());
@@ -267,6 +264,9 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 					break;
 			}
 		}
+
+		params.put(AbstractReporter.STUDY_NAME_REPORT_KEY, studyName);
+
 
 		return params;
 	}

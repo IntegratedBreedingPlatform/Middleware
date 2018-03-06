@@ -53,7 +53,7 @@ public class MaizeTrialManifestTest {
         reportParams.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, TEST_PROGRAM_NAME);
 
 
-        final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams);
+        final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams, TEST_STUDY_NAME);
         Assert.assertTrue("Report should be able to provide the study name", reportValues.containsKey(AbstractReporter.STUDY_NAME_REPORT_KEY));
         Assert.assertEquals("Unable to provide the expected value for study name", TEST_STUDY_NAME, reportValues.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 
@@ -74,7 +74,7 @@ public class MaizeTrialManifestTest {
         reportParams.put(AbstractReporter.DATA_SOURCE_KEY, observations);
         reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, trialObservations);
 
-        final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams);
+        final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams, TEST_STUDY_NAME);
         Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY));
         Assert.assertEquals("Unable to provide report with season value", TEST_SEASON_VALUE, reportValues.get("season"));
     }
@@ -95,7 +95,7 @@ public class MaizeTrialManifestTest {
         reportParams.put(AbstractReporter.DATA_SOURCE_KEY, observations);
         reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, trialObservations);
 
-        final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams);
+        final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams, TEST_STUDY_NAME);
         Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY));
         Assert.assertEquals("Unable to provide report with season value", TEST_SEASON_VALUE, reportValues.get("season"));
     }

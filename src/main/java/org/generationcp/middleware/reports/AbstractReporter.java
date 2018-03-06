@@ -83,13 +83,13 @@ public abstract class AbstractReporter implements Reporter {
 	 * distribution.
 	 */
 	@Override
-	public JasperPrint buildJRPrint(final Map<String, Object> args) throws JRException {
+	public JasperPrint buildJRPrint(final Map<String, Object> args, String studyName) throws JRException {
 
 		Map<String, Object> jrParams = null;
 		JRDataSource jrDataSource = null;
 
 		if (null != args) {
-			jrParams = this.buildJRParams(args);
+			jrParams = this.buildJRParams(args, studyName);
 			this.fileName = this.buildOutputFileName(jrParams);
 
 			if (args.containsKey("dataSource")) {
@@ -112,7 +112,7 @@ public abstract class AbstractReporter implements Reporter {
 	 * @return Map of parameters for a JarperPrint
 	 */
 	@Override
-	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
+	public Map<String, Object> buildJRParams(final Map<String, Object> args, String studyName) {
 		final Map<String, Object> params = new HashMap<String, Object>();
 
 		if (args.containsKey("datePattern")) {

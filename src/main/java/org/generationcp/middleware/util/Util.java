@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 
 import com.google.common.base.Function;
@@ -352,5 +353,21 @@ public class Util {
 			i++;
 		}
 		return csv.toString();
+	}
+
+	/**
+	 * Converts the date from the old format to the new format
+	 *
+	 * @param date
+	 * @param oldFormat
+	 * @param newFormat
+	 * @return String converted date from old format to new format
+	 * @throws ParseException
+	 */
+	public static String convertDate(String date, String oldFormat, String newFormat) throws ParseException {
+		SimpleDateFormat sdf = Util.getSimpleDateFormat(oldFormat);
+		Date d = sdf.parse(date);
+		sdf.applyPattern(newFormat);
+		return sdf.format(d);
 	}
 }

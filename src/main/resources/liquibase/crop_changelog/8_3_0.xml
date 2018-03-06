@@ -1,0 +1,228 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="vanina" id="v8.3.0-1">
+	<preConditions onFail="MARK_RAN">
+		<and>
+		    <not>
+		        <columnExists tableName="project" columnName="start_date"/>
+		    </not>
+		    <not>
+		        <columnExists tableName="project" columnName="end_date"/>
+		    </not>
+		    <not>
+		        <columnExists tableName="project" columnName="study_update"/>
+		    </not>
+		</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE project
+				ADD COLUMN start_date VARCHAR(8),
+				ADD INDEX start_date_fk_idx (start_date ASC);
+
+				ALTER TABLE project
+				ADD COLUMN end_date VARCHAR(8),
+				ADD INDEX end_date_fk_idx (end_date ASC);
+
+				ALTER TABLE project
+				ADD COLUMN study_update VARCHAR(8),
+				ADD INDEX study_update_fk_idx (study_update ASC);
+
+			CREATE TABLE projectprop_dates_bkp (
+			  projectprop_id INT(11) NOT NULL AUTO_INCREMENT,
+			  project_id     INT(11) NOT NULL,
+			  type_id        INT(11) NOT NULL,
+			  value          VARCHAR(255)     DEFAULT NULL,
+			  rank           INT(11) NOT NULL DEFAULT '0',
+			  variable_id    INT(11) NOT NULL,
+			  alias          VARCHAR(255)     DEFAULT NULL,
+			  PRIMARY KEY (projectprop_id),
+			  UNIQUE KEY projectprop_idx1  (project_id, type_id, rank, variable_id)
+			);
+
+			INSERT INTO projectprop_dates_bkp (SELECT *
+			                                         FROM projectprop
+			                                         WHERE variable_id in (8050, 8060, 8009));
+
+			UPDATE project p
+				        INNER JOIN
+				    projectprop pp ON p.project_id = pp.project_id
+				SET
+				    p.START_DATE = substr(pp.VALUE, 1, 8)
+				WHERE
+				    pp.variable_id = 8050
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
+
+			UPDATE project p
+				        INNER JOIN
+				    projectprop pp ON p.project_id = pp.project_id
+				SET
+				    p.END_DATE = substr(pp.VALUE, 1, 8)
+				WHERE
+				    pp.variable_id = 8060
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
+
+			UPDATE project p
+				        INNER JOIN
+				    projectprop pp ON p.project_id = pp.project_id
+				SET
+				    p.STUDY_UPDATE = substr(pp.VALUE, 1, 8)
+				WHERE
+				    pp.variable_id = 8009
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
+
+			DELETE FROM projectprop
+			WHERE variable_id = 8050;
+			DELETE FROM cvterm_relationship
+			WHERE subject_id = 8050;
+			DELETE FROM cvterm
+			WHERE cvterm_id = 8050;
+
+			DELETE FROM projectprop
+			WHERE variable_id = 8060;
+			DELETE FROM cvterm_relationship
+			WHERE subject_id = 8060;
+			DELETE FROM cvterm
+			WHERE cvterm_id = 8060;
+
+			DELETE FROM projectprop
+			WHERE variable_id = 8009;
+			DELETE FROM cvterm_relationship
+			WHERE subject_id = 8009;
+			DELETE FROM cvterm
+			WHERE cvterm_id = 8009;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v8.3.0-2">
+	<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="objective"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE project
+				ADD COLUMN objective VARCHAR(255),
+				ADD INDEX objective_fk_idx (objective ASC);
+
+			CREATE TABLE projectprop_objective_bkp (
+			  projectprop_id INT(11) NOT NULL AUTO_INCREMENT,
+			  project_id     INT(11) NOT NULL,
+			  type_id        INT(11) NOT NULL,
+			  value          VARCHAR(255)     DEFAULT NULL,
+			  rank           INT(11) NOT NULL DEFAULT '0',
+			  variable_id    INT(11) NOT NULL,
+			  alias          VARCHAR(255)     DEFAULT NULL,
+			  PRIMARY KEY (projectprop_id),
+			  UNIQUE KEY projectprop_idx1  (project_id, type_id, rank, variable_id)
+			);
+
+			INSERT INTO projectprop_objective_bkp (SELECT *
+			                                         FROM projectprop
+			                                         WHERE variable_id in (8030));
+
+			UPDATE project p
+				        INNER JOIN
+				    projectprop pp ON p.project_id = pp.project_id
+				SET
+				    p.objective = pp.VALUE
+				WHERE
+				    pp.variable_id = 8030
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
+
+			DELETE FROM projectprop
+			WHERE variable_id = 8030;
+			DELETE FROM cvterm_relationship
+			WHERE subject_id = 8030;
+			DELETE FROM cvterm
+			WHERE cvterm_id = 8030;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v8.3.0-3">
+	<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="projectprop_name_bkp"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE projectprop_name_bkp (
+			  projectprop_id INT(11) NOT NULL AUTO_INCREMENT,
+			  project_id     INT(11) NOT NULL,
+			  type_id        INT(11) NOT NULL,
+			  value          VARCHAR(255)     DEFAULT NULL,
+			  rank           INT(11) NOT NULL DEFAULT '0',
+			  variable_id    INT(11) NOT NULL,
+			  alias          VARCHAR(255)     DEFAULT NULL,
+			  PRIMARY KEY (projectprop_id),
+			  UNIQUE KEY projectprop_idx1  (project_id, type_id, rank, variable_id)
+			);
+
+			INSERT INTO projectprop_name_bkp (SELECT *
+			                                         FROM projectprop
+			                                         WHERE variable_id in (8005));
+
+			DELETE FROM projectprop
+			WHERE variable_id = 8005;
+			DELETE FROM cvterm_relationship
+			WHERE subject_id = 8005;
+			DELETE FROM cvterm
+			WHERE cvterm_id = 8005;
+		</sql>
+	</changeSet>
+
+		<changeSet author="vanina" id="v8.3.0-4">
+	<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="created_by"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE project
+				ADD COLUMN created_by VARCHAR(255),
+				ADD INDEX created_by_fk_idx (created_by ASC);
+
+			CREATE TABLE projectprop_created_by_bkp (
+			  projectprop_id INT(11) NOT NULL AUTO_INCREMENT,
+			  project_id     INT(11) NOT NULL,
+			  type_id        INT(11) NOT NULL,
+			  value          VARCHAR(255)     DEFAULT NULL,
+			  rank           INT(11) NOT NULL DEFAULT '0',
+			  variable_id    INT(11) NOT NULL,
+			  alias          VARCHAR(255)     DEFAULT NULL,
+			  PRIMARY KEY (projectprop_id),
+			  UNIQUE KEY projectprop_idx1  (project_id, type_id, rank, variable_id)
+			);
+
+			INSERT INTO projectprop_created_by_bkp (SELECT *
+			                                         FROM projectprop
+			                                         WHERE variable_id in (8020));
+
+			UPDATE project p
+				        INNER JOIN
+				    projectprop pp ON p.project_id = pp.project_id
+				SET
+				    p.created_by = pp.VALUE
+				WHERE
+				    pp.variable_id = 8020
+				        AND p.name NOT LIKE '%-ENVIRONMENT%'
+				        AND p.name NOT LIKE '%-PLOTDATA%';
+
+			DELETE FROM projectprop
+			WHERE variable_id = 8020;
+			DELETE FROM cvterm_relationship
+			WHERE subject_id = 8020;
+			DELETE FROM cvterm
+			WHERE cvterm_id = 8020;
+		</sql>
+	</changeSet>
+</databaseChangeLog>

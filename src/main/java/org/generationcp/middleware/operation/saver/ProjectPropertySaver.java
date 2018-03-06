@@ -295,7 +295,7 @@ public class ProjectPropertySaver {
 	}
 
 	private void updateVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
-			final MeasurementVariable variable, final boolean isConstant, final Geolocation geolocation) {
+		final MeasurementVariable variable, final boolean isConstant, final Geolocation geolocation) {
 		if (TermId.TRIAL_INSTANCE_FACTOR.getId() != variable.getTermId()) {
 
 			if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
@@ -329,13 +329,6 @@ public class ProjectPropertySaver {
 					}
 				} else {
 					this.updateVariable(measurementDataset, variable);
-				}
-			} else {
-				// study
-				this.updateVariable(project, variable);
-				if (variable.getTermId() == TermId.STUDY_NAME.getId()) {
-					project.setName(variable.getValue());
-					this.daoFactory.getDmsProjectDao().merge(project);
 				}
 			}
 		}

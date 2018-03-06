@@ -81,6 +81,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
+		studyDetails.setCreatedBy("1");
 
 		setUpWorkbook();
 	}
@@ -92,6 +93,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		studyDetails.setStudyName("Test Trial " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
+		studyDetails.setCreatedBy("1");
 
 		setUpWorkbook();
 	}
@@ -105,11 +107,6 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 
 		// Conditions
 		final List<MeasurementVariable> conditions = new ArrayList<>();
-		conditions.add(this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)",
-			WorkbookBuilderIntegrationTest.PROP_STUDY, WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBCV,
-			WorkbookBuilderIntegrationTest.CHAR, studyDetails.getStudyName(), WorkbookBuilderIntegrationTest.STUDY,
-			PhenotypicType.STUDY, true));
-
 		workbook.setConditions(conditions);
 
 		// Constants
@@ -244,8 +241,8 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
 		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
 
-		int measurementDataSetId = this.workbookBuilder.getMeasurementDataSetId(studyId, studyDetails.getStudyName());
-		Workbook workbookCompleteDataset = this.workbookBuilder.getDataSetBuilder().buildCompleteDataset(measurementDataSetId, true);
+		final int measurementDataSetId = this.workbookBuilder.getMeasurementDataSetId(studyId, studyDetails.getStudyName());
+		final Workbook workbookCompleteDataset = this.workbookBuilder.getDataSetBuilder().buildCompleteDataset(measurementDataSetId, true);
 
 		Assert.assertTrue(workbookCompleteDataset.getObservations().size() > 0);
 	}

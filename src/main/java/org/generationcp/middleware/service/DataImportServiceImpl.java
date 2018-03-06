@@ -10,21 +10,7 @@
 
 package org.generationcp.middleware.service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -52,7 +38,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import javax.annotation.Resource;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 @Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
@@ -155,14 +153,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public Workbook parseWorkbook(final File file) throws WorkbookParserException {
+	public Workbook parseWorkbook(final File file, final Integer currentIbdbUserId) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
 		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
 
 		// partially parse the file to parse the description sheet only at first
 		// Set performValidation to false to disable validation during parsing.
-		final Workbook workbook = parser.parseFile(excelWorkbook, false);
+		final Workbook workbook = parser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
 
 		parser.parseAndSetObservationRows(excelWorkbook, workbook, false);
 
@@ -170,22 +168,22 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public Workbook parseWorkbookDescriptionSheet(final org.apache.poi.ss.usermodel.Workbook excelWorkbook)
+	public Workbook parseWorkbookDescriptionSheet(final org.apache.poi.ss.usermodel.Workbook excelWorkbook, final Integer currentIbdbUserId)
 			throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 		// Only parses the description sheet.
-		final Workbook workbook = parser.parseFile(excelWorkbook, false);
+		final Workbook workbook = parser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
 		return workbook;
 	}
 
 	@Override
-	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {
+	public Workbook strictParseWorkbook(final File file, final String programUUID, final Integer currentIbdbUserId) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
 		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
 
 		// partially parse the file to parse the description sheet only at first
-		return this.strictParseWorkbook(file, parser, parser.parseFile(excelWorkbook, true), programUUID);
+		return this.strictParseWorkbook(file, parser, parser.parseFile(excelWorkbook, true, currentIbdbUserId.toString()), programUUID);
 	}
 
 	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook,
@@ -251,12 +249,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public Workbook parseWorkbook(final File file, final String programUUID, final boolean discardInvalidValues,
-			final WorkbookParser workbookParser) throws WorkbookParserException {
+			final WorkbookParser workbookParser, final Integer currentIbdbUserId) throws WorkbookParserException {
 
 		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = workbookParser.loadFileToExcelWorkbook(file);
 
 		// Parse the description sheet only at first
-		final Workbook workbook = workbookParser.parseFile(excelWorkbook, false);
+		final Workbook workbook = workbookParser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
 
 		// Remove obsolete factors, conditions, constants and traits in the
 		// workbook if there's any
@@ -1035,7 +1033,5 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		if (value > 0) {
 			this.maxRowLimit = value;
 		}
-
 	}
-
 }

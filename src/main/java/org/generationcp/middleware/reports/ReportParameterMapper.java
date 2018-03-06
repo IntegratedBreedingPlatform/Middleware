@@ -45,12 +45,4 @@ public class ReportParameterMapper {
             reportParamMap.put("LoCycle", value);
         }
     }
-
-    public void mapBasicStudyValues(MeasurementVariable var, Map<String, Object> reportParamMap) {
-        final TermId term = TermId.getById(var.getTermId());
-
-        if (TermId.STUDY_NAME.equals(term)) {
-            reportParamMap.put(AbstractReporter.STUDY_NAME_REPORT_KEY, var.getValue());
-        }
-    }
 }

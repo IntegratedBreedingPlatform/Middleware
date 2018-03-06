@@ -53,6 +53,7 @@ public class DataImportServiceImplTest {
 	private static final String STUDY_NAME = "Study 1";
 	private static final int TRIAL_NO = 1;
 	private static final boolean IS_MULTIPLE_LOCATION = false;
+	public static final Integer CREATED_BY = 1;
 
 	@Mock
 	private WorkbookParser parser;
@@ -311,9 +312,9 @@ public class DataImportServiceImplTest {
 		final Workbook testWorkbook = this.createTestWorkbook(true);
 
 		Mockito.when(this.parser.loadFileToExcelWorkbook(this.file)).thenReturn(this.excelWorkbook);
-		Mockito.when(this.parser.parseFile(excelWorkbook, false)).thenReturn(testWorkbook);
+		Mockito.when(this.parser.parseFile(excelWorkbook, false, CREATED_BY.toString())).thenReturn(testWorkbook);
 
-		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, true, this.parser);
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, true, this.parser, CREATED_BY);
 
 		Mockito.verify(this.parser).parseAndSetObservationRows(excelWorkbook, testWorkbook, true);
 
@@ -329,9 +330,9 @@ public class DataImportServiceImplTest {
 		final Workbook testWorkbook = this.createTestWorkbook(true);
 
 		Mockito.when(this.parser.loadFileToExcelWorkbook(this.file)).thenReturn(this.excelWorkbook);
-		Mockito.when(this.parser.parseFile(this.excelWorkbook, false)).thenReturn(testWorkbook);
+		Mockito.when(this.parser.parseFile(this.excelWorkbook, false, CREATED_BY.toString())).thenReturn(testWorkbook);
 
-		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser);
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser, CREATED_BY);
 
 		Mockito.verify(this.parser).parseAndSetObservationRows(excelWorkbook, testWorkbook, false);
 
@@ -356,9 +357,9 @@ public class DataImportServiceImplTest {
 				.thenReturn(obsoleteStandardVariable);
 
 		Mockito.when(this.parser.loadFileToExcelWorkbook(this.file)).thenReturn(this.excelWorkbook);
-		Mockito.when(this.parser.parseFile(excelWorkbook, false)).thenReturn(testWorkbook);
+		Mockito.when(this.parser.parseFile(excelWorkbook, false, CREATED_BY.toString())).thenReturn(testWorkbook);
 
-		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser);
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser, CREATED_BY);
 
 		Mockito.verify(this.parser).parseAndSetObservationRows(excelWorkbook, testWorkbook, false);
 

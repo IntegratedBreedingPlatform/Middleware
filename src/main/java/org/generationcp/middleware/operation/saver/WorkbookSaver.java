@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -47,10 +40,19 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.DatasetUtil;
 import org.generationcp.middleware.util.TimerWatch;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -526,7 +528,7 @@ public class WorkbookSaver extends Saver {
 			}
 		}
 	}
-	
+
 	//Sets the value of categorical variables to the key of the possible value instead of its name
 	void setCategoricalVariableValues(final MeasurementVariable mvar, final Variable variable) {
 		if (variable != null && mvar.getPossibleValues() != null && !mvar.getPossibleValues().isEmpty()) {
@@ -620,21 +622,21 @@ public class WorkbookSaver extends Saver {
 				studyVariables.add(this.createOccVariableType(studyVariables.size() + 1, programUUID));
 			}
 
-			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId,
-					workbook.getStudyDetails(), studyMV, studyVariables);
+			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId, studyMV, studyVariables);
 
 			watch.restart("save study");
 
-			StudyType studyType;
+			final StudyType studyType;
 			if (workbook.isNursery()) {
 				studyType = StudyType.N;
 			} else {
 				studyType = StudyType.T;
 			}
-			final DmsProject study = this.getStudySaver().saveStudy(
-					(int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
-					saveStudyExperiment, programUUID, cropPrefix, studyType,
-					workbook.getStudyDetails().getDescription());
+			final DmsProject study =
+					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
+							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription(),
+						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails().getObjective(),
+						workbook.getStudyDetails().getStudyName(), workbook.getStudyDetails().getCreatedBy());
 			studyId = study.getProjectId();
 		}
 		watch.stop();
@@ -1131,7 +1133,7 @@ public class WorkbookSaver extends Saver {
 		return list;
 	}
 
-	public void saveWorkbookVariables(final Workbook workbook) {
+	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
 		this.getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(),
 				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
 		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
@@ -1163,13 +1165,44 @@ public class WorkbookSaver extends Saver {
 		this.getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
 
 		final String description = workbook.getStudyDetails().getDescription();
-		this.updateStudyDescription(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset);
-		this.updateStudyDescription(description, study);
-		this.updateStudyDescription(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset);
+		final String startDate = workbook.getStudyDetails().getStartDate();
+		final String endDate = workbook.getStudyDetails().getEndDate();
+		final String objective = workbook.getStudyDetails().getObjective();
+		final String createdBy = workbook.getStudyDetails().getCreatedBy();
+
+		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset, objective);
+		this.updateStudyDetails(description, startDate, endDate, study, objective, createdBy);
+		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset, objective);
 	}
 
-	private void updateStudyDescription(final String description, final DmsProject study) {
+	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study,
+		final String objective, final String createdBy)
+		throws ParseException {
+
+		if (study.getCreatedBy() == null) {
+			study.setCreatedBy(createdBy);
+		}
+
+		if (startDate != null && startDate.contains("-")) {
+			study.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
+		} else {
+			study.setStartDate(startDate);
+		}
+		study.setStudyUpdate(Util.getCurrentDateAsStringValue(Util.DATE_AS_NUMBER_FORMAT));
+
+		if (endDate != null && endDate.contains("-")) {
+			study.setEndDate(Util.convertDate(endDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
+		} else {
+			study.setEndDate(endDate);
+		}
+
+		this.updateStudyDetails(description, study, objective);
+	}
+
+
+	private void updateStudyDetails(final String description, final DmsProject study, final String objective) {
 		study.setDescription(description);
+		study.setObjective(objective);
 		this.getDmsProjectDao().merge(study);
 	}
 
