@@ -1145,4 +1145,6 @@ public interface GermplasmDataManager {
 	 * @return Attribute value that matches with attribute name and gid
 	 */
 	String getAttributeValue (final Integer gid, final String attributeName);
+
+	void save(Germplasm germplasm);
 }

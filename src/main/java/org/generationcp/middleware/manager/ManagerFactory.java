@@ -49,7 +49,6 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.GermplasmNamingReferenceDataResolver;
-import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
@@ -62,7 +61,6 @@ import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
-import org.generationcp.middleware.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
@@ -271,10 +269,6 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmGroupingService getGermplasmGroupingService() {
 		return new GermplasmGroupingServiceImpl(this.sessionProvider);
-	}
-
-	public GermplasmNamingService getGermplasmNamingService() {
-		return new GermplasmNamingServiceImpl(this.sessionProvider);
 	}
 
 	public GermplasmNamingReferenceDataResolver getGermplasmNamingReferenceDataResolver() {

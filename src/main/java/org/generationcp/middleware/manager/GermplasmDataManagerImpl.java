@@ -1554,4 +1554,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			return attribute.getAval();
 		}
 	}
+
+	@Override
+	public void save(final Germplasm germplasm) {
+		this.getGermplasmDao().save(germplasm);
+	}
 }
