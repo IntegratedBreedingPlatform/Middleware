@@ -112,6 +112,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return germplasmGroup;
 	}
 
+	@Override
+	public List<Germplasm> getGroupMembers(final Integer gid) {
+		return this.germplasmDAO.getManagementGroupMembers(gid);
+	}
+
 	private void traverseAssignGroup(final GermplasmPedigreeTreeNode node, final Integer groupId,
 			final boolean preserveExistingGroup) {
 

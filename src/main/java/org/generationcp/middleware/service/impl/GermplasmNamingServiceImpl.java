@@ -1,4 +1,5 @@
 
+
 package org.generationcp.middleware.service.impl;
 
 import java.util.LinkedHashMap;
@@ -15,6 +16,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
+import org.generationcp.middleware.pojos.workbench.NamingConfiguration;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
@@ -143,7 +145,8 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 
 
-	private void addName(final Germplasm germplasm, final String groupName, final UserDefinedField nameType, final Integer userId,
+	@Override
+	public void addName(final Germplasm germplasm, final String groupName, final UserDefinedField nameType, final Integer userId,
 			final Integer locationId, final GermplasmGroupNamingResult result) {
 
 		final List<Name> currentNames = germplasm.getNames();
