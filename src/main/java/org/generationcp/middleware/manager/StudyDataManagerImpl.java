@@ -216,6 +216,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows){
+		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, variableTypes, true);
+	}
+
+	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(final int trialDataSetId, final int dataSetId, final int start,
 			final int numRows) {
 		final VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
