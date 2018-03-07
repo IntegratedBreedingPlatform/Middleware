@@ -17,4 +17,19 @@
 			update listnms set listtype='STUDY' where listtype in ('TRIAL','NURSERY');
 		</sql>
 	</changeSet>
+
+	<changeSet id="v8.2.0-2" author="clarysabel">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm where cvterm_id = 10169;
+			</sqlCheck>
+		</preConditions>
+		<comment>Create entry list order experimental design</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (10169, 2040, 'ELO', 'Entry list order', null, 0, 0);
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id)
+			VALUES (1190, 17265, 10169);
+		</sql>
+	</changeSet>
 </databaseChangeLog>
