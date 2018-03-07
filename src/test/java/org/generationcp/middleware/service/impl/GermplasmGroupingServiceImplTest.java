@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -816,5 +818,13 @@ public class GermplasmGroupingServiceImplTest {
 						GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, name.getNstat());
 			}
 		}
+	}
+
+	@Test
+	public void testGetGroupMembers() {
+		final Integer gid = 1;
+		final List<Germplasm> groupMembers = new ArrayList<>();
+		Mockito.when(this.germplasmDAO.getManagementGroupMembers(gid)).thenReturn(groupMembers);
+		Assert.assertSame(groupMembers, germplasmGroupingService.getGroupMembers(gid));
 	}
 }

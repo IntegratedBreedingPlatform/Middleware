@@ -44,6 +44,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -1270,6 +1271,18 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final String attributeValue = this.germplasmDataManager.getAttributeValue(germplasmDB.getGid(), userdefinedField.getFcode());
 		assertThat(attributeValue, is(notNullValue()));
 		assertThat(attributeVal, is(attributeValue));
+	}
+
+	@Test
+	public void testSave() {
+
+		final Germplasm germplasm = createGermplasm();
+		try {
+			this.germplasmDataManager.save(germplasm);
+		} catch (final MiddlewareQueryException e) {
+			Assert.fail("Cannot save germplasm.");
+		}
+
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
