@@ -21,8 +21,8 @@ public abstract class AbstractTrialReporter extends AbstractNurseryReporter {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
-		final Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(final Map<String, Object> args, final String studyName) {
+		final Map<String, Object> params = super.buildJRParams(args, studyName);
 
 		final List<MeasurementRow> entries;
 

@@ -179,10 +179,14 @@ public interface StudyDataManager {
 	 * @param cropPrefix
 	 * @param studyType
 	 * @param description
+	 * @param objective
+	 * @param name
+	 * @param createdBy
 	 * @return StudyReference corresponding to the newly-created Study
 	 */
 	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
-			final String cropPrefix, final StudyType studyType, final String description);
+		final String cropPrefix, final StudyType studyType, final String description, final String startDate, final String endDate,
+		final String objective, final String name, final String createdBy);
 
 	/**
 	 * Adds a dataset, dataset labels (factors and variate labels), and parent study association in the local database.
@@ -424,12 +428,13 @@ public interface StudyDataManager {
 	 * is not existing in the local database and the name of the folder is not unique
 	 *
 	 * @param parentFolderId the parent folder id
-	 * @param name           the name
-	 * @param description    the description
-	 * @param programUUID    the program UUID
+	 * @param name the name
+	 * @param description the description
+	 * @param programUUID the program UUID
+	 * @param objective
 	 * @return ID of the folder created
 	 */
-	int addSubFolder(int parentFolderId, String name, String description, String programUUID);
+	int addSubFolder(int parentFolderId, String name, String description, String programUUID, final String objective);
 
 	/**
 	 * Rename sub folder.
@@ -790,5 +795,7 @@ public interface StudyDataManager {
 	 * @return
 	 */
 	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(final String variableId, final String variableValue, final String programUUID);
+
+	Map<String, Integer> getInstanceGeolocationIdsMap (final Integer studyId);
 
 }

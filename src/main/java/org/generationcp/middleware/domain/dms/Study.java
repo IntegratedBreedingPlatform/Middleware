@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Contains the details of a study - id, conditions and constants.
@@ -27,6 +28,8 @@ public class Study implements Serializable {
 
 	private int id;
 
+	private String name;
+
 	private VariableList conditions;
 
 	private VariableList constants;
@@ -36,6 +39,16 @@ public class Study implements Serializable {
 	private StudyType studyType;
 
 	private String description;
+
+	private String startDate;
+
+	private String endDate;
+
+	private String studyUpdate;
+
+	private String objective;
+
+	private String createdBy;
 
 	public Study() {
 	}
@@ -52,12 +65,16 @@ public class Study implements Serializable {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
 	public String getName() {
-		return this.getDisplayValue(TermId.STUDY_NAME);
+		return this.name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	public String getDescription() {
@@ -65,7 +82,7 @@ public class Study implements Serializable {
 	}
 
 	public String getObjective() {
-		return this.getDisplayValue(TermId.STUDY_OBJECTIVE);
+		return this.objective;
 	}
 
 	public Integer getPrimaryInvestigator() {
@@ -77,22 +94,19 @@ public class Study implements Serializable {
 	}
 
 	public Integer getStartDate() {
-		return this.getDisplayValueAsInt(TermId.START_DATE);
+		return Integer.valueOf(this.startDate);
 	}
 
 	public Integer getEndDate() {
-		return this.getDisplayValueAsInt(TermId.END_DATE);
+		return (this.endDate != null && !this.endDate.isEmpty() ? Integer.valueOf(this.endDate): null);
 	}
 
 	public Integer getUser() {
-		return this.getDisplayValueAsInt(TermId.STUDY_UID);
+		return Integer.valueOf(this.getCreatedBy());
 	}
 
-	public Integer getCreationDate() {
-		return this.getDisplayValueAsInt(TermId.CREATION_DATE);
-	}
 
-	public String getDisplayValue(TermId termId) {
+	public String getDisplayValue(final TermId termId) {
 		String value = null;
 		Variable variable = this.conditions.findById(termId);
 		if (variable == null) {
@@ -104,9 +118,9 @@ public class Study implements Serializable {
 		return value;
 	}
 
-	public Integer getDisplayValueAsInt(TermId termId) {
+	private Integer getDisplayValueAsInt(final TermId termId) {
 		Integer value = null;
-		String strValue = this.getDisplayValue(termId);
+		final String strValue = this.getDisplayValue(termId);
 		if (strValue != null && !"".equals(strValue)) {
 			value = Integer.parseInt(strValue);
 		}
@@ -117,7 +131,7 @@ public class Study implements Serializable {
 		return this.conditions.sort();
 	}
 
-	public void setConditions(VariableList conditions) {
+	public void setConditions(final VariableList conditions) {
 		this.conditions = conditions;
 	}
 
@@ -129,71 +143,32 @@ public class Study implements Serializable {
 		return this.constants.sort();
 	}
 
-	public void setConstants(VariableList constants) {
+	public void setConstants(final VariableList constants) {
 		this.constants = constants;
 	}
 
-	public VariableTypeList getConstantVariableTypes() {
-		return this.constants.getVariableTypes().sort();
-	}
-
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "Study: ");
 		Debug.println(indent + 3, "Id: " + this.getId());
 		Debug.println(indent + 3, "Name: " + this.getName());
 		Debug.println(indent + 3, "Title: " + this.getDescription());
 
 		Debug.println(indent + 3, "Conditions: ");
-		for (Variable condition : this.conditions.getVariables()) {
+		for (final Variable condition : this.conditions.getVariables()) {
 			condition.print(indent + 6);
 		}
 
 		Debug.println(indent + 3, "Constants: ");
-		for (Variable constant : this.constants.getVariables()) {
+		for (final Variable constant : this.constants.getVariables()) {
 			constant.print(indent + 6);
 		}
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (this.conditions == null ? 0 : this.conditions.hashCode());
-		result = prime * result + (this.constants == null ? 0 : this.constants.hashCode());
-		result = prime * result + this.id;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Study)) {
-			return false;
-		}
-		Study other = (Study) obj;
-		return this.getId() == other.getId();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Study [id=");
-		builder.append(this.id);
-		builder.append(", conditions=");
-		builder.append(this.conditions);
-		builder.append(", constants=");
-		builder.append(this.constants);
-		builder.append("]");
-		return builder.toString();
-	}
-
-	public VariableTypeList getVariableTypesByPhenotypicType(PhenotypicType pheotypicType) {
-		VariableTypeList filteredFactors = new VariableTypeList();
-		VariableTypeList factors = this.getConditionVariableTypes();
+	public VariableTypeList getVariableTypesByPhenotypicType(final PhenotypicType pheotypicType) {
+		final VariableTypeList filteredFactors = new VariableTypeList();
+		final VariableTypeList factors = this.getConditionVariableTypes();
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (DMSVariableType factor : factors.getVariableTypes()) {
+			for (final DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getPhenotypicType() == pheotypicType) {
 					filteredFactors.add(factor);
 				}
@@ -206,7 +181,7 @@ public class Study implements Serializable {
 		return programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 
@@ -216,5 +191,69 @@ public class Study implements Serializable {
 
 	public void setDescription(final String description) {
 		this.description = description;
+	}
+
+	public void setStartDate(final String startDate) {
+		this.startDate = startDate;
+	}
+
+	public void setEndDate(final String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getStudyUpdate() {
+		return this.studyUpdate;
+	}
+
+	public void setStudyUpdate(final String studyUpdate) {
+		this.studyUpdate = studyUpdate;
+	}
+
+	public StudyType getStudyType() {
+		return this.studyType;
+	}
+
+	public void setObjective(final String objective) {
+		this.objective = objective;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Study))
+			return false;
+		final Study study = (Study) o;
+		return this.getId() == study.getId() && Objects.equals(this.getName(), study.getName()) && Objects
+			.equals(this.getConditions(), study.getConditions()) && Objects.equals(this.getConstants(), study.getConstants()) && Objects
+			.equals(this.getProgramUUID(), study.getProgramUUID()) && this.getStudyType() == study.getStudyType() && Objects
+			.equals(this.getDescription(), study.getDescription()) && Objects.equals(this.getStartDate(), study.getStartDate()) && Objects
+			.equals(this.getEndDate(), study.getEndDate()) && Objects.equals(this.getStudyUpdate(), study.getStudyUpdate()) && Objects
+			.equals(this.getObjective(), study.getObjective()) && Objects.equals(this.getCreatedBy(), study.getCreatedBy());
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects
+			.hash(this.getId(), this.getName(), this.getConditions(), this.getConstants(), this.getProgramUUID(), this.getStudyType(), this.getDescription(), this
+					.getStartDate(),
+				this.getEndDate(), this.getStudyUpdate(), this.getObjective(), this.getCreatedBy());
+	}
+
+	@Override
+	public String toString() {
+		return "Study{" + "id=" + id + ", name='" + name + '\'' + ", conditions=" + conditions + ", constants=" + constants
+			+ ", programUUID='" + programUUID + '\'' + ", studyType=" + studyType + ", description='" + description + '\'' + ", startDate='"
+			+ startDate + '\'' + ", endDate='" + endDate + '\'' + ", studyUpdate='" + studyUpdate + '\'' + ", objective='" + objective
+			+ '\'' + ", createdBy='" + createdBy + '\'' + '}';
 	}
 }

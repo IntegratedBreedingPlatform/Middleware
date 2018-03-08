@@ -44,14 +44,13 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 	}
 
 	@Override
-	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
-		final Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(final Map<String, Object> args, String studyName) {
+		final Map<String, Object> params = super.buildJRParams(args, studyName);
 
 		params.put(MAIZE_MANIFEST_PROGRAM_KEY, args.get(PROGRAM_NAME_ARG_KEY));
 
         final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
         for (final MeasurementVariable studyCondition : studyConditions) {
-            this.parameterMapper.mapBasicStudyValues(studyCondition, params);
             mapEnvironmentValue(studyCondition, params, studyCondition.getValue());
         }
 

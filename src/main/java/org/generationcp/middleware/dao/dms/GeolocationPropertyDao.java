@@ -155,7 +155,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		StringBuilder sql = new StringBuilder().append("SELECT  ").append("    cv.definition as name, geo.value as value ").append("FROM ")
 				.append("    nd_geolocationprop geo ").append("        INNER JOIN ")
 				.append("    cvterm cv ON (cv.cvterm_id = geo.type_id) ").append("WHERE ").append("    geo.nd_geolocation_id = :studyId ")
-				.append("        AND geo.type_id NOT IN (8050 , 8060, 8371, 8190, 8070, 8180) ");
+				.append("        AND geo.type_id NOT IN (8371, 8190, 8070, 8180) ");
 		try {
 			Query query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("studyId", studyId);

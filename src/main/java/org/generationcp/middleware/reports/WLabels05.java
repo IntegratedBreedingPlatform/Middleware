@@ -54,12 +54,12 @@ public class WLabels05 extends AbstractReporter {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public JasperPrint buildJRPrint(final Map<String, Object> args) throws JRException {
+	public JasperPrint buildJRPrint(final Map<String, Object> args, String studyName) throws JRException {
 
 		Map<String, Object> jrParams = null;
 
 		if (null != args) {
-			jrParams = this.buildJRParams(args);
+			jrParams = this.buildJRParams(args, studyName);
 			this.setFileName(super.buildOutputFileName(jrParams));
 
 		}
@@ -94,8 +94,8 @@ public class WLabels05 extends AbstractReporter {
 	}
 
 	@Override
-	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
-		final Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(final Map<String, Object> args, String studyName) {
+		final Map<String, Object> params = super.buildJRParams(args, studyName);
 
 		@SuppressWarnings("unchecked")
 		final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get("studyConditions");

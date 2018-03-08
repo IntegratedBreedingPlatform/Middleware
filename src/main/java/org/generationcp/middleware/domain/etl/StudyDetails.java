@@ -61,12 +61,17 @@ public class StudyDetails implements Serializable {
 
 	private String description;
 
+	private String studyUpdate;
+
+	private String createdBy;
+
 	public StudyDetails() {
 
 	}
 
-	public StudyDetails(String studyName, String description, String objective, String startDate, String endDate,
-			StudyType studyType, long parentFolderId, String trialDatasetName, String measurementDatasetName) {
+	public StudyDetails(final String studyName, final String description, final String objective, final String startDate, final String endDate,
+			final StudyType studyType, final long parentFolderId, final String trialDatasetName, final String measurementDatasetName, final String studyUpdate, final String
+		createdBy) {
 		this.studyName = studyName;
 		this.description = description;
 		this.objective = objective;
@@ -76,16 +81,18 @@ public class StudyDetails implements Serializable {
 		this.parentFolderId = parentFolderId;
 		this.trialDatasetName = trialDatasetName;
 		this.measurementDatasetName = measurementDatasetName;
-		this.label = studyName;
+		label = studyName;
+		this.studyUpdate = studyUpdate;
+		this.createdBy = createdBy;
 	}
 
 	// Used by getTrialObservationTable
-	public StudyDetails(Integer id, String studyName, String description, String objective, String startDate, String endDate,
-			StudyType studyType, String piName, String siteName, String piId, String siteId) {
+	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate, final String endDate,
+			final StudyType studyType, final String piName, final String siteName, final String piId, final String siteId, final String studyUpdate, final String createdBy) {
 
-		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy);
 		this.id = id;
-		if (piId != null && NumberUtils.isNumber(piId)) {
+		if ((piId != null) && NumberUtils.isNumber(piId)) {
 			this.piId = Double.valueOf(piId).intValue();
 		}
 		if (siteId != null && NumberUtils.isNumber(siteId)) {
@@ -93,57 +100,57 @@ public class StudyDetails implements Serializable {
 		}
 	}
 
-	public StudyDetails(Integer id, String studyName, String description, String objective, String startDate, String endDate,
-			StudyType studyType, String piName, String siteName) {
+	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate, final String endDate,
+			final StudyType studyType, final String piName, final String siteName, final String studyUpdate, final String createdBy) {
 
-		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy);
 		this.id = id;
 	}
 
-	public StudyDetails(String studyName, String description, String objective, String startDate, String endDate, StudyType studyType,
-			String piName, String siteName) {
-		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null);
+	public StudyDetails(final String studyName, final String description, final String objective, final String startDate, final String endDate, final StudyType studyType,
+			final String piName, final String siteName, final String studyUpdate, final String createdBy) {
+		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null, studyUpdate, createdBy);
 		this.siteName = siteName;
-		this.setPiName(piName);
+		setPiName(piName);
 	}
 
 	public Integer getId() {
-		return this.id;
+		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
 	public String getStudyName() {
-		return this.studyName;
+		return studyName;
 	}
 
-	public void setStudyName(String studyName) {
+	public void setStudyName(final String studyName) {
 		this.studyName = studyName;
 	}
 
 	public String getObjective() {
-		return this.objective;
+		return objective;
 	}
 
-	public void setObjective(String objective) {
+	public void setObjective(final String objective) {
 		this.objective = objective;
 	}
 
 	public String getStartDate() {
-		return this.startDate;
+		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
 	}
 
 	public String getStartYear() {
-		if (this.startDate != null) {
+		if (startDate != null) {
 			try {
-				return this.startDate.substring(0, 4);
-			} catch (Exception e) {
+				return startDate.substring(0, 4);
+			} catch (final Exception e) {
 				StudyDetails.LOG.error(e.getMessage(), e);
 				return null;
 			}
@@ -152,54 +159,54 @@ public class StudyDetails implements Serializable {
 	}
 
 	public String getEndDate() {
-		return this.endDate;
+		return endDate;
 	}
 
-	public void setEndDate(String endDate) {
+	public void setEndDate(final String endDate) {
 		this.endDate = endDate;
 	}
 
 	public StudyType getStudyType() {
-		return this.studyType;
+		return studyType;
 	}
 
-	public void setStudyType(StudyType studyType) {
+	public void setStudyType(final StudyType studyType) {
 		this.studyType = studyType;
 	}
 
 	public long getParentFolderId() {
-		return this.parentFolderId;
+		return parentFolderId;
 	}
 
-	public void setParentFolderId(long parentFolderId) {
+	public void setParentFolderId(final long parentFolderId) {
 		this.parentFolderId = parentFolderId;
 	}
 
 	public boolean isNursery() {
-		return this.studyType != null && this.studyType == StudyType.N;
+		return (this.studyType != null) && (this.studyType == StudyType.N);
 	}
 
 	public String getTrialDatasetName() {
-		return this.trialDatasetName;
+		return trialDatasetName;
 	}
 
-	public void setTrialDatasetName(String trialDatasetName) {
+	public void setTrialDatasetName(final String trialDatasetName) {
 		this.trialDatasetName = trialDatasetName;
 	}
 
 	public String getMeasurementDatasetName() {
-		return this.measurementDatasetName;
+		return measurementDatasetName;
 	}
 
-	public void setMeasurementDatasetName(String measurementDatasetName) {
+	public void setMeasurementDatasetName(final String measurementDatasetName) {
 		this.measurementDatasetName = measurementDatasetName;
 	}
 
 	public String getSiteName() {
-		return this.siteName;
+		return siteName;
 	}
 
-	public void setSiteName(String siteName) {
+	public void setSiteName(final String siteName) {
 		this.siteName = siteName;
 	}
 
@@ -207,21 +214,21 @@ public class StudyDetails implements Serializable {
 	 * @return the piName
 	 */
 	public String getPiName() {
-		return this.piName;
+		return piName;
 	}
 
 	/**
 	 * @param piName the piName to set
 	 */
-	public void setPiName(String piName) {
+	public void setPiName(final String piName) {
 		this.piName = piName;
 	}
 
 	public Season getSeason() {
-		return this.season;
+		return season;
 	}
 
-	public void setSeason(Season season) {
+	public void setSeason(final Season season) {
 		this.season = season;
 	}
 
@@ -229,13 +236,13 @@ public class StudyDetails implements Serializable {
 	 * @return the piId
 	 */
 	public Integer getPiId() {
-		return this.piId;
+		return piId;
 	}
 
 	/**
 	 * @param piId the piId to set
 	 */
-	public void setPiId(Integer piId) {
+	public void setPiId(final Integer piId) {
 		this.piId = piId;
 	}
 
@@ -243,34 +250,34 @@ public class StudyDetails implements Serializable {
 	 * @return the siteId
 	 */
 	public Integer getSiteId() {
-		return this.siteId;
+		return siteId;
 	}
 
 	/**
 	 * @param siteId the siteId to set
 	 */
-	public void setSiteId(Integer siteId) {
+	public void setSiteId(final Integer siteId) {
 		this.siteId = siteId;
 	}
 
 	public String getLabel() {
-		return this.label;
+		return label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
 	public String getProgramUUID() {
-		return this.programUUID;
+		return programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
@@ -281,119 +288,119 @@ public class StudyDetails implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.endDate == null ? 0 : this.endDate.hashCode());
-		result = prime * result + (this.id == null ? 0 : this.id.hashCode());
-		result = prime * result + (this.measurementDatasetName == null ? 0 : this.measurementDatasetName.hashCode());
-		result = prime * result + (this.objective == null ? 0 : this.objective.hashCode());
-		result = prime * result + (int) (this.parentFolderId ^ this.parentFolderId >>> 32);
-		result = prime * result + (this.piName == null ? 0 : this.piName.hashCode());
-		result = prime * result + (this.season == null ? 0 : this.season.hashCode());
-		result = prime * result + (this.siteName == null ? 0 : this.siteName.hashCode());
-		result = prime * result + (this.startDate == null ? 0 : this.startDate.hashCode());
-		result = prime * result + (this.studyName == null ? 0 : this.studyName.hashCode());
-		result = prime * result + (this.studyType == null ? 0 : this.studyType.hashCode());
-		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
-		result = prime * result + (this.trialDatasetName == null ? 0 : this.trialDatasetName.hashCode());
-		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
+		result = (prime * result) + ((this.endDate == null) ? 0 : endDate.hashCode());
+		result = (prime * result) + ((this.id == null) ? 0 : id.hashCode());
+		result = (prime * result) + ((this.measurementDatasetName == null) ? 0 : measurementDatasetName.hashCode());
+		result = (prime * result) + ((this.objective == null) ? 0 : objective.hashCode());
+		result = (prime * result) + (int) (parentFolderId ^ (this.parentFolderId >>> 32));
+		result = (prime * result) + ((this.piName == null) ? 0 : piName.hashCode());
+		result = (prime * result) + ((this.season == null) ? 0 : season.hashCode());
+		result = (prime * result) + ((this.siteName == null) ? 0 : siteName.hashCode());
+		result = (prime * result) + ((this.startDate == null) ? 0 : startDate.hashCode());
+		result = (prime * result) + ((this.studyName == null) ? 0 : studyName.hashCode());
+		result = (prime * result) + ((this.studyType == null) ? 0 : studyType.hashCode());
+		result = (prime * result) + ((this.description == null) ? 0 : description.hashCode());
+		result = (prime * result) + ((this.trialDatasetName == null) ? 0 : trialDatasetName.hashCode());
+		result = (prime * result) + ((this.description == null) ? 0 : description.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
 		if (obj == null) {
 			return false;
 		}
-		if (this.getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		StudyDetails other = (StudyDetails) obj;
-		if (this.endDate == null) {
+		final StudyDetails other = (StudyDetails) obj;
+		if (endDate == null) {
 			if (other.endDate != null) {
 				return false;
 			}
-		} else if (!this.endDate.equals(other.endDate)) {
+		} else if (!endDate.equals(other.endDate)) {
 			return false;
 		}
-		if (this.id == null) {
+		if (id == null) {
 			if (other.id != null) {
 				return false;
 			}
-		} else if (!this.id.equals(other.id)) {
+		} else if (!id.equals(other.id)) {
 			return false;
 		}
-		if (this.measurementDatasetName == null) {
+		if (measurementDatasetName == null) {
 			if (other.measurementDatasetName != null) {
 				return false;
 			}
-		} else if (!this.measurementDatasetName.equals(other.measurementDatasetName)) {
+		} else if (!measurementDatasetName.equals(other.measurementDatasetName)) {
 			return false;
 		}
-		if (this.objective == null) {
+		if (objective == null) {
 			if (other.objective != null) {
 				return false;
 			}
-		} else if (!this.objective.equals(other.objective)) {
+		} else if (!objective.equals(other.objective)) {
 			return false;
 		}
-		if (this.parentFolderId != other.parentFolderId) {
+		if (parentFolderId != other.parentFolderId) {
 			return false;
 		}
-		if (this.piName == null) {
+		if (piName == null) {
 			if (other.piName != null) {
 				return false;
 			}
-		} else if (!this.piName.equals(other.piName)) {
+		} else if (!piName.equals(other.piName)) {
 			return false;
 		}
-		if (this.season != other.season) {
+		if (season != other.season) {
 			return false;
 		}
-		if (this.siteName == null) {
+		if (siteName == null) {
 			if (other.siteName != null) {
 				return false;
 			}
-		} else if (!this.siteName.equals(other.siteName)) {
+		} else if (!siteName.equals(other.siteName)) {
 			return false;
 		}
-		if (this.startDate == null) {
+		if (startDate == null) {
 			if (other.startDate != null) {
 				return false;
 			}
-		} else if (!this.startDate.equals(other.startDate)) {
+		} else if (!startDate.equals(other.startDate)) {
 			return false;
 		}
-		if (this.studyName == null) {
+		if (studyName == null) {
 			if (other.studyName != null) {
 				return false;
 			}
-		} else if (!this.studyName.equals(other.studyName)) {
+		} else if (!studyName.equals(other.studyName)) {
 			return false;
 		}
-		if (this.studyType != other.studyType) {
+		if (studyType != other.studyType) {
 			return false;
 		}
-		if (this.description == null) {
+		if (description == null) {
 			if (other.description != null) {
 				return false;
 			}
-		} else if (!this.description.equals(other.description)) {
+		} else if (!description.equals(other.description)) {
 			return false;
 		}
-		if (this.trialDatasetName == null) {
+		if (trialDatasetName == null) {
 			if (other.trialDatasetName != null) {
 				return false;
 			}
-		} else if (!this.trialDatasetName.equals(other.trialDatasetName)) {
+		} else if (!trialDatasetName.equals(other.trialDatasetName)) {
 			return false;
 		}
-		if (this.description == null) {
+		if (description == null) {
 			if (other.description != null) {
 				return false;
 			}
-		} else if (!this.description.equals(other.description)) {
+		} else if (!description.equals(other.description)) {
 			return false;
 		}
 		return true;
@@ -401,62 +408,77 @@ public class StudyDetails implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("StudyDetails [");
 		builder.append("id=");
-		builder.append(this.id);
+		builder.append(id);
 		builder.append(", studyName=");
-		builder.append(this.studyName);
+		builder.append(studyName);
 		builder.append(", description=");
-		builder.append(this.description);
+		builder.append(description);
 		builder.append(", objective=");
-		builder.append(this.objective);
+		builder.append(objective);
 		builder.append(", startDate=");
-		builder.append(this.startDate);
+		builder.append(startDate);
 		builder.append(", endDate=");
-		builder.append(this.endDate);
+		builder.append(endDate);
 		builder.append(", studyType=");
-		builder.append(this.studyType);
+		builder.append(studyType);
 		builder.append(", parentFolderId=");
-		builder.append(this.parentFolderId);
+		builder.append(parentFolderId);
 		builder.append(", trialDatasetName=");
-		builder.append(this.trialDatasetName);
+		builder.append(trialDatasetName);
 		builder.append(", measurementDatasetName=");
-		builder.append(this.measurementDatasetName);
+		builder.append(measurementDatasetName);
 		builder.append(", siteName=");
-		builder.append(this.siteName);
+		builder.append(siteName);
 		builder.append(", piName=");
-		builder.append(this.piName);
+		builder.append(piName);
 		builder.append(", season=");
-		builder.append(this.season);
+		builder.append(season);
 		builder.append(", piId=");
-		builder.append(this.piId);
+		builder.append(piId);
 		builder.append(", siteId=");
-		builder.append(this.siteId);
+		builder.append(siteId);
 		builder.append(", description=");
-		builder.append(this.description);
+		builder.append(description);
 		builder.append("]");
 		return builder.toString();
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "StudyDetails: ");
-		Debug.println(indent + 3, "Id: " + this.id);
-		Debug.println(indent + 3, "Name: " + this.studyName);
-		Debug.println(indent + 3, "Title: " + this.description);
-		Debug.println(indent + 3, "Objective: " + this.objective);
-		Debug.println(indent + 3, "Start Date: " + this.startDate);
-		Debug.println(indent + 3, "End Date: " + this.endDate);
-		Debug.println(indent + 3, "Study Type: " + this.studyType);
-		Debug.println(indent + 3, "Parent Folder Id: " + this.parentFolderId);
-		Debug.println(indent + 3, "Trial Dataset Name: " + this.trialDatasetName);
-		Debug.println(indent + 3, "Measurement Dataset Name: " + this.measurementDatasetName);
-		Debug.println(indent + 3, "Site Name: " + this.siteName);
-		Debug.println(indent + 3, "Season: " + this.season);
-		Debug.println(indent + 3, "PI Name: " + this.piName);
-		Debug.println(indent + 3, "PI Id: " + this.piId);
-		Debug.println(indent + 3, "Site Id: " + this.siteId);
-		Debug.println(indent + 3, "Description: " + this.description);
+		Debug.println(indent + 3, "Id: " + id);
+		Debug.println(indent + 3, "Name: " + studyName);
+		Debug.println(indent + 3, "Title: " + description);
+		Debug.println(indent + 3, "Objective: " + objective);
+		Debug.println(indent + 3, "Start Date: " + startDate);
+		Debug.println(indent + 3, "End Date: " + endDate);
+		Debug.println(indent + 3, "Study Type: " + studyType);
+		Debug.println(indent + 3, "Parent Folder Id: " + parentFolderId);
+		Debug.println(indent + 3, "Trial Dataset Name: " + trialDatasetName);
+		Debug.println(indent + 3, "Measurement Dataset Name: " + measurementDatasetName);
+		Debug.println(indent + 3, "Site Name: " + siteName);
+		Debug.println(indent + 3, "Season: " + season);
+		Debug.println(indent + 3, "PI Name: " + piName);
+		Debug.println(indent + 3, "PI Id: " + piId);
+		Debug.println(indent + 3, "Site Id: " + siteId);
+		Debug.println(indent + 3, "Description: " + description);
 	}
 
+	public String getStudyUpdate() {
+		return this.studyUpdate;
+	}
+
+	public void setStudyUpdate(final String studyUpdate) {
+		this.studyUpdate = studyUpdate;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
 }

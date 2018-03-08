@@ -43,6 +43,7 @@ public class DatasetProjectSaver extends Saver {
 		DmsProject datasetProject = new DmsProject();
 		datasetProject.setName(this.getName(datasetValues));
 		datasetProject.setDescription(this.getDescription(datasetValues));
+
 		datasetProject.setProgramUUID(programUUID);
 
 		this.addNameVariableTypeIfNecessary(variableTypeList, programUUID);

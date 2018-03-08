@@ -144,15 +144,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllStudyVariates() throws Exception {
-		final VariableTypeList variates = this.manager.getAllStudyVariates(this.studyReference.getId());
-		Assert.assertNotNull(variates);
-		final DMSVariableType studyName = variates.findById(TermId.STUDY_NAME.getId());
-		Assert.assertEquals("The study name should be " + StudyTestDataInitializer.STUDY_NAME, StudyTestDataInitializer.STUDY_NAME,
-				studyName.getLocalName());
-	}
-
-	@Test
 	public void testGetStudiesByFolder() throws Exception {
 		final StudyResultSet resultSet = this.manager.searchStudies(new ParentFolderStudyQueryFilter(1), 5);
 		// We are sure that the result set will return at least one study, the study that we added in the setup
@@ -218,7 +209,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final String uniqueId = this.commonTestProject.getUniqueID();
 		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
-		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
+		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 
 		final List<Reference> childrenNodes = this.manager
 				.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID());
@@ -295,14 +286,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLocalNameByStandardVariableId() throws Exception {
-		final Integer standardVariableId = TermId.STUDY_NAME.getId();
-		final String localName = this.manager.getLocalNameByStandardVariableId(this.studyReference.getId(), standardVariableId);
-		Assert.assertEquals("The local name should be " + StudyTestDataInitializer.STUDY_NAME, StudyTestDataInitializer.STUDY_NAME,
-				localName);
-	}
-
-	@Test
 	public void testGetAllStudyDetails() throws Exception {
 		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
@@ -339,7 +322,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetParentFolder() throws MiddlewareQueryException {
 		final String uniqueId = "001";
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
-		final int id = this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
+		final int id = this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 		final DmsProject proj = this.manager.getParentFolder(id);
 		Assert.assertEquals("The folder names should be equal", project.getName(), proj.getName());
 	}
@@ -595,8 +578,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testIsFolderEmptyFalse() {
 		final String uniqueId = this.commonTestProject.getUniqueID();
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
-		this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId);
-		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId);
+		this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
+		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
 		Assert.assertFalse("The folder should not be empty", isEmpty);
 	}
 

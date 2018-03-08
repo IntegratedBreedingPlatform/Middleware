@@ -110,7 +110,6 @@ public class WorkbookParser {
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, "", WorkbookParser.LABEL};
 
-
 	public enum Section {
 		CONDITION, FACTOR, CONSTANT, VARIATE
 	}
@@ -175,20 +174,22 @@ public class WorkbookParser {
 		return excelWorkbook;
 	}
 
-	public org.generationcp.middleware.domain.etl.Workbook parseFile(final Workbook excelWorkbook, final boolean performValidation)
+	public org.generationcp.middleware.domain.etl.Workbook parseFile(final Workbook excelWorkbook, final boolean performValidation, final
+		String createdBy)
 			throws WorkbookParserException {
-		return this.parseFile(excelWorkbook, performValidation, true);
+		return this.parseFile(excelWorkbook, performValidation, true, createdBy);
 	}
 
 	/**
 	 * Parses given file and transforms it into a Workbook
 	 *
 	 * @param file
+	 * @param createdBy
 	 * @return workbook
 	 * @throws org.generationcp.middleware.exceptions.WorkbookParserException
 	 */
 	public org.generationcp.middleware.domain.etl.Workbook parseFile(final Workbook excelWorkbook, final boolean performValidation,
-			final boolean isReadVariate) throws WorkbookParserException {
+		final boolean isReadVariate, final String createdBy) throws WorkbookParserException {
 
 		this.currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
 		this.currentRowZeroBased = 0;
@@ -203,7 +204,7 @@ public class WorkbookParser {
 			throw new WorkbookParserException(this.errorMessages);
 		}
 
-		this.currentWorkbook.setStudyDetails(this.readStudyDetails(excelWorkbook));
+		this.currentWorkbook.setStudyDetails(this.readStudyDetails(excelWorkbook, createdBy));
 		this.currentWorkbook.setConditions(this.readMeasurementVariables(excelWorkbook, Section.CONDITION.toString()));
 		this.currentWorkbook.setFactors(this.readMeasurementVariables(excelWorkbook, Section.FACTOR.toString()));
 		this.currentWorkbook.setConstants(this.readMeasurementVariables(excelWorkbook, Section.CONSTANT.toString()));
@@ -279,7 +280,7 @@ public class WorkbookParser {
 
 	}
 
-	protected StudyDetails readStudyDetails(final Workbook wb) {
+	protected StudyDetails readStudyDetails(final Workbook wb, final String createdBy) {
 
 		// get study details
 		final String study = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_NAME_ROW_INDEX,
@@ -365,7 +366,8 @@ public class WorkbookParser {
 		}
 
 		final StudyDetails studyDetails =
-				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
+				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null, Util
+					.getCurrentDateAsStringValue(), createdBy);
 
 		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
 			this.currentRowZeroBased++;
