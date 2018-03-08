@@ -134,6 +134,16 @@ public interface StudyDataManager {
 	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList);
 
 	/**
+	 * Gets the experiments of the first Instance.
+	 *
+	 * @param dataSetId   the data set id
+	 * @param start       the start
+	 * @param numOfRows   the num of rows
+	 * @return the experiments
+	 */
+	List<Experiment> getExperimentsOfFirstInstance(final int dataSetId,final  int start,final int numOfRows);
+
+	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 *
 	 * @param dataSetId the data set id

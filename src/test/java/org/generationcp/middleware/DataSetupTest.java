@@ -369,7 +369,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		}
 		// Add listdata_project entries
 		final int nurseryListId = this.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId,
-				GermplasmListType.NURSERY, germplasmListId, listDataProjects, 1);
+				GermplasmListType.STUDY, germplasmListId, listDataProjects, 1);
 
 		// Load and check some basics
 		final Workbook nurseryWorkbook = this.middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);
