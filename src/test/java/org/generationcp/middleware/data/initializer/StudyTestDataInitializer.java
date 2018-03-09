@@ -16,8 +16,8 @@ import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -45,7 +45,7 @@ public class StudyTestDataInitializer {
 	public static final String END_DATE = "20160606";
 	private static final String OBJECTIVE = "OBJ1";
 	private static final String CREATED_BY = "1";
-	public static int DATASET_ID = 255;
+	public static int datasetId = 255;
 
 	private final StudyDataManagerImpl studyDataManager;
 	private final OntologyDataManager ontologyManager;
@@ -64,22 +64,24 @@ public class StudyTestDataInitializer {
 	}
 
 	public StudyReference addTestStudy(final String cropPrefix) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T, cropPrefix,
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), new StudyTypeDto("T"),
+			cropPrefix,
 			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 				.END_DATE, StudyTestDataInitializer.STUDY_UPDATE, StudyTestDataInitializer.OBJECTIVE);
 	}
 	
 	public StudyReference addTestStudy(final String uniqueId, final String cropPrefix) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, new StudyTypeDto("T"), cropPrefix,
+			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 			.END_DATE, StudyTestDataInitializer.STUDY_UPDATE, StudyTestDataInitializer.OBJECTIVE);
 	}
 	
-	public StudyReference addTestStudy(final StudyType studyType, final String studyName, final String cropPrefix) throws Exception {
+	public StudyReference addTestStudy(final StudyTypeDto studyType, final String studyName, final String cropPrefix) throws Exception {
 		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 			.END_DATE, StudyTestDataInitializer.OBJECTIVE, StudyTestDataInitializer.CREATED_BY);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType, final String cropPrefix,
+	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyTypeDto studyType, final String cropPrefix,
 		final String description, final String startDate, final String endDate, final String objective, final String createdBy) throws
 		Exception {
 		final VariableTypeList typeList = new VariableTypeList();
@@ -91,7 +93,8 @@ public class StudyTestDataInitializer {
 			studyType, description, startDate, endDate, objective, studyName, createdBy);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId,
+	public StudyReference addTestStudy(final String studyName, final StudyTypeDto studyType, final String seasonId, final String
+		locationId,
 		final String startDate, final String cropPrefix) throws Exception {
 
 		final VariableTypeList typeList = new VariableTypeList();

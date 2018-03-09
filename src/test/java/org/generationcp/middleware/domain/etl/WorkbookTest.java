@@ -11,24 +11,23 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
-import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.common.collect.Lists;
+import static org.junit.Assert.assertEquals;
 
 public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForTrial() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto("T"));
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
@@ -58,7 +57,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForNursery() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto("N"));
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
@@ -116,7 +115,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForNursery() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto("N"));
 		WorkbookTestDataInitializer.createTrialObservations(1, workbook);
 
 		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
@@ -126,7 +125,7 @@ public class WorkbookTest {
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForTrial() {
 		final int noOfInstances = 2;
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, new StudyTypeDto("T"));
 		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {
@@ -145,7 +144,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testHasExistingExperimentalDesign() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		final List<MeasurementVariable> expVariables = new ArrayList<>();
 
 		// we add an RCBD variable which is an experimental design variable
@@ -157,7 +156,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testNoExistingExperimentalDesign() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		Assert.assertFalse("Expected hasExistingExperimentalDesign() to return false when there is no design but it didn't.",
 				workbook.hasExistingExperimentalDesign());
 	}
@@ -179,11 +178,11 @@ public class WorkbookTest {
 
 		workbook.setConditions(Lists.newArrayList(locationMV, seasonMV));
 
-		MeasurementVariable location = workbook.findConditionById(TermId.LOCATION_ABBR.getId());
+		final MeasurementVariable location = workbook.findConditionById(TermId.LOCATION_ABBR.getId());
 		Assert.assertNotNull(location);
 		Assert.assertEquals(locationMV, location);
 
-		MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
+		final MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
 		Assert.assertNotNull(season);
 		Assert.assertEquals(seasonMV, season);
 	}

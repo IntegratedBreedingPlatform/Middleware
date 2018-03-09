@@ -14,8 +14,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -230,7 +230,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		final Workbook workbook = new Workbook();
 		// Basic Details
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.N);
+		studyDetails.setStudyType(new StudyTypeDto("N"));
 		studyDetails.setStudyName("Test Nursery " + randomInt);
 		studyDetails.setObjective(studyDetails.getStudyName() + " Objective");
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");

@@ -32,15 +32,16 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -195,7 +196,7 @@ public interface StudyDataManager {
 	 * @return StudyReference corresponding to the newly-created Study
 	 */
 	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
-		final String cropPrefix, final StudyType studyType, final String description, final String startDate, final String endDate,
+		final String cropPrefix, final StudyTypeDto studyType, final String description, final String startDate, final String endDate,
 		final String objective, final String name, final String createdBy);
 
 	/**
@@ -392,8 +393,8 @@ public interface StudyDataManager {
 	 * @param studyType   Can be either StudyType.T (Trial) or StudyType.N (Nursery)
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
-			CrossExpansionProperties crossExpansionProperties);
+
+	List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
@@ -506,7 +507,7 @@ public interface StudyDataManager {
 	 * @param numOfRows The number of items to retrieve
 	 * @return The list of study details having the given study type
 	 */
-	List<StudyDetails> getStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows);
+	List<StudyDetails> getStudyDetails(StudyTypeDto studyType, String programUUID, int start, int numOfRows);
 
 	/**
 	 * Gets the study details.
@@ -515,7 +516,7 @@ public interface StudyDataManager {
 	 * @param id        the id
 	 * @return the study details
 	 */
-	StudyDetails getStudyDetails(StudyType studyType, int id);
+	StudyDetails getStudyDetails(StudyTypeDto studyType, int id);
 
 	/**
 	 * Retrieves the study details of the all nurseries and trials from both selected DB instance ordered by study name.
@@ -534,7 +535,7 @@ public interface StudyDataManager {
 	 * @param programUUID unique ID of the currenly selected program
 	 * @return The list of study details having the given study type
 	 */
-	List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID);
+	List<StudyDetails> getAllStudyDetails(StudyTypeDto studyType, String programUUID);
 
 	/**
 	 * Count all studies of the given study type from selected DB instance.
@@ -543,7 +544,7 @@ public interface StudyDataManager {
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details having the given study type
 	 */
-	long countStudyDetails(StudyType studyType, String programUUID);
+	long countStudyDetails(StudyTypeDto studyType, String programUUID);
 
 	/**
 	 * Count all studies of the given study type from both central and local.
@@ -552,7 +553,7 @@ public interface StudyDataManager {
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details having the given study type
 	 */
-	long countAllStudyDetails(StudyType studyType, String programUUID);
+	long countAllStudyDetails(StudyTypeDto studyType, String programUUID);
 
 	/**
 	 * Retrieves the study details of the all nurseries and trials from both central and local ordered by db instance then study name.
@@ -680,7 +681,7 @@ public interface StudyDataManager {
 	 * @param studyId Identifier of the study to determine study type for.
 	 * @return {@link StudyType} of the study. Returns {@code null} if study type can not be determined for the given study.
 	 */
-	StudyType getStudyType(int studyId);
+	StudyTypeDto getStudyType(int studyId);
 
 	/**
 	 * Soft-delete all program studies
@@ -808,4 +809,11 @@ public interface StudyDataManager {
 
 	Map<String, Integer> getInstanceGeolocationIdsMap (final Integer studyId);
 
+	List<StudyTypeDto> getAllStudyTypes();
+
+	StudyTypeDto getStudyTypeByName(String name);
+
+	StudyTypeDto getStudyTypeByLabel(String label);
+
+	List<StudyTypeDto> getAllVisibleStudyTypes();
 }

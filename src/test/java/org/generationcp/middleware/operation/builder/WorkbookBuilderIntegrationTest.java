@@ -13,8 +13,8 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.junit.Assert;
@@ -77,7 +77,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private void setUpNursery() {
 		// Basic Details
 		studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.N);
+		studyDetails.setStudyType(new StudyTypeDto("N"));
 		studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
@@ -89,7 +89,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private void setUpTrial() {
 		// Basic Details
 		studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(new StudyTypeDto("T"));
 		studyDetails.setStudyName("Test Trial " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
@@ -197,7 +197,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
-		final Workbook studyWorkbook = this.workbookBuilder.create(studyId, StudyType.N);
+		final Workbook studyWorkbook = this.workbookBuilder.create(studyId, new StudyTypeDto("N"));
 		Assert.assertNotNull(studyWorkbook);
 
 		// The main assertion.
@@ -224,7 +224,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
-		final Workbook studyWorkbook = this.workbookBuilder.create(studyId, StudyType.T);
+		final Workbook studyWorkbook = this.workbookBuilder.create(studyId, new StudyTypeDto("T"));
 		Assert.assertNotNull(studyWorkbook);
 
 		// The main assertion.
@@ -242,7 +242,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
 
 		final int measurementDataSetId = this.workbookBuilder.getMeasurementDataSetId(studyId, studyDetails.getStudyName());
-		final Workbook workbookCompleteDataset = this.workbookBuilder.getDataSetBuilder().buildCompleteDataset(measurementDataSetId, true);
+		final Workbook workbookCompleteDataset = this.workbookBuilder.getDataSetBuilder().buildCompleteDataset(measurementDataSetId);
 
 		Assert.assertTrue(workbookCompleteDataset.getObservations().size() > 0);
 	}

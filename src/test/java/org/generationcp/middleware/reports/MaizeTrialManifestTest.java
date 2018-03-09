@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class MaizeTrialManifestTest {
     public static final String TEST_STUDY_NAME = "testStudyName";
     public static final String TEST_PROGRAM_NAME = "testProgram";
 
-    private MaizeTrialManifest unitUnderTest = new MaizeTrialManifest();
+    private final MaizeTrialManifest unitUnderTest = new MaizeTrialManifest();
 
 
     @Test
@@ -42,7 +42,7 @@ public class MaizeTrialManifestTest {
 
     @Test
     public void testBuildBasicReportValues() {
-        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, StudyType.T, TEST_STUDY_NAME, 1, false);
+        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, new StudyTypeDto("T"), TEST_STUDY_NAME, 1, false);
         final List<MeasurementVariable> conditions = workbook.getStudyConditions();
         final List<MeasurementRow> observations = workbook.getObservations();
 
@@ -63,7 +63,7 @@ public class MaizeTrialManifestTest {
 
     @Test
     public void testBuildReportValuesFromEnvironmentSettings() {
-        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, StudyType.T, TEST_STUDY_NAME, 1, false);
+        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, new StudyTypeDto("T"), TEST_STUDY_NAME, 1, false);
         final List<MeasurementVariable> conditions = workbook.getStudyConditions();
         final List<MeasurementRow> observations = workbook.getObservations();
         final List<MeasurementRow> trialObservations = createTestRowForReport();
@@ -81,7 +81,7 @@ public class MaizeTrialManifestTest {
 
     @Test
     public void testBuildReportValuesFromTrialSettings() {
-        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, StudyType.T, "testStudyName", 1, false);
+        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, new StudyTypeDto("T"), "testStudyName", 1, false);
         final List<MeasurementVariable> conditions = workbook.getStudyConditions();
         final List<MeasurementRow> observations = workbook.getObservations();
         final List<MeasurementRow> trialObservations = workbook.getTrialObservations();

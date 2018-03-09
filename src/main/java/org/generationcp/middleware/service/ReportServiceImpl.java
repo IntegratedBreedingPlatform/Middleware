@@ -8,8 +8,8 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -97,7 +97,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 */
 	private Map<String, Object> extractFieldbookData(final Integer studyId, final boolean parentsInfoRequireed) {
 
-		final StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
+		final StudyTypeDto studyType = this.getStudyDataManager().getStudyType(studyId);
 		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
 		// getWorkbookBuilder().create no longer loads observations collection by default. Load only when needed. Like here.
 		this.getWorkbookBuilder().loadAllObservations(wb);

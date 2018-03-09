@@ -15,13 +15,14 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
@@ -80,14 +81,14 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testSaveTrialDataset() throws MiddlewareException {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
 				DataImportServiceImplTestIT.PROGRAM_UUID, this.cropPrefix);
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
-		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
+		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		Assert.assertEquals(
 				"Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
@@ -107,14 +108,14 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testSaveNurseryDataset() throws MiddlewareException {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
 				DataImportServiceImplTestIT.PROGRAM_UUID, this.cropPrefix);
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
-		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
+		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		Assert.assertEquals(
 				"Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
@@ -134,7 +135,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testAddTrialEnvironmentToTrial() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(4, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(4, new StudyTypeDto("T"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
 				DataImportServiceImplTestIT.PROGRAM_UUID, this.cropPrefix);
@@ -158,7 +159,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
 		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID,
 				this.cropPrefix);
@@ -180,7 +181,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		// src/test/resources. no need to change per user to reflect file
 		// location
 
-		final String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
+		final String fileLocation = Objects.requireNonNull(this.getClass().getClassLoader().getResource("ricetest2.xls")).getFile();
 		final File file = new File(fileLocation);
 		final Workbook workbook = this.dataImportService.parseWorkbook(file, CURRENT_IBDB_USER_ID);
 		workbook.print(IntegrationTestBase.INDENT);
@@ -192,7 +193,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testParseWorkbookDescriptionSheet() throws WorkbookParserException {
-		final String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
+		final String fileLocation = Objects.requireNonNull(this.getClass().getClassLoader().getResource("ricetest2.xls")).getFile();
 		final File file = new File(fileLocation);
 		final WorkbookParser parser = new WorkbookParser(WorkbookParser.DEFAULT_MAX_ROW_LIMIT);
 		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
@@ -252,8 +253,8 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testParseWorkbookWithNoTrialNursery() {
-		final String fileLocation = this.getClass().getClassLoader()
-				.getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoTrialEnvironment.xls")
+		final String fileLocation = Objects.requireNonNull(this.getClass().getClassLoader()
+			.getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoTrialEnvironment.xls"))
 				.getFile();
 		final File file = new File(fileLocation);
 		try {
@@ -267,8 +268,8 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testParseWorkbookWithEmptyFields() {
-		final String fileLocation = this.getClass().getClassLoader()
-				.getResource("org/generationcp/middleware/service/test/GCP5802SevenFieldsMissing.xls").getFile();
+		final String fileLocation = Objects.requireNonNull(
+			this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5802SevenFieldsMissing.xls")).getFile();
 		final File file = new File(fileLocation);
 		try {
 			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID, CURRENT_IBDB_USER_ID);
@@ -279,7 +280,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 			Assert.assertNotNull(messages);
 			// There should be 7 error messages to correspond with the 7 missing
 			// fields in the file
-			Assert.assertSame(messages.size(), 7);
+			Assert.assertSame(7, messages.size());
 
 			return;
 		} catch (final MiddlewareException e) {
@@ -291,7 +292,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	protected void testFileAgainstExpectedErrorCondition(final String qualifiedFilename, final String expectedErrorKey,
 			final String errorMessage) {
-		final String fileLocation = this.getClass().getClassLoader().getResource(qualifiedFilename).getFile();
+		final String fileLocation = Objects.requireNonNull(this.getClass().getClassLoader().getResource(qualifiedFilename)).getFile();
 		try {
 			final File file = new File(fileLocation);
 			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID, CURRENT_IBDB_USER_ID);
@@ -380,17 +381,15 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final Map<String, List<Message>> errors = this.dataImportService.validateProjectOntology(workbook,
 				DataImportServiceImplTestIT.PROGRAM_UUID);
 		Assert.assertNotNull(errors);
-		if (errors != null) {
-			Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
-			for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
-				Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
-				for (final Message m : e.getValue()) {
-					if (m.getMessageParams() != null) {
-						Debug.println(IntegrationTestBase.INDENT + 4,
-								"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
-					} else {
-						Debug.println(IntegrationTestBase.INDENT + 4, "Key: " + m.getMessageKey());
-					}
+		Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
+		for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
+			Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
+			for (final Message m : e.getValue()) {
+				if (m.getMessageParams() != null) {
+					Debug.println(IntegrationTestBase.INDENT + 4,
+							"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
+				} else {
+					Debug.println(IntegrationTestBase.INDENT + 4, "Key: " + m.getMessageKey());
 				}
 			}
 		}
@@ -407,17 +406,15 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final Map<String, List<Message>> errors = this.dataImportService.validateProjectData(workbook,
 				DataImportServiceImplTestIT.PROGRAM_UUID);
 		Assert.assertNotNull(errors);
-		if (errors != null) {
-			Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
-			for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
-				Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
-				for (final Message m : e.getValue()) {
-					if (m.getMessageParams() != null) {
-						Debug.println(IntegrationTestBase.INDENT + 4,
-								"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
-					} else {
-						Debug.println(IntegrationTestBase.INDENT + 4, "Key: " + m.getMessageKey());
-					}
+		Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
+		for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
+			Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
+			for (final Message m : e.getValue()) {
+				if (m.getMessageParams() != null) {
+					Debug.println(IntegrationTestBase.INDENT + 4,
+							"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
+				} else {
+					Debug.println(IntegrationTestBase.INDENT + 4, "Key: " + m.getMessageKey());
 				}
 			}
 		}

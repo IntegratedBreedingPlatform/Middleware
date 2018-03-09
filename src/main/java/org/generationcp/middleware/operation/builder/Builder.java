@@ -40,7 +40,7 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public abstract class Builder extends DatabaseBroker {
 
-	public Builder(HibernateSessionProvider sessionProvider) {
+	public Builder(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
@@ -62,6 +62,10 @@ public abstract class Builder extends DatabaseBroker {
 
 	protected final VariableTypeBuilder getVariableTypeBuilder() {
 		return new VariableTypeBuilder(this.sessionProvider);
+	}
+
+	protected final StudyTypeBuilder getStudyTypeBuilder() {
+		return new StudyTypeBuilder();
 	}
 
 	protected final ExperimentBuilder getExperimentBuilder() {

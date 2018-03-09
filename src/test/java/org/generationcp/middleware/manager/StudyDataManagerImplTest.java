@@ -35,13 +35,13 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -287,11 +287,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllStudyDetails() throws Exception {
-		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(new StudyTypeDto("N"), this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
+		this.studyTDI.addTestStudy(new StudyTypeDto("N"), "NEW NURSERY", cropPrefix);
 		final List<StudyDetails> updatedNurseryStudyDetails =
-				this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+				this.manager.getAllStudyDetails(new StudyTypeDto("N"), this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
 		Assert.assertEquals("The size after adding new nursery should be equal to the size before adding a new nursery + 1",
 				sizeAfterAddingNewNursery, sizeBeforeAddingNewNursery + 1);
@@ -313,7 +313,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
-				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties);
+				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyDataManagerImplTest.crossExpansionProperties);
 		// compare the size to the minimum possible value of field map infos' size
 		Assert.assertTrue("The size should be greater than 0", fieldMapInfos.size() > 0);
 	}
@@ -427,7 +427,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyType() {
 		try {
-			Assert.assertEquals("Study type returned did not match.", StudyType.T, this.manager.getStudyType(this.studyReference.getId()));
+			Assert.assertEquals("Study type returned did not match.", new StudyTypeDto("T"), this.manager.getStudyType(this.studyReference.getId()));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -461,11 +461,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyDetails() throws Exception {
-		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(new StudyTypeDto("T"), this.commonTestProject
+			.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
+		this.studyTDI.addTestStudy(new StudyTypeDto("T"), "NEW TRIAL", cropPrefix);
 		final List<StudyDetails> updatedTrialStudyDetails =
-				this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+				this.manager.getStudyDetails(new StudyTypeDto("T"), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewTrial = updatedTrialStudyDetails.size();
 		Assert.assertEquals("The size after adding new trial should be equal to the size before adding a new trial + 1",
 				sizeAfterAddingNewTrial, sizeBeforeAddingNewTrial + 1);
@@ -476,8 +477,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> studyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
-		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
-		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
+		this.studyTDI.addTestStudy(new StudyTypeDto("N"), "NEW NURSERY", cropPrefix);
+		this.studyTDI.addTestStudy(new StudyTypeDto("T"), "NEW TRIAL", cropPrefix);
 		final List<StudyDetails> newStudyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
@@ -487,7 +488,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareException {
-		final StudyDetails studyDetails = this.manager.getStudyDetails(StudyType.T, this.studyReference.getId());
+		final StudyDetails studyDetails = this.manager.getStudyDetails(new StudyTypeDto("T"), this.studyReference.getId());
 		Assert.assertNotNull("Study should not be null", studyDetails);
 		Assert.assertEquals("Study should have the id " + this.studyReference.getId(), studyDetails.getId(), studyDetails.getId());
 	}

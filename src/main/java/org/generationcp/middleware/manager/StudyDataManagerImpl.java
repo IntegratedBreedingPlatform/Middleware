@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -40,7 +41,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -51,6 +51,7 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -86,20 +87,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
+	private StudyTypeDAO studyTypeDAO;
 
 	public StudyDataManagerImpl() {
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
+		init(sessionProvider);
+	}
+
+	private void init(final HibernateSessionProvider sessionProvider) {
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
+		this.studyTypeDAO = new StudyTypeDAO();
+		this.studyTypeDAO.setSession(sessionProvider.getSession());
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
-		this.pedigreeService = this.getPedigreeService();
+		this.init(sessionProvider);
 	}
 
 	private PedigreeService getPedigreeService() {
@@ -174,7 +181,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
-		final String programUUID, final String cropPrefix, final StudyType studyType, final String description, final String startDate,
+		final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description, final String startDate,
 		final String endDate, final String objective, final String name, final String createdBy) {
 
 		try {
@@ -321,7 +328,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public long countExperimentsByTrialEnvironmentAndVariate(final int trialEnvironmentId, final int variateVariableId) {
-		long count = 0;
+		final long count;
 		count = this.getExperimentDao().countByTrialEnvironmentAndVariate(trialEnvironmentId, variateVariableId);
 		return count;
 	}
@@ -420,20 +427,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FieldMapInfo> getFieldMapInfoOfStudy(final List<Integer> studyIdList, final StudyType studyType,
-			final CrossExpansionProperties crossExpansionProperties) {
+	public List<FieldMapInfo> getFieldMapInfoOfStudy(final List<Integer> studyIdList,
+		final CrossExpansionProperties crossExpansionProperties) {
 		final List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
 		for (final Integer studyId : studyIdList) {
 			final FieldMapInfo fieldMapInfo = new FieldMapInfo();
 
 			fieldMapInfo.setFieldbookId(studyId);
 			fieldMapInfo.setFieldbookName(this.getDmsProjectDao().getById(studyId).getName());
-
-			if (studyType == StudyType.T) {
-				fieldMapInfo.setTrial(true);
-			} else {
-				fieldMapInfo.setTrial(false);
-			}
 
 			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
 			fieldMapInfo.setDatasets(fieldMapDatasetInfos);
@@ -566,10 +567,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public boolean renameSubFolder(final String newFolderName, final int folderId, final String programUUID) {
 
-		// check for existing folder name
+		// check for existing folder label
 		final boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(newFolderName, programUUID);
 		if (isExisting) {
-			throw new MiddlewareQueryException("Folder name is not unique");
+			throw new MiddlewareQueryException("Folder label is not unique");
 		}
 
 		try {
@@ -582,7 +583,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered with renameFolder(folderId=" + folderId + ", name=" + newFolderName + ": " + e.getMessage(), e);
+					"Error encountered with renameFolder(folderId=" + folderId + ", label=" + newFolderName + ": " + e.getMessage(), e);
 		}
 	}
 
@@ -596,7 +597,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		final boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
 		if (isExisting) {
-			throw new MiddlewareQueryException("Folder name is not unique");
+			throw new MiddlewareQueryException("Folder label is not unique");
 		}
 
 		try {
@@ -607,7 +608,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered with addSubFolder(parentFolderId=" + parentFolderId + ", name=" + name + ", description="
+					"Error encountered with addSubFolder(parentFolderId=" + parentFolderId + ", label=" + name + ", description="
 							+ description + "): " + e.getMessage(), e);
 		}
 	}
@@ -660,7 +661,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		try {
 
-			// modify the folder name
+			// modify the folder label
 			final String name = project.getName() + "#" + Math.random();
 			project.setName(name);
 			dmsProjectDao.saveOrUpdate(project);
@@ -705,15 +706,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudyDetails> getStudyDetails(final StudyType studyType, final String programUUID, final int start, final int numOfRows) {
+	public List<StudyDetails> getStudyDetails(final StudyTypeDto studyType, final String programUUID, final int start, final int numOfRows) {
 		final List<StudyDetails> details = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID, start, numOfRows);
 		this.populateSiteAndPersonIfNecessary(details);
 		return details;
 	}
 
 	@Override
-	public StudyDetails getStudyDetails(final StudyType studyType, final int studyId) {
-		final StudyDetails studyDetails = this.getDmsProjectDao().getStudyDetails(studyType, studyId);
+	public StudyDetails getStudyDetails(final StudyTypeDto studyType, final int studyId) {
+		StudyTypeDto newStudyType = studyType;
+		if (studyType.getId() == null) {
+			newStudyType = this.getStudyTypeByName(studyType.getName());
+		}
+
+		final StudyDetails studyDetails = this.getDmsProjectDao().getStudyDetails(newStudyType, studyId);
 		this.populateSiteAnPersonIfNecessary(studyDetails);
 		return studyDetails;
 	}
@@ -727,7 +733,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
-	public List<StudyDetails> getAllStudyDetails(final StudyType studyType, final String programUUID) {
+	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
 		final List<StudyDetails> list = new ArrayList<>();
 		final List localList = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID);
 		if (localList != null) {
@@ -738,14 +744,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countAllStudyDetails(final StudyType studyType, final String programUUID) {
+	public long countAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
 		long count = 0;
 		count += this.getDmsProjectDao().countAllStudyDetails(studyType, programUUID);
 		return count;
 	}
 
 	@Override
-	public long countStudyDetails(final StudyType studyType, final String programUUID) {
+	public long countStudyDetails(final StudyTypeDto studyType, final String programUUID) {
 		long count = 0;
 		count += this.getDmsProjectDao().countAllStudyDetails(studyType, programUUID);
 		return count;
@@ -970,8 +976,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyType getStudyType(final int studyId) {
-		return this.getDmsProjectDao().getStudyType(studyId);
+	public StudyTypeDto getStudyType(final int studyId) {
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getById(studyId));
 	}
 
 	@Override
@@ -1146,5 +1152,25 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
 
+	}
+
+	@Override
+	public List<StudyTypeDto> getAllStudyTypes() {
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAll());
+	}
+
+	@Override
+	public StudyTypeDto getStudyTypeByName(final String name) {
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getStudyTypeByName(name));
+	}
+
+	@Override
+	public StudyTypeDto getStudyTypeByLabel(final String label) {
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getStudyTypeByLabel(label));
+	}
+
+	@Override
+	public List<StudyTypeDto> getAllVisibleStudyTypes() {
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.studyTypeDAO.getAllVisibleStudyTypes());
 	}
 }

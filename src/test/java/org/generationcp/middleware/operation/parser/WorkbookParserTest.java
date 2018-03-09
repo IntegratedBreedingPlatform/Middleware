@@ -14,9 +14,9 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkbookParserTest {
@@ -60,7 +61,7 @@ public class WorkbookParserTest {
 			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL123"};
 	public static final String CREATED_BY = "1";
 
-	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Mock
 	private File file;
@@ -86,7 +87,7 @@ public class WorkbookParserTest {
 	@After
 	public void afterEachTest() {
 		final long elapsedTime = System.nanoTime() - this.startTime;
-		this.LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
+		this.log.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
 				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
 	}
 
@@ -352,7 +353,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(new StudyTypeDto("T"));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -361,7 +362,7 @@ public class WorkbookParserTest {
 		// If the Section is CONSTANT and the study is Trial, the variable type should be TRIAL_CONDITION
 		Assert.assertEquals(VariableType.TRIAL_CONDITION, measurementVariable.getVariableType());
 
-		studyDetails.setStudyType(StudyType.N);
+		studyDetails.setStudyType(new StudyTypeDto("N"));
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
 		// If the Section is CONSTANT and the study is Nursery, the variable type should be NURSERY_CONDITION
@@ -374,7 +375,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(new StudyTypeDto("T"));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -687,7 +688,7 @@ public class WorkbookParserTest {
 		Assert.assertEquals(mv.getLabel(), row.getCell(7).getStringCellValue());
 
 		// Assert variable type based on property name
-		Assert.assertEquals(mv.getVariableType(), VariableType.SELECTION_METHOD);
+		Assert.assertEquals(VariableType.SELECTION_METHOD, mv.getVariableType());
 	}
 
 	@Test
@@ -1064,7 +1065,7 @@ public class WorkbookParserTest {
 		for (int i = 0; i < allVariables.size(); i++) {
 			final HSSFCell cell = row2.createCell(i);
 
-			if (allVariables.get(i).getDataTypeId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+			if (Objects.equals(allVariables.get(i).getDataTypeId(), DataType.CATEGORICAL_VARIABLE.getId())) {
 				cell.setCellValue(withInvalidValues ? "6" : CREATED_BY);
 			} else {
 				cell.setCellValue(CREATED_BY);

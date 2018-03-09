@@ -8,10 +8,10 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -84,7 +86,7 @@ public class DataImportServiceImplTest {
 	public void init() {
 
 		this.workbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO,
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("N"), STUDY_NAME, TRIAL_NO,
 						IS_MULTIPLE_LOCATION);
 
 		this.mockStandardVariable(TEST_VARIABLE_TERM_ID, TEST_VARIABLE_NAME, TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME,
@@ -237,7 +239,7 @@ public class DataImportServiceImplTest {
 	public void testSetRequiredFieldsForTrial() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.T, STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
 
 		this.dataImportService.setRequiredFields(trialWorkbook);
 
@@ -442,7 +444,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsAllGidsExist() {
 
 		// The count of matched record in germplasm should match the number of observation in data file.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Mockito.anySet()))
+		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySet()))
 				.thenReturn(Long.valueOf(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS));
 
 		final List<Message> messages = new ArrayList<>();
@@ -456,7 +458,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsDoNotExist() {
 
 		// Retun a number not equal to no of observation to simulate that there are gids that do not exist in the database.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Mockito.anySet())).thenReturn(Long.valueOf(0L));
+		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySet())).thenReturn(Long.valueOf(0L));
 
 		final List<Message> messages = new ArrayList<>();
 		this.dataImportService.checkForInvalidGids(this.workbook, messages);
@@ -473,7 +475,7 @@ public class DataImportServiceImplTest {
 		// Remove the GID variable to simulate that GID doesnt exist in the data file
 		final Iterator<MeasurementVariable> iterator = this.workbook.getFactors().iterator();
 		while (iterator.hasNext()) {
-			if (iterator.next().getName() == WorkbookTestDataInitializer.GID) {
+			if (Objects.equals(iterator.next().getName(), WorkbookTestDataInitializer.GID)) {
 				iterator.remove();
 			}
 		}

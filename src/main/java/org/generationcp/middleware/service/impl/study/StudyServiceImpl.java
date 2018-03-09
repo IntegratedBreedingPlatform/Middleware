@@ -11,6 +11,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -23,7 +24,6 @@ import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -165,16 +165,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final List<StudySummary> studySummaries = new ArrayList<>();
 
-		StringBuffer sql = new StringBuffer()
-		.append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ")
-		.append("	p.program_uuid AS programUUID, p.study_type AS studyType, p.objective AS objective, ")
-		.append("	p.start_date AS startDate, p.end_date AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason"
-			+ ".value AS season ")
-		.append(" FROM project p ")
-		.append("  LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.type_id = ").append(TermId.PI_NAME.getId())
-		.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ").append(TermId.TRIAL_LOCATION.getId())
-		.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ").append(TermId.SEASON_VAR_TEXT.getId())
-		.append(" WHERE p.deleted = 0");
+		final StringBuffer sql = new StringBuffer().append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ").append(
+			"	p.program_uuid AS programUUID, st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible ")
+			.append("as visible, st.cvterm_id as cvtermId, p.objective AS objective, ")
+			.append("	p.start_date AS startDate, p.end_date AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason")
+			.append(".value AS season ").append(" FROM project p ")
+			.append("  LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.type_id = ").append(TermId.PI_NAME.getId())
+			.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ")
+			.append(TermId.TRIAL_LOCATION.getId())
+			.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ")
+			.append(TermId.SEASON_VAR_TEXT.getId()).append(" INNER JOIN study_type st ON p.study_type = st.study_type_id ")
+			.append(" WHERE p.deleted = 0");
 
 		if (!StringUtils.isEmpty(serchParameters.getProgramUniqueId())) {
 			sql.append(" AND p.program_uuid = '").append(serchParameters.getProgramUniqueId().trim()).append("'");
@@ -189,13 +190,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 			sql.append(" AND ppSeason.value LIKE '%").append(serchParameters.getSeason().trim()).append("%'");
 		}
 
-		List<Object[]> list = null;
+		final List<Object[]> list;
 		try {
 
-			final Query query =
-					this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
-					.addScalar("programUUID").addScalar("studyType").addScalar("objective").addScalar("startDate")
-					.addScalar("endDate").addScalar("piName").addScalar("location").addScalar("season");
+			final Query query = this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
+				.addScalar("programUUID").addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("cvTermId")
+				.addScalar("visible").addScalar("label").addScalar("studyTypeName").addScalar("cvTermId").addScalar("visible")
+				.addScalar("objective").addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("location")
+				.addScalar("season");
 
 			list = query.list();
 		} catch (final HibernateException e) {
@@ -208,17 +210,22 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final String name = (String) row[1];
 				final String title = (String) row[2];
 				final String programUUID = (String) row[3];
-				final String studyType = (String) row[4];
-				final String objective = (String) row[5];
-				final String startDate = (String) row[6];
-				final String endDate = (String) row[7];
-				final String pi = (String) row[8];
-				final String location = (String) row[9];
-				final String season = (String) row[10];
+				final Integer studyTypeId = (Integer) row[4];
+				final String label = (String) row[5];
+				final String studyTypeName = (String) row[6];
+				final boolean visible = ((Integer) row[7]) == 1;
+				final Integer cvtermId = (Integer) row[8];
+				final String objective = (String) row[9];
+				final String startDate = (String) row[10];
+				final String endDate = (String) row[11];
+				final String pi = (String) row[12];
+				final String location = (String) row[13];
+				final String season = (String) row[14];
+
+				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 
 				final StudySummary studySummary =
-						new StudySummary(id, name, title, objective, StudyType.getStudyTypeByName(studyType), startDate,
-								endDate, programUUID, pi, location, season);
+					new StudySummary(id, name, title, objective, studyTypeDto, startDate, endDate, programUUID, pi, location, season);
 
 				studySummaries.add(studySummary);
 			}
@@ -426,9 +433,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			for (final Object[] row : results) {
 				final List<String> entry = Lists.newArrayList();
 
-				if (year != null) {
-					entry.add(year);
-				}
+				entry.add(year);
 
 				final int lastFixedColumn = 18;
 
@@ -512,7 +517,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
 					} else {
-						entry.add((String) rowValue);
+						entry.add((String) null);
 					}
 
 					// get every other column skipping over PhenotypeId column

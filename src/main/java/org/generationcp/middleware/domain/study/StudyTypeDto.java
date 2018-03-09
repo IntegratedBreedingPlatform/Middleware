@@ -1,19 +1,36 @@
 package org.generationcp.middleware.domain.study;
 
-import org.pojomatic.Pojomatic;
-
 import java.io.Serializable;
+import java.util.Objects;
 
 public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 
 	private Integer id;
 	private String label;
 	private String name;
+	private Integer cvTermId;
+	private boolean visible;
+
+	public StudyTypeDto(final Integer id, final String label, final String name, final Integer cvTermId, final boolean visible) {
+		this.id = id;
+		this.label = label;
+		this.name = name;
+		this.cvTermId = cvTermId;
+		this.visible = visible;
+	}
 
 	public StudyTypeDto(final Integer id, final String label, final String name){
 			this.setId(id);
 			this.setLabel(label);
 			this.setName(name);
+	}
+
+	public StudyTypeDto(final String name) {
+		super();
+		this.name = name;
+	}
+
+	public StudyTypeDto() {
 	}
 
 	public Integer getId() {
@@ -28,7 +45,7 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 		return label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
@@ -36,28 +53,52 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
-	@Override
-	public int hashCode() {
-		return Pojomatic.hashCode(this);
+	public Integer getCvTermId() {
+		return cvTermId;
 	}
 
-	@Override
-	public String toString() {
-		return Pojomatic.toString(this);
+	public void setCvTermId(final Integer cvTermId) {
+		this.cvTermId = cvTermId;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(final boolean visible) {
+		this.visible = visible;
 	}
 
 	@Override
 	public boolean equals(final Object o) {
-		return Pojomatic.equals(this, o);
+		if (this == o)
+			return true;
+		if (!(o instanceof StudyTypeDto))
+			return false;
+		final StudyTypeDto that = (StudyTypeDto) o;
+		return isVisible() == that.isVisible() && Objects.equals(getId(), that.getId()) && Objects.equals(getLabel(), that.getLabel())
+			&& Objects.equals(getName(), that.getName()) && Objects.equals(getCvTermId(), that.getCvTermId());
 	}
 
 	@Override
-	public int compareTo(final StudyTypeDto o) {
-		int compareId = o.getId();
-		return Integer.valueOf(this.getId()).compareTo(compareId);
+	public int hashCode() {
+
+		return Objects.hash(getId(), getLabel(), getName(), getCvTermId(), isVisible());
+	}
+
+	@Override
+	public String toString() {
+		return "StudyTypeDto{" + "id=" + id + ", label='" + label + '\'' + ", name='" + name + '\'' + ", cvTermId=" + cvTermId
+			+ ", visible=" + visible + '}';
+	}
+
+	@Override
+	public int compareTo(@SuppressWarnings("NullableProblems") final StudyTypeDto o) {
+		final int compareId = o.getId();
+		return this.getId().compareTo(compareId);
 	}
 }

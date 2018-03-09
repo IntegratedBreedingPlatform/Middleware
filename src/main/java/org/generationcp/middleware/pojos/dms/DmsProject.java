@@ -11,22 +11,23 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -95,9 +96,9 @@ public class DmsProject implements Serializable {
 	@Column(name = "deleted", columnDefinition = "TINYINT")
 	private boolean deleted;
 
-	@Basic(optional = true)
-	@Column(name = "study_type")
-	@Enumerated(EnumType.STRING)
+	@ManyToOne(targetEntity = StudyType.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "study_type_id")
+	@NotFound(action = NotFoundAction.EXCEPTION)
 	private StudyType studyType;
 
 	@Column(name = "start_date")
@@ -188,8 +189,8 @@ public class DmsProject implements Serializable {
 		return studyType;
 	}
 
-	public void setStudyType(final StudyType studyType) {
-		this.studyType = studyType;
+	public void setStudyType(final StudyType studyTypeEnum) {
+		this.studyType = studyTypeEnum;
 	}
 
 	public void setDeleted(final boolean deleted) {

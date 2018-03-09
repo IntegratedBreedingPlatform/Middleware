@@ -24,7 +24,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
@@ -230,7 +230,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		studyDetails.setDescription("Study title");
 		studyDetails.setCreatedBy("1");
 		studyDetails.setObjective("Test transformer");
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(new StudyTypeDto("T"));
 		studyDetails.setStartDate("20000101");
 		studyDetails.setEndDate("20000130");
 		return studyDetails;

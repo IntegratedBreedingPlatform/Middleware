@@ -13,9 +13,9 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
 
@@ -154,7 +154,7 @@ public class WorkbookTestDataInitializer {
 	public static final int PLANT_HEIGHT_MEAN_ID = 18180;
 	private static final String CREATED_BY = "1";
 
-	public Workbook createWorkbook(final StudyType studyType) {
+	public Workbook createWorkbook(final StudyTypeDto studyType) {
 		final Workbook workbook = new Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyType(studyType);
@@ -168,16 +168,16 @@ public class WorkbookTestDataInitializer {
 			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	public static Workbook getTestWorkbook() {
-		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1,
+		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("N"), null, 1,
 				false, false);
 	}
 
 	public static Workbook getTestWorkbook(final boolean isForMeansDataset) {
-		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1,
+		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("N"), null, 1,
 				false, isForMeansDataset);
 	}
 
-	public static Workbook getTestWorkbook(final int noOfObservations, final StudyType studyType) {
+	public static Workbook getTestWorkbook(final int noOfObservations, final StudyTypeDto studyType) {
 		return WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, studyType, null, 1, false, false);
 	}
 
@@ -193,17 +193,17 @@ public class WorkbookTestDataInitializer {
 		final List<Workbook> workbooks = new ArrayList<>();
 		final String studyName = "pheno_t7" + new Random().nextInt(10000);
 		for (int i = 1; i <= noOfTrial; i++) {
-			workbooks.add(WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, StudyType.T, studyName, i, true, false));
+			workbooks.add(WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, new StudyTypeDto("T"), studyName, i, true, false));
 		}
 		return workbooks;
 	}
 
-	public static Workbook createTestWorkbook(final int noOfObservations, final StudyType studyType, final String studyName,
+	public static Workbook createTestWorkbook(final int noOfObservations, final StudyTypeDto studyType, final String studyName,
 			final int trialNo, final boolean hasMultipleLocations) {
 		return WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, studyType, studyName, trialNo, hasMultipleLocations, false);
 	}
 
-	public static Workbook createTestWorkbook(final int noOfObservations, final StudyType studyType, final String studyName,
+	public static Workbook createTestWorkbook(final int noOfObservations, final StudyTypeDto studyType, final String studyName,
 			final int trialNo, final boolean hasMultipleLocations, final boolean isForMeansDataset) {
 		final Workbook workbook = new Workbook();
 		WorkbookTestDataInitializer.setDefaultValues(workbook);
@@ -249,7 +249,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook workbook = new Workbook();
 
 		final String studyName = "workbookWithErrors" + new Random().nextInt(10000);
-		WorkbookTestDataInitializer.createStudyDetails(workbook, studyName, StudyType.T);
+		WorkbookTestDataInitializer.createStudyDetails(workbook, studyName, new StudyTypeDto("T"));
 		workbook.setConditions(WorkbookTestDataInitializer.createConditions(false, 1, WorkbookTestDataInitializer.LOCATION_ID_1));
 		WorkbookTestDataInitializer.createFactors(workbook, false, false, 1);
 		WorkbookTestDataInitializer.createConstants(workbook);
@@ -262,7 +262,7 @@ public class WorkbookTestDataInitializer {
 	public static Workbook createTestWorkbookForWizard(final String studyName, final int trialNo) {
 		final Workbook wbook = new Workbook();
 
-		WorkbookTestDataInitializer.createStudyDetails(wbook, studyName, StudyType.T);
+		WorkbookTestDataInitializer.createStudyDetails(wbook, studyName, new StudyTypeDto("T"));
 		wbook.setConditions(WorkbookTestDataInitializer.createConditions(false, trialNo, WorkbookTestDataInitializer.LOCATION_ID_1));
 		WorkbookTestDataInitializer.createFactors(wbook, true, true, trialNo);
 		WorkbookTestDataInitializer.createConstants(wbook);
@@ -272,14 +272,14 @@ public class WorkbookTestDataInitializer {
 		return wbook;
 	}
 
-	public static void createStudyDetails(final Workbook workbook, final String studyName, final StudyType studyType) {
+	public static void createStudyDetails(final Workbook workbook, final String studyName, final StudyTypeDto studyType) {
 		final StudyDetails details = new StudyDetails();
 		if (studyName != null) {
 			// this is used for adding multiple locations to one study
 			details.setStudyName(studyName);
 		} else {
 			details.setStudyName(
-					(studyType.equals(StudyType.N) ? WorkbookTestDataInitializer.NURSERY_NAME : WorkbookTestDataInitializer.TRIAL_NAME)
+					(studyType.equals(new StudyTypeDto("N")) ? WorkbookTestDataInitializer.NURSERY_NAME : WorkbookTestDataInitializer.TRIAL_NAME)
 							+ new Random().nextInt(10000));
 		}
 		details.setDescription(WorkbookTestDataInitializer.TITLE);
@@ -727,7 +727,7 @@ public class WorkbookTestDataInitializer {
 	public static MeasurementRow createTrialObservationWithoutSite() {
 		final Workbook workbook = new Workbook();
 
-		WorkbookTestDataInitializer.createStudyDetails(workbook, null, StudyType.T);
+		WorkbookTestDataInitializer.createStudyDetails(workbook, null, new StudyTypeDto("T"));
 		workbook.setConditions(WorkbookTestDataInitializer.createConditions(true, 1, WorkbookTestDataInitializer.LOCATION_ID_1));
 
 		final MeasurementRow row = new MeasurementRow();

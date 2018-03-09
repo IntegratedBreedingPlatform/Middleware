@@ -13,13 +13,14 @@
 package org.generationcp.middleware.domain.etl;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class StudyDetails implements Serializable {
 
@@ -38,7 +39,7 @@ public class StudyDetails implements Serializable {
 
 	private String endDate;
 
-	private StudyType studyType;
+	private StudyTypeDto studyType;
 
 	private long parentFolderId;
 
@@ -70,7 +71,7 @@ public class StudyDetails implements Serializable {
 	}
 
 	public StudyDetails(final String studyName, final String description, final String objective, final String startDate, final String endDate,
-			final StudyType studyType, final long parentFolderId, final String trialDatasetName, final String measurementDatasetName, final String studyUpdate, final String
+			final StudyTypeDto studyType, final long parentFolderId, final String trialDatasetName, final String measurementDatasetName, final String studyUpdate, final String
 		createdBy) {
 		this.studyName = studyName;
 		this.description = description;
@@ -88,7 +89,7 @@ public class StudyDetails implements Serializable {
 
 	// Used by getTrialObservationTable
 	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate, final String endDate,
-			final StudyType studyType, final String piName, final String siteName, final String piId, final String siteId, final String studyUpdate, final String createdBy) {
+			final StudyTypeDto studyType, final String piName, final String siteName, final String piId, final String siteId, final String studyUpdate, final String createdBy) {
 
 		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy);
 		this.id = id;
@@ -101,13 +102,13 @@ public class StudyDetails implements Serializable {
 	}
 
 	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate, final String endDate,
-			final StudyType studyType, final String piName, final String siteName, final String studyUpdate, final String createdBy) {
+			final StudyTypeDto studyType, final String piName, final String siteName, final String studyUpdate, final String createdBy) {
 
 		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy);
 		this.id = id;
 	}
 
-	public StudyDetails(final String studyName, final String description, final String objective, final String startDate, final String endDate, final StudyType studyType,
+	public StudyDetails(final String studyName, final String description, final String objective, final String startDate, final String endDate, final StudyTypeDto studyType,
 			final String piName, final String siteName, final String studyUpdate, final String createdBy) {
 		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null, studyUpdate, createdBy);
 		this.siteName = siteName;
@@ -166,11 +167,11 @@ public class StudyDetails implements Serializable {
 		this.endDate = endDate;
 	}
 
-	public StudyType getStudyType() {
+	public StudyTypeDto getStudyType() {
 		return studyType;
 	}
 
-	public void setStudyType(final StudyType studyType) {
+	public void setStudyType(final StudyTypeDto studyType) {
 		this.studyType = studyType;
 	}
 
@@ -183,7 +184,7 @@ public class StudyDetails implements Serializable {
 	}
 
 	public boolean isNursery() {
-		return (this.studyType != null) && (this.studyType == StudyType.N);
+		return this.studyType != null && Objects.equals(this.studyType.getName(), "N");
 	}
 
 	public String getTrialDatasetName() {
@@ -397,9 +398,6 @@ public class StudyDetails implements Serializable {
 			return false;
 		}
 		if (description == null) {
-			if (other.description != null) {
-				return false;
-			}
 		} else if (!description.equals(other.description)) {
 			return false;
 		}

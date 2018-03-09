@@ -22,7 +22,7 @@ public class Constant implements Serializable {
 	private Double minRange;
 	private Double maxRange;
 	private Operation operation;
-	private boolean isTrial;
+	//private boolean isTrial;
 	private int id;
 	private int storedIn;
 	private String label;
@@ -32,8 +32,9 @@ public class Constant implements Serializable {
 		super();
 	}
 
-	public Constant(String name, String description, String property, String scale, String method, String role, String datatype,
-			String value, Integer dataTypeId, Double minRange, Double maxRange, boolean isTrial) {
+	public Constant(
+		final String name, final String description, final String property, final String scale, final String method, final String role, final String datatype,
+			final String value, final Integer dataTypeId, final Double minRange, final Double maxRange) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -46,14 +47,14 @@ public class Constant implements Serializable {
 		this.dataTypeId = dataTypeId;
 		this.minRange = minRange;
 		this.maxRange = maxRange;
-		this.isTrial = isTrial;
+		//this.isTrial = isTrial;
 	}
 
 	public String getName() {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -61,7 +62,7 @@ public class Constant implements Serializable {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -69,7 +70,7 @@ public class Constant implements Serializable {
 		return this.property;
 	}
 
-	public void setProperty(String property) {
+	public void setProperty(final String property) {
 		this.property = property;
 	}
 
@@ -77,7 +78,7 @@ public class Constant implements Serializable {
 		return this.scale;
 	}
 
-	public void setScale(String scale) {
+	public void setScale(final String scale) {
 		this.scale = scale;
 	}
 
@@ -85,7 +86,7 @@ public class Constant implements Serializable {
 		return this.method;
 	}
 
-	public void setMethod(String method) {
+	public void setMethod(final String method) {
 		this.method = method;
 	}
 
@@ -93,7 +94,7 @@ public class Constant implements Serializable {
 		return this.role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(final String role) {
 		this.role = role;
 	}
 
@@ -101,7 +102,7 @@ public class Constant implements Serializable {
 		return this.datatype;
 	}
 
-	public void setDatatype(String datatype) {
+	public void setDatatype(final String datatype) {
 		this.datatype = datatype;
 	}
 
@@ -109,7 +110,7 @@ public class Constant implements Serializable {
 		return this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -117,7 +118,7 @@ public class Constant implements Serializable {
 		return this.dataTypeId;
 	}
 
-	public void setDataTypeId(Integer dataTypeId) {
+	public void setDataTypeId(final Integer dataTypeId) {
 		this.dataTypeId = dataTypeId;
 	}
 
@@ -125,7 +126,7 @@ public class Constant implements Serializable {
 		return this.minRange;
 	}
 
-	public void setMinRange(Double minRange) {
+	public void setMinRange(final Double minRange) {
 		this.minRange = minRange;
 	}
 
@@ -133,7 +134,7 @@ public class Constant implements Serializable {
 		return this.maxRange;
 	}
 
-	public void setMaxRange(Double maxRange) {
+	public void setMaxRange(final Double maxRange) {
 		this.maxRange = maxRange;
 	}
 
@@ -147,7 +148,7 @@ public class Constant implements Serializable {
 	/**
 	 * @param operation the operation to set
 	 */
-	public void setOperation(Operation operation) {
+	public void setOperation(final Operation operation) {
 		this.operation = operation;
 	}
 
@@ -161,7 +162,7 @@ public class Constant implements Serializable {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -175,23 +176,23 @@ public class Constant implements Serializable {
 	/**
 	 * @param storedIn the storedIn to set
 	 */
-	public void setStoredIn(int storedIn) {
+	public void setStoredIn(final int storedIn) {
 		this.storedIn = storedIn;
 	}
 
-	/**
+/*	*//**
 	 * @return the isTrial
-	 */
+	 *//*
 	public boolean isTrial() {
 		return this.isTrial;
-	}
+	}*/
 
-	/**
+/*	*//**
 	 * @param isTrial the isTrial to set
-	 */
+	 *//*
 	public void setTrial(boolean isTrial) {
 		this.isTrial = isTrial;
-	}
+	}*/
 
 	/**
 	 * @return the label
@@ -203,7 +204,7 @@ public class Constant implements Serializable {
 	/**
 	 * @param label the label to set
 	 */
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
@@ -217,7 +218,7 @@ public class Constant implements Serializable {
 	/**
 	 * @param possibleValues the possibleValues to set
 	 */
-	public void setPossibleValues(List<ValueReference> possibleValues) {
+	public void setPossibleValues(final List<ValueReference> possibleValues) {
 		this.possibleValues = possibleValues;
 	}
 
