@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -70,6 +68,8 @@ import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -297,7 +297,11 @@ public class ManagerFactory implements Serializable {
 		return new PlantServiceImpl(this.sessionProvider);
 	}
 
-	public DatasetService getDatasetService() {return new DatasetServiceImpl(this.sessionProvider); }
+	public DatasetService getDatasetService() {
+		return new DatasetServiceImpl(this.sessionProvider);
+	}
 
-	public ListDataProjectSaver getListDataProjectSaver() {return new ListDataProjectSaver(this.sessionProvider); }
+	public ListDataProjectSaver getListDataProjectSaver() {
+		return new ListDataProjectSaver(this.sessionProvider);
+	}
 }
