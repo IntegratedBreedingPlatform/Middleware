@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StudyValues;
@@ -10,9 +8,10 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+
+import java.util.List;
 
 public class StudyValuesTransformer extends Transformer {
 
@@ -20,14 +19,11 @@ public class StudyValuesTransformer extends Transformer {
 		super(sessionProviderForLocal);
 	}
 
-	public StudyValues transform(Integer germplasmId, Integer locationId, StudyDetails studyDetails,
-			List<MeasurementVariable> measurementVariables, VariableTypeList variableTypeList) throws MiddlewareException {
+	public StudyValues transform(Integer germplasmId, Integer locationId, List<MeasurementVariable> measurementVariables,
+		VariableTypeList variableTypeList) throws MiddlewareException {
 
 		StudyValues studyValues = new StudyValues();
 		VariableList variableList = new VariableList();
-		VariableList variableListFromStudy = this.getVariableListTransformer().transformStudyDetails(studyDetails, variableTypeList);
-		variableTypeList.allocateRoom(variableListFromStudy.size());
-
 		if (variableTypeList != null) {
 			for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 				if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.STUDY
@@ -41,13 +37,6 @@ public class StudyValuesTransformer extends Transformer {
 					}
 					variableList.add(new Variable(variableType, value));
 				}
-			}
-		}
-
-		if (variableListFromStudy != null) {
-			for (Variable variable : variableListFromStudy.getVariables()) {
-				variableList.add(variable);
-				variableTypeList.add(variable.getVariableType());
 			}
 		}
 

@@ -23,8 +23,8 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 
     @SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
-		final Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(final Map<String, Object> args, final String studyName) {
+		final Map<String, Object> params = super.buildJRParams(args, studyName);
 
 		final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
 		MeasurementRow[] entries = {};
@@ -42,9 +42,7 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 		params.put(PROGRAM_NAME_REPORT_KEY, args.get(PROGRAM_NAME_ARG_KEY));
 
 		for (final MeasurementVariable var : studyConditions) {
-			parameterMapper.mapBasicStudyValues(var, params);
-
-            parameterMapper.mapEnvironmentValue(var, params, var.getValue());
+			parameterMapper.mapEnvironmentValue(var, params, var.getValue());
 		}
 
 		// TODO: pending mappings

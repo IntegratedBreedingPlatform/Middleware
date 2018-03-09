@@ -8,8 +8,8 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -58,7 +58,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Reporter reporter = this.factory.createReporter(code);
 		final Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
 
-		return reporter.buildJRPrint(dataBeans);
+		return reporter.buildJRPrint(dataBeans, (String) dataBeans.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 
 	}
 
@@ -70,7 +70,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
 		dataBeans.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
-		reporter.buildJRPrint(dataBeans);
+		reporter.buildJRPrint(dataBeans, (String) dataBeans.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 		reporter.asOutputStream(output);
 
 		return reporter;
@@ -83,7 +83,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Map<String, Object> data = this.extractGermplasmListData();
 		data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
-		reporter.buildJRPrint(data);
+		reporter.buildJRPrint(data, (String) data.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 		reporter.asOutputStream(output);
 
 		return reporter;
@@ -97,7 +97,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 */
 	private Map<String, Object> extractFieldbookData(final Integer studyId, final boolean parentsInfoRequireed) {
 
-		final StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
+		final StudyTypeDto studyType = this.getStudyDataManager().getStudyType(studyId);
 		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
 		// getWorkbookBuilder().create no longer loads observations collection by default. Load only when needed. Like here.
 		this.getWorkbookBuilder().loadAllObservations(wb);
@@ -121,6 +121,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		dataBeans.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, wb.getTrialObservations());
 		dataBeans.put("studyId", studyId);
 		dataBeans.put(AbstractReporter.STUDY_TITLE_REPORT_KEY, wb.getStudyDetails().getDescription());
+		dataBeans.put(AbstractReporter.STUDY_NAME_REPORT_KEY, wb.getStudyDetails().getStudyName());
 
 		return dataBeans;
 	}
@@ -130,6 +131,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Map<String, Object> params = new HashMap<>();
 		params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
 		params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
+		params.put(AbstractReporter.STUDY_NAME_REPORT_KEY, StringUtils.EMPTY);
 		return params;
 	}
 

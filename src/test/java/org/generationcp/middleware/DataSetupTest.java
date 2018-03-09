@@ -14,8 +14,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -230,13 +230,14 @@ public class DataSetupTest extends IntegrationTestBase {
 		final Workbook workbook = new Workbook();
 		// Basic Details
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.N);
+		studyDetails.setStudyType(new StudyTypeDto("N"));
 		studyDetails.setStudyName("Test Nursery " + randomInt);
 		studyDetails.setObjective(studyDetails.getStudyName() + " Objective");
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setStartDate("20151001");
 		studyDetails.setEndDate("20151031");
 		studyDetails.setParentFolderId(1);
+		studyDetails.setCreatedBy("1");
 		workbook.setStudyDetails(studyDetails);
 
 		// Conditions
@@ -251,24 +252,6 @@ public class DataSetupTest extends IntegrationTestBase {
 				DataSetupTest.PROP_INSTITUTE, DataSetupTest.CONDUCTED, DataSetupTest.DBCV, DataSetupTest.CHAR, "CIMMYT",
 				DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
-		conditions.add(this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME",
-				"Study - assigned (DBCV)", DataSetupTest.PROP_STUDY, DataSetupTest.ASSIGNED, DataSetupTest.DBCV,
-				DataSetupTest.CHAR, studyDetails.getStudyName(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
-
-		conditions.add(
-				this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
-						DataSetupTest.PROP_START_DATE, DataSetupTest.ASSIGNED, DataSetupTest.DATE, DataSetupTest.CHAR,
-						studyDetails.getStartDate(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
-
-		conditions.add(this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE",
-				"Objective - described (text)", DataSetupTest.PROP_OBJECTIVE, DataSetupTest.DESCRIBED,
-				DataSetupTest.SCALE_TEXT, DataSetupTest.CHAR, studyDetails.getObjective(), DataSetupTest.STUDY,
-				PhenotypicType.STUDY, true));
-
-		conditions.add(this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)",
-				DataSetupTest.PROP_END_DATE, DataSetupTest.ASSIGNED, DataSetupTest.DATE, DataSetupTest.CHAR,
-				studyDetails.getEndDate(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
-		
 		if (locationIsStudyDetail) {
 			conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
 					LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
@@ -277,7 +260,7 @@ public class DataSetupTest extends IntegrationTestBase {
 			conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
 					LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
 					"Default Breeding Location", DataSetupTest.STUDY, PhenotypicType.TRIAL_ENVIRONMENT, true));
-		} 
+		}
 
 		workbook.setConditions(conditions);
 
@@ -386,7 +369,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		}
 		// Add listdata_project entries
 		final int nurseryListId = this.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId,
-				GermplasmListType.NURSERY, germplasmListId, listDataProjects, 1);
+				GermplasmListType.STUDY, germplasmListId, listDataProjects, 1);
 
 		// Load and check some basics
 		final Workbook nurseryWorkbook = this.middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);

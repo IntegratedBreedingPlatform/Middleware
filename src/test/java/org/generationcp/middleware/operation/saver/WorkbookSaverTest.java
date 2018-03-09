@@ -11,14 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
@@ -32,13 +24,13 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
@@ -49,6 +41,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class WorkbookSaverTest extends TestOutputFormatter {
 
@@ -142,17 +142,17 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 	@Test
 	public void testRemoveConstantsVariables() {
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, "TEST STUDY", 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto("N"), "TEST STUDY", 1, true);
 		final VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConstants(), 1);
 		Assert.assertTrue("The variable type list should have contents.",
 				variableTypeList.getVariableTypes().size() > 0);
 		WorkbookSaverTest.workbookSaver.removeConstantsVariables(variableTypeList, workbook.getConstants());
-		Assert.assertEquals("All the variable should be removed.", variableTypeList.getVariableTypes().size(), 0);
+		Assert.assertEquals("All the variable should be removed.", 0, variableTypeList.getVariableTypes().size());
 	}
 
 	@Test
 	public void testSetVariableListValues() {
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, "TEST STUDY", 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto("N"), "TEST STUDY", 1, true);
 		WorkbookTestDataInitializer.setTrialObservations(workbook);
 		final VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConditions(), 1);
 		final VariableList variableList = WorkbookSaverTest.workbookSaver.getVariableListTransformer()
@@ -171,9 +171,9 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	
 	@Test
 	public void testSetCategoricalVariableValues() {
-		MeasurementVariable mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(1001, "1");
+		final MeasurementVariable mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(1001, "1");
 		mvar.setPossibleValues(ValueReferenceTestDataInitializer.createPossibleValues());
-		Variable variable  = new Variable();
+		final Variable variable  = new Variable();
 		WorkbookSaverTest.workbookSaver.setCategoricalVariableValues(mvar, variable);
 		Assert.assertNotNull(variable.getValue());
 		Assert.assertEquals("1", variable.getValue());
@@ -198,7 +198,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final String programUUID = "abc";
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
 
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, studyName, 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto("N"), studyName, 1, true);
 		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
 
 		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class); // new
@@ -308,7 +308,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
 
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, studyName, 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto("N"), studyName, 1, true);
 		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
 
 		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class);

@@ -31,8 +31,8 @@ public class WFieldbook22 extends AbstractReporter {
 	}
 
 	@Override
-	public Map<String, Object> buildJRParams(Map<String, Object> args) {
-		Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(Map<String, Object> args, String studyName) {
+		Map<String, Object> params = super.buildJRParams(args, studyName);
 
 		Integer dummyInt = new Integer(111);
 

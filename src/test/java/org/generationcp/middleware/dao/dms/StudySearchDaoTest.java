@@ -10,9 +10,9 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -69,8 +69,8 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	private final String cropPrefix = "ABCD";
 	
-	private List<StudyReference> dryStudies = new ArrayList<>();
-	private List<StudyReference> wetStudies = new ArrayList<>();
+	private final List<StudyReference> dryStudies = new ArrayList<>();
+	private final List<StudyReference> wetStudies = new ArrayList<>();
 	
 
 	@Before
@@ -514,19 +514,19 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// First 3 studies have location and season variables at study level
 		// We need to add datasets to studies because search queries expect "Belongs to Study" record in project_relationship
-		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_1, StudyType.T,
+		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_1, new StudyTypeDto("T"),
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());
 		this.dryStudies.add(studyReference1);
 
-		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_2, StudyType.T,
+		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_2, new StudyTypeDto("T"),
 				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference2.getId());
 		this.wetStudies.add(studyReference2);
 
-		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_3, StudyType.T,
+		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_3, new StudyTypeDto("T"),
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference3.getId());
@@ -534,12 +534,12 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// This study has season and location variables at environment level
 		final StudyReference studyReference4 =
-				studyTestDataInitializer.addTestStudy(StudyType.T, StudySearchDaoTest.TEST_TRIAL_NAME_4, this.cropPrefix);
+				studyTestDataInitializer.addTestStudy(new StudyTypeDto("T"), StudySearchDaoTest.TEST_TRIAL_NAME_4, this.cropPrefix);
 		studyTestDataInitializer.addEnvironmentDataset(studyReference4.getId(),
 				String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), String.valueOf(TermId.SEASON_DRY.getId()));
 		this.dryStudies.add(studyReference4);
 		
-		final StudyReference studyReference5 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_5, StudyType.T,
+		final StudyReference studyReference5 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_5, new StudyTypeDto("T"),
 				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.BANGLADESH_COUNTRY_LOCATION_ID), "20200103",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference5.getId());

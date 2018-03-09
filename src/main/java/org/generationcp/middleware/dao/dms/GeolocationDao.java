@@ -11,15 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
@@ -38,6 +29,15 @@ import org.hibernate.SQLQuery;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Geolocation}.
@@ -642,4 +642,27 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		}
 		return tiMetadata;
 	}
+
+	public List<Geolocation> getEnvironmentGeolocations(final Integer studyId) {
+		List<Geolocation> returnList = new ArrayList<>();
+		if (studyId != null) {
+			try {
+				final String sql = "SELECT g.* " + //
+						" FROM nd_geolocation g " + //
+						" INNER JOIN nd_experiment exp ON (exp.nd_geolocation_id = g.nd_geolocation_id) " + //
+						" INNER JOIN nd_experiment_project ndproj ON (ndproj.nd_experiment_id = exp.nd_experiment_id) " + //
+						" INNER JOIN project_relationship pr ON (pr.subject_project_id = ndproj.project_id) " + //
+						" INNER JOIN project envdataset on (envdataset.project_id = pr.subject_project_id) " + //
+						" WHERE pr.object_project_id = :studyId and envdataset.name like '%-ENVIRONMENT' ";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("g", Geolocation.class);
+				query.setParameter("studyId", studyId);
+				returnList = query.list();
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getEnvironmentGeolocations(studyId=" + studyId + "): " + e.getMessage(), e);
+			}
+		}
+		return returnList;
+	}
+
 }

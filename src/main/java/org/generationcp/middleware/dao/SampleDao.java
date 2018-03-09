@@ -3,14 +3,14 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -54,6 +54,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private static final String PLANT_EXPERIMENT = "plant.experiment";
 	private static final String EXPERIMENT = "experiment";
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
+	public static final String SAMPLE_ID = "sampleId";
 
 	public List<SampleDTO> getByPlotId(final String plotId) {
 		return getSampleDTOSWithRestriction(Restrictions.eq("experiment.plotId", plotId));
@@ -61,7 +62,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	public Sample getBySampleId(final Integer sampleId) {
 		final DetachedCriteria criteria = DetachedCriteria.forClass(Sample.class);
-		criteria.add(Restrictions.eq("sampleId", sampleId));
+		criteria.add(Restrictions.eq(SAMPLE_ID, sampleId));
 		return (Sample) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
 
@@ -73,11 +74,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("sample.takenBy", "takenBy")
 			.createAlias("takenBy.person", "person")
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
-			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
+			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
+			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)
 			.add(restriction)
 			.setProjection(Projections.distinct(Projections.projectionList()
-				.add(Projections.property("sampleId")) //row[0]
+				.add(Projections.property(SAMPLE_ID)) //row[0]
 				.add(Projections.property("sampleName")) //row[1]
 				.add(Projections.property(SAMPLE_BUSINESS_KEY)) //row[2]
 				.add(Projections.property("person.firstName")) //row[3]
@@ -168,7 +169,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.experimentStocks", "experimentStocks")
 			.createAlias("experimentStocks.stock", "stock")
-			.add(Restrictions.in("sampleId", sampleIds))
+			.add(Restrictions.in(SAMPLE_ID, sampleIds))
 			.setProjection(Projections.projectionList()
 				.add(Projections.property("sample.sampleId"))
 				.add(Projections.property("stock.dbxrefId")))
@@ -188,16 +189,17 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		final List<Object[]> result = getSession()
 
 			.createCriteria(Sample.class, SAMPLE).createAlias(SAMPLE_PLANT, PLANT)//
-			.createAlias("sample.sampleList", "sampleList", Criteria.LEFT_JOIN)//
-			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)//
-			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)//
-
+			.createAlias("sample.sampleList", "sampleList", CriteriaSpecification.LEFT_JOIN)//
+			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)//
+			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)//
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)//
+
 			.createAlias("experiment.experimentStocks", "experimentStocks")//
 			.createAlias("experimentStocks.stock", "stock")//
 			.createAlias("experiment.project", "project")//
 			.createAlias("project.relatedTos", "relatedTos")//
 			.createAlias("relatedTos.objectProject", "objectProject")//
+			.createAlias("objectProject.studyType", "studyType")//
 			.add(Restrictions.eq("stock.dbxrefId", gid))//
 			.add(Restrictions.ne("project." + DmsProjectDao.DELETED, true))
 
@@ -214,8 +216,12 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("objectProject.projectId"))//
 				.add(Projections.property("objectProject.name"))//
 				.add(Projections.property("objectProject.programUUID"))//
+				.add(Projections.property("studyType.studyTypeId"))//
+				.add(Projections.property("studyType.label"))//
+				.add(Projections.property("studyType.name"))//
+				.add(Projections.property("studyType.visible"))//
+				.add(Projections.property("studyType.cvTermid"))//
 				.add(Projections.property("objectProject.studyType"))))//
-
 			.list();//
 
 		final HashMap<String,SampleGermplasmDetailDTO> samplesMap = new HashMap<>();
@@ -231,7 +237,12 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			final Integer projectId = (Integer) row[6];
 			final String studyName = (String) row[7];
 			final String programUuid = (String) row[8];
-			final StudyType studyType = (StudyType) row[9];
+			final Integer studyTypeId = (Integer) row[9];
+			final String label = (String) row[10];
+			final String studyTypeName = (String) row[11];
+			final boolean visible = ((Integer) row[12]) == 1;
+			final Integer cvtermId = (Integer) row[13];
+			final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 
 			if(samplesMap.containsKey(sampleBk)){
 				sample = samplesMap.get(sampleBk);
@@ -242,7 +253,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				sample.setSampleBk(sampleBk);
 				sample.setPlotId(plotId);
 				sample.setPlantBk(plantBk);
-				sample.setStudy(new StudyReference(projectId, studyName, "", programUuid, studyType));
+				sample.setStudy(new StudyReference(projectId, studyName, "", programUuid, studyTypeDto));
 				sample.addDataset(datasetId, datasetName);
 				samplesMap.put(sampleBk,sample);
 			}

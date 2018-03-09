@@ -11,7 +11,6 @@ public class FieldMapInfoTestDataInitializer {
 
 	public FieldMapInfo createFieldMapInfo(final Boolean isTrial) {
 		final FieldMapInfo fieldMapInfo = new FieldMapInfo();
-		fieldMapInfo.setTrial(isTrial);
 		fieldMapInfo.setDatasets(new ArrayList<FieldMapDatasetInfo>());
 		return fieldMapInfo;
 	}

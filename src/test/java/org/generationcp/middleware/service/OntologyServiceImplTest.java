@@ -48,13 +48,6 @@ public class OntologyServiceImplTest extends IntegrationTestBase {
 	private static final String PROGRAM_UUID = "1234567";
 
 	@Test
-	public void testGetStandardVariableById() throws MiddlewareException {
-		StandardVariable var = this.ontologyService.getStandardVariable(8005, PROGRAM_UUID);
-		Assert.assertNotNull(var);
-		var.print(IntegrationTestBase.INDENT);
-	}
-
-	@Test
 	public void testGetStandardVariables() throws MiddlewareException {
 		this.ontologyService.getStandardVariables("CUAN_75DAG", PROGRAM_UUID);
 

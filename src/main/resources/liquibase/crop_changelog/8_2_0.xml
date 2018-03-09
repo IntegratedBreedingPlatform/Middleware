@@ -18,7 +18,77 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="v8.2.0-2" author="clarysabel">
+	<changeSet author="vanina" id="v8.2.0-2">
+	<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+					WHERE TABLE_NAME = 'project'
+					AND CONSTRAINT_NAME = 'study_type_fk'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+		ALTER TABLE project DROP FOREIGN KEY study_type_fk;
+
+		ALTER TABLE project DROP INDEX study_type_fk_idx;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v8.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="study_type"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE study_type;
+
+			CREATE TABLE study_type (
+			  study_type_id INT NOT NULL AUTO_INCREMENT,
+			  label VARCHAR(45) NOT NULL,
+			  name VARCHAR(45) NOT NULL,
+			  cvterm_id INT NULL,
+			  visible TINYINT NOT NULL,
+			  PRIMARY KEY (study_type_id),
+			  UNIQUE INDEX label_UNIQUE (label ASC),
+			  UNIQUE INDEX name_UNIQUE (name ASC));
+
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Nursery", "N", 10000, 1);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Hybridization Nursery", "HB", 10001, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Pedigree Nursery", "PN", 10002, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Characterization Nursery", "CN", 10003, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("BULU Observational Nursery", "BON", 10007, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Trial", "T", 10010, 1);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Observational Yield Trial", "OYT", 10005, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Replication Yield Trial", "RYT", 10015, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("On Form Trial", "OFT", 10017, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Survey", "S", 10020, 0);
+			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Experiment", "E", 10030, 0);
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="vanina" id="v8.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="project" columnName="study_type_id"/> </not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE project
+			  ADD COLUMN study_type_id INT;
+
+			UPDATE project p SET p.study_type_id = (SELECT st.study_type_id FROM study_type st where st.name = p.study_type);
+
+			ALTER TABLE project DROP COLUMN study_type;
+
+			ALTER TABLE project
+			  ADD CONSTRAINT study_type_fk
+			FOREIGN KEY (study_type_id)
+			REFERENCES study_type (study_type_id)
+			  ON DELETE NO ACTION
+			  ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet id="v8.2.0-5" author="clarysabel">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(*) from cvterm where cvterm_id = 10169;

@@ -11,20 +11,12 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -32,11 +24,11 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
@@ -54,6 +46,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class WorkbookBuilderTest extends IntegrationTestBase {
@@ -132,7 +131,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
 		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
@@ -167,7 +166,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
@@ -307,7 +306,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRemoveTrialDatasetVariables() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
 		final VariableTypeList factorsVariableTypeList =
@@ -336,7 +335,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final List<MeasurementVariable> measurementVariableLists = new ArrayList<MeasurementVariable>();
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVariableLists.add(measurementVar);
-		Set set = new HashSet<>(measurementVariableLists);
+		final Set set = new HashSet<>(measurementVariableLists);
 		this.workbookBuilder.setMeasurementVarRoles(set, false, true);
 		for (final MeasurementVariable var : measurementVariableLists) {
 			Assert.assertEquals("Should have a phenotype role of variate since its not a factor", var.getRole(), PhenotypicType.VARIATE);
@@ -356,7 +355,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testBuildTrialObservations() {
 
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
@@ -378,16 +377,16 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testBuildConditionVariablesOnTrial() {
 		//final int noOfObservations, final StudyType studyType, final String studyName, final int trialNo, final boolean hasMultipleLocations
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyType.T, "Test study", 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, new StudyTypeDto("T"), "Test study", 1, true);
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
 		// create measurement variables of condition types
 		final List<MeasurementVariable> conditionMeasurementVariableList = workbook.getStudyConditions();
-		VariableTypeList conditionVariableTypeList = variableTypeListTransformer.transform(conditionMeasurementVariableList, PROGRAM_UUID);
+		final VariableTypeList conditionVariableTypeList = variableTypeListTransformer.transform(conditionMeasurementVariableList, PROGRAM_UUID);
 
 		// create measurement variables of trial environement types
 		final List<MeasurementVariable> trialEnvironmentMeasurementVariableList = workbook.getTrialConditions();
-		VariableTypeList trialEnvironmentVariableTypeList =
+		final VariableTypeList trialEnvironmentVariableTypeList =
 				variableTypeListTransformer.transform(trialEnvironmentMeasurementVariableList, PROGRAM_UUID);
 
 		final VariableList conditionVariables =
@@ -399,7 +398,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				this.workbookBuilder.buildConditionVariables(conditionVariables, trialEnvironmentVariables);
 
 		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;
-		for (MeasurementVariable measurementVariable : result) {
+		for (final MeasurementVariable measurementVariable : result) {
 			if (measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT)) {
 				noOfConditionsWithTrialEnvironmentPhenotypicType++;
 			}
@@ -410,12 +409,12 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 						" but returned " + noOfConditionsWithTrialEnvironmentPhenotypicType,
 				trialEnvironmentVariables.size() >= noOfConditionsWithTrialEnvironmentPhenotypicType);
 
-		List<String> trialEnvironmentVariableNames = new ArrayList<String>();
-		for(Variable variable : trialEnvironmentVariables.getVariables()) {
+		final List<String> trialEnvironmentVariableNames = new ArrayList<String>();
+		for(final Variable variable : trialEnvironmentVariables.getVariables()) {
 			trialEnvironmentVariableNames.add(variable.getVariableType().getLocalName());
 		}
 
-		for(MeasurementVariable measurementVariable : result){
+		for(final MeasurementVariable measurementVariable : result){
 			if(trialEnvironmentVariableNames.contains(measurementVariable.getName())){
 				Assert.assertTrue("Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
 						measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT) );

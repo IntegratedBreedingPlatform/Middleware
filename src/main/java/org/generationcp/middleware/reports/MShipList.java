@@ -23,8 +23,8 @@ public class MShipList extends AbstractReporter {
 	}
 
 	@Override
-	public Map<String, Object> buildJRParams(Map<String, Object> args) {
-		Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(Map<String, Object> args, String studyName) {
+		Map<String, Object> params = super.buildJRParams(args, studyName);
 
         // removed previous code placing ?? as value as we need the report blank for the user to manually fill up
 

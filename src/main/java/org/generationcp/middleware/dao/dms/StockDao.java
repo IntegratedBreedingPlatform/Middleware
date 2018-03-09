@@ -13,7 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.hibernate.Criteria;
@@ -39,7 +39,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
-		List<Integer> stockIds = new ArrayList<>();
+		final List<Integer> stockIds;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			if ("dbxrefId".equals(columnName)) {
@@ -76,17 +76,17 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows)  {
+	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
-			final SQLQuery query = this.getSession()
-					.createSQLQuery("select distinct p.project_id, p.name, p.description, p.study_type, p.program_uuid " + "FROM stock s "
-							+ "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
-							+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
-							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
-							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
-							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
-							+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
+			final SQLQuery query = this.getSession().createSQLQuery("select distinct p.project_id, p.name, p.description, "
+				+ "p.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id"
+				+ " as cvtermId, p.program_uuid " + "FROM stock s " + "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
+				+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
+				+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
+				+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
+				+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
+				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id " + " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
@@ -95,9 +95,13 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				if (row[0] == null) {
 					continue;
 				}
-				final String studyTypeRaw = (String) row[3];
-				final StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeByName(studyTypeRaw) : null;
-				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2],(String) row[4],studyType));
+				final Integer studyTypeId = (Integer) row[3];
+				final String label = (String) row[4];
+				final String studyTypeName = (String) row[5];
+				final boolean visible = ((Integer) row[6]) == 1;
+				final Integer cvtermId = (Integer) row[7];
+				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
+				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], (String) row[4], studyTypeDto));
 			}
 
 		} catch (final HibernateException e) {

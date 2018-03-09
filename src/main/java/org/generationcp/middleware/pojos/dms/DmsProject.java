@@ -11,22 +11,23 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -95,10 +96,26 @@ public class DmsProject implements Serializable {
 	@Column(name = "deleted", columnDefinition = "TINYINT")
 	private boolean deleted;
 
-	@Basic(optional = true)
-	@Column(name = "study_type")
-	@Enumerated(EnumType.STRING)
+	@ManyToOne(targetEntity = StudyType.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "study_type_id")
+	@NotFound(action = NotFoundAction.EXCEPTION)
 	private StudyType studyType;
+
+	@Column(name = "start_date")
+	private String startDate;
+
+	@Column(name = "end_date")
+	private String endDate;
+
+	@Column(name = "study_update")
+	private String studyUpdate;
+
+	@Column(name = "objective")
+	private String objective;
+
+
+	@Column(name = "created_by")
+	private String createdBy;
 
 	public DmsProject() {
 		super();
@@ -108,7 +125,7 @@ public class DmsProject implements Serializable {
 		return this.projectId;
 	}
 
-	public void setProjectId(Integer projectId) {
+	public void setProjectId(final Integer projectId) {
 		this.projectId = projectId;
 	}
 
@@ -116,7 +133,7 @@ public class DmsProject implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -124,7 +141,7 @@ public class DmsProject implements Serializable {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -132,7 +149,7 @@ public class DmsProject implements Serializable {
 		return this.programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 
@@ -140,7 +157,7 @@ public class DmsProject implements Serializable {
 		return this.properties;
 	}
 
-	public void setProperties(List<ProjectProperty> properties) {
+	public void setProperties(final List<ProjectProperty> properties) {
 		this.properties = properties;
 	}
 
@@ -148,7 +165,7 @@ public class DmsProject implements Serializable {
 		return this.relatedTos;
 	}
 
-	public void setRelatedTos(List<ProjectRelationship> relatedTos) {
+	public void setRelatedTos(final List<ProjectRelationship> relatedTos) {
 		this.relatedTos = relatedTos;
 	}
 
@@ -156,7 +173,7 @@ public class DmsProject implements Serializable {
 		return this.relatedBys;
 	}
 
-	public void setRelatedBys(List<ProjectRelationship> relatedBys) {
+	public void setRelatedBys(final List<ProjectRelationship> relatedBys) {
 		this.relatedBys = relatedBys;
 	}
 
@@ -172,8 +189,54 @@ public class DmsProject implements Serializable {
 		return studyType;
 	}
 
-	public void setStudyType(final StudyType studyType) {
-		this.studyType = studyType;
+	public void setStudyType(final StudyType studyTypeEnum) {
+		this.studyType = studyTypeEnum;
+	}
+
+	public void setDeleted(final boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public String getStartDate() {
+		return this.startDate;
+	}
+
+	public void setStartDate(final String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return this.endDate;
+	}
+
+	public void setEndDate(final String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getStudyUpdate() {
+		return this.studyUpdate;
+	}
+
+	public void setStudyUpdate(final String studyUpdate) {
+		this.studyUpdate = studyUpdate;
+	}
+
+	public String getObjective() {
+		return this.objective;
+	}
+
+	public void setObjective(final String objective) {
+		this.objective = objective;
+	}
+
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		if (this.createdBy == null || this.createdBy.isEmpty()) {
+			this.createdBy = createdBy;
+		}
 	}
 
 	@Override
@@ -185,7 +248,7 @@ public class DmsProject implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -195,7 +258,7 @@ public class DmsProject implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		DmsProject other = (DmsProject) obj;
+		final DmsProject other = (DmsProject) obj;
 		if (this.projectId == null) {
 			if (other.projectId != null) {
 				return false;
@@ -208,7 +271,7 @@ public class DmsProject implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append(this.getEntityName() + " [projectId=");
 		builder.append(this.projectId);
 		builder.append(", name=");
@@ -225,7 +288,7 @@ public class DmsProject implements Serializable {
 		return "DmsProject";
 	}
 
-	public void addProperty(ProjectProperty property) {
+	public void addProperty(final ProjectProperty property) {
 		if (this.properties == null) {
 			this.properties = new ArrayList<>();
 		}

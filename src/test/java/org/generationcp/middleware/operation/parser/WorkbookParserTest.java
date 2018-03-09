@@ -14,9 +14,9 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkbookParserTest {
@@ -58,8 +59,9 @@ public class WorkbookParserTest {
 			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE123", "SAMPLE LEVEL"};
 	public final static String[] INCORRECT_VARIATE_HEADERS =
 			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL123"};
+	public static final String CREATED_BY = "1";
 
-	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Mock
 	private File file;
@@ -85,7 +87,7 @@ public class WorkbookParserTest {
 	@After
 	public void afterEachTest() {
 		final long elapsedTime = System.nanoTime() - this.startTime;
-		this.LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
+		this.log.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
 				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
 	}
 
@@ -166,7 +168,7 @@ public class WorkbookParserTest {
 
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
-		moleWorkbookParser.parseFile(sampleWorkbook, true);
+		moleWorkbookParser.parseFile(sampleWorkbook, true, CREATED_BY);
 		Mockito.verify(moleWorkbookParser).checkHeadersValid(sampleWorkbook, 0, 0, headerArray);
 	}
 
@@ -180,7 +182,7 @@ public class WorkbookParserTest {
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
 		try {
-			moleWorkbookParser.parseFile(sampleWorkbook, true);
+			moleWorkbookParser.parseFile(sampleWorkbook, true, CREATED_BY);
 			Assert.fail("Validation exception should have been thrown");
 		} catch (final WorkbookParserException e) {
 			final String errorMessage = "Incorrect headers for " + sectionName;
@@ -193,7 +195,7 @@ public class WorkbookParserTest {
 		// mock / skip other parsing logic and validations
 		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).loadFileToExcelWorkbook(file);
 		Mockito.doNothing().when(moleWorkbookParser).validateExistenceOfSheets(sampleWorkbook);
-		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook);
+		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook, CREATED_BY);
 
 		// only interested in specific section
 		for (final Section aSection : Section.values()) {
@@ -351,7 +353,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(new StudyTypeDto("T"));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -360,7 +362,7 @@ public class WorkbookParserTest {
 		// If the Section is CONSTANT and the study is Trial, the variable type should be TRIAL_CONDITION
 		Assert.assertEquals(VariableType.TRIAL_CONDITION, measurementVariable.getVariableType());
 
-		studyDetails.setStudyType(StudyType.N);
+		studyDetails.setStudyType(new StudyTypeDto("N"));
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
 		// If the Section is CONSTANT and the study is Nursery, the variable type should be NURSERY_CONDITION
@@ -373,7 +375,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(new StudyTypeDto("T"));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -686,7 +688,7 @@ public class WorkbookParserTest {
 		Assert.assertEquals(mv.getLabel(), row.getCell(7).getStringCellValue());
 
 		// Assert variable type based on property name
-		Assert.assertEquals(mv.getVariableType(), VariableType.SELECTION_METHOD);
+		Assert.assertEquals(VariableType.SELECTION_METHOD, mv.getVariableType());
 	}
 
 	@Test
@@ -778,9 +780,9 @@ public class WorkbookParserTest {
 		final List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, true, allVariables);
 		final MeasurementRow row = new MeasurementRow(result);
 
-		Assert.assertEquals("1", row.getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(PLOT_NO).getValue());
 
 		// ALEU_COL_1_5's value in Excel is "6" but since it is invalid data and the user chose to discard the invalid values,
 		// it should be set to empty
@@ -799,9 +801,9 @@ public class WorkbookParserTest {
 		final List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, false, allVariables);
 		final MeasurementRow row = new MeasurementRow(result);
 
-		Assert.assertEquals("1", row.getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(PLOT_NO).getValue());
 		Assert.assertEquals("6", row.getMeasurementData(ALEU_COL_1_5).getValue());
 	}
 
@@ -815,10 +817,10 @@ public class WorkbookParserTest {
 
 		Assert.assertEquals(1, result.size());
 
-		Assert.assertEquals("1", result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(PLOT_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ALEU_COL_1_5).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ALEU_COL_1_5).getValue());
 
 	}
 
@@ -832,9 +834,9 @@ public class WorkbookParserTest {
 
 		Assert.assertEquals(1, result.size());
 
-		Assert.assertEquals("1", result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(PLOT_NO).getValue());
 
 		// ALEU_COL_1_5's value in Excel is "6" but since it is invalid data and the user chose to discard the invalid values,
 		// it should be set to empty
@@ -852,9 +854,9 @@ public class WorkbookParserTest {
 
 		Assert.assertEquals(1, result.size());
 
-		Assert.assertEquals("1", result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(PLOT_NO).getValue());
 		Assert.assertEquals("6", result.get(0).getMeasurementData(ALEU_COL_1_5).getValue());
 
 	}
@@ -1063,10 +1065,10 @@ public class WorkbookParserTest {
 		for (int i = 0; i < allVariables.size(); i++) {
 			final HSSFCell cell = row2.createCell(i);
 
-			if (allVariables.get(i).getDataTypeId() == DataType.CATEGORICAL_VARIABLE.getId()) {
-				cell.setCellValue(withInvalidValues ? "6" : "1");
+			if (Objects.equals(allVariables.get(i).getDataTypeId(), DataType.CATEGORICAL_VARIABLE.getId())) {
+				cell.setCellValue(withInvalidValues ? "6" : CREATED_BY);
 			} else {
-				cell.setCellValue("1");
+				cell.setCellValue(CREATED_BY);
 			}
 
 		}
@@ -1098,7 +1100,7 @@ public class WorkbookParserTest {
 
 	private List<ValueReference> createPossibleValues() {
 		final List<ValueReference> possibleValues = new ArrayList<>();
-		possibleValues.add(new ValueReference(1, "1", ""));
+		possibleValues.add(new ValueReference(1, CREATED_BY, ""));
 		possibleValues.add(new ValueReference(2, "2", ""));
 		possibleValues.add(new ValueReference(3, "3", ""));
 		possibleValues.add(new ValueReference(4, "4", ""));

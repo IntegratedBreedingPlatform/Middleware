@@ -11,8 +11,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.Objects;
 
 /**
  * Contains the primary details of a study - id, name, description.
@@ -24,29 +26,29 @@ public class StudyReference extends Reference {
 
 	private Integer numberOfEnvironments;
 	
-	private StudyType studyType;
+	private StudyTypeDto studyType;
 
-	public StudyReference(Integer id, String name) {
+	public StudyReference(final Integer id, final String name) {
 		super.setId(id);
 		super.setName(name);
 	}
 
-	public StudyReference(Integer id, String name, String description) {
+	public StudyReference(final Integer id, final String name, final String description) {
 		this(id, name);
 		super.setDescription(description);
 	}
 
-	public StudyReference(Integer id, String name, String description, String programUUID) {
+	public StudyReference(final Integer id, final String name, final String description, final String programUUID) {
 		this(id, name, description);
 		super.setProgramUUID(programUUID);
 	}
 	
-	public StudyReference(Integer id, String name, String description, String programUUID, StudyType studyType) {
+	public StudyReference(final Integer id, final String name, final String description, final String programUUID, final StudyTypeDto studyType) {
 		this(id, name, description, programUUID);
 		this.studyType = studyType;
 	}
 
-	public StudyReference(Integer id, String name, String description, Integer numberOfEnvironments) {
+	public StudyReference(final Integer id, final String name, final String description, final Integer numberOfEnvironments) {
 		this(id, name, description);
 		this.setNumberOfEnvironments(numberOfEnvironments);
 	}
@@ -55,21 +57,40 @@ public class StudyReference extends Reference {
 		return this.numberOfEnvironments;
 	}
 
-	public void setNumberOfEnvironments(Integer numberOfEnvironments) {
+	public void setNumberOfEnvironments(final Integer numberOfEnvironments) {
 		this.numberOfEnvironments = numberOfEnvironments;
 	}
 	
-	public StudyType getStudyType() {
+	public StudyTypeDto getStudyType() {
 		return studyType;
 	}
 
-	public void setStudyType(StudyType studyType) {
+	public void setStudyType(final StudyTypeDto studyType) {
 		this.studyType = studyType;
 	}
 
 	@Override
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "STUDY:[id=" + this.getId() + ", name=" + this.getName() + ", description=" + this.getDescription()
 				+ ", noOfEnv=" + this.numberOfEnvironments + "]");
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof StudyReference))
+			return false;
+		if (!super.equals(o))
+			return false;
+		final StudyReference that = (StudyReference) o;
+		return Objects.equals(getNumberOfEnvironments(), that.getNumberOfEnvironments()) && Objects
+			.equals(getStudyType(), that.getStudyType());
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(super.hashCode(), getNumberOfEnvironments(), getStudyType());
 	}
 }
