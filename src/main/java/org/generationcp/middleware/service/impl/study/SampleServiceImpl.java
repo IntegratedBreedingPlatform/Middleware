@@ -38,7 +38,7 @@ import java.util.Set;
 @Transactional
 public class SampleServiceImpl implements SampleService {
 
-	private static final String S = "S";
+	private static final String SAMPLE_KEY_PREFIX = "S";
 
 	private final SampleDao sampleDao;
 	private final ExperimentDao experimentDao;
@@ -90,15 +90,15 @@ public class SampleServiceImpl implements SampleService {
 
 	private String getSampleBusinessKey(final String cropPrefix) {
 		String sampleBusinessKey = cropPrefix;
-		sampleBusinessKey = sampleBusinessKey + SampleServiceImpl.S;
+		sampleBusinessKey = sampleBusinessKey + SampleServiceImpl.SAMPLE_KEY_PREFIX;
 		sampleBusinessKey = sampleBusinessKey + RandomStringUtils.randomAlphanumeric(8);
 
 		return sampleBusinessKey;
 	}
 
 	@Override
-	public List<SampleDTO> getSamples(final String plotId) {
-		return this.sampleDao.getByPlotId(plotId);
+	public List<SampleDTO> filter(final String plotId, Integer listId) {
+		return this.sampleDao.filter(plotId, listId);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {

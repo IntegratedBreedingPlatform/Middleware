@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -17,12 +18,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
@@ -55,8 +51,15 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private static final String EXPERIMENT = "experiment";
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
 
-	public List<SampleDTO> getByPlotId(final String plotId) {
-		return getSampleDTOSWithRestriction(Restrictions.eq("experiment.plotId", plotId));
+	public List<SampleDTO> filter(final String plotId, final Integer listId) {
+		Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+		if (StringUtils.isNotBlank(plotId)) {
+			criteria.add(Restrictions.eq("experiment.plotId", plotId));
+		}
+		if (listId != null) {
+		    criteria.add(Restrictions.eq("sampleList.id", listId));
+        }
+		return getSampleDTOS(criteria);
 	}
 
 	public Sample getBySampleId(final Integer sampleId) {
@@ -66,8 +69,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<SampleDTO> getSampleDTOSWithRestriction(final Criterion restriction) {
-		final List<Object[]> result = getSession().createCriteria(Sample.class, SAMPLE)
+	private List<SampleDTO> getSampleDTOS(final Criteria criteria) {
+	    if (criteria == null) {
+	    	return Collections.<SampleDTO>emptyList();
+		}
+		final List<Object[]> result = criteria
 			.createAlias(SAMPLE_PLANT, PLANT)
 			.createAlias("sample.sampleList", "sampleList")
 			.createAlias("sample.takenBy", "takenBy")
@@ -75,7 +81,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
 			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
-			.add(restriction)
 			.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.property("sampleId")) //row[0]
 				.add(Projections.property("sampleName")) //row[1]
@@ -89,10 +94,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("dataset.datasetName")) //row[9]
 			)).list();
 
-		return getSampleDTOS(result);
+		return mapSampleDTOS(result);
 	}
 
-	private List<SampleDTO> getSampleDTOS(final List<Object[]> result) {
+	private List<SampleDTO> mapSampleDTOS(final List<Object[]> result) {
 		final Map<Integer, SampleDTO> sampleDTOMap = new HashMap<>();
 		for (final Object[] row : result) {
 
@@ -180,7 +185,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	public List<SampleDTO> getBySampleBks(final Set<String> sampleUIDs) {
-		return getSampleDTOSWithRestriction(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs));
+		return getSampleDTOS(getSession().createCriteria(Sample.class, SAMPLE) //
+				.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs)));
 	}
 
 	@SuppressWarnings("unchecked")
