@@ -107,6 +107,12 @@ public class ExperimentalDesignVariable {
 		return this.getByTermId(TermId.EXPT_DESIGN_SOURCE);
 	}
 
+	public MeasurementVariable getChecksStartingPosition() { return this.getByTermId(TermId.CHECK_START);}
+
+	public MeasurementVariable getChecksSpacing() { return this.getByTermId(TermId.CHECK_INTERVAL);}
+
+	public MeasurementVariable getChecksMannerOfInsertion() { return this.getByTermId(TermId.CHECK_PLAN);}
+
 	/**
 	 * @return the variables
 	 */
