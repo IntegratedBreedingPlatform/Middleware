@@ -100,6 +100,20 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
+	@Transactional
+	public void unfixLine(final Germplasm germplasm) {
+
+		final boolean hasMGID = germplasm.getMgid() != null && germplasm.getMgid() != 0;
+
+		if (hasMGID) {
+			// Unfixing a germplasm line equates to assigning mgid to 0.
+			germplasm.setMgid(0);
+			this.germplasmDAO.save(germplasm);
+		}
+
+	}
+
+	@Override
 	public GermplasmGroup getGroupMembers(final Germplasm founder) {
 		final GermplasmGroup germplasmGroup = new GermplasmGroup();
 
