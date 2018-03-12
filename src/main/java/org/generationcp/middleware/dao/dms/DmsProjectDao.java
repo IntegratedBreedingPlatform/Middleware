@@ -84,7 +84,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as "
 			+ "cvtermId "
 			+ " FROM project subject " + "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "
-			+ " INNER JOIN study_type st ON subject.study_type_id = st.study_type_id "
+			+ " LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
 			+ "    WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
 			+ "		AND pr.object_project_id = :folderId "
 			+ "     AND NOT EXISTS (SELECT 1 FROM project p WHERE p.project_id = subject.project_id AND p.deleted = " + DELETED_STUDY + ")"
@@ -717,7 +717,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// 8180
 				.append(" LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
 				.append(" AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-				.append(" INNER JOIN study_type st ON p.study_type_id = st.study_type_id ")
+				.append(" LEFT JOIN study_type st ON p.study_type_id = st.study_type_id ")
 				.append(" WHERE p.deleted != " + DELETED_STUDY + " ")
 				.append(" AND p.study_type_id IN ( '" + StudyType.N.getName() + "', '" + StudyType.T.getName() + "')")//TODO arreglar
 				.append(" AND (p.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR p.program_uuid IS NULL) ")
