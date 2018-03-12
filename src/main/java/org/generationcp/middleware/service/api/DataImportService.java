@@ -65,7 +65,7 @@ public interface DataImportService {
 	 * @param file
 	 * @return workbook
 	 */
-	Workbook parseWorkbook(File file) throws WorkbookParserException;
+	Workbook parseWorkbook(File file, final Integer currentIbdbUserId) throws WorkbookParserException;
 
 	/**
 	 * Parses the file to create a workbook object with options to discard the
@@ -80,7 +80,7 @@ public interface DataImportService {
 	 * @return
 	 * @throws WorkbookParserException
 	 */
-	Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, WorkbookParser workbookParser)
+	Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, WorkbookParser workbookParser, final Integer currentIbdbUserId)
 			throws WorkbookParserException;
 
 	/**
@@ -91,7 +91,8 @@ public interface DataImportService {
 	 * @throws WorkbookParserException
 	 * @throws MiddlewareQueryException
 	 */
-	Workbook strictParseWorkbook(File file, String programUUID) throws WorkbookParserException, MiddlewareException;
+	Workbook strictParseWorkbook(File file, String programUUID, final Integer currentIbdbUserId) throws WorkbookParserException,
+		MiddlewareException;
 
 	/**
 	 * Checks if the name specified is an already existing project name
@@ -177,7 +178,7 @@ public interface DataImportService {
 	 */
 	void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID);
 
-	Workbook parseWorkbookDescriptionSheet(org.apache.poi.ss.usermodel.Workbook excelWorkbook)
+	Workbook parseWorkbookDescriptionSheet(org.apache.poi.ss.usermodel.Workbook excelWorkbook, final Integer currentIbdbUserId)
 			throws WorkbookParserException;
 
 }

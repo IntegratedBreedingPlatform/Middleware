@@ -152,6 +152,7 @@ public class WorkbookTestDataInitializer {
 	private static final String PLANT_HEIGHT_MEAN = "PLANT_HEIGHT_MEAN";
 	public static final int PLANT_HEIGHT_UNIT_ERRORS_ID = 18210;
 	public static final int PLANT_HEIGHT_MEAN_ID = 18180;
+	private static final String CREATED_BY = "1";
 
 	public Workbook createWorkbook(final StudyType studyType) {
 		final Workbook workbook = new Workbook();
@@ -287,7 +288,7 @@ public class WorkbookTestDataInitializer {
 		details.setEndDate(WorkbookTestDataInitializer.END_DATE);
 		details.setParentFolderId(WorkbookTestDataInitializer.FOLDER_ID);
 		details.setStudyType(studyType);
-
+		details.setCreatedBy(WorkbookTestDataInitializer.CREATED_BY);
 		workbook.setStudyDetails(details);
 	}
 
@@ -343,11 +344,6 @@ public class WorkbookTestDataInitializer {
 	public static List<MeasurementVariable> createConditions(final boolean withTrial, final int trialNo, final int locationId,
 			final String studyName) {
 		final List<MeasurementVariable> conditions = WorkbookTestDataInitializer.createConditions(withTrial, trialNo, locationId);
-
-		conditions.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY NAME", "Study name",
-				WorkbookTestDataInitializer.NAME, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.STUDY,
-				WorkbookTestDataInitializer.CHAR, studyName, WorkbookTestDataInitializer.STUDY, TermId.CHARACTER_VARIABLE.getId(),
-				PhenotypicType.STUDY, false));
 
 		return conditions;
 	}
@@ -535,7 +531,7 @@ public class WorkbookTestDataInitializer {
 
 	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
 			final String scale, final String method, final String property, final String dataType, final String value, final String label,
-			final int dataTypeId, final PhenotypicType role, VariableType variableType) {
+			final int dataTypeId, final PhenotypicType role, final VariableType variableType) {
 		final MeasurementVariable variable =
 				new MeasurementVariable(termId, name, description, scale, method, property, dataType, value, label);
 		variable.setRole(role);

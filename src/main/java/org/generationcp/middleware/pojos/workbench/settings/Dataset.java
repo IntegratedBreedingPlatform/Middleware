@@ -14,6 +14,10 @@ public class Dataset extends ParentDataset {
 	private List<Factor> trialLevelFactor;
 	private List<TreatmentFactor> treatmentFactors;
 	private String description;
+	private String 	startDate;
+	private String 	endDate;
+	private String 	studyUpdate;
+
 
 	public Dataset() {
 		super();
@@ -96,5 +100,29 @@ public class Dataset extends ParentDataset {
 
 	public String getDescription() {
 		return description;
+	}
+
+	public void setStartDate(final String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getStartDate() {
+		return this.startDate;
+	}
+
+	public String getEndDate() {
+		return this.endDate;
+	}
+
+	public void setEndDate(final String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getStudyUpdate() {
+		return this.studyUpdate;
+	}
+
+	public void setStudyUpdate(final String studyUpdate) {
+		this.studyUpdate = studyUpdate;
 	}
 }

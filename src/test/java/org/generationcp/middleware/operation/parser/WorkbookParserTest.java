@@ -58,6 +58,7 @@ public class WorkbookParserTest {
 			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE123", "SAMPLE LEVEL"};
 	public final static String[] INCORRECT_VARIATE_HEADERS =
 			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL123"};
+	public static final String CREATED_BY = "1";
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -166,7 +167,7 @@ public class WorkbookParserTest {
 
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
-		moleWorkbookParser.parseFile(sampleWorkbook, true);
+		moleWorkbookParser.parseFile(sampleWorkbook, true, CREATED_BY);
 		Mockito.verify(moleWorkbookParser).checkHeadersValid(sampleWorkbook, 0, 0, headerArray);
 	}
 
@@ -180,7 +181,7 @@ public class WorkbookParserTest {
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
 		try {
-			moleWorkbookParser.parseFile(sampleWorkbook, true);
+			moleWorkbookParser.parseFile(sampleWorkbook, true, CREATED_BY);
 			Assert.fail("Validation exception should have been thrown");
 		} catch (final WorkbookParserException e) {
 			final String errorMessage = "Incorrect headers for " + sectionName;
@@ -193,7 +194,7 @@ public class WorkbookParserTest {
 		// mock / skip other parsing logic and validations
 		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).loadFileToExcelWorkbook(file);
 		Mockito.doNothing().when(moleWorkbookParser).validateExistenceOfSheets(sampleWorkbook);
-		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook);
+		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook, CREATED_BY);
 
 		// only interested in specific section
 		for (final Section aSection : Section.values()) {
@@ -778,9 +779,9 @@ public class WorkbookParserTest {
 		final List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, true, allVariables);
 		final MeasurementRow row = new MeasurementRow(result);
 
-		Assert.assertEquals("1", row.getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(PLOT_NO).getValue());
 
 		// ALEU_COL_1_5's value in Excel is "6" but since it is invalid data and the user chose to discard the invalid values,
 		// it should be set to empty
@@ -799,9 +800,9 @@ public class WorkbookParserTest {
 		final List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, false, allVariables);
 		final MeasurementRow row = new MeasurementRow(result);
 
-		Assert.assertEquals("1", row.getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", row.getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, row.getMeasurementData(PLOT_NO).getValue());
 		Assert.assertEquals("6", row.getMeasurementData(ALEU_COL_1_5).getValue());
 	}
 
@@ -815,10 +816,10 @@ public class WorkbookParserTest {
 
 		Assert.assertEquals(1, result.size());
 
-		Assert.assertEquals("1", result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(PLOT_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ALEU_COL_1_5).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ALEU_COL_1_5).getValue());
 
 	}
 
@@ -832,9 +833,9 @@ public class WorkbookParserTest {
 
 		Assert.assertEquals(1, result.size());
 
-		Assert.assertEquals("1", result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(PLOT_NO).getValue());
 
 		// ALEU_COL_1_5's value in Excel is "6" but since it is invalid data and the user chose to discard the invalid values,
 		// it should be set to empty
@@ -852,9 +853,9 @@ public class WorkbookParserTest {
 
 		Assert.assertEquals(1, result.size());
 
-		Assert.assertEquals("1", result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(ENTRY_NO).getValue());
-		Assert.assertEquals("1", result.get(0).getMeasurementData(PLOT_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(TRIAL_INSTANCE).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(ENTRY_NO).getValue());
+		Assert.assertEquals(CREATED_BY, result.get(0).getMeasurementData(PLOT_NO).getValue());
 		Assert.assertEquals("6", result.get(0).getMeasurementData(ALEU_COL_1_5).getValue());
 
 	}
@@ -1064,9 +1065,9 @@ public class WorkbookParserTest {
 			final HSSFCell cell = row2.createCell(i);
 
 			if (allVariables.get(i).getDataTypeId() == DataType.CATEGORICAL_VARIABLE.getId()) {
-				cell.setCellValue(withInvalidValues ? "6" : "1");
+				cell.setCellValue(withInvalidValues ? "6" : CREATED_BY);
 			} else {
-				cell.setCellValue("1");
+				cell.setCellValue(CREATED_BY);
 			}
 
 		}
@@ -1098,7 +1099,7 @@ public class WorkbookParserTest {
 
 	private List<ValueReference> createPossibleValues() {
 		final List<ValueReference> possibleValues = new ArrayList<>();
-		possibleValues.add(new ValueReference(1, "1", ""));
+		possibleValues.add(new ValueReference(1, CREATED_BY, ""));
 		possibleValues.add(new ValueReference(2, "2", ""));
 		possibleValues.add(new ValueReference(3, "3", ""));
 		possibleValues.add(new ValueReference(4, "4", ""));
