@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -74,20 +73,18 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
-	private StudyTypeDAO studyTypeDAO;
+
 
 	public StudyDataManagerImpl() {
 	}
@@ -100,8 +97,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private void init(final HibernateSessionProvider sessionProvider) {
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
-		this.studyTypeDAO = new StudyTypeDAO();
-		this.studyTypeDAO.setSession(sessionProvider.getSession());
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
@@ -1171,6 +1166,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<StudyTypeDto> getAllVisibleStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.studyTypeDAO.getAllVisibleStudyTypes());
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAllVisibleStudyTypes());
 	}
 }
