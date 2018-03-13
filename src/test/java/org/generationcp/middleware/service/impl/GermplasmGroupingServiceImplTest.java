@@ -817,4 +817,27 @@ public class GermplasmGroupingServiceImplTest {
 			}
 		}
 	}
+
+	@Test
+	public void testUnfixLineGermplasmHasMGID() {
+
+		final Germplasm germplasm = new Germplasm();
+		germplasm.setMgid(111);
+		this.germplasmGroupingService.unfixLine(germplasm);
+
+		Assert.assertEquals(0, germplasm.getMgid().intValue());
+		Mockito.verify(this.germplasmDAO).save(germplasm);
+
+	}
+
+	@Test
+	public void testUnfixLineGermplasmHasNoMGID() {
+
+		final Germplasm germplasm = new Germplasm();
+		this.germplasmGroupingService.unfixLine(germplasm);
+
+		Assert.assertNull(germplasm.getMgid());
+		Mockito.verify(this.germplasmDAO, Mockito.never()).save(germplasm);
+
+	}
 }
