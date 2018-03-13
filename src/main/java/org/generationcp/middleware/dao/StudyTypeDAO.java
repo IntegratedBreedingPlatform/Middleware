@@ -17,12 +17,18 @@ public class StudyTypeDAO extends GenericDAO<StudyType, Integer> {
 	public StudyType getStudyTypeByName(final String name) {
 		final Criteria criteria = this.getSession().createCriteria(StudyType.class);
 		criteria.add(Restrictions.eq("name", name));
-		return (StudyType) criteria.list().get(0);
+		if (!criteria.list().isEmpty()) {
+			return (StudyType) criteria.list().get(0);
+		}
+		return null;
 	}
 
 	public StudyType getStudyTypeByLabel(final String label) {
 		final Criteria criteria = this.getSession().createCriteria(StudyType.class);
 		criteria.add(Restrictions.eq("label", label));
-		return (StudyType) criteria.list().get(0);
+		if (!criteria.list().isEmpty()) {
+			return (StudyType) criteria.list().get(0);
+		}
+		return null;
 	}
 }
