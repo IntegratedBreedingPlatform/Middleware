@@ -73,12 +73,14 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
