@@ -68,7 +68,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 		// setup test data
 		studyId = this.createNurseryTestData();
-		this.testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.STUDY, 0);
+		this.testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.STUDY, 0, "1");
 	}
 
 	@Test
