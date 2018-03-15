@@ -420,7 +420,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<StudyNode> getAllNurseryAndTrialStudyNodes(final String programUUID) {
-		return this.getDmsProjectDao().getAllNurseryAndTrialStudyNodes(programUUID);
+		return this.getDmsProjectDao().getAllStudyNodes(programUUID);
 	}
 
 	@Override
@@ -723,7 +723,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<StudyDetails> getNurseryAndTrialStudyDetails(final String programUUID, final int start, final int numOfRows) {
-		final List<StudyDetails> list = this.getDmsProjectDao().getAllNurseryAndTrialStudyDetails(programUUID, start, numOfRows);
+		final List<StudyDetails> list = this.getDmsProjectDao().getAllStudyDetails(programUUID, start, numOfRows);
 		this.populateSiteAndPersonIfNecessary(list);
 		return list;
 	}
@@ -758,7 +758,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(final String programUUID) {
 		final List<StudyDetails> list = new ArrayList<>();
-		final List localList = this.getDmsProjectDao().getAllNurseryAndTrialStudyDetails(programUUID);
+		final List localList = this.getDmsProjectDao().getAllStudyDetails(programUUID);
 		if (localList != null) {
 			list.addAll(localList);
 		}
@@ -769,7 +769,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public long countAllNurseryAndTrialStudyDetails(final String programUUID) {
 		long count = 0;
-		count += this.getDmsProjectDao().countAllNurseryAndTrialStudyDetails(programUUID);
+		count += this.getDmsProjectDao().countAllStudyDetails(programUUID);
 		return count;
 	}
 

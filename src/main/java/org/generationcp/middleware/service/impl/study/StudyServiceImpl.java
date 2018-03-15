@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -94,9 +93,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
 					+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
-
-
-	public static final String TRIAL_TYPE = StudyType.T.getName();
 
 	private MeasurementVariableService measurementVariableService;
 
@@ -546,15 +542,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setMetadata(studyMetadata);
 				final List<UserDto> users = new ArrayList<>();
 				final Map<String, String> properties = new HashMap<>();
-				if (studyMetadata.getStudyType().equalsIgnoreCase(StudyServiceImpl.TRIAL_TYPE)) {
-					users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-					properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
-					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
-				} else {
-					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
-				}
+
+				users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+				users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
+				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;

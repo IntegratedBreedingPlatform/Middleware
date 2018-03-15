@@ -37,7 +37,7 @@ public enum StudyType {
 	private final String name;
 	private final String label;
 
-	private StudyType(String name, int id, String label) {
+	private StudyType(final String name, final int id, final String label) {
 		this.name = name;
 		this.id = id;
 		this.label = label;
@@ -55,14 +55,14 @@ public enum StudyType {
 		return this.label;
 	}
 
-	public static StudyType getStudyTypeByName(String name) {
+	/*public static StudyType getStudyTypeByName(String name) {
 		for (StudyType studyType : StudyType.values()) {
 			if (studyType.getName().equals(name)) {
 				return studyType;
 			}
 		}
 		return null;
-	}
+	}*/
 
 	public static List<StudyType> nurseriesAndTrials() {
 		final List<StudyType> nurseriesAndTrials = new ArrayList<>(nurseries());

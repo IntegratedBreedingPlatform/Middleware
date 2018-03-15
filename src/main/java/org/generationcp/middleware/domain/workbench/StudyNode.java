@@ -11,7 +11,7 @@
 
 package org.generationcp.middleware.domain.workbench;
 
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
 
@@ -25,7 +25,7 @@ public class StudyNode implements Comparable<StudyNode> {
 
 	private String startDate;
 
-	private StudyType studyType;
+	private StudyTypeDto studyType;
 
 	private Season season;
 
@@ -33,7 +33,7 @@ public class StudyNode implements Comparable<StudyNode> {
 
 	}
 
-	public StudyNode(String name, String description, String startDate, StudyType studyType, Season season) {
+	public StudyNode(final String name, final String description, final String startDate, final StudyTypeDto studyType, final Season season) {
 		this.name = name;
 		this.description = description;
 		this.startDate = startDate;
@@ -41,7 +41,7 @@ public class StudyNode implements Comparable<StudyNode> {
 		this.season = season;
 	}
 
-	public StudyNode(Integer id, String name, String description, String startDate, StudyType studyType, Season season) {
+	public StudyNode(final Integer id, final String name, final String description, final String startDate, final StudyTypeDto studyType, final Season season) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
@@ -54,7 +54,7 @@ public class StudyNode implements Comparable<StudyNode> {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -62,7 +62,7 @@ public class StudyNode implements Comparable<StudyNode> {
 		return this.name;
 	}
 
-	public void setName(String studyName) {
+	public void setName(final String studyName) {
 		this.name = studyName;
 	}
 
@@ -76,7 +76,7 @@ public class StudyNode implements Comparable<StudyNode> {
 	/**
 	 * @param description the description to set
 	 */
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -84,7 +84,7 @@ public class StudyNode implements Comparable<StudyNode> {
 		 return this.startDate;
 	 }
 
-	 public void setStartDate(String startDate) {
+	 public void setStartDate(final String startDate) {
 		 this.startDate = startDate;
 	 }
 
@@ -95,32 +95,32 @@ public class StudyNode implements Comparable<StudyNode> {
 		return null;
 	 }
 
-	 public StudyType getStudyType() {
+	 public StudyTypeDto getStudyType() {
 		 return this.studyType;
 	 }
 
-	 public void setStudyType(StudyType studyType) {
+	 public void setStudyType(final StudyTypeDto studyType) {
 		 this.studyType = studyType;
 	 }
 
-	 public boolean isNursery() {
+	 /*public boolean isNursery() {
 		 if (this.studyType != null && this.studyType == StudyType.N) {
 			 return true;
 		 }
 		 return false;
-	 }
+	 }*/
 
 	 public Season getSeason() {
 		 return this.season;
 	 }
 
-	 public void setSeason(Season season) {
+	 public void setSeason(final Season season) {
 		 this.season = season;
 	 }
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("StudyNode [");
 		builder.append("id=");
 		builder.append(this.id);
@@ -140,7 +140,7 @@ public class StudyNode implements Comparable<StudyNode> {
 		return builder.toString();
 	}
 
-	 public void print(int indent) {
+	 public void print(final int indent) {
 		 Debug.println(indent, "StudyDetails: ");
 		Debug.println(indent + 3, "Id: " + this.id);
 		 Debug.println(indent + 3, "Name: " + this.name);
@@ -151,7 +151,7 @@ public class StudyNode implements Comparable<StudyNode> {
 	 }
 
 	@Override
-	public int compareTo(StudyNode node2) {
+	public int compareTo(final StudyNode node2) {
 		int c = node2.getStartYear().compareTo(this.getStartYear()); // descending by year
 		if (c == 0) {
 			c = this.getSeason().getSortOrder().compareTo(node2.getSeason().getSortOrder()); // season in this order: dry, wet, general

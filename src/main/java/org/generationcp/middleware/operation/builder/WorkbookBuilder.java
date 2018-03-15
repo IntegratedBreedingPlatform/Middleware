@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -202,7 +200,7 @@ public class WorkbookBuilder extends Builder {
 				stdVariable.setPhenotypicType(varType.getRole());
 
 				// DA geolocation prop access for value
-				String value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
+				final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
 
 				/*if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
 					// if value is null we have a .... trial instance, or location attribute (lat,long etc)
