@@ -765,7 +765,7 @@ public interface FieldbookService {
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
 			PhenotypicType role, String programUUID);
 
-	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID);
+	void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID);
 
 	/**
 	 * Return the measurement rows of a given dataset.
@@ -904,7 +904,8 @@ public interface FieldbookService {
 	 */
 	long countListDataProjectByListIdAndEntryType(int listId, SystemDefinedEntryType systemDefinedEntryType);
 
-	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId);
+	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId, final String instanceNumber);
+
 
 	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
 
@@ -967,13 +968,13 @@ public interface FieldbookService {
 	 */
 	Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
-	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
-	public List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
+	List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
 
-	public String getPlotCodePrefix(final String cropName);
+	String getPlotCodePrefix(final String cropName);
 
-	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
+	List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
 
 	List<Location> getLocationsByProgramUUID(String programUUID);
 
