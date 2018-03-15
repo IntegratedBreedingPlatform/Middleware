@@ -11,10 +11,19 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
+import org.generationcp.middleware.data.initializer.VariableListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -47,13 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 @Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class WorkbookBuilderTest extends IntegrationTestBase {
 
@@ -82,9 +84,10 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@BeforeClass
 	public static void setUpOnce() {
-		// Variable caching relies on the context holder to determine current crop database in use
+		// Variable caching relies on the context holder to determine current
+		// crop database in use
 		ContextHolder.setCurrentCrop("maize");
-		ContextHolder.setCurrentProgram(PROGRAM_UUID);
+		ContextHolder.setCurrentProgram(WorkbookBuilderTest.PROGRAM_UUID);
 	}
 
 	@Before
@@ -129,11 +132,13 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		Assert.assertFalse("Expected no error but got one", hasError);
 	}
 
+	@Ignore
 	@Test
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
-		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID,
+				WorkbookBuilderTest.CROP_PREFIX);
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
@@ -142,7 +147,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	}
 
-	private boolean areConstantsMatch(final List<MeasurementVariable> constants, final List<MeasurementVariable> constants2) {
+	private boolean areConstantsMatch(final List<MeasurementVariable> constants,
+			final List<MeasurementVariable> constants2) {
 		if (constants != null && constants2 != null) {
 			for (final MeasurementVariable var : constants) {
 				if (!this.isMactchInNewConstantList(constants2, var.getTermId(), var.getValue())) {
@@ -153,7 +159,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return true;
 	}
 
-	private boolean isMactchInNewConstantList(final List<MeasurementVariable> constants, final int termId, final String value) {
+	private boolean isMactchInNewConstantList(final List<MeasurementVariable> constants, final int termId,
+			final String value) {
 		if (constants != null) {
 			for (final MeasurementVariable var : constants) {
 				if (var.getTermId() == termId) {
@@ -164,11 +171,13 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return false;
 	}
 
+	@Ignore
 	@Test
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
-		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID,
+				WorkbookBuilderTest.CROP_PREFIX);
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -176,7 +185,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				this.areConstantsCorrect(createdWorkbook.getConstants(), createdWorkbook.getTrialObservations()));
 	}
 
-	private boolean areConstantsCorrect(final List<MeasurementVariable> constants, final List<MeasurementRow> trialObservations) {
+	private boolean areConstantsCorrect(final List<MeasurementVariable> constants,
+			final List<MeasurementRow> trialObservations) {
 		if (trialObservations != null && constants != null) {
 			for (final MeasurementRow row : trialObservations) {
 				return this.areConstantsInRow(row.getDataList(), constants);
@@ -227,6 +237,66 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testAddMeasurementDataForFactors() {
+		final List<MeasurementVariable> factorList = new ArrayList<>(Arrays.asList(
+				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(), "CROSS")));
+		final VariableList factors = VariableListTestDataInitializer.createVariableList();
+		final List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList);
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
+		Assert.assertEquals(factors.getVariables().get(0).getValue(), measurementData.getValue());
+		Assert.assertNull(measurementData.getcValueId());
+	}
+
+	@Test
+	public void testAddMeasurementDataForFactorsForCategoricalVariable() {
+		final List<MeasurementVariable> factorList = new ArrayList<>(Arrays.asList(
+				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(), "CROSS")));
+		final VariableList factors = VariableListTestDataInitializer.createVariableListWithCategoricalVariable();
+		final List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList);
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
+		Assert.assertEquals(factors.getVariables().get(0).getValue(), measurementData.getValue());
+		Assert.assertEquals(factors.getVariables().get(0).getValue(), measurementData.getcValueId());
+	}
+
+	@Test
+	public void testAddMeasurementDataForFactorsNotFound() {
+		final List<MeasurementVariable> factorList = new ArrayList<>(
+				Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(),
+						TermId.CROSS.name(), "CROSS")));
+		final VariableList factors = new VariableList();
+		final List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList);
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
+		Assert.assertEquals("", measurementData.getValue());
+		Assert.assertNull(measurementData.getcValueId());
+	}
+
+	@Test
+	public void testAddMeasurementDataForFactorsNotFoundPlotId() {
+		final List<MeasurementVariable> factorList = new ArrayList<>(
+				Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.PLOT_ID.getId(),
+						TermId.PLOT_ID.name(), "PLOT")));
+		final Experiment experiment = new Experiment();
+		experiment.setPlotId("plot id 1");
+		final VariableList factors = new VariableList();
+		final List<MeasurementData> measurementDataList = new ArrayList<>();
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, experiment, factors, measurementDataList);
+		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
+		final MeasurementData measurementData = measurementDataList.get(0);
+		Assert.assertEquals(TermId.PLOT_ID.name(), measurementData.getLabel());
+		Assert.assertEquals(experiment.getPlotId(), measurementData.getValue());
+		Assert.assertNull(measurementData.getcValueId());
+	}
+
+	@Test
 	public void testPopulateMeasurementData() throws MiddlewareException {
 		final List<MeasurementVariable> measurementVariableList = this.createMeasurementVariableList();
 		final VariableList variableList = this.createVariableList(measurementVariableList);
@@ -236,16 +306,15 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		for (final MeasurementData measurementData : measurementDataList) {
 			if (TermId.CATEGORICAL_VARIABLE.getId() != measurementData.getMeasurementVariable().getDataTypeId()) {
 				Assert.assertNull("Categorical value id should be null", measurementData.getcValueId());
-			} else if (WorkbookBuilderTest.CUSTOM_VARIATE == measurementData.getMeasurementVariable().getTermId()) {
-				Assert.assertNull("Categorical value id should be null", measurementData.getcValueId());
 			} else {
-				Assert.assertEquals("Categorical value id should equal to " + measurementData.getValue(), measurementData.getValue(),
-						measurementData.getcValueId());
+				Assert.assertEquals("Categorical value id should equal to " + measurementData.getValue(),
+						measurementData.getValue(), measurementData.getcValueId());
 			}
 		}
 	}
 
-	private VariableList createVariableList(final List<MeasurementVariable> measurementVariableList) throws MiddlewareException {
+	private VariableList createVariableList(final List<MeasurementVariable> measurementVariableList)
+			throws MiddlewareException {
 		final VariableList variableList = new VariableList();
 		int count = 0;
 		for (final MeasurementVariable measurementVariable : measurementVariableList) {
@@ -256,14 +325,12 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 			}
 			final Variable variable = this.createVariable(measurementVariable, value);
 			variableList.add(variable);
-			if (count == measurementVariableList.size()) {
-				variable.setCustomValue(true);
-			}
 		}
 		return variableList;
 	}
 
-	private Variable createVariable(final MeasurementVariable measurementVariable, final String value) throws MiddlewareException {
+	private Variable createVariable(final MeasurementVariable measurementVariable, final String value)
+			throws MiddlewareException {
 		final Variable variable = new Variable();
 		final DMSVariableType variableType = this.createVariableType(measurementVariable);
 		variable.setVariableType(variableType);
@@ -271,9 +338,10 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return variable;
 	}
 
-	private DMSVariableType createVariableType(final MeasurementVariable measurementVariable) throws MiddlewareException {
-		final DMSVariableType variableType =
-				this.transformMeasurementVariable(measurementVariable, this.getStandardVariable(measurementVariable.getTermId()));
+	private DMSVariableType createVariableType(final MeasurementVariable measurementVariable)
+			throws MiddlewareException {
+		final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable,
+				this.getStandardVariable(measurementVariable.getTermId()));
 		return variableType;
 	}
 
@@ -287,44 +355,50 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		measurementVariableList.add(this.getMeasurementVariable(TermId.PLOT_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.SITE_SOIL_PH, false));
 		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.CRUST, false));
-		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.CUSTOM_VARIATE, false));
 		return measurementVariableList;
 	}
 
-	private MeasurementVariable getMeasurementVariable(final int termId, final boolean isFactor) throws MiddlewareException {
+	private MeasurementVariable getMeasurementVariable(final int termId, final boolean isFactor)
+			throws MiddlewareException {
 		return this.measurementVariableTransformer.transform(this.getStandardVariable(termId), isFactor);
 	}
 
 	private StandardVariable getStandardVariable(final int id) throws MiddlewareException {
-		return this.standardVariableBuilder.create(id, "1234567");
+		final StandardVariable standardVariable = this.standardVariableBuilder.create(id, "1234567");
+		standardVariable.setPhenotypicType(PhenotypicType.VARIATE);
+		return standardVariable;
 	}
 
 	private DMSVariableType transformMeasurementVariable(final MeasurementVariable measurementVariable,
 			final StandardVariable standardVariable) {
-		return new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
+		return new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(),
+				standardVariable, 0);
 	}
 
+	@Ignore
 	@Test
 	public void testRemoveTrialDatasetVariables() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
-		final VariableTypeList factorsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getFactors(), WorkbookBuilderTest.PROGRAM_UUID);
-		final VariableTypeList conditionsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConditions(), WorkbookBuilderTest.PROGRAM_UUID);
-		final VariableTypeList constantsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConstants(), WorkbookBuilderTest.PROGRAM_UUID);
-		final VariableList conditions =
-				this.transformMeasurementVariablesToVariableList(workbook.getConditions(), conditionsVariableTypeList);
-		final VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(), constantsVariableTypeList);
+		final VariableTypeList factorsVariableTypeList = this.variableTypeListTransformer
+				.transform(workbook.getFactors(), WorkbookBuilderTest.PROGRAM_UUID);
+		final VariableTypeList conditionsVariableTypeList = this.variableTypeListTransformer
+				.transform(workbook.getConditions(), WorkbookBuilderTest.PROGRAM_UUID);
+		final VariableTypeList constantsVariableTypeList = this.variableTypeListTransformer
+				.transform(workbook.getConstants(), WorkbookBuilderTest.PROGRAM_UUID);
+		final VariableList conditions = this.transformMeasurementVariablesToVariableList(workbook.getConditions(),
+				conditionsVariableTypeList);
+		final VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(),
+				constantsVariableTypeList);
 		// find the trial instance variable before removing it as a factor
 		final DMSVariableType trialInstance = factorsVariableTypeList.findById(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		final VariableList toBeDeleted = new VariableList();
 		toBeDeleted.addAll(conditions);
 		toBeDeleted.addAll(constants);
 		// call the method to test: remove trial instance
-		final VariableTypeList finalFactors = this.workbookBuilder.removeTrialDatasetVariables(factorsVariableTypeList, toBeDeleted);
+		final VariableTypeList finalFactors = this.workbookBuilder.removeTrialDatasetVariables(factorsVariableTypeList,
+				toBeDeleted);
 		// verify if the trial instance is no longer found in the final factors
 		Assert.assertFalse(finalFactors.getVariableTypes().contains(trialInstance));
 
@@ -338,7 +412,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final Set set = new HashSet<>(measurementVariableLists);
 		this.workbookBuilder.setMeasurementVarRoles(set, false, true);
 		for (final MeasurementVariable var : measurementVariableLists) {
-			Assert.assertEquals("Should have a phenotype role of variate since its not a factor", var.getRole(), PhenotypicType.VARIATE);
+			Assert.assertEquals("Should have a phenotype role of variate since its not a factor", var.getRole(),
+					PhenotypicType.VARIATE);
 		}
 
 		this.workbookBuilder.setMeasurementVarRoles(set, true, true);
@@ -348,22 +423,25 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 		this.workbookBuilder.setMeasurementVarRoles(set, true, false);
 		for (final MeasurementVariable var : measurementVariableLists) {
-			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
+			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(),
+					PhenotypicType.TRIAL_ENVIRONMENT);
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testBuildTrialObservations() {
 
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
-		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
+				WorkbookBuilderTest.CROP_PREFIX);
 
-		final List<MeasurementRow> result =
-				this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(),
-						workbook.getTrialConstants());
+		final List<MeasurementRow> result = this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(),
+				workbook.getTrialConditions(), workbook.getTrialConstants());
 
-		Assert.assertEquals("The trial observation should only contain one measurement row since the study is Nursery Type", 1,
+		Assert.assertEquals(
+				"The trial observation should only contain one measurement row since the study is Nursery Type", 1,
 				result.size());
 		Assert.assertEquals(5, result.get(0).getDataList().size());
 		Assert.assertTrue(this.isTermIdExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), result.get(0).getDataList()));
@@ -374,28 +452,33 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	}
 
+	@Ignore
 	@Test
 	public void testBuildConditionVariablesOnTrial() {
-		//final int noOfObservations, final StudyType studyType, final String studyName, final int trialNo, final boolean hasMultipleLocations
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, new StudyTypeDto("T"), "Test study", 1, true);
-		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
+		// final int noOfObservations, final StudyType studyType, final String
+		// studyName, final int trialNo, final boolean hasMultipleLocations
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyType.T, "Test study", 1,
+				true);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
+				WorkbookBuilderTest.CROP_PREFIX);
 
 		// create measurement variables of condition types
 		final List<MeasurementVariable> conditionMeasurementVariableList = workbook.getStudyConditions();
-		final VariableTypeList conditionVariableTypeList = variableTypeListTransformer.transform(conditionMeasurementVariableList, PROGRAM_UUID);
+		final VariableTypeList conditionVariableTypeList = this.variableTypeListTransformer
+				.transform(conditionMeasurementVariableList, WorkbookBuilderTest.PROGRAM_UUID);
 
 		// create measurement variables of trial environement types
 		final List<MeasurementVariable> trialEnvironmentMeasurementVariableList = workbook.getTrialConditions();
-		final VariableTypeList trialEnvironmentVariableTypeList =
-				variableTypeListTransformer.transform(trialEnvironmentMeasurementVariableList, PROGRAM_UUID);
+		final VariableTypeList trialEnvironmentVariableTypeList = this.variableTypeListTransformer
+				.transform(trialEnvironmentMeasurementVariableList, WorkbookBuilderTest.PROGRAM_UUID);
 
-		final VariableList conditionVariables =
-				this.transformMeasurementVariablesToVariableList(conditionMeasurementVariableList, conditionVariableTypeList);
-		final VariableList trialEnvironmentVariables =
-				this.transformMeasurementVariablesToVariableList(trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
+		final VariableList conditionVariables = this.transformMeasurementVariablesToVariableList(
+				conditionMeasurementVariableList, conditionVariableTypeList);
+		final VariableList trialEnvironmentVariables = this.transformMeasurementVariablesToVariableList(
+				trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
 
-		final Set<MeasurementVariable> result =
-				this.workbookBuilder.buildConditionVariables(conditionVariables, trialEnvironmentVariables);
+		final List<MeasurementVariable> result = this.workbookBuilder.buildConditionVariables(conditionVariables,
+				trialEnvironmentVariables, true);
 
 		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;
 		for (final MeasurementVariable measurementVariable : result) {
@@ -405,19 +488,21 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		}
 
 		Assert.assertTrue(
-				"Expecting that the number of condition with trial environment phenotypic type is " + trialEnvironmentVariables.size() +
-						" but returned " + noOfConditionsWithTrialEnvironmentPhenotypicType,
+				"Expecting that the number of condition with trial environment phenotypic type is "
+						+ trialEnvironmentVariables.size() + " but returned "
+						+ noOfConditionsWithTrialEnvironmentPhenotypicType,
 				trialEnvironmentVariables.size() >= noOfConditionsWithTrialEnvironmentPhenotypicType);
 
 		final List<String> trialEnvironmentVariableNames = new ArrayList<String>();
-		for(final Variable variable : trialEnvironmentVariables.getVariables()) {
+		for (final Variable variable : trialEnvironmentVariables.getVariables()) {
 			trialEnvironmentVariableNames.add(variable.getVariableType().getLocalName());
 		}
 
-		for(final MeasurementVariable measurementVariable : result){
-			if(trialEnvironmentVariableNames.contains(measurementVariable.getName())){
-				Assert.assertTrue("Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
-						measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT) );
+		for (final MeasurementVariable measurementVariable : result) {
+			if (trialEnvironmentVariableNames.contains(measurementVariable.getName())) {
+				Assert.assertTrue(
+						"Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
+						measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT));
 			}
 		}
 	}
@@ -431,7 +516,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return false;
 	}
 
-	// derived from VariableListTransformer.transformTrialEnvironment (but with no specific role to filter)
+	// derived from VariableListTransformer.transformTrialEnvironment (but with
+	// no specific role to filter)
 	private VariableList transformMeasurementVariablesToVariableList(final List<MeasurementVariable> mVarList,
 			final VariableTypeList variableTypeList) {
 		final VariableList variableList = new VariableList();
@@ -458,21 +544,22 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testCreateMeasurementVariable() {
 		final int termId = TermId.TRIAL_INSTANCE_FACTOR.getId();
-		final StandardVariable stdVariable =
-				this.createStandardVariable(termId, "TRIAL INSTANCE", "Trial instance - enumerated (number)", "Trial instance", "Number",
-						"Enumerated", DataType.NUMERIC_VARIABLE.getName());
+		final StandardVariable stdVariable = this.createStandardVariable(termId, "TRIAL INSTANCE",
+				"Trial instance - enumerated (number)", "Trial instance", "Number", "Enumerated",
+				DataType.NUMERIC_VARIABLE.getName());
 		final VariableType varType = VariableType.ENVIRONMENT_DETAIL;
 		final DmsProject project = this.createDmsProject(1);
 		final int rank = 1;
-		final ProjectProperty localNameProjectProp = this.createProjectProperty(project, varType.getId(), "VAR_NAME", rank);
+		final ProjectProperty localNameProjectProp = this.createProjectProperty(project, varType.getId(), "VAR_NAME",
+				rank);
 		final String value = "1";
 		final Double minRange = null;
 		final Double maxRange = null;
-		final MeasurementVariable measurementVariable =
-			this.workbookBuilder.createMeasurementVariable(stdVariable, localNameProjectProp, value, minRange, maxRange, varType);
+		final MeasurementVariable measurementVariable = this.workbookBuilder.createMeasurementVariable(stdVariable,
+				localNameProjectProp, value, minRange, maxRange, varType);
 		Assert.assertNotNull(measurementVariable);
 		Assert.assertEquals(stdVariable.getId(), measurementVariable.getTermId());
-		Assert.assertEquals(localNameProjectProp.getValue(), measurementVariable.getName());
+		Assert.assertEquals(localNameProjectProp.getAlias(), measurementVariable.getName());
 		Assert.assertEquals(stdVariable.getDescription(), measurementVariable.getDescription());
 		Assert.assertEquals(stdVariable.getProperty().getName(), measurementVariable.getProperty());
 		Assert.assertEquals(stdVariable.getScale().getName(), measurementVariable.getScale());
@@ -483,9 +570,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals(maxRange, measurementVariable.getMaxRange());
 		Assert.assertTrue(measurementVariable.isFactor());
 		Assert.assertEquals(stdVariable.getDataType().getId(), measurementVariable.getDataTypeId().intValue());
-		Assert.assertEquals(
-				this.workbookBuilder.getMeasurementVariableTransformer().transformPossibleValues(stdVariable.getEnumerations()),
-				measurementVariable.getPossibleValues());
+		Assert.assertEquals(this.workbookBuilder.getMeasurementVariableTransformer()
+				.transformPossibleValues(stdVariable.getEnumerations()), measurementVariable.getPossibleValues());
 		Assert.assertEquals(varType.getRole(), measurementVariable.getRole());
 		Assert.assertEquals(varType, measurementVariable.getVariableType());
 	}
@@ -499,7 +585,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final Map<Integer, String> samplesMap = new HashMap<>();
 		samplesMap.put(experimentId, samplesValue);
 
-		final MeasurementData samplesMeasurementData = this.workbookBuilder.getMeasurementDataWithSample(samplesMap, experimentId);
+		final MeasurementData samplesMeasurementData = this.workbookBuilder.getMeasurementDataWithSample(samplesMap,
+				experimentId);
 
 		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementData.getLabel());
 		Assert.assertFalse(samplesMeasurementData.isEditable());
@@ -511,7 +598,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementVariable.getName());
 		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementVariable.getLabel());
 		Assert.assertTrue(samplesMeasurementVariable.isFactor());
-		Assert.assertEquals(Integer.valueOf(DataType.CHARACTER_VARIABLE.getId()), samplesMeasurementVariable.getDataTypeId());
+		Assert.assertEquals(Integer.valueOf(DataType.CHARACTER_VARIABLE.getId()),
+				samplesMeasurementVariable.getDataTypeId());
 		Assert.assertNotNull(samplesMeasurementVariable.getPossibleValues());
 
 	}
@@ -522,7 +610,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return project;
 	}
 
-	private ProjectProperty createProjectProperty(final DmsProject project, final Integer typeId, final String value, final int rank) {
+	private ProjectProperty createProjectProperty(final DmsProject project, final Integer typeId, final String value,
+			final int rank) {
 		final ProjectProperty projectProperty = new ProjectProperty();
 		projectProperty.setProject(project);
 		projectProperty.setTypeId(typeId);
@@ -531,8 +620,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return projectProperty;
 	}
 
-	private StandardVariable createStandardVariable(final int id, final String name, final String description, final String property,
-			final String scale, final String method, final String datatype) {
+	private StandardVariable createStandardVariable(final int id, final String name, final String description,
+			final String property, final String scale, final String method, final String datatype) {
 		final StandardVariable stdVariable = new StandardVariable();
 		stdVariable.setId(id);
 		stdVariable.setName(name);
