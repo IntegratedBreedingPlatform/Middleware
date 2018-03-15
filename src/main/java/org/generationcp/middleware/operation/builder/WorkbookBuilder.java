@@ -164,16 +164,18 @@ public class WorkbookBuilder extends Builder {
 		final List<MeasurementVariable> variates = this.buildVariates(variables, new ArrayList<>(constants));
 		final List<MeasurementVariable> expDesignVariables = new ArrayList<>();
 
-		// remove OCC from nursery level conditions for nursery cause its
-		// duplicating becuase its being added in conditions and factors
-		// FIXME : redesign dataset or filter earlier
+		// Nursery case
+/*		if (!isTrial) {
+			// remove OCC from nursery level conditions for nursery cause its duplicating becuase its being added in conditions and factors
+			// FIXME : redesign dataset or filter earlier
 			final Iterator<MeasurementVariable> iter = conditions.iterator();
 			while (iter.hasNext()) {
 				if (iter.next().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					iter.remove();
 				}
 			}
-
+		}
+*/ // TODO COMMENTED TO FIX THEN
 		this.populateBreedingMethodPossibleValues(variates);
 
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
@@ -202,10 +204,8 @@ public class WorkbookBuilder extends Builder {
 				// DA geolocation prop access for value
 				String value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
 
-				if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
-
-					// if value is null we have a .... trial instance, or
-					// location attribute (lat,long etc)
+				/*if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
+					// if value is null we have a .... trial instance, or location attribute (lat,long etc)
 					if (value == null) {
 						// set trial env for nursery studies
 						final List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
@@ -213,7 +213,7 @@ public class WorkbookBuilder extends Builder {
 							final Integer locId = locIds.get(0);
 							// DA geolocation table
 							final Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							value = this.getVariableValueFromGeolocation(stdVariableId, value, geolocation);
+							value = getVariableValueFromGeolocation(stdVariableId, null, geolocation);
 						}
 						// redundant logic?
 						if (value == null) {
@@ -222,20 +222,20 @@ public class WorkbookBuilder extends Builder {
 					}
 
 					// continuing redundant logic ...
-					if (value != null) {
-						final MeasurementVariable measurementVariable = this.createMeasurementVariable(stdVariable,
-								projectProperty, value, minRange, maxRange, varType);
+					final MeasurementVariable measurementVariable =
+						this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
 
 						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 							expDesignVariables.add(measurementVariable);
 						} else if (!conditions.contains(measurementVariable)) {
 							conditions.add(measurementVariable);
 						}
-					}
-				} else if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
+					}*/
+				//} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
+				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 
-					final MeasurementVariable measurementVariable = this.createMeasurementVariable(stdVariable,
-							projectProperty, value, minRange, maxRange, varType);
+					final MeasurementVariable measurementVariable =
+						this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
 
 					expDesignVariables.add(measurementVariable);
 					this.setValueInCondition(new ArrayList<>(conditions), value, stdVariableId);
@@ -445,9 +445,8 @@ public class WorkbookBuilder extends Builder {
 						if (value == null) {
 							value = StringUtils.EMPTY;
 						}
-					} else if (PhenotypicType.VARIATE == varType.getRole()) {
-						// constants, no need to retrieve the value if it's a
-						// trial study
+					} else if (PhenotypicType.VARIATE == varType.getRole()) {// TODO traits
+						// constants, no need to retrieve the value if it's a trial study
 						isConstant = true;
 /*						if (isNursery) {
 							final List<Phenotype> phenotypes =

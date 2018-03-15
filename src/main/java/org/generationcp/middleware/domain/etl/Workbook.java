@@ -700,13 +700,9 @@ public class Workbook {
 			return false;
 		}
 		if (this.variates == null) {
-			if (other.variates != null) {
-				return false;
-			}
-		} else if (!this.variates.equals(other.variates)) {
-			return false;
-		}
-		return true;
+			return other.variates == null;
+		} else
+			return this.variates.equals(other.variates);
 	}
 
 	public void print(final int indent) {
