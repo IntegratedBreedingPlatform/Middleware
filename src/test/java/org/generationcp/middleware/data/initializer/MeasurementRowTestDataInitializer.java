@@ -37,6 +37,7 @@ public class MeasurementRowTestDataInitializer {
 		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(),
 				"LOCATION_NAME", "Manila"));
 		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(111, "Some Variable", "Test Data"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.GID.getId(), "GID", "1"));
 		measurementRow.setDataList(dataList);
 
 		return measurementRow;
