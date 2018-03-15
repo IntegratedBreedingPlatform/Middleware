@@ -14,8 +14,10 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -457,7 +459,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testBuildConditionVariablesOnTrial() {
 		// final int noOfObservations, final StudyType studyType, final String
 		// studyName, final int trialNo, final boolean hasMultipleLocations
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyType.T, "Test study", 1,
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, new StudyTypeDto("T"), "Test study", 1,
 				true);
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
 				WorkbookBuilderTest.CROP_PREFIX);
@@ -477,8 +479,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final VariableList trialEnvironmentVariables = this.transformMeasurementVariablesToVariableList(
 				trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
 
-		final List<MeasurementVariable> result = this.workbookBuilder.buildConditionVariables(conditionVariables,
-				trialEnvironmentVariables, true);
+		final Set<MeasurementVariable> result = this.workbookBuilder.buildConditionVariables(conditionVariables,
+				trialEnvironmentVariables);
 
 		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;
 		for (final MeasurementVariable measurementVariable : result) {

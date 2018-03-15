@@ -305,7 +305,7 @@ public class WorkbookBuilder extends Builder {
 			final VariableList trialEnvironmentVariables) {
 		// we set roles here (study, trial, variate) which seem to match the
 		// dataset : reconcile - we might be over-categorizing
-		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(studyConditionVariables, true,
+		final Set<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(studyConditionVariables, true,
 				true);
 			conditions.addAll(this.buildStudyMeasurementVariables(trialEnvironmentVariables, true, false));
 		return conditions;
