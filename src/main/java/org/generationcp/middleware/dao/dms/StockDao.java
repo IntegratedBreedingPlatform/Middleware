@@ -79,14 +79,17 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery("select distinct p.project_id, p.name, p.description, "
-				+ "p.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id"
-				+ " as cvtermId, p.program_uuid " + "FROM stock s " + "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
+			final SQLQuery query = this.getSession()//
+				.createSQLQuery("select distinct p.project_id, p.name, p.description, "
+				+ "st.study_type_id, st.label, st.name, st.visible, st.cvterm_id, p.program_uuid "
+				+ "FROM stock s "
+				+ "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
 				+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
 				+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 				+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
 				+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
-				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id " + " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
+				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
+				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
@@ -101,7 +104,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final boolean visible = ((Byte) row[6]) == 1;
 				final Integer cvtermId = (Integer) row[7];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], (String) row[4], studyTypeDto));
+				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], (String) row[8], studyTypeDto));
 			}
 
 		} catch (final HibernateException e) {
