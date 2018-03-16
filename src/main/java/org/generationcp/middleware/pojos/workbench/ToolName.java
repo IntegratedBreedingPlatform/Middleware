@@ -41,7 +41,7 @@ public enum ToolName {
 	STUDY_BROWSER_WITH_ID("study_browser_with_id"),
 	TRAIT_DONOR_QUERY("trait_donor_query"),
 	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web"),
-	STUDY_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web");
+	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web");
 
 	private final String name;
 
@@ -67,7 +67,7 @@ public enum ToolName {
 		final List<ToolName> workbenchTools = Arrays.asList(BV_SSA, BV_META_ANALYSIS, BV_GXE);
 		final List<ToolName> toolsWithURL = new ArrayList<>(Arrays.asList(ToolName.values()));
 		toolsWithURL.removeAll(workbenchTools);
-		for (ToolName tool : toolsWithURL) {
+		for (final ToolName tool : toolsWithURL) {
 			if (tool.getName().equals(name)) {
 				return true;
 			}
