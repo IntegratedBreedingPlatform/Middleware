@@ -220,7 +220,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("studyType.label"))//
 				.add(Projections.property("studyType.name"))//
 				.add(Projections.property("studyType.visible"))//
-				.add(Projections.property("studyType.cvTermid"))//
+				.add(Projections.property("studyType.cvTermId"))//
 				.add(Projections.property("objectProject.studyType"))))//
 			.list();//
 
