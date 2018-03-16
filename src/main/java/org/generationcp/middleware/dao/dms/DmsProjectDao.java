@@ -722,7 +722,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final Integer studyTypeId = (Integer) row[8];
 					final String label = (String) row[9];
 					final String studyTypeName = (String) row[10];
-					final boolean visible = ((Integer) row[11]) == 1;
+					final boolean visible = ((Byte) row[11]) == 1;
 					final Integer cvtermId = (Integer) row[12];
 					final String piId = (String) row[13];
 					final String siteId = (String) row[14];
@@ -832,7 +832,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Integer studyTypeId = (Integer) row[4];
 			final String label = (String) row[5];
 			final String studyTypeName = (String) row[6];
-			final boolean visible = ((Integer) row[7]) == 1;
+			final boolean visible = ((Byte) row[7]) == 1;
 			final Integer cvtermId = (Integer) row[8];
 			final String seasonStr = (String) row[9];
 

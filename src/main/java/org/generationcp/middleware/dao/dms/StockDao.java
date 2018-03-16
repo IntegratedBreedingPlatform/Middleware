@@ -98,7 +98,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final Integer studyTypeId = (Integer) row[3];
 				final String label = (String) row[4];
 				final String studyTypeName = (String) row[5];
-				final boolean visible = ((Integer) row[6]) == 1;
+				final boolean visible = ((Byte) row[6]) == 1;
 				final Integer cvtermId = (Integer) row[7];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], (String) row[4], studyTypeDto));

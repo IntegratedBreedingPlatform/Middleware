@@ -209,7 +209,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final Integer studyTypeId = (Integer) row[4];
 				final String label = (String) row[5];
 				final String studyTypeName = (String) row[6];
-				final boolean visible = ((Integer) row[7]) == 1;
+				final boolean visible = ((Byte) row[7]) == 1;
 				final Integer cvtermId = (Integer) row[8];
 				final String objective = (String) row[9];
 				final String startDate = (String) row[10];
