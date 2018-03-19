@@ -1004,11 +1004,4 @@ public interface FieldbookService {
 	 */
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
-
-	/**
-	 * Gets the NamingConfiguration matching the given name
-	 * @param name
-	 * @return the NamingConfiguration
-	 */
-	NamingConfiguration getNamingConfigurationByName(final String name);
 }

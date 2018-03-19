@@ -42,6 +42,7 @@ import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
+import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
@@ -1547,5 +1548,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void save(final Germplasm germplasm) {
 		this.getGermplasmDao().save(germplasm);
+	}
+
+	@Override
+	public NamingConfiguration getNamingConfigurationByName(final String name) {
+		return this.getNamingConfigurationDAO().getByName(name);
 	}
 }

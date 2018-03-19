@@ -71,9 +71,6 @@ public class FieldbookServiceImplTest {
 	Session session;
 
 	@Mock
-	GermplasmListDAO germplasmListDao;
-
-	@Mock
 	HibernateSessionProvider sessionProvider;
 
 	@Mock
@@ -84,9 +81,6 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	Criteria criteria;
-
-	@Mock
-	GermplasmDataManager germplasmDataManager;
 
 	@Mock
 	LocationDAO locationDAO;
@@ -125,7 +119,6 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
 		this.fieldbookServiceImpl.setListDataProjectSaver(this.listDataProjectSaver);
 		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
-		this.fieldbookServiceImpl.setNamingConfigurationDAO(this.namingConfigurationDAO);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
 		Mockito.doReturn(this.criteria).when(this.session).createCriteria(UserDefinedField.class);
@@ -248,18 +241,6 @@ public class FieldbookServiceImplTest {
 		Mockito.verify(listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
 				new ArrayList<ListDataProject>(), userId);
 
-
-	}
-
-	@Test
-	public void testGetNamingConfigurationByName() {
-
-		final String nameCode1 = "CODE 1";
-
-		when(this.namingConfigurationDAO.getByName(nameCode1)).thenReturn(new NamingConfiguration());
-
-		final NamingConfiguration code1 = this.fieldbookServiceImpl.getNamingConfigurationByName(nameCode1);
-		Assert.assertNotNull(code1);
 
 	}
 
