@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -98,11 +99,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	@Transactional
-	public void unfixLine(final Germplasm germplasm) {
+	public void unfixLines(final Set<Integer> gids) {
 
-		final boolean hasMGID = germplasm.getMgid() != null && germplasm.getMgid() != 0;
-
-		if (hasMGID) {
+		// Only process germplasm with assigned group
+		final List<Germplasm> listOfGermplasmWithGroup = this.germplasmDataManager.getGermplasmWithGroup(new ArrayList<Integer>(gids));
+		for (final Germplasm germplasm : listOfGermplasmWithGroup) {
 			// Unfixing a germplasm line equates to assigning mgid to 0.
 			germplasm.setMgid(0);
 			this.germplasmDAO.save(germplasm);

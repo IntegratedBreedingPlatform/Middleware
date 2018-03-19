@@ -26,17 +26,17 @@ public interface GermplasmGroupingService {
 	GermplasmGroup markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
 
 	/**
-	 * Unfix a germplasm (line).
+	 * Unfix a list of germplasm (line).
 	 * There are some cases where a line is fixed (and therefore grouped) and then discovered not to be
 	 * pertaining to the assigned group or not really being fixed, either via genotyping or phenotypic observation.
 	 * In these cases the users would like to undo this fixed mark and remove the germplasm from whichever group they've been assigned to.
 	 * <p>
 	 * At the database level, this will reset the mgid of a germplasm to zero.
 	 *
-	 * @param germplasm
+	 * @param gids - List of gids
 	 * @return
 	 */
-	void unfixLine(Germplasm germplasm);
+	void unfixLines(Set<Integer> gids);
 
 	/**
 	 * Service to apply group (MGID) inheritance to newly created crosses.

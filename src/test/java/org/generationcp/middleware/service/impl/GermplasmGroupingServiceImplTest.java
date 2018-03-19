@@ -21,6 +21,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GermplasmGroupingServiceImplTest {
@@ -787,11 +791,22 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testUnfixLineGermplasmHasMGID() {
+	public void testUnfixLineGermplasmHasGermplasmWithGroup() {
+
+		final int gid = 222;
+		final int mgid = 111;
 
 		final Germplasm germplasm = new Germplasm();
-		germplasm.setMgid(111);
-		this.germplasmGroupingService.unfixLine(germplasm);
+		germplasm.setGid(gid);
+		germplasm.setMgid(mgid);
+
+		final Set<Integer> gidsToProcess = new HashSet<>(Arrays.asList(gid));
+
+		final List<Germplasm> listOfGemrplasmWithAssignedGroup = Arrays.asList(germplasm);
+
+		Mockito.when(this.germplasmDataManager.getGermplasmWithGroup(new ArrayList<Integer>(gidsToProcess))).thenReturn(listOfGemrplasmWithAssignedGroup);
+
+		this.germplasmGroupingService.unfixLines(gidsToProcess);
 
 		Assert.assertEquals(0, germplasm.getMgid().intValue());
 		Mockito.verify(this.germplasmDAO).save(germplasm);
@@ -799,13 +814,16 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testUnfixLineGermplasmHasNoMGID() {
+	public void testUnfixLineGermplasmHasNoGermplasmWithoutGroup() {
 
-		final Germplasm germplasm = new Germplasm();
-		this.germplasmGroupingService.unfixLine(germplasm);
+		final int gid = 222;
 
-		Assert.assertNull(germplasm.getMgid());
-		Mockito.verify(this.germplasmDAO, Mockito.never()).save(germplasm);
+		// Return an empty list
+		Mockito.when(this.germplasmDataManager.getGermplasmWithGroup(Arrays.asList(gid))).thenReturn(new ArrayList<Germplasm>());
+
+		this.germplasmGroupingService.unfixLines(new HashSet<Integer>(Arrays.asList(gid)));
+
+		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
 
 	}
 }

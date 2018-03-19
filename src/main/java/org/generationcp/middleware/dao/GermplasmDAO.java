@@ -1068,4 +1068,62 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		return new HashMap<>();
 	}
+
+	/**
+	 * Only return germplasm with no group assigned (mgid = 0 or mgid is null)
+	 * @param gids
+	 * @return
+	 */
+	public List<Germplasm> getGermplasmWithoutGroup(final List<Integer> gids) {
+
+		if (gids.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
+			queryString.append("g.gid IN( :gids ) AND (g.mgid = 0 || g.mgid IS NULL)");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gids);
+			query.addEntity("g", Germplasm.class);
+
+			return query.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getGermplasmWithoutGroup(gids=" + gids.toString() + ") " + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	/**
+	 * Only return germplasm with assigned group.
+	 * @param gids
+	 * @return
+	 */
+	public List<Germplasm> getGermplasmWithGroup(final List<Integer> gids) {
+
+		if (gids.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
+			queryString.append("g.gid IN( :gids ) AND (g.mgid != 0 && g.mgid IS NOT NULL)");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gids);
+			query.addEntity("g", Germplasm.class);
+
+			return query.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getGermplasmWithoutGroup(gids=" + gids.toString() + ") " + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }
