@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 
 public class StandardVariableTestDataInitializer {
 	private static final int DUMMY_PROPERTY_ID = 10;
@@ -89,10 +90,11 @@ public class StandardVariableTestDataInitializer {
 				StandardVariableTestDataInitializer.DUMMY_DATATYPE_DEF));
 		return standardVariable;
 	}
-	
-	public static StandardVariable createStandardVariable(Term property, Term scale, Term method, Term dataType) throws Exception {
 
-		StandardVariable standardVariable = new StandardVariable();
+	public static StandardVariable createStandardVariable(final Term property, final Term scale, final Term method,
+			final Term dataType) throws Exception {
+
+		final StandardVariable standardVariable = new StandardVariable();
 
 		standardVariable.setName("TestVariable" + new Random().nextLong());
 		standardVariable.setDescription("For unit testing purposes");
@@ -103,5 +105,16 @@ public class StandardVariableTestDataInitializer {
 		standardVariable.setPhenotypicType(PhenotypicType.VARIATE);
 
 		return standardVariable;
+	}
+
+	public static StandardVariable createStandardVariableWithCategoricalDataType(final int id, final String name) {
+
+		final StandardVariable stdVariable = StandardVariableTestDataInitializer.createStandardVariable();
+		stdVariable.setId(id);
+		stdVariable.setName(name);
+		stdVariable.setDescription(name + " Description");
+		stdVariable.setDataType(new Term(TermId.CATEGORICAL_VARIABLE.getId(), "Categorical variable",
+				"variable with categorical values"));
+		return stdVariable;
 	}
 }

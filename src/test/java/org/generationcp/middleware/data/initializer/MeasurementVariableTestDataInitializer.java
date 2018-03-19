@@ -32,6 +32,7 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setTermId(termId);
 		measurementVar.setName(name);
 		measurementVar.setValue(value);
+		measurementVar.setDataTypeId(TermId.NUMERIC_VARIABLE.getId());
 		return measurementVar;
 	}
 
