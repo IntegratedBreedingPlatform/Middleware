@@ -66,6 +66,7 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink"/>
+        <mapping class="org.generationcp.middleware.pojos.naming.NamingConfiguration"/>
 
         <!-- Mapping classes for new OMS schema -->
         <mapping class="org.generationcp.middleware.pojos.oms.CV"/>

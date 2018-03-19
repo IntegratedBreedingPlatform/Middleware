@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 
 /**
  * This is the API for retrieving Germplasm information.
@@ -1145,4 +1146,13 @@ public interface GermplasmDataManager {
 	 * @return Attribute value that matches with attribute name and gid
 	 */
 	String getAttributeValue (final Integer gid, final String attributeName);
+
+	void save(Germplasm germplasm);
+
+	/**
+	 * Get the NamingConfiguration by name
+	 * @param name
+	 * @return
+	 */
+	NamingConfiguration getNamingConfigurationByName(String name);
 }
