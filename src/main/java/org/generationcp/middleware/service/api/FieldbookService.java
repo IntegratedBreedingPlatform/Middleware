@@ -40,6 +40,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -1003,4 +1004,11 @@ public interface FieldbookService {
 	 */
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
+
+	/**
+	 * Gets the NamingConfiguration matching the given name
+	 * @param name
+	 * @return the NamingConfiguration
+	 */
+	NamingConfiguration getNamingConfigurationByName(final String name);
 }

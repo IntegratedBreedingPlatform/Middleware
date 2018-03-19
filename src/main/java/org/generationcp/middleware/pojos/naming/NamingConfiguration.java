@@ -1,4 +1,4 @@
-package org.generationcp.middleware.pojos.workbench;
+package org.generationcp.middleware.pojos.naming;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;

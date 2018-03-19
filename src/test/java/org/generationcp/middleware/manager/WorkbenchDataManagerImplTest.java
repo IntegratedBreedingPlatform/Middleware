@@ -32,7 +32,6 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
-import org.generationcp.middleware.pojos.workbench.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -739,16 +738,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<User> usersAfter = this.workbenchDataManager.getUsersByProjectId(id);
 		Assert.assertNotNull(usersAfter);
 		Assert.assertTrue(usersAfter.isEmpty());
-	}
-
-	@Test
-	public void testGetNamingConfigurationByName() {
-		final NamingConfiguration code1 = this.workbenchDataManager.getNamingConfigurationByName("CODE 1");
-		Assert.assertNotNull(code1);
-		final NamingConfiguration code2 = this.workbenchDataManager.getNamingConfigurationByName("CODE 2");
-		Assert.assertNotNull(code2);
-		final NamingConfiguration code3 = this.workbenchDataManager.getNamingConfigurationByName("CODE 3");
-		Assert.assertNotNull(code3);
 	}
 	
 }

@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -63,6 +64,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -98,6 +100,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
 
+	private NamingConfigurationDAO namingConfigurationDAO;
+
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
 	public FieldbookServiceImpl() {
@@ -106,6 +110,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public FieldbookServiceImpl(final HibernateSessionProvider sessionProvider, final String localDatabaseName) {
 		super(sessionProvider, localDatabaseName);
+		this.namingConfigurationDAO = new NamingConfigurationDAO();
+		this.namingConfigurationDAO.setSession(this.getCurrentSession());
 	}
 
 	@Override
@@ -1246,6 +1252,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.getGermplasmDataManager().getNoBulkingMethodsByType("GEN", programUUID);
 	}
 
+	@Override
+	public NamingConfiguration getNamingConfigurationByName(final String name) {
+		return namingConfigurationDAO.getByName(name);
+	}
+
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
@@ -1256,6 +1267,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public void setListDataProjectSaver(final ListDataProjectSaver listDataProjectSaver) {
 		this.listDataProjectSaver = listDataProjectSaver;
+	}
+
+	void setNamingConfigurationDAO(final NamingConfigurationDAO namingConfigurationDAO) {
+		this.namingConfigurationDAO = namingConfigurationDAO;
 	}
 
 }
