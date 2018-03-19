@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
@@ -36,11 +37,10 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -51,7 +51,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -62,15 +61,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
 
 	public static final String PROGRAM_UUID = "9f9c606e-03c1-4073-bf0c-2ffa58c36037";
 	@Mock
 	Session session;
-
-	@Mock
-	GermplasmListDAO germplasmListDao;
 
 	@Mock
 	HibernateSessionProvider sessionProvider;
@@ -83,9 +81,6 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	Criteria criteria;
-
-	@Mock
-	GermplasmDataManager germplasmDataManager;
 
 	@Mock
 	LocationDAO locationDAO;
@@ -104,6 +99,9 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	private GermplasmGroupingService germplasmGroupingService;
+
+	@Mock
+	private NamingConfigurationDAO namingConfigurationDAO;
 
 	private List<Pair<Germplasm, List<Name>>> germplasms;
 
@@ -128,8 +126,8 @@ public class FieldbookServiceImplTest {
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
-		Mockito.when(this.dbBroker.getLocationDAO()).thenReturn(this.locationDAO);
-		Mockito.when(this.locationDataManager.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID))
+		when(this.dbBroker.getLocationDAO()).thenReturn(this.locationDAO);
+		when(this.locationDataManager.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID))
 				.thenReturn(new ArrayList<Location>());
 	}
 
