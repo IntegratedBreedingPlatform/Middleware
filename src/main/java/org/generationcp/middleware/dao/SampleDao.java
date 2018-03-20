@@ -79,6 +79,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("sample.takenBy", "takenBy")
 			.createAlias("takenBy.person", "person")
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
+			.createAlias("experiment.experimentStocks", "experimentStocks")
+			.createAlias("experimentStocks.stock", "stock")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
@@ -92,6 +94,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("plant.plantBusinessKey")) //row[7]
 				.add(Projections.property("dataset.datasetId")) //row[8]
 				.add(Projections.property("dataset.datasetName")) //row[9]
+				.add(Projections.property("stock.dbxrefId")) //row[10]
+				.add(Projections.property("stock.name")) //row[11] TODO preferred name
+				.add(Projections.property("samplingDate")) //row[12]
 			)).list();
 
 		return mapSampleDTOS(result);
@@ -99,12 +104,17 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	private List<SampleDTO> mapSampleDTOS(final List<Object[]> result) {
 		final Map<Integer, SampleDTO> sampleDTOMap = new HashMap<>();
+		// TODO
+		// - 2nd iteration: use setMaxResults and a combination of page and pageSize to compute entryNo
+		// - 3rd iteration: BMS-4785
+		Integer entryNo = 1;
 		for (final Object[] row : result) {
 
 			final Integer sampleId = (Integer) row[0];
 			SampleDTO dto = sampleDTOMap.get(sampleId);
 			if (dto == null) {
 				dto = new SampleDTO();
+				dto.setEntryNo(entryNo++);
 				dto.setSampleId(sampleId);
 				dto.setSampleName((String) row[1]);
 				dto.setSampleBusinessKey((String) row[2]);
@@ -112,6 +122,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				dto.setSampleList((String) row[5]);
 				dto.setPlantNumber((Integer) row[6]);
 				dto.setPlantBusinessKey((String) row[7]);
+				dto.setGid((Integer) row[10]);
+				dto.setDesignation((String) row[11]);
+				if (row[12] != null) {
+					dto.setSamplingDate((Date) row[12]);
+				}
 				dto.setDatasets(new HashSet<SampleDTO.Dataset>());
 			}
 
