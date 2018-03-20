@@ -24,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+
 import java.util.List;
 import java.util.Set;
 
@@ -790,7 +791,6 @@ public class GermplasmGroupingServiceImplTest {
 		}
 	}
 
-	@Test
 	public void testUnfixLines() {
 
 		final int gid = 222;
@@ -803,5 +803,11 @@ public class GermplasmGroupingServiceImplTest {
 
 	}
 
-
+	public void testGetGroupMembers() {
+		final Integer gid = 1;
+		final List<Germplasm> groupMembers = new ArrayList<>();
+		Mockito.when(this.germplasmDAO.getManagementGroupMembers(gid)).thenReturn(groupMembers);
+		Assert.assertSame(groupMembers, germplasmGroupingService.getGroupMembers(gid));
+	}
+  
 }

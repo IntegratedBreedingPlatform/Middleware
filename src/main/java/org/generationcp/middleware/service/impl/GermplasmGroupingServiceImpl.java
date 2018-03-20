@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -114,6 +115,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		germplasmGroup.setGroupId(founder.getMgid());
 		germplasmGroup.setGroupMembers(this.germplasmDAO.getManagementGroupMembers(founder.getMgid()));
 		return germplasmGroup;
+	}
+
+	@Override
+	public List<Germplasm> getGroupMembers(final Integer gid) {
+		return this.germplasmDAO.getManagementGroupMembers(gid);
 	}
 
 	private void traverseAssignGroup(final GermplasmPedigreeTreeNode node, final Integer groupId, final boolean preserveExistingGroup) {

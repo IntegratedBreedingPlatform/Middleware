@@ -66,6 +66,8 @@ public interface GermplasmGroupingService {
 	 */
 	GermplasmGroup getGroupMembers(Germplasm founder);
 
+	List<Germplasm> getGroupMembers(Integer gid);
+
 	GermplasmPedigreeTree getDescendantTree(Germplasm germplasm);
 
 	void copyCodedNames(Germplasm germplasm, Germplasm sourceGermplasm);
