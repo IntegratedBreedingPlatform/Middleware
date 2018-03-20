@@ -100,15 +100,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Override
 	@Transactional
 	public void unfixLines(final Set<Integer> gids) {
-
-		// Only process germplasm with assigned group
-		final List<Germplasm> listOfGermplasmWithGroup = this.germplasmDataManager.getGermplasmWithGroup(new ArrayList<Integer>(gids));
-		for (final Germplasm germplasm : listOfGermplasmWithGroup) {
-			// Unfixing a germplasm line equates to assigning mgid to 0.
-			germplasm.setMgid(0);
-			this.germplasmDAO.save(germplasm);
-		}
-
+		this.germplasmDAO.resetGermplasmGroup(new ArrayList<Integer>(gids));
 	}
 
 	@Override

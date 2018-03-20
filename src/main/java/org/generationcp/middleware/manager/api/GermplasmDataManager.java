@@ -789,15 +789,6 @@ public interface GermplasmDataManager {
 	 */
 	List<Germplasm> getGermplasmWithoutGroup(List<Integer> gids);
 
-
-	/**
-	 * Given a List of GIDs, return the list of Germplasm with group assigned.
-	 *
-	 * @param gids the gids
-	 * @return the germplasms
-	 */
-	List<Germplasm> getGermplasmWithGroup(List<Integer> gids);
-
 	/**
 	 * Given a List of GIDs, return the list of all Germplasm together with their PreferredName.
 	 *

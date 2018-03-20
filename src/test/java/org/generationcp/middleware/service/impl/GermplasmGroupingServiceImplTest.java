@@ -791,39 +791,17 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testUnfixLineGermplasmHasGermplasmWithGroup() {
+	public void testUnfixLines() {
 
 		final int gid = 222;
-		final int mgid = 111;
-
-		final Germplasm germplasm = new Germplasm();
-		germplasm.setGid(gid);
-		germplasm.setMgid(mgid);
 
 		final Set<Integer> gidsToProcess = new HashSet<>(Arrays.asList(gid));
 
-		final List<Germplasm> listOfGemrplasmWithAssignedGroup = Arrays.asList(germplasm);
-
-		Mockito.when(this.germplasmDataManager.getGermplasmWithGroup(new ArrayList<Integer>(gidsToProcess))).thenReturn(listOfGemrplasmWithAssignedGroup);
-
 		this.germplasmGroupingService.unfixLines(gidsToProcess);
 
-		Assert.assertEquals(0, germplasm.getMgid().intValue());
-		Mockito.verify(this.germplasmDAO).save(germplasm);
+		Mockito.verify(this.germplasmDAO).resetGermplasmGroup(new ArrayList<Integer>(gidsToProcess));
 
 	}
 
-	@Test
-	public void testUnfixLineGermplasmHasNoGermplasmWithoutGroup() {
 
-		final int gid = 222;
-
-		// Return an empty list
-		Mockito.when(this.germplasmDataManager.getGermplasmWithGroup(Arrays.asList(gid))).thenReturn(new ArrayList<Germplasm>());
-
-		this.germplasmGroupingService.unfixLines(new HashSet<Integer>(Arrays.asList(gid)));
-
-		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
-
-	}
 }

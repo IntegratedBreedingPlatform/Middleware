@@ -51,10 +51,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private TransactionDAO transactionDAO;
 
-	private Integer germplasmGID;
-
-	private Name preferredName;
-
 	private ListDataProjectDAO listDataProjectDAO;
 
 	private GermplasmListDAO germplasmListDAO;
@@ -551,7 +547,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmWithoutGroup() {
+	public void testGermplasmWithoutGroup() {
 
 		// Create 2 germplasm without group
 		final Germplasm germplasm1 =
@@ -575,26 +571,26 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmWithGroup() {
+	public void resetGermplasmGroup() {
 
-		// Create 2 germplasm without group
+		// Create 2 germplasm with group
 		final Germplasm germplasm1 =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 99, 1, 1, "MethodName", "LocationName");
 		final Germplasm germplasm2 =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-
-		// Create 1 germplasm with group
-		final Germplasm germplasm3 =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 999, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 100, 1, 1, "MethodName", "LocationName");
 
 		// Save them
 		this.dao.save(germplasm1);
 		this.dao.save(germplasm2);
-		this.dao.save(germplasm3);
 
-		List<Germplasm> listOfGermplasm =
-				dao.getGermplasmWithGroup(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
-		Assert.assertEquals("Only 1 germplasm from the gid list has group assigned", 1, listOfGermplasm.size());
+		// Reset the germplasm group
+		dao.resetGermplasmGroup(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()));
+
+		dao.getSession().refresh(germplasm1);
+		dao.getSession().refresh(germplasm2);
+
+		Assert.assertEquals(0, germplasm1.getMgid().intValue());
+		Assert.assertEquals(0, germplasm2.getMgid().intValue());
 
 	}
 
@@ -620,12 +616,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm mParent =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer mParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
-
-		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
-						"LocationName");
-		this.preferredName = germplasm.getPreferredName();
-		this.germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 
 		final Germplasm mgMember = GermplasmTestDataInitializer
 				.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",

@@ -1099,31 +1099,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	/**
-	 * Only return germplasm with assigned group.
+	 * Resets the mgids of a given list of germplasm to zero.
 	 * @param gids
-	 * @return
 	 */
-	public List<Germplasm> getGermplasmWithGroup(final List<Integer> gids) {
-
-		if (gids.isEmpty()) {
-			return new ArrayList<>();
-		}
+	public void resetGermplasmGroup(final List<Integer> gids) {
 
 		try {
-			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
-			queryString.append("g.gid IN( :gids ) AND (g.mgid != 0 && g.mgid IS NOT NULL)");
 
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameterList("gids", gids);
-			query.addEntity("g", Germplasm.class);
-
-			return query.list();
+		final SQLQuery query = this.getSession().createSQLQuery("UPDATE germplsm SET mgid = 0 WHERE gid IN (:gids)");
+		query.setParameterList("gids", gids);
+		query.executeUpdate();
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getGermplasmWithoutGroup(gids=" + gids.toString() + ") " + e.getMessage();
+			final String message = "Error with resetGermplasmGroup(gids=" + gids.toString() + ") " + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+
 	}
 }
