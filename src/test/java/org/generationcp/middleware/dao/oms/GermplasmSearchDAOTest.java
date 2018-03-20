@@ -198,9 +198,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final Germplasm actualResult = results.get(0);
 		final Germplasm mgMember = results.get(1);
 		Assert.assertEquals("Lot count should be 0", Integer.valueOf(1), actualResult.getInventoryInfo().getActualInventoryLotCount());
-		Assert.assertEquals("Total Available Balance should be 100.0", Double.valueOf(100.0), actualResult.getInventoryInfo().getTotalAvailableBalance());
-		Assert.assertEquals("Lot count for mgMember should be 0", Integer.valueOf(0), mgMember.getInventoryInfo().getActualInventoryLotCount());
-		Assert.assertEquals("Total Available Balance for mgMember should be 0.0", Double.valueOf(0.0), mgMember.getInventoryInfo().getTotalAvailableBalance());
+		Assert.assertEquals("Total Available Balance should be 100.0", Double.valueOf(100.0),
+				actualResult.getInventoryInfo().getTotalAvailableBalance());
+		Assert.assertEquals("Lot count for mgMember should be 0", Integer.valueOf(0),
+				mgMember.getInventoryInfo().getActualInventoryLotCount());
+		Assert.assertEquals("Total Available Balance for mgMember should be 0.0", Double.valueOf(0.0),
+				mgMember.getInventoryInfo().getTotalAvailableBalance());
 	}
 
 	@Test
@@ -1188,7 +1191,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.germplasmDataDM.addGermplasmAttribute(attribute);
 
-		final Lot lot =  new Lot();
+		final Lot lot = new Lot();
 		lot.setEntityType("GERMPLSM");
 		lot.setLocationId(0);
 		lot.setScaleId(TermId.SEED_AMOUNT_G.getId());
@@ -1206,7 +1209,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				.createGermplasm(germplasmDate, femaleParentGID, maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
 						"MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
-
 
 	}
 
@@ -1291,10 +1293,10 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private void assertInventoryFields(final List<Germplasm> germplasmSearchResults) {
 		for (final Germplasm germplasm : germplasmSearchResults) {
 			Assert.assertEquals("Lot count should be 1", Integer.valueOf(1), germplasm.getInventoryInfo().getActualInventoryLotCount());
-			Assert.assertEquals("Total Available Balance should be 100.0", Double.valueOf(100.0), germplasm.getInventoryInfo().getTotalAvailableBalance());
+			Assert.assertEquals("Total Available Balance should be 100.0", Double.valueOf(100.0),
+					germplasm.getInventoryInfo().getTotalAvailableBalance());
 		}
 	}
-
 
 	private void assertAddedGermplasmFields(final Germplasm germplasm, final List<String> propertyIds) {
 
