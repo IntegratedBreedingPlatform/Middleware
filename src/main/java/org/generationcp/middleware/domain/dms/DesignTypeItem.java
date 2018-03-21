@@ -5,20 +5,20 @@ public class DesignTypeItem {
 	
 	// Constants for well known (e.g. BreedingView) design types.
 	public static final DesignTypeItem RANDOMIZED_COMPLETE_BLOCK = new DesignTypeItem(0, "Randomized Complete Block Design",
-			"randomizedCompleteBlockParams.html", false, 0, 0, false);
+			"randomizedCompleteBlockParams.html", 0, 0, false);
 
 	public static final DesignTypeItem RESOLVABLE_INCOMPLETE_BLOCK = new DesignTypeItem(1, "Resolvable Incomplete Block Design",
-			"incompleteBlockParams.html", false, 0, 0, false);
+			"incompleteBlockParams.html", 0, 0, false);
 	
-	public static final DesignTypeItem ROW_COL = new DesignTypeItem(2, "Row-and-Column", "rowAndColumnParams.html", false, 0, 0, false);
+	public static final DesignTypeItem ROW_COL = new DesignTypeItem(2, "Row-and-Column", "rowAndColumnParams.html", 0, 0, false);
 	
-	public static final DesignTypeItem CUSTOM_IMPORT = new DesignTypeItem(3, "Custom Import Design", null, false, 0, 0, false);
+	public static final DesignTypeItem CUSTOM_IMPORT = new DesignTypeItem(3, "Custom Import Design", null, 0, 0, false);
 
 	public static final DesignTypeItem AUGMENTED_RANDOMIZED_BLOCK = new DesignTypeItem(4, "Augmented Randomized Block design",
-			"augmentedRandomizedBlockParams.html", false, 0, 0, false);
+			"augmentedRandomizedBlockParams.html", 0, 0, false);
 
 	public static final DesignTypeItem ENTRY_LIST_ORDER = new DesignTypeItem(5, "Entry list order",
-			"entryListOrderParams.html", false, 0, 0, false);
+			"entryListOrderParams.html", 0, 0, false);
 
 	public static final String ALPHA_LATTICE = "Alpha Lattice";
 
@@ -27,7 +27,6 @@ public class DesignTypeItem {
 
 	// this is an html file that contains the specific fields under design type
 	private String params;
-	private Boolean isPreset;
 	private Integer repNo;
 	private Integer totalNoOfEntries;
 	private Boolean isDisabled;
@@ -41,12 +40,11 @@ public class DesignTypeItem {
 		this.id = id;
 	}
 
-	public DesignTypeItem(final Integer id, final String name, final String params, final Boolean isPreset,
+	public DesignTypeItem(final Integer id, final String name, final String params,
 			final Integer noOfReps, final Integer noOfEntries, final Boolean isDisabled) {
 		this.id = id;
 		this.name = name;
 		this.params = params;
-		this.isPreset = isPreset;
 		this.repNo = noOfReps;
 		this.totalNoOfEntries = noOfEntries;
 		this.isDisabled = isDisabled;
@@ -79,14 +77,6 @@ public class DesignTypeItem {
 
 	public void setParams(final String params) {
 		this.params = params;
-	}
-
-	public Boolean getIsPreset() {
-		return this.isPreset;
-	}
-
-	public void setIsPreset(final Boolean isPreset) {
-		this.isPreset = isPreset;
 	}
 
 	public Integer getRepNo() {
