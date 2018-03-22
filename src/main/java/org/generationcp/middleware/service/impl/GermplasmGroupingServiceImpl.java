@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -94,6 +96,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 
 		return this.getGroupMembers(germplasmToFix);
+	}
+
+	@Override
+	@Transactional
+	public void unfixLines(final Set<Integer> gids) {
+		this.germplasmDAO.resetGermplasmGroup(new ArrayList<Integer>(gids));
 	}
 
 	@Override
