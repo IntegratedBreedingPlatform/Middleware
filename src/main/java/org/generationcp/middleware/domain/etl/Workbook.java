@@ -11,6 +11,12 @@
 
 package org.generationcp.middleware.domain.etl;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.util.Debug;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,12 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.util.Debug;
 
 public class Workbook {
 
@@ -263,16 +263,14 @@ public class Workbook {
 	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
 		final Set<MeasurementVariable> list = new LinkedHashSet<>();
-		//if (!this.isNursery()) { //TODO COMMENTED CODE
-			MeasurementVariable trialFactor = null;
-			if (this.getTrialFactors() != null) {
-				for (final MeasurementVariable var : this.getTrialConditions()) {
-					if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-						trialFactor = var;
-						break;
-					}
+		MeasurementVariable trialFactor = null;
+		if (this.getTrialFactors() != null) {
+			for (final MeasurementVariable var : this.getTrialConditions()) {
+				if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					trialFactor = var;
+					break;
 				}
-			//}
+			}
 			if (trialFactor != null) {
 				list.add(trialFactor);
 			}

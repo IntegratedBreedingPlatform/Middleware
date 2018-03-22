@@ -103,13 +103,6 @@ public class StudyNode implements Comparable<StudyNode> {
 		 this.studyType = studyType;
 	 }
 
-	 /*public boolean isNursery() {
-		 if (this.studyType != null && this.studyType == StudyType.N) {
-			 return true;
-		 }
-		 return false;
-	 }*/
-
 	 public Season getSeason() {
 		 return this.season;
 	 }

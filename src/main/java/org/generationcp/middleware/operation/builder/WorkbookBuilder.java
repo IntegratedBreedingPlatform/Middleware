@@ -446,41 +446,8 @@ public class WorkbookBuilder extends Builder {
 					} else if (PhenotypicType.VARIATE == varType.getRole()) {// TODO traits
 						// constants, no need to retrieve the value if it's a trial study
 						isConstant = true;
-/*						if (isNursery) {
-							final List<Phenotype> phenotypes =
-								this.getPhenotypeDao().getByProjectAndType(trialDatasetId, stdVariable.getId());
-							// expects only 1 value for nursery
-							if (phenotypes != null && !phenotypes.isEmpty()) {
-								if (phenotypes.get(0).getcValueId() != null) {
-									// categorical constant
-									final Enumeration enumeration = stdVariable
-											.getEnumeration(phenotypes.get(0).getcValueId());
-									value = enumeration.getDescription();
-								} else {
-									value = phenotypes.get(0).getValue();
-								}
-							}
-							if (value == null) {
-								value = StringUtils.EMPTY;
-							}
-						} else {*/
-							value = StringUtils.EMPTY;
-						/*}*/
+						value = StringUtils.EMPTY;
 					}
-
-/*					if (isNursery && value.isEmpty()) {
-						// set trial env for nursery studies
-						final List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
-						if (locIds != null && !locIds.isEmpty()) {
-							final Integer locId = locIds.get(0);
-							final Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							final int varId = stdVariable.getId();
-							value = this.getVariableValueFromGeolocation(varId, value, geolocation);
-						}
-						if (value == null) {
-							value = StringUtils.EMPTY;
-						}
-					}*/
 
 					if (value != null) {
 						final MeasurementVariable measurementVariable = this.createMeasurementVariable(stdVariable,
