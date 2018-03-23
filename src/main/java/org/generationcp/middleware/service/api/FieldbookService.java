@@ -204,24 +204,6 @@ public interface FieldbookService {
 	Integer getGermplasmIdByName(String name);
 
 	/**
-	 * Gets the data set.
-	 *
-	 * @param id
-	 *            the id
-	 * @return the data set
-	 */
-	Workbook getNurseryDataSet(int id);
-
-	/**
-	 * Gets the data set.
-	 *
-	 * @param id
-	 *            the id
-	 * @return the data set
-	 */
-	Workbook getTrialDataSet(int id);
-
-	/**
 	 * Given a workbook already loaded which does not load observations now - this is a helper method to trigger
 	 * loading the observations collection IF AND WHEN NEEDED. This method is a
 	 * stop gap mecahnism to lazy load the observations collection until we can
@@ -1014,4 +996,5 @@ public interface FieldbookService {
 
 	Workbook getStudyDataSet(final int id, final StudyTypeDto studyType);
 
+	Workbook getStudyDataSet(int studyID);
 }

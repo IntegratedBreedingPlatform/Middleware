@@ -372,7 +372,7 @@ public class DataSetupTest extends IntegrationTestBase {
 				GermplasmListType.STUDY, germplasmListId, listDataProjects, 1);
 
 		// Load and check some basics
-		final Workbook nurseryWorkbook = this.middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);
+		final Workbook nurseryWorkbook = this.middlewareFieldbookService.getStudyDataSet(nurseryStudyId);
 		Assert.assertNotNull(nurseryWorkbook);
 
 		final StudyDetails nurseryStudyDetails = nurseryWorkbook.getStudyDetails();

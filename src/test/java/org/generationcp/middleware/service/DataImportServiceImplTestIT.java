@@ -86,7 +86,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
 				DataImportServiceImplTestIT.PROGRAM_UUID, this.cropPrefix);
 
-		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
+		final Workbook createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
@@ -113,7 +113,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
 				DataImportServiceImplTestIT.PROGRAM_UUID, this.cropPrefix);
 
-		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
+		final Workbook createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
@@ -140,7 +140,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
 				DataImportServiceImplTestIT.PROGRAM_UUID, this.cropPrefix);
 
-		Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
+		Workbook createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		final int noOfOrigTrialInstances = createdWorkbook.getTrialObservations().size();
 
@@ -149,7 +149,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		this.dataImportService.saveDataset(createdWorkbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID,
 				this.cropPrefix);
 
-		createdWorkbook = this.fieldbookService.getTrialDataSet(id);
+		createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		Assert.assertTrue(
 				"Expected " + (noOfOrigTrialInstances + 1) + " instances but got "
@@ -164,13 +164,13 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID,
 				this.cropPrefix);
 
-		Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
+		Workbook createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		WorkbookTestDataInitializer.deleteExperimentPropVar(createdWorkbook);
 
 		this.dataImportService.saveDataset(createdWorkbook, DataImportServiceImplTestIT.PROGRAM_UUID, this.cropPrefix);
 
-		createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
+		createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		Assert.assertNotNull("Expected successful retrieval of workbook.", createdWorkbook);
 	}

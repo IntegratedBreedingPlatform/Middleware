@@ -142,7 +142,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID,
 				WorkbookBuilderTest.CROP_PREFIX);
 
-		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
+		final Workbook createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		Assert.assertTrue("Expected correct values for constants but did not match with old workbook.",
 				this.areConstantsMatch(workbook.getConstants(), createdWorkbook.getConstants()));
@@ -181,7 +181,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID,
 				WorkbookBuilderTest.CROP_PREFIX);
 
-		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
+		final Workbook createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
 		Assert.assertTrue("Expected correct values for trial observations but did not match with old workbook.",
 				this.areConstantsCorrect(createdWorkbook.getConstants(), createdWorkbook.getTrialObservations()));
