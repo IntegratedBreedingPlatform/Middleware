@@ -203,7 +203,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
-		if (!workbook.isNursery() && !trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
+		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
 
@@ -654,11 +654,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// it means the location is defined in the observation sheet
 		trialInstanceNumber = this.getTrialInstanceNumberFromMeasurementRows(workbook.getObservations(),
 				workbook.getTrialFactors());
-
-		if (workbook.isNursery()) {
-			return "1";
+		if (trialInstanceNumber != null) {
+			return trialInstanceNumber;
 		}
-		return null;
+
+		return "1";
 	}
 
 	private Integer getStudyId(final String name, final String programUUID) {
@@ -851,7 +851,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
-		if (!workbook.isNursery() && !trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
+		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
 			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
@@ -935,93 +935,78 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		this.setRequiredField(TermId.PLOT_NNO.getId(), workbook.getFactors());
 		this.setRequiredField(TermId.ENTRY_NO.getId(), workbook.getFactors());
 		this.setRequiredField(TermId.GID.getId(), workbook.getFactors());
-
-		if (!workbook.isNursery()) {
-			this.setRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables());
-		}
+		this.setRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables());
 	}
 
-	private void checkForExistingTrialInstance(final Workbook workbook, final Map<String, List<Message>> errors,
-			final String programUUID) {
+	private void checkForExistingTrialInstance(final Workbook workbook, final Map<String, List<Message>> errors, final String programUUID) {
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
 		String trialInstanceNumber;
-		if (workbook.isNursery()) {
-			trialInstanceNumber = "1";
-			final Integer locationId = this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName,
-					trialInstanceNumber, programUUID);
-			// same location and study
-			if (locationId != null) {
-				this.initializeIfNull(errors, Constants.GLOBAL);
-				errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", trialInstanceNumber));
-			}
-		} else {
-			// get local variable name of the trial instance number
-			String trialInstanceHeader = null;
-			final List<MeasurementVariable> trialVariables = workbook.getTrialFactors();
-			trialVariables.addAll(workbook.getConditions());
-			for (final MeasurementVariable mvar : trialVariables) {
-				final Integer varId = this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(
-						mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-				if (varId != null) {
-					final StandardVariable svar = this.ontologyDataManager.getStandardVariable(varId, programUUID);
-					if (svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-						trialInstanceHeader = mvar.getName();
-						break;
-					}
-				}
-			}
-			// get and check if trialInstanceNumber already exists
-			final Set<String> locationIds = new LinkedHashSet<>();
 
-			int maxNumOfIterations = 100000;
-			final int observationCount = workbook.getObservations().size();
-			if (observationCount < maxNumOfIterations) {
-				maxNumOfIterations = observationCount;
-			}
-			final List<String> duplicateTrialInstances = new ArrayList<>();
-			final boolean isMeansDataImport = workbook.getImportType() != null
-					&& workbook.getImportType() == DataSetType.MEANS_DATA.getId();
-			for (int i = 0; i < maxNumOfIterations; i++) {
-				final MeasurementRow row = workbook.getObservations().get(i);
-				trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
-				if (locationIds.add(trialInstanceNumber)) {
-					final Integer locationId = this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName,
-							trialInstanceNumber, programUUID);
-					// same location and study
-					if (locationId != null) {
-						duplicateTrialInstances.add(trialInstanceNumber);
-					}
+		// get local variable name of the trial instance number
+		String trialInstanceHeader = null;
+		final List<MeasurementVariable> trialVariables = workbook.getTrialFactors();
+		trialVariables.addAll(workbook.getConditions());
+		for (final MeasurementVariable mvar : trialVariables) {
+			final Integer varId =
+				this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+			if (varId != null) {
+				final StandardVariable svar = this.ontologyDataManager.getStandardVariable(varId, programUUID);
+				if (svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					trialInstanceHeader = mvar.getName();
+					break;
 				}
 			}
-			boolean hasDuplicateTrialInstances = false;
-			if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
-				// check import type first
-				final List<Integer> variateIds = new ArrayList<>();
-				// check all variates
-				for (final MeasurementVariable mvar : workbook.getVariates()) {
-					variateIds.add(mvar.getTermId());
-				}
-
-				final int numberOfVariatesData = this.getPhenotypeDao().countVariatesDataOfStudy(
-						isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(),
-						variateIds);
-				if (numberOfVariatesData > 0) {
-					hasDuplicateTrialInstances = true;
-				}
-			}
-			if (hasDuplicateTrialInstances) {
-				this.initializeIfNull(errors, Constants.GLOBAL);
-				final StringBuilder trialInstanceNumbers = new StringBuilder();
-				for (final String trialInstanceNo : duplicateTrialInstances) {
-					trialInstanceNumbers.append(trialInstanceNo);
-					trialInstanceNumbers.append(",");
-				}
-				errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",
-						trialInstanceNumbers.toString().substring(0, trialInstanceNumbers.toString().length() - 1)));
-			}
-
 		}
+		// get and check if trialInstanceNumber already exists
+		final Set<String> locationIds = new LinkedHashSet<>();
+
+		int maxNumOfIterations = 100000;
+		final int observationCount = workbook.getObservations().size();
+		if (observationCount < maxNumOfIterations) {
+			maxNumOfIterations = observationCount;
+		}
+		final List<String> duplicateTrialInstances = new ArrayList<>();
+		final boolean isMeansDataImport = workbook.getImportType() != null && workbook.getImportType() == DataSetType.MEANS_DATA.getId();
+		for (int i = 0; i < maxNumOfIterations; i++) {
+			final MeasurementRow row = workbook.getObservations().get(i);
+			trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
+			if (locationIds.add(trialInstanceNumber)) {
+				final Integer locationId =
+					this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber, programUUID);
+				// same location and study
+				if (locationId != null) {
+					duplicateTrialInstances.add(trialInstanceNumber);
+				}
+			}
+		}
+		boolean hasDuplicateTrialInstances = false;
+		if (!duplicateTrialInstances.isEmpty() && workbook.getStudyDetails().getId() != null) {
+			// check import type first
+			final List<Integer> variateIds = new ArrayList<>();
+			// check all variates
+			for (final MeasurementVariable mvar : workbook.getVariates()) {
+				variateIds.add(mvar.getTermId());
+			}
+
+			final int numberOfVariatesData = this.getPhenotypeDao()
+				.countVariatesDataOfStudy(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(),
+					variateIds);
+			if (numberOfVariatesData > 0) {
+				hasDuplicateTrialInstances = true;
+			}
+		}
+		if (hasDuplicateTrialInstances) {
+			this.initializeIfNull(errors, Constants.GLOBAL);
+			final StringBuilder trialInstanceNumbers = new StringBuilder();
+			for (final String trialInstanceNo : duplicateTrialInstances) {
+				trialInstanceNumbers.append(trialInstanceNo);
+				trialInstanceNumbers.append(",");
+			}
+			errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",
+				trialInstanceNumbers.toString().substring(0, trialInstanceNumbers.toString().length() - 1)));
+		}
+
 	}
 
 	public int getMaxRowLimit() {
