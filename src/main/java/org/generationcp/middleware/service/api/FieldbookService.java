@@ -222,8 +222,7 @@ public interface FieldbookService {
 	Workbook getTrialDataSet(int id);
 
 	/**
-	 * Given a workbook already loaded via {@link WorkbookBuilder#create(int)} -
-	 * which does not load observations now - this is a helper method to trigger
+	 * Given a workbook already loaded which does not load observations now - this is a helper method to trigger
 	 * loading the observations collection IF AND WHEN NEEDED. This method is a
 	 * stop gap mecahnism to lazy load the observations collection until we can
 	 * gradually refactor all code so that entire set of observations (plots)

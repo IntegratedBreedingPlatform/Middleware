@@ -11,15 +11,8 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -57,8 +50,14 @@ import org.generationcp.middleware.util.DatasetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class WorkbookBuilder extends Builder {
 
@@ -81,13 +80,8 @@ public class WorkbookBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Workbook create(final int id) {
-		return this.create(id, new StudyTypeDto("N"));
-	}
-
 	/**
-	 * Given a workbook already loaded via {@link WorkbookBuilder#create(int)} -
-	 * which does not load observations now - this is a helper method to trigger
+	 * Given a workbook already loaded which does not load observations now - this is a helper method to trigger
 	 * loading the observations collection IF AND WHEN NEEDED. This method is a
 	 * stop gap mecahnism to lazy load the observations collection until we can
 	 * gradually refactor all code so that entire set of observations (plots)
