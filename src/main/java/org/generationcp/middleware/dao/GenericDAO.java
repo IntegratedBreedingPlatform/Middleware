@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -24,10 +18,19 @@ import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class GenericDAO<T, ID extends Serializable> {
 
@@ -240,4 +243,25 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 		return criterion;
 	}
+
+	/**
+	 * addOrder to criteria for each pageable.getSort
+	 * @param criteria
+	 * @param pageable
+	 */
+	static void addOrder(final Criteria criteria, final Pageable pageable) {
+		if (pageable == null || pageable.getSort() == null) {
+			return;
+		}
+		for (Sort.Order order : pageable.getSort()) {
+			switch (order.getDirection()) {
+				case ASC:
+					criteria.addOrder(Order.asc(order.getProperty()));
+					break;
+				case DESC:
+					criteria.addOrder(Order.desc(order.getProperty()));
+			}
+		}
+	}
+
 }

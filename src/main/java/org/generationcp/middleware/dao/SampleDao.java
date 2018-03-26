@@ -17,6 +17,8 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.*;
 
@@ -51,8 +53,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private static final String EXPERIMENT = "experiment";
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
 
-	public List<SampleDTO> filter(final String plotId, final Integer listId) {
+	public List<SampleDTO> filter(final String plotId, final Integer listId, final Pageable pageable) {
 		Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+		addOrder(criteria, pageable);
 		if (StringUtils.isNotBlank(plotId)) {
 			criteria.add(Restrictions.eq("experiment.plotId", plotId));
 		}
@@ -103,7 +106,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	private List<SampleDTO> mapSampleDTOS(final List<Object[]> result) {
-		final Map<Integer, SampleDTO> sampleDTOMap = new HashMap<>();
+		final Map<Integer, SampleDTO> sampleDTOMap = new LinkedHashMap<>();
 		// TODO
 		// - 2nd iteration: use setMaxResults and a combination of page and pageSize to compute entryNo
 		// - 3rd iteration: BMS-4785

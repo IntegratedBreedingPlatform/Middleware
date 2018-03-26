@@ -238,6 +238,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>1.8.2.RELEASE</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions-jta</artifactId>
 			<version>${atomikos.version}</version>

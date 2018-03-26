@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,7 @@ public interface SampleService {
 	Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName,
 		final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy, Date createdDate, User takenBy);
 
-	List<SampleDTO> filter(final String plotId, Integer listId);
+	List<SampleDTO> filter(final String plotId, Integer listId, Pageable pageable);
 
 	SampleDetailsDTO getSampleObservation(final String sampleId);
 
