@@ -244,7 +244,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(), "CROSS")));
 		final VariableList factors = VariableListTestDataInitializer.createVariableList();
 		final List<MeasurementData> measurementDataList = new ArrayList<>();
-		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList);
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, null, factors, measurementDataList);
 		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
 		final MeasurementData measurementData = measurementDataList.get(0);
 		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
@@ -258,7 +258,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.CROSS.getId(), "CROSS")));
 		final VariableList factors = VariableListTestDataInitializer.createVariableListWithCategoricalVariable();
 		final List<MeasurementData> measurementDataList = new ArrayList<>();
-		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList);
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, null, factors, measurementDataList);
 		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
 		final MeasurementData measurementData = measurementDataList.get(0);
 		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
@@ -273,7 +273,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 						TermId.CROSS.name(), "CROSS")));
 		final VariableList factors = new VariableList();
 		final List<MeasurementData> measurementDataList = new ArrayList<>();
-		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, null, factors, measurementDataList);
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, null, factors, measurementDataList);
 		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
 		final MeasurementData measurementData = measurementDataList.get(0);
 		Assert.assertEquals(TermId.CROSS.name(), measurementData.getLabel());
@@ -290,7 +290,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		experiment.setPlotId("plot id 1");
 		final VariableList factors = new VariableList();
 		final List<MeasurementData> measurementDataList = new ArrayList<>();
-		this.workbookBuilder.addMeasurementDataForFactors(factorList, false, experiment, factors, measurementDataList);
+		this.workbookBuilder.addMeasurementDataForFactors(factorList, experiment, factors, measurementDataList);
 		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
 		final MeasurementData measurementData = measurementDataList.get(0);
 		Assert.assertEquals(TermId.PLOT_ID.name(), measurementData.getLabel());
