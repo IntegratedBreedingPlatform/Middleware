@@ -156,18 +156,6 @@ public class WorkbookBuilder extends Builder {
 		final List<MeasurementVariable> variates = this.buildVariates(variables, new ArrayList<>(constants));
 		final List<MeasurementVariable> expDesignVariables = new ArrayList<>();
 
-		// Nursery case
-/*		if (!isTrial) {
-			// remove OCC from nursery level conditions for nursery cause its duplicating becuase its being added in conditions and factors
-			// FIXME : redesign dataset or filter earlier
-			final Iterator<MeasurementVariable> iter = conditions.iterator();
-			while (iter.hasNext()) {
-				if (iter.next().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-					iter.remove();
-				}
-			}
-		}
-*/ // TODO COMMENTED TO FIX THEN
 		this.populateBreedingMethodPossibleValues(variates);
 
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
@@ -196,34 +184,6 @@ public class WorkbookBuilder extends Builder {
 				// DA geolocation prop access for value
 				final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
 
-				/*if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
-					// if value is null we have a .... trial instance, or location attribute (lat,long etc)
-					if (value == null) {
-						// set trial env for nursery studies
-						final List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
-						if (locIds != null && !locIds.isEmpty()) {
-							final Integer locId = locIds.get(0);
-							// DA geolocation table
-							final Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							value = getVariableValueFromGeolocation(stdVariableId, null, geolocation);
-						}
-						// redundant logic?
-						if (value == null) {
-							value = StringUtils.EMPTY;
-						}
-					}
-
-					// continuing redundant logic ...
-					final MeasurementVariable measurementVariable =
-						this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
-
-						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
-							expDesignVariables.add(measurementVariable);
-						} else if (!conditions.contains(measurementVariable)) {
-							conditions.add(measurementVariable);
-						}
-					}*/
-				//} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 
 					final MeasurementVariable measurementVariable =
@@ -305,12 +265,7 @@ public class WorkbookBuilder extends Builder {
 
 	private List<MeasurementRow> getTrialObservations(final Workbook workbook) {
 		final List<MeasurementRow> trialObservations;
-/*		if (!isTrial) {
-			trialObservations =
-					this.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
-		} else {*/
-			trialObservations = this.getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId()).getObservations();
-/*		}*/
+		trialObservations = this.getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId()).getObservations();
 		return trialObservations;
 	}
 
@@ -708,7 +663,7 @@ public class WorkbookBuilder extends Builder {
 
 	protected void setMeasurementVarRoles(final Set<MeasurementVariable> measurementVariableLists, final boolean isFactor,
 			final boolean isStudy) {
-		PhenotypicType role = null;
+		PhenotypicType role;
 		if (!isFactor) {
 			// is factor == false, then always variate phenotype
 			role = PhenotypicType.VARIATE;
@@ -781,7 +736,7 @@ public class WorkbookBuilder extends Builder {
 
 	private List<MeasurementVariable> removeConstantsFromVariates(final List<MeasurementVariable> variates,
 			final List<MeasurementVariable> constants) {
-		final List<MeasurementVariable> newVariates = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> newVariates = new ArrayList<>();
 		if (variates != null && !variates.isEmpty()) {
 			for (final MeasurementVariable variate : variates) {
 				boolean found = false;
@@ -891,16 +846,16 @@ public class WorkbookBuilder extends Builder {
 		final int totalRows = (int) this.getStudyDataManager().countExperiments(trialDatasetId);
 		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(trialDatasetId, 0, totalRows);
 
-		final List<MeasurementRow> rows = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> rows = new ArrayList<>();
 		if (experiments != null) {
 			for (final Experiment experiment : experiments) {
-				final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+				final List<MeasurementData> dataList = new ArrayList<>();
 				for (final Variable variable : experiment.getFactors().getVariables()) {
 					if (variable.getVariableType().getId() == TermId.EXPERIMENT_DESIGN_FACTOR.getId()
 							|| variable.getVariableType().getId() == TermId.EXPT_DESIGN_SOURCE.getId()) {
 						continue;
 					}
-					MeasurementData measurementData = null;
+					MeasurementData measurementData;
 					final MeasurementVariable measurementVariable = this
 							.getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList);
 					if (variable.getVariableType().getStandardVariable().getDataType()

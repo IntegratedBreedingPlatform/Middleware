@@ -29,7 +29,6 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -40,7 +39,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -754,11 +752,9 @@ public interface FieldbookService {
 	 *
 	 * @param datasetId
 	 *            the dataset id
-	 * @param isTrial
-	 *            the is trial
 	 * @return the complete dataset
 	 */
-	Workbook getCompleteDataset(int datasetId, boolean isTrial);
+	Workbook getCompleteDataset(int datasetId);
 
 	/**
 	 * Gets the germplasm name types.

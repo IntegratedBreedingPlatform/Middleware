@@ -558,7 +558,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		if (stdVarId != null) {
 			return this.getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
 		}
-		return new ArrayList<ValueReference>();
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -574,7 +574,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<ValueReference> getAllNurseryTypes(final String programUUID) {
 
-		final List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
+		final List<ValueReference> nurseryTypes = new ArrayList<>();
 
 		final StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId(), programUUID);
 		final List<Enumeration> validValues = stdVar.getEnumerations();
@@ -993,7 +993,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getCompleteDataset(final int datasetId, final boolean isTrial) {
+	public Workbook getCompleteDataset(final int datasetId) {
 		final Workbook workbook = this.getDataSetBuilder().buildCompleteDataset(datasetId);
 		this.setOrderVariableByRank(workbook, datasetId);
 		return workbook;

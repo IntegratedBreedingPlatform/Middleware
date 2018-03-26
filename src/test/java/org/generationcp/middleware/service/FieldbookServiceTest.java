@@ -46,7 +46,7 @@ public class FieldbookServiceTest {
 		studyDetails.setStudyName("Test Name");
 		workbook.setStudyDetails(studyDetails);
 		Mockito.when(builder.buildCompleteDataset(Matchers.anyInt())).thenReturn(workbook);
-		impl.getCompleteDataset(1, true);
+		impl.getCompleteDataset(1);
 		Mockito.verify(impl, Mockito.times(1)).setOrderVariableByRank(Matchers.any(Workbook.class), Matchers.anyInt());
 
 	}
