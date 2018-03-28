@@ -287,7 +287,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		try {
 
-			final Geolocation geolocation = this.getGeolocationSaver().saveGeolocation(variableList, null, false);
+			final Geolocation geolocation = this.getGeolocationSaver().saveGeolocation(variableList, null);
 			return geolocation.getLocationId();
 
 		} catch (final Exception e) {
