@@ -677,8 +677,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final StringBuilder sqlString = new StringBuilder()
 				.append("SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 				.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, st"
-					+ ".study_type_id AS "
-					+ "studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as cvtermId ")
+						+ ".study_type_id AS "
+						+ "studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as cvtermId ")
 				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy ").append("FROM project p ")
 				.append(" LEFT JOIN projectprop  ppPI ON p.project_id = ppPI.project_id ").append(" AND ppPI.variable_id =  ")
 				.append(TermId.PI_NAME.getId()).append(" ")
@@ -703,8 +703,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 				this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("cvTermId").addScalar("visible")
-					.addScalar("objective").addScalar("piId").addScalar("siteId").addScalar("createdBy")
+					.addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("visible").addScalar("cvTermId")
+					.addScalar("piId").addScalar("siteId").addScalar("createdBy")
 					.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
 			final List<Object[]> list = query.list();
@@ -723,12 +723,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final String label = (String) row[9];
 					final String studyTypeName = (String) row[10];
 					final boolean visible = ((Byte) row[11]) == 1;
-					final Integer cvtermId = (Integer) row[12];
+					final Integer cvTermId = (Integer) row[12];
 					final String piId = (String) row[13];
 					final String siteId = (String) row[14];
 					final String createdBy = (String) row[15];
 
-					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
+					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvTermId, visible);
 					studyDetails.add(
 						new StudyDetails(id, name, title, objective, startDate, endDate, studyTypeDto, piName, siteName, piId, siteId,
 							Util.getCurrentDateAsStringValue(), createdBy));
@@ -795,7 +795,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				new StringBuilder().append("SELECT DISTINCT p.project_id AS id ").append("        , p.name AS name ")
 				.append("        , p.description AS description ").append("        , p.start_date AS startDate ")
 				.append("        , p.study_type_id AS studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st"
-					+ ".cvterm_id as cvtermId ").append(" , gpSeason.value AS season ")
+						+ ".cvterm_id as cvtermId ").append(" , gpSeason.value AS season ")
 				.append("FROM project p  ")
 				.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
 				.append("   INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
