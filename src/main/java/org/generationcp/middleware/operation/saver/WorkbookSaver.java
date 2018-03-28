@@ -373,8 +373,7 @@ public class WorkbookSaver extends Saver {
 	public void saveTrialObservations(final Workbook workbook, final String programUUID) {
 		if (!workbook.getTrialObservations().isEmpty()) {
 			for (final MeasurementRow trialObservation : workbook.getTrialObservations()) {
-				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery(),
-						programUUID);
+				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, programUUID);
 			}
 		}
 	}
@@ -406,9 +405,9 @@ public class WorkbookSaver extends Saver {
 		}
 
 		watch.restart("save geolocation");
-		final Geolocation g = this.getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
-				workbook.getStudyDetails().getStudyName(), geolocation, null, workbook.isNursery(),
-				isDeleteTrialObservations, programUUID);
+		final Geolocation g = this.getGeolocationSaver()
+			.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null, isDeleteTrialObservations,
+				programUUID);
 		studyLocationId = g.getLocationId();
 		if (g.getVariates() != null && !g.getVariates().isEmpty()) {
 			final VariableList trialVariates = new VariableList();
@@ -443,9 +442,6 @@ public class WorkbookSaver extends Saver {
 		if (!workbook.getTrialObservations().isEmpty()) {
 			observations = workbook.getTrialObservations();
 			hasTrialObservations = true;
-			if (workbook.isNursery()) {
-				geolocationId = observations.get(0).getLocationId();
-			}
 		} else {
 			observations = workbook.getObservations();
 		}
@@ -469,8 +465,8 @@ public class WorkbookSaver extends Saver {
 						if (!locationMap.containsKey(trialInstanceNumber)) {
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
-							final Geolocation g = this.getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
-									workbook.getStudyDetails().getStudyName(), geolocation, row, workbook.isNursery(),
+							final Geolocation g = this.getGeolocationSaver()
+								.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
 									isDeleteTrialObservations, programUUID);
 							geolocationId = g.getLocationId().longValue();
 							locationIds.add(geolocationId.intValue());
@@ -542,15 +538,6 @@ public class WorkbookSaver extends Saver {
 		return null;
 	}
 
-	private MeasurementVariable getTrialInstanceFactor(final List<MeasurementVariable> mvars) {
-		for (final MeasurementVariable mvar : mvars) {
-			if (mvar.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-				return mvar;
-			}
-		}
-		return null;
-	}
-
 	private String getStockFactor(final VariableList stockVariables) {
 		if (stockVariables != null && stockVariables.getVariables() != null) {
 			for (final Variable variable : stockVariables.getVariables()) {
@@ -610,10 +597,6 @@ public class WorkbookSaver extends Saver {
 			studyVariables.addAll(
 				this.getVariableTypeListTransformer().transform(workbook.getStudyConstants(), studyVariables.size() + 1, programUUID));
 
-			if (workbook.isNursery() && this.getTrialInstanceFactor(workbook.getTrialVariables()) == null) {
-				studyVariables.add(this.createOccVariableType(studyVariables.size() + 1, programUUID));
-			}
-
 			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId, studyMV, studyVariables);
 
 			watch.restart("save study");
@@ -631,8 +614,8 @@ public class WorkbookSaver extends Saver {
 		return studyId;
 	}
 
-	private int createTrialDatasetIfNecessary(final Workbook workbook, final int studyId,
-			final List<MeasurementVariable> trialMV, final VariableTypeList trialVariables, final String programUUID) {
+	private int createTrialDatasetIfNecessary(final Workbook workbook, final int studyId, final List<MeasurementVariable> trialMV,
+		final VariableTypeList trialVariables, final String programUUID) {
 		final TimerWatch watch = new TimerWatch("find trial dataset");
 		String trialName = workbook.getStudyDetails().getTrialDatasetName();
 		Integer trialDatasetId = null;
@@ -646,36 +629,26 @@ public class WorkbookSaver extends Saver {
 				}
 				if (trialDatasetId == null) {
 					trialName = this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
-					trialDatasetId = this.getDatasetId(trialName,
-							this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
+					trialDatasetId =
+						this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
 				}
 			} else {
 				trialName = this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
-				trialDatasetId = this.getDatasetId(trialName,
-						this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
+				trialDatasetId =
+					this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
 			}
 		}
 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
-			final String trialDescription = !workbook.getStudyDetails().getDescription().isEmpty()
-					? this.generateTrialDatasetName(workbook.getStudyDetails().getDescription()) : trialName;
-			final DatasetValues trialValues = this.getDatasetValuesTransformer().transform(trialName, trialDescription,
-					DataSetType.SUMMARY_DATA, trialMV, trialVariables);
-
-			if (workbook.isNursery()
-					&& (trialMV == null || trialMV.isEmpty() || this.getTrialInstanceFactor(trialMV) == null)) {
-				trialVariables.add(this.createOccVariableType(trialVariables.size() + 1, programUUID));
-			}
+			final String trialDescription = !workbook.getStudyDetails().getDescription().isEmpty() ?
+				this.generateTrialDatasetName(workbook.getStudyDetails().getDescription()) :
+				trialName;
+			final DatasetValues trialValues = this.getDatasetValuesTransformer()
+				.transform(trialName, trialDescription, DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 
 			watch.restart("save trial dataset");
-			final DmsProject trial = this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues,
-					programUUID);
+			final DmsProject trial = this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID);
 			trialDatasetId = trial.getProjectId();
-		} else {
-			if (workbook.isNursery()
-					&& (trialMV == null || trialMV.isEmpty() || this.getTrialInstanceFactor(trialMV) == null)) {
-				trialVariables.add(this.createOccVariableType(trialVariables.size() + 1, programUUID));
-			}
 		}
 
 		watch.stop();
