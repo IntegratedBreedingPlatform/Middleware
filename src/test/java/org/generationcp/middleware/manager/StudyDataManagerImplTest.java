@@ -666,7 +666,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variable.setVariableType(dmsVariableType);
 		variable.setValue(locationNameIdValue);
 		variableList.add(variable);
-		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
 
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
@@ -714,7 +714,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variable.setVariableType(dmsVariableType);
 		variable.setValue(locationNameIdValue);
 		variableList.add(variable);
-		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
 
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
