@@ -600,10 +600,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	private String getYearFromStudy(final int studyIdentifier) {
-		final DmsProject project = new DmsProject();
-		project.setProjectId(studyIdentifier);
-		return project.getStartDate().substring(0, 4);
-
+		return this.studyDataManager.getProjectStartDateByProjectId(studyIdentifier).substring(0, 4);
 	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
