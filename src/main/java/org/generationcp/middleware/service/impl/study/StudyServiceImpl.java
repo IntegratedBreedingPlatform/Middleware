@@ -599,7 +599,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return this;
 	}
 
-	private String getYearFromStudy(final int studyIdentifier) {
+	String getYearFromStudy(final int studyIdentifier) {
 		return this.studyDataManager.getProjectStartDateByProjectId(studyIdentifier).substring(0, 4);
 	}
 
