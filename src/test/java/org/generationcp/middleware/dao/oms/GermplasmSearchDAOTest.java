@@ -14,16 +14,21 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +48,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private GermplasmSearchDAO dao;
 
 	private UserDefinedFieldDAO userDefinedFieldDao;
+	private GermplasmDAO germplasmDao;
 
 	private Integer germplasmGID;
 	private Integer femaleParentGID;
@@ -58,11 +64,19 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
 
+	@Autowired
+	private InventoryDataManager inventoryDataManager;
+
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
 			this.dao = new GermplasmSearchDAO();
 			this.dao.setSession(this.sessionProvder.getSession());
+
+		}
+		if (this.germplasmDao == null) {
+			this.germplasmDao = new GermplasmDAO();
+			this.germplasmDao.setSession(this.sessionProvder.getSession());
 
 		}
 		if (this.userDefinedFieldDao == null) {
@@ -80,6 +94,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				this.dao.searchForGermplasms(this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false));
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 		this.assertPossibleGermplasmFields(results);
+		this.assertInventoryFields(results);
 	}
 
 	@Test
@@ -90,6 +105,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				"The results should contain one germplasm since there's only one test data with '" + this.preferredName.getNval()
 						+ "' name", 1, results.size());
 		this.assertPossibleGermplasmFields(results);
+		this.assertInventoryFields(results);
 	}
 
 	@Test
@@ -100,6 +116,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				"The results should contain one germplasm since there's only one test data with gid that starts with " + this.germplasmGID,
 				1, results.size());
 		this.assertPossibleGermplasmFields(results);
+		this.assertInventoryFields(results);
 	}
 
 	@Test
@@ -126,6 +143,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				"The results should contain one germplasm since there's only one test data with gid that contains " + this.germplasmGID, 1,
 				results.size());
 		this.assertPossibleGermplasmFields(results);
+		this.assertInventoryFields(results);
 	}
 
 	@Test
@@ -136,6 +154,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				"The results should contain one germplasm since there's only one test data with name that contains " + this.preferredName
 						.getNval(), results.size() == 1);
 		this.assertPossibleGermplasmFields(results);
+		this.assertInventoryFields(results);
 	}
 
 	@Test
@@ -175,6 +194,16 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
 				results.size());
 		this.assertPossibleGermplasmFields(results);
+
+		final Germplasm actualResult = results.get(0);
+		final Germplasm mgMember = results.get(1);
+		Assert.assertEquals("Lot count should be 0", Integer.valueOf(1), actualResult.getInventoryInfo().getActualInventoryLotCount());
+		Assert.assertEquals("Total Available Balance should be 100.0", Double.valueOf(100.0),
+				actualResult.getInventoryInfo().getTotalAvailableBalance());
+		Assert.assertEquals("Lot count for mgMember should be 0", Integer.valueOf(0),
+				mgMember.getInventoryInfo().getActualInventoryLotCount());
+		Assert.assertEquals("Total Available Balance for mgMember should be 0.0", Double.valueOf(0.0),
+				mgMember.getInventoryInfo().getTotalAvailableBalance());
 	}
 
 	@Test
@@ -1162,10 +1191,25 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.germplasmDataDM.addGermplasmAttribute(attribute);
 
+		final Lot lot = new Lot();
+		lot.setEntityType("GERMPLSM");
+		lot.setLocationId(0);
+		lot.setScaleId(TermId.SEED_AMOUNT_G.getId());
+		lot.setEntityId(germplasmGID);
+		lot.setStatus(0);
+		this.inventoryDataManager.addLot(lot);
+
+		final Transaction transaction = new Transaction();
+		transaction.setQuantity(100.0);
+		transaction.setStatus(0);
+		transaction.setLot(lot);
+		this.inventoryDataManager.addTransaction(transaction);
+
 		final Germplasm mgMember = GermplasmTestDataInitializer
 				.createGermplasm(germplasmDate, femaleParentGID, maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
 						"MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
+
 	}
 
 	private List<Integer> createTestGermplasmForSorting() {
@@ -1243,6 +1287,14 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			Assert.assertEquals("Result should contain Germplasm Number of Progenitor", Integer.valueOf(2), germplasm.getGnpgs());
 			Assert.assertEquals("Result should contain Germplasm Date", Integer.valueOf(germplasmDate), germplasm.getGdate());
 			Assert.assertEquals("Result should contain Reference Id", Integer.valueOf(1), germplasm.getReferenceId());
+		}
+	}
+
+	private void assertInventoryFields(final List<Germplasm> germplasmSearchResults) {
+		for (final Germplasm germplasm : germplasmSearchResults) {
+			Assert.assertEquals("Lot count should be 1", Integer.valueOf(1), germplasm.getInventoryInfo().getActualInventoryLotCount());
+			Assert.assertEquals("Total Available Balance should be 100.0", Double.valueOf(100.0),
+					germplasm.getInventoryInfo().getTotalAvailableBalance());
 		}
 	}
 
