@@ -175,10 +175,6 @@ public class Workbook {
 		this.observations = observations;
 	}
 
-	public boolean isNursery() {// FIXME SE DEBE BORRAR.
-		return this.studyDetails.isNursery();
-	}
-
 	public void setMeasurementDatasetVariables(final List<MeasurementVariable> measurementDatasetVariables) {
 		this.measurementDatasetVariables = measurementDatasetVariables;
 	}
