@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 
 /**
  * This is the API for retrieving Germplasm information.
@@ -782,6 +783,14 @@ public interface GermplasmDataManager {
 	List<Germplasm> getGermplasms(List<Integer> gids);
 
 	/**
+	 * Given a List of GIDs, return the list of Germplasm without group assigned (mgid = 0 or mgid is null).
+	 *
+	 * @param gids the gids
+	 * @return the germplasms
+	 */
+	List<Germplasm> getGermplasmWithoutGroup(List<Integer> gids);
+
+	/**
 	 * Given a List of GIDs, return the list of all Germplasm together with their PreferredName.
 	 *
 	 * @param gids the gids
@@ -1145,4 +1154,13 @@ public interface GermplasmDataManager {
 	 * @return Attribute value that matches with attribute name and gid
 	 */
 	String getAttributeValue (final Integer gid, final String attributeName);
+
+	void save(Germplasm germplasm);
+
+	/**
+	 * Get the NamingConfiguration by name
+	 * @param name
+	 * @return
+	 */
+	NamingConfiguration getNamingConfigurationByName(String name);
 }

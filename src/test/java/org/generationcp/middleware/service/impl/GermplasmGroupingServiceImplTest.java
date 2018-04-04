@@ -1,7 +1,9 @@
 package org.generationcp.middleware.service.impl;
 
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
@@ -19,10 +21,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+
+import java.util.List;
+import java.util.Set;
 
 public class GermplasmGroupingServiceImplTest {
 
@@ -63,42 +67,43 @@ public class GermplasmGroupingServiceImplTest {
 		this.selectionHistoryNameCode.setFtable("NAMES");
 		this.selectionHistoryNameCode.setFtype("NAME");
 		this.selectionHistoryNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE)).thenReturn(this.selectionHistoryNameCode);
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
+				.thenReturn(this.selectionHistoryNameCode);
 
 		this.selectionHistoryNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS);
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS))
+		Mockito.when(this.userDefinedFieldDAO
+				.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS))
 				.thenReturn(this.selectionHistoryNameCode);
 
 		this.selHisFixNameCode = new UserDefinedField(222);
 		this.selHisFixNameCode.setFtable("NAMES");
 		this.selHisFixNameCode.setFtype("NAME");
 		this.selHisFixNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE))
+		Mockito.when(this.userDefinedFieldDAO
+				.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE))
 				.thenReturn(this.selHisFixNameCode);
 
 		this.codedName1 = new UserDefinedField(600000007);
 		this.codedName1.setFtable("NAMES");
 		this.codedName1.setFtype("NAME");
 		this.codedName1.setFcode(GermplasmGroupingServiceImpl.CODED_NAME_1);
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.CODED_NAME_1)).thenReturn(this.codedName1);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.CODED_NAME_1))
+				.thenReturn(this.codedName1);
 
 		this.codedName2 = new UserDefinedField(600000008);
 		this.codedName2.setFtable("NAMES");
 		this.codedName2.setFtype("NAME");
 		this.codedName2.setFcode(GermplasmGroupingServiceImpl.CODED_NAME_2);
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.CODED_NAME_2)).thenReturn(this.codedName2);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.CODED_NAME_2))
+				.thenReturn(this.codedName2);
 
 		this.codedName3 = new UserDefinedField(600000009);
 		this.codedName3.setFtable("NAMES");
 		this.codedName3.setFtype("NAME");
 		this.codedName3.setFcode(GermplasmGroupingServiceImpl.CODED_NAME_3);
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.CODED_NAME_3)).thenReturn(this.codedName3);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.CODED_NAME_3))
+				.thenReturn(this.codedName3);
 
 		this.selectionHistoryNameParent = new Name();
 		this.selectionHistoryNameParent.setNstat(GermplasmGroupingServiceImplTest.PREFERRED_CODE);
@@ -115,8 +120,9 @@ public class GermplasmGroupingServiceImplTest {
 		this.selectionHistoryNameChild2.setNval("SelectionHistoryChild2");
 		this.selectionHistoryNameChild2.setTypeId(this.selectionHistoryNameCode.getFldno());
 
-		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.methodDAO,
-				this.userDefinedFieldDAO, this.germplasmDataManager, "maize");
+		this.germplasmGroupingService =
+				new GermplasmGroupingServiceImpl(this.germplasmDAO, this.methodDAO, this.userDefinedFieldDAO, this.germplasmDataManager,
+						"maize");
 	}
 
 	/**
@@ -129,12 +135,10 @@ public class GermplasmGroupingServiceImplTest {
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, false, false);
 
-		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(),
-				germplasmToFix.getMgid());
-		Assert.assertEquals("Existing selection history should remain preferred name.",
-				GermplasmGroupingServiceImplTest.PREFERRED_CODE, this.selectionHistoryNameParent.getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as a new name.", 2,
-				germplasmToFix.getNames().size());
+		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
+		Assert.assertEquals("Existing selection history should remain preferred name.", GermplasmGroupingServiceImplTest.PREFERRED_CODE,
+				this.selectionHistoryNameParent.getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as a new name.", 2, germplasmToFix.getNames().size());
 		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name.",
 				GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, germplasmToFix.getNames().get(1).getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code.",
@@ -160,52 +164,42 @@ public class GermplasmGroupingServiceImplTest {
 		child2.setMgid(333);
 		child2.getNames().add(this.selectionHistoryNameChild2);
 
-		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid()))
-				.thenReturn(Lists.newArrayList(child1, child2));
+		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, true, false);
 
-		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(),
-				germplasmToFix.getMgid());
-		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(),
-				child1.getMgid());
-		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(),
-				child2.getMgid());
+		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
+		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
+		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
 		// Parent selection history name must be copied as selhisfix and as
 		// preferred name.
 		Assert.assertEquals("Existing selection history should remain preferred name for parent.",
 				GermplasmGroupingServiceImplTest.PREFERRED_CODE, this.selectionHistoryNameParent.getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as a new name for parent.", 2,
-				germplasmToFix.getNames().size());
+		Assert.assertEquals("Selection history at fixation should be added as a new name for parent.", 2, germplasmToFix.getNames().size());
 		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for parent.",
 				GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, germplasmToFix.getNames().get(1).getNstat());
-		Assert.assertEquals(
-				"Selection history at fixation should be added as with name type = SELHISFIX code for parent.",
+		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code for parent.",
 				this.selHisFixNameCode.getFldno(), germplasmToFix.getNames().get(1).getTypeId());
 
 		// Child1 selection history name must be copied as selhisfix and as
 		// preferred name.
 		Assert.assertEquals("Existing selection history should remain preferred name for child1.",
 				GermplasmGroupingServiceImplTest.PREFERRED_CODE, this.selectionHistoryNameChild1.getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as a new name for child1.", 2,
-				child1.getNames().size());
+		Assert.assertEquals("Selection history at fixation should be added as a new name for child1.", 2, child1.getNames().size());
 		Assert.assertEquals("Selection history at fixation should be added as non-preferred name for child1.",
 				GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, child1.getNames().get(1).getNstat());
-		Assert.assertEquals(
-				"Selection history at fixation should be added as with name type = SELHISFIX code for parent.",
+		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code for parent.",
 				this.selHisFixNameCode.getFldno(), child1.getNames().get(1).getTypeId());
 
 		// Child2 selection history name must be copied as selhisfix and as
 		// preferred name.
 		Assert.assertEquals("Existing selection history should remain preferred name for child2.",
 				GermplasmGroupingServiceImplTest.PREFERRED_CODE, this.selectionHistoryNameChild2.getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as a new name for child2.", 2,
-				child2.getNames().size());
+		Assert.assertEquals("Selection history at fixation should be added as a new name for child2.", 2, child2.getNames().size());
 		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for child2.",
 				GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, child2.getNames().get(1).getNstat());
-		Assert.assertEquals(
-				"Selection history at fixation should be added as with name type = SELHISFIX code for child2.",
+		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code for child2.",
 				this.selHisFixNameCode.getFldno(), child2.getNames().get(1).getTypeId());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Matchers.any(Germplasm.class));
@@ -224,13 +218,11 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm child2 = new Germplasm(3);
 		child2.setMgid(333);
 
-		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid()))
-				.thenReturn(Lists.newArrayList(child1, child2));
+		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, false, false);
 
-		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(),
-				germplasmToFix.getMgid());
+		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
 		Assert.assertEquals("Expecting child1 mgid to remain the same as before.", new Integer(222), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to remain the same as before.", new Integer(333), child2.getMgid());
 
@@ -287,17 +279,13 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm child2 = new Germplasm(3);
 		child2.setMgid(333);
 
-		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid()))
-				.thenReturn(Lists.newArrayList(child1, child2));
+		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, true, false);
 
-		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(),
-				germplasmToFix.getMgid());
-		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(),
-				child1.getMgid());
-		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(),
-				child2.getMgid());
+		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
+		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
+		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Matchers.any(Germplasm.class));
 	}
@@ -323,13 +311,11 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm child2 = new Germplasm(3);
 		child2.setMgid(333);
 
-		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid()))
-				.thenReturn(Lists.newArrayList(child1, child2));
+		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, true, false);
 
-		Assert.assertEquals("Expecting no mgid changes when method is generative.", expectedParentMGID,
-				germplasmToFix.getMgid());
+		Assert.assertEquals("Expecting no mgid changes when method is generative.", expectedParentMGID, germplasmToFix.getMgid());
 
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Matchers.any(Germplasm.class));
 	}
@@ -354,17 +340,13 @@ public class GermplasmGroupingServiceImplTest {
 		child2.setMgid(expectedChild2MGID);
 		child2.setMethodId(generativeMethodId);
 
-		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid()))
-				.thenReturn(Lists.newArrayList(child1, child2));
+		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, true, false);
 
-		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(),
-				germplasmToFix.getMgid());
-		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(),
-				child1.getMgid());
-		Assert.assertEquals("Expecting child2 mgid to remain unchanged as method is generative.", expectedChild2MGID,
-				child2.getMgid());
+		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
+		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
+		Assert.assertEquals("Expecting child2 mgid to remain unchanged as method is generative.", expectedChild2MGID, child2.getMgid());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Matchers.any(Germplasm.class));
 	}
@@ -409,15 +391,12 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm(crossGid2);
 		crossGermplasm1.setMethodId(nonHybridMethodId);
-		Mockito.when(
-				this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
-				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2,
-						crossGermplasm2));
+		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
+				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
 		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2), false,
 				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
-		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID,
-				crossGermplasm1.getMgid());
+		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID, crossGermplasm1.getMgid());
 
 		// Previous crosses should be queried once.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
@@ -459,16 +438,14 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm crossGermplasm2 = new Germplasm(crossGid2);
 		crossGermplasm1.setMethodId(nonHybridMethodId);
 		Mockito.when(this.germplasmDAO.getById(crossGid2)).thenReturn(crossGermplasm2);
-		Mockito.when(
-				this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
-				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2,
-						crossGermplasm2));
+		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
+				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
 
 		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2), false,
 				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
-		Assert.assertEquals("Expected new cross to be assigned MGID = GID of the cross when no previous crosses exist.",
-				crossGid1, crossGermplasm1.getMgid());
+		Assert.assertEquals("Expected new cross to be assigned MGID = GID of the cross when no previous crosses exist.", crossGid1,
+				crossGermplasm1.getMgid());
 		// Previous crosses should be queried once.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
 		// No selection history should be copied.
@@ -501,8 +478,8 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2));
 
-		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false,
-				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+		this.germplasmGroupingService
+				.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
 		// Previous crosses should never be queried.
@@ -531,8 +508,8 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1));
 
-		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false,
-				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+		this.germplasmGroupingService
+				.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
 		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
 		// Previous crosses should never be queried.
@@ -579,13 +556,13 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2));
 
-		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), true,
-				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+		this.germplasmGroupingService
+				.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), true, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
-		Assert.assertEquals("Expected new cross to be assigned MGID = GID as none of the previous crosses have MGID.",
-				crossGid1, crossGermplasm1.getMgid());
-		Assert.assertEquals("Expected previous cross to be assigned same MGID as the current cross.",
-				crossGermplasm1.getMgid(), previousCross.getMgid());
+		Assert.assertEquals("Expected new cross to be assigned MGID = GID as none of the previous crosses have MGID.", crossGid1,
+				crossGermplasm1.getMgid());
+		Assert.assertEquals("Expected previous cross to be assigned same MGID as the current cross.", crossGermplasm1.getMgid(),
+				previousCross.getMgid());
 
 		// Previous crosses should be queried once.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
@@ -634,15 +611,12 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm(crossGid2);
 		crossGermplasm1.setMethodId(nonHybridMethodId);
-		Mockito.when(
-				this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
-				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2,
-						crossGermplasm2));
+		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
+				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
 		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2), true,
 				GermplasmGroupingServiceImplTest.HYBRID_METHODS);
 
-		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID,
-				crossGermplasm1.getMgid());
+		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID, crossGermplasm1.getMgid());
 
 		// Previous crosses should be queried once.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
@@ -655,16 +629,16 @@ public class GermplasmGroupingServiceImplTest {
 	public void testGetSelectionHistory() {
 		final Germplasm germplasm = new Germplasm();
 		// Germplasm has no name yet, expect to return null
-		Assert.assertNull(this.germplasmGroupingService.getSelectionHistory(germplasm,
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE));
+		Assert.assertNull(
+				this.germplasmGroupingService.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE));
 
 		// Add a matching name
 		final Name selHisNameExpected = new Name(1);
 		selHisNameExpected.setTypeId(this.selectionHistoryNameCode.getFldno());
 		germplasm.getNames().add(selHisNameExpected);
 
-		final Name selectionHistoryName = this.germplasmGroupingService.getSelectionHistory(germplasm,
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+		final Name selectionHistoryName =
+				this.germplasmGroupingService.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 		Assert.assertEquals(selHisNameExpected, selectionHistoryName);
 	}
 
@@ -672,27 +646,27 @@ public class GermplasmGroupingServiceImplTest {
 	public void testGetSelectionHistoryAtFixation() {
 		final Germplasm germplasm = new Germplasm();
 		// Germplasm has no name yet, expect to return null
-		Assert.assertNull(this.germplasmGroupingService.getSelectionHistory(germplasm,
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE));
+		Assert.assertNull(this.germplasmGroupingService
+				.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE));
 
 		// Add a matching name
 		final Name selHisFixNameExpected = new Name(1);
 		selHisFixNameExpected.setTypeId(this.selHisFixNameCode.getFldno());
 		germplasm.getNames().add(selHisFixNameExpected);
 
-		final Name selHisFixNameActual = this.germplasmGroupingService.getSelectionHistory(germplasm,
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		final Name selHisFixNameActual = this.germplasmGroupingService
+				.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		Assert.assertEquals(selHisFixNameExpected, selHisFixNameActual);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testGetSelectionHistoryNameType() {
 
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE)).thenReturn(null);
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
+				.thenReturn(null);
 
-		this.germplasmGroupingService
-				.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+		this.germplasmGroupingService.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE
 				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
 	}
@@ -700,11 +674,11 @@ public class GermplasmGroupingServiceImplTest {
 	@Test(expected = IllegalStateException.class)
 	public void testGetSelectionHistoryAtFixationNameType() {
 
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-				GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE)).thenReturn(null);
+		Mockito.when(this.userDefinedFieldDAO
+				.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE))
+				.thenReturn(null);
 
-		this.germplasmGroupingService
-				.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		this.germplasmGroupingService.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE
 				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
 	}
@@ -715,8 +689,8 @@ public class GermplasmGroupingServiceImplTest {
 		// Setup source germplasm which has SELHISFIX name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
-		final Name selHisFixNameOfParent = NameTestDataInitializer.createName(11,
-				GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML", this.selHisFixNameCode.getFldno());
+		final Name selHisFixNameOfParent = NameTestDataInitializer
+				.createName(11, GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML", this.selHisFixNameCode.getFldno());
 		advancedGermplasmSource.getNames().add(selHisFixNameOfParent);
 
 		// Setup advanced germplasm with a name given on advancing
@@ -724,8 +698,8 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid1(1);
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
-		final Name normalAdvancingNameOfChild = NameTestDataInitializer.createName(22,
-				GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
+		final Name normalAdvancingNameOfChild =
+				NameTestDataInitializer.createName(22, GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Setup parent child relationship mock between the two via gpid2
@@ -738,8 +712,8 @@ public class GermplasmGroupingServiceImplTest {
 		// for parent gets added)
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
 				advancedGermplasm.getNames().size());
-		Assert.assertEquals("Normal advancing name should remain preferred",
-				GermplasmGroupingServiceImplTest.PREFERRED_CODE, normalAdvancingNameOfChild.getNstat());
+		Assert.assertEquals("Normal advancing name should remain preferred", GermplasmGroupingServiceImplTest.PREFERRED_CODE,
+				normalAdvancingNameOfChild.getNstat());
 	}
 
 	@Test
@@ -748,8 +722,8 @@ public class GermplasmGroupingServiceImplTest {
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
-		final Name code1 = NameTestDataInitializer.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE,
-				"CODE1", this.codedName1.getFldno());
+		final Name code1 = NameTestDataInitializer
+				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
 		advancedGermplasmSource.getNames().add(code1);
 
 		// Setup advanced germplasm with a name given on advancing
@@ -757,8 +731,8 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid1(1);
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
-		final Name normalAdvancingNameOfChild = NameTestDataInitializer.createName(22,
-				GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
+		final Name normalAdvancingNameOfChild =
+				NameTestDataInitializer.createName(22, GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Invoke the service
@@ -768,8 +742,8 @@ public class GermplasmGroupingServiceImplTest {
 		// for parent gets added)
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
 				advancedGermplasm.getNames().size());
-		Assert.assertEquals("Normal advancing name should become non-preferred",
-				GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, normalAdvancingNameOfChild.getNstat());
+		Assert.assertEquals("Normal advancing name should become non-preferred", GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE,
+				normalAdvancingNameOfChild.getNstat());
 	}
 
 	@Test
@@ -778,16 +752,16 @@ public class GermplasmGroupingServiceImplTest {
 		// Setup source germplasm which has coded name
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
-		final Name code1 = NameTestDataInitializer.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE,
-				"CODE1", this.codedName1.getFldno());
+		final Name code1 = NameTestDataInitializer
+				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
 		advancedGermplasmSource.getNames().add(code1);
 
-		final Name code2 = NameTestDataInitializer.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE,
-				"CODE2", this.codedName2.getFldno());
+		final Name code2 = NameTestDataInitializer
+				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE2", this.codedName2.getFldno());
 		advancedGermplasmSource.getNames().add(code2);
 
-		final Name code3 = NameTestDataInitializer.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE,
-				"CODE3", this.codedName3.getFldno());
+		final Name code3 = NameTestDataInitializer
+				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE3", this.codedName3.getFldno());
 		advancedGermplasmSource.getNames().add(code3);
 
 		// Setup advanced germplasm with a name given on advancing
@@ -795,8 +769,8 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid1(1);
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
-		final Name normalAdvancingNameOfChild = NameTestDataInitializer.createName(22,
-				GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
+		final Name normalAdvancingNameOfChild =
+				NameTestDataInitializer.createName(22, GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Invoke the service
@@ -808,13 +782,32 @@ public class GermplasmGroupingServiceImplTest {
 				advancedGermplasm.getNames().size());
 		for (final Name name : advancedGermplasm.getNames()) {
 			if (name.getTypeId().equals(this.codedName3.getFldno())) {
-				Assert.assertEquals(
-						"Name with fldno " + this.codedName3.getFldno() + " should be set as preferred name",
+				Assert.assertEquals("Name with fldno " + this.codedName3.getFldno() + " should be set as preferred name",
 						GermplasmGroupingServiceImplTest.PREFERRED_CODE, name.getNstat());
 			} else {
-				Assert.assertEquals("Other inherited names should be non-preferred",
-						GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, name.getNstat());
+				Assert.assertEquals("Other inherited names should be non-preferred", GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE,
+						name.getNstat());
 			}
 		}
 	}
+
+	public void testUnfixLines() {
+
+		final int gid = 222;
+
+		final Set<Integer> gidsToProcess = new HashSet<>(Arrays.asList(gid));
+
+		this.germplasmGroupingService.unfixLines(gidsToProcess);
+
+		Mockito.verify(this.germplasmDAO).resetGermplasmGroup(new ArrayList<Integer>(gidsToProcess));
+
+	}
+
+	public void testGetGroupMembers() {
+		final Integer gid = 1;
+		final List<Germplasm> groupMembers = new ArrayList<>();
+		Mockito.when(this.germplasmDAO.getManagementGroupMembers(gid)).thenReturn(groupMembers);
+		Assert.assertSame(groupMembers, germplasmGroupingService.getGroupMembers(gid));
+	}
+  
 }

@@ -660,5 +660,5 @@ public interface WorkbenchDataManager {
 	 * @return the user matching the given project_uuid
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
-	
+
 }
