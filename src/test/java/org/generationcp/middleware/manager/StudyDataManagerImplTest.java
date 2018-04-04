@@ -742,7 +742,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void getProjectStartDateByProjectId() {
+	public void testGetProjectStartDateByProjectId() {
 		// Create project record
 		final DmsProject project = new DmsProject();
 		final String programUUID = "74364-9075-asdhaskj-74825";
