@@ -183,10 +183,6 @@ public class StudyDetails implements Serializable {
 		this.parentFolderId = parentFolderId;
 	}
 
-	public boolean isNursery() {
-		return this.studyType != null && Objects.equals(this.studyType.getName(), "N");
-	}
-
 	public String getTrialDatasetName() {
 		return trialDatasetName;
 	}
