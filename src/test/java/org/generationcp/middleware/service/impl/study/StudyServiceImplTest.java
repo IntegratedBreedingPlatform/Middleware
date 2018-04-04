@@ -344,4 +344,11 @@ public class StudyServiceImplTest {
 		final String year = this.studyServiceImpl.getYearFromStudy(1);
 		Assert.assertEquals("2018", year);
 	}
+	
+	@Test
+	public void testGetYearFromStudyNull() {
+		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(Matchers.anyInt())).thenReturn(null);
+		final String year = this.studyServiceImpl.getYearFromStudy(1);
+		Assert.assertNull(year);
+	}
 }
