@@ -19,6 +19,7 @@ import java.util.Properties;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
+import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -32,6 +33,7 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -53,6 +55,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
@@ -62,7 +65,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private static final String LOCATION_NAME = "LOCATION NAME";
@@ -149,7 +151,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will return at least one study, the study that we added in the setup
 		Assert.assertTrue("The size should be greater than 0.", resultSet.size() > 0);
 	}
-
+	
+	@Ignore
 	@Test
 	public void testSearchStudiesForName() throws Exception {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
@@ -164,7 +167,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will contain at least one study
 		Assert.assertTrue("The size should be greater than zero", resultSet.size() > 0);
 	}
-
+	
+	@Ignore
 	@Test
 	public void testSearchStudiesForStartDate() throws Exception {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
@@ -175,7 +179,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will contain the test study we added in the set up
 		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
 	}
-
+	
+	@Ignore
 	@Test
 	public void testSearchStudiesForAll() throws Exception {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
@@ -251,7 +256,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetFactorsByProperty() throws Exception {
 		final DatasetReference datasetReference = this.studyTDI.addTestDataset(this.studyReference.getId());
 		final DataSet dataset = this.manager.getDataSet(datasetReference.getId());
-		final int propertyId = 15009;
+		final int propertyId = 2120;
 		final VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
 		Assert.assertTrue(
 				"The size should be 1 since we added 1 factor, with property id = " + propertyId + ", in the set up of the data set",
@@ -507,7 +512,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
 	}
-
+	
+	@Ignore
 	@Test
 	public void testGetTrialInstanceNumberByGeolocationId() {
 		try {
@@ -733,6 +739,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(
 				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
+	}
+	
+	@Test
+	public void testGetProjectStartDateByProjectId() {
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		project.setName("Project Name");
+		project.setDescription("Project Description");
+		project.setProgramUUID(programUUID);
+		project.setDeleted(false);
+		project.setStartDate("20180403");
+		this.manager.getDmsProjectDao().save(project);
+		
+		final String startDate = this.manager.getProjectStartDateByProjectId(project.getProjectId());
+		Assert.assertEquals(project.getStartDate(), startDate);
 	}
 
 }
