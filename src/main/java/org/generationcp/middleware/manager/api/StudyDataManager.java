@@ -816,4 +816,7 @@ public interface StudyDataManager {
 	StudyTypeDto getStudyTypeByLabel(String label);
 
 	List<StudyTypeDto> getAllVisibleStudyTypes();
+
+	String getProjectStartDateByProjectId(final int projectId);
+
 }

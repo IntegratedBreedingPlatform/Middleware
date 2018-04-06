@@ -1105,4 +1105,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return ((BigInteger) query.uniqueResult()).intValue() != 0;
 
 	}
+	
+	public String getProjectStartDateByProjectId(final int projectId) {
+		try {
+			final String sql = "SELECT start_date FROM project WHERE project_id = :projectId";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("projectId", projectId);
+			final List<String> list = query.list();
+			if (list != null && !list.isEmpty()) {
+				return list.get(0);
+			}
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getProjectStartDateByProjectId() query from Project " + e.getMessage(), e);
+		}
+		return null;
+	}
 }

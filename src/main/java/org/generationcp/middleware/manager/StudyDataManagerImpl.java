@@ -1170,4 +1170,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<StudyTypeDto> getAllVisibleStudyTypes() {
 		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAllVisibleStudyTypes());
 	}
+
+	@Override
+	public String getProjectStartDateByProjectId(final int projectId) {
+		return this.getDmsProjectDao().getProjectStartDateByProjectId(projectId);
+	}
 }

@@ -71,7 +71,13 @@ public class StudyServiceImplTest {
 	
 	@Mock
 	private DesignFactors designFactors;
-
+	
+	@Mock
+	private StudyDataManager studyDataManager;
+	
+	@Mock
+	private UserDataManager userDataManager;
+	
 	private StudyServiceImpl studyServiceImpl;
 	
 	final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
@@ -85,6 +91,10 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl = new StudyServiceImpl(this.mockSessionProvider);
 		this.studyServiceImpl.setGermplasmDescriptors(this.germplasmDescriptors);
 		this.studyServiceImpl.setDesignFactors(this.designFactors);
+		
+		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
+		this.studyServiceImpl.setUserDataManager(this.userDataManager);
+		
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockSqlQuery);
 		Mockito.when(this.mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(this.mockSqlQuery);
@@ -243,15 +253,9 @@ public class StudyServiceImplTest {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("p1", "v1");
 
-		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
-		final UserDataManager userDataManager = Mockito.mock(UserDataManager.class);
-
-		this.studyServiceImpl.setStudyDataManager(studyDataManager);
-		this.studyServiceImpl.setUserDataManager(userDataManager);
-
-		Mockito.when(studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
-		Mockito.when(userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users);
-		Mockito.when(studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties);
+		Mockito.when(this.studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
+		Mockito.when(this.userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users);
+		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties);
 
 		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
 
@@ -297,16 +301,11 @@ public class StudyServiceImplTest {
 		Map<String, String> properties2 = new HashMap<>();
 		properties2.put("p2", "v2");
 
-		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
-		final UserDataManager userDataManager = Mockito.mock(UserDataManager.class);
-		this.studyServiceImpl.setStudyDataManager(studyDataManager);
-		this.studyServiceImpl.setUserDataManager(userDataManager);
-
-		Mockito.when(studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
-		Mockito.when(userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users1);
-		Mockito.when(studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties1);
-		Mockito.when(userDataManager.getUsersForEnvironment(metadata.getNurseryOrTrialId())).thenReturn(users2);
-		Mockito.when(studyDataManager.getGeolocationPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties2);
+		Mockito.when(this.studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
+		Mockito.when(this.userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users1);
+		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties1);
+		Mockito.when(this.userDataManager.getUsersForEnvironment(metadata.getNurseryOrTrialId())).thenReturn(users2);
+		Mockito.when(this.studyDataManager.getGeolocationPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties2);
 
 
 		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
@@ -337,5 +336,19 @@ public class StudyServiceImplTest {
 	public void testFindAdditionalDesignFactors() {
 		final List<String> genericDesignFactors = this.studyServiceImpl.findAdditionalDesignFactors(StudyServiceImplTest.STUDY_ID);
 		Assert.assertEquals(this.additionalDesignFactors, genericDesignFactors);
+	}
+	
+	@Test
+	public void testGetYearFromStudy() {
+		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(Matchers.anyInt())).thenReturn("20180404");
+		final String year = this.studyServiceImpl.getYearFromStudy(1);
+		Assert.assertEquals("2018", year);
+	}
+	
+	@Test
+	public void testGetYearFromStudyNull() {
+		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(Matchers.anyInt())).thenReturn(null);
+		final String year = this.studyServiceImpl.getYearFromStudy(1);
+		Assert.assertNull(year);
 	}
 }
