@@ -1,11 +1,15 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -22,8 +26,6 @@ import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerI
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -50,14 +52,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -599,11 +598,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return this;
 	}
 
-	private String getYearFromStudy(final int studyIdentifier) {
-		final DmsProject project = new DmsProject();
-		project.setProjectId(studyIdentifier);
-		return project.getStartDate().substring(0, 4);
-
+	String getYearFromStudy(final int studyIdentifier) {
+		final String startDate = this.studyDataManager.getProjectStartDateByProjectId(studyIdentifier);
+		if(startDate != null) {
+			return startDate.substring(0, 4);
+		}
+		return startDate;
 	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
