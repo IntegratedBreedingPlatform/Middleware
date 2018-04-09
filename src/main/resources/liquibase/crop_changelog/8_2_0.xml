@@ -102,4 +102,229 @@
 			VALUES (1190, 17265, 10169);
 		</sql>
 	</changeSet>
+
+	<changeSet id="v8.2.0-6" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(*) from projectprop where alias = 'EXPT_DESIGN' AND value = '';
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop
+			SET value = 10169
+			WHERE alias = 'EXPT_DESIGN' AND value = '';
+		</sql>
+	</changeSet>
+
+
+	<changeSet id="v8.2.0-7" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(*) from nd_geolocationprop where type_id = 8135 AND value = '';
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE nd_geolocationprop
+			SET VALUE = 10169
+			WHERE type_id = 8135 AND value = '';
+		</sql>
+	</changeSet>
+
+		<changeSet id="v8.2.0-8" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_check_list';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE migrate_check_list;
+		</sql>
+	</changeSet>
+
+		<changeSet id="v8.2.0-9" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_check_list';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE migrate_check_list()
+			  BEGIN
+				DECLARE done INT DEFAULT FALSE;
+			    DECLARE checkType INT(11);
+			    DECLARE listId INT(11);
+			    DECLARE designation VARCHAR(255) charset UTF8
+			    COLLATE utf8_general_ci;
+
+			    DECLARE cur1 CURSOR FOR
+			      -- to update
+			      SELECT
+			        ldp.check_type  AS checkType,
+			        ldp.designation AS designation,
+			        li.listid       AS listId
+			      FROM
+			        listdata_project ldp
+			        INNER JOIN
+			        listnms nm ON ldp.list_id = nm.listid
+			        INNER JOIN
+			        listnms li ON li.projectid = nm.projectid
+			      WHERE
+			        nm.listtype = 'CHECK'
+			        AND li.listtype = 'STUDY'
+			        AND EXISTS((SELECT 1
+			                    FROM
+			                      listdata_project l
+			                    WHERE
+			                      l.designation = ldp.designation
+			                      AND l.list_id != ldp.list_id));
+
+			    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+			    OPEN cur1;
+			    read_loop: LOOP FETCH cur1 INTO checkType, designation, listId;
+
+				IF done THEN
+	            LEAVE read_loop;
+	            END IF;
+
+			      UPDATE listdata_project ldp
+			      SET
+			        ldp.check_type = checkType
+			      WHERE
+			        ldp.designation = designation
+			        AND ldp.list_id = listId;
+
+			    END LOOP read_loop;
+				CLOSE cur1;
+
+			INSERT INTO listdata_project (list_id, germplasm_id, check_type, entry_id, entry_code, seed_source, designation, group_name, duplicate_notes, crossing_date, notes)
+			      SELECT
+			        (select l.listid from listnms l where l.projectid = nm.projectid and l.listtype = 'STUDY'),
+			        germplasm_id,
+			        check_type,
+			        entry_id,
+			        entry_code,
+			        seed_source,
+			        designation,
+			        group_name,
+			        duplicate_notes,
+			        crossing_date,
+			        ldp.notes
+			      FROM
+			        listdata_project ldp
+			        INNER JOIN
+			        listnms nm ON ldp.list_id = nm.listid
+			      WHERE
+			        nm.listtype = 'CHECK'
+			        and not exists((select 1
+			                        from listdata_project l
+			                        where l.designation = ldp.designation and l.list_id != ldp.list_id));
+
+				CREATE TABLE listnms_bkp (
+				  listid int(11) NOT NULL AUTO_INCREMENT,
+				  listname varchar(50) NOT NULL DEFAULT '-',
+				  listdate int(11) NOT NULL DEFAULT '0',
+				  listtype varchar(10) NOT NULL DEFAULT 'LST',
+				  listuid int(11) NOT NULL DEFAULT '0',
+				  listdesc varchar(255) NOT NULL DEFAULT '-',
+				  lhierarchy int(11) DEFAULT '0',
+				  liststatus int(11) DEFAULT '1',
+				  sdate int(11) DEFAULT NULL,
+				  edate int(11) DEFAULT NULL,
+				  listlocn int(11) DEFAULT NULL,
+				  listref int(11) DEFAULT NULL,
+				  projectid int(11) DEFAULT '0',
+				  program_uuid varchar(36) DEFAULT NULL,
+				  notes text,
+				  PRIMARY KEY (listid)
+				);
+
+
+
+				CREATE TABLE listdata_project_bkp(
+				  listdata_project_id int(11) NOT NULL AUTO_INCREMENT,
+				  list_id int(11) NOT NULL,
+				  germplasm_id int(11) NOT NULL DEFAULT '0',
+				  check_type int(11) NOT NULL DEFAULT '0',
+				  entry_id int(11) NOT NULL DEFAULT '0',
+				  entry_code varchar(47) NOT NULL DEFAULT '-',
+				  seed_source varchar(255) NOT NULL DEFAULT '-',
+				  designation varchar(255) NOT NULL DEFAULT '-',
+				  group_name varchar(255) NOT NULL DEFAULT '-',
+				  duplicate_notes varchar(600) DEFAULT NULL,
+				  crossing_date int(11) DEFAULT NULL,
+				  notes varchar(200) DEFAULT NULL,
+				  PRIMARY KEY (listdata_project_id)
+				);
+
+				INSERT INTO listdata_project_bkp
+				SELECT * FROM listdata_project
+			    WHERE list_id IN (select l.listid
+			                          from listnms l
+			                          where l.listtype = 'CHECK' and l.listid = list_id );
+
+			    DELETE FROM listdata_project
+			    WHERE list_id IN (select l.listid
+			                          from listnms l
+			                          where l.listtype = 'CHECK' and l.listid = list_id );
+
+				INSERT INTO listnms_bkp
+				SELECT *  FROM listnms
+			    WHERE listtype = 'CHECK';
+
+			    DELETE FROM listnms
+			    WHERE listtype = 'CHECK';
+			  END;
+		</sql>
+		</changeSet>
+
+	<changeSet id="v8.2.0-10" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_check_list';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call migrate_check_list();
+		</sql>
+	</changeSet>
+
+	<changeSet id="v8.2.0-11" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_check_list';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE migrate_check_list;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
