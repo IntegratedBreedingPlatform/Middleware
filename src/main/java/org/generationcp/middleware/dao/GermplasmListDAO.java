@@ -24,7 +24,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
@@ -661,10 +661,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 *            a group of folder ids for which we want to return children
 	 * @return the resultant map which contains the folder meta data
 	 */
-	public Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(final List<Integer> folderIds) {
+	public Map<Integer, ListMetadata> getGermplasmFolderMetadata(final List<Integer> folderIds) {
 
 		if (folderIds.isEmpty()) {
-			return Collections.<Integer, GermplasmFolderMetadata> emptyMap();
+			return Collections.<Integer, ListMetadata> emptyMap();
 		}
 
 		final String folderMetaDataQuery = "SELECT parent.listid AS listId, COUNT(child.listid) AS numberOfChildren FROM listnms parent "
@@ -674,11 +674,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		setResultTransformer.setParameterList("folderIds", folderIds);
 		setResultTransformer.addScalar("listId", new IntegerType());
 		setResultTransformer.addScalar("numberOfChildren", new IntegerType());
-		setResultTransformer.setResultTransformer(Transformers.aliasToBean(GermplasmFolderMetadata.class));
-		final List<GermplasmFolderMetadata> list = setResultTransformer.list();
-		return Maps.uniqueIndex(list, new Function<GermplasmFolderMetadata, Integer>() {
+		setResultTransformer.setResultTransformer(Transformers.aliasToBean(ListMetadata.class));
+		final List<ListMetadata> list = setResultTransformer.list();
+		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
 			@Override
-			public Integer apply(final GermplasmFolderMetadata folderMetaData) {
+			public Integer apply(final ListMetadata folderMetaData) {
 				return folderMetaData.getListId();
 			}
 		});
