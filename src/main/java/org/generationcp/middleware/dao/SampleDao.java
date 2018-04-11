@@ -240,7 +240,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			final Integer studyTypeId = (Integer) row[9];
 			final String label = (String) row[10];
 			final String studyTypeName = (String) row[11];
-			final boolean visible = ((Byte) row[12]) == 1;
+			final boolean visible = ((Boolean) row[12]);
 			final Integer cvtermId = (Integer) row[13];
 			final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 
