@@ -192,7 +192,7 @@
 			                      listdata_project l
 			                    WHERE
 			                      l.designation = ldp.designation
-			                      AND l.list_id != ldp.list_id));
+			                      AND l.list_id != ldp.list_id AND l.check_type = ''));
 
 			    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
@@ -234,7 +234,10 @@
 			        nm.listtype = 'CHECK'
 			        and not exists((select 1
 			                        from listdata_project l
-			                        where l.designation = ldp.designation and l.list_id != ldp.list_id));
+			                        where l.designation = ldp.designation and l.list_id != ldp.list_id AND l.check_type = ''));
+
+				DROP TABLE IF EXISTS listdata_project_bkp;
+				DROP TABLE IF EXISTS listnms_bkp;
 
 				CREATE TABLE listnms_bkp (
 				  listid int(11) NOT NULL AUTO_INCREMENT,
@@ -254,8 +257,6 @@
 				  notes text,
 				  PRIMARY KEY (listid)
 				);
-
-
 
 				CREATE TABLE listdata_project_bkp(
 				  listdata_project_id int(11) NOT NULL AUTO_INCREMENT,
