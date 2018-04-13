@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -16,13 +17,10 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
@@ -56,8 +54,16 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
 	public static final String SAMPLE_ID = "sampleId";
 
-	public List<SampleDTO> getByPlotId(final String plotId) {
-		return getSampleDTOSWithRestriction(Restrictions.eq("experiment.plotId", plotId));
+	public List<SampleDTO> filter(final String plotId, final Integer listId, final Pageable pageable) {
+		Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+		addOrder(criteria, pageable);
+		if (StringUtils.isNotBlank(plotId)) {
+			criteria.add(Restrictions.eq("experiment.plotId", plotId));
+		}
+		if (listId != null) {
+		    criteria.add(Restrictions.eq("sampleList.id", listId));
+        }
+		return getSampleDTOS(criteria);
 	}
 
 	public Sample getBySampleId(final Integer sampleId) {
@@ -67,16 +73,20 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<SampleDTO> getSampleDTOSWithRestriction(final Criterion restriction) {
-		final List<Object[]> result = getSession().createCriteria(Sample.class, SAMPLE)
+	private List<SampleDTO> getSampleDTOS(final Criteria criteria) {
+	    if (criteria == null) {
+	    	return Collections.<SampleDTO>emptyList();
+		}
+		final List<Object[]> result = criteria
 			.createAlias(SAMPLE_PLANT, PLANT)
 			.createAlias("sample.sampleList", "sampleList")
 			.createAlias("sample.takenBy", "takenBy")
 			.createAlias("takenBy.person", "person")
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
-			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)
-			.add(restriction)
+			.createAlias("experiment.experimentStocks", "experimentStocks")
+			.createAlias("experimentStocks.stock", "stock")
+			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
+			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.property(SAMPLE_ID)) //row[0]
 				.add(Projections.property("sampleName")) //row[1]
@@ -88,19 +98,27 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("plant.plantBusinessKey")) //row[7]
 				.add(Projections.property("dataset.datasetId")) //row[8]
 				.add(Projections.property("dataset.datasetName")) //row[9]
+				.add(Projections.property("stock.dbxrefId")) //row[10]
+				.add(Projections.property("stock.name")) //row[11] TODO preferred name
+				.add(Projections.property("samplingDate")) //row[12]
 			)).list();
 
-		return getSampleDTOS(result);
+		return mapSampleDTOS(result);
 	}
 
-	private List<SampleDTO> getSampleDTOS(final List<Object[]> result) {
-		final Map<Integer, SampleDTO> sampleDTOMap = new HashMap<>();
+	private List<SampleDTO> mapSampleDTOS(final List<Object[]> result) {
+		final Map<Integer, SampleDTO> sampleDTOMap = new LinkedHashMap<>();
+		// TODO
+		// - 2nd iteration: use setMaxResults and a combination of page and pageSize to compute entryNo
+		// - 3rd iteration: BMS-4785
+		Integer entryNo = 1;
 		for (final Object[] row : result) {
 
 			final Integer sampleId = (Integer) row[0];
 			SampleDTO dto = sampleDTOMap.get(sampleId);
 			if (dto == null) {
 				dto = new SampleDTO();
+				dto.setEntryNo(entryNo++);
 				dto.setSampleId(sampleId);
 				dto.setSampleName((String) row[1]);
 				dto.setSampleBusinessKey((String) row[2]);
@@ -108,6 +126,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				dto.setSampleList((String) row[5]);
 				dto.setPlantNumber((Integer) row[6]);
 				dto.setPlantBusinessKey((String) row[7]);
+				dto.setGid((Integer) row[10]);
+				dto.setDesignation((String) row[11]);
+				if (row[12] != null) {
+					dto.setSamplingDate((Date) row[12]);
+				}
 				dto.setDatasets(new HashSet<SampleDTO.Dataset>());
 			}
 
@@ -181,7 +204,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	public List<SampleDTO> getBySampleBks(final Set<String> sampleUIDs) {
-		return getSampleDTOSWithRestriction(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs));
+		return getSampleDTOS(getSession().createCriteria(Sample.class, SAMPLE) //
+				.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs)));
 	}
 
 	@SuppressWarnings("unchecked")

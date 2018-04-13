@@ -16,29 +16,21 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 @Transactional
 public class SampleServiceImpl implements SampleService {
 
-	private static final String S = "S";
+	private static final String SAMPLE_KEY_PREFIX = "S";
 
 	private final SampleDao sampleDao;
 	private final ExperimentDao experimentDao;
@@ -90,15 +82,15 @@ public class SampleServiceImpl implements SampleService {
 
 	private String getSampleBusinessKey(final String cropPrefix) {
 		String sampleBusinessKey = cropPrefix;
-		sampleBusinessKey = sampleBusinessKey + SampleServiceImpl.S;
+		sampleBusinessKey = sampleBusinessKey + SampleServiceImpl.SAMPLE_KEY_PREFIX;
 		sampleBusinessKey = sampleBusinessKey + RandomStringUtils.randomAlphanumeric(8);
 
 		return sampleBusinessKey;
 	}
 
 	@Override
-	public List<SampleDTO> getSamples(final String plotId) {
-		return this.sampleDao.getByPlotId(plotId);
+	public List<SampleDTO> filter(final String plotId, final Integer listId, Pageable pageable) {
+		return this.sampleDao.filter(plotId, listId, pageable);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {

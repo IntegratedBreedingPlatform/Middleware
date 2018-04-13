@@ -37,6 +37,7 @@ public enum ToolName {
 	NURSERY_MANAGER_FIELDBOOK_WEB("nursery_manager_fieldbook_web"),
 	ONTOLOGY_MANAGER("ontology_manager"),
 	QUERY_FOR_ADAPTED_GERMPLASM("query_for_adapted_germplasm"),
+	SAMPLE_MANAGER("sample_manager"),
 	STUDY_BROWSER("study_browser"),
 	STUDY_BROWSER_WITH_ID("study_browser_with_id"),
 	TRAIT_DONOR_QUERY("trait_donor_query"),

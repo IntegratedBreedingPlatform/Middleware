@@ -2,14 +2,14 @@ package org.generationcp.middleware.pojos;
 
 
 /**
- * Container for the germplasm folder meta data.
+ * Container for the list meta data.
  *
  */
-public class GermplasmFolderMetadata {
+public class ListMetadata {
 
 	private Integer listId;
-	
 	private Integer numberOfChildren;
+	private Integer numberOfEntries;
 
 	public Integer getListId() {
 		return listId;
@@ -26,5 +26,12 @@ public class GermplasmFolderMetadata {
 	public void setNumberOfChildren(Integer numberOfChildren) {
 		this.numberOfChildren = numberOfChildren;
 	}
-	
+
+	public Integer getNumberOfEntries() {
+		return numberOfEntries;
+	}
+
+	public void setNumberOfEntries(final Integer numberOfEntries) {
+		this.numberOfEntries = numberOfEntries;
+	}
 }

@@ -2,7 +2,7 @@ package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
-import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 
@@ -90,7 +90,7 @@ public interface SampleListService {
 	 *
 	 * @param sampleLists ids for which we should retrieve metadata
 	 */
-	Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists);
+	Map<Integer, ListMetadata> getListMetadata(final List<SampleList> sampleLists);
 
 	/**
 	 * @param listId - the list Id

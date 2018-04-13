@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -182,32 +182,37 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	 * @param folderIds a group of folder ids for which we want to return children
 	 * @return the resultant map which contains the folder meta data
 	 */
-	public Map<Integer, GermplasmFolderMetadata> getSampleFolderMetadata(final List<Integer> folderIds) {
-		final List<GermplasmFolderMetadata> list;
+	public Map<Integer, ListMetadata> getSampleListMetadata(final List<Integer> folderIds) {
+		final List<ListMetadata> list;
 		if (folderIds.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
 		try {
-			final String folderMetaDataQuery = "SELECT parent.list_id AS listId, COUNT(child.list_id) AS numberOfChildren "
-					+ "FROM sample_list parent  LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
-					+ "WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
+			final String folderMetaDataQuery = "SELECT parent.list_id AS listId,"
+				+ "  COUNT(child.list_id) AS numberOfChildren, "
+				+ "  COUNT(s.sample_id) AS numberOfEntries "
+				+ " FROM sample_list parent"
+				+ "   LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
+				+ "   LEFT OUTER JOIN sample s ON s.sample_list = parent.list_id "
+				+ " WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
 			final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
 			setResultTransformer.setParameterList("folderIds", folderIds);
 			setResultTransformer.addScalar("listId", new IntegerType());
 			setResultTransformer.addScalar("numberOfChildren", new IntegerType());
-			setResultTransformer.setResultTransformer(Transformers.aliasToBean(GermplasmFolderMetadata.class));
+			setResultTransformer.addScalar("numberOfEntries", new IntegerType());
+			setResultTransformer.setResultTransformer(Transformers.aliasToBean(ListMetadata.class));
 			list = setResultTransformer.list();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error with getSampleFolderMetadata(folderIds=" + folderIds.toString() + ") query from sample_list: " + e.getMessage(),
+					"Error with getSampleListMetadata(folderIds=" + folderIds.toString() + ") query from sample_list: " + e.getMessage(),
 					e);
 		}
-		return Maps.uniqueIndex(list, new Function<GermplasmFolderMetadata, Integer>() {
+		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
 
 			@Override
-			public Integer apply(final GermplasmFolderMetadata folderMetaData) {
+			public Integer apply(final ListMetadata folderMetaData) {
 				return folderMetaData.getListId();
 			}
 		});
