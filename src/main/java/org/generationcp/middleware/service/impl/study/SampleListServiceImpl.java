@@ -1,6 +1,9 @@
 package org.generationcp.middleware.service.impl.study;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +20,7 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -400,19 +404,16 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public Map<Integer, GermplasmFolderMetadata> getFolderMetadata(final List<SampleList> sampleLists) {
-		final List<Integer> folderIdsToRetrieveFolderCount = this.getFolderIdsFromSampleList(sampleLists);
-		return this.getSampleListDao().getSampleFolderMetadata(folderIdsToRetrieveFolderCount);
-	}
+	public Map<Integer, ListMetadata> getListMetadata(final List<SampleList> sampleLists) {
+		final List<Integer> listIds = Lists.transform(sampleLists, new Function<SampleList, Integer>() {
 
-	private List<Integer> getFolderIdsFromSampleList(final List<SampleList> listIds) {
-		final List<Integer> folderIdsToRetrieveFolderCount = new ArrayList<>();
-		for (final SampleList parentList : listIds) {
-			if (parentList.isFolder()) {
-				folderIdsToRetrieveFolderCount.add(parentList.getId());
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final SampleList sampleList) {
+				return sampleList.getId();
 			}
-		}
-		return folderIdsToRetrieveFolderCount;
+		});
+		return this.getSampleListDao().getSampleListMetadata(listIds);
 	}
 
 	protected boolean isDescendant(final SampleList list, final SampleList of) {

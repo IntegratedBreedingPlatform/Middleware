@@ -13,7 +13,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
@@ -212,9 +212,9 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_FOLDER,
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID);
 		saveGermplasm(testFolder);
-		final Map<Integer, GermplasmFolderMetadata> result =
+		final Map<Integer, ListMetadata> result =
 				this.dao.getGermplasmFolderMetadata(Collections.singletonList(testFolder.getId()));
-		final GermplasmFolderMetadata germplasmFolderMetadata = result.get(testFolder.getId());
+		final ListMetadata germplasmFolderMetadata = result.get(testFolder.getId());
 		Assert.assertNotNull("Newly created folder should not be null", germplasmFolderMetadata);
 		Assert.assertEquals("Newly created folder should have zero children", 
 				new Integer(0), germplasmFolderMetadata.getNumberOfChildren());
