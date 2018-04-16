@@ -295,7 +295,7 @@
 		</sql>
 		</changeSet>
 
-	<changeSet id="v8.2.0-10" author="vanina">
+<!--	<changeSet id="v8.2.0-10" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -310,7 +310,7 @@
 		<sql dbms="mysql" splitStatements="false">
 			call migrate_check_list();
 		</sql>
-	</changeSet>
+	</changeSet>-->
 
 	<changeSet id="v8.2.0-11" author="vanina">
 		<preConditions onFail="MARK_RAN">
