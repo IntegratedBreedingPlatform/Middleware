@@ -338,7 +338,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		Preconditions.checkArgument(newParentFolder != null, "Specified newParentFolderId does not exist");
-		Preconditions.checkArgument(newParentFolder.isFolder(), "Specified newParentFolderId is not a folder");
+		Preconditions.checkArgument(newParentFolder.isFolder(), "Moving of a list to another list is not allowed.");
 
 		// if the list is moved to the crop list, set the program uuid to null so that
 		// it will be accessible to all programs of the same crop.
