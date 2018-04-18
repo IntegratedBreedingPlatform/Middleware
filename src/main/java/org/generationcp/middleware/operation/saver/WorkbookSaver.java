@@ -250,7 +250,7 @@ public class WorkbookSaver extends Saver {
 		}
 		trialDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
 
-		this.saveOrUpdateTrialObservations(trialDatasetId, workbook, trialVariableTypeList, locationIds,
+		this.saveOrUpdateTrialObservations(trialDatasetId, workbook, locationIds,
 				trialVariatesMap, studyLocationId, totalRows, isDeleteObservations, programUUID, cropPrefix);
 
 		datasetId = this.createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables,
@@ -359,8 +359,7 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	public void saveOrUpdateTrialObservations(final int trialDatasetId, final Workbook workbook,
-			final VariableTypeList trialVariableTypeList, final List<Integer> locationIds,
+	public void saveOrUpdateTrialObservations(final int trialDatasetId, final Workbook workbook, final List<Integer> locationIds,
 			final Map<Integer, VariableList> trialVariatesMap, final int studyLocationId, final int totalRows,
 			final boolean isDeleteObservations, final String programUUID, final String cropPrefix) {
 		if (totalRows == workbook.getTrialObservations().size() && totalRows > 0 && !isDeleteObservations) {
