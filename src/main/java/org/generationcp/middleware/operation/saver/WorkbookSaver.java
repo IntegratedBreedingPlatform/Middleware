@@ -368,6 +368,7 @@ public class WorkbookSaver extends Saver {
 		} else {
 			if (locationIds != null && !locationIds.isEmpty()) {// multi-location
 				for (final Integer locationId : locationIds) {
+					this.setVariableListValues(trialVariatesMap.get(locationId), workbook.getConstants());
 					this.createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId),
 							cropPrefix);
 				}
