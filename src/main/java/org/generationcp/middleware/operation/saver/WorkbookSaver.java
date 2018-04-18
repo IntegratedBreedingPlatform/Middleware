@@ -216,10 +216,10 @@ public class WorkbookSaver extends Saver {
 			// geolocationid
 			this.resetTrialObservations(workbook.getTrialObservations());
 		}
-
+		
 		if (trialVariableTypeList != null && !isDeleteObservations) {
 			// multi-location for data loader
-			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariableTypeList,
+			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables,
 					trialHeaders, trialVariatesMap, false, programUUID);
 		} else if (workbook.getTrialObservations().size() > 1) {
 			// also a multi-location
