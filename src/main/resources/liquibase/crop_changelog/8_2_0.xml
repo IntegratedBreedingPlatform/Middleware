@@ -134,7 +134,7 @@
 		</sql>
 	</changeSet>
 
-		<changeSet id="v8.2.0-8" author="vanina">
+	<changeSet id="v8.2.0-8" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -164,50 +164,52 @@
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
+			<![CDATA[
 			CREATE PROCEDURE migrate_check_list()
 			  BEGIN
+
 				DECLARE done INT DEFAULT FALSE;
 			    DECLARE checkType INT(11);
 			    DECLARE listId INT(11);
-			    DECLARE designation VARCHAR(255) charset UTF8
-			    COLLATE utf8_general_ci;
+			    DECLARE germplasm_id INT(11);
+				DECLARE countInsert INT;
+				DECLARE countInsertListnms INT;
+
 
 			    DECLARE cur1 CURSOR FOR
-			      -- to update
-			      SELECT
-			        ldp.check_type  AS checkType,
-			        ldp.designation AS designation,
-			        li.listid       AS listId
-			      FROM
-			        listdata_project ldp
-			        INNER JOIN
-			        listnms nm ON ldp.list_id = nm.listid
-			        INNER JOIN
-			        listnms li ON li.projectid = nm.projectid
-			      WHERE
-			        nm.listtype = 'CHECK'
-			        AND li.listtype = 'STUDY'
-			        AND EXISTS((SELECT 1
-			                    FROM
-			                      listdata_project l
-			                    WHERE
-			                      l.designation = ldp.designation
-			                      AND l.list_id != ldp.list_id AND l.check_type = ''));
+				      -- ONLY UPDATE in case of drag and drop checks
+					SELECT
+					  listDataCheck.check_type,
+					  listDataCheck.germplasm_id,
+					  listNursery.listid
+					FROM
+					  listdata_project listDataCheck
+					  INNER JOIN
+					  listnms listCheck ON listDataCheck.list_id = listCheck.listid
+					  INNER JOIN
+					  listnms listNursery ON listNursery.projectid = listCheck.projectid
+					  inner join listdata_project listDataNursery on listDataNursery.list_id = listNursery.listid
+					WHERE
+					  listCheck.listtype = 'CHECK'
+					AND listNursery.listtype = 'STUDY'
+					and listDataNursery.germplasm_id = listDataCheck.germplasm_id
+					AND listDataNursery.check_type = ''
+					AND listDataCheck.entry_id < (select max(entry_id) from listdata_project lmax where lmax.list_id = listNursery.listid);
 
 			    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 			    OPEN cur1;
-			    read_loop: LOOP FETCH cur1 INTO checkType, designation, listId;
+			    read_loop: LOOP FETCH cur1 INTO checkType, germplasm_id, listId;
 
 				IF done THEN
-	            LEAVE read_loop;
+	                LEAVE read_loop;
 	            END IF;
 
 			      UPDATE listdata_project ldp
 			      SET
 			        ldp.check_type = checkType
 			      WHERE
-			        ldp.designation = designation
+			        ldp.germplasm_id = germplasm_id
 			        AND ldp.list_id = listId;
 
 			    END LOOP read_loop;
@@ -215,26 +217,59 @@
 
 			INSERT INTO listdata_project (list_id, germplasm_id, check_type, entry_id, entry_code, seed_source, designation, group_name, duplicate_notes, crossing_date, notes)
 			      SELECT
-			        (select l.listid from listnms l where l.projectid = nm.projectid and l.listtype = 'STUDY'),
-			        germplasm_id,
-			        check_type,
-			        entry_id,
-			        entry_code,
-			        seed_source,
-			        designation,
-			        group_name,
-			        duplicate_notes,
-			        crossing_date,
-			        ldp.notes
-			      FROM
-			        listdata_project ldp
-			        INNER JOIN
-			        listnms nm ON ldp.list_id = nm.listid
-			      WHERE
-			        nm.listtype = 'CHECK'
-			        and not exists((select 1
-			                        from listdata_project l
-			                        where l.designation = ldp.designation and l.list_id != ldp.list_id AND l.check_type = ''));
+			      -- -- items from other browsed list (different gids)
+					  (select l.listid from listnms l where l.projectid = listCheck.projectid and l.listtype = 'STUDY'),
+					  listDataCheck.germplasm_id,
+					  listDataCheck.check_type,
+					  listDataCheck.entry_id,
+					  listDataCheck.entry_code,
+					  listDataCheck.seed_source,
+					  listDataCheck.designation,
+					  listDataCheck.group_name,
+					  listDataCheck.duplicate_notes,
+					  listDataCheck.crossing_date,
+					  listDataCheck.notes
+					FROM
+					  listdata_project listDataCheck
+					  INNER JOIN
+					  listnms listCheck ON listDataCheck.list_id = listCheck.listid
+					WHERE
+					  listCheck.listtype = 'CHECK'
+					  and not exists((select 1
+					                  from listdata_project l
+					                  where l.germplasm_id = listDataCheck.germplasm_id and l.list_id != listDataCheck.list_id AND l.check_type = ''))
+					UNION
+					SELECT
+					-- items from the same browsed list with entry_id > max (entry_id) from the original list (same gids)
+						listNursery.listid,
+						listDataCheck.germplasm_id,
+						listDataCheck.check_type,
+						listDataCheck.entry_id,
+						listDataCheck.entry_code,
+						listDataCheck.seed_source,
+						listDataCheck.designation,
+						listDataCheck.group_name,
+						listDataCheck.duplicate_notes,
+						listDataCheck.crossing_date,
+						listDataCheck.notes
+					  FROM
+						listdata_project listDataCheck
+						INNER JOIN
+						listnms listCheck ON listDataCheck.list_id = listCheck.listid
+						INNER JOIN
+						listnms listNursery ON listNursery.projectid = listCheck.projectid
+						inner join listdata_project listDataNursery on listDataNursery.list_id = listNursery.listid
+					  WHERE
+						listCheck.listtype = 'CHECK'
+						AND listNursery.listtype = 'STUDY'
+						and listDataNursery.germplasm_id = listDataCheck.germplasm_id
+						AND listDataNursery.check_type = ''
+						AND listDataCheck.entry_id > (SELECT max(entry_id) from listdata_project lmax where lmax.list_id = listNursery.listid);
+
+				-- update entries without checks to Test Entry
+				UPDATE listdata_project
+				SET check_type = 10170
+				WHERE check_type = 0;
 
 				DROP TABLE IF EXISTS listdata_project_bkp;
 				DROP TABLE IF EXISTS listnms_bkp;
@@ -274,58 +309,75 @@
 				  PRIMARY KEY (listdata_project_id)
 				);
 
-				INSERT INTO listdata_project_bkp
-				SELECT * FROM listdata_project
+				SELECT COUNT(*) INTO countInsert
+				FROM listdata_project
 			    WHERE list_id IN (select l.listid
 			                          from listnms l
 			                          where l.listtype = 'CHECK' and l.listid = list_id );
+
+				IF countInsert > 0 THEN
+					INSERT INTO listdata_project_bkp
+					SELECT * FROM listdata_project
+				    WHERE list_id IN (select l.listid
+				                          from listnms l
+				                          where l.listtype = 'CHECK' and l.listid = list_id );
+				END IF;
+
+				SELECT COUNT(*) INTO countInsertListnms
+				FROM listnms
+				WHERE listtype = 'CHECK';
+				
+				IF countInsertListnms > 0 THEN
+					INSERT INTO listnms_bkp
+					SELECT *  FROM listnms
+				    WHERE listtype = 'CHECK';
+				END IF;
 
 			    DELETE FROM listdata_project
 			    WHERE list_id IN (select l.listid
 			                          from listnms l
-			                          where l.listtype = 'CHECK' and l.listid = list_id );
-
-				INSERT INTO listnms_bkp
-				SELECT *  FROM listnms
-			    WHERE listtype = 'CHECK';
+			                          where l.listtype = 'CHECK' and l.listid = list_id);
 
 			    DELETE FROM listnms
 			    WHERE listtype = 'CHECK';
+
 			  END;
+			  ]]>
 		</sql>
 		</changeSet>
 
-<!--	<changeSet id="v8.2.0-10" author="vanina">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-				information_schema.routines
-				WHERE
-				routine_schema = DATABASE()
-				AND specific_name = 'migrate_check_list';
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="false">
-			call migrate_check_list();
-		</sql>
-	</changeSet>-->
+		<changeSet id="v8.2.0-10" author="vanina">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'migrate_check_list';
+				</sqlCheck>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				call migrate_check_list();
+			</sql>
+		</changeSet>
 
-	<changeSet id="v8.2.0-11" author="vanina">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-				information_schema.routines
-				WHERE
-				routine_schema = DATABASE()
-				AND specific_name = 'migrate_check_list';
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="false">
-			DROP PROCEDURE migrate_check_list;
-		</sql>
-	</changeSet>
+		<changeSet id="v8.2.0-11" author="vanina">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'migrate_check_list';
+				</sqlCheck>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				DROP PROCEDURE migrate_check_list;
+			</sql>
+		</changeSet>
+
 </databaseChangeLog>
