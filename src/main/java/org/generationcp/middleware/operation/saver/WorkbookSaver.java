@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -600,6 +601,13 @@ public class WorkbookSaver extends Saver {
 			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId, studyMV, studyVariables);
 
 			watch.restart("save study");
+
+			//Recover the studyTypeDto if the id is null. Is necessary to save it in the project table.
+			if (null == workbook.getStudyDetails().getStudyType().getId()) {
+				StudyTypeDto studyTypeDto =
+					this.getStudyDataManager().getStudyTypeByName(workbook.getStudyDetails().getStudyType().getName());
+				workbook.getStudyDetails().setStudyType(studyTypeDto);
+			}
 
 			final DmsProject study = this.getStudySaver()
 				.saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues, saveStudyExperiment,
