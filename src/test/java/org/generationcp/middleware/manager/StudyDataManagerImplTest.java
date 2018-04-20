@@ -493,7 +493,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareException {
-		final StudyDetails studyDetails = this.manager.getStudyDetails(new StudyTypeDto("T"), this.studyReference.getId());
+		final StudyDetails studyDetails = this.manager.getStudyDetails(this.studyReference.getId());
 		Assert.assertNotNull("Study should not be null", studyDetails);
 		Assert.assertEquals("Study should have the id " + this.studyReference.getId(), studyDetails.getId(), studyDetails.getId());
 	}

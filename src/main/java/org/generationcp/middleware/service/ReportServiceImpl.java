@@ -97,8 +97,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 */
 	private Map<String, Object> extractFieldbookData(final Integer studyId, final boolean parentsInfoRequireed) {
 
-		final StudyTypeDto studyType = this.getStudyDataManager().getStudyType(studyId);
-		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
+		final Workbook wb = this.getWorkbookBuilder().create(studyId);
 		// getWorkbookBuilder().create no longer loads observations collection by default. Load only when needed. Like here.
 		this.getWorkbookBuilder().loadAllObservations(wb);
 		final List<MeasurementRow> observations = wb.getObservations();

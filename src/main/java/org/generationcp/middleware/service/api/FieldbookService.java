@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Attribute;
@@ -571,13 +570,11 @@ public interface FieldbookService {
 	/**
 	 * Get study details.
 	 *
-	 * @param studyType
-	 *            the study type
 	 * @param studyId
 	 *            the study id
 	 * @return the study details
 	 */
-	StudyDetails getStudyDetails(StudyTypeDto studyType, int studyId);
+	StudyDetails getStudyDetails(int studyId);
 
 	/**
 	 * Get the block id of a particular trial instance in a dataset.
@@ -978,19 +975,6 @@ public interface FieldbookService {
 	 * @return All generative and no bulking method
 	 */
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
-
-
-	/**
-	 * Gets the data set.
-	 *
-	 * @param id
-	 *            the id
-	 * @param studyType
-	 *            the StudyType
-	 * @return the data set
-	 */
-
-	Workbook getStudyDataSet(final int id, final StudyTypeDto studyType);
 
 	Workbook getStudyDataSet(int studyID);
 }
