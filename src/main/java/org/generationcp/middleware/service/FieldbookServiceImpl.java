@@ -203,16 +203,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getStudyDataSet(final int id, final StudyTypeDto studyType) {
-		final Workbook workbook = this.getWorkbookBuilder().create(id, studyType);
-		this.setOrderVariableByRank(workbook);
-		return workbook;
-	}
-
-	@Override
 	public Workbook getStudyDataSet(final int id) {
-		final StudyTypeDto studyType = this.getStudy(id).getStudyType();
-		final Workbook workbook = this.getWorkbookBuilder().create(id, studyType);
+		final Workbook workbook = this.getWorkbookBuilder().create(id);
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
@@ -889,8 +881,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public StudyDetails getStudyDetails(final StudyTypeDto studyType, final int studyId) {
-		return this.getStudyDataManager().getStudyDetails(studyType, studyId);
+	public StudyDetails getStudyDetails(final int studyId) {
+		return this.getStudyDataManager().getStudyDetails(studyId);
 	}
 
 	@Override

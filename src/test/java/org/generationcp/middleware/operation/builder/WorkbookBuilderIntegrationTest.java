@@ -197,7 +197,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
-		final Workbook studyWorkbook = this.workbookBuilder.create(studyId, new StudyTypeDto("N"));
+		final Workbook studyWorkbook = this.workbookBuilder.create(studyId);
 		Assert.assertNotNull(studyWorkbook);
 
 		// The main assertion.
@@ -224,7 +224,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
-		final Workbook studyWorkbook = this.workbookBuilder.create(studyId, new StudyTypeDto("T"));
+		final Workbook studyWorkbook = this.workbookBuilder.create(studyId);
 		Assert.assertNotNull(studyWorkbook);
 
 		// The main assertion.

@@ -710,13 +710,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyDetails getStudyDetails(final StudyTypeDto studyType, final int studyId) {
-		StudyTypeDto newStudyType = studyType;
-		if (studyType.getId() == null) {
-			newStudyType = this.getStudyTypeByName(studyType.getName());
-		}
-
-		final StudyDetails studyDetails = this.getDmsProjectDao().getStudyDetails(newStudyType, studyId);
+	public StudyDetails getStudyDetails(final int studyId) {
+		final StudyDetails studyDetails = this.getDmsProjectDao().getStudyDetails(studyId);
 		this.populateSiteAnPersonIfNecessary(studyDetails);
 		return studyDetails;
 	}
