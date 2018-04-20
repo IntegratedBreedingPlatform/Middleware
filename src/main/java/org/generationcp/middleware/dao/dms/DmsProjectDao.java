@@ -162,6 +162,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   p.objective                AS objective, \n"
 		+ "   p.start_date      		 AS startDate, \n"
 		+ "   p.end_date		         AS endDate, \n"
+		+ "   stype.study_type_id        AS studyTypeId, \n"
+		+ "   stype.label                AS studyTypeLabel, \n"
+		+ "   stype.name                 AS studyTypeName, \n"
 		+ "   ppPI.value                 AS piName, \n"
 		+ "   gpSiteName.value           AS siteName, \n"
 		+ "   p.project_id               AS id, \n"
@@ -173,6 +176,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "	  p.created_by               AS createdBy "
 		+ " FROM \n"
 		+ "   project p \n"
+		+ "   INNER JOIN study_type stype on stype.study_type_id = p.study_type_id"
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
@@ -588,15 +592,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studyDetails;
 	}
 
-	public StudyDetails getStudyDetails(final StudyTypeDto studyType, final int studyId) {
+	public StudyDetails getStudyDetails(final int studyId) {
 		StudyDetails studyDetails = null;
 		try {
 
 			final Query query =
 					this.getSession().createSQLQuery(STUDY_DETAILS_SQL).addScalar("name").addScalar("title").addScalar("objective")
-					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("piId").addScalar("siteId").addScalar("folderId").addScalar("programUUID").addScalar("studyUpdate")
-						.addScalar("createdBy");
+					.addScalar("startDate").addScalar("endDate").addScalar("studyTypeId").addScalar("studyTypeLabel").addScalar(
+							"studyTypeName").addScalar("piName").addScalar("siteName").addScalar("id").addScalar("piId").addScalar("siteId").addScalar("folderId").addScalar("programUUID").addScalar("studyUpdate")
+							.addScalar("createdBy");
 
 			query.setParameter("studyId", studyId);
 
@@ -609,18 +613,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final String objective = (String) row[2];
 					final String startDate = (String) row[3];
 					final String endDate = (String) row[4];
-					final String piName = (String) row[5];
-					final String siteName = (String) row[6];
-					final Integer id = (Integer) row[7];
-					final String piId = (String) row[8];
-					final String siteId = (String) row[9];
-					final Integer folderId = (Integer) row[10];
-					final String programUUID = (String) row[11];
-					final String studyUpdate = (String) row[12];
-					final String createdBy = (String) row[13];
+					final Integer studyTypeId = (Integer) row[5];
+					final String studyTypeLabel = (String) row[6];
+					final String studyTypeName = (String) row[7];
+					final String piName = (String) row[8];
+					final String siteName = (String) row[9];
+					final Integer id = (Integer) row[10];
+					final String piId = (String) row[11];
+					final String siteId = (String) row[12];
+					final Integer folderId = (Integer) row[13];
+					final String programUUID = (String) row[14];
+					final String studyUpdate = (String) row[15];
+					final String createdBy = (String) row[16];
+
+					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, studyTypeLabel, studyTypeName);
 
 					studyDetails =
-							new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId,
+							new StudyDetails(id, name, title, objective, startDate, endDate, studyTypeDto, piName, siteName, piId, siteId,
 								studyUpdate, createdBy);
 					studyDetails.setParentFolderId(folderId.longValue());
 					studyDetails.setProgramUUID(programUUID);

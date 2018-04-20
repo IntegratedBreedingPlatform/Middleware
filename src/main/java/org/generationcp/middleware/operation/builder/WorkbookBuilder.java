@@ -37,7 +37,6 @@ import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.ErrorCode;
@@ -103,7 +102,7 @@ public class WorkbookBuilder extends Builder {
 			workbook.getConditions(), samples));
 	}
 
-	public Workbook create(final int id, final StudyTypeDto studyType) {
+	public Workbook create(final int id) {
 
 		final Monitor monitor = MonitorFactory.start("Build Workbook");
 
@@ -120,7 +119,7 @@ public class WorkbookBuilder extends Builder {
 		 */
 
 		// DA
-		final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(studyType, id);
+		final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(id);
 
 		// DA getDMSProject
 		final Study study = this.getStudyBuilder().createStudy(id);
@@ -308,9 +307,8 @@ public class WorkbookBuilder extends Builder {
 
 		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(id);
 		if (datasetRefList != null) {
-			final StudyTypeDto studyType =  study.getType();
 
-			final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(studyType, id);
+			final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(id);
 			workbook.setStudyDetails(studyDetails);
 			for (final DatasetReference datasetRef : datasetRefList) {
 				if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName())

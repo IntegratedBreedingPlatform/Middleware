@@ -306,10 +306,10 @@ public class WorkbookParser {
 						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 
 		// determine study type
-		final String studyType = WorkbookParser
+		final String studyTypeName = WorkbookParser
 				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX - rowAdjustMent,
 						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final StudyTypeDto studyTypeValue = new StudyTypeDto(studyType);
+		final StudyTypeDto studyTypeValue = new StudyTypeDto(studyTypeName);
 
 		// GCP-6991 and GCP-6992
 		if (study == null || StringUtils.isEmpty(study)) {

@@ -512,11 +512,10 @@ public interface StudyDataManager {
 	/**
 	 * Gets the study details.
 	 *
-	 * @param studyType the study type
 	 * @param id        the id
 	 * @return the study details
 	 */
-	StudyDetails getStudyDetails(StudyTypeDto studyType, int id);
+	StudyDetails getStudyDetails(int id);
 
 	/**
 	 * Retrieves the study details of the all nurseries and trials from both selected DB instance ordered by study name.

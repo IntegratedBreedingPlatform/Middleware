@@ -258,9 +258,10 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 		try {
+			User cropUser = this.userDao.getUserByUserName(createdBy.getName());
 			final SampleList sampleFolder = new SampleList();
 			sampleFolder.setCreatedDate(new Date());
-			sampleFolder.setCreatedBy(createdBy);
+			sampleFolder.setCreatedBy(cropUser);
 			sampleFolder.setDescription(null);
 			sampleFolder.setListName(folderName);
 			sampleFolder.setNotes(null);
