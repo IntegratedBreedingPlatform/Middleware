@@ -20,6 +20,9 @@ import java.util.List;
  * The possible study types used in Middleware.
  */
 //FIXME Review types other than N and T and see if we can just remove them as we dont use others except in historic studies.
+@Deprecated
+// We still need to differentiate by T and N. It will be managed as an improvement
+// DO NOT CHANGE
 public enum StudyType {
 
 	N("N", 10000, "Nursery"),
