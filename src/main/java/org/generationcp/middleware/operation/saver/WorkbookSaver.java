@@ -11,6 +11,14 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -45,14 +53,6 @@ import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -219,7 +219,7 @@ public class WorkbookSaver extends Saver {
 
 		if (trialVariableTypeList != null && !isDeleteObservations) {
 			// multi-location for data loader
-			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariableTypeList,
+			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables,
 					trialHeaders, trialVariatesMap, false, programUUID);
 		} else if (workbook.getTrialObservations().size() > 1) {
 			// also a multi-location
@@ -250,8 +250,8 @@ public class WorkbookSaver extends Saver {
 		}
 		trialDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
 
-		this.saveOrUpdateTrialObservations(trialDatasetId, workbook, trialVariableTypeList, locationIds,
-				trialVariatesMap, studyLocationId, totalRows, isDeleteObservations, programUUID, cropPrefix);
+		this.saveOrUpdateTrialObservations(trialDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId,
+				totalRows, isDeleteObservations, programUUID, cropPrefix);
 
 		datasetId = this.createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables,
 				trialVariables, programUUID);
@@ -360,14 +360,15 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void saveOrUpdateTrialObservations(final int trialDatasetId, final Workbook workbook,
-			final VariableTypeList trialVariableTypeList, final List<Integer> locationIds,
-			final Map<Integer, VariableList> trialVariatesMap, final int studyLocationId, final int totalRows,
-			final boolean isDeleteObservations, final String programUUID, final String cropPrefix) {
+			final List<Integer> locationIds, final Map<Integer, VariableList> trialVariatesMap,
+			final int studyLocationId, final int totalRows, final boolean isDeleteObservations,
+			final String programUUID, final String cropPrefix) {
 		if (totalRows == workbook.getTrialObservations().size() && totalRows > 0 && !isDeleteObservations) {
 			this.saveTrialObservations(workbook, programUUID);
 		} else {
 			if (locationIds != null && !locationIds.isEmpty()) {// multi-location
 				for (final Integer locationId : locationIds) {
+					this.setVariableListValues(trialVariatesMap.get(locationId), workbook.getConstants());
 					this.createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId),
 							cropPrefix);
 				}
@@ -529,7 +530,8 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	//Sets the value of categorical variables to the key of the possible value instead of its name
+	// Sets the value of categorical variables to the key of the possible value
+	// instead of its name
 	void setCategoricalVariableValues(final MeasurementVariable mvar, final Variable variable) {
 		if (variable != null && mvar.getPossibleValues() != null && !mvar.getPossibleValues().isEmpty()) {
 			for (final ValueReference possibleValue : mvar.getPossibleValues()) {
@@ -622,7 +624,8 @@ public class WorkbookSaver extends Saver {
 				studyVariables.add(this.createOccVariableType(studyVariables.size() + 1, programUUID));
 			}
 
-			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId, studyMV, studyVariables);
+			final StudyValues studyValues = this.getStudyValuesTransformer().transform(null, studyLocationId, studyMV,
+					studyVariables);
 
 			watch.restart("save study");
 
@@ -632,11 +635,12 @@ public class WorkbookSaver extends Saver {
 			} else {
 				studyType = StudyType.T;
 			}
-			final DmsProject study =
-					this.getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
-							saveStudyExperiment, programUUID, cropPrefix, studyType, workbook.getStudyDetails().getDescription(),
-						workbook.getStudyDetails().getStartDate(), workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails().getObjective(),
-						workbook.getStudyDetails().getStudyName(), workbook.getStudyDetails().getCreatedBy());
+			final DmsProject study = this.getStudySaver().saveStudy(
+					(int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues,
+					saveStudyExperiment, programUUID, cropPrefix, studyType,
+					workbook.getStudyDetails().getDescription(), workbook.getStudyDetails().getStartDate(),
+					workbook.getStudyDetails().getEndDate(), workbook.getStudyDetails().getObjective(),
+					workbook.getStudyDetails().getStudyName(), workbook.getStudyDetails().getCreatedBy());
 			studyId = study.getProjectId();
 		}
 		watch.stop();
@@ -1137,8 +1141,8 @@ public class WorkbookSaver extends Saver {
 		this.getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(),
 				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
 		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
-		Integer trialDatasetId = workbook.getTrialDatasetId(),
-				measurementDatasetId = workbook.getMeasurementDatesetId();
+		Integer trialDatasetId = workbook.getTrialDatasetId();
+		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
 			measurementDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(study.getProjectId(),
 					workbook.getStudyName());
@@ -1175,9 +1179,8 @@ public class WorkbookSaver extends Saver {
 		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset, objective);
 	}
 
-	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study,
-		final String objective, final String createdBy)
-		throws ParseException {
+	private void updateStudyDetails(final String description, final String startDate, final String endDate,
+			final DmsProject study, final String objective, final String createdBy) throws ParseException {
 
 		if (study.getCreatedBy() == null) {
 			study.setCreatedBy(createdBy);
@@ -1198,7 +1201,6 @@ public class WorkbookSaver extends Saver {
 
 		this.updateStudyDetails(description, study, objective);
 	}
-
 
 	private void updateStudyDetails(final String description, final DmsProject study, final String objective) {
 		study.setDescription(description);
