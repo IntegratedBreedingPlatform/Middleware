@@ -492,7 +492,7 @@ public class WorkbookParser {
 			final StudyTypeDto studyType = workbook.getStudyDetails().getStudyType();
 			// We still need to differentiate by T and N, until we merge nursery and trial conditions. It will be managed as an improvement
 			// DO NOT CHANGE
-			if (studyType.getName().equalsIgnoreCase("N")) {
+			if (studyType.getName().equalsIgnoreCase(StudyType.N.getName())) {
 				measurementVariable.setVariableType(VariableType.NURSERY_CONDITION);
 			} else if (Objects.equals(studyType, StudyType.T)) {
 				measurementVariable.setVariableType(VariableType.TRIAL_CONDITION);
