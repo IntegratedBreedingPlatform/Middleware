@@ -15,13 +15,17 @@
 			UPDATE methods SET mtype='GEN', mprgn=2, geneq=1560,`separator`=NULL,`count`='[SEQUENCE]' WHERE `mid`=321;
 		</sql>
 	</changeSet>
+
 	<changeSet author="clarissa" id="v8.4.0-2">
-		<!-- Apply fix on cowpea and bean crop dBs by replacing with proper fcode values. Jira IBP-1544 IBP-1693  -->
 		<preConditions onFail="CONTINUE">
 			<sqlCheck expectedResult="1">select case when ('ibdbv2_cowpea_merged' = DATABASE()) OR ('ibdbv2_bean_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
 		</preConditions>
+		<comment>
+			Apply fix on cowpea and bean crop dBs by replacing with proper fcode values. Jira IBP-1544 IBP-1693
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			REPLACE INTO `udflds` (`fldno`, `ftable`, `ftype`, `fcode`, `fname`, `ffmt`, `fdesc`, `lfldno`, `fuid`, `fdate`, `scaleid`) VALUES (401,'LOCATION','LTYPE','CONT','CONTINENT','','',0,0,19960000,0),
+			REPLACE INTO `udflds` (`fldno`, `ftable`, `ftype`, `fcode`, `fname`, `ffmt`, `fdesc`, `lfldno`, `fuid`, `fdate`, `scaleid`) VALUES
+			(401,'LOCATION','LTYPE','CONT','CONTINENT','','',0,0,19960000,0),
 			(402,'LOCATION','LTYPE','GREGN','GEOGRAPHICAL REGION','','',0,0,19960000,0),
 			(403,'LOCATION','LTYPE','PREGN','GEOPOLITICAL REGION','','',0,0,19960000,0),
 			(404,'LOCATION','LTYPE','EREGN','ECOLOGICAL REGION','','',0,0,19960000,0),
@@ -35,4 +39,5 @@
 			(412,'LOCATION','LTYPE','INTEST','INTERNATIONAL TEST SITE','','',0,0,19960000,0);
 		</sql>
 	</changeSet>
+
 </databaseChangeLog>
