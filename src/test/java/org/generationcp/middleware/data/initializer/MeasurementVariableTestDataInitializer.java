@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.Operation;
 
 public class MeasurementVariableTestDataInitializer {
 
@@ -33,6 +34,13 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setName(name);
 		measurementVar.setValue(value);
 		measurementVar.setDataTypeId(TermId.NUMERIC_VARIABLE.getId());
+		return measurementVar;
+	}
+	
+	public static MeasurementVariable createMeasurementVariableWithOperation(final int termId, final String name,
+			final String value, final Operation operation) {
+		final MeasurementVariable measurementVar = MeasurementVariableTestDataInitializer.createMeasurementVariable(termId, name, value);
+		measurementVar.setOperation(operation);
 		return measurementVar;
 	}
 

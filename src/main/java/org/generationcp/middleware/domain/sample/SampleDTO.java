@@ -11,6 +11,9 @@ import java.util.Set;
 public class SampleDTO {
 
 	private Integer sampleId;
+	private Integer entryNo;
+	private Integer gid;
+	private String designation;
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
@@ -141,6 +144,30 @@ public class SampleDTO {
 
 	public void setSampleId(final Integer sampleId) { this.sampleId = sampleId;}
 
+	public Integer getEntryNo() {
+		return entryNo;
+	}
+
+	public void setEntryNo(Integer entryNo) {
+		this.entryNo = entryNo;
+	}
+
+	public Integer getGid() {
+		return gid;
+	}
+
+	public void setGid(Integer gid) {
+		this.gid = gid;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
+	}
+
 	public Set<Dataset> getDatasets() {
 		if (datasets == null) {
 			return new HashSet<>();
@@ -164,27 +191,37 @@ public class SampleDTO {
 
 		final SampleDTO sampleDTO = (SampleDTO) o;
 
-		return new EqualsBuilder().append(sampleName, sampleDTO.sampleName)
+		return new EqualsBuilder()
+			.append(sampleId, sampleDTO.sampleId)
+			.append(entryNo, sampleDTO.entryNo)
+			.append(gid, sampleDTO.gid)
+			.append(designation, sampleDTO.designation)
+			.append(sampleName, sampleDTO.sampleName)
 			.append(sampleBusinessKey, sampleDTO.sampleBusinessKey)
 			.append(takenBy, sampleDTO.takenBy)
-			.append(samplingDate, sampleDTO.samplingDate)
 			.append(sampleList, sampleDTO.sampleList)
 			.append(plantNumber, sampleDTO.plantNumber)
 			.append(plantBusinessKey, sampleDTO.plantBusinessKey)
-			.append(sampleId, sampleDTO.sampleId)
+			.append(datasets, sampleDTO.datasets)
+			.append(samplingDate, sampleDTO.samplingDate)
 			.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(sampleName)
+		return new HashCodeBuilder(17, 37)
+			.append(sampleId)
+			.append(entryNo)
+			.append(gid)
+			.append(designation)
+			.append(sampleName)
 			.append(sampleBusinessKey)
 			.append(takenBy)
-			.append(samplingDate)
 			.append(sampleList)
 			.append(plantNumber)
 			.append(plantBusinessKey)
-			.append(sampleId)
+			.append(datasets)
+			.append(samplingDate)
 			.toHashCode();
 	}
 }

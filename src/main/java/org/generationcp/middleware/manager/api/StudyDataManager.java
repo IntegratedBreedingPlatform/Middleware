@@ -800,4 +800,6 @@ public interface StudyDataManager {
 
 	Map<String, Integer> getInstanceGeolocationIdsMap (final Integer studyId);
 
+	String getProjectStartDateByProjectId(final int projectId);
+
 }

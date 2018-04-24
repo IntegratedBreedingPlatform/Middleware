@@ -1142,4 +1142,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
 
 	}
+	
+	@Override
+	public String getProjectStartDateByProjectId(final int projectId) {
+		return this.getDmsProjectDao().getProjectStartDateByProjectId(projectId);
+	}
 }
