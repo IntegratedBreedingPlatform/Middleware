@@ -6,8 +6,20 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+	<changeSet author="aldrin" id="v8.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+			<sqlCheck expectedResult="0">
+				<![CDATA[SELECT COUNT(*) FROM listnms a INNER JOIN listnms b ON a.lhierarchy = b.listid AND b.listtype <> 'FOLDER';]]>
+			</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			<![CDATA[UPDATE listnms a INNER JOIN listnms b ON a.lhierarchy = b.listid AND b.listtype <> 'FOLDER' SET a.lhierarchy = null;]]>
+		</sql>
+	</changeSet>
 
-	<changeSet author="clarissa" id="v8.4.0-1">
+	<changeSet author="clarissa" id="v8.4.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">select count(*) FROM methods WHERE `mid`=321;</sqlCheck>
 		</preConditions>
@@ -16,8 +28,8 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarissa" id="v8.4.0-2">
-		<preConditions onFail="CONTINUE">
+	<changeSet author="clarissa" id="v8.4.0-3">
+		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">select case when ('ibdbv2_cowpea_merged' = DATABASE()) OR ('ibdbv2_bean_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
 		</preConditions>
 		<comment>
@@ -39,5 +51,4 @@
 			(412,'LOCATION','LTYPE','INTEST','INTERNATIONAL TEST SITE','','',0,0,19960000,0);
 		</sql>
 	</changeSet>
-
 </databaseChangeLog>
