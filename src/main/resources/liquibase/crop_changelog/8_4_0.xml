@@ -10,12 +10,12 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 			<sqlCheck expectedResult="0">
-				SELECT COUNT(*) FROM listnms a INNER JOIN listnms b ON a.lhierarchy = b.listid AND b.listtype &lt;&gt; 'FOLDER';
+				<![CDATA[SELECT COUNT(*) FROM listnms a INNER JOIN listnms b ON a.lhierarchy = b.listid AND b.listtype <> 'FOLDER';]]>
 			</sqlCheck>
 			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE listnms a INNER JOIN listnms b ON a.lhierarchy = b.listid AND b.listtype &lt;&gt; 'FOLDER' SET a.lhierarchy = null;
+			<![CDATA[UPDATE listnms a INNER JOIN listnms b ON a.lhierarchy = b.listid AND b.listtype <> 'FOLDER' SET a.lhierarchy = null;]]>
 		</sql>
 	</changeSet>
 </databaseChangeLog>
