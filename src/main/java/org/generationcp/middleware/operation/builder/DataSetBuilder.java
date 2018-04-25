@@ -166,7 +166,7 @@ public class DataSetBuilder extends Builder {
 		variables = this.filterDatasetVariables(variables, isMeasurementDataset);
 
 		final List<MeasurementVariable> factorList = this.getMeasurementVariableTransformer().transform(variables.getFactors(), true);
-		final List<MeasurementVariable> variateList = this.getMeasurementVariableTransformer().transform(variables.getVariates(), false, true);
+		final List<MeasurementVariable> variateList = this.getMeasurementVariableTransformer().transform(variables.getVariates(), false);
 		final Workbook workbook = new Workbook();
 		workbook.setObservations(this.getWorkbookBuilder().buildDatasetObservations(experiments, variables, factorList, variateList));
 		workbook.setFactors(factorList);

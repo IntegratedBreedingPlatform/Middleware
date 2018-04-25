@@ -1,11 +1,6 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -17,6 +12,11 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class MeasurementVariableTransformer extends Transformer {
 
 	public MeasurementVariableTransformer(final HibernateSessionProvider sessionProviderForLocal) {
@@ -24,16 +24,12 @@ public class MeasurementVariableTransformer extends Transformer {
 	}
 
 	public List<MeasurementVariable> transform(final VariableTypeList variableTypeList, final boolean isFactor) {
-		return this.transform(variableTypeList, isFactor, false);
-	}
-
-	public List<MeasurementVariable> transform(final VariableTypeList variableTypeList, final boolean isFactor, final boolean isTrial) {
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
 			for (final DMSVariableType dmsVariableType : variableTypeList.getVariableTypes()) {
-				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, isTrial);
+				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor);
 				measurementVariables.add(measurementVariable);
 			}
 		}
@@ -41,10 +37,10 @@ public class MeasurementVariableTransformer extends Transformer {
 		return measurementVariables;
 	}
 
-	public MeasurementVariable transform(final DMSVariableType dmsVariableType, final boolean isFactor, final boolean isTrial) {
+	public MeasurementVariable transform(final DMSVariableType dmsVariableType, final boolean isFactor) {
 		final StandardVariable stdVariable = dmsVariableType.getStandardVariable();
 		String label = this.getLabelBasedOnRole(stdVariable.getPhenotypicType());
-		if (!isFactor && isTrial) {
+		if (!isFactor) {
 			label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 		}
 
@@ -74,7 +70,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		if (variableList != null && !variableList.isEmpty()) {
 			for (final Variable variable : variableList.getVariables()) {
 				final DMSVariableType dmsVariableType = variable.getVariableType();
-				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, !isStudy);
+				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor);
 				measurementVariable.setValue(variable.getDisplayValue());
 				if (!measurementVariables.contains(measurementVariable)) {
 					measurementVariables.add(measurementVariable);

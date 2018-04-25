@@ -42,7 +42,7 @@ public class FieldMapLabel implements Serializable {
 	private String germplasmName;
 
 	/** The rep. */
-	private Integer rep; // null if isTrial = false
+	private Integer rep;
 	private Integer blockNo;
 
 	/** The plot no. */
@@ -103,13 +103,13 @@ public class FieldMapLabel implements Serializable {
 	 * @param rep the rep
 	 * @param plotNo the plot no
 	 */
-	public FieldMapLabel(Integer experimentId, Integer entryNumber, String germplasmName, Integer rep, Integer plotNo) {
+	public FieldMapLabel(final Integer experimentId, final Integer entryNumber, final String germplasmName, final Integer rep, final Integer plotNo) {
 		this(experimentId, entryNumber, germplasmName, rep, plotNo, null);
 		this.userFields = new HashMap<>();
 	}
 
-	public FieldMapLabel(Integer experimentId, Integer entryNumber, String germplasmName, Integer rep, Integer plotNo,
-			Map<Integer, String> userFields) {
+	public FieldMapLabel(final Integer experimentId, final Integer entryNumber, final String germplasmName, final Integer rep, final Integer plotNo,
+			final Map<Integer, String> userFields) {
 		this.experimentId = experimentId;
 		this.entryNumber = entryNumber;
 		this.germplasmName = germplasmName;
@@ -132,7 +132,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param experimentId the new experiment id
 	 */
-	public void setExperimentId(Integer experimentId) {
+	public void setExperimentId(final Integer experimentId) {
 		this.experimentId = experimentId;
 	}
 
@@ -150,7 +150,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param entryNumber the new entry number
 	 */
-	public void setEntryNumber(Integer entryNumber) {
+	public void setEntryNumber(final Integer entryNumber) {
 		this.entryNumber = entryNumber;
 	}
 
@@ -168,7 +168,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param germplasmName the new germplasm name
 	 */
-	public void setGermplasmName(String germplasmName) {
+	public void setGermplasmName(final String germplasmName) {
 		this.germplasmName = germplasmName;
 	}
 
@@ -189,7 +189,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param rep the new rep
 	 */
-	public void setRep(Integer rep) {
+	public void setRep(final Integer rep) {
 		this.rep = rep;
 	}
 
@@ -207,7 +207,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param plotNo the new plot no
 	 */
-	public void setPlotNo(Integer plotNo) {
+	public void setPlotNo(final Integer plotNo) {
 		this.plotNo = plotNo;
 	}
 
@@ -225,7 +225,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param column the column to set
 	 */
-	public void setColumn(Integer column) {
+	public void setColumn(final Integer column) {
 		this.column = column;
 	}
 
@@ -243,7 +243,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param range the range to set
 	 */
-	public void setRange(Integer range) {
+	public void setRange(final Integer range) {
 		this.range = range;
 	}
 
@@ -261,7 +261,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param studyName the studyName to set
 	 */
-	public void setStudyName(String studyName) {
+	public void setStudyName(final String studyName) {
 		this.studyName = studyName;
 	}
 
@@ -279,7 +279,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param datasetId the datasetId to set
 	 */
-	public void setDatasetId(Integer datasetId) {
+	public void setDatasetId(final Integer datasetId) {
 		this.datasetId = datasetId;
 	}
 
@@ -297,7 +297,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param geolocationId the geolocationId to set
 	 */
-	public void setGeolocationId(Integer geolocationId) {
+	public void setGeolocationId(final Integer geolocationId) {
 		this.geolocationId = geolocationId;
 	}
 
@@ -324,7 +324,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param gid the new gid
 	 */
-	public void setGid(Integer gid) {
+	public void setGid(final Integer gid) {
 		this.gid = gid;
 	}
 
@@ -342,11 +342,11 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param season the new season
 	 */
-	public void setSeason(Season season) {
+	public void setSeason(final Season season) {
 		this.season = season;
 	}
 
-	public void setSeason(String seasonStr) {
+	public void setSeason(final String seasonStr) {
 		if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()) {
 			this.season = Season.DRY;
 		} else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()) {
@@ -370,7 +370,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param startYear the new start year
 	 */
-	public void setStartYear(String startYear) {
+	public void setStartYear(final String startYear) {
 		this.startYear = startYear;
 	}
 
@@ -379,7 +379,7 @@ public class FieldMapLabel implements Serializable {
 	 *
 	 * @param siteName the siteName to set
 	 */
-	public void setSiteName(String siteName) {
+	public void setSiteName(final String siteName) {
 		this.siteName = siteName;
 	}
 
@@ -387,7 +387,7 @@ public class FieldMapLabel implements Serializable {
 		return this.pedigree;
 	}
 
-	public void setPedigree(String pedigree) {
+	public void setPedigree(final String pedigree) {
 		this.pedigree = pedigree;
 	}
 
@@ -398,7 +398,7 @@ public class FieldMapLabel implements Serializable {
 		return "";
 	}
 
-	public void setPlotCoordinate(String plotCoordinate) {
+	public void setPlotCoordinate(final String plotCoordinate) {
 		this.plotCoordinate = plotCoordinate;
 	}
 
@@ -409,7 +409,7 @@ public class FieldMapLabel implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("FieldMapLabel [experimentId=");
 		builder.append(this.experimentId);
 		builder.append(", entryNumber=");
@@ -473,7 +473,7 @@ public class FieldMapLabel implements Serializable {
 		return this.blockNo;
 	}
 
-	public void setBlockNo(Integer blockNo) {
+	public void setBlockNo(final Integer blockNo) {
 		this.blockNo = blockNo;
 	}
 
@@ -481,7 +481,7 @@ public class FieldMapLabel implements Serializable {
 		return this.userFields;
 	}
 
-	public void setUserFields(Map<Integer, String> userFields) {
+	public void setUserFields(final Map<Integer, String> userFields) {
 		this.userFields = userFields;
 	}
 
@@ -489,7 +489,7 @@ public class FieldMapLabel implements Serializable {
 		return this.inventoryAmount;
 	}
 
-	public void setInventoryAmount(Double inventoryAmount) {
+	public void setInventoryAmount(final Double inventoryAmount) {
 		this.inventoryAmount = inventoryAmount;
 	}
 
@@ -497,7 +497,7 @@ public class FieldMapLabel implements Serializable {
 		return this.lotId;
 	}
 
-	public void setLotId(Integer lotId) {
+	public void setLotId(final Integer lotId) {
 		this.lotId = lotId;
 	}
 
@@ -505,7 +505,7 @@ public class FieldMapLabel implements Serializable {
 		return this.scaleName;
 	}
 
-	public void setScaleName(String scaleName) {
+	public void setScaleName(final String scaleName) {
 		this.scaleName = scaleName;
 	}
 
