@@ -330,6 +330,9 @@ public class ProjectPropertySaver {
 				} else {
 					this.updateVariable(measurementDataset, variable);
 				}
+			}  else {
+				// study
+				this.updateVariable(project, variable);
 			}
 		}
 	}
