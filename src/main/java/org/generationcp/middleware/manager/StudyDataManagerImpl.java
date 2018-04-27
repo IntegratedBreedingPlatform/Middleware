@@ -65,6 +65,7 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -1153,7 +1154,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyTypeDto getStudyTypeByName(final String name) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getStudyTypeByName(name));
+		final StudyType studyTypeByName = this.getStudyTypeDao().getStudyTypeByName(name);
+		if (studyTypeByName != null) {
+			return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeByName);
+		}
+		return null;
 	}
 
 	@Override
