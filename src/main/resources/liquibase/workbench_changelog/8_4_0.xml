@@ -1,0 +1,34 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet author="aldrin" id="v8.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM workbench_sidebar_category_link where tool_name="sample_manager";
+			</sqlCheck>
+		</preConditions>
+		<comment>Adding Manager Study</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name="sample_manager";
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v8.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM workbench_sidebar_category_link where tool_name="trait_donor_query";
+			</sqlCheck>
+		</preConditions>
+		<comment>Adding Manager Study</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title)
+			VALUES ('trait_donor_query', '2', 'trait_donor_query', 'Trait Donor Query');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
