@@ -193,7 +193,7 @@ public class WorkbookParser {
 
 		this.currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
 		this.currentRowZeroBased = 0;
-		this.errorMessages = new LinkedList<Message>();
+		this.errorMessages = new LinkedList<>();
 		this.setHasIncorrectDatatypeValue(false);
 
 		// validation Descriptin and Observation Sheets
@@ -286,8 +286,6 @@ public class WorkbookParser {
 		final String study = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_NAME_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 		final String description = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TITLE_ROW_INDEX,
-				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final String pmKey = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.PMKEY_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 		final String pmKeyLabel = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.PMKEY_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_LABEL_COLUMN_INDEX);
@@ -388,7 +386,7 @@ public class WorkbookParser {
 	}
 
 	protected List<MeasurementVariable> readMeasurementVariables(final Workbook wb, final String name) throws WorkbookParserException {
-		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		try {
 
@@ -608,7 +606,7 @@ public class WorkbookParser {
 		final Integer lastRowNum = this.getLastRowNumber(excelWorkbook, WorkbookParser.OBSERVATION_SHEET);
 
 		if (lastRowNum == 0) {
-			final List<Message> messages = new ArrayList<Message>();
+			final List<Message> messages = new ArrayList<>();
 			final Message message = new Message("error.observation.no.records");
 			messages.add(message);
 			throw new WorkbookParserException(messages);
@@ -627,7 +625,7 @@ public class WorkbookParser {
 		final Integer lastRowNum = this.getLastRowNumber(excelWorkbook, WorkbookParser.OBSERVATION_SHEET);
 
 		if (lastRowNum > this.getMaxRowLimit()) {
-			final List<Message> messages = new ArrayList<Message>();
+			final List<Message> messages = new ArrayList<>();
 			final Message message =
 					new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(this.getMaxRowLimit()));
 			messages.add(message);
@@ -704,7 +702,7 @@ public class WorkbookParser {
 	protected List<MeasurementRow> readObservations(final Workbook excelWorkbook,
 			final org.generationcp.middleware.domain.etl.Workbook workbook, final boolean discardInvalidValues)
 			throws WorkbookParserException {
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 
 		this.validateExistenceOfObservationRecords(excelWorkbook);
 		this.validateMaximumLimitOfObservationRecords(excelWorkbook);
@@ -755,7 +753,7 @@ public class WorkbookParser {
 	 */
 	protected List<MeasurementData> convertSheetRowToDataList(final int rowNumber, final Workbook excelWorkbook,
 			final boolean discardInvalidValues, final List<MeasurementVariable> variables) {
-		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		final List<MeasurementData> dataList = new ArrayList<>();
 
 		for (int col = 0; col < variables.size(); col++) {
 
