@@ -324,16 +324,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public int deleteGermplasmList(final List<GermplasmList> germplasmLists) {
 		int germplasmListsDeleted = 0;
 		try {
-			// begin delete transaction
-
-			final List<Integer> listIds = new ArrayList<Integer>();
-			for (final GermplasmList germplasmList : germplasmLists) {
-				listIds.add(germplasmList.getId());
-			}
-
-			if (!listIds.isEmpty()) {
-				this.getTransactionDao().cancelUnconfirmedTransactionsForLists(listIds);
-			}
 
 			for (final GermplasmList germplasmList : germplasmLists) {
 
@@ -423,8 +413,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		int germplasmListDataDeleted = 0;
 		try {
 			germplasmListDataDeleted = this.getGermplasmListDataDAO().deleteByListId(listId);
-			this.getTransactionDao().cancelUnconfirmedTransactionsForLists(Arrays.asList(new Integer[] {listId}));
-
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
@@ -459,16 +447,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		int germplasmListDataDeleted = 0;
 		try {
-			// begin delete transaction
-
-			final List<Integer> listEntryIds = new ArrayList<Integer>();
-			for (final GermplasmListData germplasmListData : germplasmListDatas) {
-				listEntryIds.add(germplasmListData.getId());
-			}
-
-			if (!listEntryIds.isEmpty()) {
-				this.getTransactionDao().cancelUnconfirmedTransactionsForListEntries(listEntryIds);
-			}
 
 			for (final GermplasmListData germplasmListData : germplasmListDatas) {
 				this.getGermplasmListDataDAO().makeTransient(germplasmListData);
