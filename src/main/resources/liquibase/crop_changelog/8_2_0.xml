@@ -173,6 +173,7 @@
 				    DECLARE listId INT(11);
 				    DECLARE germplasm_id INT(11);
 				    DECLARE countInsert INT;
+				    DECLARE listdataProjectId INT;
 				    DECLARE countInsertListnms INT;
 
 
@@ -181,7 +182,8 @@
 				      SELECT
 				        listDataCheck.check_type,
 				        listDataCheck.germplasm_id,
-				        listNursery.listid
+				        listNursery.listid,
+				        listDataCheck.listdata_project_id
 				      FROM
 				        listdata_project listDataCheck
 				        INNER JOIN
@@ -193,7 +195,8 @@
 				        listCheck.listtype = 'CHECK'
 				        AND listNursery.listtype = 'STUDY'
 				        and listDataNursery.germplasm_id = listDataCheck.germplasm_id
-				        AND listDataNursery.check_type = ''
+				        AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+				        AND listDataCheck.check_type != 10170
 				        AND listDataCheck.entry_id < (select max(entry_id)
 				                                      from listdata_project lmax
 				                                      where lmax.list_id = listNursery.listid);
@@ -201,18 +204,22 @@
 				    DECLARE exit handler for sqlexception
 				    BEGIN
 				      -- ERROR
+
 				      ROLLBACK;
+				      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Custom error';
 				    END;
 
 				    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 				    START TRANSACTION;
 				    OPEN cur1;
 				    read_loop: LOOP FETCH cur1
-				    INTO checkType, germplasm_id, listId;
+				    INTO checkType, germplasm_id, listId, listdataProjectId;
 
 				      IF done
 				      THEN
+
 				        LEAVE read_loop;
+
 				      END IF;
 
 				      UPDATE listdata_project ldp
@@ -222,34 +229,50 @@
 				        ldp.germplasm_id = germplasm_id
 				        AND ldp.list_id = listId;
 
+				      DELETE FROM listdata_project WHERE listdata_project_id = listdataProjectId;
+
 				    END LOOP read_loop;
 				    CLOSE cur1;
 
-				    INSERT INTO listdata_project (list_id, germplasm_id, check_type, entry_id, entry_code, seed_source, designation, group_name, duplicate_notes, crossing_date, notes)
-				      SELECT
-				        -- -- items from other browsed list (different gids)
-				        (select l.listid
-				         from listnms l
-				         where l.projectid = listCheck.projectid and l.listtype = 'STUDY'),
-				        listDataCheck.germplasm_id,
-				        listDataCheck.check_type,
-				        listDataCheck.entry_id,
-				        listDataCheck.entry_code,
-				        listDataCheck.seed_source,
-				        listDataCheck.designation,
-				        listDataCheck.group_name,
-				        listDataCheck.duplicate_notes,
-				        listDataCheck.crossing_date,
-				        listDataCheck.notes
-				      FROM
-				        listdata_project listDataCheck
-				        INNER JOIN
-				        listnms listCheck ON listDataCheck.list_id = listCheck.listid
-				      WHERE
-				        listCheck.listtype = 'CHECK'
-				        and not exists((select 1
-				                        from listdata_project l
-				                        where l.germplasm_id = listDataCheck.germplasm_id and l.list_id != listDataCheck.list_id AND l.check_type = ''))
+					INSERT INTO listdata_project (list_id, germplasm_id, check_type, entry_id, entry_code, seed_source, designation, group_name, duplicate_notes, crossing_date, notes)
+				      -- -- items from other browsed list (different gids)
+						SELECT DISTINCT
+						    (SELECT
+						            l.listid
+						        FROM
+						            listnms l
+						        WHERE
+						            l.projectid = listCheck.projectid
+						                AND l.listtype = 'STUDY'),
+						    listDataCheck.germplasm_id,
+						    listDataCheck.check_type,
+						    listDataCheck.entry_id,
+						    listDataCheck.entry_code,
+						    listDataCheck.seed_source,
+						    listDataCheck.designation,
+						    listDataCheck.group_name,
+						    listDataCheck.duplicate_notes,
+						    listDataCheck.crossing_date,
+						    listDataCheck.notes
+						FROM
+						    listdata_project listDataCheck
+						        INNER JOIN
+						    listnms listCheck ON listDataCheck.list_id = listCheck.listid
+						WHERE
+						    listCheck.listtype = 'CHECK'
+						        AND listDataCheck.check_type != 10170
+						        AND NOT EXISTS( (SELECT
+						            1
+						        FROM
+						            listnms listNursery
+						                INNER JOIN
+						            listdata_project listDataNursery ON listDataNursery.list_id = listNursery.listid
+						        WHERE
+						            listDataNursery.germplasm_id = listDataCheck.germplasm_id
+						                AND listDataNursery.list_id != listDataCheck.list_id
+						                AND listNursery.listtype = 'STUDY'
+						                AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+						                AND listNursery.projectid = listCheck.projectid))
 				      UNION
 				      SELECT
 				        -- items from the same browsed list with entry_id > max (entry_id) from the original list (same gids)
@@ -275,7 +298,8 @@
 				        listCheck.listtype = 'CHECK'
 				        AND listNursery.listtype = 'STUDY'
 				        and listDataNursery.germplasm_id = listDataCheck.germplasm_id
-				        AND listDataNursery.check_type = ''
+				        AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+				        AND listDataCheck.check_type != 10170
 				        AND listDataCheck.entry_id > (SELECT max(entry_id)
 				                                      from listdata_project lmax
 				                                      where lmax.list_id = listNursery.listid);
@@ -332,6 +356,7 @@
 
 				    IF countInsert > 0
 				    THEN
+
 				      INSERT INTO listdata_project_bkp
 				        SELECT *
 				        FROM listdata_project
@@ -347,6 +372,7 @@
 
 				    IF countInsertListnms > 0
 				    THEN
+
 				      INSERT INTO listnms_bkp
 				        SELECT *
 				        FROM listnms
@@ -362,6 +388,7 @@
 				    WHERE listtype = 'CHECK';
 				    COMMIT;
 				  END;
+
 			  ]]>
 		</sql>
 		</changeSet>
@@ -378,9 +405,9 @@
 					AND specific_name = 'migrate_check_list';
 				</sqlCheck>
 			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
-				call migrate_check_list();
-			</sql>
+				<sql dbms="mysql" splitStatements="false">
+					call migrate_check_list();
+				</sql>
 		</changeSet>
 
 		<changeSet id="v8.2.0-11" author="vanina">
@@ -397,6 +424,52 @@
 			</preConditions>
 			<sql dbms="mysql" splitStatements="false">
 				DROP PROCEDURE migrate_check_list;
+			</sql>
+		</changeSet>
+
+		<changeSet id="v8.2.0-12" author="vanina">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+						cvterm
+					WHERE cvterm_id = 1802 AND name = 'Trial Condition';
+				</sqlCheck>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				REPLACE INTO cvterm(cvterm_id,cv_id,name,definition,dbxref_id,is_obsolete,is_relationshiptype) VALUES
+					(1802,1041,'Study Condition','Observations made of conditions in a study',NULL,0,0);
+			</sql>
+		</changeSet>
+
+		<changeSet id="v8.2.0-13" author="vanina">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+						cvtermprop
+					WHERE value = 'Nursery Condition' AND type_id = 1800;
+				</sqlCheck>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				UPDATE cvtermprop.value SET value = 'Trial Condition' WHERE value = 'Nursery Condition' AND type_id = 1800;
+			</sql>
+		</changeSet>
+
+		<changeSet id="v8.2.0-14" author="vanina">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+						projectprop
+					WHERE type_id = 1803;
+				</sqlCheck>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				UPDATE projectprop SET type_id=1802 WHERE type_id=1803;
 			</sql>
 		</changeSet>
 
