@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	
+	<changeSet author="clarissa" id="v9.0.0">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="project" columnName="created_by"/>
+		</preConditions>
+		<comment>
+			Assign project.created_by = admin user id for nursery, trial templates. Jira IBP-1655 
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE project p SET p.created_by =  
+				(SELECT userid FROM users WHERE uname='admin')
+			WHERE NAME LIKE '%template' AND program_uuid IS NULL;
+		</sql>
+	</changeSet>
+</databaseChangeLog>
