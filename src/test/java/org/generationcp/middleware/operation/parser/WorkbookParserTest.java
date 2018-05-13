@@ -186,7 +186,7 @@ public class WorkbookParserTest {
 			Assert.fail("Validation exception should have been thrown");
 		} catch (final WorkbookParserException e) {
 			final String errorMessage = "Incorrect headers for " + sectionName;
-			Assert.assertTrue("Should have thrown validation exception but did not", errorMessage.equals(e.getMessage()));
+			Assert.assertEquals("Should have thrown validation exception but did not", errorMessage, e.getMessage());
 		}
 	}
 
@@ -359,14 +359,14 @@ public class WorkbookParserTest {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
-		// If the Section is CONSTANT and the study is Trial, the variable type should be TRIAL_CONDITION
-		Assert.assertEquals(VariableType.TRIAL_CONDITION, measurementVariable.getVariableType());
+		// If the Section is CONSTANT and the study is Trial, the variable type should be STUDY_CONDITION
+		Assert.assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
 		studyDetails.setStudyType(new StudyTypeDto("N"));
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
-		// If the Section is CONSTANT and the study is Nursery, the variable type should be NURSERY_CONDITION
-		Assert.assertEquals(VariableType.NURSERY_CONDITION, measurementVariable.getVariableType());
+		// If the Section is CONSTANT and the study is Nursery, the variable type should be STUDY_CONDITION
+		Assert.assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
 	}
 
@@ -912,9 +912,9 @@ public class WorkbookParserTest {
 		;
 		Assert.assertEquals("columnPlantHeight and columnEarPH are deleted, so columnEarSel is now on the second column ", columnEarSel,
 				headerRow.getCell(1).getStringCellValue());
-		Assert.assertEquals("No cell should be on the third column", null, headerRow.getCell(2));
-		Assert.assertEquals("No cell should be on the fourth column", null, headerRow.getCell(3));
-		Assert.assertEquals("No cell should be on the fifth column", null, headerRow.getCell(4));
+		Assert.assertNull("No cell should be on the third column", headerRow.getCell(2));
+		Assert.assertNull("No cell should be on the fourth column", headerRow.getCell(3));
+		Assert.assertNull("No cell should be on the fifth column", headerRow.getCell(4));
 
 		// Verify the data row
 		Assert.assertEquals("columnTrialInstance data is deleted, so columnPlotNo data is now on the first column", columnData2,
@@ -922,9 +922,9 @@ public class WorkbookParserTest {
 		;
 		Assert.assertEquals("columnPlantHeight and columnEarPH data are deleted, so columnEarSel data is now on the second column ",
 				columnData5, dataRow.getCell(1).getStringCellValue());
-		Assert.assertEquals("No cell should be on the third column", null, dataRow.getCell(2));
-		Assert.assertEquals("No cell should be on the fourth column", null, dataRow.getCell(3));
-		Assert.assertEquals("No cell should be on the fifth column", null, dataRow.getCell(4));
+		Assert.assertNull("No cell should be on the third column", dataRow.getCell(2));
+		Assert.assertNull("No cell should be on the fourth column", dataRow.getCell(3));
+		Assert.assertNull("No cell should be on the fifth column", dataRow.getCell(4));
 
 	}
 

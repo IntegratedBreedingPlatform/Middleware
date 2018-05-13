@@ -25,7 +25,6 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -51,7 +50,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 public class WorkbookParser {
 
@@ -490,13 +488,7 @@ public class WorkbookParser {
 		// NOTE: Explicitly setting variable type
 		if (Section.CONSTANT.toString().equals(name) && workbook != null) {
 			final StudyTypeDto studyType = workbook.getStudyDetails().getStudyType();
-			// We still need to differentiate by T and N, until we merge nursery and trial conditions. It will be managed as an improvement
-			// DO NOT CHANGE
-			if (studyType.getName().equalsIgnoreCase(StudyType.N.getName())) {
-				measurementVariable.setVariableType(VariableType.NURSERY_CONDITION);
-			} else if (Objects.equals(studyType, StudyType.T)) {
-				measurementVariable.setVariableType(VariableType.TRIAL_CONDITION);
-			}
+			measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
 		} else {
 			measurementVariable
 					.setVariableType(OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable.getProperty()));
@@ -657,7 +649,7 @@ public class WorkbookParser {
 					WorkbookParser.getCellStringValue(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRowZeroBased, col);
 			if (col < factors.size()) {
 
-				if (columnName == null || !factors.get(col).getName().equalsIgnoreCase(columnName)) {
+				if (!factors.get(col).getName().equalsIgnoreCase(columnName)) {
 					throw new WorkbookParserException("Incorrect header for observations.");
 				} else {
 					variables.add(factors.get(col));

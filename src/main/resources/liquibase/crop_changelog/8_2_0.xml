@@ -429,6 +429,44 @@
 
 		<changeSet id="v8.2.0-12" author="vanina">
 			<preConditions onFail="MARK_RAN">
+				<not>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					from cvtermprop
+					where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
+                                                    FROM cvterm cvt
+                                                      INNER JOIN cvtermprop cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+                                                    WHERE cvt.cv_id = 1040 -- variable
+                                                          AND cvtp.type_id = 1800 -- variable type
+                                                          AND cvtp.value IN (
+                                                      'Nursery Condition'
+                                                      , 'Trial Condition'
+                                                    )
+                                                    group by cvt.cvterm_id
+                                                    having count(1) = 2);
+				</sqlCheck>
+				</not>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				delete from cvtermprop
+				where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
+                                                    FROM cvterm cvt
+                                                      INNER JOIN cvtermprop cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+                                                    WHERE cvt.cv_id = 1040 -- variable
+                                                          AND cvtp.type_id = 1800 -- variable type
+                                                          AND cvtp.value IN (
+                                                      'Nursery Condition'
+                                                      , 'Trial Condition'
+                                                    )
+                                                    group by cvt.cvterm_id
+                                                    having count(1) = 2);
+
+			</sql>
+		</changeSet>
+
+		<changeSet id="v8.2.0-13" author="vanina">
+			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
 					COUNT(*)
@@ -443,7 +481,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-13" author="vanina">
+		<changeSet id="v8.2.0-14" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -458,7 +496,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-14" author="vanina">
+		<changeSet id="v8.2.0-15" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -470,6 +508,38 @@
 			</preConditions>
 			<sql dbms="mysql" splitStatements="false">
 				UPDATE projectprop SET type_id=1802 WHERE type_id=1803;
+			</sql>
+		</changeSet>
+
+		<changeSet id="v8.2.0-16" author="vanina">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+						cvterm
+					WHERE cvterm_id = 1803;
+				</sqlCheck>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				DELETE FROM cvterm WHERE cvterm_id= 1803;
+			</sql>
+		</changeSet>
+
+		<changeSet id="v8.2.0-17" author="vanina">
+			<preConditions onFail="MARK_RAN">
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT
+						COUNT(*)
+						FROM
+							cvtermprop
+						where value = 'Nursery Condition' or value = 'Trial Condition';
+					</sqlCheck>
+				</not>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				update cvtermprop set value = 'Study Condition' where value = 'Nursery Condition' or value = 'Trial Condition';
 			</sql>
 		</changeSet>
 
