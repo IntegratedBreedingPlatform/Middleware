@@ -76,7 +76,6 @@ public class SampleListServiceImpl implements SampleListService {
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 		this.sampleService = new SampleServiceImpl(sessionProvider);
 		this.studyService = new StudyDataManagerImpl(sessionProvider);
-		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 	}
 
 	public void setSampleListDao(final SampleListDao sampleListDao) {
@@ -154,24 +153,25 @@ public class SampleListServiceImpl implements SampleListService {
 				 * maxSequence is the maximum number among samples in the same GID. If there is no sample for Gid, the sequence starts in 1.
 				 */
 
-				final Integer key = observationDto.getGid();
-				Integer maxSequence = maxSequenceNumberByGID.get(key);
+				final Integer gid = observationDto.getGid();
+				Integer maxSequence = maxSequenceNumberByGID.get(gid);
 
 				if (maxSequence == null) {
 					maxSequence = 0;
-					maxSequenceNumberByGID.put(key, maxSequence);
+					maxSequenceNumberByGID.put(gid, maxSequence);
 				}
 
-				final BigInteger sampleNumber = new BigInteger(observationDto.getVariableMeasurements().get(0).getVariableValue());
+				final Integer sampleNumber = Integer.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue());
 				Integer plantNumber = maxPlantNumbers.get(observationDto.getMeasurementId());
 				if (plantNumber == null) {
-					// counter should be start in 1
 					plantNumber = 0;
 				}
-				for (double i = 0; i < sampleNumber.doubleValue(); i++) {
+
+				for (int i = 0; i < sampleNumber; i++) {
 
 					plantNumber++;
 					maxSequence++;
+
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 
 					final Sample sample = this.sampleService
@@ -180,7 +180,7 @@ public class SampleListServiceImpl implements SampleListService {
 					samples.add(sample);
 				}
 
-				maxSequenceNumberByGID.put(key, maxSequence);
+				maxSequenceNumberByGID.put(gid, maxSequence);
 			}
 
 			sampleList.setSamples(samples);
@@ -469,7 +469,6 @@ public class SampleListServiceImpl implements SampleListService {
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
-
 	public void setPlantDao(final PlantDao plantDAO) {
 		this.plantDao = plantDAO;
 	}
