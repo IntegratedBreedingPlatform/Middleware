@@ -1,0 +1,53 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="nahuel" id="v9.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="sample" columnName="entry_no"></columnExists>
+			</not>
+		</preConditions>
+		<comment>Add entry_no column to sample</comment>
+		<addColumn tableName="sample">
+			<column name="entry_no" type="INT" afterColumn="sample_id"></column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v9.1.0-2">
+		<preConditions onFail="CONTINUE">
+			<columnExists tableName="sample" columnName="entry_no"></columnExists>
+		</preConditions>
+		<comment>Fill entry_no column</comment>
+		<sql dbms="mysql">
+			# Number the entries in a sample list ordered by sample_id
+			# by keeping a counter that restart when sample_list changes.
+			# Order by sample_list in case non-consecutive entries belong
+			# to the same list
+
+			set @entry_no = 0;
+			set @sample_list = 0;
+
+			update sample
+			set
+			  entry_no     = @entry_no :=
+							 case when @sample_list = sample_list
+							   then @entry_no + 1
+							 else 1 end,
+			  sample_list = @sample_list := sample_list
+			order by sample_list, sample_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v9.1.0-3">
+		<preConditions onFail="CONTINUE">
+			<columnExists tableName="sample" columnName="entry_no"></columnExists>
+		</preConditions>
+		<addNotNullConstraint tableName="sample" columnName="entry_no" columnDataType="INT"></addNotNullConstraint>
+	</changeSet>
+
+</databaseChangeLog>

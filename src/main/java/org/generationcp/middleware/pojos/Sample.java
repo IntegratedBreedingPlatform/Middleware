@@ -42,6 +42,10 @@ public class Sample implements Serializable {
 	private Integer sampleId;
 
 	@Basic(optional = false)
+	@Column(name = "entry_no")
+	private Integer entryNumber;
+
+	@Basic(optional = false)
 	@Column(name = "sample_name")
 	private String sampleName;
 
@@ -105,6 +109,14 @@ public class Sample implements Serializable {
 
 	public void setSampleId(final Integer sampleId) {
 		this.sampleId = sampleId;
+	}
+
+	public Integer getEntryNumber() {
+		return this.entryNumber;
+	}
+
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	public String getSampleName() {

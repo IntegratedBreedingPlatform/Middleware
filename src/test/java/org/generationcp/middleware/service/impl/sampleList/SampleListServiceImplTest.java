@@ -581,7 +581,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
 		Mockito.when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
 		Mockito.when(this.sampleService
-				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, preferredNameGid,
+				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, 1, preferredNameGid,
 						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		Mockito.when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleList);
 		final SampleList rootSampleList = new SampleList();

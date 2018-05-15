@@ -16,8 +16,9 @@ import java.util.Set;
 
 public interface SampleService {
 
-	Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName,
-		final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy, Date createdDate, User takenBy);
+	Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final Integer entryNumber,
+		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
+		Date createdDate, User takenBy);
 
 	List<SampleDTO> filter(final String plotId, Integer listId, Pageable pageable);
 

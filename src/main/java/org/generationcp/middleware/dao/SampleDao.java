@@ -100,6 +100,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("stock.dbxrefId")) //row[10]
 				.add(Projections.property("stock.name")) //row[11] TODO preferred name
 				.add(Projections.property("samplingDate")) //row[12]
+				.add(Projections.property("entryNumber")) //row[13]
 			)).list();
 
 		return mapSampleDTOS(result);
@@ -107,17 +108,13 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	private List<SampleDTO> mapSampleDTOS(final List<Object[]> result) {
 		final Map<Integer, SampleDTO> sampleDTOMap = new LinkedHashMap<>();
-		// TODO
-		// - 2nd iteration: use setMaxResults and a combination of page and pageSize to compute entryNo
-		// - 3rd iteration: BMS-4785
-		Integer entryNo = 1;
 		for (final Object[] row : result) {
 
 			final Integer sampleId = (Integer) row[0];
 			SampleDTO dto = sampleDTOMap.get(sampleId);
 			if (dto == null) {
 				dto = new SampleDTO();
-				dto.setEntryNo(entryNo++);
+				dto.setEntryNo((Integer) row[13]);
 				dto.setSampleId(sampleId);
 				dto.setSampleName((String) row[1]);
 				dto.setSampleBusinessKey((String) row[2]);

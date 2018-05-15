@@ -175,7 +175,7 @@ public class SampleListServiceImpl implements SampleListService {
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 
 					final Sample sample = this.sampleService
-							.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, sampleName, sampleListDTO.getSamplingDate(),
+							.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, i + 1, sampleName, sampleListDTO.getSamplingDate(),
 									observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}

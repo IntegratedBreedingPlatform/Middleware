@@ -54,7 +54,8 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
+	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final Integer entryNumber,
+		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
 		final Date createdDate, final User takenBy) {
 
 		final Sample sample = new Sample();
@@ -68,7 +69,7 @@ public class SampleServiceImpl implements SampleService {
 
 		sample.setPlant(this.plantService.buildPlant(localCropPrefix, plantNumber, experimentId));
 		sample.setTakenBy(takenBy);
-		// Preferred name GID
+		sample.setEntryNumber(entryNumber);
 		sample.setSampleName(sampleName);
 		sample.setCreatedDate(new Date());
 		sample.setSamplingDate(samplingDate);
