@@ -83,17 +83,6 @@ public class Sample implements Serializable {
 
 	}
 
-	public Sample(final Integer sampleId, final String sampleName, final User takenBy, final Date samplingDate, final Date createdDate,
-			final String sampleBusinessKey, final Plant plant) {
-		this.sampleId = sampleId;
-		this.sampleName = sampleName;
-		this.takenBy = takenBy;
-		this.samplingDate = samplingDate;
-		this.createdDate = createdDate;
-		this.sampleBusinessKey = sampleBusinessKey;
-		this.plant = plant;
-	}
-
 	public User getCreatedBy() {
 		return createdBy;
 	}
