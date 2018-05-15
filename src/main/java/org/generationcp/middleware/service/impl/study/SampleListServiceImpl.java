@@ -449,6 +449,11 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
+	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID) {
+		return this.sampleListDao.searchSampleLists(searchString, exactMatch, programUUID);
+	}
+
+	@Override
 	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
 		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
 	}
