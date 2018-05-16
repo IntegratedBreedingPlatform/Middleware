@@ -44,12 +44,12 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	protected static final String SEARCH_SAMPLE_LIST_CONTAINS =
 			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
 					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
-					+ "WHERE sample_list.type = :listType AND sample_list.program_uuid = :program_uuid AND (sample_list.list_name LIKE :searchString\n"
+					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name LIKE :searchString\n"
 					+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString)";
 	protected static final String SEARCH_SAMPLE_LIST_EXACT_MATCH =
 			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
 					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
-					+ "WHERE sample_list.type = :listType AND sample_list.program_uuid = :program_uuid AND (sample_list.list_name = :searchString\n"
+					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name = :searchString\n"
 					+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString)";
 
 	static {
