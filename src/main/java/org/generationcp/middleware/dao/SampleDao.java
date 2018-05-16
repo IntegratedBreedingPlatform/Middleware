@@ -62,6 +62,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		if (listId != null) {
 		    criteria.add(Restrictions.eq("sampleList.id", listId));
         }
+        if (pageable != null) {
+			return getSampleDTOS(criteria, pageable);
+		}
 		return getSampleDTOS(criteria);
 	}
 
@@ -136,6 +139,70 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				dataset.setDatasetId((Integer) row[8]);
 				dataset.setName((String) row[9]);
 				dto.getDatasets().add(dataset);
+			}
+
+			sampleDTOMap.put(sampleId, dto);
+		}
+
+		return new ArrayList<>(sampleDTOMap.values());
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<SampleDTO> getSampleDTOS(final Criteria criteria, final Pageable pageable) {
+		if (criteria == null) {
+			return Collections.<SampleDTO>emptyList();
+		}
+
+		final int pageSize = pageable.getPageSize();
+		int start = pageSize * pageable.getPageNumber();
+
+		// TODO add datasets
+		final List<Object[]> result = criteria
+			.setFirstResult(start)
+			.setMaxResults(pageSize)
+			.createAlias(SAMPLE_PLANT, PLANT)
+			.createAlias("sample.sampleList", "sampleList")
+			.createAlias("sample.takenBy", "takenBy")
+			.createAlias("takenBy.person", "person")
+			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
+			.createAlias("experiment.experimentStocks", "experimentStocks")
+			.createAlias("experimentStocks.stock", "stock")
+			.setProjection(Projections.distinct(Projections.projectionList()
+				.add(Projections.property("sampleId")) //row[0]
+				.add(Projections.property("sampleName")) //row[1]
+				.add(Projections.property(SAMPLE_BUSINESS_KEY)) //row[2]
+				.add(Projections.property("person.firstName")) //row[3]
+				.add(Projections.property("person.lastName")) //row[4]
+				.add(Projections.property("sampleList.listName")) //row[5]
+				.add(Projections.property("plant.plantNumber")) //row[6]
+				.add(Projections.property("plant.plantBusinessKey")) //row[7]
+				.add(Projections.property("stock.dbxrefId")) //row[8]
+				.add(Projections.property("stock.name")) //row[9] TODO preferred name
+				.add(Projections.property("samplingDate")) //row[10]
+				.add(Projections.property("entryNumber")) //row[11]
+			)).list();
+
+		final Map<Integer, SampleDTO> sampleDTOMap = new LinkedHashMap<>();
+		for (final Object[] row : result) {
+
+			final Integer sampleId = (Integer) row[0];
+			SampleDTO dto = sampleDTOMap.get(sampleId);
+			if (dto == null) {
+				dto = new SampleDTO();
+				dto.setEntryNo((Integer) row[11]);
+				dto.setSampleId(sampleId);
+				dto.setSampleName((String) row[1]);
+				dto.setSampleBusinessKey((String) row[2]);
+				dto.setTakenBy(row[3] + " " + row[4]);
+				dto.setSampleList((String) row[5]);
+				dto.setPlantNumber((Integer) row[6]);
+				dto.setPlantBusinessKey((String) row[7]);
+				dto.setGid((Integer) row[8]);
+				dto.setDesignation((String) row[9]);
+				if (row[10] != null) {
+					dto.setSamplingDate((Date) row[10]);
+				}
+				// TODO add datasets
 			}
 
 			sampleDTOMap.put(sampleId, dto);
