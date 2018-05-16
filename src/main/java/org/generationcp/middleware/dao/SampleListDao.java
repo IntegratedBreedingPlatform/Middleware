@@ -25,10 +25,13 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,12 +48,12 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
 					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
 					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name LIKE :searchString\n"
-					+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString)";
+					+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString) ORDER BY ";
 	protected static final String SEARCH_SAMPLE_LIST_EXACT_MATCH =
 			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
 					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
 					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name = :searchString\n"
-					+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString)";
+					+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString) ORDER BY ";
 
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
@@ -112,9 +115,9 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		return criteria.list();
 	}
 
-	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID) {
+	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
 
-		final SQLQuery query = this.getSession().createSQLQuery(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS);
+		final SQLQuery query = this.getSession().createSQLQuery(addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
 
 		query.setParameter("searchString", searchString + (exactMatch ? "" : "%"));
 		query.setParameter("listType", SampleListType.SAMPLE_LIST.toString());
@@ -284,6 +287,24 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	protected Criterion getRestrictedSnapshopTypes() {
 		return SampleListDao.RESTRICTED_LIST;
+	}
+
+	String addOrder(final String queryString, final Pageable pageable) {
+
+		final StringBuilder stringBuilder = new StringBuilder(queryString);
+
+		if (pageable == null || pageable.getSort() == null) {
+			return "";
+		}
+
+		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+		while(iterator.hasNext()) {
+			final Sort.Order order = iterator.next();
+			stringBuilder.append(order.getProperty() + " " + order.getDirection().name());
+			if (iterator.hasNext()) stringBuilder.append(",");
+		}
+
+		return stringBuilder.toString();
 	}
 
 }

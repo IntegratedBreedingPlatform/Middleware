@@ -29,6 +29,7 @@ import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -449,8 +450,8 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID) {
-		return this.sampleListDao.searchSampleLists(searchString, exactMatch, programUUID);
+	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
+		return this.sampleListDao.searchSampleLists(searchString, exactMatch, programUUID, pageable);
 	}
 
 	@Override
