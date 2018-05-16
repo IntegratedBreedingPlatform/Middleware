@@ -68,12 +68,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return getSampleDTOS(criteria);
 	}
 
-	public Sample getBySampleId(final Integer sampleId) {
-		final DetachedCriteria criteria = DetachedCriteria.forClass(Sample.class);
-		criteria.add(Restrictions.eq("sampleId", sampleId));
-		return (Sample) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
-	}
-
 	@SuppressWarnings("unchecked")
 	private List<SampleDTO> getSampleDTOS(final Criteria criteria) {
 	    if (criteria == null) {
