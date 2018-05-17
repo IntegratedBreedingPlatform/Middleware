@@ -33,6 +33,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -666,5 +667,22 @@ public class SampleListServiceImplTest {
 		Assert.assertEquals(result0.getGid(), dto0.getGid());
 		Assert.assertEquals(result1.getEntryNo(), dto1.getEntryNo());
 		Assert.assertEquals(result1.getGid(), dto1.getGid());
+	}
+
+	@Test
+	public void testSearchSampleLists() {
+
+		final String searchString = "searchString";
+		final String programUUID = "dasdhjashd-djasd-askjdhsa";
+		final boolean exactMatch = false;
+		final Pageable pageable = null;
+
+		final List<SampleList> expectedResult = new ArrayList<>();
+		Mockito.when(this.sampleListDao.searchSampleLists(searchString, exactMatch, programUUID, pageable)).thenReturn(expectedResult);
+
+		final List<SampleList> result = this.sampleListService.searchSampleLists(searchString, exactMatch, programUUID, pageable);
+
+		Assert.assertSame(expectedResult, result);
+
 	}
 }

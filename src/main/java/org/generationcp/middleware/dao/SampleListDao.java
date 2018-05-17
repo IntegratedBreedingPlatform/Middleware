@@ -48,12 +48,12 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
 					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
 					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name LIKE :searchString\n"
-					+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString) ORDER BY ";
+					+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString) ";
 	protected static final String SEARCH_SAMPLE_LIST_EXACT_MATCH =
 			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
 					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
 					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name = :searchString\n"
-					+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString) ORDER BY ";
+					+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString) ";
 
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
@@ -126,7 +126,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		query.addScalar("id", new IntegerType());
 		query.addScalar("listName", new StringType());
 		query.addScalar("description", new StringType());
-		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		query.setResultTransformer(Transformers.aliasToBean(SampleList.class));
 
 		return query.list();
 
@@ -294,8 +294,10 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		final StringBuilder stringBuilder = new StringBuilder(queryString);
 
 		if (pageable == null || pageable.getSort() == null) {
-			return "";
+			return stringBuilder.toString();
 		}
+
+		stringBuilder.append("ORDER BY ");
 
 		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
 		while(iterator.hasNext()) {
