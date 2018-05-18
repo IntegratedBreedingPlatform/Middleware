@@ -189,8 +189,8 @@ public class DmsProject implements Serializable {
 		return studyType;
 	}
 
-	public void setStudyType(final StudyType studyTypeEnum) {
-		this.studyType = studyTypeEnum;
+	public void setStudyType(final StudyType studyType) {
+		this.studyType = studyType;
 	}
 
 	public void setDeleted(final boolean deleted) {
