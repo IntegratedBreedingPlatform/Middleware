@@ -32,9 +32,7 @@ public class SampleServiceImpl implements SampleService {
 
 	private static final String SAMPLE_KEY_PREFIX = "S";
 
-	private final SampleDao sampleDao;
-	private final ExperimentDao experimentDao;
-	private final UserDAO userDao;
+	private final HibernateSessionProvider sessionProvider;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -43,14 +41,25 @@ public class SampleServiceImpl implements SampleService {
 	private PlantService plantService;
 
 	public SampleServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.sampleDao = new SampleDao();
-		this.sampleDao.setSession(sessionProvider.getSession());
+		this.sessionProvider = sessionProvider;
+	}
+	
+	private SampleDao getSampleDao() {
+		final SampleDao sampleDao = new SampleDao();
+		sampleDao.setSession(sessionProvider.getSession());
+		return sampleDao;
+	}
 
-		this.experimentDao = new ExperimentDao();
-		this.experimentDao.setSession(sessionProvider.getSession());
+	private ExperimentDao getExperimentDao() {
+		final ExperimentDao experimentDao = new ExperimentDao();
+		experimentDao.setSession(sessionProvider.getSession());
+		return experimentDao;
+	}
 
-		this.userDao = new UserDAO();
-		this.userDao.setSession(sessionProvider.getSession());
+	private UserDAO getUserDAO() {
+		final UserDAO userDao = new UserDAO();
+		userDao.setSession(sessionProvider.getSession());
+		return userDao;
 	}
 
 	@Override
@@ -91,18 +100,18 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> filter(final String plotId, final Integer listId, Pageable pageable) {
-		return this.sampleDao.filter(plotId, listId, pageable);
+		return this.getSampleDao().filter(plotId, listId, pageable);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
-		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
+		final Sample sample = this.getSampleDao().getBySampleBk(sampleId);
 
 		return this.getSampleDetailsDTO(sample);
 	}
 
 	@Override
 	public Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs) {
-		final List<SampleDTO> sampleDTOs = this.sampleDao.getBySampleBks(sampleUIDs);
+		final List<SampleDTO> sampleDTOs = this.getSampleDao().getBySampleBks(sampleUIDs);
 		return Maps.uniqueIndex(sampleDTOs, new Function<SampleDTO, String>() {
 
 			public String apply(final SampleDTO from) {
@@ -191,12 +200,12 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid) {
-		return this.sampleDao.getByGid(gid);
+		return this.getSampleDao().getByGid(gid);
 	}
 
 	@Override
 	public Boolean studyHasSamples(final Integer studyId) {
-		return this.sampleDao.hasSamples(studyId);
+		return this.getSampleDao().hasSamples(studyId);
 	}
 
 }
