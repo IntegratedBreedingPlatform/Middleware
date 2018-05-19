@@ -12,15 +12,20 @@ import org.generationcp.middleware.pojos.Sample;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
@@ -54,18 +59,31 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
 
 	public List<SampleDTO> filter(final String plotId, final Integer listId, final Pageable pageable) {
-		Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
 		addOrder(criteria, pageable);
 		if (StringUtils.isNotBlank(plotId)) {
 			criteria.add(Restrictions.eq("experiment.plotId", plotId));
 		}
 		if (listId != null) {
-		    criteria.add(Restrictions.eq("sampleList.id", listId));
-        }
-        if (pageable != null) {
+			criteria.add(Restrictions.eq("sampleList.id", listId));
+		}
+		if (pageable != null) {
 			return getSampleDTOS(criteria, pageable);
 		}
 		return getSampleDTOS(criteria);
+	}
+
+	public long countFilter(final String plotId, final Integer listId) {
+		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+		if (StringUtils.isNotBlank(plotId)) {
+			criteria.add(Restrictions.eq("experiment.plotId", plotId));
+		}
+		if (listId != null) {
+			criteria.add(Restrictions.eq("sampleList.id", listId));
+		}
+
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")

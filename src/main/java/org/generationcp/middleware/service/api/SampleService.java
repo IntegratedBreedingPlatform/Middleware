@@ -22,6 +22,11 @@ public interface SampleService {
 
 	List<SampleDTO> filter(final String plotId, Integer listId, Pageable pageable);
 
+	/**
+	 * count results from {@link #filter}
+	 */
+	long countFilter(final String plotId, final Integer listId);
+
 	SampleDetailsDTO getSampleObservation(final String sampleId);
 
 	Map<String, SampleDTO> getSamplesBySampleUID (final Set<String> sampleUIDs);

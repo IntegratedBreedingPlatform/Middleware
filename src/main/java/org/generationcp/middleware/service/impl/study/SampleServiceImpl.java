@@ -43,7 +43,7 @@ public class SampleServiceImpl implements SampleService {
 	public SampleServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
-	
+
 	private SampleDao getSampleDao() {
 		final SampleDao sampleDao = new SampleDao();
 		sampleDao.setSession(sessionProvider.getSession());
@@ -101,6 +101,11 @@ public class SampleServiceImpl implements SampleService {
 	@Override
 	public List<SampleDTO> filter(final String plotId, final Integer listId, Pageable pageable) {
 		return this.getSampleDao().filter(plotId, listId, pageable);
+	}
+
+	@Override
+	public long countFilter(final String plotId, final Integer listId) {
+		return this.getSampleDao().countFilter(plotId, listId);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
