@@ -12,6 +12,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Plant;
@@ -233,7 +234,14 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	private void createSampleListForSearch(final String listName) {
 
-		final User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
+		User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
+		if (user == null) {
+			// FIXME fresh db doesn't have admin user in crop. BMS-886
+			user = UserTestDataInitializer.createUser();
+			user.setName(ADMIN);
+			user.setUserid(null);
+			this.userDao.saveOrUpdate(user);
+		}
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 		sampleList.setListName(listName);
 		sampleList.setDescription("DESCRIPTION-" + listName);
@@ -255,8 +263,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		this.sampleDao.saveOrUpdate(sample);
-
-		System.out.print(1);
 	}
 
 }
