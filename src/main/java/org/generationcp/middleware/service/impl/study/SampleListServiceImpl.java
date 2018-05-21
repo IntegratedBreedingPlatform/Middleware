@@ -148,6 +148,7 @@ public class SampleListServiceImpl implements SampleListService {
 			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(experimentIds);
 			final Map<Integer, Integer> maxSequenceNumberByGID = this.getMaxSequenceNumberByGID(gids);
 			final List<Sample> samples = new ArrayList<>();
+			int entryNumber = 0;
 
 			for (final ObservationDto observationDto : observationDtos) {
 				/*
@@ -172,12 +173,14 @@ public class SampleListServiceImpl implements SampleListService {
 
 					plantNumber++;
 					maxSequence++;
+					entryNumber++;
 
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 
 					final Sample sample = this.sampleService
-							.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, i + 1, sampleName, sampleListDTO.getSamplingDate(),
-									observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
+						.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, entryNumber, sampleName,
+							sampleListDTO.getSamplingDate(),
+							observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
 
