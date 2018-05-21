@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
@@ -48,6 +50,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private GeolocationDao geolocationDao;
 	private StockDao stockDao;
 	private ExperimentStockDao experimentStockDao;
+	private PersonDAO personDAO;
 
 	private Integer listId;
 
@@ -76,6 +79,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
+
+		this.personDAO = new PersonDAO();
+		this.personDAO.setSession(this.sessionProvder.getSession());
 
 		this.listId = this.createSampleListForFilter("TEST-LIST-FOR-SAMPLE-DAO-1");
 	}
@@ -159,9 +165,13 @@ public class SampleDaoTest extends IntegrationTestBase {
 		User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
 		if (user == null) {
 			// FIXME fresh db doesn't have admin user in crop. BMS-886
+			final Person person = PersonTestDataInitializer.createPerson();
+			this.personDAO.saveOrUpdate(person);
+
 			user = UserTestDataInitializer.createUser();
 			user.setName(ADMIN);
 			user.setUserid(null);
+			user.setPersonid(person.getId());
 			this.userDao.saveOrUpdate(user);
 		}
 
