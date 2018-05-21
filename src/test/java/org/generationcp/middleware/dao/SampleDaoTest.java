@@ -77,7 +77,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
 
-		this.listId = this.createSampleListForFilter("TEST-LIST-1");
+		this.listId = this.createSampleListForFilter("TEST-LIST-FOR-SAMPLE-DAO-1");
 	}
 
 	@Test
