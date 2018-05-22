@@ -42,6 +42,10 @@ public class Sample implements Serializable {
 	private Integer sampleId;
 
 	@Basic(optional = false)
+	@Column(name = "entry_no")
+	private Integer entryNumber;
+
+	@Basic(optional = false)
 	@Column(name = "sample_name")
 	private String sampleName;
 
@@ -83,17 +87,6 @@ public class Sample implements Serializable {
 
 	}
 
-	public Sample(final Integer sampleId, final String sampleName, final User takenBy, final Date samplingDate, final Date createdDate,
-			final String sampleBusinessKey, final Plant plant) {
-		this.sampleId = sampleId;
-		this.sampleName = sampleName;
-		this.takenBy = takenBy;
-		this.samplingDate = samplingDate;
-		this.createdDate = createdDate;
-		this.sampleBusinessKey = sampleBusinessKey;
-		this.plant = plant;
-	}
-
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -116,6 +109,14 @@ public class Sample implements Serializable {
 
 	public void setSampleId(final Integer sampleId) {
 		this.sampleId = sampleId;
+	}
+
+	public Integer getEntryNumber() {
+		return this.entryNumber;
+	}
+
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	public String getSampleName() {
