@@ -106,7 +106,7 @@ public enum TermId {
 
 	, BREEDING_METHOD_ID(8257), BREEDING_METHOD(8256), BREEDING_METHOD_CODE(8251)
 
-	// Advance Nursery
+	// Advance Study
 	, PLANTS_SELECTED(8263)
 
 	// Manage Settings
