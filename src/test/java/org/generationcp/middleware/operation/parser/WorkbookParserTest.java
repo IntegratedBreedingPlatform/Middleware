@@ -156,8 +156,7 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateStartDate() {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
-		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		final Date startDate = this.workbookParser.validateStartDate("20180503",dateFormat);
+		final Date startDate = this.workbookParser.validateDate("20180503", true, new Message("error.start.date.invalid"));
 		Assert.assertNotNull(startDate);
 		Assert.assertTrue(this.workbookParser.getErrorMessages().isEmpty());
 	}
@@ -165,8 +164,7 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateStartDateInvalidFormat() {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
-		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		final Date startDate = this.workbookParser.validateStartDate("fdsf",dateFormat);
+		final Date startDate = this.workbookParser.validateDate("fdsf",true, new Message("error.start.date.invalid"));
 		Assert.assertNull(startDate);
 		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
 		Assert.assertEquals("error.start.date.invalid", this.workbookParser.getErrorMessages().get(0).getMessageKey());
@@ -175,8 +173,7 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateStartDateBlank() {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
-		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		final Date startDate = this.workbookParser.validateStartDate("",dateFormat);
+		final Date startDate = this.workbookParser.validateDate("", true, new Message("error.start.date.invalid"));
 		Assert.assertNull(startDate);
 		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
 		Assert.assertEquals("error.start.date.is.empty", this.workbookParser.getErrorMessages().get(0).getMessageKey());
@@ -185,8 +182,7 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateEndDate() {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
-		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		final Date endDate = this.workbookParser.validateEndDate("20180503",dateFormat);
+		final Date endDate = this.workbookParser.validateDate("20180503", false, new Message("error.end.date.invalid"));
 		Assert.assertNotNull(endDate);
 		Assert.assertTrue(this.workbookParser.getErrorMessages().isEmpty());
 	}
@@ -194,8 +190,7 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateEndDateInvalidFormat() {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
-		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		final Date endDate = this.workbookParser.validateEndDate("fdsf",dateFormat);
+		final Date endDate = this.workbookParser.validateDate("fdsf", false, new Message("error.end.date.invalid"));
 		Assert.assertNull(endDate);
 		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
 		Assert.assertEquals("error.end.date.invalid", this.workbookParser.getErrorMessages().get(0).getMessageKey());
