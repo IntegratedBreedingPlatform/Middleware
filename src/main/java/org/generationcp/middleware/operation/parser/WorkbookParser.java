@@ -193,7 +193,7 @@ public class WorkbookParser {
 
 		this.currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
 		this.currentRowZeroBased = 0;
-		this.errorMessages = new LinkedList<Message>();
+		this.errorMessages = new LinkedList<>();
 		this.setHasIncorrectDatatypeValue(false);
 
 		// validation Descriptin and Observation Sheets
@@ -287,8 +287,6 @@ public class WorkbookParser {
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 		final String description = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TITLE_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final String pmKey = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.PMKEY_ROW_INDEX,
-				WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 		final String pmKeyLabel = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.PMKEY_ROW_INDEX,
 				WorkbookParser.STUDY_DETAILS_LABEL_COLUMN_INDEX);
 		int rowAdjustMent = 0;
@@ -320,33 +318,8 @@ public class WorkbookParser {
 			this.errorMessages.add(new Message("error.blank.study.title"));
 		}
 
-		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		Date startDate = null;
-		Date endDate = null;
-
-		if (startDateStr != null && startDateStr.length() != 0 && startDateStr.length() != 8) {
-			this.errorMessages.add(new Message("error.start.date.invalid"));
-		} else {
-			try {
-				if (startDateStr != null && !"".equals(startDateStr)) {
-					startDate = dateFormat.parse(startDateStr);
-				}
-			} catch (final ParseException e) {
-				this.errorMessages.add(new Message("error.start.date.invalid"));
-			}
-		}
-		if (endDateStr != null && endDateStr.length() != 0 && endDateStr.length() != 8) {
-			this.errorMessages.add(new Message("error.end.date.invalid"));
-		} else {
-			try {
-				if (endDateStr != null && !"".equals(endDateStr)) {
-					endDate = dateFormat.parse(endDateStr);
-				}
-			} catch (final ParseException e) {
-				this.errorMessages.add(new Message("error.end.date.invalid"));
-			}
-
-		}
+		Date startDate = this.validateDate(startDateStr, true, new Message("error.start.date.invalid"));
+		Date endDate = this.validateDate(endDateStr, false, new Message("error.end.date.invalid"));
 
 		if (startDate != null && endDate != null && startDate.after(endDate)) {
 			this.errorMessages.add(new Message("error.start.is.after.end.date"));
@@ -374,9 +347,29 @@ public class WorkbookParser {
 		}
 		return studyDetails;
 	}
+	
+	protected Date validateDate(final String dateString, final boolean isStartDate, final Message errorMessage) {
+		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+		Date date = null;
+		if (dateString != null && dateString.length() != 0 && dateString.length() != 8) {
+			this.errorMessages.add(errorMessage);
+		} else {
+			try {
+				if (dateString != null && !"".equals(dateString)) {
+					date  = dateFormat.parse(dateString);
+				}
+				if (isStartDate && date == null) {
+					this.errorMessages.add(new Message("error.start.date.is.empty"));
+				}
+			} catch (final ParseException e) {
+				this.errorMessages.add(errorMessage);
+			}
+		}
+		return date;
+	}
 
 	protected List<MeasurementVariable> readMeasurementVariables(final Workbook wb, final String name) throws WorkbookParserException {
-		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		try {
 
@@ -596,7 +589,7 @@ public class WorkbookParser {
 		final Integer lastRowNum = this.getLastRowNumber(excelWorkbook, WorkbookParser.OBSERVATION_SHEET);
 
 		if (lastRowNum == 0) {
-			final List<Message> messages = new ArrayList<Message>();
+			final List<Message> messages = new ArrayList<>();
 			final Message message = new Message("error.observation.no.records");
 			messages.add(message);
 			throw new WorkbookParserException(messages);
@@ -615,7 +608,7 @@ public class WorkbookParser {
 		final Integer lastRowNum = this.getLastRowNumber(excelWorkbook, WorkbookParser.OBSERVATION_SHEET);
 
 		if (lastRowNum > this.getMaxRowLimit()) {
-			final List<Message> messages = new ArrayList<Message>();
+			final List<Message> messages = new ArrayList<>();
 			final Message message =
 					new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(this.getMaxRowLimit()));
 			messages.add(message);
@@ -692,7 +685,7 @@ public class WorkbookParser {
 	protected List<MeasurementRow> readObservations(final Workbook excelWorkbook,
 			final org.generationcp.middleware.domain.etl.Workbook workbook, final boolean discardInvalidValues)
 			throws WorkbookParserException {
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 
 		this.validateExistenceOfObservationRecords(excelWorkbook);
 		this.validateMaximumLimitOfObservationRecords(excelWorkbook);
@@ -743,7 +736,7 @@ public class WorkbookParser {
 	 */
 	protected List<MeasurementData> convertSheetRowToDataList(final int rowNumber, final Workbook excelWorkbook,
 			final boolean discardInvalidValues, final List<MeasurementVariable> variables) {
-		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		final List<MeasurementData> dataList = new ArrayList<>();
 
 		for (int col = 0; col < variables.size(); col++) {
 
