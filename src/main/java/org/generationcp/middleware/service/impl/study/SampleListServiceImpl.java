@@ -29,6 +29,7 @@ import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +77,6 @@ public class SampleListServiceImpl implements SampleListService {
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 		this.sampleService = new SampleServiceImpl(sessionProvider);
 		this.studyService = new StudyDataManagerImpl(sessionProvider);
-		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 	}
 
 	public void setSampleListDao(final SampleListDao sampleListDao) {
@@ -148,39 +148,43 @@ public class SampleListServiceImpl implements SampleListService {
 			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(experimentIds);
 			final Map<Integer, Integer> maxSequenceNumberByGID = this.getMaxSequenceNumberByGID(gids);
 			final List<Sample> samples = new ArrayList<>();
+			int entryNumber = 0;
 
 			for (final ObservationDto observationDto : observationDtos) {
 				/*
 				 * maxSequence is the maximum number among samples in the same GID. If there is no sample for Gid, the sequence starts in 1.
 				 */
 
-				final Integer key = observationDto.getGid();
-				Integer maxSequence = maxSequenceNumberByGID.get(key);
+				final Integer gid = observationDto.getGid();
+				Integer maxSequence = maxSequenceNumberByGID.get(gid);
 
 				if (maxSequence == null) {
 					maxSequence = 0;
-					maxSequenceNumberByGID.put(key, maxSequence);
+					maxSequenceNumberByGID.put(gid, maxSequence);
 				}
 
-				final BigInteger sampleNumber = new BigInteger(observationDto.getVariableMeasurements().get(0).getVariableValue());
+				final Integer sampleNumber = Integer.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue());
 				Integer plantNumber = maxPlantNumbers.get(observationDto.getMeasurementId());
 				if (plantNumber == null) {
-					// counter should be start in 1
 					plantNumber = 0;
 				}
-				for (double i = 0; i < sampleNumber.doubleValue(); i++) {
+
+				for (int i = 0; i < sampleNumber; i++) {
 
 					plantNumber++;
 					maxSequence++;
+					entryNumber++;
+
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 
 					final Sample sample = this.sampleService
-							.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, sampleName, sampleListDTO.getSamplingDate(),
-									observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
+						.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, entryNumber, sampleName,
+							sampleListDTO.getSamplingDate(),
+							observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
 
-				maxSequenceNumberByGID.put(key, maxSequence);
+				maxSequenceNumberByGID.put(gid, maxSequence);
 			}
 
 			sampleList.setSamples(samples);
@@ -449,6 +453,11 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
+	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
+		return this.sampleListDao.searchSampleLists(searchString, exactMatch, programUUID, pageable);
+	}
+
+	@Override
 	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
 		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
 	}
@@ -464,7 +473,6 @@ public class SampleListServiceImpl implements SampleListService {
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
-
 	public void setPlantDao(final PlantDao plantDAO) {
 		this.plantDao = plantDAO;
 	}
