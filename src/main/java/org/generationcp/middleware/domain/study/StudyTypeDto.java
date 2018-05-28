@@ -5,6 +5,12 @@ import java.util.Objects;
 
 public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 
+	public static final String TRIAL_NAME="T";
+	public static final String NURSERY_NAME="N";
+
+	public static final String TRIAL_LABEL="Trial";
+	public static final String NURSERY_LABEL="Nursery";
+
 	private Integer id;
 	private String label;
 	private String name;
@@ -86,7 +92,6 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 
 	@Override
 	public int hashCode() {
-
 		return Objects.hash(getId(), getLabel(), getName(), getCvTermId(), isVisible());
 	}
 
