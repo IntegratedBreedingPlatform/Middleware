@@ -353,7 +353,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("T"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -362,7 +362,7 @@ public class WorkbookParserTest {
 		// If the Section is CONSTANT and the study is Trial, the variable type should be STUDY_CONDITION
 		Assert.assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
-		studyDetails.setStudyType(new StudyTypeDto("N"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
 		// If the Section is CONSTANT and the study is Nursery, the variable type should be STUDY_CONDITION
@@ -375,7 +375,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("T"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
