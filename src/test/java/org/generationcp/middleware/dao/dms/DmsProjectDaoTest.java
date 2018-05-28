@@ -3,8 +3,8 @@ package org.generationcp.middleware.dao.dms;
 
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.hibernate.SQLQuery;
@@ -55,10 +55,10 @@ public class DmsProjectDaoTest {
 		Object[] mockDBRow2 = new Object[] {2, "My Folder", "My Folder Desc", 0, PROG_UUID, null};
 		mockQueryResult.add(mockDBRow2);
 
-		Object[] mockDBRow3 = new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, StudyType.N.getName()};
+		Object[] mockDBRow3 = new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, StudyTypeDto.NURSERY_NAME};
 		mockQueryResult.add(mockDBRow3);
 
-		Object[] mockDBRow4 = new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, StudyType.T.getName()};
+		Object[] mockDBRow4 = new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, StudyTypeDto.TRIAL_NAME};
 		mockQueryResult.add(mockDBRow4);
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
@@ -77,12 +77,12 @@ public class DmsProjectDaoTest {
 
 		Reference myNursery = result.get(2);
 		Assert.assertTrue(myNursery.isStudy());
-		Assert.assertEquals(StudyType.N, ((StudyReference) myNursery).getStudyType());
+		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, ((StudyReference) myNursery).getStudyType());
 		this.assertCommonDataMapping(mockDBRow3, myNursery);
 
 		Reference myTrial = result.get(3);
 		Assert.assertTrue(myTrial.isStudy());
-		Assert.assertEquals(StudyType.T, ((StudyReference) myTrial).getStudyType());
+		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, ((StudyReference) myTrial).getStudyType());
 		this.assertCommonDataMapping(mockDBRow4, myTrial);
 	}
 
@@ -110,7 +110,7 @@ public class DmsProjectDaoTest {
 	public void testGetStudyMetadata() {
  		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID)).thenReturn(this.mockQuery);
 
-		final Object[] mockDBRow1 = new Object[] {"31", 2088, "TR", StudyType.T.getName(), "10300", "2088", "TR", "20161212", "", "9006", "2"};
+		final Object[] mockDBRow1 = new Object[] {"31", 2088, "TR", StudyTypeDto.TRIAL_NAME, "10300", "2088", "TR", "20161212", "", "9006", "2"};
 		Mockito.when(this.mockQuery.uniqueResult()).thenReturn(mockDBRow1);
 		StudyMetadata studyMetadata = this.dao.getStudyMetadata(31);
 
