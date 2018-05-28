@@ -318,33 +318,8 @@ public class WorkbookParser {
 			this.errorMessages.add(new Message("error.blank.study.title"));
 		}
 
-		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		Date startDate = null;
-		Date endDate = null;
-
-		if (startDateStr != null && startDateStr.length() != 0 && startDateStr.length() != 8) {
-			this.errorMessages.add(new Message("error.start.date.invalid"));
-		} else {
-			try {
-				if (startDateStr != null && !"".equals(startDateStr)) {
-					startDate = dateFormat.parse(startDateStr);
-				}
-			} catch (final ParseException e) {
-				this.errorMessages.add(new Message("error.start.date.invalid"));
-			}
-		}
-		if (endDateStr != null && endDateStr.length() != 0 && endDateStr.length() != 8) {
-			this.errorMessages.add(new Message("error.end.date.invalid"));
-		} else {
-			try {
-				if (endDateStr != null && !"".equals(endDateStr)) {
-					endDate = dateFormat.parse(endDateStr);
-				}
-			} catch (final ParseException e) {
-				this.errorMessages.add(new Message("error.end.date.invalid"));
-			}
-
-		}
+		Date startDate = this.validateDate(startDateStr, true, new Message("error.start.date.invalid"));
+		Date endDate = this.validateDate(endDateStr, false, new Message("error.end.date.invalid"));
 
 		if (startDate != null && endDate != null && startDate.after(endDate)) {
 			this.errorMessages.add(new Message("error.start.is.after.end.date"));
@@ -367,6 +342,26 @@ public class WorkbookParser {
 			this.currentRowZeroBased++;
 		}
 		return studyDetails;
+	}
+	
+	protected Date validateDate(final String dateString, final boolean isStartDate, final Message errorMessage) {
+		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+		Date date = null;
+		if (dateString != null && dateString.length() != 0 && dateString.length() != 8) {
+			this.errorMessages.add(errorMessage);
+		} else {
+			try {
+				if (dateString != null && !"".equals(dateString)) {
+					date  = dateFormat.parse(dateString);
+				}
+				if (isStartDate && date == null) {
+					this.errorMessages.add(new Message("error.start.date.is.empty"));
+				}
+			} catch (final ParseException e) {
+				this.errorMessages.add(errorMessage);
+			}
+		}
+		return date;
 	}
 
 	protected List<MeasurementVariable> readMeasurementVariables(final Workbook wb, final String name) throws WorkbookParserException {

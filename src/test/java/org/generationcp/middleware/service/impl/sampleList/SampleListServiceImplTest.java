@@ -33,6 +33,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -581,7 +582,7 @@ public class SampleListServiceImplTest {
 		Mockito.when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
 		Mockito.when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
 		Mockito.when(this.sampleService
-				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, preferredNameGid,
+				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, 1, preferredNameGid,
 						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		Mockito.when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleList);
 		final SampleList rootSampleList = new SampleList();
@@ -666,5 +667,22 @@ public class SampleListServiceImplTest {
 		Assert.assertEquals(result0.getGid(), dto0.getGid());
 		Assert.assertEquals(result1.getEntryNo(), dto1.getEntryNo());
 		Assert.assertEquals(result1.getGid(), dto1.getGid());
+	}
+
+	@Test
+	public void testSearchSampleLists() {
+
+		final String searchString = "searchString";
+		final String programUUID = "dasdhjashd-djasd-askjdhsa";
+		final boolean exactMatch = false;
+		final Pageable pageable = null;
+
+		final List<SampleList> expectedResult = new ArrayList<>();
+		Mockito.when(this.sampleListDao.searchSampleLists(searchString, exactMatch, programUUID, pageable)).thenReturn(expectedResult);
+
+		final List<SampleList> result = this.sampleListService.searchSampleLists(searchString, exactMatch, programUUID, pageable);
+
+		Assert.assertSame(expectedResult, result);
+
 	}
 }

@@ -16,7 +16,7 @@ public class DesignFactors {
 	 */
 	final static String QUERY = 
 			" SELECT name" +
-			" FROM  projectprop pp INNER JOIN cvterm cvt ON cvt.name = pp.alias " +
+			" FROM  projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id " +
 			" WHERE pp.type_id IN (" + VariableType.EXPERIMENTAL_DESIGN.getId() +  "," + VariableType.TREATMENT_FACTOR.getId() + ") " +  
 			" AND project_id = ( " + 
 			"		SELECT p.project_id " + 

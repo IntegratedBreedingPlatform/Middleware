@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,8 @@ public interface SampleListService {
 	 * sampleListId must exist (could be a folder or a list), newParentFolderId must exist and must be a folder
 	 * newParentFolderId folder must not contain another sample list or folder with the name that the one that needs to be moved
 	 * isCropList set to true if the list will be moved to the crop list folder.
-	 *  @param sampleListId
+	 *
+	 * @param sampleListId
 	 * @param newParentFolderId
 	 * @param isCropList
 	 * @param programUUID
@@ -110,4 +112,21 @@ public interface SampleListService {
 	 */
 	List<SampleList> getAllSampleTopLevelLists(final String programUUID);
 
+	/**
+	 * Returns sample lists that matches the specified search term.
+	 * <p>
+	 * The search results will show lists in which:
+	 * <p>
+	 * The list name contains the search term
+	 * The list contains samples with names that contain the search term
+	 * The list contains samples with Sample UIDs that contain the search term
+	 * <p>
+	 * If exactMatch is True, this will return results that match the search term exactly
+	 *
+	 * @param searchString
+	 * @param exactMatch
+	 * @param programUUID
+	 * @return
+	 */
+	List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
 }
