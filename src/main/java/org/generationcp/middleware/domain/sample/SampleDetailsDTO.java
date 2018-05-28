@@ -28,6 +28,7 @@ public class SampleDetailsDTO implements Serializable {
 	private String studyName;
 	private String season;
 	private String locationName;
+	// TODO not in brapi? use another name or remove, to avoid confusion with entryNumber
 	private Integer entryNo;
 	private Integer plotNo;
 	private Integer gid;
@@ -37,7 +38,7 @@ public class SampleDetailsDTO implements Serializable {
 	private String designation;
 	private Integer plantNo;
 	private String displayDate;
-	private String entryNumber;
+	private Integer entryNumber;
 	private String plotNumber;
 	private Integer sampleEntryNo;
 
@@ -60,11 +61,11 @@ public class SampleDetailsDTO implements Serializable {
 		this.plotNumber = plotNumber;
 	}
 
-	public String getEntryNumber() {
+	public Integer getEntryNumber() {
 		return entryNumber;
 	}
 
-	public void setEntryNumber(final String entryNumber) {
+	public void setEntryNumber(final Integer entryNumber) {
 		this.entryNumber = entryNumber;
 	}
 
@@ -173,6 +174,7 @@ public class SampleDetailsDTO implements Serializable {
 		this.locationName = locationName;
 	}
 
+	// TODO not in brapi? use another name or remove, to avoid confusion with entryNumber
 	public Integer getEntryNo() {
 		return entryNo;
 	}
