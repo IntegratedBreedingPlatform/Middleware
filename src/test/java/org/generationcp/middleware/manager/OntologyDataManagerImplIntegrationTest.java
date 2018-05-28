@@ -28,7 +28,6 @@ import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
@@ -225,9 +224,9 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.N.getId(), StudyType.N.getName(),  StudyType.N.getLabel(), 1));
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.HB.getId(), StudyType.HB.getName(),  StudyType.HB.getLabel(), 2));
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.PN.getId(), StudyType.PN.getName(),  StudyType.PN.getLabel(), 3));
+		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization Nursery", 2));
+		stdVariable.getEnumerations().add(new Enumeration( 10002,"PN", "Pedigree Nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		stdVariable.setCropOntologyId("CROP-TEST");
 
@@ -280,9 +279,9 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.N.getId(), StudyType.N.getName(),  StudyType.N.getLabel(), 1));
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.HB.getId(), StudyType.HB.getName(),  StudyType.HB.getLabel(), 2));
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.PN.getId(), StudyType.PN.getName(),  StudyType.PN.getLabel(), 3));
+		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization Nursery", 2));
+		stdVariable.getEnumerations().add(new Enumeration(10002,"PN", "Pedigree Nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 
 		this.ontologyDataManager.addStandardVariable(stdVariable, PROGRAM_UUID);
@@ -1058,9 +1057,9 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.N.getId(), StudyType.N.getName(),  StudyType.N.getLabel(), 1));
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.HB.getId(), StudyType.HB.getName(),  StudyType.HB.getLabel(), 2));
-		stdVariable.getEnumerations().add(new Enumeration(StudyType.PN.getId(), StudyType.PN.getName(),  StudyType.PN.getLabel(), 3));
+		stdVariable.getEnumerations().add(new Enumeration( 10000,"N", "Nursery", 1));
+		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization Nursery", 2));
+		stdVariable.getEnumerations().add(new Enumeration( 10002,"PN", "Pedigree Nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		stdVariable.setCropOntologyId("CROP-TEST");
 
