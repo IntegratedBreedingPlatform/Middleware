@@ -1,23 +1,11 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-
+import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.oms.StudyType;
-
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -42,7 +30,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.beust.jcommander.internal.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
 
 /**
  * The class <code>StudyServiceImplTest</code> contains tests for the class <code>{@link StudyServiceImpl}</code>.
@@ -189,7 +186,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testListAllStudies() throws MiddlewareQueryException {
 
-		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", StudyType.T.getName(),
+		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", StudyTypeDto.TRIAL_NAME,
 				"Wheat Trial 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 
@@ -238,7 +235,7 @@ public class StudyServiceImplTest {
 		List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
-				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyType.N.getName(),
+				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.NURSERY_NAME,
 					"studyName");
 
 		UserDto user = new UserDto();
@@ -280,7 +277,7 @@ public class StudyServiceImplTest {
 		List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
-				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyType.T.getName(),
+				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.TRIAL_NAME,
 					"studyName");
 
 		UserDto user = new UserDto();
