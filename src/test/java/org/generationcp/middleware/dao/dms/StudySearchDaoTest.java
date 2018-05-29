@@ -1,10 +1,7 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
@@ -32,7 +29,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class StudySearchDaoTest extends IntegrationTestBase {
 
@@ -191,11 +190,10 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesByLocationIdsExcludingDeletedStudies() throws UnpermittedDeletionException {
 		final ArrayList<Integer> locationIds = Lists.newArrayList(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID);
-		List<StudyReference> studyReferences = this.studySearchDao.getStudiesByLocationIds(
-				locationIds, StudySearchDaoTest.PROGRAM_UUID);
+		List<StudyReference> studyReferences = this.studySearchDao.getStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID);
 		final Integer previousCount = studyReferences.size();
 		Assert.assertEquals("There should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES + " studies that are in Luxembourg",
-				StudySearchDaoTest.NO_OF_TEST_STUDIES - 1, studyReferences.size());
+			StudySearchDaoTest.NO_OF_TEST_STUDIES - 1, studyReferences.size());
 
 		// Delete test study
 		final StudyReference studyToDelete = studyReferences.get(0);
@@ -514,19 +512,19 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// First 3 studies have location and season variables at study level
 		// We need to add datasets to studies because search queries expect "Belongs to Study" record in project_relationship
-		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_1, new StudyTypeDto(StudyTypeDto.TRIAL_NAME),
+		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_1, new StudyTypeDto(6,StudyTypeDto.TRIAL_LABEL,StudyTypeDto.TRIAL_NAME,10010,true),
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());
 		this.dryStudies.add(studyReference1);
 
-		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_2, new StudyTypeDto(StudyTypeDto.TRIAL_NAME),
+		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_2, new StudyTypeDto(6,StudyTypeDto.TRIAL_LABEL,StudyTypeDto.TRIAL_NAME,10010,true),
 				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference2.getId());
 		this.wetStudies.add(studyReference2);
 
-		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_3, new StudyTypeDto(StudyTypeDto.TRIAL_NAME),
+		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_3, new StudyTypeDto(6,StudyTypeDto.TRIAL_LABEL,StudyTypeDto.TRIAL_NAME,10010,true),
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference3.getId());
@@ -534,12 +532,12 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// This study has season and location variables at environment level
 		final StudyReference studyReference4 =
-				studyTestDataInitializer.addTestStudy(new StudyTypeDto(StudyTypeDto.TRIAL_NAME), StudySearchDaoTest.TEST_TRIAL_NAME_4, this.cropPrefix);
+				studyTestDataInitializer.addTestStudy(new StudyTypeDto(6,StudyTypeDto.TRIAL_LABEL,StudyTypeDto.TRIAL_NAME,10010,true), StudySearchDaoTest.TEST_TRIAL_NAME_4, this.cropPrefix);
 		studyTestDataInitializer.addEnvironmentDataset(studyReference4.getId(),
 				String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), String.valueOf(TermId.SEASON_DRY.getId()));
 		this.dryStudies.add(studyReference4);
 		
-		final StudyReference studyReference5 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_5, new StudyTypeDto(StudyTypeDto.TRIAL_NAME),
+		final StudyReference studyReference5 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_5, new StudyTypeDto(6,StudyTypeDto.TRIAL_LABEL,StudyTypeDto.TRIAL_NAME,10010,true),
 				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.BANGLADESH_COUNTRY_LOCATION_ID), "20200103",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference5.getId());
