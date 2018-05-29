@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.Util;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,9 +38,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -149,6 +152,49 @@ public class WorkbookParserTest {
 	@Test
 	public void testInCorrectFactorHeadersValidated() throws Exception {
 		this.testIncorrectSectionHeadersValidated(Section.FACTOR, WorkbookParserTest.INCORRECT_FACTOR_HEADERS);
+	}
+	
+	@Test
+	public void testValidateStartDate() {
+		this.workbookParser.setErrorMessages(new ArrayList<Message>());
+		final Date startDate = this.workbookParser.validateDate("20180503", true, new Message("error.start.date.invalid"));
+		Assert.assertNotNull(startDate);
+		Assert.assertTrue(this.workbookParser.getErrorMessages().isEmpty());
+	}
+	
+	@Test
+	public void testValidateStartDateInvalidFormat() {
+		this.workbookParser.setErrorMessages(new ArrayList<Message>());
+		final Date startDate = this.workbookParser.validateDate("fdsf",true, new Message("error.start.date.invalid"));
+		Assert.assertNull(startDate);
+		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
+		Assert.assertEquals("error.start.date.invalid", this.workbookParser.getErrorMessages().get(0).getMessageKey());
+	}
+	
+	@Test
+	public void testValidateStartDateBlank() {
+		this.workbookParser.setErrorMessages(new ArrayList<Message>());
+		final Date startDate = this.workbookParser.validateDate("", true, new Message("error.start.date.invalid"));
+		Assert.assertNull(startDate);
+		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
+		Assert.assertEquals("error.start.date.is.empty", this.workbookParser.getErrorMessages().get(0).getMessageKey());
+	}
+	
+	@Test
+	public void testValidateEndDate() {
+		this.workbookParser.setErrorMessages(new ArrayList<Message>());
+		final Date endDate = this.workbookParser.validateDate("20180503", false, new Message("error.end.date.invalid"));
+		Assert.assertNotNull(endDate);
+		Assert.assertTrue(this.workbookParser.getErrorMessages().isEmpty());
+	}
+	
+	@Test
+	public void testValidateEndDateInvalidFormat() {
+		this.workbookParser.setErrorMessages(new ArrayList<Message>());
+		final Date endDate = this.workbookParser.validateDate("fdsf", false, new Message("error.end.date.invalid"));
+		Assert.assertNull(endDate);
+		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
+		Assert.assertEquals("error.end.date.invalid", this.workbookParser.getErrorMessages().get(0).getMessageKey());
 	}
 
 	@Test
@@ -353,7 +399,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("T"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -362,7 +408,7 @@ public class WorkbookParserTest {
 		// If the Section is CONSTANT and the study is Trial, the variable type should be STUDY_CONDITION
 		Assert.assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
-		studyDetails.setStudyType(new StudyTypeDto("N"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
 		// If the Section is CONSTANT and the study is Nursery, the variable type should be STUDY_CONDITION
@@ -375,7 +421,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("T"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();

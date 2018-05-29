@@ -77,7 +77,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private void setUpNursery() {
 		// Basic Details
 		studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("N"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
 		studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
@@ -89,7 +89,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private void setUpTrial() {
 		// Basic Details
 		studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("T"));
+		studyDetails.setStudyType(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		studyDetails.setStudyName("Test Trial " + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);

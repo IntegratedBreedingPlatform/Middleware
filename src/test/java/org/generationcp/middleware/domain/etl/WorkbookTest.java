@@ -57,7 +57,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForNursery() {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto("N"));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
@@ -115,7 +115,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForNursery() {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto("N"));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
 		WorkbookTestDataInitializer.createTrialObservations(1, workbook);
 
 		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
@@ -125,7 +125,7 @@ public class WorkbookTest {
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForTrial() {
 		final int noOfInstances = 2;
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, new StudyTypeDto("T"));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {

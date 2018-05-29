@@ -66,7 +66,7 @@ public class StudyValuesTransformerTest extends IntegrationTestBase {
 	private StudyDetails createStudyDetailsTestData() {
 		final StudyDetails studyDetails =
 				new StudyDetails("pheno_t7", "Phenotyping trials of the Population 114", "To evaluate the Population 114", "20130805",
-						"20130805", new StudyTypeDto("N"), 1, "This is a TrialDataSetName", "This is a measurementDatasetName", Util
+						"20130805", new StudyTypeDto(StudyTypeDto.NURSERY_NAME), 1, "This is a TrialDataSetName", "This is a measurementDatasetName", Util
 					.getCurrentDateAsStringValue(), "1");
 		return studyDetails;
 	}
