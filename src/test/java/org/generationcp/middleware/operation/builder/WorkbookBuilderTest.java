@@ -457,8 +457,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Ignore
 	@Test
 	public void testBuildConditionVariablesOnTrial() {
-		// final int noOfObservations, final StudyType studyType, final String
-		// studyName, final int trialNo, final boolean hasMultipleLocations
 		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, new StudyTypeDto(StudyTypeDto.TRIAL_NAME), "Test study", 1,
 				true);
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
