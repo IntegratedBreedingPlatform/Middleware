@@ -14,8 +14,6 @@ package org.generationcp.middleware.domain.dms;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.util.Debug;
 
-import java.util.Objects;
-
 /**
  * Contains the primary details of a study - id, name, description.
  *
@@ -73,24 +71,5 @@ public class StudyReference extends Reference {
 	public void print(final int indent) {
 		Debug.println(indent, "STUDY:[id=" + this.getId() + ", name=" + this.getName() + ", description=" + this.getDescription()
 				+ ", noOfEnv=" + this.numberOfEnvironments + "]");
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof StudyReference))
-			return false;
-		if (!super.equals(o))
-			return false;
-		final StudyReference that = (StudyReference) o;
-		return Objects.equals(getNumberOfEnvironments(), that.getNumberOfEnvironments()) && Objects
-			.equals(getStudyType(), that.getStudyType());
-	}
-
-	@Override
-	public int hashCode() {
-
-		return Objects.hash(super.hashCode(), getNumberOfEnvironments(), getStudyType());
 	}
 }
