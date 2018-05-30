@@ -91,7 +91,7 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getId(), getLabel(), getName(), getCvTermId(), isVisible());
+		return Objects.hash(getName());
 	}
 
 	@Override
