@@ -77,9 +77,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * Type of study is stored in projectprops table.
 	 * Which folder the study is in, is defined in the project_relationship table.
 	 */
-	static final String GET_CHILDREN_OF_FOLDER =
-		"SELECT subject.project_id, subject.name,  subject.description, " + "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId()
-			+ ") THEN 1 ELSE 0 END) AS is_study, " + "    subject.program_uuid, "
+	public static final String GET_CHILDREN_OF_FOLDER =
+		"SELECT subject.project_id AS project_id, subject.name AS name,  subject.description AS description, " + "	(CASE WHEN (pr"
+			+ ".type_id = " + TermId.IS_STUDY
+			.getId()
+			+ ") THEN 1 ELSE 0 END) AS is_study, " + "    subject.program_uuid AS program_uuid, "
 			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as "
 			+ "cvtermId "
 			+ " FROM project subject " + "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "

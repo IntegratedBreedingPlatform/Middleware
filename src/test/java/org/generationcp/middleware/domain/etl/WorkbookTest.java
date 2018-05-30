@@ -26,8 +26,8 @@ import static org.junit.Assert.assertEquals;
 public class WorkbookTest {
 
 	@Test
-	public void testGetMeasurementDatasetVariablesViewForTrial() {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto("T"));
+	public void testGetMeasurementDatasetVariablesView() {
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyTypeDto.getTrialDto());
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
@@ -53,18 +53,6 @@ public class WorkbookTest {
 						variates.get(i - noOfFactors).getTermId());
 			}
 		}
-	}
-
-	@Test
-	public void testGetMeasurementDatasetVariablesViewForNursery() {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
-
-		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
-		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
-
-		Assert.assertEquals("MeasurementDatasetVariablesView size should be the total no of non trial factors, variates",
-				totalMeasurementVariableCount, list.size());
-
 	}
 
 	@Test
@@ -114,18 +102,9 @@ public class WorkbookTest {
 	}
 
 	@Test
-	public void testGetTrialObservationByTrialInstanceNoForNursery() {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
-		WorkbookTestDataInitializer.createTrialObservations(1, workbook);
-
-		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
-		Assert.assertNotNull("Expecting that every Nursery created has by default 1 instance level observation.", trialObservation);
-	}
-
-	@Test
-	public void testGetTrialObservationByTrialInstanceNoForTrial() {
+	public void testGetTrialObservationByTrialInstanceNo() {
 		final int noOfInstances = 2;
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyTypeDto.getTrialDto());
 		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {

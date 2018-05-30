@@ -11,16 +11,12 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -28,6 +24,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DAO class for searching studies stored in {@link DmsProject}.
@@ -146,7 +147,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		if (startDate != null) {
 			try {
-				String dateString = String.valueOf(startDate) + "%";
+				final String dateString = String.valueOf(startDate) + "%";
 
 				final SQLQuery query = this.getSession()
 						.createSQLQuery("select distinct p.project_id, p.name, p.description " + this.getSearchByStartDateMainQuery());
@@ -189,16 +190,24 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 				}
 
 				if (valueId != 0) {
-					final SQLQuery query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id, p.name, p.description"
+					final SQLQuery query = this.getSession().createSQLQuery(
+						"SELECT DISTINCT p.project_id, p.name, p.description, st.study_type_id, st.label, st.name as studyTypeName, st"
+							+ ".cvterm_id, st.visible"
 							+ this.getSearchBySeasonAtEnvironmentLevelMainQuery() + StudySearchDao.UNION_DISTINCT
-							+ "  SELECT DISTINCT p.project_id, p.name, p.description " + this.getSearchBySeasonAtStudyLevelMainQuery());
+							+ "  SELECT DISTINCT p.project_id, p.name, p.description, st.study_type_id, st.label, st.name as studyTypeName, st.cvterm_id,"
+							+ " st.visible "
+							+ this.getSearchBySeasonAtStudyLevelMainQuery());
 
 					query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 					query.setParameter("seasonId", valueId);
 
 					final List<Object[]> results = query.list();
 					for (final Object[] row : results) {
-						final StudyReference sr = new StudyReference((Integer) row[0], (String) row[1], (String) row[2]);
+
+						final StudyTypeDto studyTypeDto =
+							new StudyTypeDto((Integer) row[3], (String) row[4], (String) row[5], (Integer) row[6], ((Byte) row[7]) == 1);
+						final StudyReference sr =
+							new StudyReference((Integer) row[0], (String) row[1], (String) row[2], programUUID, studyTypeDto);
 						studyReferences.add(sr);
 					}
 				}
@@ -213,20 +222,20 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	private String getSearchBySeasonAtEnvironmentLevelMainQuery() {
-		return " FROM project p " + " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-				+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep ON ep.project_id = pr.subject_project_id "
-				+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id and e.type_id = "
-				+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-				+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-				+ TermId.SEASON_VAR.getId() + " WHERE  p.program_uuid = :programUUID AND gp.value = :seasonId "
-				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+		return " FROM project p " + " INNER JOIN study_type st ON st.study_type_id = p.study_type_id "
+			+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY
+			.getId() + " INNER JOIN nd_experiment_project ep ON ep.project_id = pr.subject_project_id "
+			+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id and e.type_id = "
+			+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+			+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.SEASON_VAR
+			.getId() + " WHERE  p.program_uuid = :programUUID AND gp.value = :seasonId " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
 	}
 
 	private String getSearchBySeasonAtStudyLevelMainQuery() {
-		return "FROM project p  " + "INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.variable_id = "
-				+ TermId.SEASON_VAR.getId() + "  " + "WHERE  p.program_uuid = :programUUID AND pp.value = :seasonId "
-				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+		return "FROM project p  " + " INNER JOIN study_type st ON st.study_type_id = p.study_type_id " + "INNER JOIN project_relationship "
+			+ "pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
+			+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.variable_id = " + TermId.SEASON_VAR.getId() + "  "
+			+ "WHERE  p.program_uuid = :programUUID AND pp.value = :seasonId " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
 	}
 
 	@SuppressWarnings("unchecked")

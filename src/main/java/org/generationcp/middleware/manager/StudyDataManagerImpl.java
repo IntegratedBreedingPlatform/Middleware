@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -87,6 +88,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
+	private StudyTypeDAO studyTypeDAO;
 
 
 	public StudyDataManagerImpl() {
@@ -95,6 +97,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
 		init(sessionProvider);
+		this.studyTypeDAO = new StudyTypeDAO();
+		this.studyTypeDAO.setSession(sessionProvider.getSession());
 	}
 
 	private void init(final HibernateSessionProvider sessionProvider) {
@@ -187,7 +191,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID,
 					cropPrefix, studyType, description, startDate, endDate, objective, name, createdBy);
 
-			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
+			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), programUUID, studyType);
 
 		} catch (final Exception e) {
 
@@ -970,7 +974,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyTypeDto getStudyType(final int studyId) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getById(studyId));
+		return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeDAO.getById(studyId));
 	}
 
 	@Override
@@ -1149,12 +1153,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<StudyTypeDto> getAllStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAll());
+		return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeDAO.getAll());
 	}
 
 	@Override
 	public StudyTypeDto getStudyTypeByName(final String name) {
-		final StudyType studyTypeByName = this.getStudyTypeDao().getStudyTypeByName(name);
+		final StudyType studyTypeByName = studyTypeDAO.getStudyTypeByName(name);
 		if (studyTypeByName != null) {
 			return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeByName);
 		}
@@ -1163,16 +1167,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyTypeDto getStudyTypeByLabel(final String label) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getStudyTypeByLabel(label));
+		return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeDAO.getStudyTypeByLabel(label));
 	}
 
 	@Override
 	public List<StudyTypeDto> getAllVisibleStudyTypes() {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getAllVisibleStudyTypes());
+		return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeDAO.getAllVisibleStudyTypes());
 	}
 
 	@Override
 	public String getProjectStartDateByProjectId(final int projectId) {
 		return this.getDmsProjectDao().getProjectStartDateByProjectId(projectId);
+	}
+
+	public void setStudyTypeDAO(final StudyTypeDAO studyTypeDAO) {
+		this.studyTypeDAO = studyTypeDAO;
 	}
 }

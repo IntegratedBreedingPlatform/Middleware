@@ -13,8 +13,11 @@ public class StudyTypeBuilder {
 	}
 
 	public StudyTypeDto createStudyTypeDto(final StudyType studyType) {
-		return new StudyTypeDto(studyType.getStudyTypeId(), studyType.getLabel(), studyType.getName(), studyType.getCvTermId(),
-			studyType.isVisible());
+		if (studyType != null) {
+			return new StudyTypeDto(studyType.getStudyTypeId(), studyType.getLabel(), studyType.getName(), studyType.getCvTermId(),
+				studyType.isVisible());
+		}
+		return null;
 	}
 
 	public List<StudyTypeDto> createStudyTypeDto(final List<StudyType> all) {

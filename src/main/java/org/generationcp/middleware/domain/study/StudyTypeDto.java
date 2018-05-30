@@ -106,4 +106,14 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 		final int compareId = o.getId();
 		return this.getId().compareTo(compareId);
 	}
+
+	//TODO try to improve this
+	public static StudyTypeDto getTrialDto() {
+		return new StudyTypeDto(6, StudyTypeDto.TRIAL_LABEL, StudyTypeDto.TRIAL_NAME, 10010, true);
+	}
+
+	//TODO try to improve this
+	public static StudyTypeDto getNurseryDto() {
+		return new StudyTypeDto(1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME, 10000, true);
+	}
 }
