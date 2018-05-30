@@ -263,30 +263,6 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testSetRequiredFieldsForNursery() {
-
-		this.dataImportService.setRequiredFields(this.workbook);
-
-		final Optional<MeasurementVariable> optionalPlotNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), this.workbook.getFactors());
-		final Optional<MeasurementVariable> optionalEntryNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
-		final Optional<MeasurementVariable> optionalGid =
-				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), this.workbook.getFactors());
-		final Optional<MeasurementVariable> optionalTrialInstance =
-				dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), this.workbook.getTrialVariables());
-		final Optional<MeasurementVariable> optionalPlotNNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), this.workbook.getFactors());
-
-		Assert.assertTrue(optionalPlotNo.get().isRequired());
-		Assert.assertTrue(optionalEntryNo.get().isRequired());
-		Assert.assertTrue(optionalGid.get().isRequired());
-		Assert.assertFalse(optionalTrialInstance.get().isRequired());
-		Assert.assertFalse(optionalPlotNNo.isPresent());
-
-	}
-
-	@Test
 	public void testExtractGidsFromObservations() {
 
 		final Set<Integer> result =
@@ -643,7 +619,7 @@ public class DataImportServiceImplTest {
 		// Expecting that measurementVariables list has 1 item.
 		// The added variable should not be deleted from the list because it is not obsolete.
 		Assert.assertEquals(1, measurementVariables.size());
-		Assert.assertTrue(adObsolete.equals(measurementVariables.get(0)));
+		Assert.assertEquals(adObsolete, measurementVariables.get(0));
 
 	}
 

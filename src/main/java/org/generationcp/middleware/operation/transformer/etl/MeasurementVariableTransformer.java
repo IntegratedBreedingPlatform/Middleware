@@ -24,12 +24,16 @@ public class MeasurementVariableTransformer extends Transformer {
 	}
 
 	public List<MeasurementVariable> transform(final VariableTypeList variableTypeList, final boolean isFactor) {
+		return this.transform(variableTypeList, isFactor, false);
+	}
+
+	public List<MeasurementVariable> transform(final VariableTypeList variableTypeList, final boolean isFactor, final boolean isStudy) {
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
 			for (final DMSVariableType dmsVariableType : variableTypeList.getVariableTypes()) {
-				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor);
+				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, isStudy);
 				measurementVariables.add(measurementVariable);
 			}
 		}
@@ -37,10 +41,10 @@ public class MeasurementVariableTransformer extends Transformer {
 		return measurementVariables;
 	}
 
-	public MeasurementVariable transform(final DMSVariableType dmsVariableType, final boolean isFactor) {
+	public MeasurementVariable transform(final DMSVariableType dmsVariableType, final boolean isFactor, final boolean isStudy) {
 		final StandardVariable stdVariable = dmsVariableType.getStandardVariable();
 		String label = this.getLabelBasedOnRole(stdVariable.getPhenotypicType());
-		if (!isFactor) {
+		if (!isFactor && isStudy) {
 			label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 		}
 
@@ -70,7 +74,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		if (variableList != null && !variableList.isEmpty()) {
 			for (final Variable variable : variableList.getVariables()) {
 				final DMSVariableType dmsVariableType = variable.getVariableType();
-				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor);
+				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, !isStudy);
 				measurementVariable.setValue(variable.getDisplayValue());
 				if (!measurementVariables.contains(measurementVariable)) {
 					measurementVariables.add(measurementVariable);

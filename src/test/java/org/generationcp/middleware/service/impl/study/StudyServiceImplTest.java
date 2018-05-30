@@ -129,7 +129,7 @@ public class StudyServiceImplTest {
 		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
 			.thenReturn(this.mockSqlQuery);
 
-		List<Integer> ids = Arrays.asList(1000,1002);
+		final List<Integer> ids = Arrays.asList(1000,1002);
 		assertThat(true, is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
@@ -141,7 +141,7 @@ public class StudyServiceImplTest {
 		Mockito.when(this.mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED))
 			.thenReturn(this.mockSqlQuery);
 
-		List<Integer> ids = Arrays.asList(1000,1002);
+		final List<Integer> ids = Arrays.asList(1000,1002);
 		assertThat(false,is(equalTo(this.studyServiceImpl.hasMeasurementDataEntered(ids, 4))));
 	}
 
@@ -185,8 +185,9 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testListAllStudies() throws MiddlewareQueryException {
-
-		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", StudyTypeDto.TRIAL_NAME,
+		final StudyTypeDto studyTypeDto = StudyTypeDto.getTrialDto();
+		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", studyTypeDto.getId(),
+			studyTypeDto.getLabel(), studyTypeDto.getName(), Byte.valueOf("1"), studyTypeDto.getCvTermId(),
 				"Wheat Trial 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 
@@ -204,13 +205,13 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(testDBRow[1], studySummary.getName());
 		Assert.assertEquals(testDBRow[2], studySummary.getTitle());
 		Assert.assertEquals(testDBRow[3], studySummary.getProgramUUID());
-		Assert.assertEquals(testDBRow[4], studySummary.getType().getName());
-		Assert.assertEquals(testDBRow[5], studySummary.getObjective());
-		Assert.assertEquals(testDBRow[6], studySummary.getStartDate());
-		Assert.assertEquals(testDBRow[7], studySummary.getEndDate());
-		Assert.assertEquals(testDBRow[8], studySummary.getPrincipalInvestigator());
-		Assert.assertEquals(testDBRow[9], studySummary.getLocation());
-		Assert.assertEquals(testDBRow[10], studySummary.getSeason());
+		Assert.assertEquals(testDBRow[4], studySummary.getType().getId());
+		Assert.assertEquals(testDBRow[9], studySummary.getObjective());
+		Assert.assertEquals(testDBRow[10], studySummary.getStartDate());
+		Assert.assertEquals(testDBRow[11], studySummary.getEndDate());
+		Assert.assertEquals(testDBRow[12], studySummary.getPrincipalInvestigator());
+		Assert.assertEquals(testDBRow[13], studySummary.getLocation());
+		Assert.assertEquals(testDBRow[14], studySummary.getSeason());
 
 	}
 
@@ -223,7 +224,7 @@ public class StudyServiceImplTest {
 
 		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(123);
 
-		Assert.assertTrue(studyInstances.size() == 1);
+		Assert.assertEquals(1, studyInstances.size());
 		Assert.assertEquals(testDBRow[0], studyInstances.get(0).getInstanceDbId());
 		Assert.assertEquals(testDBRow[1], studyInstances.get(0).getLocationName());
 		Assert.assertEquals(testDBRow[2], studyInstances.get(0).getLocationAbbreviation());
@@ -232,22 +233,22 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testGetStudyDetailsForANursery() {
-		List<String> seasons = new ArrayList<>();
+		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
 				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.NURSERY_NAME,
 					"studyName");
 
-		UserDto user = new UserDto();
+		final UserDto user = new UserDto();
 		user.setEmail("a@a.com");
 		user.setFirstName("name");
 		user.setLastName("last");
 		user.setRole("ADMIN");
 		user.setUserId(1);
-		List<UserDto> users = new ArrayList<>();
+		final List<UserDto> users = new ArrayList<>();
 		users.add(user);
 
-		Map<String, String> properties = new HashMap<>();
+		final Map<String, String> properties = new HashMap<>();
 		properties.put("p1", "v1");
 
 		Mockito.when(this.studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
@@ -274,28 +275,28 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testGetStudyDetailsForATrial() {
-		List<String> seasons = new ArrayList<>();
+		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
 				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.TRIAL_NAME,
 					"studyName");
 
-		UserDto user = new UserDto();
+		final UserDto user = new UserDto();
 		user.setEmail("a@a.com");
 		user.setFirstName("name");
 		user.setLastName("last");
 		user.setRole("ADMIN");
 		user.setUserId(1);
-		List<UserDto> users1 = new ArrayList<>();
+		final List<UserDto> users1 = new ArrayList<>();
 		users1.add(user);
 
-		List<UserDto> users2 = new ArrayList<>();
+		final List<UserDto> users2 = new ArrayList<>();
 
 
-		Map<String, String> properties1 = new HashMap<>();
+		final Map<String, String> properties1 = new HashMap<>();
 		properties1.put("p1", "v1");
 
-		Map<String, String> properties2 = new HashMap<>();
+		final Map<String, String> properties2 = new HashMap<>();
 		properties2.put("p2", "v2");
 
 		Mockito.when(this.studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);

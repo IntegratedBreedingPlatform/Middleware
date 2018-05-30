@@ -86,8 +86,7 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 		if (!(o instanceof StudyTypeDto))
 			return false;
 		final StudyTypeDto that = (StudyTypeDto) o;
-		return isVisible() == that.isVisible() && Objects.equals(getId(), that.getId()) && Objects.equals(getLabel(), that.getLabel())
-			&& Objects.equals(getName(), that.getName()) && Objects.equals(getCvTermId(), that.getCvTermId());
+		return Objects.equals(getLabel(), that.getLabel());
 	}
 
 	@Override

@@ -1,15 +1,11 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -26,7 +22,6 @@ import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerI
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -53,11 +48,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -191,10 +189,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 
 			final Query query = this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
-				.addScalar("programUUID").addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("cvTermId")
-				.addScalar("visible").addScalar("label").addScalar("studyTypeName").addScalar("cvTermId").addScalar("visible")
-				.addScalar("objective").addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("location")
-				.addScalar("season");
+				.addScalar("programUUID").addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("visible")
+				.addScalar("cvTermId").addScalar("objective").addScalar("startDate").addScalar("endDate").addScalar("piName")
+				.addScalar("location").addScalar("season");
 
 			list = query.list();
 		} catch (final HibernateException e) {
