@@ -123,7 +123,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
 
 		this.studyTypeDAO = Mockito.mock(StudyTypeDAO.class);
-		this.manager.setStudyTypeDAO(this.studyTypeDAO);
 
 		final StudyType studyType = new StudyType();
 		studyType.setStudyTypeId(6);
