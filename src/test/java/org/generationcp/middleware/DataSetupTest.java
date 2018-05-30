@@ -230,7 +230,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		final Workbook workbook = new Workbook();
 		// Basic Details
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("N"));
+		studyDetails.setStudyType(StudyTypeDto.getNurseryDto());
 		studyDetails.setStudyName("Test Nursery " + randomInt);
 		studyDetails.setObjective(studyDetails.getStudyName() + " Objective");
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
