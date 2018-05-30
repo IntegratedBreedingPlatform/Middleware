@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -1146,5 +1148,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public String getProjectStartDateByProjectId(final int projectId) {
 		return this.getDmsProjectDao().getProjectStartDateByProjectId(projectId);
+	}
+
+	@Override
+	public boolean isLocationIdVariable(final int studyId, final String variableName) {
+
+		final DataSet trialDataSet = this.findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
+
+		final DMSVariableType dmsVariableType = trialDataSet.findVariableTypeByLocalName(variableName);
+
+		return dmsVariableType.getId() == TermId.LOCATION_ID.getId();
+	}
+
+	@Override
+	public BiMap<String, String> createInstanceLocationIdToNameMapFromStudy(final int studyId) {
+		// Create LocatioName to LocationId Map
+		final BiMap<String, String> map = HashBiMap.create();
+		List<InstanceMetadata> metadataList = this.getInstanceMetadata(studyId);
+		for (InstanceMetadata instanceMetadata : metadataList) {
+			map.put(String.valueOf(instanceMetadata.getLocationDbId()), instanceMetadata.getLocationName());
+		}
+		return map;
 	}
 }

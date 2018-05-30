@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -801,5 +802,9 @@ public interface StudyDataManager {
 	Map<String, Integer> getInstanceGeolocationIdsMap (final Integer studyId);
 
 	String getProjectStartDateByProjectId(final int projectId);
+
+	boolean isLocationIdVariable(final int studyId, final String variableName);
+
+	BiMap<String, String> createInstanceLocationIdToNameMapFromStudy(final int studyId);
 
 }
