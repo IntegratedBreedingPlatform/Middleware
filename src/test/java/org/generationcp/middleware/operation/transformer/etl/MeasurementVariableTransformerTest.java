@@ -182,7 +182,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		final boolean isFactor = false;
 		final boolean isInTrialDataset = true;
 		final VariableTypeList varTypeList = this.createTrialConstantVariableTypeList();
-		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor);
+		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInTrialDataset);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
 		int index = 0;
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
