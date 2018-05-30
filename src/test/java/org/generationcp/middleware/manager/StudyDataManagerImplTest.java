@@ -79,6 +79,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private static final int START_DATE = 20140627;
 
 	private static final String BASIC_NURSERY_TEMPLATE = "Basic nursery template";
+	private static final int PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID = -10000;
 
 	private StudyDataManagerImpl manager;
 
@@ -453,7 +454,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyTypeNullEdgeCase() {
 		try {
-			Assert.assertNull("Expected null return value but was non null.", this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_ID));
+			Assert.assertNull("Expected null return value but was non null.", this.manager.getStudyType
+				(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
