@@ -818,4 +818,5 @@ public interface StudyDataManager {
 
 	String getProjectStartDateByProjectId(final int projectId);
 
+	StudyTypeDto getStudyTypeByStudyId(Integer studyIdentifier);
 }

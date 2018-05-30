@@ -122,17 +122,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
 
-		this.studyTypeDAO = Mockito.mock(StudyTypeDAO.class);
-
 		final StudyType studyType = new StudyType();
 		studyType.setStudyTypeId(6);
 		studyType.setLabel(StudyTypeDto.TRIAL_LABEL);
 		studyType.setName(StudyTypeDto.TRIAL_NAME);
 		studyType.setCvTermId(10010);
 		studyType.setVisible(true);
-
-		Mockito.when(studyTypeDAO.getById(Matchers.eq(PRESUMABLY_NON_EXISTENT_STUDY_ID))).thenReturn(null);
-		Mockito.when(studyTypeDAO.getById(AdditionalMatchers.not(Matchers.eq(PRESUMABLY_NON_EXISTENT_STUDY_ID)))).thenReturn(studyType);
 	}
 
 	@Test
@@ -448,8 +443,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyType() {
 		try {
-
-			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(), this.manager.getStudyType(this.studyReference.getId()));
+			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(), this.manager.getStudyType(this
+				.studyReference.getStudyType().getId()));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}

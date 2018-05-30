@@ -968,8 +968,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyTypeDto getStudyType(final int studyId) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getById(studyId));
+	public StudyTypeDto getStudyType(final int studyTypeId) {
+		return this.getStudyTypeBuilder().createStudyTypeDto(this.getStudyTypeDao().getById(studyTypeId));
 	}
 
 	@Override
@@ -1173,5 +1173,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public String getProjectStartDateByProjectId(final int projectId) {
 		return this.getDmsProjectDao().getProjectStartDateByProjectId(projectId);
+	}
+
+	@Override
+	public StudyTypeDto getStudyTypeByStudyId(final Integer studyIdentifier) {
+		final DmsProject study = this.getDmsProjectDao().getById(studyIdentifier);
+		if (study != null && study.getStudyType() != null) {
+			return this.getStudyTypeBuilder().createStudyTypeDto(study.getStudyType());
+		}
+		return null;
 	}
 }
