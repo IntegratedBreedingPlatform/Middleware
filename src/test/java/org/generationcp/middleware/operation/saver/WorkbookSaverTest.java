@@ -142,7 +142,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 	@Test
 	public void testRemoveConstantsVariables() {
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto(StudyTypeDto.NURSERY_NAME), "TEST STUDY", 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), "TEST STUDY", 1, true);
 		final VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConstants(), 1);
 		Assert.assertTrue("The variable type list should have contents.",
 				variableTypeList.getVariableTypes().size() > 0);
@@ -152,7 +152,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 	@Test
 	public void testSetVariableListValues() {
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto(StudyTypeDto.NURSERY_NAME), "TEST STUDY", 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), "TEST STUDY", 1, true);
 		WorkbookTestDataInitializer.setTrialObservations(workbook);
 		final VariableTypeList variableTypeList = this.createVariableTypeList(workbook.getConditions(), 1);
 		final VariableList variableList = WorkbookSaverTest.workbookSaver.getVariableListTransformer()
@@ -198,7 +198,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final String programUUID = "abc";
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
 
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto(StudyTypeDto.NURSERY_NAME), studyName, 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), studyName, 1, true);
 		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
 
 		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class); // new
@@ -308,7 +308,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
 
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, new StudyTypeDto(StudyTypeDto.NURSERY_NAME), studyName, 1, true);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyTypeDto.getNurseryDto(), studyName, 1, true);
 		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
 
 		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class);
@@ -331,7 +331,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		WorkbookSaverTest.workbookSaver.removeDeletedVariablesAndObservations(workbook);
 
-		Assert.assertTrue(workbook.getTrialObservations().get(0).getMeasurementVariables().size() == 0);
+		Assert.assertEquals(0, workbook.getTrialObservations().get(0).getMeasurementVariables().size());
 	}
 
 	private List<MeasurementRow> createTrialObservations(final int noOfTrialInstances, final Workbook workbook) {

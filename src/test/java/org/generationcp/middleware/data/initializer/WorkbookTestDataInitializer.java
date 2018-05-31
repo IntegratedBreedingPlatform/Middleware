@@ -168,12 +168,12 @@ public class WorkbookTestDataInitializer {
 			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	public static Workbook getTestWorkbook() {
-		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto(StudyTypeDto.NURSERY_NAME), null, 1,
+		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyTypeDto.getNurseryDto(), null, 1,
 				false, false);
 	}
 
 	public static Workbook getTestWorkbook(final boolean isForMeansDataset) {
-		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto(StudyTypeDto.NURSERY_NAME), null, 1,
+		return WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyTypeDto.getNurseryDto(), null, 1,
 				false, isForMeansDataset);
 	}
 
@@ -193,7 +193,7 @@ public class WorkbookTestDataInitializer {
 		final List<Workbook> workbooks = new ArrayList<>();
 		final String studyName = "pheno_t7" + new Random().nextInt(10000);
 		for (int i = 1; i <= noOfTrial; i++) {
-			workbooks.add(WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, new StudyTypeDto(StudyTypeDto.TRIAL_NAME), studyName, i, true, false));
+			workbooks.add(WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, StudyTypeDto.getTrialDto(), studyName, i, true, false));
 		}
 		return workbooks;
 	}
@@ -249,7 +249,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook workbook = new Workbook();
 
 		final String studyName = "workbookWithErrors" + new Random().nextInt(10000);
-		WorkbookTestDataInitializer.createStudyDetails(workbook, studyName, new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
+		WorkbookTestDataInitializer.createStudyDetails(workbook, studyName, StudyTypeDto.getTrialDto());
 		workbook.setConditions(WorkbookTestDataInitializer.createConditions(false, 1, WorkbookTestDataInitializer.LOCATION_ID_1));
 		WorkbookTestDataInitializer.createFactors(workbook, false, false, 1);
 		WorkbookTestDataInitializer.createConstants(workbook);
@@ -262,7 +262,7 @@ public class WorkbookTestDataInitializer {
 	public static Workbook createTestWorkbookForWizard(final String studyName, final int trialNo) {
 		final Workbook wbook = new Workbook();
 
-		WorkbookTestDataInitializer.createStudyDetails(wbook, studyName, new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
+		WorkbookTestDataInitializer.createStudyDetails(wbook, studyName, StudyTypeDto.getTrialDto());
 		wbook.setConditions(WorkbookTestDataInitializer.createConditions(false, trialNo, WorkbookTestDataInitializer.LOCATION_ID_1));
 		WorkbookTestDataInitializer.createFactors(wbook, true, true, trialNo);
 		WorkbookTestDataInitializer.createConstants(wbook);
@@ -279,7 +279,7 @@ public class WorkbookTestDataInitializer {
 			details.setStudyName(studyName);
 		} else {
 			details.setStudyName(
-					(studyType.equals(new StudyTypeDto(StudyTypeDto.NURSERY_NAME)) ? WorkbookTestDataInitializer.NURSERY_NAME : WorkbookTestDataInitializer.TRIAL_NAME)
+					(studyType.equals(StudyTypeDto.getNurseryDto()) ? WorkbookTestDataInitializer.NURSERY_NAME : WorkbookTestDataInitializer.TRIAL_NAME)
 							+ new Random().nextInt(10000));
 		}
 		details.setDescription(WorkbookTestDataInitializer.TITLE);
@@ -727,7 +727,7 @@ public class WorkbookTestDataInitializer {
 	public static MeasurementRow createTrialObservationWithoutSite() {
 		final Workbook workbook = new Workbook();
 
-		WorkbookTestDataInitializer.createStudyDetails(workbook, null, new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
+		WorkbookTestDataInitializer.createStudyDetails(workbook, null, StudyTypeDto.getTrialDto());
 		workbook.setConditions(WorkbookTestDataInitializer.createConditions(true, 1, WorkbookTestDataInitializer.LOCATION_ID_1));
 
 		final MeasurementRow row = new MeasurementRow();

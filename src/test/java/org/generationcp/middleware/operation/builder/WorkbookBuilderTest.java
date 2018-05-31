@@ -137,7 +137,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Ignore
 	@Test
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyTypeDto.getNurseryDto());
 
 		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID,
 				WorkbookBuilderTest.CROP_PREFIX);
@@ -176,7 +176,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Ignore
 	@Test
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyTypeDto.getTrialDto());
 
 		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID,
 				WorkbookBuilderTest.CROP_PREFIX);
@@ -380,7 +380,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Ignore
 	@Test
 	public void testRemoveTrialDatasetVariables() throws MiddlewareException {
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyTypeDto.getTrialDto());
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
 		final VariableTypeList factorsVariableTypeList = this.variableTypeListTransformer
@@ -434,7 +434,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Test
 	public void testBuildTrialObservations() {
 
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto(StudyTypeDto.NURSERY_NAME));
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyTypeDto.getNurseryDto());
 
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
 				WorkbookBuilderTest.CROP_PREFIX);
@@ -457,7 +457,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Ignore
 	@Test
 	public void testBuildConditionVariablesOnTrial() {
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, new StudyTypeDto(StudyTypeDto.TRIAL_NAME), "Test study", 1,
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyTypeDto.getTrialDto(), "Test study", 1,
 				true);
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
 				WorkbookBuilderTest.CROP_PREFIX);
@@ -500,9 +500,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 		for (final MeasurementVariable measurementVariable : result) {
 			if (trialEnvironmentVariableNames.contains(measurementVariable.getName())) {
-				Assert.assertTrue(
-						"Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
-						measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT));
+				Assert.assertEquals("Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
+					measurementVariable.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
 			}
 		}
 	}
