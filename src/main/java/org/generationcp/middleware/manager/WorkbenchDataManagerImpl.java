@@ -16,6 +16,7 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
@@ -139,6 +141,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final UserInfoDAO userInfoDao = new UserInfoDAO();
 		userInfoDao.setSession(this.getCurrentSession());
 		return userInfoDao;
+	}
+	
+	private RoleDAO getRoleDao() {
+		final RoleDAO roleDao = new RoleDAO();
+		roleDao.setSession(this.getCurrentSession());
+		return roleDao;
 	}
 
 	private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
@@ -975,6 +983,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Integer> getActiveUserIDsByProjectId(Long projectId) {
 		return this.getProjectUserInfoDao().getActiveUserIDsByProjectId(projectId);
+	}
+
+	@Override
+	public List<Role> getAssignableRoles() {
+		return this.getRoleDao().getAssignableRoles();
 	}
 
 }

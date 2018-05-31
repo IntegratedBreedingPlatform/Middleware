@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
@@ -660,5 +661,12 @@ public interface WorkbenchDataManager {
 	 * @return the user matching the given project_uuid
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
+	
+	/**
+	 * Returns list of roles that can be assigned to a new user
+	 * 
+	 * @return
+	 */
+	List<Role> getAssignableRoles();
 
 }
