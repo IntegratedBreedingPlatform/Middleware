@@ -98,7 +98,8 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		workbenchUser.setPersonid(person.getId());
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
-		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, "ADMIN")));
+		// Role ID 1 = ADMIN
+		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, 1)));
 
 		this.workbenchDataManager.addUser(workbenchUser);
 

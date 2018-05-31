@@ -9,7 +9,7 @@ public class UserDtoTestDataInitializer {
 		userDto.setLastName(lastName);
 		userDto.setEmail(email);
 		userDto.setPassword(password);
-		userDto.setRole(role);
+		userDto.setRoleName(role);
 		userDto.setUsername(username);
 		return userDto;
 	}

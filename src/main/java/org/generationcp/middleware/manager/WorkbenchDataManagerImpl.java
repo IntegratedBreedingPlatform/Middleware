@@ -10,6 +10,12 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -51,12 +57,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Implementation of the WorkbenchDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -894,8 +894,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		user.setStatus(userDto.getStatus());
 		user.setType(0);
 
-		// add user roles to the particular user
-		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole().toUpperCase())));
+		// Add user roles to the particular user
+		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRoleId())));
 
 		try {
 
@@ -934,8 +934,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			// update user roles to the particular user
 			final UserRole role = user.getRoles().get(0);
-			if (!role.getRole().equalsIgnoreCase(userDto.getRole())) {
-				role.setRole(userDto.getRole().toUpperCase());
+			if (!role.getRole().getName().equalsIgnoreCase(userDto.getRoleName())) {
+				role.setRole(new Role(userDto.getRoleName().toUpperCase()));
 			}
 
 			this.getUserDao().saveOrUpdate(user);

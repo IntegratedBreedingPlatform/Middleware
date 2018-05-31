@@ -62,7 +62,8 @@ public class WorkbenchTestDataUtil {
 		user.setPersonid(1);
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
-		user.setRoles(Arrays.asList(new UserRole(user, "ADMIN")));
+		// Role ID 1 = ADMIN
+		user.setRoles(Arrays.asList(new UserRole(user, 1)));
 		return user;
 	}
 
@@ -172,7 +173,7 @@ public class WorkbenchTestDataUtil {
 		userdto.setFirstName(firstName);
 		final String lastName = RandomStringUtils.randomAlphanumeric(50);
 		userdto.setLastName(lastName);
-		userdto.setRole("ADMIN");
+		userdto.setRoleName("ADMIN");
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		userdto.setEmail("test" + email + "@leafnode.io");

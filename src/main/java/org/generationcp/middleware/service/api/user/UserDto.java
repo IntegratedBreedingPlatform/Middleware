@@ -21,8 +21,10 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String firstName;
 
 	private String lastName;
+	
+	private Integer roleId;
 
-	private String role;
+	private String roleName;
 
 	private Integer status;
 
@@ -39,7 +41,8 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.username = "";
 		this.status = 0;
 		// default
-		this.role = "TECHNICIAN";
+		this.roleId = 3;
+		this.roleName = "TECHNICIAN";
 	}
 
 	public UserDto(Integer userId, String username, String firstName, String lastName, String role, Integer status, String email) {
@@ -47,7 +50,17 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.role = role;
+		this.roleName = role;
+		this.status = status;
+		this.email = email;
+	}
+	
+	public UserDto(Integer userId, String username, String firstName, String lastName, Integer roleId, Integer status, String email) {
+		this.userId = userId;
+		this.username = username;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.roleId = roleId;
 		this.status = status;
 		this.email = email;
 	}
@@ -84,12 +97,22 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.lastName = lastName;
 	}
 
-	public String getRole() {
-		return this.role;
+	
+	public Integer getRoleId() {
+		return roleId;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	
+	public void setRoleId(Integer roleId) {
+		this.roleId = roleId;
+	}
+
+	public String getRoleName() {
+		return this.roleName;
+	}
+
+	public void setRoleName(String role) {
+		this.roleName = role;
 	}
 
 	public Integer getStatus() {
@@ -129,7 +152,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		result = prime * result + (this.username == null ? 0 : this.username.hashCode());
 		result = prime * result + (this.firstName == null ? 0 : this.firstName.hashCode());
 		result = prime * result + (this.lastName == null ? 0 : this.lastName.hashCode());
-		result = prime * result + (this.role == null ? 0 : this.role.hashCode());
+		result = prime * result + (this.roleName == null ? 0 : this.roleName.hashCode());
 		result = prime * result + (this.email == null ? 0 : this.email.hashCode());
 
 		result = prime * result + (int) (this.status ^ this.status >>> 32);

@@ -372,7 +372,7 @@ public class User implements Serializable, BeanFormState {
 	public boolean hasRole(String role) {
 		if (!Objects.equals(this.roles,null)) {
 			for (UserRole userRole : this.roles) {
-				if (userRole.getRole().equals(role)) {
+				if (userRole.getRole().getCapitalizedName().equalsIgnoreCase(role)) {
 					return true;
 				}
 			}

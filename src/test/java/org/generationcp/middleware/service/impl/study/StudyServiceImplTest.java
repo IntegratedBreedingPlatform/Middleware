@@ -245,7 +245,7 @@ public class StudyServiceImplTest {
 		user.setEmail("a@a.com");
 		user.setFirstName("name");
 		user.setLastName("last");
-		user.setRole("ADMIN");
+		user.setRoleName("ADMIN");
 		user.setUserId(1);
 		List<UserDto> users = new ArrayList<>();
 		users.add(user);
@@ -287,7 +287,7 @@ public class StudyServiceImplTest {
 		user.setEmail("a@a.com");
 		user.setFirstName("name");
 		user.setLastName("last");
-		user.setRole("ADMIN");
+		user.setRoleName("ADMIN");
 		user.setUserId(1);
 		List<UserDto> users1 = new ArrayList<>();
 		users1.add(user);

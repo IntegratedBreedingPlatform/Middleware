@@ -41,7 +41,8 @@ public class UserTestDataInitializer {
 	public static User createUserWithRole(final Integer userid) {
 		final User user = new User();
 		user.setUserid(userid);
-		user.setRoles(Arrays.asList(new UserRole(user, "Admin")));
+		// Role ID 1 = ADMIN
+		user.setRoles(Arrays.asList(new UserRole(user, 1)));
 		return user;
 	}
 
@@ -60,7 +61,8 @@ public class UserTestDataInitializer {
 		user.setStatus(0);
 		
 		final List<UserRole> userRoleList = new ArrayList<>();
-		userRoleList.add(new UserRole(user, "ADMIN"));
+		// Role ID 1 = ADMIN
+		userRoleList.add(new UserRole(user, 1));
 		user.setRoles(userRoleList);
 		
 		return user;

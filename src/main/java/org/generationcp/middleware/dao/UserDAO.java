@@ -373,7 +373,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			user.setLastName((String) row[2]);
 			user.setEmail((String) row[3]);
 			if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
-				user.setRole((String) row[4]);
+				user.setRoleName((String) row[4]);
 			}
 			users.add(user);
 		}
@@ -385,7 +385,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		userDto.setFirstName(user.getPerson().getFirstName());
 		userDto.setLastName(user.getPerson().getLastName());
 		userDto.setEmail(user.getPerson().getEmail());
-		userDto.setRole(user.getRoles().toString());
+		userDto.setRoleName(user.getRoles().toString());
 		return userDto;
 	}
 

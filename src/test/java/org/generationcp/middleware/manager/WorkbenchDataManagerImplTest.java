@@ -126,7 +126,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		adminUser.setCloseDate(20140101);
 
 		final List<UserRole> adminRoles = new ArrayList<UserRole>();
-		adminRoles.add(new UserRole(adminUser, "ADMIN"));
+		// Role ID 1 = ADMIN
+		adminRoles.add(new UserRole(adminUser, 1));
 		adminUser.setRoles(adminRoles);
 		this.workbenchDataManager.addUser(adminUser);
 		Assert.assertNotNull("Expected id of a newly saved record in users.", adminUser.getUserid());
@@ -161,7 +162,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		breederUser.setCloseDate(20140101);
 
 		final List<UserRole> breederRoles = new ArrayList<UserRole>();
-		breederRoles.add(new UserRole(breederUser, "BREEDER"));
+		// Role ID 2 = BREEDER
+		breederRoles.add(new UserRole(breederUser, 2));
 		breederUser.setRoles(breederRoles);
 		this.workbenchDataManager.addUser(breederUser);
 		Assert.assertNotNull("Expected id of a newly saved record in users.", adminUser.getUserid());
@@ -196,7 +198,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		technicianUser.setCloseDate(20140101);
 
 		final List<UserRole> technicianRoles = new ArrayList<UserRole>();
-		technicianRoles.add(new UserRole(technicianUser, "TECHNICIAN"));
+		// Role ID 3 = TECHNICIAN
+		technicianRoles.add(new UserRole(technicianUser, 3));
 		technicianUser.setRoles(technicianRoles);
 		this.workbenchDataManager.addUser(technicianUser);
 		Assert.assertNotNull("Expected id of a newly saved record in users.", technicianUser.getUserid());
@@ -567,7 +570,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
 		final Integer userId = this.workbenchDataManager.createUser(userDto);
 		userDto.setUserId(userId);
-		userDto.setRole("BREEDER");
+		userDto.setRoleName("BREEDER");
 		final Integer result = this.workbenchDataManager.updateUser(userDto);
 
 		assertThat("Expected id of userDto saved record in workbench_user.", result != null);
