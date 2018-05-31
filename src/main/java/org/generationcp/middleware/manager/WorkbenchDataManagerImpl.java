@@ -25,7 +25,7 @@ import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
@@ -33,7 +33,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
@@ -47,6 +46,7 @@ import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.Util;
@@ -129,9 +129,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return toolDao;
 	}
 
-	private UserDAO getUserDao() {
+	private WorkbenchUserDAO getWorkbenchUserDao() {
 
-		final UserDAO userDao = new UserDAO();
+		final WorkbenchUserDAO userDao = new WorkbenchUserDAO();
 		userDao.setSession(this.getCurrentSession());
 		return userDao;
 	}
@@ -197,7 +197,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjectsByUser(final User user) {
+	public List<Project> getProjectsByUser(final WorkbenchUser user) {
 		return this.getProjectUserInfoDao().getProjectsByUser(user);
 	}
 
@@ -344,7 +344,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public boolean isUsernameExists(final String userName) {
-		return this.getUserDao().isUsernameExists(userName);
+		return this.getWorkbenchUserDao().isUsernameExists(userName);
 	}
 
 	@Override
@@ -370,12 +370,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer addUser(final User user) {
+	public Integer addUser(final WorkbenchUser user) {
 
 		Integer idUserSaved = null;
 		try {
 
-			final User recordSaved = this.getUserDao().saveOrUpdate(user);
+			final WorkbenchUser recordSaved = this.getWorkbenchUserDao().saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 
 		} catch (final Exception e) {
@@ -404,29 +404,29 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<User> getAllUsers() {
-		return this.getUserDao().getAll();
+	public List<WorkbenchUser> getAllUsers() {
+		return this.getWorkbenchUserDao().getAll();
 	}
 
 	@Override
-	public List<User> getAllActiveUsersSorted() {
-		return this.getUserDao().getAllActiveUsersSorted();
+	public List<WorkbenchUser> getAllActiveUsersSorted() {
+		return this.getWorkbenchUserDao().getAllActiveUsersSorted();
 	}
 
 	@Override
 	public long countAllUsers() {
-		return this.getUserDao().countAll();
+		return this.getWorkbenchUserDao().countAll();
 	}
 
 	@Override
-	public User getUserById(final int id) {
-		return this.getUserDao().getById(id, false);
+	public WorkbenchUser getUserById(final int id) {
+		return this.getWorkbenchUserDao().getById(id, false);
 	}
 
 	@Override
-	public List<User> getUserByName(final String name, final int start, final int numOfRows, final Operation op) {
-		final UserDAO dao = this.getUserDao();
-		List<User> users = new ArrayList<>();
+	public List<WorkbenchUser> getUserByName(final String name, final int start, final int numOfRows, final Operation op) {
+		final WorkbenchUserDAO dao = this.getWorkbenchUserDao();
+		List<WorkbenchUser> users = new ArrayList<>();
 		if (op == Operation.EQUAL) {
 			users = dao.getByNameUsingEqual(name, start, numOfRows);
 		} else if (op == Operation.LIKE) {
@@ -436,11 +436,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public void deleteUser(final User user) {
+	public void deleteUser(final WorkbenchUser user) {
 
 		try {
 
-			this.getUserDao().makeTransient(user);
+			this.getWorkbenchUserDao().makeTransient(user);
 
 		} catch (final Exception e) {
 
@@ -485,7 +485,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<User> getUsersByProjectId(final Long projectId) {
+	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getUsersByProjectId(projectId);
 	}
 	
@@ -679,14 +679,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public UserInfo getUserInfoByUsername(final String username) {
-		final User user = this.getUserByName(username, 0, 1, Operation.EQUAL).get(0);
+		final WorkbenchUser user = this.getUserByName(username, 0, 1, Operation.EQUAL).get(0);
 
 		return this.getUserInfo(user.getUserid());
 	}
 
 	@Override
-	public User getUserByUsername(final String userName) {
-		return this.getUserDao().getUserByUserName(userName);
+	public WorkbenchUser getUserByUsername(final String userName) {
+		return this.getWorkbenchUserDao().getUserByUserName(userName);
 	}
 
 	@Override
@@ -732,7 +732,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public boolean changeUserPassword(final String username, final String password) {
-		return this.getUserDao().changePassword(username, password);
+		return this.getWorkbenchUserDao().changePassword(username, password);
 	}
 
 	@Override
@@ -860,13 +860,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<UserDto> getAllUsersSortedByLastName() {
-		return this.getUserDao().getAllUsersSortedByLastName();
+		return this.getWorkbenchUserDao().getAllUsersSortedByLastName();
 
 	}
 
 	@Override
 	public List<UserDto> getUsersByProjectUuid(final String projectUuid) {
-		return this.getUserDao().getUsersByProjectUUId(projectUuid);
+		return this.getWorkbenchUserDao().getUsersByProjectUUId(projectUuid);
 
 	}
 
@@ -882,7 +882,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
 		final Person person = this.setPerson(userDto, new Person());
 
-		final User user = new User();
+		final WorkbenchUser user = new WorkbenchUser();
 		user.setPersonid(person.getId());
 		user.setPerson(person);
 		user.setName(userDto.getUsername());
@@ -899,7 +899,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		try {
 
-			final User recordSaved = this.getUserDao().saveOrUpdate(user);
+			final WorkbenchUser recordSaved = this.getWorkbenchUserDao().saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 
 		} catch (final Exception e) {
@@ -920,7 +920,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Integer updateUser(final UserDto userDto) {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		User user = null;
+		WorkbenchUser user = null;
 		Integer idUserSaved = null;
 
 		try {
@@ -938,7 +938,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				role.setRole(new Role(userDto.getRoleName().toUpperCase()));
 			}
 
-			this.getUserDao().saveOrUpdate(user);
+			this.getWorkbenchUserDao().saveOrUpdate(user);
 			idUserSaved = user.getUserid();
 		} catch (final Exception e) {
 
@@ -950,8 +950,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public void updateUser(final User user) {
-		this.getUserDao().saveOrUpdate(user);
+	public void updateUser(final WorkbenchUser user) {
+		this.getWorkbenchUserDao().saveOrUpdate(user);
 		this.getPersonDao().saveOrUpdate(user.getPerson());
 	}
 

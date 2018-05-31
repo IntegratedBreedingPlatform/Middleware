@@ -9,11 +9,14 @@
  *
  *******************************************************************************/
 
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,34 +24,62 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.BeanFormState;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 /**
- * POJO for users table.
+ * POJO for users table in Workbench Database. 
+ * It differs from users in crop dbs as there are no
+ * users_roles and role table and therefore relation in crop DBs
  *
  */
-@NamedQueries({
-	@NamedQuery(name = "getByFullName",
-	query = "SELECT u FROM User u, Person p WHERE u.personid = p.id AND (CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
+@NamedQueries({@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM WorkbenchUser s WHERE s.name = :name"),
+		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
+		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
+		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
+		@NamedQuery(name = "getByFullName",
+		query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.personid = p.id AND (CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 })
+@NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
+		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
 @Entity
 @Table(name = "users")
-public class User implements Serializable, BeanFormState {
+public class WorkbenchUser implements Serializable, BeanFormState {
 
 	private static final long serialVersionUID = 1L;
-	
-	public static final String GET_BY_FULLNAME = "getByFullName";
 
-	// FIXME fix retrieval of role
+	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
+	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
+	public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
+	public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
+	public static final String GET_BY_FULLNAME = "getByFullName";
+	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
+
+	public static final String GET_USERS_BY_PROJECT_UUID =
+		"SELECT users.userid, users.uname, person.fname, person.lname, role.role, users.ustatus, person.pemail \n"
+		+ "FROM users \n"
+		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
+		+ "INNER JOIN persons person ON person.personid = users.personid \n "
+		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
+		+ "INNER JOIN users_roles role ON role.userid = users.userid "
+		+ "WHERE pp.project_uuid = :project_uuid \n "
+		+ "GROUP BY users.userid";
+
 	public static final String GET_USERS_ASSOCIATED_TO_STUDY = "SELECT DISTINCT \n"
 			+ "  person.personid AS personId, \n"
 			+ "  person.fname    AS fName, \n"
@@ -96,6 +127,10 @@ public class User implements Serializable, BeanFormState {
 	@Column(name = "cdate")
 	private Integer cdate;
 
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@NotFound(action = NotFoundAction.IGNORE)
+	private List<UserRole> roles;
+
 	@Transient
 	private Boolean isnew = false;
 
@@ -110,15 +145,15 @@ public class User implements Serializable, BeanFormState {
 	@Transient
 	private Boolean enabled = true;
 
-	public User() {
+	public WorkbenchUser() {
 	}
 
-	public User(Integer userid) {
+	public WorkbenchUser(Integer userid) {
 		super();
 		this.userid = userid;
 	}
 
-	public User(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password,
+	public WorkbenchUser(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password,
 			Integer personid, Integer adate, Integer cdate) {
 		super();
 		this.userid = userid;
@@ -135,11 +170,33 @@ public class User implements Serializable, BeanFormState {
 	}
 
 	/**
-	 * Get a copy of this {@link User} object. Note that this method will not copy the {@link User#userid} field.
+	 * Get a copy of this {@link WorkbenchUser} object. Note that this method will not copy the {@link WorkbenchUser#userid} field.
 	 * 
 	 * @return the copy of the User object
 	 */
-	public User copy() {
+	public WorkbenchUser copy() {
+		WorkbenchUser user = new WorkbenchUser();
+		user.setInstalid(this.instalid);
+		user.setStatus(this.status);
+		user.setAccess(this.access);
+		user.setType(this.type);
+		user.setName(this.name);
+		user.setPassword(this.password);
+		user.setPersonid(this.personid);
+		user.setAssignDate(this.adate);
+		user.setCloseDate(this.cdate);
+		user.setIsNew(this.isnew);
+		user.setActive(this.active);
+		user.setEnabled(this.enabled);
+		return user;
+	}
+	
+	/**
+	 * Get a copy of this {@link WorkbenchUser} object. Note that this method will not copy the {@link WorkbenchUser#userid} field.
+	 * 
+	 * @return the copy of the User object
+	 */
+	public User copyToUser() {
 		User user = new User();
 		user.setInstalid(this.instalid);
 		user.setStatus(this.status);
@@ -252,6 +309,14 @@ public class User implements Serializable, BeanFormState {
 		this.isnew = val;
 	}
 
+	public List<UserRole> getRoles() {
+		return this.roles;
+	}
+
+	public void setRoles(List<UserRole> roles) {
+		this.roles = roles;
+	}
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.userid).hashCode();
@@ -265,11 +330,11 @@ public class User implements Serializable, BeanFormState {
 		if (obj == this) {
 			return true;
 		}
-		if (!User.class.isInstance(obj)) {
+		if (!WorkbenchUser.class.isInstance(obj)) {
 			return false;
 		}
 
-		User otherObj = (User) obj;
+		WorkbenchUser otherObj = (WorkbenchUser) obj;
 
 		return new EqualsBuilder().append(this.userid, otherObj.userid).isEquals();
 	}
@@ -331,4 +396,16 @@ public class User implements Serializable, BeanFormState {
 
 	}
 
+	public boolean hasRole(String role) {
+		if (!Objects.equals(this.roles,null)) {
+			for (UserRole userRole : this.roles) {
+				if (userRole.getRole().getCapitalizedName().equalsIgnoreCase(role)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+	
 }

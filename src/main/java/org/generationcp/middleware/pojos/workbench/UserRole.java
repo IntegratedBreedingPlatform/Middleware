@@ -10,8 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.generationcp.middleware.pojos.User;
-
 @Entity
 @Table(name = "users_roles")
 public class UserRole {
@@ -23,7 +21,7 @@ public class UserRole {
 
 	@ManyToOne
 	@JoinColumn(name = "userid", nullable = false)
-	private User user;
+	private WorkbenchUser user;
 
 	@ManyToOne
 	@JoinColumn(name = "role_id", nullable=false)
@@ -32,12 +30,12 @@ public class UserRole {
 	public UserRole() {
 	}
 
-	public UserRole(final User user, final Integer roleId) {
+	public UserRole(final WorkbenchUser user, final Integer roleId) {
 		this.user = user;
 		this.role = new Role(roleId);
 	}
 	
-	public UserRole(final User user, final Role role) {
+	public UserRole(final WorkbenchUser user, final Role role) {
 		this.user = user;
 		this.role = role;
 	}
@@ -52,11 +50,11 @@ public class UserRole {
 		this.id = id;
 	}
 
-	public User getUser() {
+	public WorkbenchUser getUser() {
 		return this.user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(WorkbenchUser user) {
 		this.user = user;
 	}
 

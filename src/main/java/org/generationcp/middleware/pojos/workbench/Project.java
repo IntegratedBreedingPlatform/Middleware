@@ -29,7 +29,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.User;
 
 /**
  * POJO for workbench_project table.
@@ -74,7 +73,7 @@ public class Project implements Serializable {
 	private Date lastOpenDate;
 
 	@Transient
-	private Set<User> members;
+	private Set<WorkbenchUser> members;
 
 	@Transient
 	private Set<Method> methods;
@@ -138,11 +137,11 @@ public class Project implements Serializable {
 		return this.lastOpenDate;
 	}
 
-	public Set<User> getMembers() {
+	public Set<WorkbenchUser> getMembers() {
 		return this.members;
 	}
 
-	public void setMembers(Set<User> members) {
+	public void setMembers(Set<WorkbenchUser> members) {
 		this.members = members;
 	}
 

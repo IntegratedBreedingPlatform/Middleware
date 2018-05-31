@@ -8,13 +8,13 @@ import java.util.Random;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +23,7 @@ public class WorkbenchTestDataUtil {
 	@Autowired
 	private final WorkbenchDataManager workbenchDataManager;
 	private Project commonTestProject;
-	private User testUser1, testUser2;
+	private WorkbenchUser testUser1, testUser2;
 	private Person testPerson1, testPerson2;
 	private ProjectActivity testProjectActivity1, testProjectActivity2;
 	private CropType cropType;
@@ -51,8 +51,8 @@ public class WorkbenchTestDataUtil {
 		return person;
 	}
 
-	public User createTestUserData() {
-		User user = new User();
+	public WorkbenchUser createTestUserData() {
+		WorkbenchUser user = new WorkbenchUser();
 		user.setInstalid(1);
 		user.setStatus(1);
 		user.setAccess(1);
@@ -79,7 +79,7 @@ public class WorkbenchTestDataUtil {
 		return project;
 	}
 
-	public ProjectActivity createTestProjectActivityData(Project project, User user) {
+	public ProjectActivity createTestProjectActivityData(Project project, WorkbenchUser user) {
 		ProjectActivity projectActivity = new ProjectActivity();
 		projectActivity.setProject(project);
 		projectActivity.setName("Project Activity" + new Random().nextInt());
@@ -146,14 +146,14 @@ public class WorkbenchTestDataUtil {
 		return this.cropType;
 	}
 
-	public User getTestUser1() {
+	public WorkbenchUser getTestUser1() {
 		if (this.testUser1 == null) {
 			this.testUser1 = this.createTestUserData();
 		}
 		return this.testUser1;
 	}
 	
-	public User getTestUser2() {
+	public WorkbenchUser getTestUser2() {
 		if (this.testUser2 == null) {
 			this.testUser2 = this.createTestUserData();
 		}

@@ -78,32 +78,6 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return false;
 	}
 
-	public boolean changePassword(final String username, final String password) {
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
-			// of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-
-			if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
-				final String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
-				final Session s = this.getSession();
-				final Query q = s.createSQLQuery(queryString);
-				q.setString("username", username);
-				q.setString("password", password);
-				final int success = q.executeUpdate();
-
-				return success > 0;
-			}
-		} catch (final Exception e) {
-			final String message = "Error with changePassword(username=" + username + ") query from User: " + e.getMessage();
-			UserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return false;
-	}
-
 	public User getUserDetailsByUsername(final String username) {
 		try {
 			if (username != null) {
@@ -160,53 +134,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<User> getByNameUsingEqual(final String name, final int start, final int numOfRows) {
-		try {
-			if (name != null) {
-				final Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_EQUAL);
-				query.setParameter("name", name);
-				query.setFirstResult(start);
-				query.setMaxResults(numOfRows);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getByNameUsingEqual(name=" + name + ") query from User: " + e.getMessage();
-			UserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return new ArrayList<>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<User> getByNameUsingLike(final String name, final int start, final int numOfRows) {
-		try {
-			if (name != null) {
-				final Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_LIKE);
-				query.setParameter("name", name);
-				query.setFirstResult(start);
-				query.setMaxResults(numOfRows);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getByNameUsingLike(name=" + name + ") query from User: " + e.getMessage();
-			UserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return new ArrayList<>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<User> getAllActiveUsersSorted() {
-		try {
-			final Query query = this.getSession().getNamedQuery(User.GET_ALL_ACTIVE_USERS_SORTED);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
-			UserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
+	
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getUserIdsByCountryIds(final Collection<Integer> countryIds) {
@@ -260,38 +188,6 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return user;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<UserDto> getAllUsersSortedByLastName() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(User.class);
-
-			criteria.createAlias("person", "person");
-			criteria.createAlias("roles", "roles");
-
-			final ProjectionList projectionList = Projections.projectionList();
-
-			projectionList.add(Projections.property("userid"), "userId");
-			projectionList.add(Projections.property("name"), "username");
-			projectionList.add(Projections.property("person.firstName"), "firstName");
-			projectionList.add(Projections.property("person.lastName"), "lastName");
-			projectionList.add(Projections.property("roles.role"), "role");
-			projectionList.add(Projections.property("status"), "status");
-			projectionList.add(Projections.property("person.email"), "email");
-
-			criteria.setProjection(projectionList);
-
-			criteria.addOrder(Order.asc("person.lastName"));
-
-			criteria.setResultTransformer(Transformers.aliasToBean(UserDto.class));
-
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllUserDtosSorted() query from User: " + e.getMessage();
-			UserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		final List<UserDto> users = new ArrayList<>();
@@ -336,34 +232,6 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 	}
 
-	@SuppressWarnings({"unchecked"})
-	public List<UserDto> getUsersByProjectUUId(final String projectUUID) {
-		final List<UserDto> users = new ArrayList<>();
-		try {
-			if (projectUUID != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(User.GET_USERS_BY_PROJECT_UUID);
-				query.setParameter("project_uuid", projectUUID);
-
-				final List<Object> results = query.list();
-				for (final Object o : results) {
-					final Object[] user = (Object[]) o;
-					final Integer userId = (Integer) user[0];
-					final String username = (String) user[1];
-					final String firstName = (String) user[2];
-					final String lastName = (String) user[3];
-					final String role = (String) user[4];
-					final Integer status = (Integer) user[5];
-					final String email = (String) user[6];
-					final UserDto u = new UserDto(userId, username, firstName, lastName, role, status, email);
-					users.add(u);
-				}
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getUsersByProjectUUId(project_uuid=" + projectUUID + ")", e);
-		}
-		return users;
-	}
-
 	private void mapUsers(final List<UserDto> users, final List<Object> results) {
 		for (final Object obj : results) {
 			final Object[] row = (Object[]) obj;
@@ -377,16 +245,6 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			}
 			users.add(user);
 		}
-	}
-
-	public UserDto mapUserToUserDto(final User user) {
-		final UserDto userDto = new UserDto();
-		userDto.setUserId(user.getUserid());
-		userDto.setFirstName(user.getPerson().getFirstName());
-		userDto.setLastName(user.getPerson().getLastName());
-		userDto.setEmail(user.getPerson().getEmail());
-		userDto.setRoleName(user.getRoles().toString());
-		return userDto;
 	}
 
 }
