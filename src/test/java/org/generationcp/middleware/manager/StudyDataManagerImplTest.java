@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -56,8 +55,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.AdditionalMatchers;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -101,7 +98,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
 	private final String cropPrefix = "ABCD";
-	private StudyTypeDAO studyTypeDAO;
+
 
 	@Before
 	public void setUp() throws Exception {
