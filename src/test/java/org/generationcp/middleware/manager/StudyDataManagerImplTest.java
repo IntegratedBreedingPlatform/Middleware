@@ -538,6 +538,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	@Ignore
 	public void testSaveGeolocationProperty() throws MiddlewareQueryException {
 		final Integer stdVarId = TermId.EXPERIMENT_DESIGN_FACTOR.getId();
 		final Integer studyId = 25019;
