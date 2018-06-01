@@ -30,17 +30,22 @@ public class DataSetTestDataInitializer {
 
 	public static List<DataSet> createPlotDatasetsTestData(final String datasetName) {
 		final List<DataSet> plotDatasets = new ArrayList<>();
-		plotDatasets.add(DataSetTestDataInitializer.createPlotDatasetTestData(datasetName));
+		plotDatasets.add(DataSetTestDataInitializer.createPlotDatasetTestData(datasetName, false));
 		return plotDatasets;
 	}
 
-	public static DataSet createPlotDatasetTestData(final String datasetName) {
+	public static DataSet createPlotDatasetTestData(final String datasetName, final boolean isStudy) {
 		final DataSet plotDataset = new DataSet();
 		plotDataset.setName(datasetName);
 		plotDataset.setDescription(datasetName);
 		plotDataset.setDataSetType(DataSetType.PLOT_DATA);
-		plotDataset.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
-		plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
+		if (isStudy) {
+			plotDataset.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
+			plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
+		} else {
+			plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createPlotVariableTypesTestData());
+			plotDataset.setId(DataSetTestDataInitializer.MEASUREMENT_DATASET_ID);
+		}
 		return plotDataset;
 	}
 
