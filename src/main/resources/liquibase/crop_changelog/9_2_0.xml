@@ -1,0 +1,126 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="aldrin" id="v9.2.0-1">
+		<preConditions onFail="CONTINUE">
+				<sqlCheck expectedResult="0">
+					<![CDATA[Select count(*) from `location` Where lname = 'Unspecified Location';]]>
+				</sqlCheck>
+		</preConditions>
+		<comment>Add Location Name variable to all existing studies.</comment>
+		<sql dbms="mysql">
+			<![CDATA[
+			-- FOR TRIAL STUDIES
+
+			INSERT INTO `location` (`ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`)
+			Values ('405', '1', 'Unspecified Location', 'NOLOC', '0', '0', '0', '0', '0', '0');
+
+			-- Create LOCATION_ID variable entries in ENVIRONMENT (SUMMARY) DATASET
+
+			Insert into projectprop (project_id, type_id, value, rank, variable_id, alias)
+			Select project.project_id,
+			1806,
+			(Select locid from location where lname = 'Unspecified Location'),
+			case when max(projectpropRank.rank) is null then 1 else max(projectpropRank.rank) + 1 end as rank,
+			8190,
+			'LOCATION_NAME'
+			from project
+			inner join projectprop projectprop_dataset on projectprop_dataset.project_id = project.project_id and projectprop_dataset.variable_id = 8160 and projectprop_dataset.value = 10080
+			inner join project_relationship on project.project_id = project_relationship.subject_project_id
+			inner join project projectTrial on projectTrial.project_id = project_relationship.object_project_id
+			left join projectprop on project.project_id = projectprop.project_id and projectprop.variable_id = 8190
+			left join projectprop projectpropRank on project.project_id = projectpropRank.project_id
+			where projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template' and projectprop.variable_id is null
+			group by project_id;
+
+			-- Create LOCATION_ID variable entries at INSTANCE/ENVIRONMENT level
+
+			Insert into nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+			SELECT
+			nd_geolocation.nd_geolocation_id,
+			8190,
+			(Select locid from location where lname = 'Unspecified Location'),
+			case when max(gpRank.rank) is null then 1 else max(gpRank.rank) + 1 end as rank
+			from project
+			inner join projectprop projectprop_dataset on projectprop_dataset.project_id = project.project_id and projectprop_dataset.variable_id = 8160 and projectprop_dataset.value = 10080
+			inner join project_relationship on project.project_id = project_relationship.subject_project_id
+			inner join project projectTrial on projectTrial.project_id = project_relationship.object_project_id
+			inner join nd_experiment_project on project.project_id = nd_experiment_project.project_id
+			inner join nd_experiment on nd_experiment.nd_experiment_id = nd_experiment_project.nd_experiment_id
+			inner join nd_geolocation on nd_geolocation.nd_geolocation_id = nd_experiment.nd_geolocation_id
+			left join nd_geolocationprop on nd_geolocationprop.nd_geolocation_id = nd_geolocation.nd_geolocation_id and nd_geolocationprop.type_id = 8190
+			left join nd_geolocationprop gpRank on gpRank.nd_geolocation_id = nd_geolocation.nd_geolocation_id
+			where projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template' and nd_geolocationprop.type_id is null
+			group by nd_geolocation_id;
+
+			-- Update LOCATION_ID variable's value to 'Unspecified Location' if the existing variables have no value
+
+			Update nd_geolocationprop set nd_geolocationprop.value = (Select locid from location where lname = 'Unspecified Location')
+			where nd_geolocationprop.type_id = 8190 and  nd_geolocationprop.type_id is not null and (nd_geolocationprop.value = '' or nd_geolocationprop.value is null);
+
+			-- Preserve the alias of location name
+
+            Update projectprop
+            inner join project on project.project_id = projectprop.project_id
+			inner join projectprop projectprop_dataset on projectprop_dataset.project_id = project.project_id and projectprop_dataset.variable_id = 8160 and projectprop_dataset.value = 10080
+			inner join project_relationship on project.project_id = project_relationship.subject_project_id
+			inner join project projectTrial on projectTrial.project_id = project_relationship.object_project_id
+            left join projectprop projectprop_location_name on project.project_id = projectprop_location_name.project_id and projectprop_location_name.variable_id = 8180
+			set projectprop.alias = Case when projectprop_location_name.alias is null Then 'LOCATION_NAME' else projectprop_location_name.alias END
+            where projectprop.variable_id = 8190 and projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template';
+
+			-- Delete LOCATION_NAME variable in all Trial Studies
+
+			Delete projectprop from project
+			inner join projectprop projectprop_dataset on projectprop_dataset.project_id = project.project_id and projectprop_dataset.variable_id = 8160 and projectprop_dataset.value = 10080
+			inner join project_relationship on project.project_id = project_relationship.subject_project_id
+			inner join project projectTrial on projectTrial.project_id = project_relationship.object_project_id
+			left join projectprop on project.project_id = projectprop.project_id and projectprop.variable_id = 8180
+			where projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template';
+
+			Delete FROM nd_geolocationprop where type_id = 8180;
+
+			-- FOR NURSERY STUDIES
+
+			# Create LOCATION_ID variable entries in STUDY DATASET
+
+			Insert into projectprop (project_id, type_id, value, rank, variable_id, alias)
+			Select project.project_id,
+			1805,
+			(Select locid from location where lname = 'Unspecified Location'),
+			case when max(projectpropRank.rank) is null then 1 else max(projectpropRank.rank) + 1 end as rank,
+			8190,
+			'LOCATION_NAME'
+			from project
+			left join projectprop on projectprop.project_id = project.project_id and projectprop.variable_id = 8190
+			left join projectprop projectpropRank on project.project_id = projectpropRank.project_id
+			where project.study_type = 'N' and name <> 'Basic nursery template' and projectprop.variable_id is null
+			group by project_id;
+
+			-- Update LOCATION_ID variable's value to 'Unspecified Location' if the existing variables have no value
+            -- Preserve the alias of location name
+
+			Update projectprop
+			inner join project on project.project_id = projectprop.project_id
+            left join projectprop projectprop_location_name on project.project_id = projectprop_location_name.project_id and projectprop_location_name.variable_id = 8180
+			set projectprop.value = (Select locid from location where lname = 'Unspecified Location'),
+            projectprop.alias = Case when projectprop_location_name.alias is null Then 'LOCATION_NAME' else projectprop_location_name.alias END
+			where projectprop.variable_id = 8190 and (projectprop.value is null or projectprop.value = '')
+			and project.study_type = 'N' and name <> 'Basic nursery template';
+
+			-- Delete LOCATION_NAME variable in all Nursery Studies
+
+			Delete projectprop from projectprop
+			inner join project on projectprop.project_id = project.project_id and projectprop.variable_id = 8180
+			where project.study_type = 'N' and name <> 'Basic nursery template';
+			]]>
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>
