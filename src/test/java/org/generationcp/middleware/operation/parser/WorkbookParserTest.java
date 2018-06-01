@@ -403,7 +403,7 @@ public class WorkbookParserTest {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
-		// If the Section is CONSTANT and the study is Trial, the variable type should be STUDY_CONDITION
+		// If the Section is CONSTANT and the study is Study, the variable type should be STUDY_CONDITION
 		Assert.assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
 		studyDetails.setStudyType(StudyTypeDto.getNurseryDto());

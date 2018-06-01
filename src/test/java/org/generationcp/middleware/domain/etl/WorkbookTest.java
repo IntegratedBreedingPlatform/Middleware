@@ -105,7 +105,7 @@ public class WorkbookTest {
 	public void testGetTrialObservationByTrialInstanceNo() {
 		final int noOfInstances = 2;
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyTypeDto.getTrialDto());
-		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
+		WorkbookTestDataInitializer.createObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {
 			final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(trialInstanceNo);

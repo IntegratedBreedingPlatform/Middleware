@@ -29,7 +29,7 @@ public class FieldMapDataUtil {
 	private static final String FIELDBOOK_NAME = "test fieldbook";
 
 	public static final int DATASET_ID = 1;
-	private static final String DATASET_NAME = "test-trial-PLOT";
+	private static final String DATASET_NAME = "test-study-PLOT";
 
 	// data for TrialInstanceInfo
 	public static final int BLOCK_ID = -1;
@@ -55,11 +55,11 @@ public class FieldMapDataUtil {
 	public static final int MACHINE_ROW_CAPACITY = 2;
 	public static final int FIELD_ID = -2;
 
-	public static List<FieldMapInfo> createFieldMapInfoList(final boolean isTrial) {
+	public static List<FieldMapInfo> createFieldMapInfoList() {
 		final List<FieldMapInfo> fieldMapInfoList = new ArrayList<FieldMapInfo>();
 		final FieldMapInfo fieldMapInfo = new FieldMapInfo();
 
-		final ArrayList<FieldMapDatasetInfo> datasets = FieldMapDataUtil.createFieldMapDatasetInfo(isTrial);
+		final ArrayList<FieldMapDatasetInfo> datasets = FieldMapDataUtil.createFieldMapDatasetInfo();
 		fieldMapInfo.setDatasets(datasets);
 		fieldMapInfo.setFieldbookId(FieldMapDataUtil.FIELDBOOK_ID);
 		fieldMapInfo.setFieldbookName(FieldMapDataUtil.FIELDBOOK_NAME);
@@ -68,7 +68,7 @@ public class FieldMapDataUtil {
 		return fieldMapInfoList;
 	}
 
-	private static ArrayList<FieldMapDatasetInfo> createFieldMapDatasetInfo(final boolean isTrial) {
+	private static ArrayList<FieldMapDatasetInfo> createFieldMapDatasetInfo() {
 		final ArrayList<FieldMapDatasetInfo> datasets = new ArrayList<FieldMapDatasetInfo>();
 
 		final FieldMapDatasetInfo dataset = new FieldMapDatasetInfo();

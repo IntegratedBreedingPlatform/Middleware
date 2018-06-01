@@ -97,7 +97,7 @@ public class DataImportServiceImplTest {
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, PROGRAM_UUID);
 		this.mockStandardVariable(TermId.ENTRY_NO.getId(), WorkbookTestDataInitializer.ENTRY, WorkbookTestDataInitializer.GERMPLASM_ENTRY,
 				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED, PROGRAM_UUID);
-		this.mockStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), WorkbookTestDataInitializer.TRIAL_NAME,
+		this.mockStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), WorkbookTestDataInitializer.STUDY_NAME,
 				WorkbookTestDataInitializer.TRIAL, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
 				PROGRAM_UUID);
 
@@ -236,7 +236,7 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testSetRequiredFieldsForTrial() {
+	public void testSetRequiredFieldsForStudy() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
 				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);

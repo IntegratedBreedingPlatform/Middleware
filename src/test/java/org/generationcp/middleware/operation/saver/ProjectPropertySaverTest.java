@@ -34,7 +34,7 @@ import org.mockito.Mockito;
 @Ignore("Disabling temporarily. Please enable once failing tests are fixed.")
 public class ProjectPropertySaverTest {
 
-	private static final List<Integer> DATASET_STUDY_TRIAL_IDS = Arrays.asList(8150, 8155, 8160, 8190, 8180,
+	private static final List<Integer> DATASET_STUDY_IDS = Arrays.asList(8150, 8155, 8160, 8190, 8180,
 			TermId.TRIAL_INSTANCE_FACTOR.getId());
 	private static final List<Integer> GERMPLASM_PLOT_VARIATE_IDS = Arrays.asList(8230, 8250, 8377, 8240, 8200, 20345, 20325, 20338, 20310,
 			20314, 20327, 20307, 8390, 8263, 8255, 8400, 8410);
@@ -335,7 +335,7 @@ public class ProjectPropertySaverTest {
 
 	private static List<ProjectProperty> getDummyProjectPropIds() {
 		final List<Integer> allVariableIds = new ArrayList<>();
-		allVariableIds.addAll(ProjectPropertySaverTest.DATASET_STUDY_TRIAL_IDS);
+		allVariableIds.addAll(ProjectPropertySaverTest.DATASET_STUDY_IDS);
 		allVariableIds.addAll(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
 
 		final List<ProjectProperty> projectProperties = new ArrayList<>();

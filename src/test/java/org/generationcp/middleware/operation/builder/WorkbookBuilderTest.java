@@ -175,7 +175,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Ignore
 	@Test
-	public void testGetTrialObservationsForTrial() throws MiddlewareException {
+	public void testGetStudyObservationsForStudy() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyTypeDto.getTrialDto());
 
 		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID,
@@ -183,14 +183,14 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 		final Workbook createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
-		Assert.assertTrue("Expected correct values for trial observations but did not match with old workbook.",
+		Assert.assertTrue("Expected correct values for study observations but did not match with old workbook.",
 				this.areConstantsCorrect(createdWorkbook.getConstants(), createdWorkbook.getTrialObservations()));
 	}
 
 	private boolean areConstantsCorrect(final List<MeasurementVariable> constants,
-			final List<MeasurementRow> trialObservations) {
-		if (trialObservations != null && constants != null) {
-			for (final MeasurementRow row : trialObservations) {
+			final List<MeasurementRow> observations) {
+		if (observations != null && constants != null) {
+			for (final MeasurementRow row : observations) {
 				return this.areConstantsInRow(row.getDataList(), constants);
 			}
 		}
@@ -379,7 +379,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Ignore
 	@Test
-	public void testRemoveTrialDatasetVariables() throws MiddlewareException {
+	public void testRemoveStudyDatasetVariables() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyTypeDto.getTrialDto());
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
@@ -425,14 +425,14 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 		this.workbookBuilder.setMeasurementVarRoles(set, true, false);
 		for (final MeasurementVariable var : measurementVariableLists) {
-			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(),
+			Assert.assertEquals("Should have a phenotype role of Study Environment", var.getRole(),
 					PhenotypicType.TRIAL_ENVIRONMENT);
 		}
 	}
 
 	@Ignore
 	@Test
-	public void testBuildTrialObservations() {
+	public void testBuildStudyObservations() {
 
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyTypeDto.getNurseryDto());
 
@@ -443,7 +443,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				workbook.getTrialConditions(), workbook.getTrialConstants());
 
 		Assert.assertEquals(
-				"The trial observation should only contain one measurement row since the study is Nursery Type", 1,
+				"The study observation should only contain one measurement row since the study is Nursery Type", 1,
 				result.size());
 		Assert.assertEquals(5, result.get(0).getDataList().size());
 		Assert.assertTrue(this.isTermIdExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), result.get(0).getDataList()));
@@ -456,7 +456,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Ignore
 	@Test
-	public void testBuildConditionVariablesOnTrial() {
+	public void testBuildConditionVariablesOnStudy() {
 		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyTypeDto.getTrialDto(), "Test study", 1,
 				true);
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
@@ -467,40 +467,40 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final VariableTypeList conditionVariableTypeList = this.variableTypeListTransformer
 				.transform(conditionMeasurementVariableList, WorkbookBuilderTest.PROGRAM_UUID);
 
-		// create measurement variables of trial environement types
-		final List<MeasurementVariable> trialEnvironmentMeasurementVariableList = workbook.getTrialConditions();
-		final VariableTypeList trialEnvironmentVariableTypeList = this.variableTypeListTransformer
-				.transform(trialEnvironmentMeasurementVariableList, WorkbookBuilderTest.PROGRAM_UUID);
+		// create measurement variables of study environement types
+		final List<MeasurementVariable> environmentMeasurementVariableList = workbook.getTrialConditions();
+		final VariableTypeList environmentVariableTypeList = this.variableTypeListTransformer
+				.transform(environmentMeasurementVariableList, WorkbookBuilderTest.PROGRAM_UUID);
 
 		final VariableList conditionVariables = this.transformMeasurementVariablesToVariableList(
 				conditionMeasurementVariableList, conditionVariableTypeList);
-		final VariableList trialEnvironmentVariables = this.transformMeasurementVariablesToVariableList(
-				trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
+		final VariableList environmentVariables = this.transformMeasurementVariablesToVariableList(
+				environmentMeasurementVariableList, environmentVariableTypeList);
 
 		final Set<MeasurementVariable> result = this.workbookBuilder.buildConditionVariables(conditionVariables,
-				trialEnvironmentVariables);
+				environmentVariables);
 
-		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;
+		int noOfConditionsWithEnvironmentPhenotypicType = 0;
 		for (final MeasurementVariable measurementVariable : result) {
 			if (measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT)) {
-				noOfConditionsWithTrialEnvironmentPhenotypicType++;
+				noOfConditionsWithEnvironmentPhenotypicType++;
 			}
 		}
 
 		Assert.assertTrue(
 				"Expecting that the number of condition with trial environment phenotypic type is "
-						+ trialEnvironmentVariables.size() + " but returned "
-						+ noOfConditionsWithTrialEnvironmentPhenotypicType,
-				trialEnvironmentVariables.size() >= noOfConditionsWithTrialEnvironmentPhenotypicType);
+						+ environmentVariables.size() + " but returned "
+						+ noOfConditionsWithEnvironmentPhenotypicType,
+				environmentVariables.size() >= noOfConditionsWithEnvironmentPhenotypicType);
 
-		final List<String> trialEnvironmentVariableNames = new ArrayList<String>();
-		for (final Variable variable : trialEnvironmentVariables.getVariables()) {
-			trialEnvironmentVariableNames.add(variable.getVariableType().getLocalName());
+		final List<String> environmentVariableNames = new ArrayList<String>();
+		for (final Variable variable : environmentVariables.getVariables()) {
+			environmentVariableNames.add(variable.getVariableType().getLocalName());
 		}
 
 		for (final MeasurementVariable measurementVariable : result) {
-			if (trialEnvironmentVariableNames.contains(measurementVariable.getName())) {
-				Assert.assertEquals("Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
+			if (environmentVariableNames.contains(measurementVariable.getName())) {
+				Assert.assertEquals("Expecting that STUDY_ENVIRONMENT is set as the phenotypic type for trial environment variables",
 					measurementVariable.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
 			}
 		}
@@ -515,7 +515,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return false;
 	}
 
-	// derived from VariableListTransformer.transformTrialEnvironment (but with
+	// derived from VariableListTransformer.transformStudyEnvironment (but with
 	// no specific role to filter)
 	private VariableList transformMeasurementVariablesToVariableList(final List<MeasurementVariable> mVarList,
 			final VariableTypeList variableTypeList) {

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MaizeTrialManifestTest {
+public class MaizeStudyManifestTest {
     public static final String TEST_SEASON_VALUE = "Wet season";
     public static final String TEST_COLLABORATOR_NAME = "LeafNode";
 
@@ -24,7 +24,7 @@ public class MaizeTrialManifestTest {
     public static final String TEST_STUDY_NAME = "testStudyName";
     public static final String TEST_PROGRAM_NAME = "testProgram";
 
-    private final MaizeTrialManifest unitUnderTest = new MaizeTrialManifest();
+    private final MaizeStudyManifest unitUnderTest = new MaizeStudyManifest();
 
 
     @Test
@@ -34,7 +34,7 @@ public class MaizeTrialManifestTest {
 
         Assert.assertFalse("Unable to provide empty entries for known fields in the report", paramMap.isEmpty());
 
-        final Object collaborator =  paramMap.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY);
+        final Object collaborator =  paramMap.get(MaizeStudyManifest.COLLABORATOR_REPORT_KEY);
         Assert.assertNotNull("Unable to provide empty entries for known field in the report", collaborator);
         Assert.assertTrue("Value for unknown field is not empty", StringUtils.isEmpty((String) collaborator));
 
@@ -57,8 +57,8 @@ public class MaizeTrialManifestTest {
         Assert.assertTrue("Report should be able to provide the study name", reportValues.containsKey(AbstractReporter.STUDY_NAME_REPORT_KEY));
         Assert.assertEquals("Unable to provide the expected value for study name", TEST_STUDY_NAME, reportValues.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
 
-        Assert.assertTrue("Report should be able to provide the program name", reportValues.containsKey(MaizeTrialManifest.MAIZE_MANIFEST_PROGRAM_KEY));
-        Assert.assertEquals("Unable to provide the expected value for program name", TEST_PROGRAM_NAME, reportValues.get(MaizeTrialManifest.MAIZE_MANIFEST_PROGRAM_KEY));
+        Assert.assertTrue("Report should be able to provide the program name", reportValues.containsKey(MaizeStudyManifest.MAIZE_MANIFEST_PROGRAM_KEY));
+        Assert.assertEquals("Unable to provide the expected value for program name", TEST_PROGRAM_NAME, reportValues.get(MaizeStudyManifest.MAIZE_MANIFEST_PROGRAM_KEY));
     }
 
     @Test
@@ -66,16 +66,16 @@ public class MaizeTrialManifestTest {
         final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, new StudyTypeDto("T"), TEST_STUDY_NAME, 1, false);
         final List<MeasurementVariable> conditions = workbook.getStudyConditions();
         final List<MeasurementRow> observations = workbook.getObservations();
-        final List<MeasurementRow> trialObservations = createTestRowForReport();
+        final List<MeasurementRow> studyObservations = createTestRowForReport();
 
 
         final Map<String, Object> reportParams = new HashMap<>();
         reportParams.put(AbstractReporter.STUDY_CONDITIONS_KEY, conditions);
         reportParams.put(AbstractReporter.DATA_SOURCE_KEY, observations);
-        reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, trialObservations);
+        reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, studyObservations);
 
         final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams, TEST_STUDY_NAME);
-        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY));
+        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeStudyManifest.COLLABORATOR_REPORT_KEY));
         Assert.assertEquals("Unable to provide report with season value", TEST_SEASON_VALUE, reportValues.get("season"));
     }
 
@@ -96,7 +96,7 @@ public class MaizeTrialManifestTest {
         reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, trialObservations);
 
         final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams, TEST_STUDY_NAME);
-        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY));
+        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeStudyManifest.COLLABORATOR_REPORT_KEY));
         Assert.assertEquals("Unable to provide report with season value", TEST_SEASON_VALUE, reportValues.get("season"));
     }
 

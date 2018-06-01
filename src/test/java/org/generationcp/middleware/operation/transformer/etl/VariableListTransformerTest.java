@@ -49,13 +49,13 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		Debug.println(TestOutputFormatter.INDENT, "testTransformStock");
 		final VariableTypeList variableTypeList = this.createVariableTypeListTestData();
 		final MeasurementRow measurementRow = this.createMeasurementRowTestData(variableTypeList);
-		final List<String> trialHeaders = this.getTrialHeaders(variableTypeList);
+		final List<String> headers = this.getStudyHeaders(variableTypeList);
 		Debug.println(TestOutputFormatter.INDENT, "Input MeasurmentRow");
 		measurementRow.print(TestOutputFormatter.INDENT);
 		Debug.println(TestOutputFormatter.INDENT, "Input VariableTypeList");
 		variableTypeList.print(TestOutputFormatter.INDENT);
 
-		final VariableList stocks = VariableListTransformerTest.transformer.transformStock(measurementRow, variableTypeList, trialHeaders);
+		final VariableList stocks = VariableListTransformerTest.transformer.transformStock(measurementRow, variableTypeList, headers);
 
 		Assert.assertNotNull(stocks);
 		final VariableList result = this.getStockResult(variableTypeList);
@@ -72,17 +72,17 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 
 	@Test
 	public void transformTrialEnvironment() throws Exception {
-		Debug.println(TestOutputFormatter.INDENT, "transformTrialEnvironment");
+		Debug.println(TestOutputFormatter.INDENT, "transformEnvironment");
 		final VariableTypeList variableTypeList = this.createVariableTypeListTestData();
 		final MeasurementRow measurementRow = this.createMeasurementRowTestData(variableTypeList);
-		final List<String> trialHeaders = this.getTrialHeaders(variableTypeList);
+		final List<String> headers = this.getStudyHeaders(variableTypeList);
 		Debug.println(TestOutputFormatter.INDENT, "Input MeasurmentRow");
 		measurementRow.print(TestOutputFormatter.INDENT);
 		Debug.println(TestOutputFormatter.INDENT, "Input VariableTypeList");
 		variableTypeList.print(TestOutputFormatter.INDENT);
 
 		final VariableList stocks =
-				VariableListTransformerTest.transformer.transformTrialEnvironment(measurementRow, variableTypeList, trialHeaders);
+				VariableListTransformerTest.transformer.transformTrialEnvironment(measurementRow, variableTypeList, headers);
 
 		Assert.assertNotNull(stocks);
 		final VariableList result = this.getStockResult2(variableTypeList);
@@ -99,7 +99,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 
 	@Test
 	public void transformTrialEnvironment2() throws Exception {
-		Debug.println(TestOutputFormatter.INDENT, "testTransformTrialEnvironment 2");
+		Debug.println(TestOutputFormatter.INDENT, "testTransformEnvironment 2");
 		final List<MeasurementVariable> mVarList = this.createMeasurementVariableListTestData();
 		final VariableTypeList variableTypeList = this.createVariableTypeListTestData();
 
@@ -157,16 +157,16 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		return list;
 	}
 
-	public List<String> getTrialHeaders(final VariableTypeList list) {
-		final List<String> trialHeaders = new ArrayList<String>();
+	public List<String> getStudyHeaders(final VariableTypeList list) {
+		final List<String> headers = new ArrayList<String>();
 		if (list != null && list.size() > 0) {
 			for (final DMSVariableType var : list.getVariableTypes()) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.equals(var.getStandardVariable().getPhenotypicType())) {
-					trialHeaders.add(var.getLocalName());
+					headers.add(var.getLocalName());
 				}
 			}
 		}
-		return trialHeaders;
+		return headers;
 	}
 
 	private VariableList getStockResult(final VariableTypeList varTypeList) {

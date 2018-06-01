@@ -214,7 +214,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<Reference> rootFolders =
 				this.manager.getRootFolders(this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(rootFolders);
-		Assert.assertFalse("Root folders should not be empty because it contains the templates for Nursery and Trial.",
+		Assert.assertFalse("Root folders should not be empty because it contains the templates for Studies.",
 				rootFolders.isEmpty());
 	}
 
@@ -323,7 +323,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetFieldMapInfoOfTrial() throws MiddlewareQueryException {
+	public void testGetFieldMapInfoOfStudy() throws MiddlewareQueryException {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
@@ -361,7 +361,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
 						false, null, FieldMapDataUtil.FIELD_ID);
 
-		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 
 		this.manager.setLocationDataManager(locationDataManager);
 
@@ -417,7 +417,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
 						false, null, FieldMapDataUtil.FIELD_ID);
 
-		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
 		trialInstance.setBlockId(null);
 
@@ -479,16 +479,16 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject
 			.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL", cropPrefix);
-		final List<StudyDetails> updatedTrialStudyDetails =
+		this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY", cropPrefix);
+		final List<StudyDetails> updatedStudyDetails =
 				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
-		final int sizeAfterAddingNewTrial = updatedTrialStudyDetails.size();
-		Assert.assertEquals("The size after adding new trial should be equal to the size before adding a new trial + 1",
-				sizeAfterAddingNewTrial, sizeBeforeAddingNewTrial + 1);
+		final int sizeAfterAddingNewStudy = updatedStudyDetails.size();
+		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
+				sizeAfterAddingNewStudy, sizeBeforeAddingNewTrial + 1);
 	}
 
 	@Test
-	public void testGetNurseryAndTrialStudyDetails() throws Exception {
+	public void testGetStudyStudyDetails() throws Exception {
 		final List<StudyDetails> studyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
@@ -602,7 +602,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevel() {
+	public void testIsVariableUsedInStudyEnvironmentInOtherProgramsVariableExistsInStudyLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -630,7 +630,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
+	public void testIsVariableUsedInStudyEnvironmentInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -659,7 +659,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevel() {
+	public void testIsVariableUsedInStudEnvironmentInOtherProgramsVariableExistsInEnvironmentLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -706,7 +706,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevelStudyIsDeleted() {
+	public void testIsVariableUsedInStudyEnvironmentInOtherProgramsVariableExistsInEnvironmentLevelStudyIsDeleted() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();

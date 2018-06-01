@@ -151,17 +151,17 @@ public class StudyServiceImplTest {
 	 */
 	@Test
 	public void testGetObservations() throws Exception {
-		final MeasurementVariableService mockTrialTraits = Mockito.mock(MeasurementVariableService.class);
-		final StudyMeasurements mockTrialMeasurements = Mockito.mock(StudyMeasurements.class);
+		final MeasurementVariableService mockTraits = Mockito.mock(MeasurementVariableService.class);
+		final StudyMeasurements mockMeasurements = Mockito.mock(StudyMeasurements.class);
 		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
 
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockTrialTraits, mockTrialMeasurements, mockStudyGermplasmListService,
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockTraits, mockMeasurements, mockStudyGermplasmListService,
 				this.germplasmDescriptors);
 		studyServiceImpl.setDesignFactors(this.designFactors);
 
 		final List<MeasurementVariableDto> projectTraits =
 				Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
-		Mockito.when(mockTrialTraits.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
+		Mockito.when(mockTraits.getVariables(StudyServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
 				VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue"));
@@ -171,7 +171,7 @@ public class StudyServiceImplTest {
 		final int instanceId = 1;
 		final int pageNumber = 1;
 		final int pageSize = 100;
-		Mockito.when(mockTrialMeasurements.getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
+		Mockito.when(mockMeasurements.getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
 				this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null))
 				.thenReturn(testMeasurements);
 
@@ -179,16 +179,16 @@ public class StudyServiceImplTest {
 		final List<ObservationDto> actualMeasurements = studyServiceImpl.getObservations(StudyServiceImplTest.STUDY_ID, 1, 1, 100, null, null);
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
-		Mockito.verify(mockTrialMeasurements).getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
+		Mockito.verify(mockMeasurements).getAllMeasurements(StudyServiceImplTest.STUDY_ID, projectTraits,
 				this.additionalGermplasmDescriptors, this.additionalDesignFactors, instanceId, pageNumber, pageSize, null, null);
 	}
 
 	@Test
 	public void testListAllStudies() throws MiddlewareQueryException {
 		final StudyTypeDto studyTypeDto = StudyTypeDto.getTrialDto();
-		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", studyTypeDto.getId(),
+		final Object[] testDBRow = {2007, "Wheat Study 1", "Wheat Study 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", studyTypeDto.getId(),
 			studyTypeDto.getLabel(), studyTypeDto.getName(), Byte.valueOf("1"), studyTypeDto.getCvTermId(),
-				"Wheat Trial 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
+				"Wheat Study 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
@@ -274,11 +274,11 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void testGetStudyDetailsForATrial() {
+	public void testGetStudyDetailsForAStudy() {
 		final List<String> seasons = new ArrayList<>();
 		seasons.add("WET");
 		final StudyMetadata metadata =
-				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "trialName", StudyTypeDto.TRIAL_NAME,
+				new StudyMetadata(2, 2, 4, Boolean.TRUE, "20160101", "20170101", 8, seasons, "studyName", StudyTypeDto.TRIAL_NAME,
 					"studyName");
 
 		final UserDto user = new UserDto();

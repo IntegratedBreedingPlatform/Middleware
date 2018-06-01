@@ -86,11 +86,11 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		setUpWorkbook();
 	}
 
-	private void setUpTrial() {
+	private void setUpStudy() {
 		// Basic Details
 		studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		studyDetails.setStudyName("Test Trial " + new Random().nextInt(100));
+		studyDetails.setStudyName("Test Study" + new Random().nextInt(100));
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
 		studyDetails.setCreatedBy("1");
@@ -216,8 +216,8 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testWorkbookBuilderLoadsNoObservationsByDefaultTrial() throws MiddlewareException {
-		setUpTrial();
+	public void testWorkbookBuilderLoadsNoObservationsByDefaultStudy() throws MiddlewareException {
+		setUpStudy();
 
 		// Save the workbook
 		final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, "9CVR");

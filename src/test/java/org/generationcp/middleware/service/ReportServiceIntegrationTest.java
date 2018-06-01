@@ -24,11 +24,11 @@ public class ReportServiceIntegrationTest extends IntegrationTestBase {
 
 	private static final int PROJECT_ID = -2; // local nursery;
 	private static final String KEY_MAIZE_FIELDBOOK_NURSERY = "MFbNur";
-	private static final String KEY_MAIZE_FIELDBOOK_TRIAL = "MFbTrial";
+	private static final String KEY_MAIZE_FIELDBOOK = "MFbTrial";
 	private static final String KEY_MAIZE_FIELDBOOK_SHIPM = "MFbShipList";
 
-	private static final int PROJECT_WHEAT_ID = -2; // local trial;
-	private static final int PROJECT_WHEAT_CROSSES_ID = -8; // local nursery;
+	private static final int PROJECT_WHEAT_ID = -2; // local study;
+	private static final int PROJECT_WHEAT_CROSSES_ID = -8; // local study;
 	private static final String KEY_WHEAT_FIELDBOOK_23 = "WFb23";
 	private static final String KEY_WHEAT_FIELDBOOK_24 = "WFb24";
 	private static final String KEY_WHEAT_FIELDBOOK_25 = "WFb25";
@@ -60,8 +60,8 @@ public class ReportServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStreamReport_MaizeTrial() {
-		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_ID, ReportServiceIntegrationTest.KEY_MAIZE_FIELDBOOK_TRIAL);
+	public void testGetStreamReport_Maize() {
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_ID, ReportServiceIntegrationTest.KEY_MAIZE_FIELDBOOK);
 
 	}
 
@@ -159,25 +159,25 @@ public class ReportServiceIntegrationTest extends IntegrationTestBase {
 	 * @param studyId id of the test study
 	 * @param reportCode specific report code to generate.
 	 */
-	private void assertReportGenerated(Integer studyId, String reportCode) {
+	private void assertReportGenerated(final Integer studyId, final String reportCode) {
 
-		boolean hasReportKey = this.reportService.getReportKeys().contains(reportCode);
+		final boolean hasReportKey = this.reportService.getReportKeys().contains(reportCode);
 
 		if (hasReportKey) {
 			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-				Reporter rep = this.reportService.getStreamReport(reportCode, studyId, "testReportName", baos);
+				final Reporter rep = this.reportService.getStreamReport(reportCode, studyId, "testReportName", baos);
 
 				Assert.assertTrue("Failed test - empty report for code [" + reportCode + "].", baos.size() > 0);
 
 				// additionally creates the file in 'target' folder, for human validation ;)
-				File xlsx = new File("target", rep.getFileName());
+				final File xlsx = new File("target", rep.getFileName());
 				baos.writeTo(new FileOutputStream(xlsx));
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
-				Assert.assertTrue("Failed test - generate report with code [" + reportCode + "].", false);
+				Assert.fail("Failed test - generate report with code [" + reportCode + "].");
 			}
 		}
 	}

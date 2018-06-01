@@ -67,7 +67,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 			// dataset names.
 			final int randomNumber = new Random().nextInt(10000);
 			workbook.getStudyDetails().setTrialDatasetName(
-					"MultiLocationTrial_" + workbook.getStudyDetails().getStudyName() + randomNumber);
+					"MultiLocationStudy_" + workbook.getStudyDetails().getStudyName() + randomNumber);
 			workbook.getStudyDetails().setMeasurementDatasetName(
 					"MultiLocationMeasurement_" + workbook.getStudyDetails().getStudyName() + randomNumber);
 
@@ -80,7 +80,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveTrialDataset() throws MiddlewareException {
+	public void testSaveStudyDataset() throws MiddlewareException {
 		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
@@ -91,18 +91,18 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		Assert.assertEquals(
-				"Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
+				"Expected " + workbook.getTrialConditions().size() + " of records for study conditions but got "
 						+ createdWorkbook.getTrialConditions().size(),
 				workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions().size());
-		Assert.assertTrue("Expected the same trial conditions retrieved but found a different condition.",
-				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConditions(),
+		Assert.assertTrue("Expected the same study conditions retrieved but found a different condition.",
+				WorkbookTestDataInitializer.areStudyVariablesSame(workbook.getTrialConditions(),
 						createdWorkbook.getTrialConditions()));
 		Assert.assertEquals(
-				"Expected " + workbook.getTrialConstants().size() + " of records for trial constants but got "
+				"Expected " + workbook.getTrialConstants().size() + " of records for study constants but got "
 						+ createdWorkbook.getTrialConstants().size(),
 				workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants().size());
-		Assert.assertTrue("Expected the same trial constants retrieved but found a different constant.",
-				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConstants(),
+		Assert.assertTrue("Expected the same study constants retrieved but found a different constant.",
+				WorkbookTestDataInitializer.areStudyVariablesSame(workbook.getTrialConstants(),
 						createdWorkbook.getTrialConstants()));
 	}
 
@@ -118,23 +118,23 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		Assert.assertEquals(
-				"Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
+				"Expected " + workbook.getTrialConditions().size() + " of records for study conditions but got "
 						+ createdWorkbook.getTrialConditions().size(),
 				workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions().size());
-		Assert.assertTrue("Expected the same trial conditions retrieved but found a different condition.",
-				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConditions(),
+		Assert.assertTrue("Expected the same study conditions retrieved but found a different condition.",
+				WorkbookTestDataInitializer.areStudyVariablesSame(workbook.getTrialConditions(),
 						createdWorkbook.getTrialConditions()));
 		Assert.assertEquals(
-				"Expected " + workbook.getTrialConstants().size() + " of records for trial constants but got "
+				"Expected " + workbook.getTrialConstants().size() + " of records for study constants but got "
 						+ createdWorkbook.getTrialConstants().size(),
 				workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants().size());
-		Assert.assertTrue("Expected the same trial constants retrieved but found a different constant.",
-				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConstants(),
+		Assert.assertTrue("Expected the same study constants retrieved but found a different constant.",
+				WorkbookTestDataInitializer.areStudyVariablesSame(workbook.getTrialConstants(),
 						createdWorkbook.getTrialConstants()));
 	}
 
 	@Test
-	public void testAddTrialEnvironmentToTrial() throws MiddlewareException {
+	public void testAddStudyEnvironmentToStudy() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(4, new StudyTypeDto("T"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
@@ -151,10 +151,9 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 		createdWorkbook = this.fieldbookService.getStudyDataSet(id);
 
-		Assert.assertTrue(
-				"Expected " + (noOfOrigTrialInstances + 1) + " instances but got "
-						+ createdWorkbook.getTrialObservations().size() + " instead.",
-				noOfOrigTrialInstances + 1 == createdWorkbook.getTrialObservations().size());
+		Assert.assertEquals(
+			"Expected " + (noOfOrigTrialInstances + 1) + " instances but got " + createdWorkbook.getTrialObservations().size()
+				+ " instead.", noOfOrigTrialInstances + 1, createdWorkbook.getTrialObservations().size());
 	}
 
 	@Test
@@ -245,16 +244,16 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testParseWorkbookWithNoTrialNonNursery() {
+	public void testParseWorkbookWithNoStudyNonNursery() {
 		this.testFileAgainstExpectedErrorCondition(
-				"org/generationcp/middleware/service/test/GCP5799NonNurseryWorkbookNoTrialEnvironment.xls",
+				"org/generationcp/middleware/service/test/GCP5799NonNurseryWorkbookNoStudyEnvironment.xls",
 				"error.missing.trial.condition", "Unable to detect missing trial condition");
 	}
 
 	@Test
-	public void testParseWorkbookWithNoTrialNursery() {
+	public void testParseWorkbookWithNoStudyNursery() {
 		final String fileLocation = Objects.requireNonNull(this.getClass().getClassLoader()
-			.getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoTrialEnvironment.xls"))
+			.getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoStudyEnvironment.xls"))
 				.getFile();
 		final File file = new File(fileLocation);
 		try {
@@ -300,7 +299,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 			final List<Message> messages = e.getErrorMessages();
 
 			Assert.assertNotNull(messages);
-			Assert.assertTrue(messages.size() == 1);
+			Assert.assertEquals(1, messages.size());
 			Assert.assertEquals(expectedErrorKey, messages.get(0).getMessageKey());
 			return;
 		} catch (final MiddlewareException e) {
@@ -398,8 +397,8 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	@Test
 	public void testValidateProjectData() throws MiddlewareException {
 		final String studyName = "validateProjectData_" + new Random().nextInt(10000);
-		final int trialNo = 1;
-		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookForWizard(studyName, trialNo);
+		final int studyNo = 1;
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookForWizard(studyName, studyNo);
 		workbook.print(IntegrationTestBase.INDENT);
 		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID,
 				this.cropPrefix);

@@ -120,7 +120,7 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
-		final VariableList locationVariableList = this.createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
+		final VariableList locationVariableList = this.createEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
 		studyValues.setLocationId(this.studyDataManager.addTrialEnvironment(locationVariableList));
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -150,7 +150,7 @@ public class StudyTestDataInitializer {
 		return var;
 	}
 
-	private VariableList createTrialEnvironment(final String trialInstance, final String latitude, final String longitude, final String data,
+	private VariableList createEnvironment(final String trialInstance, final String latitude, final String longitude, final String data,
 			final String altitude, final String experimentDesign) throws Exception {
 		final VariableList variableList = new VariableList();
 		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 0, PhenotypicType.TRIAL_ENVIRONMENT));
@@ -162,7 +162,7 @@ public class StudyTestDataInitializer {
 		return variableList;
 	}
 	
-	private VariableList createTrialEnvironmentWithLocationAndSeason(final String trialInstance, final String experimentDesign, final String siteName, final String locationId, final String seasonId) throws Exception {
+	private VariableList createEnvironmentWithLocationAndSeason(final String trialInstance, final String experimentDesign, final String siteName, final String locationId, final String seasonId) throws Exception {
 		final VariableList variableList = new VariableList();
 		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		variableList.add(this.createVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), experimentDesign, 0, PhenotypicType.TRIAL_ENVIRONMENT));
@@ -222,12 +222,12 @@ public class StudyTestDataInitializer {
 	}
 	
 	public void addEnvironmentDataset(final int studyId, final String locationId, final String seasonId) throws Exception {
-		final VariableList locationVariableList = this.createTrialEnvironmentWithLocationAndSeason("1", "RCBD", "SOME SITE NAME", locationId, seasonId);
+		final VariableList locationVariableList = this.createEnvironmentWithLocationAndSeason("1", "RCBD", "SOME SITE NAME", locationId, seasonId);
 		final int geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
 
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName("ENVIRONMENT " + StudyTestDataInitializer.DATASET_NAME);
-		datasetValues.setDescription("My Trial Environment Dataset");
+		datasetValues.setDescription("My Environment Dataset");
 		datasetValues.setType(DataSetType.SUMMARY_DATA);
 		final DatasetReference dataSet = this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null);
 		

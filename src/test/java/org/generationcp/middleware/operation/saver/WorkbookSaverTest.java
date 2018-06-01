@@ -63,9 +63,9 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testPropagationOfTrialFactorsWithTrialVariablesAndWOTrialFactorWithEnvironmentAndVariates() {
+	public void testPropagationOfStudyFactorsWithStudyVariablesAndWOStudyFactorWithEnvironmentAndVariates() {
 		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
-		final VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(true);
+		final VariableTypeList trialVariables = VariableTypeListDataUtil.createVariableTypeList(true);
 
 		final VariableTypeList plotVariables = WorkbookSaverTest.workbookSaver
 				.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
@@ -73,10 +73,10 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		Assert.assertEquals("Expected an aditional entry for trial instance but found none.",
 				effectVariables.size() + 1, plotVariables.size());
 		Assert.assertFalse("Expected non trial environment and non constant variables but found at least one.",
-				this.areTrialAndConstantsInList(plotVariables, effectVariables));
+				this.areStudyAndConstantsInList(plotVariables, effectVariables));
 	}
 
-	private boolean areTrialAndConstantsInList(final VariableTypeList plotVariables,
+	private boolean areStudyAndConstantsInList(final VariableTypeList plotVariables,
 			final VariableTypeList effectVariables) {
 		if (plotVariables != null) {
 			for (final DMSVariableType var : plotVariables.getVariableTypes()) {
@@ -103,9 +103,9 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testPropagationOfTrialFactorsWithTrialVariablesAndWOTrialFactorWOEnvironmentAndVariates() {
+	public void testPropagationOfStudyFactorsWithStudyVariablesAndWOStudyFactorWOEnvironmentAndVariates() {
 		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
-		final VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(false);
+		final VariableTypeList trialVariables = VariableTypeListDataUtil.createVariableTypeList(false);
 
 		final VariableTypeList plotVariables = WorkbookSaverTest.workbookSaver
 				.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
@@ -113,13 +113,13 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		Assert.assertEquals("Expected an aditional entry for trial instance but found none.",
 				effectVariables.size() + 1, plotVariables.size());
 		Assert.assertFalse("Expected non trial environment and non constant variables but found at least one.",
-				this.areTrialAndConstantsInList(plotVariables, effectVariables));
+				this.areStudyAndConstantsInList(plotVariables, effectVariables));
 	}
 
 	@Test
-	public void testPropagationOfTrialFactorsWithTrialVariablesAndTrialFactor() {
+	public void testPropagationOfStudyFactorsWithStudyVariablesAndStudyFactor() {
 		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(true);
-		final VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(false);
+		final VariableTypeList trialVariables = VariableTypeListDataUtil.createVariableTypeList(false);
 
 		final VariableTypeList plotVariables = WorkbookSaverTest.workbookSaver
 				.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
@@ -129,7 +129,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testPropagationOfTrialFactorsWOTrialVariablesWithTrialFactor() {
+	public void testPropagationOfStudyFactorsWOStudyVariablesWithStudyFactor() {
 		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(true);
 		final VariableTypeList trialVariables = null;
 
@@ -180,12 +180,12 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testPropagationOfTrialFactorsWOTrialVariablesAndTrialFactor() {
+	public void testPropagationOfStudyFactorsWOStudyVariablesAndStudyFactor() {
 		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
-		final VariableTypeList trialVariables = null;
+		final VariableTypeList variables = null;
 
 		final VariableTypeList plotVariables = WorkbookSaverTest.workbookSaver
-				.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+				.propagateTrialFactorsIfNecessary(effectVariables, variables);
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(),
 				plotVariables.size());
@@ -204,24 +204,24 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class); // new
 																											// VariableTypeListTransformer(Mockito.mock(HibernateSessionProvider.class));
 
-		final VariableTypeList trialConditionsVariableTypeList = this
+		final VariableTypeList conditionsVariableTypeList = this
 				.createVariableTypeList(workbook.getTrialConditions(), 1);
-		Mockito.doReturn(trialConditionsVariableTypeList).when(transformer).transform(workbook.getTrialConditions(),
+		Mockito.doReturn(conditionsVariableTypeList).when(transformer).transform(workbook.getTrialConditions(),
 				programUUID);
 
-		final VariableTypeList nonTrialFactorsVariableTypeList = this
+		final VariableTypeList nonFactorsVariableTypeList = this
 				.createVariableTypeList(workbook.getNonTrialFactors(), 1);
-		Mockito.doReturn(nonTrialFactorsVariableTypeList).when(transformer).transform(workbook.getNonTrialFactors(),
+		Mockito.doReturn(nonFactorsVariableTypeList).when(transformer).transform(workbook.getNonTrialFactors(),
 				programUUID);
 
-		final VariableTypeList trialFactorsVariableTypeList = this.createVariableTypeList(workbook.getTrialFactors(),
+		final VariableTypeList factorsVariableTypeList = this.createVariableTypeList(workbook.getTrialFactors(),
 				1);
-		Mockito.doReturn(trialFactorsVariableTypeList).when(transformer).transform(workbook.getTrialFactors(),
+		Mockito.doReturn(factorsVariableTypeList).when(transformer).transform(workbook.getTrialFactors(),
 				workbook.getTrialConditions().size() + 1, programUUID);
 
-		final VariableTypeList trialConstantsVariableTypeList = this
+		final VariableTypeList constantsVariableTypeList = this
 				.createVariableTypeList(workbook.getTrialConstants(), 1);
-		Mockito.doReturn(trialConstantsVariableTypeList).when(transformer).transform(workbook.getTrialConstants(),
+		Mockito.doReturn(constantsVariableTypeList).when(transformer).transform(workbook.getTrialConstants(),
 				workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1, programUUID);
 
 		final VariableTypeList variatesVariableTypeList = this.createVariableTypeList(workbook.getVariates(), 1);
@@ -238,23 +238,23 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 				.get("measurementVariableMap");
 		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 
-		final List<String> trialHeaders = headerMap.get("trialHeaders");
+		final List<String> headers = headerMap.get("trialHeaders");
 
-		final VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
-		final VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
+		final VariableTypeList types = variableTypeMap.get("trialVariableTypeList");
+		final VariableTypeList variableTypes = variableTypeMap.get("trialVariables");
 		final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
 
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
+		final List<MeasurementVariable> measurementVariables = measurementVariableMap.get("trialMV");
 		final List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
 
-		Assert.assertNotEquals(0, trialHeaders.size());
+		Assert.assertNotEquals(0, headers.size());
 
-		Assert.assertNotEquals(0, trialMV.size());
+		Assert.assertNotEquals(0, measurementVariables.size());
 		Assert.assertNotEquals(0, effectMV.size());
 
 		Assert.assertNotEquals(0, effectVariables.getVariableTypes().size());
-		Assert.assertNotEquals(0, trialVariables.getVariableTypes().size());
-		Assert.assertNotEquals(0, trialVariableTypeList.getVariableTypes().size());
+		Assert.assertNotEquals(0, variableTypes.getVariableTypes().size());
+		Assert.assertNotEquals(0, types.getVariableTypes().size());
 	}
 
 	private StandardVariable transformMeasurementVariableToVariable(final MeasurementVariable measurementVariable) {
@@ -304,7 +304,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testRemoveDeletedTrialObservations() throws Exception {
+	public void testRemoveDeletedStudyObservations() throws Exception {
 
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
 
@@ -313,7 +313,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class);
 
-		workbook.setTrialObservations(this.createTrialObservations(1, workbook));
+		workbook.setTrialObservations(this.createObservations(1, workbook));
 
 		Mockito.doReturn(transformer).when(workbookSaver).getVariableTypeListTransformer();
 
@@ -334,8 +334,8 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		Assert.assertEquals(0, workbook.getTrialObservations().get(0).getMeasurementVariables().size());
 	}
 
-	private List<MeasurementRow> createTrialObservations(final int noOfTrialInstances, final Workbook workbook) {
-		final List<MeasurementRow> trialObservations = new ArrayList<MeasurementRow>();
+	private List<MeasurementRow> createObservations(final int noOfTrialInstances, final Workbook workbook) {
+		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 
 		MeasurementRow row;
 		List<MeasurementData> dataList;
@@ -351,10 +351,10 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 			dataList.add(data);
 
 			row.setDataList(dataList);
-			trialObservations.add(row);
+			observations.add(row);
 		}
 
-		return trialObservations;
+		return observations;
 	}
 
 	private MeasurementVariable getMeasurementVariable(final int termId, final List<MeasurementVariable> variables) {
