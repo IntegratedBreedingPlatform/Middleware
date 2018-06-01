@@ -51,9 +51,7 @@ import org.hibernate.annotations.NotFoundAction;
 @NamedQueries({@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM WorkbenchUser s WHERE s.name = :name"),
 		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
 		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
-		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
-		@NamedQuery(name = "getByFullName",
-		query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.personid = p.id AND (CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
+		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name")
 })
 @NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
 		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
@@ -67,32 +65,18 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
 	public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
-	public static final String GET_BY_FULLNAME = "getByFullName";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 
 	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.role, users.ustatus, person.pemail \n"
+		"SELECT users.userid, users.uname, person.fname, person.lname, role.role_id, role.name, users.ustatus, person.pemail \n"
 		+ "FROM users \n"
 		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
 		+ "INNER JOIN persons person ON person.personid = users.personid \n "
 		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
-		+ "INNER JOIN users_roles role ON role.userid = users.userid "
+		+ "INNER JOIN users_roles ur ON ur.userid = users.userid "
+		+ "INNER JOIN role ON role.role_id = ur.role_id "
 		+ "WHERE pp.project_uuid = :project_uuid \n "
 		+ "GROUP BY users.userid";
-
-	public static final String GET_USERS_ASSOCIATED_TO_STUDY = "SELECT DISTINCT \n"
-			+ "  person.personid AS personId, \n"
-			+ "  person.fname    AS fName, \n"
-			+ "  person.lname    AS lName, \n"
-			+ "  person.pemail   AS email, \n"
-			+ "  role.role       AS role \n"
-			+ "FROM cvterm scale INNER JOIN cvterm_relationship r ON (r.object_id = scale.cvterm_id) \n"
-			+ "  INNER JOIN cvterm variable ON (r.subject_id = variable.cvterm_id) \n"
-			+ "  INNER JOIN projectprop pp ON (pp.variable_id = variable.cvterm_id) \n"
-			+ "  INNER JOIN workbench.persons person ON (pp.value = person.personid) \n"
-			+ "  INNER JOIN workbench.users user ON (user.personid = person.personid) \n"
-			+ "  LEFT JOIN workbench.users_roles role ON (role.userid = user.userid) \n"
-			+ "WHERE pp.project_id = :studyId AND r.object_id = 1901";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

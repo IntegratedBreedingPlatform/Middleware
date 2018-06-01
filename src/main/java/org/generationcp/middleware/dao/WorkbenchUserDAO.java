@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.Criteria;
@@ -107,10 +108,11 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 					final String username = (String) user[1];
 					final String firstName = (String) user[2];
 					final String lastName = (String) user[3];
-					final String role = (String) user[4];
-					final Integer status = (Integer) user[5];
-					final String email = (String) user[6];
-					final UserDto u = new UserDto(userId, username, firstName, lastName, role, status, email);
+					final Integer roleId = (Integer) user[4];
+					final String roleName = (String) user[5];
+					final Integer status = (Integer) user[6];
+					final String email = (String) user[7];
+					final UserDto u = new UserDto(userId, username, firstName, lastName, new Role(roleId, roleName), status, email);
 					users.add(u);
 				}
 			}

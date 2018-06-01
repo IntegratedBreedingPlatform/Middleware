@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -570,7 +571,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
 		final Integer userId = this.workbenchDataManager.createUser(userDto);
 		userDto.setUserId(userId);
-		userDto.setRoleName("BREEDER");
+		userDto.setRole(new Role(2, "BREEDER"));
 		final Integer result = this.workbenchDataManager.updateUser(userDto);
 
 		assertThat("Expected id of userDto saved record in workbench_user.", result != null);

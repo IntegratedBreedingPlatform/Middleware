@@ -895,7 +895,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		user.setType(0);
 
 		// Add user roles to the particular user
-		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRoleId())));
+		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
 
 		try {
 
@@ -934,8 +934,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			// update user roles to the particular user
 			final UserRole role = user.getRoles().get(0);
-			if (!role.getRole().getName().equalsIgnoreCase(userDto.getRoleName())) {
-				role.setRole(new Role(userDto.getRoleName().toUpperCase()));
+			if (!role.getRole().equals(userDto.getRole())) {
+				role.setRole(userDto.getRole());
 			}
 
 			this.getWorkbenchUserDao().saveOrUpdate(user);

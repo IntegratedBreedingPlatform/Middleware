@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -173,7 +174,7 @@ public class WorkbenchTestDataUtil {
 		userdto.setFirstName(firstName);
 		final String lastName = RandomStringUtils.randomAlphanumeric(50);
 		userdto.setLastName(lastName);
-		userdto.setRoleName("ADMIN");
+		userdto.setRole(new Role(1, "ADMIN"));
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		userdto.setEmail("test" + email + "@leafnode.io");
