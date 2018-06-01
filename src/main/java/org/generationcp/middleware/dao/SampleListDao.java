@@ -22,12 +22,16 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +44,16 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	protected static final String PROGRAMUUID = "programUUID";
 	protected static final String SAMPLES = "samples";
 	protected static final Criterion RESTRICTED_LIST;
+	protected static final String SEARCH_SAMPLE_LIST_CONTAINS =
+			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
+					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
+					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name LIKE :searchString\n"
+					+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString) ";
+	protected static final String SEARCH_SAMPLE_LIST_EXACT_MATCH =
+			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
+					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
+					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name = :searchString\n"
+					+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString) ";
 
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
@@ -101,6 +115,23 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		return criteria.list();
 	}
 
+	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
+
+		final SQLQuery query = this.getSession().createSQLQuery(addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
+
+		query.setParameter("searchString", searchString + (exactMatch ? "" : "%"));
+		query.setParameter("listType", SampleListType.SAMPLE_LIST.toString());
+		query.setParameter("program_uuid", programUUID);
+
+		query.addScalar("id", new IntegerType());
+		query.addScalar("listName", new StringType());
+		query.addScalar("description", new StringType());
+		query.setResultTransformer(Transformers.aliasToBean(SampleList.class));
+
+		return query.list();
+
+	}
+
 	public List<SampleDetailsDTO> getSampleDetailsDTO(final Integer sampleListId) {
 
 		final Criteria criteria = this.getSession().createCriteria(SampleList.class);
@@ -111,6 +142,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("properties.value"), "plotNumber");
 		projectionList.add(Projections.property("plant.plantNumber"), "plantNo");
 		projectionList.add(Projections.property("sample.sampleName"), "sampleName");
+		projectionList.add(Projections.property("sample.entryNumber"), "entryNumber");
 		projectionList.add(Projections.property("user.name"), "takenBy");
 		projectionList.add(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey");
 		projectionList.add(Projections.property("plant.plantBusinessKey"), "plantBusinessKey");
@@ -189,13 +221,11 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		}
 
 		try {
-			final String folderMetaDataQuery = "SELECT parent.list_id AS listId,"
-				+ "  COUNT(child.list_id) AS numberOfChildren, "
-				+ "  COUNT(s.sample_id) AS numberOfEntries "
-				+ " FROM sample_list parent"
-				+ "   LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
-				+ "   LEFT OUTER JOIN sample s ON s.sample_list = parent.list_id "
-				+ " WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
+			final String folderMetaDataQuery = "SELECT parent.list_id AS listId," + "  COUNT(child.list_id) AS numberOfChildren, "
+					+ "  COUNT(s.sample_id) AS numberOfEntries " + " FROM sample_list parent"
+					+ "   LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
+					+ "   LEFT OUTER JOIN sample s ON s.sample_list = parent.list_id "
+					+ " WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
 			final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
 			setResultTransformer.setParameterList("folderIds", folderIds);
 			setResultTransformer.addScalar("listId", new IntegerType());
@@ -257,6 +287,26 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	protected Criterion getRestrictedSnapshopTypes() {
 		return SampleListDao.RESTRICTED_LIST;
+	}
+
+	String addOrder(final String queryString, final Pageable pageable) {
+
+		final StringBuilder stringBuilder = new StringBuilder(queryString);
+
+		if (pageable == null || pageable.getSort() == null) {
+			return stringBuilder.toString();
+		}
+
+		stringBuilder.append("ORDER BY ");
+
+		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+		while(iterator.hasNext()) {
+			final Sort.Order order = iterator.next();
+			stringBuilder.append(order.getProperty() + " " + order.getDirection().name());
+			if (iterator.hasNext()) stringBuilder.append(",");
+		}
+
+		return stringBuilder.toString();
 	}
 
 }

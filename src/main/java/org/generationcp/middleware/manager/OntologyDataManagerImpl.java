@@ -43,6 +43,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.VariableCache;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.pojos.ErrorCode;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
@@ -401,7 +402,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID) {
 		return this.getStandardVariableBuilder().getStandardVariablesInProjects(headers, programUUID);
 	}
+	
+	@Override
+	public List<ProjectProperty> getProjectPropertiesByProjectId(int projectId) {
+		return this.getProjectPropertyDao().getByProjectId(projectId);
+	}
 
+	
 	@Override
 	public List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) {
 		List<Term> terms = new ArrayList<>();
