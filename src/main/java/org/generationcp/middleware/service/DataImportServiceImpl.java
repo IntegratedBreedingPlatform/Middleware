@@ -24,12 +24,16 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.StringUtil;
@@ -66,6 +70,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
+	private static final String LOCATION_ID_DOESNT_EXISTS = "error.location.id.doesnt.exists";
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
 
@@ -74,6 +79,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Resource
 	private GermplasmDataManager germplasmDataManager;
+
+	@Resource
+	private LocationDataManager locationDataManager;
 
 	public DataImportServiceImpl() {
 
@@ -192,8 +200,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<>();
 
+		final Set<Integer> conditionsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getConditions());
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
+
+		if (conditionsTermIds.contains(TermId.TRIAL_LOCATION.getId()) && !conditionsTermIds.contains(TermId.LOCATION_ID.getId())) {
+			messages.add(new Message(DataImportServiceImpl.LOCATION_ID_DOESNT_EXISTS));
+		}
 
 		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
@@ -256,6 +269,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// Parse the description sheet only at first
 		final Workbook workbook = workbookParser.parseFile(excelWorkbook, false, currentIbdbUserId.toString());
 
+		// Location Name is mandatory when creating a new study, so we need to automatically
+		// add Location Name variable if is not available in the imported workbook.
+		addLocationVariableIfNotExists(workbook.getConditions(), programUUID);
+
 		// Remove obsolete factors, conditions, constants and traits in the
 		// workbook if there's any
 		final List<String> obsoleteVariableNames = this.removeObsoloteVariablesInWorkbook(workbook, programUUID);
@@ -269,6 +286,70 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		workbookParser.parseAndSetObservationRows(excelWorkbook, workbook, discardInvalidValues);
 
 		return workbook;
+	}
+
+	protected void addLocationVariableIfNotExists(final List<MeasurementVariable> variables, final String programUUID) {
+
+		final MeasurementVariable locationVariable = this.createLocationVariable(programUUID);
+
+		final boolean isLocationIDExists = isTermExistsInMeasurementVariableList(TermId.LOCATION_ID.getId(), variables, programUUID);
+		final boolean isLocationNameExists = isTermExistsInMeasurementVariableList(TermId.TRIAL_LOCATION.getId(), variables, programUUID);
+
+		if (!isLocationIDExists && !isLocationNameExists) {
+			variables.add(locationVariable);
+		} else {
+			// Do not save the LOCATION_NAME variable, we only need to save LOCATION_ID varible in the database.
+			final Optional<MeasurementVariable> result = this.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), variables);
+			if (result.isPresent()) {
+				variables.remove(result.get());
+			}
+		}
+
+	}
+
+	protected MeasurementVariable createLocationVariable(final String programUUID) {
+
+		String unspecifiedLocationId = "";
+		final List<Location> locations = locationDataManager.getLocationsByName("Unspecified Location", Operation.EQUAL);
+		if (!locations.isEmpty()) {
+			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
+		}
+		final MeasurementVariable variable = createMeasurementVariable(TermId.LOCATION_ID.getId(), unspecifiedLocationId, Operation.ADD, PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
+		variable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+
+		return variable;
+
+	}
+
+
+	protected boolean isTermExistsInMeasurementVariableList(final int termid, final List<MeasurementVariable> measurementVariables, final String programUUID) {
+
+		for (MeasurementVariable measurementVariable : measurementVariables) {
+			// At this point, we do not know yet the termIds of the variables (measurementVariable.getId())
+			// so we need to rely on Propery Scale Method to get the termid of the variable.
+			StandardVariable variable = ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), programUUID);
+			if (variable.getId() == termid) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected MeasurementVariable createMeasurementVariable(final int idToCreate, final String value,
+			final Operation operation, final PhenotypicType role, final String programUUID) {
+		final StandardVariable stdvar = this.ontologyDataManager.getStandardVariable(Integer.valueOf(idToCreate),
+				programUUID);
+		stdvar.setPhenotypicType(role);
+		final MeasurementVariable var = new MeasurementVariable(idToCreate, stdvar.getName(),
+				stdvar.getDescription(), stdvar.getScale().getName(), stdvar.getMethod().getName(),
+				stdvar.getProperty().getName(), stdvar.getDataType().getName(), value,
+				stdvar.getPhenotypicType().getLabelList().get(0));
+		var.setRole(role);
+		var.setDataTypeId(stdvar.getDataType().getId());
+		var.setFactor(false);
+		var.setOperation(operation);
+		return var;
+
 	}
 
 	/**
