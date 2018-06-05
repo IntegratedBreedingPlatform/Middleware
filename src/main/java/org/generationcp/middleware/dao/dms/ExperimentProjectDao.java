@@ -176,29 +176,4 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 		return null;
 	}
 
-	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
-			throws MiddlewareQueryException {
-		try {
-			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT ng.nd_geolocation_id ");
-			sql.append("FROM nd_experiment_project nep ");
-			sql.append("INNER JOIN nd_experiment ne ");
-			sql.append("ON nep.nd_experiment_id = ne.nd_experiment_id ");
-			sql.append("INNER JOIN nd_geolocation ng ");
-			sql.append("ON ng.nd_geolocation_id = ne.nd_geolocation_id ");
-			sql.append("WHERE nep.project_id = :projectId ");
-			sql.append("AND ng.description = :trialInstanceNumber ");
-			sql.append("GROUP BY ng.nd_geolocation_id ");
-			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("projectId", projectId);
-			query.setParameter("trialInstanceNumber", trialInstanceNumber);
-			return (Integer) query.uniqueResult();
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getGeolocationIdByProjectIdAndTrialInstanceNumber = " + projectId + ", "
-					+ trialInstanceNumber + " at ExperimentProjectDao: " + e.getMessage(), e);
-		}
-		return null;
-	}
-
 }
