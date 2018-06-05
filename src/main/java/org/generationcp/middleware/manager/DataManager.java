@@ -56,7 +56,6 @@ import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
 import org.generationcp.middleware.operation.saver.StudySaver;
-import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -592,13 +591,7 @@ public abstract class DataManager extends DatabaseBroker {
 		return new VariableTypeBuilder(this.sessionProvider);
 	}
 
-	protected final NameSynonymBuilder getNameSynonymBuilder() {
-		return new NameSynonymBuilder(this.sessionProvider);
-	}
-
-	protected final StudySearcherByNameStartSeasonCountry getProjectSearcher() {
-		return new StudySearcherByNameStartSeasonCountry(this.sessionProvider);
-	}
+	protected final NameSynonymBuilder getNameSynonymBuilder() { return new NameSynonymBuilder(this.sessionProvider); }
 
 	protected final StudySaver getStudySaver() {
 		return new StudySaver(this.sessionProvider);

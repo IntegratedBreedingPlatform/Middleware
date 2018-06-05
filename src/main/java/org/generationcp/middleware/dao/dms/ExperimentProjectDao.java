@@ -33,39 +33,6 @@ import org.hibernate.criterion.Restrictions;
 public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer> {
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getProjectIdsByExperimentIds(Collection<Integer> experimentIds) throws MiddlewareQueryException {
-		try {
-			if (experimentIds != null && !experimentIds.isEmpty()) {
-				boolean first = true;
-				StringBuffer buf = new StringBuffer();
-				for (int i = 0; i < experimentIds.size(); i++) {
-					if (first) {
-						first = false;
-						buf.append("?");
-					} else {
-						buf.append(",?");
-					}
-				}
-				SQLQuery query =
-						this.getSession().createSQLQuery(
-								"select distinct ep.project_id from nd_experiment_project ep where ep.nd_experiment_id in (" + buf + ")");
-				int index = 0;
-				for (Integer id : experimentIds) {
-					query.setParameter(index, id);
-					index++;
-				}
-				return query.list();
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error at getProjectIdsByExperimentIds=" + experimentIds + " query at ExperimentDao: " + e.getMessage(), e);
-		}
-		return new ArrayList<Integer>();
-
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<ExperimentProject> getExperimentProjects(int projectId, int typeId, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		try {
