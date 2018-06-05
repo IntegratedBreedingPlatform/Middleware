@@ -208,6 +208,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.LOCATION_ID_DOESNT_EXISTS));
 		}
 
+		if (factorsTermIds.contains(TermId.TRIAL_LOCATION.getId()) && !factorsTermIds.contains(TermId.LOCATION_ID.getId())) {
+			messages.add(new Message(DataImportServiceImpl.LOCATION_ID_DOESNT_EXISTS));
+		}
+
 		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
@@ -271,7 +275,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// Location Name is mandatory when creating a new study, so we need to automatically
 		// add Location Name variable if is not available in the imported workbook.
-		addLocationVariableIfNotExists(workbook.getConditions(), programUUID);
+		this.addLocationIDVariableIfNotExists(workbook, programUUID);
+		this.removeLocationNameVariableIfExists(workbook);
 
 		// Remove obsolete factors, conditions, constants and traits in the
 		// workbook if there's any
@@ -288,51 +293,56 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return workbook;
 	}
 
-	protected void addLocationVariableIfNotExists(final List<MeasurementVariable> variables, final String programUUID) {
+	protected void addLocationIDVariableIfNotExists(final Workbook workbook, final String programUUID) {
 
-		final MeasurementVariable locationVariable = this.createLocationVariable(programUUID);
+		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
+		final List<MeasurementVariable> workbookFactors = workbook.getFactors();
 
-		final boolean isLocationIDExists = isTermExistsInMeasurementVariableList(TermId.LOCATION_ID.getId(), variables, programUUID);
-		final boolean isLocationNameExists = isTermExistsInMeasurementVariableList(TermId.TRIAL_LOCATION.getId(), variables, programUUID);
+		final MeasurementVariable locationIdVariable = this.createLocationVariable(programUUID);
 
-		if (!isLocationIDExists && !isLocationNameExists) {
-			variables.add(locationVariable);
-		} else {
-			// Do not save the LOCATION_NAME variable, we only need to save LOCATION_ID varible in the database.
-			final Optional<MeasurementVariable> result = this.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), variables);
-			if (result.isPresent()) {
-				variables.remove(result.get());
-			}
+		boolean locationIdExistsInCondition = this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookConditions).isPresent();
+		boolean locationIdExistsInFactors = this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookFactors).isPresent();
+
+		// If LOCATION_ID variable is not existing in both Condition and Factors Section of workbook
+		// Automatically add LOCATION_ID variable as it is required in creating a new Study.
+		if (!locationIdExistsInCondition && !locationIdExistsInFactors) {
+			workbookConditions.add(locationIdVariable);
+		}
+	}
+
+	protected void removeLocationNameVariableIfExists(final Workbook workbook) {
+
+		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
+		final List<MeasurementVariable> workbookFactors = workbook.getFactors();
+
+		// If the workbook file contains LOCATION_NAME variable, we should not save it in the database.
+		// We only need to save LOCATION_ID varible.
+		final Optional<MeasurementVariable> locationNameInCondition = this.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), workbookConditions);
+		if (locationNameInCondition.isPresent()) {
+			workbookConditions.remove(locationNameInCondition.get());
+		}
+		final Optional<MeasurementVariable> locationNameFactors = this.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), workbookFactors);
+		if (locationNameFactors.isPresent()) {
+			workbookFactors.remove(locationNameFactors.get());
 		}
 
 	}
 
 	protected MeasurementVariable createLocationVariable(final String programUUID) {
 
+		// Creates a LOCATION_ID Variable with default value of "Unspecified Location".
+		// This variable will be added to an imported study with no LOCATION_ID Variable specified in the file.
 		String unspecifiedLocationId = "";
 		final List<Location> locations = locationDataManager.getLocationsByName("Unspecified Location", Operation.EQUAL);
 		if (!locations.isEmpty()) {
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}
 		final MeasurementVariable variable = createMeasurementVariable(TermId.LOCATION_ID.getId(), unspecifiedLocationId, Operation.ADD, PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
+		variable.setName(Workbook.DEFAULT_LOCATION_ID_VARIABLE_ALIAS);
 		variable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
 
 		return variable;
 
-	}
-
-
-	protected boolean isTermExistsInMeasurementVariableList(final int termid, final List<MeasurementVariable> measurementVariables, final String programUUID) {
-
-		for (MeasurementVariable measurementVariable : measurementVariables) {
-			// At this point, we do not know yet the termIds of the variables (measurementVariable.getId())
-			// so we need to rely on Propery Scale Method to get the termid of the variable.
-			StandardVariable variable = ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), programUUID);
-			if (variable.getId() == termid) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	protected MeasurementVariable createMeasurementVariable(final int idToCreate, final String value,
