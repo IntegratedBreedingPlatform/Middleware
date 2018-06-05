@@ -42,4 +42,94 @@
 			
 		</sql>
 	</changeSet>
+
+	<changeSet author="vanina" id="v9.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="nd_experiment" columnName="project_id"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			ADD COLUMN project_id INT(11) DEFAULT 0 AFTER plot_id,
+			ADD INDEX nd_experiment_fk3_idx (project_id ASC);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v9.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="nd_experiment" columnName="project_id"/>
+				<tableExists tableName="nd_experiment_project"/>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE nd_experiment
+			SET
+			project_id = (SELECT
+				n.project_id
+				FROM
+				(SELECT * FROM nd_experiment) AS nde
+				INNER JOIN
+					nd_experiment_project n ON nde.nd_experiment_id = n.nd_experiment_id
+				WHERE
+					nde.nd_experiment_id = nd_experiment.nd_experiment_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v9.2.0-5">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="nd_experiment" columnName="project_id"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			ADD CONSTRAINT nd_experiment_fk3
+				FOREIGN KEY (project_id)
+				REFERENCES project (project_id)
+				ON DELETE NO ACTION
+				ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v9.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="nd_experiment_project"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE nd_experiment_project;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v9.2.0-7">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="nd_experiment" columnName="project_id"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM nd_experiment
+					WHERE project_id is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'nd_experiment'
+					      AND COLUMN_NAME = 'project_id'
+					      AND IS_NULLABLE = 'YES'
+					      AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			DROP FOREIGN KEY nd_experiment_fk3;
+			ALTER TABLE nd_experiment
+			CHANGE COLUMN project_id project_id INT(11) NOT NULL;
+			ALTER TABLE nd_experiment
+			ADD CONSTRAINT nd_experiment_fk3
+			  FOREIGN KEY (project_id)
+			  REFERENCES project (project_id)
+			  ON DELETE NO ACTION
+			  ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
