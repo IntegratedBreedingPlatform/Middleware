@@ -83,7 +83,7 @@ public class ExperimentModel implements Serializable {
 	@BatchSize(size = 5000)
 	private List<ExperimentProperty> properties;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project_id")
 	private DmsProject project;
 
