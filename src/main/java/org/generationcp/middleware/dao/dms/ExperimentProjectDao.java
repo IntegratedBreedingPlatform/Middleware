@@ -33,39 +33,6 @@ import org.hibernate.criterion.Restrictions;
 public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer> {
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getProjectIdsByExperimentIds(Collection<Integer> experimentIds) throws MiddlewareQueryException {
-		try {
-			if (experimentIds != null && !experimentIds.isEmpty()) {
-				boolean first = true;
-				StringBuffer buf = new StringBuffer();
-				for (int i = 0; i < experimentIds.size(); i++) {
-					if (first) {
-						first = false;
-						buf.append("?");
-					} else {
-						buf.append(",?");
-					}
-				}
-				SQLQuery query =
-						this.getSession().createSQLQuery(
-								"select distinct ep.project_id from nd_experiment_project ep where ep.nd_experiment_id in (" + buf + ")");
-				int index = 0;
-				for (Integer id : experimentIds) {
-					query.setParameter(index, id);
-					index++;
-				}
-				return query.list();
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error at getProjectIdsByExperimentIds=" + experimentIds + " query at ExperimentDao: " + e.getMessage(), e);
-		}
-		return new ArrayList<Integer>();
-
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<ExperimentProject> getExperimentProjects(int projectId, int typeId, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		try {
@@ -172,31 +139,6 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 		} catch (HibernateException e) {
 			this.logAndThrowException(
 					"Error at getExperimentIdByProjectId=" + projectId + ", " + " query at ExperimentProjectDao: " + e.getMessage(), e);
-		}
-		return null;
-	}
-
-	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
-			throws MiddlewareQueryException {
-		try {
-			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT ng.nd_geolocation_id ");
-			sql.append("FROM nd_experiment_project nep ");
-			sql.append("INNER JOIN nd_experiment ne ");
-			sql.append("ON nep.nd_experiment_id = ne.nd_experiment_id ");
-			sql.append("INNER JOIN nd_geolocation ng ");
-			sql.append("ON ng.nd_geolocation_id = ne.nd_geolocation_id ");
-			sql.append("WHERE nep.project_id = :projectId ");
-			sql.append("AND ng.description = :trialInstanceNumber ");
-			sql.append("GROUP BY ng.nd_geolocation_id ");
-			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("projectId", projectId);
-			query.setParameter("trialInstanceNumber", trialInstanceNumber);
-			return (Integer) query.uniqueResult();
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getGeolocationIdByProjectIdAndTrialInstanceNumber = " + projectId + ", "
-					+ trialInstanceNumber + " at ExperimentProjectDao: " + e.getMessage(), e);
 		}
 		return null;
 	}

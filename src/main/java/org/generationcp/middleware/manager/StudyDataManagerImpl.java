@@ -994,11 +994,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(final int projectId, final String trialInstanceNumber) {
-		return this.getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
-	}
-
-	@Override
 	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
 		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
 		if (geolocation != null) {
