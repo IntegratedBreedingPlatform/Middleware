@@ -1116,7 +1116,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private boolean checkIfHasExistingStudyExperiment(final int studyId) {
-		final Integer experimentId = this.getExperimentProjectDao().getExperimentIdByProjectId(studyId);
+		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
 	}
 

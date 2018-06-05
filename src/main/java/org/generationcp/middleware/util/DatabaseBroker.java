@@ -37,7 +37,6 @@ import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
-import org.generationcp.middleware.dao.dms.ExperimentProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
@@ -226,12 +225,6 @@ public class DatabaseBroker {
 		ExperimentStockDao experimentStockDao = new ExperimentStockDao();
 		experimentStockDao.setSession(this.getActiveSession());
 		return experimentStockDao;
-	}
-
-	public ExperimentProjectDao getExperimentProjectDao() {
-		ExperimentProjectDao experimentProjectDao = new ExperimentProjectDao();
-		experimentProjectDao.setSession(this.getActiveSession());
-		return experimentProjectDao;
 	}
 
 	public ProjectPropertyDao getProjectPropertyDao() {

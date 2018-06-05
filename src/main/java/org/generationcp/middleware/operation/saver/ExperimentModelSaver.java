@@ -48,7 +48,7 @@ public class ExperimentModelSaver extends Saver {
 
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) {
 		int experimentId =
-				this.getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
+				this.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
 
 		// update if existing

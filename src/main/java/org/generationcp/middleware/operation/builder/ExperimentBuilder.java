@@ -52,14 +52,14 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	public long count(int dataSetId) throws MiddlewareQueryException {
-		return this.getExperimentProjectDao().count(dataSetId);
+		return this.getExperimentDao().count(dataSetId);
 	}
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes)
 			throws MiddlewareQueryException {
 		final List<Experiment> experiments = new ArrayList<>();
 		final List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+				this.getExperimentDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
 		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
 		for (final ExperimentProject experimentProject : experimentProjects) {
 			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
@@ -71,7 +71,7 @@ public class ExperimentBuilder extends Builder {
 			boolean hasVariableType) throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<>();
 		List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+				this.getExperimentDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
 		for (ExperimentProject experimentProject : experimentProjects) {
 			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
 		}
@@ -97,7 +97,7 @@ public class ExperimentBuilder extends Builder {
 		try {
 			final List<Experiment> experiments = new ArrayList<>();
 			final List<ExperimentProject> experimentProjects =
-					this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
+					this.getExperimentDao().getExperimentProjects(projectId, types, start, numOfRows);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
 
