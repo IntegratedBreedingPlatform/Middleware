@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.hibernate.Criteria;
@@ -354,9 +355,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<ExperimentModel> getExperiments(int projectId, int typeId, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		try {
+			final DmsProject project = new DmsProject();
+			project.setProjectId(projectId);
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
-			criteria.add(Restrictions.eq("projectId", projectId));
+			criteria.add(Restrictions.eq("project", project));
 			criteria.setMaxResults(numOfRows);
 			criteria.setFirstResult(start);
 			return criteria.list();
@@ -383,12 +386,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
 			queryString.append("left outer join exp.experimentStocks as es ");
 			queryString.append("left outer join es.stock as st ");
-			queryString.append("where exp.project.projectId =:p_id and ep.experiment.typeId in (:type_ids) ");
-			queryString.append("order by (ep.experiment.geoLocation.description * 1) ASC, ");
+			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
+			queryString.append("order by (exp.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");
 			queryString.append("(st.uniqueName * 1) ASC, ");
-			queryString.append("ep.experiment.ndExperimentId ASC");
+			queryString.append("exp.ndExperimentId ASC");
 
 			Query q =
 					this.getSession().createQuery(queryString.toString())//

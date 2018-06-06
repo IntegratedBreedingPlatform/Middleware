@@ -82,9 +82,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		try {
 			StringBuilder sql =
 					new StringBuilder().append("SELECT value ").append("FROM nd_experiment e ")
-							.append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
 							.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id ")
-							.append("WHERE ep.project_id = :projectId AND gp.type_id = :stdVarId ORDER BY e.nd_geolocation_id ");
+							.append("WHERE e.project_id = :projectId AND gp.type_id = :stdVarId ORDER BY e.nd_geolocation_id ");
 			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameter("projectId", studyId);
 			query.setParameter("stdVarId", stdVarId);

@@ -199,8 +199,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
-		+ "   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id \n"
-		+ "   LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id \n"
+		+ "   LEFT JOIN nd_experiment e ON p.project_id = e.project_id \n"
 		+ "   LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id AND gpSiteName.type_id = " + TermId.TRIAL_LOCATION.getId()+ " \n"
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";

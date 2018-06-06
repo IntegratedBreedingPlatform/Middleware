@@ -135,8 +135,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		final Set<Integer> locationIds = new HashSet<>();
 		try {
 			final String sql = "SELECT DISTINCT e.nd_geolocation_id"
-					+ " FROM nd_experiment e, nd_experiment_project ep "
-					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id " + "   and ep.project_id = " + projectId;
+					+ " FROM nd_experiment e "
+					+ " WHERE e.project_id = " + projectId;
 			final Query query = this.getSession().createSQLQuery(sql);
 			locationIds.addAll(query.list());
 
