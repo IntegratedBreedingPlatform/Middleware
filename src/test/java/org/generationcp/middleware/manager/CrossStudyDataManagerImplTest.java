@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -59,17 +58,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 			property.print(0);
 		}
 		Debug.println("#RECORDS: " + properties.size());
-	}
-
-	@Test
-	public void testGetStudiesForTrialEnvironments() {
-		final List<Integer> environmentIds = Arrays.asList(5770, 10081);
-		Debug.println(IntegrationTestBase.INDENT, "testGetStudiesForTrialEnvironments = " + environmentIds);
-		final List<StudyReference> studies = this.crossStudyDataManager.getStudiesForTrialEnvironments(environmentIds);
-		for (final StudyReference study : studies) {
-			study.print(IntegrationTestBase.INDENT);
-		}
-		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + studies.size());
 	}
 
 	@Test

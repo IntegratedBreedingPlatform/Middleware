@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -49,14 +48,6 @@ public interface CrossStudyDataManager {
 	 * @return a List of Environment Properties
 	 */
 	List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds);
-
-	/**
-	 * Get all studies given a list of environments.
-	 *
-	 * @param environmentIds
-	 * @return a list of Study References
-	 */
-	List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds);
 
 	/**
 	 * Retrieves a set of standard variables (traits) used for the numeric variates observed in given list of environments. Numeric variates

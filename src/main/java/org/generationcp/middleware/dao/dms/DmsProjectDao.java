@@ -154,9 +154,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         INNER JOIN "
 		+ "     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id "
 		+ "         INNER JOIN "
-		+ "     nd_experiment_project ndep ON ndep.nd_experiment_id = nde.nd_experiment_id "
-		+ "         INNER JOIN "
-		+ "     project proj ON proj.project_id = ndep.project_id "
+		+ "     project proj ON proj.project_id = nde.project_id "
 		+ "         INNER JOIN "
 		+ "     project_relationship pr ON proj.project_id = pr.subject_project_id "
 		+ "         INNER JOIN "
@@ -174,8 +172,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	static final String GET_PROJECTID_BY_STUDYDBID =
 			"SELECT DISTINCT" + "      pr.object_project_id" + " FROM" + "     project_relationship pr" + "         INNER JOIN"
 					+ "     project p ON p.project_id = pr.subject_project_id" + "         INNER JOIN"
-					+ "     nd_experiment_project ep ON pr.subject_project_id = ep.project_id" + "         INNER JOIN"
-					+ "     nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id" + "         INNER JOIN"
+					+ "     nd_experiment nde ON nde.project_id = p.project_id" + "         INNER JOIN"
 					+ "     nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id" + " WHERE"
 					+ "     gl.nd_geolocation_id = :studyDbId" + "     AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId();
 
@@ -199,7 +196,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
-		+ "   LEFT JOIN nd_experiment e ON p.project_id = e.project_id \n"
+		+ "   LEFT JOIN nd_experiment e ON p.project_id = e.project_id  \n"
 		+ "   LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id AND gpSiteName.type_id = " + TermId.TRIAL_LOCATION.getId()+ " \n"
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";

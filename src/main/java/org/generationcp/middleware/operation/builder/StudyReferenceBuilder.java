@@ -16,27 +16,22 @@ import java.util.Collection;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
 public class StudyReferenceBuilder extends Builder {
 
-	public StudyReferenceBuilder(HibernateSessionProvider sessionProviderForLocal) {
+	public StudyReferenceBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public List<StudyReference> build(Collection<DmsProject> projects) {
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+	public List<StudyReference> build(final Collection<DmsProject> projects) {
+		final List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		if (projects != null && !projects.isEmpty()) {
-			for (DmsProject project : projects) {
+			for (final DmsProject project : projects) {
 				studyReferences.add(new StudyReference(project.getProjectId(), project.getName(), project.getDescription()));
 			}
 		}
 		return studyReferences;
-	}
-
-	public List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
-		return this.getDmsProjectDao().getStudiesByTrialEnvironments(environmentIds);
 	}
 }

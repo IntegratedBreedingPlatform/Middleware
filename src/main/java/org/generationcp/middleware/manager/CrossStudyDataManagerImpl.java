@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -56,11 +55,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	@Override
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> trialEnvtIds) {
 		return this.getTrialEnvironmentBuilder().getPropertiesForTrialEnvironments(trialEnvtIds);
-	}
-
-	@Override
-	public List<StudyReference> getStudiesForTrialEnvironments(final List<Integer> environmentIds) {
-		return this.getStudyNodeBuilder().getStudiesForTrialEnvironments(environmentIds);
 	}
 
 	@Override
