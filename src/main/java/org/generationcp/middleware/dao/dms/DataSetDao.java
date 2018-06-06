@@ -41,7 +41,7 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			// Delete experiments
 			statement =
 					this.getSession().createSQLQuery(
-							"delete e, ep, es, epheno, pheno, eprop " + "from nd_experiment e, "
+							"delete e, es, epheno, pheno, eprop " + "from nd_experiment e, "
 									+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop "
 									+ "where e.project_id = " + datasetId
 									+ "  and e.nd_experiment_id = es.nd_experiment_id "
@@ -72,7 +72,7 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			// Delete experiments
 			SQLQuery statement =
 					this.getSession().createSQLQuery(
-							"delete e, ep, es, epheno, pheno, eprop " + "from nd_experiment e, "
+							"delete e, es, epheno, pheno, eprop " + "from nd_experiment e, "
 									+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop "
 									+ "where e.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
 									+ "  and e.nd_experiment_id = es.nd_experiment_id "
@@ -82,7 +82,7 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			if (statement.executeUpdate() == 0) {
 				statement =
 						this.getSession().createSQLQuery(
-								"delete e, ep, es, epheno, pheno " + "from nd_experiment e, "
+								"delete e, es, epheno, pheno " + "from nd_experiment e, "
 										+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno  "
 										+ "where e.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
 										+ "  and e.nd_experiment_id = es.nd_experiment_id "
@@ -107,7 +107,7 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			// Delete experiments
 			final SQLQuery statement =
 					this.getSession().createSQLQuery(
-							"delete e, ep, es, epheno, pheno, eprop " + "from nd_experiment e, "
+							"delete e, es, epheno, pheno, eprop " + "from nd_experiment e, "
 									+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop "
 									+ "where e.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
 									+ "  and e.type_id = " + typeId
