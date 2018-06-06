@@ -209,7 +209,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
 						.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
 						.append(" AND bexp.nd_geolocation_id = :geolocationId ")
-						.append(" AND bep.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
+						.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
 						.append(")");
 			}
 			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
