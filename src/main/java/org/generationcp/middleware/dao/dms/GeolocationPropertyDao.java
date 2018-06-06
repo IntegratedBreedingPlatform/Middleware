@@ -103,8 +103,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 							.append(" INNER JOIN nd_geolocation g ON g.nd_geolocation_id = gp.nd_geolocation_id ")
 							.append("   AND g.description = ").append(trialInstance)
 							.append(" INNER JOIN nd_experiment e ON e.nd_geolocation_id = g.nd_geolocation_id ")
-							.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
-							.append("   AND ep.project_id = ").append(datasetId).append(" WHERE gp.type_id = ").append(typeId);
+							//.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
+							.append("   AND e.project_id = ").append(datasetId).append(" WHERE gp.type_id = ").append(typeId);
 
 			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			return (String) query.uniqueResult();
@@ -135,7 +135,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 	private void executeDeleteStatement(final int studyId,final int termId,final String joinCriteria) {
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
 				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id = :termId "
-				+ "INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
+				//+ "INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 				+ "INNER JOIN project_relationship pr ON pr.type_id = :belongsToTypeId "
 				+ "			  AND ").append(joinCriteria).append(" = ep.project_id "
 				+ "WHERE pr.object_project_id = :studyId");
