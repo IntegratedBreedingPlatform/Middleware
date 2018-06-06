@@ -11,15 +11,9 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
-import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -33,7 +27,6 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -52,10 +45,8 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
@@ -64,6 +55,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
@@ -151,7 +147,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will return at least one study, the study that we added in the setup
 		Assert.assertTrue("The size should be greater than 0.", resultSet.size() > 0);
 	}
-	
+
 	@Ignore
 	@Test
 	public void testSearchStudiesForName() throws Exception {
@@ -167,7 +163,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will contain at least one study
 		Assert.assertTrue("The size should be greater than zero", resultSet.size() > 0);
 	}
-	
+
 	@Ignore
 	@Test
 	public void testSearchStudiesForStartDate() throws Exception {
@@ -179,7 +175,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will contain the test study we added in the set up
 		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
 	}
-	
+
 	@Ignore
 	@Test
 	public void testSearchStudiesForAll() throws Exception {
@@ -685,7 +681,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
-	
+
 	@Test
 	public void testGetProjectStartDateByProjectId() {
 		// Create project record
@@ -697,7 +693,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setDeleted(false);
 		project.setStartDate("20180403");
 		this.manager.getDmsProjectDao().save(project);
-		
+
 		final String startDate = this.manager.getProjectStartDateByProjectId(project.getProjectId());
 		Assert.assertEquals(project.getStartDate(), startDate);
 	}

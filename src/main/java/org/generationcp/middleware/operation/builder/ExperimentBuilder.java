@@ -11,13 +11,9 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.base.Strings;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -29,7 +25,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -40,8 +35,11 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ExperimentBuilder extends Builder {
 	
