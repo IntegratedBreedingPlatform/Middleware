@@ -172,7 +172,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	static final String GET_PROJECTID_BY_STUDYDBID =
 			"SELECT DISTINCT" + "      pr.object_project_id" + " FROM" + "     project_relationship pr" + "         INNER JOIN"
 					+ "     project p ON p.project_id = pr.subject_project_id" + "         INNER JOIN"
-					+ "     nd_experiment nde ON nde.project_id = p.project_id" + "         INNER JOIN"
+					+ "     nd_experiment nde ON nde.project_id = ep.pr.subject_project_id" + "         INNER JOIN"
 					+ "     nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id" + " WHERE"
 					+ "     gl.nd_geolocation_id = :studyDbId" + "     AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId();
 
@@ -196,7 +196,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
-		+ "   LEFT JOIN nd_experiment e ON p.project_id = e.project_id  \n"
+		+ "   LEFT JOIN nd_experiment e ON ep.project_id = p.project_id \n"
 		+ "   LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id AND gpSiteName.type_id = " + TermId.TRIAL_LOCATION.getId()+ " \n"
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";
@@ -497,30 +497,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<StudyReference> getStudiesByTrialEnvironments(final List<Integer> environmentIds) {
-		final List<StudyReference> studies = new ArrayList<>();
-		try {
-			final String sql = "SELECT p.project_id, p.name, p.description, count(DISTINCT e.nd_geolocation_id)" + " FROM project p"
-					+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = "
-					+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep"
-					+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id"
-					+ " INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
-					+ " WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id)"
-					+ " AND e.nd_geolocation_id IN (:environmentIds)" + " GROUP BY p.project_id, p.name, p.description";
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("environmentIds", environmentIds);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				studies.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], ((BigInteger) row[3]).intValue()));
-			}
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-					"Error in getStudiesByTrialEnvironments=" + environmentIds + " query in DmsProjectDao: " + e.getMessage(), e);
-		}
-		return studies;
-	}
-
 	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID, final TermId relationship) {
 		try {
 			final String sql = "SELECT s.project_id FROM project s " + " WHERE name = :name AND program_uuid = :program_uuid"
@@ -552,8 +528,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
 			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
 			.append("                   AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
-			.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-			.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("       LEFT JOIN nd_experiment e ON p.project_id = e.project_id ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
 			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
@@ -680,8 +655,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("                   AND ppPI.variable_id =  ")
 			.append(TermId.PI_NAME.getId())
 			.append(" ")
-			.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-			.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("       LEFT JOIN nd_experiment e ON p.project_id = e.project_id ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
 			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 			.append("WHERE p.deleted != " + DELETED_STUDY + " ")
@@ -721,8 +695,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// 8100
 				.append(" LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
 				.append(" AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
-				.append(" LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-				.append(" INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+				.append(" INNER JOIN nd_experiment e ON e.project_id = p.project_id ")
 				.append(" LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
 				.append(" AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 				// 8180
@@ -786,8 +759,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append(TermId.PI_NAME.getId())
 			.append(" ")
 			// 8100
-			.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-			.append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("       INNER JOIN nd_experiment e ON e.project_id = p.project_id ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
 			.append("           AND gpSiteName.type_id =  ")
 			.append(TermId.TRIAL_LOCATION.getId())
@@ -826,8 +798,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.append("        , p.description AS description ").append("        , p.start_date AS startDate ")
 				.append("        , p.study_type AS studyType ").append("        , gpSeason.value AS season ")
 				.append("FROM project p  ")
-				.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-				.append("   INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+				.append("   INNER JOIN nd_experiment e ON e.project_id = p.project_id ")
 				.append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 				.append("           AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ")
 				.append("WHERE p.deleted != " + DELETED_STUDY + " ")
@@ -1112,9 +1083,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 						+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 " + "						OR "
 						+ "				(EXISTS( SELECT \n" + "                    project.* FROM project\n"
 						+ "                        INNER JOIN\n"
-						+ "                    nd_experiment_project ON project.project_id = nd_experiment_project.project_id\n"
-						+ "                        INNER JOIN\n"
-						+ "                    nd_experiment ON nd_experiment.nd_experiment_id = nd_experiment_project.nd_experiment_id\n"
+						+ "                    nd_experiment ON nd_experiment.project_id = project.project_id\n"
 						+ "                        INNER JOIN\n"
 						+ "                    nd_geolocationprop ON nd_experiment.nd_geolocation_id = nd_geolocationprop.nd_geolocation_id"
 						+ "                WHERE nd_geolocationprop.type_id = :variableId\n"
