@@ -246,7 +246,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			Query statement =
 					this.getSession()
 					.createSQLQuery(
-							"DELETE g, gp, e, ep, es, epheno, pheno, eprop " + "FROM nd_geolocation g "
+							"DELETE g, gp, e, es, epheno, pheno, eprop " + "FROM nd_geolocation g "
 									+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
 									+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
 									//+ "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
