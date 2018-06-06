@@ -212,7 +212,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 						.append(" AND bep.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
 						.append(")");
 			}
-			sql.append(" ORDER BY bexp.nd_experiment_id ").append(order);
+			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
 
 			final Query query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
