@@ -351,24 +351,24 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	//Copied from ExperimentProjectDao
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentProject> getExperimentProjects(int projectId, int typeId, int start, int numOfRows)
+	public List<ExperimentModel> getExperiments(int projectId, int typeId, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		try {
-			Criteria criteria = this.getSession().createCriteria(ExperimentProject.class);
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("typeId", typeId));
 			criteria.add(Restrictions.eq("projectId", projectId));
-			criteria.createAlias("experiment", "experiment").add(Restrictions.eq("experiment.typeId", typeId));
 			criteria.setMaxResults(numOfRows);
 			criteria.setFirstResult(start);
 			return criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + typeId + " query at ExperimentDao: "
+			this.logAndThrowException("Error at getExperiments=" + projectId + ", " + typeId + " query at ExperimentDao: "
 					+ e.getMessage(), e);
 			return null;
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows)
+	public List<ExperimentModel> getExperiments(int projectId, List<TermId> types, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		try {
 
@@ -378,13 +378,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			StringBuilder queryString = new StringBuilder();
-			queryString.append("select distinct ep from ExperimentProject as ep ");
-			queryString.append("inner join ep.experiment as exp ");
+			queryString.append("select distinct exp from ExperimentModel as exp ");
 			queryString.append("left outer join exp.properties as plot with plot.typeId IN (8200,8380) ");
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
 			queryString.append("left outer join exp.experimentStocks as es ");
 			queryString.append("left outer join es.stock as st ");
-			queryString.append("where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids) ");
+			queryString.append("where exp.project.projectId =:p_id and ep.experiment.typeId in (:type_ids) ");
 			queryString.append("order by (ep.experiment.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");
@@ -401,17 +400,17 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return q.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					"Error at getExperimentProjects=" + projectId + ", " + types + " query at ExperimentDao: " + e.getMessage(), e);
+					"Error at getExperiments=" + projectId + ", " + types + " query at ExperimentDao: " + e.getMessage(), e);
 			return null;
 		}
 	}
 
-	public long count(int dataSetId) throws MiddlewareQueryException {
+	public long count(final int dataSetId) throws MiddlewareQueryException {
 		try {
-			return (Long) this.getSession().createQuery("select count(*) from ExperimentProject where project_id = " + dataSetId)
+			return (Long) this.getSession().createQuery("select count(*) from ExperimentModel where project_id = " + dataSetId)
 					.uniqueResult();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getExperimentProjects=" + dataSetId + " query at ExperimentDao: " + e.getMessage(),
+			this.logAndThrowException("Error at getExperiments=" + dataSetId + " query at ExperimentDao: " + e.getMessage(),
 					e);
 			return 0;
 		}
@@ -421,10 +420,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		try {
 			// update the value of phenotypes
 			String sql =
-					"SELECT exp.nd_experiment_id " + "FROM nd_experiment_project ep "
-							+ "INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id "
+					"SELECT exp.nd_experiment_id " + "FROM nd_experiment exp "
 							+ "INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  "
-							+ "INNER JOIN stock ON expstock.stock_id = stock.stock_id " + " WHERE ep.project_id = " + projectId
+							+ "INNER JOIN stock ON expstock.stock_id = stock.stock_id " + " WHERE exp.project_id = " + projectId
 							+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND stock.stock_id = "
 							+ stockId;
 
@@ -447,9 +445,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	@SuppressWarnings("unchecked")
 	public Integer getExperimentIdByProjectId(int projectId) throws MiddlewareQueryException {
 		try {
-			Criteria criteria = this.getSession().createCriteria(ExperimentProject.class);
+			Criteria criteria = this.getSession().createCriteria(ExperimentModel.class);
 			criteria.add(Restrictions.eq("projectId", projectId));
-			criteria.setProjection(Projections.property("experiment.ndExperimentId"));
+			criteria.setProjection(Projections.property("ndExperimentId"));
 			List<Integer> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);

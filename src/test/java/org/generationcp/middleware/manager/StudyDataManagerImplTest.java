@@ -625,12 +625,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
 		// Create experimentproject record
-		final ExperimentProject experimentProject = new ExperimentProject();
-		experimentProject.setExperiment(experimentModel);
-		experimentProject.setProjectId(project.getProjectId());
-		experimentProject.setExperimentProjectId(1);
-		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
-		this.manager.getExperimentProjectDao().save(experimentProject);
+//		final ExperimentProject experimentProject = new ExperimentProject();
+//		experimentProject.setExperiment(experimentModel);
+//		experimentProject.setProjectId(project.getProjectId());
+//		experimentProject.setExperimentProjectId(1);
+//		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
+//		this.manager.getExperimentProjectDao().save(experimentProject);
 
 		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
@@ -673,12 +673,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
 		// Create experimentproject record
-		final ExperimentProject experimentProject = new ExperimentProject();
-		experimentProject.setExperiment(experimentModel);
-		experimentProject.setProjectId(project.getProjectId());
-		experimentProject.setExperimentProjectId(1);
-		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
-		this.manager.getExperimentProjectDao().save(experimentProject);
+//		final ExperimentProject experimentProject = new ExperimentProject();
+//		experimentProject.setExperiment(experimentModel);
+//		experimentProject.setProjectId(project.getProjectId());
+//		experimentProject.setExperimentProjectId(1);
+//		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
+//		this.manager.getExperimentProjectDao().save(experimentProject);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
