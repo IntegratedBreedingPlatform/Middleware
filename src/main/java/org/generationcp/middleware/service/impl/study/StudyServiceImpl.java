@@ -75,10 +75,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
 			"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
 					+ " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
-					+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
-					+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
+					//+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
+					+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
+					+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
 					+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
 					+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
