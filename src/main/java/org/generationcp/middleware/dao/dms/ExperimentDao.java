@@ -348,8 +348,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return map;
 	}
 
-	//Copied from ExperimentProjectDao
-
 	@SuppressWarnings("unchecked")
 	public List<ExperimentModel> getExperiments(int projectId, int typeId, int start, int numOfRows)
 			throws MiddlewareQueryException {
@@ -363,9 +361,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			criteria.setFirstResult(start);
 			return criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getExperiments=" + projectId + ", " + typeId + " query at ExperimentDao: "
-					+ e.getMessage(), e);
-			return null;
+			final String message = "Error at getExperiments=" + projectId + ", " + typeId;
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
@@ -401,9 +399,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			return q.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error at getExperiments=" + projectId + ", " + types + " query at ExperimentDao: " + e.getMessage(), e);
-			return null;
+			final String message = "Error at getExperiments=" + projectId + ", " + types;
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
@@ -412,9 +410,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return (Long) this.getSession().createQuery("select count(*) from ExperimentModel where project_id = " + dataSetId)
 					.uniqueResult();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getExperiments=" + dataSetId + " query at ExperimentDao: " + e.getMessage(),
-					e);
-			return 0;
+			final String message = "Error at getExperiments=" + dataSetId;
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
@@ -438,26 +436,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getExperimentIdByLocationIdStockId=" + projectId + ", " + locationId
-					+ " in ExperimentDao: " + e.getMessage(), e);
-			return 0;
+			final String message = "Error in getExperimentIdByLocationIdStockId=" + projectId;
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public Integer getExperimentIdByProjectId(int projectId) throws MiddlewareQueryException {
+	public Integer getExperimentIdByProjectId(final int projectId) throws MiddlewareQueryException {
 		try {
+			final DmsProject project = new DmsProject();
+			project.setProjectId(projectId);
 			Criteria criteria = this.getSession().createCriteria(ExperimentModel.class);
-			criteria.add(Restrictions.eq("projectId", projectId));
+			criteria.add(Restrictions.eq("project", project));
 			criteria.setProjection(Projections.property("ndExperimentId"));
 			List<Integer> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
+			} else {
+				return null;
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error at getExperimentIdByProjectId=" + projectId + ", " + " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at getExperimentIdByProjectId=" + projectId;
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return null;
 	}
 }
