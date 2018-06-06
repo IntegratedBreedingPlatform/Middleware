@@ -22,11 +22,13 @@ public class PlantDao extends GenericDAO<Plant, Integer> {
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           0,"
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1))*1) AS max_sequence_no"
-		+ " FROM project p" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id"
-		+ " INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id"
-		+ " INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id"
-		+ " INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id"
-		+ " INNER JOIN stock st ON st.stock_id = es.stock_id INNER JOIN plant pl ON pl.nd_experiment_id = nde.nd_experiment_id"
+		+ " FROM "
+//		+ "project p" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id"
+//		+ " INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id"
+//		+ " INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id"
+//		+ " INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id"
+//		+ " INNER JOIN "
+		+ "stock st ON st.stock_id = es.stock_id INNER JOIN plant pl ON pl.nd_experiment_id = nde.nd_experiment_id"
 		+ " INNER JOIN sample s ON s.plant_id = pl.plant_id WHERE st.dbxref_id IN (:gids)"
 		+ " GROUP BY st.dbxref_id;";
 
