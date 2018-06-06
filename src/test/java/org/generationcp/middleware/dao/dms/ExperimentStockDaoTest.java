@@ -65,8 +65,7 @@ public class ExperimentStockDaoTest {
 		final String expectedSql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
 				+ "     INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
 				+ "     INNER JOIN stock s ON es.stock_id = s.stock_id AND s.dbxref_id IN (:gids) "
-				+ "INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
-				+ "INNER JOIN project p ON p.project_id = ep.project_id and p.program_uuid = :programUUID " + " ORDER BY s.dbxref_id ";
+				+ "INNER JOIN project p ON p.project_id = e.project_id and p.program_uuid = :programUUID " + " ORDER BY s.dbxref_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
