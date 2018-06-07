@@ -998,7 +998,7 @@ public class WorkbookSaver extends Saver {
 
 	/**
 	 * Saves experiments creating entries in the following tables:
-	 * nd_geolocation, nd_geolocationprop, nd_experiment, nd_experiment_project,
+	 * nd_geolocation, nd_geolocationprop, nd_experiment,
 	 * nd_experimentprop nd_experiment_stock, stock, stockprop,
 	 * nd_experiment_phenotype and phenotype
 	 *
