@@ -645,8 +645,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			}
 
 			// get the phenotype_id
-			final String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM "//nd_experiment_project ep "
-					+ "nd_experiment exp "//ON ep.nd_experiment_id = exp.nd_experiment_id "
+			final String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM "
+					+ "nd_experiment exp "
 					+ "INNER JOIN nd_experimentprop expprop ON expprop.nd_experiment_id = exp.nd_experiment_id "
 					+ "INNER JOIN nd_experiment_phenotype expp ON exp.nd_experiment_id = expp.nd_experiment_id  "
 					+ "INNER JOIN phenotype pheno ON expp.phenotype_id = pheno.phenotype_id " + "WHERE exp.project_id = :projectId "
@@ -855,8 +855,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		final StringBuilder sql = new StringBuilder().append(" SELECT phenotype.observable_id,count(phenotype.observable_id) ")
-				.append(" FROM nd_experiment nd_exp ")//.append(" nd_experiment_project a ")
-				//.append(" INNER JOIN nd_experiment nd_exp ON a.nd_experiment_id = nd_exp.nd_experiment_id ")
+				.append(" FROM nd_experiment nd_exp ")
 				.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
 				.append(" INNER JOIN stock ON nd_exp_stock.stock_id = stock.stock_id ")
 				.append(" LEFT JOIN nd_experiment_phenotype nd_exp_pheno ON nd_exp.nd_experiment_id = nd_exp_pheno.nd_experiment_id ")
