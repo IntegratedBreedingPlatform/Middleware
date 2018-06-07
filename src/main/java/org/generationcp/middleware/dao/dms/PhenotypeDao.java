@@ -589,13 +589,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			// update the value of phenotypes
 			final String sql =
-					"UPDATE nd_experiment e " + "INNER JOIN nd_experiment exp ON e.nd_experiment_id = exp.nd_experiment_id "
-							+ "INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  "
-							+ "INNER JOIN stock ON expstock.stock_id = stock.stock_id "
-							+ "INNER JOIN nd_experiment_phenotype expp ON e.nd_experiment_id = expp.nd_experiment_id  "
-							+ "INNER JOIN phenotype pheno ON expp.phenotype_id = pheno.phenotype_id " + "SET pheno.value = '" + value + "'"
-							+ " WHERE e.project_id = " + projectId + " AND exp.nd_geolocation_id = " + locationId
-							+ " AND exp.type_id = 1170 " + " AND stock.stock_id = " + stockId + " AND pheno.observable_id = " + cvTermId;
+				"UPDATE nd_experiment exp" + "INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  "
+					+ "INNER JOIN stock ON expstock.stock_id = stock.stock_id "
+					+ "INNER JOIN nd_experiment_phenotype expp ON exp.nd_experiment_id = expp.nd_experiment_id  "
+					+ "INNER JOIN phenotype pheno ON expp.phenotype_id = pheno.phenotype_id " + "SET pheno.value = '" + value + "'"
+					+ " WHERE exp.project_id = " + projectId + " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 "
+					+ " AND stock.stock_id = " + stockId + " AND pheno.observable_id = " + cvTermId;
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
 			final int returnVal = statement.executeUpdate();
