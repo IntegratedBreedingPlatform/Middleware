@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -43,6 +44,7 @@ import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -469,15 +471,21 @@ public class WorkbookSaver extends Saver {
 							"transformTrialEnvironment in createLocationsAndSetToObservations");
 					final VariableList geolocation = this.getVariableListTransformer().transformTrialEnvironment(row,
 							trialFactors, trialHeaders);
+
 					this.setVariableListValues(geolocation, workbook.getConditions());
 					if (geolocation != null && !geolocation.isEmpty()) {
+
 						final String trialInstanceNumber = this.getTrialInstanceNumber(geolocation);
 						if (WorkbookSaver.LOG.isDebugEnabled()) {
 							WorkbookSaver.LOG.debug("trialInstanceNumber = " + trialInstanceNumber);
 						}
 						if (!locationMap.containsKey(trialInstanceNumber)) {
+
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
+
+							this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation);
+
 							final Geolocation g = this.getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
 									workbook.getStudyDetails().getStudyName(), geolocation, row, workbook.isNursery(),
 									isDeleteTrialObservations, programUUID);
@@ -516,6 +524,21 @@ public class WorkbookSaver extends Saver {
 		}
 
 		return 0;
+	}
+
+	protected void assignLocationVariableWithUnspecifiedLocationIfEmpty(VariableList variableList) {
+
+		String unspecifiedLocationLocId = "";
+		final List<Location> locations = this.getLocationDAO().getByName("Unspecified Location", Operation.EQUAL);
+		if (!locations.isEmpty()) {
+			unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
+		}
+
+		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
+		if (locationIdVariable != null && StringUtils.isEmpty(locationIdVariable.getValue())) {
+			locationIdVariable.setValue(unspecifiedLocationLocId);
+		}
+
 	}
 
 	void setVariableListValues(final VariableList variableList, final List<MeasurementVariable> measurementVariables) {

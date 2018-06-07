@@ -275,7 +275,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// Location Name is mandatory when creating a new study, so we need to automatically
 		// add Location Name variable if is not available in the imported workbook.
-		this.addLocationIDVariableIfNotExists(workbook, programUUID);
+		this.addLocationIDVariableInConditionsIfNotExists(workbook, programUUID);
 		this.removeLocationNameVariableIfExists(workbook);
 
 		// Remove obsolete factors, conditions, constants and traits in the
@@ -293,7 +293,26 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return workbook;
 	}
 
-	protected void addLocationIDVariableIfNotExists(final Workbook workbook, final String programUUID) {
+	@Override
+	public void addLocationIDVariableInFactorsIfNotExists(final Workbook workbook, final String programUUID) {
+
+		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
+		final List<MeasurementVariable> workbookFactors = workbook.getFactors();
+
+		final MeasurementVariable locationIdVariable = this.createLocationVariable(programUUID);
+
+		boolean locationIdExistsInCondition = this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookConditions).isPresent();
+		boolean locationIdExistsInFactors = this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookFactors).isPresent();
+
+		// If LOCATION_ID variable is not existing in both Condition and Factors Section of workbook
+		// Automatically add LOCATION_ID variable as it is required in creating a new Study.
+		if (!locationIdExistsInCondition && !locationIdExistsInFactors) {
+			workbookFactors.add(locationIdVariable);
+		}
+	}
+
+	@Override
+	public void addLocationIDVariableInConditionsIfNotExists(final Workbook workbook, final String programUUID) {
 
 		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
 		final List<MeasurementVariable> workbookFactors = workbook.getFactors();
@@ -310,7 +329,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 	}
 
-	protected void removeLocationNameVariableIfExists(final Workbook workbook) {
+	@Override
+	public void removeLocationNameVariableIfExists(final Workbook workbook) {
 
 		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
 		final List<MeasurementVariable> workbookFactors = workbook.getFactors();
@@ -799,11 +819,20 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return null;
 	}
 
-	Optional<MeasurementVariable> findMeasurementVariableByTermId(final int termId,
+	@Override
+	public Optional<MeasurementVariable> findMeasurementVariableByTermId(final int termId,
 			final List<MeasurementVariable> list) {
 		for (final MeasurementVariable mvar : list) {
-			final Integer varId = this.ontologyDataManager
-					.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+
+			Integer varId;
+
+			if (mvar.getTermId() != 0) {
+				varId = mvar.getTermId();
+			} else {
+				varId = this.ontologyDataManager
+						.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+			}
+
 			if (varId != null && termId == varId.intValue()) {
 				return Optional.of(mvar);
 			}
