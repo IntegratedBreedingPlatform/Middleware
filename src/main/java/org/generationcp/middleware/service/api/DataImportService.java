@@ -177,6 +177,8 @@ public interface DataImportService {
 
 	void removeLocationNameVariableIfExists(Workbook workbook);
 
+	void assignLocationVariableWithUnspecifiedLocationIfEmpty(List<MeasurementVariable> measurementVariables);
+
 	/**
 	 * Populates the measurement variables with their possible values. Only the
 	 * categorical type variable will be populated.
