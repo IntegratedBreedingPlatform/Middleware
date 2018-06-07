@@ -1,0 +1,130 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="darla" id="v9.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="role"/>
+			</not>
+		</preConditions>
+		<comment>Create ROLE table with default values</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `role` (
+  				`id` int(11) NOT NULL AUTO_INCREMENT,
+  				`name` varchar(30) NOT NULL,
+  				PRIMARY KEY (`id`),
+  				UNIQUE (`name`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+			
+			INSERT INTO `role` VALUES (1, 'ADMIN');
+			INSERT INTO `role` VALUES (2, 'BREEDER');
+			INSERT INTO `role` VALUES (3, 'TECHNICIAN');
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="users_roles" columnName="role"/>
+			<not>
+				<columnExists tableName="users_roles" columnName="role_id"/>
+			</not>
+			<tableExists tableName="role"/>
+		</preConditions>
+		<comment>Add role_id column to users_role table and link values to role table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `users_roles` ADD COLUMN `role_id` INT(11);
+			
+			UPDATE users_roles urole
+			INNER JOIN role r ON UPPER(r.name) = UPPER(urole.role)
+			SET urole.role_id = r.id;
+					
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="users_roles" columnName="role_id"/>
+			<tableExists tableName="role"/>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'users_roles' AND CONSTRAINT_NAME='fk_user_role_id' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+		<comment>Add FK to users_role.role_id linking to role table</comment>
+		<addForeignKeyConstraint 
+			constraintName="fk_user_role_id"  
+			baseTableName="users_roles"  
+			baseColumnNames="role_id" 
+			referencedTableName="role" 
+			referencedColumnNames="id"
+			onDelete="NO ACTION"
+			onUpdate="NO ACTION"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="users_roles" columnName="role"/>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'users_roles' AND CONSTRAINT_NAME='fk_user_role_id' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+		<comment>Drop role column from users_role table</comment>
+		<dropColumn columnName="role" 
+			schemaName="workbench"
+            tableName="users_roles"/>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM workbench_tool 
+				WHERE group_name IN ('manage_program','backup_restore','about_bms');
+			</sqlCheck>
+		</preConditions>
+		<comment>Add Program Administration tools</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path)
+			VALUES 
+			('manage_program', 'manage_program', 'Manage Program Settings', '9.2', 'WORKBENCH', '/ibpworkbench/main'),
+			('backup_restore', 'backup_restore', 'Tutorial Save and Load', '9.2', 'WORKBENCH', '/ibpworkbench/main'),
+			('about_bms', 'about_bms', 'About BMS', '9.2', 'WORKBENCH', '/ibpworkbench/main');
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM workbench_sidebar_category_link 
+				WHERE tool_name IN ('manage_program','backup_restore','about_bms');
+			</sqlCheck>
+		</preConditions>
+		<comment>Add Program Administration sidebar links</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title)
+			VALUES 
+			('manage_program', 7, 'manage_program', 'Manage Program Settings'),
+			('backup_restore', 7, 'backup_restore', 'Tutorial Save and Load'),
+			('about_bms', 7, 'about_bms', 'About the BMS')
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="workbench_sidebar_category_link_role"/>
+			</not>
+		</preConditions>
+		<comment>Create workbench_sidebar_category_link_role table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `workbench_sidebar_category_link_role` (
+  				`sidebar_category_link_role_id` int(11) NOT NULL AUTO_INCREMENT,
+  				`sidebar_category_link_id` int(11) NOT NULL,
+  				`role_id` int(11) NOT NULL,
+  				PRIMARY KEY (`sidebar_category_link_role_id`),
+				CONSTRAINT `fk_sidebar_category_link_role1` FOREIGN KEY (`sidebar_category_link_id`) REFERENCES `workbench_sidebar_category_link` (`sidebar_category_link_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+ 				CONSTRAINT `fk_sidebar_category_link_role2` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+			);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
