@@ -21,9 +21,9 @@
   				UNIQUE (`name`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 			
-			INSERT INTO `role` VALUES (1, 'ADMIN');
-			INSERT INTO `role` VALUES (2, 'BREEDER');
-			INSERT INTO `role` VALUES (3, 'TECHNICIAN');
+			INSERT INTO `role` VALUES (1, 'Admin');
+			INSERT INTO `role` VALUES (2, 'Breeder');
+			INSERT INTO `role` VALUES (3, 'Technician');
 		</sql>
 	</changeSet>
 	
