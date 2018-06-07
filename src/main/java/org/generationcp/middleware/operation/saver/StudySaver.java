@@ -54,7 +54,7 @@ public class StudySaver extends Saver {
 	}
 
 	/**
-	 * Creates an entry in nd_experiment and nd_experiment_project tables if saveStudyExperiment is true.
+	 * Creates an entry in nd_experiment table if saveStudyExperiment is true.
 	 */
 	public void saveStudyExperiment(final int projectId, final StudyValues values, final String cropPrefix) throws Exception {
 		try {
