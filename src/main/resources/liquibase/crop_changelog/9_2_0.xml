@@ -1,10 +1,8 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
-		http://www.liquibase.org/xml/ns/dbchangelog-ext
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	
 	<changeSet author="clarissa" id="v9.2.0-1">
@@ -133,49 +131,139 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="v9.2.0-8">
-		<preConditions onFail="MARK_RAN">
-			<viewExists viewName="germplasm_trial_details"/>
-		</preConditions>
+    <changeSet author="clarysabel" id="v9.2.0-8">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="germplasm_trial_details"/>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER VIEW germplasm_trial_details AS
+            select
+            `pr`.`object_project_id` AS `study_id`,
+            `e`.`project_id` AS `project_id`,
+            `e`.`type_id` AS `type_id`,
+            `e`.`nd_geolocation_id` AS `envt_id`,
+            `e`.`type_id` AS `observation_type`,
+            `e`.`nd_experiment_id` AS `experiment_id`,
+            `p`.`phenotype_id` AS `phenotype_id`,
+            `td`.`trait_name` AS `trait_name`,
+            `svd`.`cvterm_id` AS `stdvar_id`,
+            `svd`.`stdvar_name` AS `stdvar_name`,
+            `p`.`value` AS `observed_value`,
+            `s`.`stock_id` AS `stock_id`,
+            `s`.`name` AS `entry_designation`,
+            `g`.`gid` AS `gid`
+            from
+            (((((((((`stock` `s`
+            join `nd_experiment_stock` `es` ON ((`es`.`stock_id` = `s`.`stock_id`)))
+            join `nd_experiment` `e` ON ((`e`.`nd_experiment_id` = `es`.`nd_experiment_id`))))
+            join `nd_experiment_phenotype` `epx` ON ((`epx`.`nd_experiment_id` = `e`.`nd_experiment_id`)))
+            join `phenotype` `p` ON ((`p`.`phenotype_id` = `epx`.`phenotype_id`)))
+            join `standard_variable_details` `svd` ON ((`svd`.`cvterm_id` = `p`.`observable_id`)))
+            join `trait_details` `td` ON ((`td`.`trait_id` = `svd`.`property_id`)))
+            join `project_relationship` `pr` ON ((`pr`.`subject_project_id` = `e`.`project_id`)))
+            join `germplsm` `g` ON ((`s`.`dbxref_id` = `g`.`gid`)))
+            where
+            ((`e`.`type_id` = 1170)
+            or ((`e`.`type_id` = 1155)
+            and (1 = (select
+            count(0)
+            from
+            `project_relationship`
+            where
+            ((`project_relationship`.`object_project_id` = `pr`.`object_project_id`)
+            and (`project_relationship`.`type_id` = 1150))))))
+            order by `e`.`project_id` , `e`.`nd_geolocation_id` , `e`.`type_id` , `td`.`trait_name` , `s`.`name`;
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v9.2.0-9">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="trial_study_locations"/>
+        </preConditions>
+		<comment>
+			Removing nd_experiment_project table from the View.
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			ALTER VIEW germplasm_trial_details AS
-			  select
-				`pr`.`object_project_id` AS `study_id`,
-				`e`.`project_id` AS `project_id`,
-				`e`.`type_id` AS `type_id`,
-				`e`.`nd_geolocation_id` AS `envt_id`,
-				`e`.`type_id` AS `observation_type`,
-				`e`.`nd_experiment_id` AS `experiment_id`,
-				`p`.`phenotype_id` AS `phenotype_id`,
-				`td`.`trait_name` AS `trait_name`,
-				`svd`.`cvterm_id` AS `stdvar_id`,
-				`svd`.`stdvar_name` AS `stdvar_name`,
-				`p`.`value` AS `observed_value`,
-				`s`.`stock_id` AS `stock_id`,
-				`s`.`name` AS `entry_designation`,
-				`g`.`gid` AS `gid`
-			  from
-				(((((((((`stock` `s`
-				  join `nd_experiment_stock` `es` ON ((`es`.`stock_id` = `s`.`stock_id`)))
-				  join `nd_experiment` `e` ON ((`e`.`nd_experiment_id` = `es`.`nd_experiment_id`))))
-				  join `nd_experiment_phenotype` `epx` ON ((`epx`.`nd_experiment_id` = `e`.`nd_experiment_id`)))
-				  join `phenotype` `p` ON ((`p`.`phenotype_id` = `epx`.`phenotype_id`)))
-				  join `standard_variable_details` `svd` ON ((`svd`.`cvterm_id` = `p`.`observable_id`)))
-				  join `trait_details` `td` ON ((`td`.`trait_id` = `svd`.`property_id`)))
-				  join `project_relationship` `pr` ON ((`pr`.`subject_project_id` = `e`.`project_id`)))
-				  join `germplsm` `g` ON ((`s`.`dbxref_id` = `g`.`gid`)))
-			  where
-				((`e`.`type_id` = 1170)
-				 or ((`e`.`type_id` = 1155)
-					 and (1 = (select
-								 count(0)
-							   from
-								 `project_relationship`
-							   where
-								 ((`project_relationship`.`object_project_id` = `pr`.`object_project_id`)
-								  and (`project_relationship`.`type_id` = 1150))))))
-			  order by `e`.`project_id` , `e`.`nd_geolocation_id` , `e`.`type_id` , `td`.`trait_name` , `s`.`name`;
+			ALTER
+			ALGORITHM = UNDEFINED
+			DEFINER = `root`@`localhost`
+			SQL SECURITY DEFINER
+			VIEW `trial_study_locations` AS
+			SELECT DISTINCT
+			`gp`.`nd_geolocation_id` AS `envtId`,
+			`l`.`lname` AS `locationName`,
+			`prov`.`lname` AS `provinceName`,
+			`c`.`isoabbr` AS `isoabbr`,
+			`p`.`project_id` AS `project_id`,
+			`p`.`name` AS `name`,
+			`gp`.`value` AS `locationId`,
+			`p`.`description` AS `description`
+			FROM
+			((((((`nd_geolocationprop` `gp`
+			JOIN `nd_experiment` `e` ON (((`e`.`nd_geolocation_id` = `gp`.`nd_geolocation_id`)
+			AND (`e`.`nd_experiment_id` = (SELECT
+			MIN(`min`.`nd_experiment_id`)
+			FROM
+			`nd_experiment` `min`
+			WHERE
+			(`min`.`nd_geolocation_id` = `gp`.`nd_geolocation_id`))))))
+			JOIN `project_relationship` `pr` ON ((((`pr`.`object_project_id` = `e`.`project_id`)
+			OR (`pr`.`subject_project_id` = `e`.`project_id`))
+			AND (`pr`.`type_id` = 1150))))
+			JOIN `project` `p` ON ((`p`.`project_id` = `pr`.`object_project_id`)))
+			LEFT JOIN `location` `l` ON ((`l`.`locid` = `gp`.`value`)))
+			LEFT JOIN `location` `prov` ON ((`prov`.`locid` = `l`.`snl1id`)))
+			LEFT JOIN `cntry` `c` ON ((`c`.`cntryid` = `l`.`cntryid`)))
+			WHERE
+			(`gp`.`type_id` = 8190);
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v9.2.0-10">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="h2h_details"/>
+        </preConditions>
+		<comment>
+			Removing nd_experiment_project table from the View.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER
+			ALGORITHM = UNDEFINED
+			DEFINER = `root`@`localhost`
+			SQL SECURITY DEFINER
+			VIEW `h2h_details` AS
+			SELECT
+			`pr`.`object_project_id` AS `study_id`,
+			`e`.`project_id` AS `project_id`,
+			`e`.`type_id` AS `type_id`,
+			`e`.`nd_geolocation_id` AS `location_id`,
+			`e`.`type_id` AS `observation_type`,
+			`e`.`nd_experiment_id` AS `experiment_id`,
+			`p`.`phenotype_id` AS `phenotype_id`,
+			`td`.`trait_name` AS `trait_name`,
+			`p`.`value` AS `observed_value`,
+			`s`.`stock_id` AS `stock_id`,
+			`s`.`name` AS `entry_designation`
+			FROM
+			(((((((`stock` `s`
+			JOIN `nd_experiment_stock` `es` ON ((`es`.`stock_id` = `s`.`stock_id`)))
+			JOIN `nd_experiment` `e` ON ((`e`.`nd_experiment_id` = `es`.`nd_experiment_id`)))
+			JOIN `nd_experiment_phenotype` `epx` ON ((`epx`.`nd_experiment_id` = `e`.`nd_experiment_id`)))
+			JOIN `phenotype` `p` ON ((`p`.`phenotype_id` = `epx`.`phenotype_id`)))
+			JOIN `standard_variable_details` `svd` ON ((`svd`.`cvterm_id` = `p`.`observable_id`)))
+			JOIN `trait_details` `td` ON ((`td`.`trait_id` = `svd`.`property_id`)))
+			JOIN `project_relationship` `pr` ON ((`pr`.`subject_project_id` = `e`.`project_id`)))
+			WHERE
+			((`e`.`type_id` = 1170)
+			OR ((`e`.`type_id` = 1155)
+			AND (1 = (SELECT
+			COUNT(0)
+			FROM
+			`project_relationship`
+			WHERE
+			((`project_relationship`.`object_project_id` = `pr`.`object_project_id`)
+			AND (`project_relationship`.`type_id` = 1150))))))
+			ORDER BY `e`.`project_id` , `e`.`nd_geolocation_id` , `e`.`type_id` , `td`.`trait_name` , `s`.`name`;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
