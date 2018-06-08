@@ -44,7 +44,7 @@
 			SELECT
 			nd_geolocation.nd_geolocation_id,
 			8190,
-			(Select locid from location where lname = 'Unspecified Location'),
+			case when  projectprop_study.value is not null and projectprop_study.value <> '' then projectprop_study.value else (Select locid from location where lname = 'Unspecified Location') end,
 			case when max(gpRank.rank) is null then 1 else max(gpRank.rank) + 1 end as rank
 			from project
 			inner join projectprop projectprop_dataset on projectprop_dataset.project_id = project.project_id and projectprop_dataset.variable_id = 8160 and projectprop_dataset.value = 10080
@@ -55,6 +55,7 @@
 			inner join nd_geolocation on nd_geolocation.nd_geolocation_id = nd_experiment.nd_geolocation_id
 			left join nd_geolocationprop on nd_geolocationprop.nd_geolocation_id = nd_geolocation.nd_geolocation_id and nd_geolocationprop.type_id = 8190
 			left join nd_geolocationprop gpRank on gpRank.nd_geolocation_id = nd_geolocation.nd_geolocation_id
+            left join projectprop projectprop_study on projectprop_study.project_id = projectTrial.project_id and projectprop_study.variable_id = 8190
 			where projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template' and nd_geolocationprop.type_id is null
 			group by nd_geolocation_id;
 
@@ -74,7 +75,7 @@
 			set projectprop.alias = Case when projectprop_location_name.alias is null Then 'LOCATION_NAME' else projectprop_location_name.alias END
             where projectprop.variable_id = 8190 and projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template';
 
-			-- Delete LOCATION_NAME variable in all Trial Studies
+			-- Delete LOCATION_NAME variable at ENVIRONMENT DETAILS (Instance Level)
 
 			Delete projectprop from project
 			inner join projectprop projectprop_dataset on projectprop_dataset.project_id = project.project_id and projectprop_dataset.variable_id = 8160 and projectprop_dataset.value = 10080
@@ -84,6 +85,15 @@
 			where projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template';
 
 			Delete FROM nd_geolocationprop where type_id = 8180;
+
+			-- Delete LOCATION_NAME/ID variables at TRIAL SETTINGS (Study Level)
+
+			Delete projectprop from project
+			inner join projectprop projectprop_dataset on projectprop_dataset.project_id = project.project_id and projectprop_dataset.variable_id = 8160 and projectprop_dataset.value = 10080
+			inner join project_relationship on project.project_id = project_relationship.subject_project_id
+			inner join project projectTrial on projectTrial.project_id = project_relationship.object_project_id
+			left join projectprop on projectTrial.project_id = projectprop.project_id and (projectprop.variable_id = 8180 or projectprop.variable_id = 8190)
+			where projectTrial.study_type = 'T' and projectTrial.name <> 'Basic Trial Template';
 
 			-- FOR NURSERY STUDIES
 
