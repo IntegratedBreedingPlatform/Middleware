@@ -24,6 +24,7 @@
 			INSERT INTO `role` VALUES (1, 'Admin');
 			INSERT INTO `role` VALUES (2, 'Breeder');
 			INSERT INTO `role` VALUES (3, 'Technician');
+			INSERT INTO `role` VALUES (4, 'Readonly');
 		</sql>
 	</changeSet>
 	
@@ -172,6 +173,14 @@
 			 INNER JOIN role
 			 WHERE link.tool_name NOT IN ('backup_restore', 'manage_program', 'germplasm_import', 'ontology_manager')
 			 AND role.name = 'TECHNICIAN';
+			 
+			 INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+			SELECT `sidebar_category_link_id`, role.id
+			  FROM `workbench_sidebar_category_link` link
+			 INNER JOIN role
+			 WHERE link.tool_name IN ('bm_list_manager_main', 'study_browser', 'germplasm_mainheadtohead', 
+			 						  'trait_donor_query', 'breeding_view_wb', 'breeding_gxe', 'about_bms')
+			 AND role.name = 'READONLY';
 		</sql>
 	</changeSet>
 
