@@ -178,14 +178,6 @@ public class ExperimentModelSaver extends Saver {
 		return experimentProperty;
 	}
 
-
-//	private void addExperimentProject(ExperimentModel experimentModel, int projectId) {
-//		ExperimentProject exproj = new ExperimentProject();
-//		exproj.setProjectId(projectId);
-//		exproj.setExperiment(experimentModel);
-//		this.getExperimentProjectDao().save(exproj);
-//	}
-
 	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) {
 		ExperimentStock experimentStock = new ExperimentStock();
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
