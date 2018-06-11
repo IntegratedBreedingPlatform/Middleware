@@ -543,4 +543,21 @@
 			</sql>
 		</changeSet>
 
+		<changeSet id="v8.2.0-18" author="clarysabel">
+			<preConditions onFail="MARK_RAN">
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT
+						COUNT(*)
+						FROM
+							projectprop
+						where alias != 'TRIAL_INSTANCE' and variable_id = 8170;
+					</sqlCheck>
+				</not>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="false">
+				update projectprop set alias = 'TRIAL_INSTANCE' where variable_id = 8170 and alias != 'TRIAL_INSTANCE';
+			</sql>
+		</changeSet>
+
 </databaseChangeLog>
