@@ -436,7 +436,7 @@
 					from cvtermprop
 					where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
                                                     FROM cvterm cvt
-                                                      INNER JOIN cvtermprop cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+                                                      INNER JOIN  (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
                                                     WHERE cvt.cv_id = 1040 -- variable
                                                           AND cvtp.type_id = 1800 -- variable type
                                                           AND cvtp.value IN (
@@ -452,7 +452,7 @@
 				delete from cvtermprop
 				where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
                                                     FROM cvterm cvt
-                                                      INNER JOIN cvtermprop cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+                                                      INNER JOIN (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
                                                     WHERE cvt.cv_id = 1040 -- variable
                                                           AND cvtp.type_id = 1800 -- variable type
                                                           AND cvtp.value IN (
@@ -476,8 +476,7 @@
 				</sqlCheck>
 			</preConditions>
 			<sql dbms="mysql" splitStatements="false">
-				REPLACE INTO cvterm(cvterm_id,cv_id,name,definition,dbxref_id,is_obsolete,is_relationshiptype) VALUES
-					(1802,1041,'Study Condition','Observations made of conditions in a study',NULL,0,0);
+				UPDATE cvterm SET name = 'Study Condition', definition = 'Observations made of conditions in a study' WHERE cvterm_id = 1802;
 			</sql>
 		</changeSet>
 
@@ -492,7 +491,7 @@
 				</sqlCheck>
 			</preConditions>
 			<sql dbms="mysql" splitStatements="false">
-				UPDATE cvtermprop.value SET value = 'Trial Condition' WHERE value = 'Nursery Condition' AND type_id = 1800;
+				UPDATE cvtermprop SET value = 'Trial Condition' WHERE value = 'Nursery Condition' AND type_id = 1800;
 			</sql>
 		</changeSet>
 
