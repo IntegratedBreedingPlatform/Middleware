@@ -11,20 +11,20 @@
 			<sqlCheck expectedResult="1">
 				SELECT count(*)
 				FROM information_schema.REFERENTIAL_CONSTRAINTS
-				where DELETE_rULE = 'CASCADE'
+				where DELETE_RULE = 'CASCADE'
 				AND table_name = 'projectprop'
 				AND CONSTRAINT_NAME = 'projectprop_2_fk2';
 			</sqlCheck>
 		</preConditions>
 		<comment>Remove cascade on projectprop_2_fk2</comment>
 		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE projectprop
-			DROP FOREIGN KEY projectprop_2_fk2;
-			ALTER TABLE projectprop
-			ADD CONSTRAINT projectprop_2_fk2
-			  FOREIGN KEY (type_id)
-			  REFERENCES cvterm (cvterm_id)
-			  ON DELETE NO ACTION;
+				ALTER TABLE projectprop
+				DROP FOREIGN KEY projectprop_2_fk2;
+				ALTER TABLE projectprop
+				ADD CONSTRAINT projectprop_2_fk2
+				  FOREIGN KEY (type_id)
+				  REFERENCES cvterm (cvterm_id)
+				  ON DELETE NO ACTION;
 		</sql>
 	</changeSet>
 
@@ -51,9 +51,7 @@
 				</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-		ALTER TABLE project DROP FOREIGN KEY study_type_fk;
-
-		ALTER TABLE project DROP INDEX study_type_fk_idx;
+			ALTER TABLE project DROP FOREIGN KEY study_type_fk;
 		</sql>
 	</changeSet>
 
@@ -581,4 +579,18 @@
 			</sql>
 		</changeSet>
 
+		<changeSet author="vanina" id="v9.2.0-20">
+		<preConditions onFail="MARK_RAN">
+					<sqlCheck expectedResult="1">
+						SELECT COUNT(*)
+						FROM INFORMATION_SCHEMA.STATISTICS
+						WHERE TABLE_SCHEMA = DATABASE()
+						AND TABLE_NAME = 'project'
+						AND INDEX_NAME = 'study_type_fk_idx';
+					</sqlCheck>
+			</preConditions>
+			<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE project DROP INDEX study_type_fk_idx;
+			</sql>
+		</changeSet>
 </databaseChangeLog>
