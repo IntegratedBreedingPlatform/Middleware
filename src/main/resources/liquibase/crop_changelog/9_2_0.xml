@@ -6,7 +6,29 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="cuenyad" id="v8.2.0-1">
+	<changeSet author="vanina" id="v9.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*)
+				FROM information_schema.REFERENTIAL_CONSTRAINTS
+				where DELETE_rULE = 'CASCADE'
+				AND table_name = 'projectprop'
+				AND CONSTRAINT_NAME = 'projectprop_2_fk2';
+			</sqlCheck>
+		</preConditions>
+		<comment>Remove cascade on projectprop_2_fk2</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE projectprop
+			DROP FOREIGN KEY projectprop_2_fk2;
+			ALTER TABLE projectprop
+			ADD CONSTRAINT projectprop_2_fk2
+			  FOREIGN KEY (type_id)
+			  REFERENCES cvterm (cvterm_id)
+			  ON DELETE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v9.2.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0 FROM listnms WHERE listtype in ('TRIAL','NURSERY');
@@ -18,7 +40,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v8.2.0-2">
+	<changeSet author="vanina" id="v9.2.0-3">
 	<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT COUNT(*)
@@ -35,7 +57,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v8.2.0-3">
+	<changeSet author="vanina" id="v9.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="study_type"/>
 		</preConditions>
@@ -67,7 +89,7 @@
 	</changeSet>
 
 
-	<changeSet author="vanina" id="v8.2.0-4">
+	<changeSet author="vanina" id="v9.2.0-5">
 		<preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="project" columnName="study_type_id"/> </not>
 		</preConditions>
@@ -88,7 +110,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="v8.2.0-5" author="clarysabel">
+	<changeSet id="v9.2.0-6" author="clarysabel">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(*) from cvterm where cvterm_id = 10169;
@@ -103,7 +125,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="v8.2.0-6" author="vanina">
+	<changeSet id="v9.2.0-7" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -119,7 +141,7 @@
 	</changeSet>
 
 
-	<changeSet id="v8.2.0-7" author="vanina">
+	<changeSet id="v9.2.0-8" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -134,7 +156,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="v8.2.0-8" author="vanina">
+	<changeSet id="v9.2.0-9" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -151,7 +173,7 @@
 		</sql>
 	</changeSet>
 
-		<changeSet id="v8.2.0-9" author="vanina">
+		<changeSet id="v9.2.0-10" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -393,7 +415,7 @@
 		</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-10" author="vanina">
+		<changeSet id="v9.2.0-11" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -410,7 +432,7 @@
 				</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-11" author="vanina">
+		<changeSet id="v9.2.0-12" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -427,7 +449,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-12" author="vanina">
+		<changeSet id="v9.2.0-13" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<not>
 				<sqlCheck expectedResult="0">
@@ -465,7 +487,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-13" author="vanina">
+		<changeSet id="v9.2.0-14" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -480,7 +502,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-14" author="vanina">
+		<changeSet id="v9.2.0-15" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -495,7 +517,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-15" author="vanina">
+		<changeSet id="v9.2.0-16" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -510,7 +532,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-16" author="vanina">
+		<changeSet id="v9.2.0-17" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -525,7 +547,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-17" author="vanina">
+		<changeSet id="v9.2.0-18" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<not>
 					<sqlCheck expectedResult="0">
@@ -542,7 +564,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v8.2.0-18" author="clarysabel">
+		<changeSet id="v9.2.0-19" author="clarysabel">
 			<preConditions onFail="MARK_RAN">
 				<not>
 					<sqlCheck expectedResult="0">
