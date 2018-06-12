@@ -1,21 +1,27 @@
 package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
+import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.util.Message;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,6 +60,7 @@ public class DataImportServiceImplTest {
 	private static final int TRIAL_NO = 1;
 	private static final boolean IS_MULTIPLE_LOCATION = false;
 	public static final Integer CREATED_BY = 1;
+	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 
 	@Mock
 	private WorkbookParser parser;
@@ -63,6 +70,9 @@ public class DataImportServiceImplTest {
 
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
+
+	@Mock
+	private LocationDataManager locationDataManager;
 
 	@Mock
 	private org.apache.poi.ss.usermodel.Workbook excelWorkbook;
@@ -102,6 +112,17 @@ public class DataImportServiceImplTest {
 		this.mockStandardVariable(EARASP_1_5_TERMID, EARASP_1_5_NAME, EARASP_1_5_PROPERTY, EARASP_1_5_SCALE, EARASP_1_5_METHOD,
 				PROGRAM_UUID);
 
+		List<Location> locations = new ArrayList<>();
+		Location unspecifiedLocation = new Location();
+		unspecifiedLocation.setLname(UNSPECIFIED_LOCATION);
+		unspecifiedLocation.setLocid(1111);
+		Mockito.when(this.locationDataManager.getLocationsByName(UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
+
+		final StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable();
+		standardVariable.setId(TermId.LOCATION_ID.getId());
+		standardVariable.setName("LOCATION_ID");
+		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.LOCATION_ID.getId(), PROGRAM_UUID))
+				.thenReturn(standardVariable);
 	}
 
 	protected void mockStandardVariable(final Integer termId, final String name, final String property, final String scale,
@@ -366,7 +387,7 @@ public class DataImportServiceImplTest {
 		// Expecting workbook's factors, conditions, constants and variates list are empty because
 		// they only contained obsolete variables.
 		Assert.assertTrue(testWorkbook.getFactors().isEmpty());
-		Assert.assertTrue(testWorkbook.getConditions().isEmpty());
+		Assert.assertFalse(testWorkbook.getConditions().isEmpty());
 		Assert.assertTrue(testWorkbook.getConstants().isEmpty());
 		Assert.assertTrue(testWorkbook.getVariates().isEmpty());
 
@@ -680,6 +701,10 @@ public class DataImportServiceImplTest {
 		observations.add(row);
 
 		testWorkbook.setObservations(observations);
+
+		final StudyDetails studyDetails = new StudyDetails();
+		studyDetails.setStudyType(StudyType.T);
+		testWorkbook.setStudyDetails(studyDetails);
 
 		return testWorkbook;
 
