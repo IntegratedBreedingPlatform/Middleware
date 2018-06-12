@@ -115,6 +115,7 @@ public class SampleListServiceImplTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateSampleListFolderFolderNameEmpty() throws Exception {
 		final User createdBy = new User();
+		createdBy.setName("superadmin");
 		this.sampleListService.createSampleListFolder("", 1, createdBy.getName(), PROGRAM_UUID);
 	}
 
@@ -159,6 +160,7 @@ public class SampleListServiceImplTest {
 	public void testCreateSampleListFolderOk() throws Exception {
 		final User createdBy = new User();
 		createdBy.setUserid(org.mockito.Matchers.anyInt());
+		createdBy.setName("superadmin");
 		final SampleList parentFolder = new SampleList();
 		parentFolder.setType(SampleListType.FOLDER);
 		Mockito.when(this.sampleListDao.getById(1)).thenReturn(parentFolder);
@@ -175,6 +177,7 @@ public class SampleListServiceImplTest {
 	public void testCreateSampleListFolderDBException() throws Exception {
 		final User createdBy = new User();
 		createdBy.setUserid(org.mockito.Matchers.anyInt());
+		createdBy.setName("superadmin");
 		final SampleList parentFolder = new SampleList();
 		parentFolder.setType(SampleListType.FOLDER);
 		Mockito.when(this.sampleListDao.getById(1)).thenReturn(parentFolder);

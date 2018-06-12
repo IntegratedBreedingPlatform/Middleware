@@ -38,6 +38,9 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLinkRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -742,6 +745,41 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<WorkbenchUser> usersAfter = this.workbenchDataManager.getUsersByProjectId(id);
 		Assert.assertNotNull(usersAfter);
 		Assert.assertTrue(usersAfter.isEmpty());
+	}
+	
+	@Test
+	public void testGetAllWorkbenchSidebarLinksByCategoryId(){
+		final WorkbenchSidebarCategory category = new WorkbenchSidebarCategory();
+		// Retrieve links for "Program Administration" category
+		category.setSidebarCategoryId(7);
+		final List<WorkbenchSidebarCategoryLink> sidebarLinks = this.workbenchDataManager.getAllWorkbenchSidebarLinksByCategoryId(category);
+		Assert.assertNotNull(sidebarLinks);
+		Assert.assertEquals(3, sidebarLinks.size());
+		
+		// Verify the roles allowed to access per link
+		for (final WorkbenchSidebarCategoryLink link : sidebarLinks) {
+			if ("manage_program".equals(link.getSidebarLinkName())) {
+				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
+				Assert.assertEquals(1, roles.size());
+				Assert.assertEquals("ADMIN", roles.get(0).getRole().getCapitalizedRole());
+			
+			} else if ("backup_restore".equals(link.getSidebarLinkName())) {
+				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
+				Assert.assertTrue(roles.isEmpty());
+				
+			} else if ("about_bms".equals(link.getSidebarLinkName())) {
+				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
+				Assert.assertEquals(4, roles.size());
+			}
+			
+		}
+	}
+	
+	@Test
+	public void testGetAssignableRoles() {
+		final List<Role> assignableRoles = this.workbenchDataManager.getAssignableRoles();
+		Assert.assertNotNull(assignableRoles);
+		Assert.assertEquals(4, assignableRoles.size());
 	}
 	
 }
