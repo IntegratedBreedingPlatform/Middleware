@@ -53,15 +53,15 @@ public class User implements Serializable, BeanFormState {
 			+ "  person.fname    AS fName, \n"
 			+ "  person.lname    AS lName, \n"
 			+ "  person.pemail   AS email, \n"
-			+ "  role.role_id    AS roleId \n"
-			+ "  role.name       AS roleName \n"
+			+ "  role.id    AS roleId \n"
+			+ "  role.description       AS roleName \n"
 			+ "FROM cvterm scale INNER JOIN cvterm_relationship r ON (r.object_id = scale.cvterm_id) \n"
 			+ "  INNER JOIN cvterm variable ON (r.subject_id = variable.cvterm_id) \n"
 			+ "  INNER JOIN projectprop pp ON (pp.variable_id = variable.cvterm_id) \n"
 			+ "  INNER JOIN workbench.persons person ON (pp.value = person.personid) \n"
 			+ "  INNER JOIN workbench.users user ON (user.personid = person.personid) \n"
 			+ "  LEFT JOIN workbench.users_roles urole ON (urole.userid = user.userid) \n"
-			+ "  LEFT JOIN workbench.role ON (role.role_id = urole.role_id) \n"
+			+ "  LEFT JOIN workbench.role ON (role.id = urole.role_id) \n"
 			+ "WHERE pp.project_id = :studyId AND r.object_id = 1901";
 
 	@Id

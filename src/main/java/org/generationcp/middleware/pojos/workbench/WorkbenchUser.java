@@ -68,13 +68,13 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 
 	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.role_id, role.name, users.ustatus, person.pemail \n"
+		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.description, users.ustatus, person.pemail \n"
 		+ "FROM users \n"
 		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
 		+ "INNER JOIN persons person ON person.personid = users.personid \n "
 		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
 		+ "INNER JOIN users_roles ur ON ur.userid = users.userid "
-		+ "INNER JOIN role ON role.role_id = ur.role_id "
+		+ "INNER JOIN role ON role.id = ur.role_id "
 		+ "WHERE pp.project_uuid = :project_uuid \n "
 		+ "GROUP BY users.userid";
 
@@ -383,7 +383,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public boolean hasRole(String role) {
 		if (!Objects.equals(this.roles,null)) {
 			for (UserRole userRole : this.roles) {
-				if (userRole.getRole().getCapitalizedName().equalsIgnoreCase(role)) {
+				if (userRole.getRole().getCapitalizedRole().equalsIgnoreCase(role)) {
 					return true;
 				}
 			}

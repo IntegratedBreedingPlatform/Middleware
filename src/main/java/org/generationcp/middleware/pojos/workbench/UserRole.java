@@ -72,7 +72,7 @@ public class UserRole {
 	}
 	
 	public String getCapitalizedRole() {
-		return this.getRole().getCapitalizedName();
+		return this.getRole().getCapitalizedRole();
 	}
 
 }

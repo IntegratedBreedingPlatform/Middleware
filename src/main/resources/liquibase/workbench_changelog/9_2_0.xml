@@ -16,9 +16,9 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `role` (
   				`id` int(11) NOT NULL AUTO_INCREMENT,
-  				`name` varchar(30) NOT NULL,
+  				`description` varchar(30) NOT NULL,
   				PRIMARY KEY (`id`),
-  				UNIQUE (`name`)
+  				UNIQUE (`description`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 			
 			INSERT INTO `role` VALUES (1, 'Admin');
@@ -41,7 +41,7 @@
 			ALTER TABLE `users_roles` ADD COLUMN `role_id` INT(11);
 			
 			UPDATE users_roles urole
-			INNER JOIN role r ON UPPER(r.name) = UPPER(urole.role)
+			INNER JOIN role r ON UPPER(r.description) = UPPER(urole.role)
 			SET urole.role_id = r.id;
 					
 		</sql>
@@ -158,21 +158,21 @@
 			  FROM `workbench_sidebar_category_link` link
 			 INNER JOIN role
 			 WHERE link.tool_name NOT IN ('backup_restore') 
-			 AND role.name = 'ADMIN';
+			 AND role.description = 'ADMIN';
 			 
 			INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
 			SELECT `sidebar_category_link_id`, role.id
 			  FROM `workbench_sidebar_category_link` link
 			 INNER JOIN role
 			 WHERE link.tool_name NOT IN ('backup_restore', 'manage_program', 'germplasm_import', 'ontology_manager')
-			 AND role.name = 'BREEDER';
+			 AND role.description = 'BREEDER';
 			 
 			 INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
 			SELECT `sidebar_category_link_id`, role.id
 			  FROM `workbench_sidebar_category_link` link
 			 INNER JOIN role
 			 WHERE link.tool_name NOT IN ('backup_restore', 'manage_program', 'germplasm_import', 'ontology_manager')
-			 AND role.name = 'TECHNICIAN';
+			 AND role.description = 'TECHNICIAN';
 			 
 			 INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
 			SELECT `sidebar_category_link_id`, role.id
@@ -180,7 +180,7 @@
 			 INNER JOIN role
 			 WHERE link.tool_name IN ('bm_list_manager_main', 'study_browser', 'germplasm_mainheadtohead', 
 			 						  'trait_donor_query', 'breeding_view_wb', 'breeding_gxe', 'about_bms')
-			 AND role.name = 'READONLY';
+			 AND role.description   = 'READONLY';
 		</sql>
 	</changeSet>
 

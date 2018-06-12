@@ -206,7 +206,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		Preconditions.checkNotNull(instanceId);
 		final List<UserDto> users = new ArrayList<>();
 		final StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
-				.append("    person.personid as personId, person.fname as fName, person.lname as lName, person.pemail as email , role.role_id as roleId, role.name as roleName ")
+				.append("    person.personid as personId, person.fname as fName, person.lname as lName, person.pemail as email , role.id as roleId, role.description as roleName ")
 				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
 				.append("    cvterm_relationship r ON (r.object_id = scale.cvterm_id) ").append("        INNER JOIN ")
 				.append("    cvterm variable ON (r.subject_id = variable.cvterm_id) ").append("        INNER JOIN ")
@@ -214,7 +214,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				.append("        INNER JOIN workbench.persons person ").append("    ON (pp.value = person.personid) ")
 				.append("    INNER JOIN workbench.users user on (user.personid = person.personid) ")
 				.append("    LEFT join workbench.users_roles urole on (urole.userid = user.userid) ")
-				.append("    LEFT join workbench.role role on (role.role_id = urole.role_id) ")
+				.append("    LEFT join workbench.role role on (role.id = urole.role_id) ")
 				.append("WHERE ")
 				.append("    pp.nd_geolocation_id = :instanceDbId ").append("        AND r.object_id = 1901    ");
 		try {

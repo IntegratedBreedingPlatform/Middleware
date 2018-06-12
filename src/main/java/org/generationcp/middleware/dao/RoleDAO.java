@@ -22,7 +22,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 		
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Role.class);
-			criteria.add(Restrictions.ne("name", SUPERADMIN));
+			criteria.add(Restrictions.ne("description", SUPERADMIN));
 			toReturn = criteria.list();
 			
 		} catch (final HibernateException e) {
