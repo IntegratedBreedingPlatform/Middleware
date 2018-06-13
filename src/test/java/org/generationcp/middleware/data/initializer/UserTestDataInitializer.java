@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
@@ -47,7 +48,7 @@ public class UserTestDataInitializer {
 		final WorkbenchUser user = new WorkbenchUser();
 		user.setUserid(userid);
 		// Role ID 1 = ADMIN
-		user.setRoles(Arrays.asList(new UserRole(user, 1)));
+		user.setRoles(Arrays.asList(new UserRole(user, new Role(1, "Admin"))));
 		return user;
 	}
 
