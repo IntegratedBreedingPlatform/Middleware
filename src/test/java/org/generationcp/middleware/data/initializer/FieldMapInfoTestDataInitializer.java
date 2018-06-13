@@ -9,17 +9,16 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 
 public class FieldMapInfoTestDataInitializer {
 
-	public FieldMapInfo createFieldMapInfo(final Boolean isTrial) {
+	public FieldMapInfo createFieldMapInfo() {
 		final FieldMapInfo fieldMapInfo = new FieldMapInfo();
-		fieldMapInfo.setTrial(isTrial);
 		fieldMapInfo.setDatasets(new ArrayList<FieldMapDatasetInfo>());
 		return fieldMapInfo;
 	}
 
-	public List<FieldMapInfo> createFieldMapInfoList(final Boolean isTrial, final int size) {
-		final List<FieldMapInfo> fieldMapInfoList = new ArrayList<FieldMapInfo>();
+	public List<FieldMapInfo> createFieldMapInfoList(final int size) {
+		final List<FieldMapInfo> fieldMapInfoList = new ArrayList<>();
 		for (int i = 0; i < size; i++) {
-			fieldMapInfoList.add(this.createFieldMapInfo(isTrial));
+			fieldMapInfoList.add(this.createFieldMapInfo());
 		}
 		return fieldMapInfoList;
 	}

@@ -14,17 +14,17 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 
 public class GeolocationPropertySaver extends Saver {
 
-	public GeolocationPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
+	public GeolocationPropertySaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public void saveFieldmapProperties(List<FieldMapInfo> infos) throws MiddlewareQueryException {
-		for (FieldMapInfo info : infos) {
-			for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-				for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+	public void saveFieldmapProperties(final List<FieldMapInfo> infos) throws MiddlewareQueryException {
+		for (final FieldMapInfo info : infos) {
+			for (final FieldMapDatasetInfo dataset : info.getDatasets()) {
+				for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 					// GCP-8093 handle old data saved using the default location, default location is no longer used
 					int locationId = trial.getGeolocationId();
-					if (!info.isTrial() && trial.getGeolocationId() != null && trial.getGeolocationId().intValue() == 1) {
+					if (trial.getGeolocationId() != null && trial.getGeolocationId().intValue() == 1) {
 						locationId = this.getExperimentModelSaver().moveStudyToNewGeolocation(info.getFieldbookId());
 					}
 
@@ -40,8 +40,8 @@ public class GeolocationPropertySaver extends Saver {
 		}
 	}
 
-	public void saveOrUpdate(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
-		Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
+	public void saveOrUpdate(final int geolocationId, final int typeId, final String value) throws MiddlewareQueryException {
+		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
 		GeolocationProperty property = null;
 		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
 			property = this.findProperty(geolocation.getProperties(), typeId);
@@ -56,10 +56,10 @@ public class GeolocationPropertySaver extends Saver {
 		this.getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 
-	private int getMaxRank(List<GeolocationProperty> properties) {
+	private int getMaxRank(final List<GeolocationProperty> properties) {
 		int maxRank = 1;
 		if(properties != null){
-			for (GeolocationProperty property : properties) {
+			for (final GeolocationProperty property : properties) {
 				if (property.getRank() >= maxRank) {
 					maxRank = property.getRank() + 1;
 				}
@@ -68,8 +68,8 @@ public class GeolocationPropertySaver extends Saver {
 		return maxRank;
 	}
 
-	private GeolocationProperty findProperty(List<GeolocationProperty> properties, int typeId) {
-		for (GeolocationProperty property : properties) {
+	private GeolocationProperty findProperty(final List<GeolocationProperty> properties, final int typeId) {
+		for (final GeolocationProperty property : properties) {
 			if (property.getTypeId() == typeId) {
 				return property;
 			}
@@ -77,7 +77,7 @@ public class GeolocationPropertySaver extends Saver {
 		return null;
 	}
 
-	public void saveOrUpdate(Geolocation geolocation, int typeId, String value) throws MiddlewareQueryException {
+	public void saveOrUpdate(final Geolocation geolocation, final int typeId, final String value) throws MiddlewareQueryException {
 		GeolocationProperty property = null;
 		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
 			property = this.findProperty(geolocation.getProperties(), typeId);

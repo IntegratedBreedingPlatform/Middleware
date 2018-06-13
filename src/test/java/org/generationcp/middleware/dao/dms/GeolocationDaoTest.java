@@ -54,7 +54,7 @@ public class GeolocationDaoTest {
 	}
 
 	@Test
-	public void testGetTrialEnvironmentDetails() {
+	public void testGetStudyEnvironmentDetails() {
 		final Set<Integer> environmentIds = new HashSet<Integer>();
 		environmentIds.add(5822);
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
@@ -86,7 +86,7 @@ public class GeolocationDaoTest {
 	}
 
 	@Test
-	public void testGetPropertiesForTrialEnvironments() {
+	public void testGetPropertiesForStudyEnvironments() {
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
 		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
 		final Object[] result = new Object[] { GeolocationDaoTest.LOCATION_ID, GeolocationDaoTest.LOCATION_NAME,

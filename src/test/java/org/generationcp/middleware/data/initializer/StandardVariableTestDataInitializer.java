@@ -1,16 +1,15 @@
 
 package org.generationcp.middleware.data.initializer;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class StandardVariableTestDataInitializer {
 	private static final int DUMMY_PROPERTY_ID = 10;
@@ -40,11 +39,11 @@ public class StandardVariableTestDataInitializer {
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
 		stdVariable.getEnumerations()
-				.add(new Enumeration(StudyType.N.getId(), StudyType.N.getName(), StudyType.N.getLabel(), 1));
+				.add(new Enumeration(10000, "N", "Nursery", 1));
 		stdVariable.getEnumerations()
-				.add(new Enumeration(StudyType.HB.getId(), StudyType.HB.getName(), StudyType.HB.getLabel(), 2));
+				.add(new Enumeration(10001, "HB", "Hybridization Nursery", 2));
 		stdVariable.getEnumerations()
-				.add(new Enumeration(StudyType.PN.getId(), StudyType.PN.getName(), StudyType.PN.getLabel(), 3));
+				.add(new Enumeration(10002, "PN", "Pedigree Nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		stdVariable.setCropOntologyId("CROP-TEST");
 

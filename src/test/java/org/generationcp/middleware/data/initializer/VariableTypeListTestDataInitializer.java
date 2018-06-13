@@ -56,32 +56,32 @@ public class VariableTypeListTestDataInitializer {
 		return plotVariableTypeList;
 	}
 
-	public static VariableTypeList createTrialVariableTypesTestData() {
-		final VariableTypeList trialVariableTypeList = new VariableTypeList();
+	public static VariableTypeList createStudyVariableTypesTestData() {
+		final VariableTypeList variableTypeList = new VariableTypeList();
 		int rank = 0;
-		trialVariableTypeList
+		variableTypeList
 				.add(new DMSVariableType(VariableTypeListTestDataInitializer.TRIAL_INSTANCE,
 						VariableTypeListTestDataInitializer.TRIAL_INSTANCE,
 						StandardVariableTestDataInitializer.createStandardVariableTestData(
 								VariableTypeListTestDataInitializer.TRIAL_INSTANCE, PhenotypicType.TRIAL_ENVIRONMENT),
 						++rank));
-		trialVariableTypeList
+		variableTypeList
 				.add(new DMSVariableType(VariableTypeListTestDataInitializer.LOCATION_ID,
 						VariableTypeListTestDataInitializer.LOCATION_ID,
 						StandardVariableTestDataInitializer.createStandardVariableTestData(
 								VariableTypeListTestDataInitializer.LOCATION_ID, PhenotypicType.TRIAL_ENVIRONMENT),
 						++rank));
-		trialVariableTypeList
+		variableTypeList
 				.add(new DMSVariableType(VariableTypeListTestDataInitializer.LOCATION_NAME,
 						VariableTypeListTestDataInitializer.LOCATION_NAME,
 						StandardVariableTestDataInitializer.createStandardVariableTestData(
 								VariableTypeListTestDataInitializer.LOCATION_NAME, PhenotypicType.TRIAL_ENVIRONMENT),
 						++rank));
-		trialVariableTypeList.add(new DMSVariableType(VariableTypeListTestDataInitializer.SITE_SOIL_PH,
+		variableTypeList.add(new DMSVariableType(VariableTypeListTestDataInitializer.SITE_SOIL_PH,
 				VariableTypeListTestDataInitializer.SITE_SOIL_PH,
 				StandardVariableTestDataInitializer.createStandardVariableTestData(
 						VariableTypeListTestDataInitializer.SITE_SOIL_PH, PhenotypicType.VARIATE),
 				++rank));
-		return trialVariableTypeList;
+		return variableTypeList;
 	}
 }

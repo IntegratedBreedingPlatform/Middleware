@@ -16,8 +16,8 @@ import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -45,7 +45,7 @@ public class StudyTestDataInitializer {
 	public static final String END_DATE = "20160606";
 	private static final String OBJECTIVE = "OBJ1";
 	private static final String CREATED_BY = "1";
-	public static int DATASET_ID = 255;
+	public static int datasetId = 255;
 
 	private final StudyDataManagerImpl studyDataManager;
 	private final OntologyDataManager ontologyManager;
@@ -64,22 +64,24 @@ public class StudyTestDataInitializer {
 	}
 
 	public StudyReference addTestStudy(final String cropPrefix) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T, cropPrefix,
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyTypeDto.getTrialDto(),
+			cropPrefix,
 			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 				.END_DATE, StudyTestDataInitializer.STUDY_UPDATE, StudyTestDataInitializer.OBJECTIVE);
 	}
 	
 	public StudyReference addTestStudy(final String uniqueId, final String cropPrefix) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyTypeDto.getTrialDto(), cropPrefix,
+			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 			.END_DATE, StudyTestDataInitializer.STUDY_UPDATE, StudyTestDataInitializer.OBJECTIVE);
 	}
 	
-	public StudyReference addTestStudy(final StudyType studyType, final String studyName, final String cropPrefix) throws Exception {
+	public StudyReference addTestStudy(final StudyTypeDto studyType, final String studyName, final String cropPrefix) throws Exception {
 		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 			.END_DATE, StudyTestDataInitializer.OBJECTIVE, StudyTestDataInitializer.CREATED_BY);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType, final String cropPrefix,
+	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyTypeDto studyType, final String cropPrefix,
 		final String description, final String startDate, final String endDate, final String objective, final String createdBy) throws
 		Exception {
 		final VariableTypeList typeList = new VariableTypeList();
@@ -91,7 +93,8 @@ public class StudyTestDataInitializer {
 			studyType, description, startDate, endDate, objective, studyName, createdBy);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId,
+	public StudyReference addTestStudy(final String studyName, final StudyTypeDto studyType, final String seasonId, final String
+		locationId,
 		final String startDate, final String cropPrefix) throws Exception {
 
 		final VariableTypeList typeList = new VariableTypeList();
@@ -117,7 +120,7 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
-		final VariableList locationVariableList = this.createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
+		final VariableList locationVariableList = this.createEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
 		studyValues.setLocationId(this.studyDataManager.addTrialEnvironment(locationVariableList));
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -147,7 +150,7 @@ public class StudyTestDataInitializer {
 		return var;
 	}
 
-	private VariableList createTrialEnvironment(final String trialInstance, final String latitude, final String longitude, final String data,
+	private VariableList createEnvironment(final String trialInstance, final String latitude, final String longitude, final String data,
 			final String altitude, final String experimentDesign) throws Exception {
 		final VariableList variableList = new VariableList();
 		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 0, PhenotypicType.TRIAL_ENVIRONMENT));
@@ -159,7 +162,7 @@ public class StudyTestDataInitializer {
 		return variableList;
 	}
 	
-	private VariableList createTrialEnvironmentWithLocationAndSeason(final String trialInstance, final String experimentDesign, final String siteName, final String locationId, final String seasonId) throws Exception {
+	private VariableList createEnvironmentWithLocationAndSeason(final String trialInstance, final String experimentDesign, final String siteName, final String locationId, final String seasonId) throws Exception {
 		final VariableList variableList = new VariableList();
 		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance, 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		variableList.add(this.createVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), experimentDesign, 0, PhenotypicType.TRIAL_ENVIRONMENT));
@@ -219,12 +222,12 @@ public class StudyTestDataInitializer {
 	}
 	
 	public void addEnvironmentDataset(final int studyId, final String locationId, final String seasonId) throws Exception {
-		final VariableList locationVariableList = this.createTrialEnvironmentWithLocationAndSeason("1", "RCBD", "SOME SITE NAME", locationId, seasonId);
+		final VariableList locationVariableList = this.createEnvironmentWithLocationAndSeason("1", "RCBD", "SOME SITE NAME", locationId, seasonId);
 		final int geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
 
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName("ENVIRONMENT " + StudyTestDataInitializer.DATASET_NAME);
-		datasetValues.setDescription("My Trial Environment Dataset");
+		datasetValues.setDescription("My Environment Dataset");
 		datasetValues.setType(DataSetType.SUMMARY_DATA);
 		final DatasetReference dataSet = this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null);
 		
