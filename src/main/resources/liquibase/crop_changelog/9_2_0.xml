@@ -163,14 +163,14 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					select count(*) from projectprop where alias = 'EXPT_DESIGN' AND value = '';
+					select count(*) from projectprop where variable_id = 8135 AND value = '';
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop
 			SET value = 10169
-			WHERE alias = 'EXPT_DESIGN' AND value = '';
+			WHERE variable_id = 8135 AND value = '';
 		</sql>
 	</changeSet>
 
