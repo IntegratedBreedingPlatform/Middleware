@@ -22,6 +22,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.util.Message;
 import org.junit.Assert;
 import org.junit.Before;
@@ -681,7 +682,9 @@ public class DataImportServiceImplTest {
 		testWorkbook.setObservations(observations);
 
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		final StudyTypeDto studyTypeDto = new StudyTypeDto();
+		studyTypeDto.setId(6);
+		studyDetails.setStudyType(studyTypeDto);
 		testWorkbook.setStudyDetails(studyDetails);
 
 		return testWorkbook;
