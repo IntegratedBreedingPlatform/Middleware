@@ -276,9 +276,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// Location Name is mandatory when creating a new study, so we need to automatically
 		// add Location Name variable if is not available in the imported workbook.
 		this.addLocationIDVariableInConditionsIfNotExists(workbook, programUUID);
-		if (workbook.isNursery()) {
-			this.assignLocationVariableWithUnspecifiedLocationIfEmpty(workbook.getConditions());
-		}
+		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(workbook.getConditions());
+
 		this.removeLocationNameVariableIfExists(workbook);
 
 		// Remove obsolete factors, conditions, constants and traits in the
