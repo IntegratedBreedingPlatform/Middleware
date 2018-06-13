@@ -776,7 +776,9 @@
 						  nd_geolocationprop.value = ''
 				   OR     nd_geolocationprop.value IS NULL);
 
-			-- Preserve the alias of location nameUPDATE projectprop
+			-- Preserve the alias of location name
+
+			UPDATE projectprop
 			INNER JOIN project
 			ON         project.project_id = projectprop.project_id
 			INNER JOIN projectprop projectprop_dataset
@@ -901,13 +903,16 @@
 			AND        project.study_type_id = 1
 			AND        name <> 'Basic nursery template';
 
-			-- Delete LOCATION_NAME variable in all Nursery StudiesDELETE projectprop
+			-- Delete LOCATION_NAME variable in all Nursery Studies
+
+			DELETE projectprop
 			FROM       projectprop
 			inner join project
 			ON         projectprop.project_id = project.project_id
 			AND        projectprop.variable_id = 8180
 			WHERE      project.study_type_id = 1
 			AND        name <> 'Basic nursery template';
+
 			]]>
 		</sql>
 	</changeSet>
