@@ -639,7 +639,7 @@
 		<comment>Automatically add location name ([8190] LOCATION_ID variable) to existing studies.</comment>
 		<sql dbms="mysql">
 			<![CDATA[
-			-- FOR TRIAL STUDIES
+			-- FOR EXISTING STUDIES
 
 			INSERT INTO `location`
 						(
@@ -705,8 +705,8 @@
 			AND        projectprop.variable_id = 8190
 			LEFT JOIN  projectprop projectpropRank
 			ON         project.project_id = projectpropRank.project_id
-			WHERE      projectTrial.study_type_id = 6
-			AND        projectTrial.name <> 'Basic Trial Template'
+			WHERE      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
 			AND        projectprop.variable_id IS NULL
 			GROUP BY   project_id;
 
@@ -757,8 +757,8 @@
 			LEFT JOIN  projectprop projectprop_study
 			ON         projectprop_study.project_id = projectTrial.project_id
 			AND        projectprop_study.variable_id = 8190
-			WHERE      projectTrial.study_type_id = 6
-			AND        projectTrial.name <> 'Basic Trial Template'
+			WHERE      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
 			AND        nd_geolocationprop.type_id IS NULL
 			GROUP BY   nd_geolocation_id;
 
@@ -792,14 +792,18 @@
 			LEFT JOIN  projectprop projectprop_location_name
 			ON         project.project_id = projectprop_location_name.project_id
 			AND        projectprop_location_name.variable_id = 8180
+			LEFT JOIN  projectprop projectprop_location_name_study_level
+			ON         projectTrial.project_id = projectprop_location_name_study_level.project_id
+			AND        projectprop_location_name_study_level.variable_id = 8180
 			SET        projectprop.alias =
 					   CASE
-								  WHEN projectprop_location_name.alias IS NULL THEN 'LOCATION_NAME'
-								  ELSE projectprop_location_name.alias
+								  WHEN projectprop_location_name_study_level.alias IS NOT NULL THEN projectprop_location_name_study_level.alias
+								  WHEN projectprop_location_name.alias IS NOT NULL THEN projectprop_location_name.alias
+								  ELSE 'LOCATION_NAME'
 					   end
 			WHERE      projectprop.variable_id = 8190
-			AND        projectTrial.study_type_id = 6
-			AND        projectTrial.name <> 'Basic Trial Template';
+			AND      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
 
 			-- Delete LOCATION_NAME variable at ENVIRONMENT DETAILS (Instance Level)
 
@@ -816,8 +820,10 @@
 			LEFT JOIN  projectprop
 			ON         project.project_id = projectprop.project_id
 			AND        projectprop.variable_id = 8180
-			WHERE      projecttrial.study_type_id = 6
-			AND        projecttrial.name <> 'Basic Trial Template';DELETE
+			WHERE      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
+
+            DELETE
 			FROM   nd_geolocationprop
 			WHERE  type_id = 8180;
 
@@ -838,80 +844,8 @@
 			AND        (
 								  projectprop.variable_id = 8180
 					   OR         projectprop.variable_id = 8190)
-			WHERE      projecttrial.study_type_id = 6
-			AND        projecttrial.name <> 'Basic Trial Template';
-
-			-- FOR NURSERY STUDIES
-
-			-- CREATE location_id variable entries IN study dataset
-
-			INSERT INTO projectprop
-						  (
-									  project_id,
-									  type_id,
-									  value,
-									  rank,
-									  variable_id,
-									  alias
-						  )
-			SELECT    project.project_id,
-						1805,
-						(
-							   SELECT locid
-							   FROM   location
-							   WHERE  lname = 'Unspecified Location'),
-						CASE
-								  WHEN max(projectproprank.rank) IS NULL THEN 1
-								  ELSE max(projectproprank.rank) + 1
-						end AS rank,
-						8190,
-						'LOCATION_NAME'
-			FROM      project
-			LEFT JOIN projectprop
-			ON        projectprop.project_id = project.project_id
-			AND       projectprop.variable_id = 8190
-			LEFT JOIN projectprop projectproprank
-			ON        project.project_id = projectproprank.project_id
-			WHERE     project.study_type_id = 1
-			AND       name <> 'Basic nursery template'
-			AND       projectprop.variable_id IS NULL
-			GROUP BY  project_id;
-
-			-- Update LOCATION_ID variable's value to 'Unspecified Location' if the existing variables have no value
-			-- Preserve the alias of location name
-
-			UPDATE projectprop
-			INNER JOIN project
-			ON         project.project_id = projectprop.project_id
-			LEFT JOIN  projectprop projectprop_location_name
-			ON         project.project_id = projectprop_location_name.project_id
-			AND        projectprop_location_name.variable_id = 8180
-			SET        projectprop.value =
-						 (
-								SELECT locid
-								FROM   location
-								WHERE  lname = 'Unspecified Location'),
-						 projectprop.alias =
-						 CASE
-									WHEN projectprop_location_name.alias IS NULL THEN 'LOCATION_NAME'
-									ELSE projectprop_location_name.alias
-						 end
-			WHERE      projectprop.variable_id = 8190
-			AND        (
-									projectprop.value IS NULL
-						 OR         projectprop.value = '')
-			AND        project.study_type_id = 1
-			AND        name <> 'Basic nursery template';
-
-			-- Delete LOCATION_NAME variable in all Nursery Studies
-
-			DELETE projectprop
-			FROM       projectprop
-			inner join project
-			ON         projectprop.project_id = project.project_id
-			AND        projectprop.variable_id = 8180
-			WHERE      project.study_type_id = 1
-			AND        name <> 'Basic nursery template';
+			AND      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
 
 			]]>
 		</sql>
