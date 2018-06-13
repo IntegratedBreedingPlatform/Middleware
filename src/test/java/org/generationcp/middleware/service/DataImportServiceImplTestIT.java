@@ -247,7 +247,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	public void testParseWorkbookWithNoStudyNonNursery() {
 		this.testFileAgainstExpectedErrorCondition(
 				"org/generationcp/middleware/service/test/GCP5799NonNurseryWorkbookNoStudyEnvironment.xls",
-				"error.missing.trial.condition", "Unable to detect missing trial condition");
+				"error.missing.study.condition", "Unable to detect missing trial condition");
 	}
 
 	@Test

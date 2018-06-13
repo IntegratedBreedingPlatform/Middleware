@@ -57,7 +57,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
 	public static final int MAX_VARIABLE_NAME_LENGTH = 32;
-	public static final String ERROR_MISSING_TRIAL_CONDITION = "error.missing.trial.condition";
+	public static final String ERROR_MISSING_STUDY_CONDITION = "error.missing.study.condition";
 	public static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
 	public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
 	public static final String ERROR_GID_DOESNT_EXIST = "error.gid.doesnt.exist";
@@ -204,7 +204,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 
 		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
-			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
+			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_STUDY_CONDITION));
 		}
 
 		messages.addAll(this.validateMeasurementVariableName(workbook.getAllVariables()));
@@ -853,7 +853,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
-			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
+			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_STUDY_CONDITION));
 		}
 
 		this.checkForDuplicatePSMCombo(workbook, errors);
