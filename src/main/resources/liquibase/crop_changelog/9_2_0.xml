@@ -1,11 +1,12 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-
 	<changeSet author="clarissa" id="v9.2.0-1">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="project" columnName="created_by"/>
@@ -38,10 +39,8 @@
 			176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,
 			191,192,193,194,195,197,199,201,203,204,205,206,207,208,209,210,
 			211,212,213,214,215,216,221,222,223,224,225,227,228);
-
 		</sql>
 	</changeSet>
-
 	<changeSet author="vanina" id="v9.2.0-1">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
@@ -63,7 +62,6 @@
 				  ON DELETE NO ACTION;
 		</sql>
 	</changeSet>
-
 	<changeSet author="cuenyad" id="v9.2.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
@@ -75,10 +73,9 @@
 			update listnms set listtype='STUDY' where listtype in ('TRIAL','NURSERY');
 		</sql>
 	</changeSet>
-
 	<changeSet author="vanina" id="v9.2.0-3">
-	<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
 					SELECT COUNT(*)
 					FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
 					WHERE TABLE_NAME = 'project'
@@ -90,7 +87,6 @@
 			ALTER TABLE project DROP FOREIGN KEY study_type_fk;
 		</sql>
 	</changeSet>
-
 	<changeSet author="vanina" id="v9.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="study_type"/>
@@ -121,11 +117,11 @@
 			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Experiment", "E", 10030, 0);
 		</sql>
 	</changeSet>
-
-
 	<changeSet author="vanina" id="v9.2.0-5">
 		<preConditions onFail="MARK_RAN">
-			<not><columnExists tableName="project" columnName="study_type_id"/> </not>
+			<not>
+				<columnExists tableName="project" columnName="study_type_id"/>
+			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE project
@@ -143,7 +139,6 @@
 			  ON UPDATE NO ACTION;
 		</sql>
 	</changeSet>
-
 	<changeSet id="v9.2.0-6" author="clarysabel">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
@@ -158,23 +153,29 @@
 			VALUES (1190, 17265, 10169);
 		</sql>
 	</changeSet>
-
 	<changeSet id="v9.2.0-7" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					select count(*) from projectprop where variable_id = 8135 AND value = '';
+					select count(*)
+					from project p
+					  inner join projectprop pp on p.project_id = pp.project_id
+					  inner join study_type st on p.study_type_id = st.study_type_id
+					where variable_id = 8135 AND value = '' and st.name = 'N';
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop
 			SET value = 10169
-			WHERE variable_id = 8135 AND value = '';
+			WHERE projectprop_id IN (select pp.projectprop_id
+			    from project p
+			                           inner join (select *
+			                                       from projectprop) pp on p.project_id = pp.project_id
+			                           inner join study_type st on p.study_type_id = st.study_type_id
+			                         where variable_id = 8135 AND value = '' and st.name = 'N');
 		</sql>
 	</changeSet>
-
-
 	<changeSet id="v9.2.0-8" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<not>
@@ -189,7 +190,6 @@
 			WHERE type_id = 8135 AND value = '';
 		</sql>
 	</changeSet>
-
 	<changeSet id="v9.2.0-9" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
@@ -206,8 +206,7 @@
 			DROP PROCEDURE migrate_check_list;
 		</sql>
 	</changeSet>
-
-		<changeSet id="v9.2.0-10" author="vanina">
+	<changeSet id="v9.2.0-10" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -447,186 +446,307 @@
 
 			  ]]>
 		</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-11" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">
-					SELECT
-					COUNT(*)
-					FROM
-					information_schema.routines
-					WHERE
-					routine_schema = DATABASE()
-					AND specific_name = 'migrate_check_list';
-				</sqlCheck>
-			</preConditions>
-				<sql dbms="mysql" splitStatements="false">
-					call migrate_check_list();
-				</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-12" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">
-					SELECT
-					COUNT(*)
-					FROM
-					information_schema.routines
-					WHERE
-					routine_schema = DATABASE()
-					AND specific_name = 'migrate_check_list';
-				</sqlCheck>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
-				DROP PROCEDURE migrate_check_list;
-			</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-13" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<not>
+	</changeSet>
+	<changeSet id="v9.2.0-11" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_check_list';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call migrate_check_list();
+		</sql>
+	</changeSet>
+	<changeSet id="v9.2.0-12" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_check_list';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE migrate_check_list;
+		</sql>
+	</changeSet>
+	<changeSet id="v9.2.0-13" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<not>
 				<sqlCheck expectedResult="0">
-					SELECT
-					COUNT(*)
-					from cvtermprop
-					where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
-                                                    FROM cvterm cvt
-                                                      INNER JOIN  (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
-                                                    WHERE cvt.cv_id = 1040 -- variable
-                                                          AND cvtp.type_id = 1800 -- variable type
-                                                          AND cvtp.value IN (
-                                                      'Nursery Condition'
-                                                      , 'Trial Condition'
-                                                    )
-                                                    group by cvt.cvterm_id
-                                                    having count(1) = 2);
-				</sqlCheck>
-				</not>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
+				SELECT
+				COUNT(*)
+				from cvtermprop
+				where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
+					FROM cvterm cvt
+					INNER JOIN  (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+					WHERE cvt.cv_id = 1040 -- variable
+					AND cvtp.type_id = 1800 -- variable type
+					AND cvtp.value IN (
+						'Nursery Condition'
+						, 'Trial Condition')
+					group by cvt.cvterm_id
+					having count(1) = 2);
+			</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
 				delete from cvtermprop
 				where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
-                                                    FROM cvterm cvt
-                                                      INNER JOIN (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
-                                                    WHERE cvt.cv_id = 1040 -- variable
-                                                          AND cvtp.type_id = 1800 -- variable type
-                                                          AND cvtp.value IN (
-                                                      'Nursery Condition'
-                                                      , 'Trial Condition'
-                                                    )
-                                                    group by cvt.cvterm_id
-                                                    having count(1) = 2);
-
+					FROM cvterm cvt
+					INNER JOIN (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+					WHERE cvt.cv_id = 1040 -- variable
+					AND cvtp.type_id = 1800 -- variable type
+					AND cvtp.value IN (
+						'Nursery Condition'
+						, 'Trial Condition')
+					group by cvt.cvterm_id
+					having count(1) = 2);
 			</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-14" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">
-					SELECT
-					COUNT(*)
-					FROM
-						cvterm
-					WHERE cvterm_id = 1802 AND name = 'Trial Condition';
-				</sqlCheck>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
+	</changeSet>
+	<changeSet id="v9.2.0-14" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+					cvterm
+				WHERE cvterm_id = 1802 AND name = 'Trial Condition';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
 				UPDATE cvterm SET name = 'Study Condition', definition = 'Observations made of conditions in a study' WHERE cvterm_id = 1802;
 			</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-15" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">
-					SELECT
-					COUNT(*)
-					FROM
-						cvtermprop
-					WHERE value = 'Nursery Condition' AND type_id = 1800;
-				</sqlCheck>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
-				UPDATE cvtermprop SET value = 'Trial Condition' WHERE value = 'Nursery Condition' AND type_id = 1800;
-			</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-16" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">
-					SELECT
-					COUNT(*)
-					FROM
-						projectprop
-					WHERE type_id = 1803;
-				</sqlCheck>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
-				UPDATE projectprop SET type_id=1802 WHERE type_id=1803;
-			</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-17" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">
-					SELECT
-					COUNT(*)
-					FROM
+	</changeSet>
+	<changeSet id="v9.2.0-15" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+					cvtermprop
+				WHERE value = 'Nursery Condition' AND type_id = 1800;
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE cvtermprop SET value = 'Trial Condition' WHERE value = 'Nursery Condition' AND type_id = 1800;
+		</sql>
+	</changeSet>
+	<changeSet id="v9.2.0-16" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+					projectprop
+				WHERE type_id = 1803;
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE projectprop SET type_id=1802 WHERE type_id=1803;
+		</sql>
+	</changeSet>
+	<changeSet id="v9.2.0-17" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
 						cvterm
 					WHERE cvterm_id = 1803;
 				</sqlCheck>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
 				DELETE FROM cvterm WHERE cvterm_id= 1803;
 			</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-18" author="vanina">
-			<preConditions onFail="MARK_RAN">
-				<not>
-					<sqlCheck expectedResult="0">
+	</changeSet>
+	<changeSet id="v9.2.0-18" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
 						SELECT
 						COUNT(*)
 						FROM
 							cvtermprop
 						where value = 'Nursery Condition' or value = 'Trial Condition';
 					</sqlCheck>
-				</not>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
 				update cvtermprop set value = 'Study Condition' where value = 'Nursery Condition' or value = 'Trial Condition';
 			</sql>
-		</changeSet>
-
-		<changeSet id="v9.2.0-19" author="clarysabel">
-			<preConditions onFail="MARK_RAN">
-				<not>
-					<sqlCheck expectedResult="0">
+	</changeSet>
+	<changeSet id="v9.2.0-19" author="clarysabel">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
 						SELECT
 						COUNT(*)
 						FROM
 							projectprop
 						where alias != 'TRIAL_INSTANCE' and variable_id = 8170;
 					</sqlCheck>
-				</not>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="false">
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
 				update projectprop set alias = 'TRIAL_INSTANCE' where variable_id = 8170 and alias != 'TRIAL_INSTANCE';
 			</sql>
-		</changeSet>
-
-		<changeSet author="vanina" id="v9.2.0-20">
+	</changeSet>
+	<changeSet author="vanina" id="v9.2.0-20">
 		<preConditions onFail="MARK_RAN">
-					<sqlCheck expectedResult="1">
+			<sqlCheck expectedResult="1">
 						SELECT COUNT(*)
 						FROM INFORMATION_SCHEMA.STATISTICS
 						WHERE TABLE_SCHEMA = DATABASE()
 						AND TABLE_NAME = 'project'
 						AND INDEX_NAME = 'study_type_fk_idx';
 					</sqlCheck>
-			</preConditions>
-			<sql dbms="mysql" splitStatements="true">
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
 				ALTER TABLE project DROP INDEX study_type_fk_idx;
 			</sql>
-		</changeSet>
+	</changeSet>
+	<changeSet author="vanina" id="v9.2.0-21">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+						select count(1)
+						from project p
+						  inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+						  inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+						  inner join study_type st on p.study_type_id = st.study_type_id
+						where not exists(select 1
+						                 from nd_geolocationprop ngp
+						                 where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8135)
+						      and st.name = 'N';
+					</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+				INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+				  select distinct
+				    e.nd_geolocation_id,
+				    8135,
+				    10169,
+				    (select max(ngp.rank) + 1
+				     from nd_geolocationprop ngp
+				     where ngp.nd_geolocation_id = e.nd_geolocation_id)
+				  from project p
+				    inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+				    inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+				    inner join study_type st on p.study_type_id = st.study_type_id
+				  where not exists(select 1
+				                   from nd_geolocationprop ngp
+				                   where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8135)
+				        and st.name = 'N';
+			</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.2.0-22">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+							select count(1)
+							from project p
+							  inner join projectprop pp on p.project_id = pp.project_id
+							  inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+							  inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+							where pp.variable_id = 8411
+							      and not exists(select 1
+							                     from nd_geolocationprop ngp
+							                     where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8411);
+						</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+					  select
+					    e.nd_geolocation_id,
+					    pp.variable_id,
+					    pp.value,
+					    pp.rank
+					  from project p
+					    inner join projectprop pp on p.project_id = pp.project_id
+					    inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+					    inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+					  where pp.variable_id = 8411
+					        and not exists(select 1
+					                       from nd_geolocationprop ngp
+					                       where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8411);
+				</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.2.0-23">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+							select count(1)
+							from project p
+							  inner join projectprop pp on p.project_id = pp.project_id
+							  inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+							  inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+							where pp.variable_id = 8412
+							      and not exists(select 1
+							                     from nd_geolocationprop ngp
+							                     where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8412);
+						</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+					  select
+					    e.nd_geolocation_id,
+					    pp.variable_id,
+					    pp.value,
+					    pp.rank
+					  from project p
+					    inner join projectprop pp on p.project_id = pp.project_id
+					    inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+					    inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+					  where pp.variable_id = 8412
+					        and not exists(select 1
+					                       from nd_geolocationprop ngp
+					                       where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8412);
+				</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.2.0-23">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+							select count(1)
+							from project p
+							  inner join projectprop pp on p.project_id = pp.project_id
+							  inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+							  inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+							where pp.variable_id = 8413
+							      and not exists(select 1
+							                     from nd_geolocationprop ngp
+							                     where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8413);
+						</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+					  select
+					    e.nd_geolocation_id,
+					    pp.variable_id,
+					    pp.value,
+					    pp.rank
+					  from project p
+					    inner join projectprop pp on p.project_id = pp.project_id
+					    inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+					    inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+					  where pp.variable_id = 8413
+					        and not exists(select 1
+					                       from nd_geolocationprop ngp
+					                       where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8413);
+				</sql>
+	</changeSet>
 </databaseChangeLog>
