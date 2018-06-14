@@ -6,6 +6,8 @@ package org.generationcp.middleware.service.api.user;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.pojos.workbench.Role;
+
 /**
  * @author vmaletta
  *
@@ -21,8 +23,8 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String firstName;
 
 	private String lastName;
-
-	private String role;
+	
+	private Role role;
 
 	private Integer status;
 
@@ -38,11 +40,9 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 
 		this.username = "";
 		this.status = 0;
-		// default
-		this.role = "TECHNICIAN";
 	}
 
-	public UserDto(Integer userId, String username, String firstName, String lastName, String role, Integer status, String email) {
+	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final Role role, Integer status, String email) {
 		this.userId = userId;
 		this.username = username;
 		this.firstName = firstName;
@@ -51,7 +51,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.status = status;
 		this.email = email;
 	}
-
+	
 	public Integer getUserId() {
 		return this.userId;
 	}
@@ -84,11 +84,13 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.lastName = lastName;
 	}
 
-	public String getRole() {
-		return this.role;
+	
+	public Role getRole() {
+		return role;
 	}
 
-	public void setRole(String role) {
+	
+	public void setRole(final Role role) {
 		this.role = role;
 	}
 

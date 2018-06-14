@@ -6,7 +6,6 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	
 	<changeSet author="clarissa" id="v9.2.0-1">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="project" columnName="created_by"/>
@@ -42,4 +41,12 @@
 			
 		</sql>
 	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="users_roles"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="users_roles"/>
+	</changeSet>
+
 </databaseChangeLog>

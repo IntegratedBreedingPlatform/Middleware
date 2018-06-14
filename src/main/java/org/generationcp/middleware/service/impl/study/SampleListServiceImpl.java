@@ -231,16 +231,16 @@ public class SampleListServiceImpl implements SampleListService {
 	 *
 	 * @param folderName
 	 * @param parentId
-	 * @param createdBy
+	 * @param username
 	 * @param programUUID
 	 * @return Sample List
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final User createdBy, final String programUUID) {
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String username, final String programUUID) {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
-		Preconditions.checkNotNull(createdBy, "createdBy can not be empty");
+		Preconditions.checkNotNull(username, "username can not be empty");
 		Preconditions.checkNotNull(programUUID);
 		Preconditions.checkArgument(!folderName.isEmpty(), "folderName can not be empty");
 		Preconditions.checkArgument(!programUUID.isEmpty(), "programUUID can not be empty");
@@ -262,7 +262,7 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 		try {
-			User cropUser = this.userDao.getUserByUserName(createdBy.getName());
+			User cropUser = this.userDao.getUserByUserName(username);
 			final SampleList sampleFolder = new SampleList();
 			sampleFolder.setCreatedDate(new Date());
 			sampleFolder.setCreatedBy(cropUser);

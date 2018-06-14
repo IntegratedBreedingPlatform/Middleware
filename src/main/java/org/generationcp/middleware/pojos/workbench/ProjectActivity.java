@@ -25,7 +25,6 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.User;
 
 /**
  * POJO for workbench_project_activity table.
@@ -65,7 +64,7 @@ public class ProjectActivity implements Serializable {
 
 	@OneToOne(optional = false)
 	@JoinColumn(name = "user_id")
-	private User user;
+	private WorkbenchUser user;
 
 	@Column(name = "date")
 	private Date createdAt;
@@ -73,7 +72,7 @@ public class ProjectActivity implements Serializable {
 	public ProjectActivity() {
 	}
 
-	public ProjectActivity(Integer projectActivityId, Project project, String name, String description, User user, Date createdAt) {
+	public ProjectActivity(Integer projectActivityId, Project project, String name, String description, WorkbenchUser user, Date createdAt) {
 		super();
 		this.projectActivityId = projectActivityId;
 		this.project = project;
@@ -115,11 +114,11 @@ public class ProjectActivity implements Serializable {
 		this.description = description;
 	}
 
-	public User getUser() {
+	public WorkbenchUser getUser() {
 		return this.user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(WorkbenchUser user) {
 		this.user = user;
 	}
 

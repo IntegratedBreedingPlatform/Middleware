@@ -18,18 +18,19 @@ import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 
@@ -94,7 +95,7 @@ public interface WorkbenchDataManager {
 	 * @param user - the User associated with the projects to be retrieved
 	 * @return the projects which the specified user is involved
 	 */
-	List<Project> getProjectsByUser(User user);
+	List<Project> getProjectsByUser(WorkbenchUser user);
 
 	/**
 	 * Save or update project.
@@ -241,14 +242,10 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param username
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	UserInfo getUserInfoByUsername(String username);
 
-	User getUserByUsername(String userName);
+	WorkbenchUser getUserByUsername(String userName);
 
 	UserInfo getUserInfoByResetToken(String token);
 
@@ -262,7 +259,7 @@ public interface WorkbenchDataManager {
 	void incrementUserLogInCount(int userId);
 
 	/**
-	 * Insert or update the specified {@link UserInfo} record.
+	 * Insert or update the specified {@link WorkbenchUserInfo} record.
 	 *
 	 * @param userDetails the user details
 	 */
@@ -282,7 +279,7 @@ public interface WorkbenchDataManager {
 	 * @param user - the user to add
 	 * @return Returns the id of the {@code User} record added
 	 */
-	Integer addUser(User user);
+	Integer addUser(WorkbenchUser user);
 
 	/**
 	 * Gets a project by id.
@@ -313,16 +310,16 @@ public interface WorkbenchDataManager {
 	/**
 	 * Returns all the Workbench users.
 	 *
-	 * @return A {@code List} of all the {@code User}s in the Workbench database.
+	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
 	 */
-	List<User> getAllUsers();
+	List<WorkbenchUser> getAllUsers();
 
 	/**
 	 * Returns all the Workbench users ordered by First Name then Last Name.
 	 *
-	 * @return A {@code List} of all the {@code User}s in the Workbench database.
+	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
 	 */
-	List<User> getAllActiveUsersSorted();
+	List<WorkbenchUser> getAllActiveUsersSorted();
 
 	/**
 	 * Returns number of all Users.
@@ -337,7 +334,7 @@ public interface WorkbenchDataManager {
 	 * @param id - the user id to match
 	 * @return the user matching the given id
 	 */
-	User getUserById(int id);
+	WorkbenchUser getUserById(int id);
 
 	/**
 	 * Gets the user by name.
@@ -348,14 +345,14 @@ public interface WorkbenchDataManager {
 	 * @param op the op
 	 * @return the user by name
 	 */
-	List<User> getUserByName(String name, int start, int numOfRows, Operation op);
+	List<WorkbenchUser> getUserByName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Deletes a user.
 	 *
-	 * @param user - the User to delete
+	 * @param user - the Workbench User to delete
 	 */
-	void deleteUser(User user);
+	void deleteUser(WorkbenchUser user);
 
 	/**
 	 * Returns all Persons.
@@ -419,18 +416,18 @@ public interface WorkbenchDataManager {
 	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
 	
 	/**
-	 * Return a List of {@link User} records associated with a {@link Project}.
+	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id
-	 * @return the List of {@link User} records
+	 * @return the List of {@link WorkbenchUser} records
 	 */
-	List<User> getUsersByProjectId(Long projectId);
+	List<WorkbenchUser> getUsersByProjectId(Long projectId);
 	
 	/**
-	 * Return a Map of {@link Person} records identified by {@link User} ids associated with a {@link Project}.
+	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id
-	 * @return the Maps of {@link Person} records identified by {@link User} ids
+	 * @return the Maps of {@link Person} records identified by {@link WorkbenchUser} ids
 	 */
 	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
 
@@ -622,10 +619,6 @@ public interface WorkbenchDataManager {
 	 * Gets the all Users Sorted
 	 *
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	List<UserDto> getAllUsersSortedByLastName();
 
@@ -646,12 +639,12 @@ public interface WorkbenchDataManager {
 	public Integer updateUser(UserDto userDto);
 
 	/**
-	 * updates the user.
+	 * Updates the user.
 	 *
 	 * @param user the user to update
 	 * @return Returns the id of the {@code User} record updated
 	 */
-	public void updateUser(User user);
+	public void updateUser(WorkbenchUser user);
 
 	/**
 	 * Gets the user by project_uuid.
@@ -660,5 +653,12 @@ public interface WorkbenchDataManager {
 	 * @return the user matching the given project_uuid
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
+	
+	/**
+	 * Returns list of roles that can be assigned to a new user
+	 * 
+	 * @return
+	 */
+	List<Role> getAssignableRoles();
 
 }
