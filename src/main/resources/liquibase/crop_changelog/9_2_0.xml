@@ -716,7 +716,7 @@
 					                       where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8412);
 				</sql>
 	</changeSet>
-	<changeSet author="vanina" id="v9.2.0-23">
+	<changeSet author="vanina" id="v9.2.0-24">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
