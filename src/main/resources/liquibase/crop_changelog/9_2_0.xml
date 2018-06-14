@@ -6,7 +6,44 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="vanina" id="v9.2.0-1">
+
+	<changeSet author="clarissa" id="v9.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="project" columnName="created_by"/>
+		</preConditions>
+		<comment>
+			Assign project.created_by = admin user id for nursery, trial templates. Jira IBP-1655
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE project p SET p.created_by =
+				(SELECT userid FROM users WHERE uname='admin')
+			WHERE NAME LIKE '%template' AND program_uuid IS NULL;
+		</sql>
+	</changeSet>
+	<changeSet author="clarissa" id="v9.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_bean_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on bean template and reduce the number of traits.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop SET type_id = 1804 WHERE type_id = 1042;
+
+			DELETE FROM projectprop WHERE project_id = 3510 AND rank IN
+			(10,17,22,23,24,25,26,27,28,29,31,32,33,34,35,39,40,46,47,48,49,
+			51,53,54,55,59,60,61,64,65,66,68,69,70,71,73,77,78,80,82,83,89,
+			90,91,92,93,94,95,97,101,102,104,105,109,110,111,112,113,114,115,
+			116,119,120,121,122,126,127,130,132,134,135,136,138,139,140,
+			141,144,145,150,151,152,156,157,158,159,160,163,164,174,175,
+			176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,
+			191,192,193,194,195,197,199,201,203,204,205,206,207,208,209,210,
+			211,212,213,214,215,216,221,222,223,224,225,227,228);
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v9.2.0-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(*)
@@ -28,7 +65,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v9.2.0-2">
+	<changeSet author="cuenyad" id="v9.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0 FROM listnms WHERE listtype in ('TRIAL','NURSERY');
@@ -40,7 +77,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v9.2.0-3">
+	<changeSet author="vanina" id="v9.2.0-5">
 	<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT COUNT(*)
@@ -55,7 +92,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v9.2.0-4">
+	<changeSet author="vanina" id="v9.2.0-6">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="study_type"/>
 		</preConditions>
@@ -87,7 +124,7 @@
 	</changeSet>
 
 
-	<changeSet author="vanina" id="v9.2.0-5">
+	<changeSet author="vanina" id="v9.2.0-7">
 		<preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="project" columnName="study_type_id"/> </not>
 		</preConditions>
@@ -108,7 +145,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="v9.2.0-6" author="clarysabel">
+	<changeSet id="v9.2.0-8" author="clarysabel">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(*) from cvterm where cvterm_id = 10169;
@@ -123,23 +160,23 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="v9.2.0-7" author="vanina">
+	<changeSet id="v9.2.0-9" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					select count(*) from projectprop where alias = 'EXPT_DESIGN' AND value = '';
+					select count(*) from projectprop where variable_id = 8135 AND value = '';
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop
 			SET value = 10169
-			WHERE alias = 'EXPT_DESIGN' AND value = '';
+			WHERE variable_id = 8135 AND value = '';
 		</sql>
 	</changeSet>
 
 
-	<changeSet id="v9.2.0-8" author="vanina">
+	<changeSet id="v9.2.0-10" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
@@ -154,7 +191,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet id="v9.2.0-9" author="vanina">
+	<changeSet id="v9.2.0-11" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -171,7 +208,7 @@
 		</sql>
 	</changeSet>
 
-		<changeSet id="v9.2.0-10" author="vanina">
+		<changeSet id="v9.2.0-12" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -413,7 +450,7 @@
 		</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-11" author="vanina">
+		<changeSet id="v9.2.0-13" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -430,7 +467,7 @@
 				</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-12" author="vanina">
+		<changeSet id="v9.2.0-14" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -447,7 +484,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-13" author="vanina">
+		<changeSet id="v9.2.0-15" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<not>
 				<sqlCheck expectedResult="0">
@@ -485,7 +522,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-14" author="vanina">
+		<changeSet id="v9.2.0-16" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -500,7 +537,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-15" author="vanina">
+		<changeSet id="v9.2.0-17" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -515,7 +552,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-16" author="vanina">
+		<changeSet id="v9.2.0-18" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -530,7 +567,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-17" author="vanina">
+		<changeSet id="v9.2.0-19" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT
@@ -545,7 +582,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-18" author="vanina">
+		<changeSet id="v9.2.0-20" author="vanina">
 			<preConditions onFail="MARK_RAN">
 				<not>
 					<sqlCheck expectedResult="0">
@@ -562,7 +599,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet id="v9.2.0-19" author="clarysabel">
+		<changeSet id="v9.2.0-21" author="clarysabel">
 			<preConditions onFail="MARK_RAN">
 				<not>
 					<sqlCheck expectedResult="0">
@@ -579,7 +616,7 @@
 			</sql>
 		</changeSet>
 
-		<changeSet author="vanina" id="v9.2.0-20">
+		<changeSet author="vanina" id="v9.2.0-22">
 		<preConditions onFail="MARK_RAN">
 					<sqlCheck expectedResult="1">
 						SELECT COUNT(*)
@@ -594,261 +631,225 @@
 			</sql>
 		</changeSet>
 
-	<changeSet author="clarissa" id="v9.2.0-21">
-		<preConditions onFail="MARK_RAN">
-			<columnExists tableName="project" columnName="created_by"/>
-		</preConditions>
-		<comment>
-			Assign project.created_by = admin user id for nursery, trial templates. Jira IBP-1655
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE project p SET p.created_by =
-			(SELECT userid FROM users WHERE uname='admin')
-			WHERE NAME LIKE '%template' AND program_uuid IS NULL;
-		</sql>
-	</changeSet>
-	<changeSet author="clarissa" id="v9.2.0-22">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">select case when ('ibdbv2_bean_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
-		</preConditions>
-		<comment>
-			Apply fix on bean template and reduce the number of traits.
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE projectprop SET type_id = 1804 WHERE type_id = 1042;
+		<changeSet author="aldrin" id="v9.2.0-23">
+			<preConditions onFail="CONTINUE">
+				<sqlCheck expectedResult="0">
+					<![CDATA[Select count(*) from `location` Where lname = 'Unspecified Location';]]>
+				</sqlCheck>
+			</preConditions>
+			<comment>Automatically add location name ([8190] LOCATION_ID variable) to existing studies.</comment>
+			<sql dbms="mysql">
+				<![CDATA[
+				-- FOR EXISTING STUDIES
 
-			DELETE FROM projectprop WHERE project_id = 3510 AND rank IN
-			(10,17,22,23,24,25,26,27,28,29,31,32,33,34,35,39,40,46,47,48,49,
-			51,53,54,55,59,60,61,64,65,66,68,69,70,71,73,77,78,80,82,83,89,
-			90,91,92,93,94,95,97,101,102,104,105,109,110,111,112,113,114,115,
-			116,119,120,121,122,126,127,130,132,134,135,136,138,139,140,
-			141,144,145,150,151,152,156,157,158,159,160,163,164,174,175,
-			176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,
-			191,192,193,194,195,197,199,201,203,204,205,206,207,208,209,210,
-			211,212,213,214,215,216,221,222,223,224,225,227,228);
+				INSERT INTO `location`
+							(
+										`ltype`,
+										`nllp`,
+										`lname`,
+										`labbr`,
+										`snl3id`,
+										`snl2id`,
+										`snl1id`,
+										`cntryid`,
+										`lrplce`,
+										`nnpid`
+							)
+							VALUES
+							(
+										'405',
+										'1',
+										'Unspecified Location',
+										'NOLOC',
+										'0',
+										'0',
+										'0',
+										'0',
+										'0',
+										'0'
+							);
 
-		</sql>
-	</changeSet>
+				-- Create LOCATION_ID variable entries in ENVIRONMENT (SUMMARY) DATASET
 
-	<changeSet author="aldrin" id="v9.2.0-23">
-		<preConditions onFail="CONTINUE">
-			<sqlCheck expectedResult="0">
-				<![CDATA[Select count(*) from `location` Where lname = 'Unspecified Location';]]>
-			</sqlCheck>
-		</preConditions>
-		<comment>Automatically add location name ([8190] LOCATION_ID variable) to existing studies.</comment>
-		<sql dbms="mysql">
-			<![CDATA[
-			-- FOR EXISTING STUDIES
+				INSERT INTO projectprop
+							(
+										project_id,
+										type_id,
+										value,
+										rank,
+										variable_id,
+										alias
+							)
+				SELECT     project.project_id,
+						   1806,
+						   (
+								  SELECT locid
+								  FROM   location
+								  WHERE  lname = 'Unspecified Location'),
+						   CASE
+									  WHEN Max(projectpropRank.rank) IS NULL THEN 1
+									  ELSE Max(projectpropRank.rank) + 1
+						   end AS rank,
+						   8190,
+						   'LOCATION_NAME'
+				FROM       project
+				INNER JOIN projectprop projectprop_dataset
+				ON         projectprop_dataset.project_id = project.project_id
+				AND        projectprop_dataset.variable_id = 8160
+				AND        projectprop_dataset.value = 10080
+				INNER JOIN project_relationship
+				ON         project.project_id = project_relationship.subject_project_id
+				INNER JOIN project projectTrial
+				ON         projectTrial.project_id = project_relationship.object_project_id
+				LEFT JOIN  projectprop
+				ON         project.project_id = projectprop.project_id
+				AND        projectprop.variable_id = 8190
+				LEFT JOIN  projectprop projectpropRank
+				ON         project.project_id = projectpropRank.project_id
+				WHERE      projectTrial.study_type_id in (1,6)
+				AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
+				AND        projectprop.variable_id IS NULL
+				GROUP BY   project_id;
 
-			INSERT INTO `location`
-						(
-									`ltype`,
-									`nllp`,
-									`lname`,
-									`labbr`,
-									`snl3id`,
-									`snl2id`,
-									`snl1id`,
-									`cntryid`,
-									`lrplce`,
-									`nnpid`
-						)
-						VALUES
-						(
-									'405',
-									'1',
-									'Unspecified Location',
-									'NOLOC',
-									'0',
-									'0',
-									'0',
-									'0',
-									'0',
-									'0'
-						);
+				-- Create LOCATION_ID variable entries at INSTANCE/ENVIRONMENT level
 
-			-- Create LOCATION_ID variable entries in ENVIRONMENT (SUMMARY) DATASET
+				INSERT INTO nd_geolocationprop
+							(
+										nd_geolocation_id,
+										type_id,
+										value,
+										rank
+							)
+				SELECT     nd_geolocation.nd_geolocation_id,
+						   8190,
+						   CASE
+									  WHEN projectprop_study.value IS NOT NULL
+									  AND        projectprop_study.value <> '' THEN projectprop_study.value
+									  ELSE
+											(
+											SELECT locid
+											FROM   location
+											WHERE  lname = 'Unspecified Location')
+						   end,
+						   CASE
+									  WHEN Max(gpRank.rank) IS NULL THEN 1
+									  ELSE Max(gpRank.rank) + 1
+						   end AS rank
+				FROM       project
+				INNER JOIN projectprop projectprop_dataset
+				ON         projectprop_dataset.project_id = project.project_id
+				AND        projectprop_dataset.variable_id = 8160
+				AND        projectprop_dataset.value = 10080
+				INNER JOIN project_relationship
+				ON         project.project_id = project_relationship.subject_project_id
+				INNER JOIN project projectTrial
+				ON         projectTrial.project_id = project_relationship.object_project_id
+				INNER JOIN nd_experiment_project
+				ON         project.project_id = nd_experiment_project.project_id
+				INNER JOIN nd_experiment
+				ON         nd_experiment.nd_experiment_id = nd_experiment_project.nd_experiment_id
+				INNER JOIN nd_geolocation
+				ON         nd_geolocation.nd_geolocation_id = nd_experiment.nd_geolocation_id
+				LEFT JOIN  nd_geolocationprop
+				ON         nd_geolocationprop.nd_geolocation_id = nd_geolocation.nd_geolocation_id
+				AND        nd_geolocationprop.type_id = 8190
+				LEFT JOIN  nd_geolocationprop gpRank
+				ON         gpRank.nd_geolocation_id = nd_geolocation.nd_geolocation_id
+				LEFT JOIN  projectprop projectprop_study
+				ON         projectprop_study.project_id = projectTrial.project_id
+				AND        projectprop_study.variable_id = 8190
+				WHERE      projectTrial.study_type_id in (1,6)
+				AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
+				AND        nd_geolocationprop.type_id IS NULL
+				GROUP BY   nd_geolocation_id;
 
-			INSERT INTO projectprop
-						(
-									project_id,
-									type_id,
-									value,
-									rank,
-									variable_id,
-									alias
-						)
-			SELECT     project.project_id,
-					   1806,
+				-- Update LOCATION_ID variable's value to 'Unspecified Location' if the existing variables have no value
+
+				UPDATE nd_geolocationprop
+				SET    nd_geolocationprop.value =
 					   (
 							  SELECT locid
 							  FROM   location
-							  WHERE  lname = 'Unspecified Location'),
-					   CASE
-								  WHEN Max(projectpropRank.rank) IS NULL THEN 1
-								  ELSE Max(projectpropRank.rank) + 1
-					   end AS rank,
-					   8190,
-					   'LOCATION_NAME'
-			FROM       project
-			INNER JOIN projectprop projectprop_dataset
-			ON         projectprop_dataset.project_id = project.project_id
-			AND        projectprop_dataset.variable_id = 8160
-			AND        projectprop_dataset.value = 10080
-			INNER JOIN project_relationship
-			ON         project.project_id = project_relationship.subject_project_id
-			INNER JOIN project projectTrial
-			ON         projectTrial.project_id = project_relationship.object_project_id
-			LEFT JOIN  projectprop
-			ON         project.project_id = projectprop.project_id
-			AND        projectprop.variable_id = 8190
-			LEFT JOIN  projectprop projectpropRank
-			ON         project.project_id = projectpropRank.project_id
-			WHERE      projectTrial.study_type_id in (1,6)
-			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
-			AND        projectprop.variable_id IS NULL
-			GROUP BY   project_id;
+							  WHERE  lname = 'Unspecified Location')
+				WHERE  nd_geolocationprop.type_id = 8190
+				AND    nd_geolocationprop.type_id IS NOT NULL
+				AND    (
+							  nd_geolocationprop.value = ''
+					   OR     nd_geolocationprop.value IS NULL);
 
-			-- Create LOCATION_ID variable entries at INSTANCE/ENVIRONMENT level
+				-- Preserve the alias of location name
 
-			INSERT INTO nd_geolocationprop
-						(
-									nd_geolocation_id,
-									type_id,
-									value,
-									rank
-						)
-			SELECT     nd_geolocation.nd_geolocation_id,
-					   8190,
-					   CASE
-								  WHEN projectprop_study.value IS NOT NULL
-								  AND        projectprop_study.value <> '' THEN projectprop_study.value
-								  ELSE
-										(
-										SELECT locid
-										FROM   location
-										WHERE  lname = 'Unspecified Location')
-					   end,
-					   CASE
-								  WHEN Max(gpRank.rank) IS NULL THEN 1
-								  ELSE Max(gpRank.rank) + 1
-					   end AS rank
-			FROM       project
-			INNER JOIN projectprop projectprop_dataset
-			ON         projectprop_dataset.project_id = project.project_id
-			AND        projectprop_dataset.variable_id = 8160
-			AND        projectprop_dataset.value = 10080
-			INNER JOIN project_relationship
-			ON         project.project_id = project_relationship.subject_project_id
-			INNER JOIN project projectTrial
-			ON         projectTrial.project_id = project_relationship.object_project_id
-			INNER JOIN nd_experiment_project
-			ON         project.project_id = nd_experiment_project.project_id
-			INNER JOIN nd_experiment
-			ON         nd_experiment.nd_experiment_id = nd_experiment_project.nd_experiment_id
-			INNER JOIN nd_geolocation
-			ON         nd_geolocation.nd_geolocation_id = nd_experiment.nd_geolocation_id
-			LEFT JOIN  nd_geolocationprop
-			ON         nd_geolocationprop.nd_geolocation_id = nd_geolocation.nd_geolocation_id
-			AND        nd_geolocationprop.type_id = 8190
-			LEFT JOIN  nd_geolocationprop gpRank
-			ON         gpRank.nd_geolocation_id = nd_geolocation.nd_geolocation_id
-			LEFT JOIN  projectprop projectprop_study
-			ON         projectprop_study.project_id = projectTrial.project_id
-			AND        projectprop_study.variable_id = 8190
-			WHERE      projectTrial.study_type_id in (1,6)
-			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
-			AND        nd_geolocationprop.type_id IS NULL
-			GROUP BY   nd_geolocation_id;
+				UPDATE projectprop
+				INNER JOIN project
+				ON         project.project_id = projectprop.project_id
+				INNER JOIN projectprop projectprop_dataset
+				ON         projectprop_dataset.project_id = project.project_id
+				AND        projectprop_dataset.variable_id = 8160
+				AND        projectprop_dataset.value = 10080
+				INNER JOIN project_relationship
+				ON         project.project_id = project_relationship.subject_project_id
+				INNER JOIN project projectTrial
+				ON         projectTrial.project_id = project_relationship.object_project_id
+				LEFT JOIN  projectprop projectprop_location_name
+				ON         project.project_id = projectprop_location_name.project_id
+				AND        projectprop_location_name.variable_id = 8180
+				LEFT JOIN  projectprop projectprop_location_name_study_level
+				ON         projectTrial.project_id = projectprop_location_name_study_level.project_id
+				AND        projectprop_location_name_study_level.variable_id = 8180
+				SET        projectprop.alias =
+						   CASE
+									  WHEN projectprop_location_name_study_level.alias IS NOT NULL THEN projectprop_location_name_study_level.alias
+									  WHEN projectprop_location_name.alias IS NOT NULL THEN projectprop_location_name.alias
+									  ELSE 'LOCATION_NAME'
+						   end
+				WHERE      projectprop.variable_id = 8190
+				AND      projectTrial.study_type_id in (1,6)
+				AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
 
-			-- Update LOCATION_ID variable's value to 'Unspecified Location' if the existing variables have no value
+				-- Delete LOCATION_NAME variable at ENVIRONMENT DETAILS (Instance Level)
 
-			UPDATE nd_geolocationprop
-			SET    nd_geolocationprop.value =
-				   (
-						  SELECT locid
-						  FROM   location
-						  WHERE  lname = 'Unspecified Location')
-			WHERE  nd_geolocationprop.type_id = 8190
-			AND    nd_geolocationprop.type_id IS NOT NULL
-			AND    (
-						  nd_geolocationprop.value = ''
-				   OR     nd_geolocationprop.value IS NULL);
+				DELETE projectprop
+				FROM       project
+				inner join projectprop projectprop_dataset
+				ON         projectprop_dataset.project_id = project.project_id
+				AND        projectprop_dataset.variable_id = 8160
+				AND        projectprop_dataset.value = 10080
+				INNER JOIN project_relationship
+				ON         project.project_id = project_relationship.subject_project_id
+				INNER JOIN project projecttrial
+				ON         projecttrial.project_id = project_relationship.object_project_id
+				LEFT JOIN  projectprop
+				ON         project.project_id = projectprop.project_id
+				AND        projectprop.variable_id = 8180
+				WHERE      projectTrial.study_type_id in (1,6)
+				AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
 
-			-- Preserve the alias of location name
+				DELETE
+				FROM   nd_geolocationprop
+				WHERE  type_id = 8180;
 
-			UPDATE projectprop
-			INNER JOIN project
-			ON         project.project_id = projectprop.project_id
-			INNER JOIN projectprop projectprop_dataset
-			ON         projectprop_dataset.project_id = project.project_id
-			AND        projectprop_dataset.variable_id = 8160
-			AND        projectprop_dataset.value = 10080
-			INNER JOIN project_relationship
-			ON         project.project_id = project_relationship.subject_project_id
-			INNER JOIN project projectTrial
-			ON         projectTrial.project_id = project_relationship.object_project_id
-			LEFT JOIN  projectprop projectprop_location_name
-			ON         project.project_id = projectprop_location_name.project_id
-			AND        projectprop_location_name.variable_id = 8180
-			LEFT JOIN  projectprop projectprop_location_name_study_level
-			ON         projectTrial.project_id = projectprop_location_name_study_level.project_id
-			AND        projectprop_location_name_study_level.variable_id = 8180
-			SET        projectprop.alias =
-					   CASE
-								  WHEN projectprop_location_name_study_level.alias IS NOT NULL THEN projectprop_location_name_study_level.alias
-								  WHEN projectprop_location_name.alias IS NOT NULL THEN projectprop_location_name.alias
-								  ELSE 'LOCATION_NAME'
-					   end
-			WHERE      projectprop.variable_id = 8190
-			AND      projectTrial.study_type_id in (1,6)
-			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
+				-- Delete LOCATION_NAME/ID variables at TRIAL SETTINGS (Study Level)
 
-			-- Delete LOCATION_NAME variable at ENVIRONMENT DETAILS (Instance Level)
+				DELETE projectprop
+				FROM       project
+				inner join projectprop projectprop_dataset
+				ON         projectprop_dataset.project_id = project.project_id
+				AND        projectprop_dataset.variable_id = 8160
+				AND        projectprop_dataset.value = 10080
+				INNER JOIN project_relationship
+				ON         project.project_id = project_relationship.subject_project_id
+				INNER JOIN project projecttrial
+				ON         projecttrial.project_id = project_relationship.object_project_id
+				LEFT JOIN  projectprop
+				ON         projecttrial.project_id = projectprop.project_id
+				AND        (
+									  projectprop.variable_id = 8180
+						   OR         projectprop.variable_id = 8190)
+				AND      projectTrial.study_type_id in (1,6)
+				AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
 
-			DELETE projectprop
-			FROM       project
-			inner join projectprop projectprop_dataset
-			ON         projectprop_dataset.project_id = project.project_id
-			AND        projectprop_dataset.variable_id = 8160
-			AND        projectprop_dataset.value = 10080
-			INNER JOIN project_relationship
-			ON         project.project_id = project_relationship.subject_project_id
-			INNER JOIN project projecttrial
-			ON         projecttrial.project_id = project_relationship.object_project_id
-			LEFT JOIN  projectprop
-			ON         project.project_id = projectprop.project_id
-			AND        projectprop.variable_id = 8180
-			WHERE      projectTrial.study_type_id in (1,6)
-			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
-
-            DELETE
-			FROM   nd_geolocationprop
-			WHERE  type_id = 8180;
-
-			-- Delete LOCATION_NAME/ID variables at TRIAL SETTINGS (Study Level)
-
-			DELETE projectprop
-			FROM       project
-			inner join projectprop projectprop_dataset
-			ON         projectprop_dataset.project_id = project.project_id
-			AND        projectprop_dataset.variable_id = 8160
-			AND        projectprop_dataset.value = 10080
-			INNER JOIN project_relationship
-			ON         project.project_id = project_relationship.subject_project_id
-			INNER JOIN project projecttrial
-			ON         projecttrial.project_id = project_relationship.object_project_id
-			LEFT JOIN  projectprop
-			ON         projecttrial.project_id = projectprop.project_id
-			AND        (
-								  projectprop.variable_id = 8180
-					   OR         projectprop.variable_id = 8190)
-			AND      projectTrial.study_type_id in (1,6)
-			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
-
-			]]>
-		</sql>
-	</changeSet>
-
+				]]>
+			</sql>
+		</changeSet>
+	
 </databaseChangeLog>
