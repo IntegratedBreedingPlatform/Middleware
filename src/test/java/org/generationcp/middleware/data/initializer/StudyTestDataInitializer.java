@@ -26,6 +26,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.workbench.DatasetType;
 import org.generationcp.middleware.pojos.workbench.Project;
 
 /*
@@ -219,6 +220,26 @@ public class StudyTestDataInitializer {
 		typeList.add(variableType);
 
 		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null);
+	}
+
+	public DatasetReference addTestDataset(final int studyId, final DataSetType datasetType) throws Exception {
+		final VariableTypeList typeList = new VariableTypeList();
+
+		final DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName(StudyTestDataInitializer.DATASET_NAME);
+		datasetValues.setDescription("My Dataset Description");
+		datasetValues.setType(datasetType);
+
+		DMSVariableType variableType = this.createVariableType(TermId.LOCATION_ID.getId(), "Location Id", "Location Id", 1);
+		variableType.setLocalName("LOCATION_NAME");
+		typeList.add(variableType);
+
+		DMSVariableType variableType2 = this.createVariableType(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), "Design Factor", "Design Factor", 2);
+		variableType2.setLocalName("EXPERIMENT_DESIGN_FACTOR");
+		typeList.add(variableType2);
+
+		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null);
+
 	}
 	
 	public void addEnvironmentDataset(final int studyId, final String locationId, final String seasonId) throws Exception {

@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import com.gargoylesoftware.htmlunit.javascript.host.geo.Geolocation;
+import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
@@ -35,6 +37,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.generationcp.middleware.utils.test.VariableTypeListDataUtil;
 import org.junit.Assert;
@@ -43,6 +46,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -332,6 +336,62 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		WorkbookSaverTest.workbookSaver.removeDeletedVariablesAndObservations(workbook);
 
 		Assert.assertEquals(0, workbook.getTrialObservations().get(0).getMeasurementVariables().size());
+	}
+
+	@Test
+	public void testAssignLocationVariableWithUnspecifiedLocationIfEmptyValueIsEmpty() {
+
+		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
+		final VariableList variableList = new VariableList();
+
+		// Set the LOCATION_ID variable value to empty
+		final Variable locationVariable = createLocationVariable();
+		locationVariable.setValue(null);
+		variableList.add(locationVariable);
+
+		final Location unspecifiedLocation = new Location();
+		final int unspecifiedLocationlocid = 111;
+		unspecifiedLocation.setLocid(unspecifiedLocationlocid);
+		final List<Location> locations = Arrays.asList(unspecifiedLocation);
+		Mockito.when(locationDAO.getByName(WorkbookSaver.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
+
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
+
+		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
+	}
+
+	@Test
+	public void testAssignLocationVariableWithUnspecifiedLocationIfEmptyValueIsNotEmpty() {
+
+		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
+		final VariableList variableList = new VariableList();
+
+
+		final Variable locationVariable = createLocationVariable();
+		// Set the value of LOCATION_ID variable
+		final String locationIdVariableValue = "999";
+		locationVariable.setValue(locationIdVariableValue);
+		variableList.add(locationVariable);
+
+		Mockito.verify(locationDAO, Mockito.times(0)).getByName(WorkbookSaver.UNSPECIFIED_LOCATION, Operation.EQUAL);
+
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
+
+		Assert.assertEquals(String.valueOf(locationIdVariableValue), locationVariable.getValue());
+
+	}
+
+	private Variable createLocationVariable() {
+
+		final DMSVariableType locationVariableType = new DMSVariableType();
+		final StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(TermId.LOCATION_ID.getId());
+		locationVariableType.setStandardVariable(standardVariable);
+
+		final Variable locationVariable = new Variable();
+		locationVariable.setVariableType(locationVariableType);
+		return locationVariable;
+
 	}
 
 	private List<MeasurementRow> createObservations(final int noOfTrialInstances, final Workbook workbook) {

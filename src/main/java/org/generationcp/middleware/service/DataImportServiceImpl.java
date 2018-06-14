@@ -72,6 +72,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 	private static final String LOCATION_ID_DOESNT_EXISTS = "error.location.id.doesnt.exists";
 	public static final int NURSERY_STUDY_TYPE_ID = 1;
+	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
 
@@ -395,7 +396,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	protected String retrieveLocIdOfUnspecifiedLocation() {
 
 		String unspecifiedLocationId = "";
-		final List<Location> locations = locationDataManager.getLocationsByName("Unspecified Location", Operation.EQUAL);
+		final List<Location> locations = locationDataManager.getLocationsByName(UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}

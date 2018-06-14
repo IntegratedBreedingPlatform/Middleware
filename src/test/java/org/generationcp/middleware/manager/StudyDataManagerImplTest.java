@@ -61,6 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
@@ -767,6 +768,39 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		
 		final String startDate = this.manager.getProjectStartDateByProjectId(project.getProjectId());
 		Assert.assertEquals(project.getStartDate(), startDate);
+	}
+
+	@Test
+	public void testIsLocationIdVariable() throws Exception {
+
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+
+		Assert.assertTrue(this.manager.isLocationIdVariable(this.studyReference.getId(), "LOCATION_NAME"));
+		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "EXPERIMENT_DESIGN_FACTOR"));
+		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "DUMMY NAME"));
+
+	}
+
+	@Test
+	public void testCreateInstanceLocationIdToNameMapFromStudy() throws Exception {
+
+		final String afghanistanLocationId = "1";
+		final String albaniaLocationId = "2";
+		final String algeriaLocationId = "3";
+
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), afghanistanLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), albaniaLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), algeriaLocationId, "1");
+
+		final Map<String, String> result = this.manager.createInstanceLocationIdToNameMapFromStudy(this.studyReference.getId());
+
+		Assert.assertEquals(3, result.size());
+		Assert.assertEquals("Afghanistan", result.get(afghanistanLocationId));
+		Assert.assertEquals("Albania", result.get(albaniaLocationId));
+		Assert.assertEquals("Algeria", result.get(algeriaLocationId));
+
 	}
 
 }

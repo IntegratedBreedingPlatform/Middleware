@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -73,6 +74,7 @@ public class WorkbookSaver extends Saver {
 	private static final String HEADERMAP = "headerMap";
 	private static final String VARIABLETYPEMAP = "variableTypeMap";
 	private static final String MEASUREMENTVARIABLEMAP = "measurementVariableMap";
+	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 
 	public WorkbookSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -411,7 +413,7 @@ public class WorkbookSaver extends Saver {
 
 		watch.restart("save geolocation");
 
-		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation);
+		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, this.getLocationDAO());
 
 		final Geolocation g = this.getGeolocationSaver()
 			.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null, isDeleteTrialObservations,
@@ -477,7 +479,7 @@ public class WorkbookSaver extends Saver {
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
 
-							this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation);
+							this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, this.getLocationDAO());
 
 							final Geolocation g = this.getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
 									workbook.getStudyDetails().getStudyName(), geolocation, row,
@@ -519,16 +521,15 @@ public class WorkbookSaver extends Saver {
 		return 0;
 	}
 
-	protected void assignLocationVariableWithUnspecifiedLocationIfEmpty(VariableList variableList) {
-
-		String unspecifiedLocationLocId = "";
-		final List<Location> locations = this.getLocationDAO().getByName("Unspecified Location", Operation.EQUAL);
-		if (!locations.isEmpty()) {
-			unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
-		}
+	protected void assignLocationVariableWithUnspecifiedLocationIfEmpty(final VariableList variableList, final LocationDAO locationDAO) {
 
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
 		if (locationIdVariable != null && StringUtils.isEmpty(locationIdVariable.getValue())) {
+			String unspecifiedLocationLocId = "";
+			final List<Location> locations = locationDAO.getByName(UNSPECIFIED_LOCATION, Operation.EQUAL);
+			if (!locations.isEmpty()) {
+				unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
+			}
 			locationIdVariable.setValue(unspecifiedLocationLocId);
 		}
 

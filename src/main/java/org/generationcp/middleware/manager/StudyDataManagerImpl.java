@@ -1184,7 +1184,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		final DMSVariableType dmsVariableType = trialDataSet.findVariableTypeByLocalName(variableName);
 
-		return dmsVariableType.getId() == TermId.LOCATION_ID.getId();
+		if (dmsVariableType != null) {
+			return dmsVariableType.getId() == TermId.LOCATION_ID.getId();
+		}
+
+		return false;
+
 	}
 
 	@Override
