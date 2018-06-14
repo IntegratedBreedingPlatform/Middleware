@@ -71,6 +71,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 	private static final String LOCATION_ID_DOESNT_EXISTS = "error.location.id.doesnt.exists";
+	public static final int NURSERY_STUDY_TYPE_ID = 1;
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
 
@@ -990,7 +991,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
-		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
+		if (workbook.getStudyDetails().getStudyType().getId() != NURSERY_STUDY_TYPE_ID && !trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
 			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_STUDY_CONDITION));
 		}
