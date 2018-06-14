@@ -410,6 +410,9 @@ public class WorkbookSaver extends Saver {
 		}
 
 		watch.restart("save geolocation");
+
+		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation);
+
 		final Geolocation g = this.getGeolocationSaver()
 			.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null, isDeleteTrialObservations,
 				programUUID);
