@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -780,6 +781,36 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Role> assignableRoles = this.workbenchDataManager.getAssignableRoles();
 		Assert.assertNotNull(assignableRoles);
 		Assert.assertEquals(4, assignableRoles.size());
+	}
+	
+	@Test
+	public void testGetSuperAdminUsers() {
+		final List<WorkbenchUser> superAdminUsers = this.workbenchDataManager.getSuperAdminUsers();
+		int superAdminCountBefore = 0;
+		if (superAdminUsers != null) {
+			superAdminCountBefore = superAdminUsers.size();
+		}
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		user.setRoles(Arrays.asList(new UserRole(user, new Role(5, "SUPERADMIN"))));
+		
+		final Integer newUserId = this.workbenchDataManager.addUser(user);
+		final List<WorkbenchUser> latestSuperAdminUsers = this.workbenchDataManager.getSuperAdminUsers();
+		Assert.assertNotNull(latestSuperAdminUsers);
+		Assert.assertEquals(latestSuperAdminUsers.size(), superAdminCountBefore + 1);
+		Assert.assertTrue(latestSuperAdminUsers.contains(new WorkbenchUser(newUserId)));
+	}
+	
+	@Test
+	public void testIsSuperAdminUser() {
+		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
+		final Integer userId1 = this.workbenchDataManager.addUser(user1);
+		
+		final WorkbenchUser user2 = this.workbenchTestDataUtil.createTestUserData();
+		user2.setRoles(Arrays.asList(new UserRole(user2, new Role(5, "SUPERADMIN"))));
+		final Integer userId2 = this.workbenchDataManager.addUser(user2);
+		
+		Assert.assertFalse(this.workbenchDataManager.isSuperAdminUser(userId1));
+		Assert.assertTrue(this.workbenchDataManager.isSuperAdminUser(userId2));
 	}
 	
 }

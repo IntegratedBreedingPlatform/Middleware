@@ -63,8 +63,7 @@ public class WorkbenchTestDataUtil {
 		user.setPersonid(1);
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
-		// Role ID 1 = ADMIN
-		user.setRoles(Arrays.asList(new UserRole(user, 1)));
+		user.setRoles(Arrays.asList(new UserRole(user, new Role(1, "Admin"))));
 		return user;
 	}
 

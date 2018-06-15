@@ -15,6 +15,7 @@ import org.apache.commons.lang.WordUtils;
 @Entity
 @Table(name = "role")
 public class Role implements Serializable {
+	public static final String SUPERADMIN = "SUPERADMIN";
 
 	private static final long serialVersionUID = 7981410876951478010L;
 
@@ -66,6 +67,10 @@ public class Role implements Serializable {
 
 	public String getCapitalizedRole() {
 		return WordUtils.capitalize(this.getDescription().toUpperCase());
+	}
+	
+	public boolean isSuperAdminUser(){
+		return SUPERADMIN.equalsIgnoreCase(this.description);
 	}
 
 }

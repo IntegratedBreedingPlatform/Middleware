@@ -660,5 +660,18 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<Role> getAssignableRoles();
+	
+	/**
+	 * Return users with SUPERADMIN role
+	 * @return
+	 */
+	List<WorkbenchUser> getSuperAdminUsers();
+	
+	/**
+	 * Returns true if user has SUPERADMIN role assigned
+	 * @param userId
+	 * @return
+	 */
+	boolean isSuperAdminUser(Integer userId);
 
 }
