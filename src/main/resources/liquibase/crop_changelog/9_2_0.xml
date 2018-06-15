@@ -519,6 +519,7 @@
 
 		</sql>
 	</changeSet>
+
 	<changeSet id="v9.2.0-14" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
@@ -529,9 +530,12 @@
 				WHERE cvterm_id = 1802 AND name = 'Trial Condition';
 			</sqlCheck>
 		</preConditions>
+		<comment>
+			Transform 'Trial Condition' cvterm to 'Study Condition'
+		</comment>
 		<sql dbms="mysql" splitStatements="false">
-				UPDATE cvterm SET name = 'Study Condition', definition = 'Observations made of conditions in a study' WHERE cvterm_id = 1802;
-			</sql>
+			UPDATE cvterm SET name = 'Study Condition', definition = 'Observations made of conditions in a study' WHERE cvterm_id = 1802;
+		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-17" author="vanina">
 		<preConditions onFail="MARK_RAN">
@@ -539,13 +543,16 @@
 				SELECT
 				COUNT(*)
 				FROM
-						cvterm
-					WHERE cvterm_id = 1803;
-				</sqlCheck>
+					cvterm
+				WHERE cvterm_id = 1803;
+			</sqlCheck>
 		</preConditions>
+		<comment>
+			deletes 'Nursery Condition' cvterm
+		</comment>
 		<sql dbms="mysql" splitStatements="false">
-				DELETE FROM cvterm WHERE cvterm_id= 1803;
-			</sql>
+			DELETE FROM cvterm WHERE cvterm_id= 1803;
+		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-18" author="vanina">
 		<preConditions onFail="MARK_RAN">
@@ -556,12 +563,15 @@
 						FROM
 							cvtermprop
 						where value = 'Nursery Condition' or value = 'Trial Condition';
-					</sqlCheck>
+				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>
+			Update cvtermprop Nursery and Trial conditions to Study Condition
+		</comment>
 		<sql dbms="mysql" splitStatements="false">
-				update cvtermprop set value = 'Study Condition' where value = 'Nursery Condition' or value = 'Trial Condition';
-			</sql>
+			update cvtermprop set value = 'Study Condition' where value = 'Nursery Condition' or value = 'Trial Condition';
+		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-19" author="clarysabel">
 		<preConditions onFail="MARK_RAN">
