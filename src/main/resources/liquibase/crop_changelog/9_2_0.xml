@@ -483,35 +483,41 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-				SELECT
-				COUNT(*)
-				from cvtermprop
-				where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
-					FROM cvterm cvt
-					INNER JOIN  (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
-					WHERE cvt.cv_id = 1040 -- variable
-					AND cvtp.type_id = 1800 -- variable type
-					AND cvtp.value IN (
-						'Nursery Condition'
-						, 'Trial Condition')
-					group by cvt.cvterm_id
-					having count(1) = 2);
-			</sqlCheck>
-			</not>
+					SELECT
+					COUNT(*)
+					from cvtermprop
+					where value = 'Nursery Condition' and cvtermprop_id in (SELECT cvtermprop_id
+                                                    FROM cvterm cvt
+                                                      INNER JOIN  (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+                                                    WHERE cvt.cv_id = 1040 -- variable
+                                                          AND cvtp.type_id = 1800 -- variable type
+                                                          AND cvtp.value IN (
+                                                      'Nursery Condition'
+                                                      , 'Trial Condition'
+                                                    )
+                                                    group by cvt.cvterm_id
+                                                    having count(1) = 2);
+				</sqlCheck>
+				</not>
 		</preConditions>
+		<comment>
+			Remove 'Nursery Condition' from variables that are have both trial and nursery conditions
+		</comment>
 		<sql dbms="mysql" splitStatements="false">
-				delete from cvtermprop
-				where value = 'Nursery Condition' and cvterm_id in (SELECT cvtermprop_id
-					FROM cvterm cvt
-					INNER JOIN (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
-					WHERE cvt.cv_id = 1040 -- variable
-					AND cvtp.type_id = 1800 -- variable type
-					AND cvtp.value IN (
-						'Nursery Condition'
-						, 'Trial Condition')
-					group by cvt.cvterm_id
-					having count(1) = 2);
-			</sql>
+			delete from cvtermprop
+			where value = 'Nursery Condition' and cvtermprop_id in (SELECT cvtermprop_id
+												FROM cvterm cvt
+												  INNER JOIN (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+												WHERE cvt.cv_id = 1040 -- variable
+													  AND cvtp.type_id = 1800 -- variable type
+													  AND cvtp.value IN (
+												  'Nursery Condition'
+												  , 'Trial Condition'
+												)
+												group by cvt.cvterm_id
+												having count(1) = 2);
+
+		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-14" author="vanina">
 		<preConditions onFail="MARK_RAN">
