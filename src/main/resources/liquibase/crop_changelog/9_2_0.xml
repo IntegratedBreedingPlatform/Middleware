@@ -637,7 +637,7 @@
 				    e.nd_geolocation_id,
 				    8135,
 				    10169,
-				    (select max(ngp.rank) + 1
+					(select if( max(ngp.rank) is null, 1 , max(ngp.rank) + 1)
 				     from nd_geolocationprop ngp
 				     where ngp.nd_geolocation_id = e.nd_geolocation_id)
 				  from project p
