@@ -533,34 +533,6 @@
 				UPDATE cvterm SET name = 'Study Condition', definition = 'Observations made of conditions in a study' WHERE cvterm_id = 1802;
 			</sql>
 	</changeSet>
-	<changeSet id="v9.2.0-15" author="vanina">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-					cvtermprop
-				WHERE value = 'Nursery Condition' AND type_id = 1800;
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="false">
-			UPDATE cvtermprop SET value = 'Trial Condition' WHERE value = 'Nursery Condition' AND type_id = 1800;
-		</sql>
-	</changeSet>
-	<changeSet id="v9.2.0-16" author="vanina">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-					projectprop
-				WHERE type_id = 1803;
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="false">
-			UPDATE projectprop SET type_id=1802 WHERE type_id=1803;
-		</sql>
-	</changeSet>
 	<changeSet id="v9.2.0-17" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
