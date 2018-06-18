@@ -232,7 +232,8 @@
 			SELECT `sidebar_category_link_id`, role.id
 			  FROM `workbench_sidebar_category_link` link
 			 INNER JOIN role
-			 WHERE role.description = 'SUPERADMIN';
+			 WHERE link.tool_name NOT IN ('backup_restore') 
+			   AND role.description = 'SUPERADMIN';
 		</sql>
 	</changeSet>
 	
