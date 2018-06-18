@@ -83,14 +83,31 @@
 					AND TABLE_SCHEMA = DATABASE();
 				</sqlCheck>
 		</preConditions>
+		<comment>Remove study_type_fk from project table</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE project DROP FOREIGN KEY study_type_fk;
 		</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.2.0-20">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+						SELECT COUNT(*)
+						FROM INFORMATION_SCHEMA.STATISTICS
+						WHERE TABLE_SCHEMA = DATABASE()
+						AND TABLE_NAME = 'project'
+						AND INDEX_NAME = 'study_type_fk_idx';
+					</sqlCheck>
+		</preConditions>
+		<comment>Remove study_type_fk_idx from project table</comment>
+		<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE project DROP INDEX study_type_fk_idx;
+			</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="study_type"/>
 		</preConditions>
+		<comment>Remove study_type table, create the new one and insert values</comment>
 		<sql dbms="mysql" splitStatements="true">
 			DROP TABLE study_type;
 
@@ -123,6 +140,7 @@
 				<columnExists tableName="project" columnName="study_type_id"/>
 			</not>
 		</preConditions>
+		<comment>Add study_type_id to project table. Insert index and fk</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE project
 			  ADD COLUMN study_type_id INT;
@@ -162,9 +180,10 @@
 					FROM
 					    project p
 					        INNER JOIN
-					    nd_experiment_project nep ON (nep.project_id = p.project_id)
-					        INNER JOIN
-					    nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
+					    (SELECT
+					        *
+					    FROM
+					        projectprop) pp ON p.project_id = pp.project_id
 					        INNER JOIN
 					    project_relationship r ON p.project_id = r.subject_project_id
 					        INNER JOIN
@@ -172,17 +191,12 @@
 					        INNER JOIN
 					    study_type st ON p2.study_type_id = st.study_type_id
 					WHERE
-					    NOT EXISTS( SELECT
-					            1
-					        FROM
-					            nd_geolocationprop ngp
-					        WHERE
-					            ngp.nd_geolocation_id = e.nd_geolocation_id
-					                AND ngp.type_id = 8135)
+					    variable_id = 8135 AND value = ''
 					        AND st.name = 'N';
 				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Update projectprop table where experimental design is empty</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop
 			SET
@@ -208,6 +222,76 @@
 			                AND st.name = 'N');
 		</sql>
 	</changeSet>
+	<changeSet id="v9.2.0-7.1" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT
+					    COUNT(1)
+					FROM
+					    project p
+					        INNER JOIN
+					    projectprop pp ON pp.project_id = p.project_id
+					        INNER JOIN
+					    project_relationship r ON p.project_id = r.subject_project_id
+					        INNER JOIN
+					    project p2 ON r.object_project_id = p2.project_id
+					        INNER JOIN
+					    study_type st ON p2.study_type_id = st.study_type_id
+					WHERE
+					    pp.variable_id = 8160
+					        AND pp.value = 10080
+					        AND st.name = 'N'
+					        AND NOT EXISTS( SELECT
+					            1
+					        FROM
+					            projectprop PROP
+					        WHERE
+					            PROP.project_id = P.PROJECT_ID
+					                AND PROP.variable_id = 8135);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Insert into projectprop table where experimental design does not exist</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO projectprop (PROJECT_ID, TYPE_ID, VALUE, RANK, VARIABLE_ID, ALIAS)
+			SELECT
+			    P.PROJECT_ID,
+			    1806,
+			    NULL,
+			    (SELECT
+			            IF(MAX(ppR.rank) IS NULL,
+			                    1,
+			                    MAX(ppR.rank) + 1)
+			        FROM
+			            projectprop ppR
+			        WHERE
+			            p.project_id = ppR.project_id),
+			    8135,
+			    'EXPT_DESIGN'
+			FROM
+			    project p
+			        INNER JOIN
+			    projectprop pp ON pp.project_id = p.project_id
+			        INNER JOIN
+			    project_relationship r ON p.project_id = r.subject_project_id
+			        INNER JOIN
+			    project p2 ON r.object_project_id = p2.project_id
+			        INNER JOIN
+			    study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			    pp.variable_id = 8160
+			        AND pp.value = 10080
+			        AND st.name = 'N'
+			        AND NOT EXISTS( SELECT
+			            1
+			        FROM
+			            projectprop PROP
+			        WHERE
+			            PROP.project_id = P.PROJECT_ID
+			                AND PROP.variable_id = 8135);
+		</sql>
+	</changeSet>
 	<changeSet id="v9.2.0-8" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<not>
@@ -216,6 +300,7 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Update nd_geolocationprop table where experimental design is empty</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE nd_geolocationprop
 			SET VALUE = 10169
@@ -234,6 +319,7 @@
 				AND specific_name = 'migrate_check_list';
 			</sqlCheck>
 		</preConditions>
+		<comment>Drop migrate check list procedure</comment>
 		<sql dbms="mysql" splitStatements="false">
 			DROP PROCEDURE migrate_check_list;
 		</sql>
@@ -250,6 +336,7 @@
 				AND specific_name = 'migrate_check_list';
 			</sqlCheck>
 		</preConditions>
+		<comment>Create migrate check list SP</comment>
 		<sql dbms="mysql" splitStatements="false">
 			<![CDATA[
 				CREATE PROCEDURE migrate_check_list()
@@ -491,6 +578,7 @@
 				AND specific_name = 'migrate_check_list';
 			</sqlCheck>
 		</preConditions>
+		<comment>Run migrate check list procedure</comment>
 		<sql dbms="mysql" splitStatements="false">
 			call migrate_check_list();
 		</sql>
@@ -617,22 +705,9 @@
 					</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Update projectprop table where TRIAL INSTANCE alias is not trial instance</comment>
 		<sql dbms="mysql" splitStatements="false">
 				update projectprop set alias = 'TRIAL_INSTANCE' where variable_id = 8170 and alias != 'TRIAL_INSTANCE';
-			</sql>
-	</changeSet>
-	<changeSet author="vanina" id="v9.2.0-20">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-						SELECT COUNT(*)
-						FROM INFORMATION_SCHEMA.STATISTICS
-						WHERE TABLE_SCHEMA = DATABASE()
-						AND TABLE_NAME = 'project'
-						AND INDEX_NAME = 'study_type_fk_idx';
-					</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-				ALTER TABLE project DROP INDEX study_type_fk_idx;
 			</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-21">
@@ -651,6 +726,7 @@
 					</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Insert into nd_geolocationprop table missing experimental design row</comment>
 		<sql dbms="mysql" splitStatements="true">
 				INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
 				SELECT DISTINCT
@@ -721,6 +797,7 @@
 						</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Insert into nd_geolocationprop table missing check start row</comment>
 		<sql dbms="mysql" splitStatements="true">
 					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
 					SELECT
@@ -784,6 +861,7 @@
 						</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Insert into nd_geolocationprop table missing check interval row</comment>
 		<sql dbms="mysql" splitStatements="true">
 					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
 					SELECT
@@ -847,6 +925,7 @@
 						</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Insert into nd_geolocationprop table missing check plan row</comment>
 		<sql dbms="mysql" splitStatements="true">
 					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
 					  SELECT
@@ -900,6 +979,7 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Update projectprop table missing entry type alias</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop
 			SET
@@ -956,12 +1036,13 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Insert into projectprop table missing entry type row</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO projectprop (project_id, type_id, value, rank, variable_id, alias)
 			SELECT
 			  p.project_id,
 			  1804,
-			  10170,
+			  NULL,
 			  (SELECT
 			     IF(MAX(pp.rank) IS NULL,
 			        1,
@@ -1033,9 +1114,10 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment>Insert into stockprop table missing entry type row</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO stockprop (stock_id, type_id, value, rank)
-			  SELECT
+			  SELECT DISTINCT
 			    s.stock_id,
 			    8255,
 			    10170,
