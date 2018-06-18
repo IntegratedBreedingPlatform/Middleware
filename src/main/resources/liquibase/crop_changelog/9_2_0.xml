@@ -851,5 +851,50 @@
 				]]>
 			</sql>
 		</changeSet>
+
+	<changeSet author="aldrin" id="v9.2.0-24">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM projectprop
+				WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+				AND variable_id = 8190 AND alias = 'SITE_ID';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Rename the alias of Location ID variable of Nursery/Trial template to 'SITE'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop SET alias = 'SITE'
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+			AND variable_id = 8190;
+
+			UPDATE projectprop SET alias = 'SITE'
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Nursery Template-ENVIRONMENT')
+			AND variable_id = 8190;
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v9.2.0-25">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM projectprop
+				WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+				AND variable_id = 8180;
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Delete the Location Name variable in Basic Nursery/Trial template.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM projectprop
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+			AND variable_id = 8180;
+
+			DELETE FROM  projectprop
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Nursery Template-ENVIRONMENT')
+			AND variable_id = 8180;
+		</sql>
+	</changeSet>
 	
 </databaseChangeLog>
