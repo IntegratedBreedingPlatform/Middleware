@@ -279,6 +279,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// add Location Name variable if is not available in the imported workbook.
 		this.addLocationIDVariableInConditionsIfNotExists(workbook, programUUID);
 		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(workbook.getConditions());
+		this.assignLocationIdVariableToEnvironmentDetailSection(workbook);
 
 		this.removeLocationNameVariableIfExists(workbook);
 
@@ -360,6 +361,29 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		if (locationIdMeasurementVariable.isPresent() && StringUtils.isEmpty(locationIdMeasurementVariable.get().getValue())) {
 			locationIdMeasurementVariable.get().setValue(this.retrieveLocIdOfUnspecifiedLocation());
 		}
+
+	}
+
+	@Override
+	public void assignLocationIdVariableToEnvironmentDetailSection(final Workbook workbook) {
+
+		final Optional<MeasurementVariable> locationIdVariableInFactors = findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbook.getFactors());
+		final Optional<MeasurementVariable> locationIdVariableInConditions = findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbook.getConditions());
+		if (locationIdVariableInFactors.isPresent()) {
+			this.asssignMeasurementVariableToEnvironmentDetail(locationIdVariableInFactors.get());
+
+		}
+		if (locationIdVariableInConditions.isPresent()) {
+			this.asssignMeasurementVariableToEnvironmentDetail(locationIdVariableInConditions.get());
+		}
+
+	}
+
+	protected void asssignMeasurementVariableToEnvironmentDetail(final MeasurementVariable measurementVariable) {
+
+		measurementVariable.setLabel(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0));
+		measurementVariable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+		measurementVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
 
 	}
 

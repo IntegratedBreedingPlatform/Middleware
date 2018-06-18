@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Optional;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -178,6 +179,8 @@ public interface DataImportService {
 	void removeLocationNameVariableIfExists(Workbook workbook);
 
 	void assignLocationVariableWithUnspecifiedLocationIfEmpty(List<MeasurementVariable> measurementVariables);
+
+	void assignLocationIdVariableToEnvironmentDetailSection(Workbook workbook);
 
 	/**
 	 * Populates the measurement variables with their possible values. Only the
