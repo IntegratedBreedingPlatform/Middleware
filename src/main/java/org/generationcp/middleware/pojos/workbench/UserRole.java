@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,8 +24,8 @@ public class UserRole {
 	@JoinColumn(name = "userid", nullable = false)
 	private WorkbenchUser user;
 
-	@ManyToOne
-	@JoinColumn(name = "role_id", nullable=false)
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "role_id", nullable=false, updatable = false, insertable = false)
 	private Role role;
 
 	public UserRole() {
