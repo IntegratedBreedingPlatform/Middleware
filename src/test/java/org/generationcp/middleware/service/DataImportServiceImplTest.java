@@ -120,13 +120,13 @@ public class DataImportServiceImplTest {
 		unspecifiedLocation.setLname(DataImportServiceImpl.UNSPECIFIED_LOCATION);
 		unspecifiedLocation.setLocid(UNSPECIFIED_LOCATION_LOCID);
 		locations.add(unspecifiedLocation);
-		Mockito.when(this.locationDataManager.getLocationsByName(DataImportServiceImpl.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
+		Mockito.when(this.locationDataManager.getLocationsByName(DataImportServiceImpl.UNSPECIFIED_LOCATION, Operation.EQUAL))
+				.thenReturn(locations);
 
 		final StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable();
 		standardVariable.setId(TermId.LOCATION_ID.getId());
 		standardVariable.setName("LOCATION_ID");
-		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.LOCATION_ID.getId(), PROGRAM_UUID))
-				.thenReturn(standardVariable);
+		Mockito.when(this.ontologyDataManager.getStandardVariable(TermId.LOCATION_ID.getId(), PROGRAM_UUID)).thenReturn(standardVariable);
 	}
 
 	protected void mockStandardVariable(final Integer termId, final String name, final String property, final String scale,
@@ -262,7 +262,8 @@ public class DataImportServiceImplTest {
 	public void testSetRequiredFieldsForStudy() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
 		this.dataImportService.setRequiredFields(trialWorkbook);
 
@@ -668,14 +669,16 @@ public class DataImportServiceImplTest {
 	public void testAddLocationIDVariableInConditionsIfNotExistsLocationIDIsNotPresentInConditionsAndFactors() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
 		removeMeasurementVariableInList(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 		removeMeasurementVariableInList(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors());
 
 		this.dataImportService.addLocationIDVariableInConditionsIfNotExists(trialWorkbook, PROGRAM_UUID);
 
-		Assert.assertTrue(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions()).isPresent());
+		Assert.assertTrue(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions())
+				.isPresent());
 
 	}
 
@@ -683,11 +686,13 @@ public class DataImportServiceImplTest {
 	public void testAddLocationIDVariableInConditionsIfNotExistsLocationIDIsAlreadyPresentInConditions() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
 		this.dataImportService.addLocationIDVariableInConditionsIfNotExists(trialWorkbook, PROGRAM_UUID);
 
-		Assert.assertTrue(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions()).isPresent());
+		Assert.assertTrue(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions())
+				.isPresent());
 
 	}
 
@@ -695,16 +700,19 @@ public class DataImportServiceImplTest {
 	public void testAddLocationIDVariableInConditionsIfNotExistsLocationIDIsAlreadyPresentInFactors() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
-		Optional<MeasurementVariable> locationIdFromCondition = this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
+		final Optional<MeasurementVariable> locationIdFromCondition =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 		trialWorkbook.getFactors().add(locationIdFromCondition.get());
 
 		removeMeasurementVariableInList(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 
 		this.dataImportService.addLocationIDVariableInConditionsIfNotExists(trialWorkbook, PROGRAM_UUID);
 
-		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions()).isPresent());
+		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions())
+				.isPresent());
 
 	}
 
@@ -712,14 +720,16 @@ public class DataImportServiceImplTest {
 	public void testAddLocationIDVariableInFactorsIfNotExistsLocationIDIsNotPresentInConditionsAndFactors() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
 		removeMeasurementVariableInList(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 		removeMeasurementVariableInList(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors());
 
 		this.dataImportService.addLocationIDVariableInFactorsIfNotExists(trialWorkbook, PROGRAM_UUID);
 
-		Assert.assertTrue(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors()).isPresent());
+		Assert.assertTrue(
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors()).isPresent());
 
 	}
 
@@ -727,11 +737,13 @@ public class DataImportServiceImplTest {
 	public void testAddLocationIDVariableInFactorsIfNotExistsLocationIDIsAlreadyPresentInConditions() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
 		this.dataImportService.addLocationIDVariableInFactorsIfNotExists(trialWorkbook, PROGRAM_UUID);
 
-		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors()).isPresent());
+		Assert.assertFalse(
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors()).isPresent());
 
 	}
 
@@ -739,16 +751,19 @@ public class DataImportServiceImplTest {
 	public void testAddLocationIDVariableInFactorsIfNotExistsLocationIDIsAlreadyPresentInFactors() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
-		final Optional<MeasurementVariable> locationIdFromCondition = this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
+		final Optional<MeasurementVariable> locationIdFromCondition =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 		trialWorkbook.getFactors().add(locationIdFromCondition.get());
 
 		removeMeasurementVariableInList(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 
 		this.dataImportService.addLocationIDVariableInFactorsIfNotExists(trialWorkbook, PROGRAM_UUID);
 
-		Assert.assertTrue(this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors()).isPresent());
+		Assert.assertTrue(
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors()).isPresent());
 
 	}
 
@@ -756,15 +771,20 @@ public class DataImportServiceImplTest {
 	public void testRemoveLocationNameVariableIfExists() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
-		final Optional<MeasurementVariable> locationNameFromCondition = this.dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), trialWorkbook.getConditions());
+		final Optional<MeasurementVariable> locationNameFromCondition =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), trialWorkbook.getConditions());
 		trialWorkbook.getFactors().add(locationNameFromCondition.get());
 
 		this.dataImportService.removeLocationNameVariableIfExists(trialWorkbook);
 
-		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), trialWorkbook.getConditions()).isPresent());
-		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), trialWorkbook.getFactors()).isPresent());
+		Assert.assertFalse(
+				this.dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), trialWorkbook.getConditions())
+						.isPresent());
+		Assert.assertFalse(this.dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_LOCATION.getId(), trialWorkbook.getFactors())
+				.isPresent());
 
 	}
 
@@ -772,11 +792,13 @@ public class DataImportServiceImplTest {
 	public void testAssignLocationVariableWithUnspecifiedLocationIfEmptyVariableValueIsNotEmpty() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
 		this.dataImportService.assignLocationVariableWithUnspecifiedLocationIfEmpty(trialWorkbook.getConditions());
 
-		final Optional<MeasurementVariable> locationIdFromConditions = this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
+		final Optional<MeasurementVariable> locationIdFromConditions =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 		Assert.assertEquals(String.valueOf(1), locationIdFromConditions.get().getValue());
 
 	}
@@ -785,9 +807,11 @@ public class DataImportServiceImplTest {
 	public void testAssignLocationVariableWithUnspecifiedLocationIfEmptyVariableValueIsEmpty() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
-		final Optional<MeasurementVariable> locationIdFromConditions = this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
+		final Optional<MeasurementVariable> locationIdFromConditions =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 		locationIdFromConditions.get().setValue("");
 
 		this.dataImportService.assignLocationVariableWithUnspecifiedLocationIfEmpty(trialWorkbook.getConditions());
@@ -800,11 +824,13 @@ public class DataImportServiceImplTest {
 	public void testAssignLocationIdVariableToEnvironmentDetailSectionConditions() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
 		this.dataImportService.assignLocationIdVariableToEnvironmentDetailSection(trialWorkbook);
 
-		final Optional<MeasurementVariable> locationIdFromConditions = this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
+		final Optional<MeasurementVariable> locationIdFromConditions =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 
 		Assert.assertTrue(locationIdFromConditions.isPresent());
 		Assert.assertEquals(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), locationIdFromConditions.get().getLabel());
@@ -817,15 +843,18 @@ public class DataImportServiceImplTest {
 	public void testAssignLocationIdVariableToEnvironmentDetailSectionFactors() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO,
+						true);
 
-		final Optional<MeasurementVariable> locationIdFromConditions = this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
+		final Optional<MeasurementVariable> locationIdFromConditions =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getConditions());
 		trialWorkbook.getFactors().add(locationIdFromConditions.get());
 		trialWorkbook.getConditions().remove(locationIdFromConditions.get());
 
 		this.dataImportService.assignLocationIdVariableToEnvironmentDetailSection(trialWorkbook);
 
-		final Optional<MeasurementVariable> locationIdFromFactors = this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors());
+		final Optional<MeasurementVariable> locationIdFromFactors =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), trialWorkbook.getFactors());
 
 		Assert.assertTrue(locationIdFromFactors.isPresent());
 		Assert.assertEquals(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), locationIdFromFactors.get().getLabel());
@@ -932,8 +961,8 @@ public class DataImportServiceImplTest {
 	}
 
 	private void removeMeasurementVariableInList(final int termId, final List<MeasurementVariable> measurementVariables) {
-		Iterator<MeasurementVariable> iterator = measurementVariables.iterator();
-		while(iterator.hasNext()) {
+		final Iterator<MeasurementVariable> iterator = measurementVariables.iterator();
+		while (iterator.hasNext()) {
 			if (iterator.next().getTermId() == termId) {
 				iterator.remove();
 			}
