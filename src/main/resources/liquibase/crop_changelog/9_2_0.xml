@@ -702,6 +702,25 @@
 			UPDATE cvterm SET name = 'Study Condition', definition = 'Observations made of conditions in a study' WHERE cvterm_id = 1802;
 		</sql>
 	</changeSet>
+	<changeSet id="v9.2.0-16" author="vanina">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+						projectprop
+					WHERE type_id = 1803;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Change 'Nursery Condition' props to 'Study Condition'
+		</comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE projectprop SET type_id=1802 WHERE type_id=1803;
+		</sql>
+	</changeSet>
 	<changeSet id="v9.2.0-17" author="vanina">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
