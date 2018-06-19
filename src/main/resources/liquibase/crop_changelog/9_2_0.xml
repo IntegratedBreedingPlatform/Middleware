@@ -323,7 +323,7 @@
 			    VALUE = 10169
 			WHERE
 			    nd_geolocationprop IN (SELECT
-										  geo.nd_geolocation_id
+			            geo.nd_geolocation_id
 										FROM
 										  project p
 										  INNER JOIN
@@ -331,7 +331,11 @@
 										  INNER JOIN
 										  nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
 										  INNER JOIN
-										  study_type st ON p.study_type_id = st.study_type_id
+			            project_relationship r ON p.project_id = r.subject_project_id
+			                INNER JOIN
+			            project p2 ON r.object_project_id = p2.project_id
+			                INNER JOIN
+			            study_type st ON p2.study_type_id = st.study_type_id
 										  INNER JOIN
 										  (SELECT
 										     *
@@ -854,7 +858,7 @@
 		<comment>Insert into nd_geolocationprop table missing check start row</comment>
 		<sql dbms="mysql" splitStatements="true">
 					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
-					SELECT
+					SELECT DISTINCT
 					    e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
 					FROM
 					    project p
@@ -918,7 +922,7 @@
 		<comment>Insert into nd_geolocationprop table missing check interval row</comment>
 		<sql dbms="mysql" splitStatements="true">
 					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
-					SELECT
+					SELECT DISTINCT
 					    e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
 					FROM
 					    project p
@@ -982,7 +986,7 @@
 		<comment>Insert into nd_geolocationprop table missing check plan row</comment>
 		<sql dbms="mysql" splitStatements="true">
 					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
-					  SELECT
+					  SELECT DISTINCT
 						    e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
 						FROM
 						    project p
