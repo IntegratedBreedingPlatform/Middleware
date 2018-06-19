@@ -191,7 +191,7 @@
 					        INNER JOIN
 					    study_type st ON p2.study_type_id = st.study_type_id
 					WHERE
-					    variable_id = 8135 AND value = ''
+					    variable_id = 8135 AND (value = '' or value IS NULL)
 					        AND st.name = 'N';
 				</sqlCheck>
 			</not>
@@ -218,7 +218,7 @@
 			                INNER JOIN
 			            study_type st ON p2.study_type_id = st.study_type_id
 			        WHERE
-			            variable_id = 8135 AND value = ''
+			            variable_id = 8135 AND (value = '' or value IS NULL)
 			                AND st.name = 'N');
 		</sql>
 	</changeSet>
@@ -296,7 +296,7 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					select count(*) from nd_geolocationprop where type_id = 8135 AND value = '';
+					select count(*) from nd_geolocationprop where type_id = 8135 AND (value = '' or value IS NULL);
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -304,7 +304,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE nd_geolocationprop
 			SET VALUE = 10169
-			WHERE type_id = 8135 AND value = '';
+			WHERE type_id = 8135 AND (value = '' or value IS NULL);
 		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-9" author="vanina">
@@ -369,7 +369,7 @@
 				        listCheck.listtype = 'CHECK'
 				        AND listNursery.listtype = 'STUDY'
 				        and listDataNursery.germplasm_id = listDataCheck.germplasm_id
-				        AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+				        AND (listDataNursery.check_type IS NULL OR listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
 				        AND listDataCheck.check_type != 10170
 				        AND listDataCheck.entry_id < (select max(entry_id)
 				                                      from listdata_project lmax
@@ -445,7 +445,7 @@
 						            listDataNursery.germplasm_id = listDataCheck.germplasm_id
 						                AND listDataNursery.list_id != listDataCheck.list_id
 						                AND listNursery.listtype = 'STUDY'
-						                AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+						                AND (listDataNursery.check_type IS NULL OR listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
 						                AND listNursery.projectid = listCheck.projectid))
 				      UNION
 				      SELECT
@@ -472,7 +472,7 @@
 				        listCheck.listtype = 'CHECK'
 				        AND listNursery.listtype = 'STUDY'
 				        and listDataNursery.germplasm_id = listDataCheck.germplasm_id
-				        AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+				        AND (listDataNursery.check_type IS NULL OR listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
 				        AND listDataCheck.check_type != 10170
 				        AND listDataCheck.entry_id > (SELECT max(entry_id)
 				                                      from listdata_project lmax
