@@ -300,8 +300,6 @@
 					FROM
 					    project p
 					        INNER JOIN
-					    projectprop pp ON p.project_id = pp.project_id
-					        INNER JOIN
 					    nd_experiment_project nep ON nep.project_id = p.project_id
 					        INNER JOIN
 					    nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
@@ -330,8 +328,6 @@
 			            geo.nd_geolocation_id
 			        FROM
 			            project p
-			                INNER JOIN
-			            projectprop pp ON p.project_id = pp.project_id
 			                INNER JOIN
 			            nd_experiment_project nep ON nep.project_id = p.project_id
 			                INNER JOIN
