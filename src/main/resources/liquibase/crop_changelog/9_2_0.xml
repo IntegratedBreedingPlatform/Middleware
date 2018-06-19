@@ -180,10 +180,7 @@
 					FROM
 					    project p
 					        INNER JOIN
-					    (SELECT
-					        *
-					    FROM
-					        projectprop) pp ON p.project_id = pp.project_id
+					    projectprop pp ON p.project_id = pp.project_id
 					        INNER JOIN
 					    project_relationship r ON p.project_id = r.subject_project_id
 					        INNER JOIN
