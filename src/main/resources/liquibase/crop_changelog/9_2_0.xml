@@ -324,7 +324,7 @@
 			SET
 			    VALUE = 10169
 			WHERE
-			    nd_geolocationprop IN (SELECT
+			    nd_geolocation_id IN (SELECT
 			            geo.nd_geolocation_id
 			        FROM
 			            project p
