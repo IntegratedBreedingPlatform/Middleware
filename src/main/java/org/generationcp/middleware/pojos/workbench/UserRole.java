@@ -24,8 +24,8 @@ public class UserRole {
 	@JoinColumn(name = "userid", nullable = false)
 	private WorkbenchUser user;
 
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "role_id", nullable=false, updatable = false, insertable = false)
+	@ManyToOne
+	@JoinColumn(name = "role_id", nullable = false)
 	private Role role;
 
 	public UserRole() {
