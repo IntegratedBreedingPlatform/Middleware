@@ -69,7 +69,7 @@ public class UserRole {
 
 	@Override
 	public String toString() {
-		return "UserRole [User=" + this.user + ", Role=" + this.role + "]";
+		return "UserRole [User=" + this.user.getUserid() + ", Role=" + this.role + "]";
 	}
 	
 	public String getCapitalizedRole() {
