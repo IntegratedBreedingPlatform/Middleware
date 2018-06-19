@@ -419,7 +419,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				+ "       Group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR \n" + "       ', ') \n"
 				+ "                                   AS `" + STOCK_IDS + "`, \n" + "       g.gid                     AS `" + GID + "`, \n"
 				+ "       g.mgid                     AS `" + GROUP_ID + "`, \n" + "       Count(DISTINCT gt.lotid)    AS `" + AVAIL_LOTS
-				+ "`, \n" + "       Sum(gt.trnqty)/(Count(g.gid)/Count(DISTINCT gt.lotid))              AS `" + AVAIL_BALANCE + "`, \n"
+				+ "`, \n" + "       Sum(gt.trnqty)/(Count(gt.trnid)/Count(DISTINCT gt.trnid))              AS `" + AVAIL_BALANCE + "`, \n"
 				+ "       m.mname                     AS `" + METHOD_NAME + "`, \n" + "       l.lname                     AS `"
 				+ LOCATION_NAME + "` \n");
 
