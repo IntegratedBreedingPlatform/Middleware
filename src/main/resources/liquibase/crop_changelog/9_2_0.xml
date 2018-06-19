@@ -293,23 +293,28 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					select count(*)
+					SELECT
+					    COUNT(1)
 					FROM
-						  project p
-						  INNER JOIN
-						  nd_experiment_project nep ON nep.project_id = p.project_id
-						  INNER JOIN
-						  nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
-						  INNER JOIN
-						  study_type st ON p.study_type_id = st.study_type_id
-						  INNER JOIN
-						  (SELECT
-						     *
-						   FROM
-						     nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
-						WHERE
-						  st.name = 'N' AND geo.type_id = 8135
-						  AND (geo.value = '' OR geo.value IS NULL);
+					    project p
+					        INNER JOIN
+					    nd_experiment_project nep ON nep.project_id = p.project_id
+					        INNER JOIN
+					    nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
+					        INNER JOIN
+					    project_relationship r ON p.project_id = r.subject_project_id
+					        INNER JOIN
+					    project p2 ON r.object_project_id = p2.project_id
+					        INNER JOIN
+					    study_type st ON p2.study_type_id = st.study_type_id
+					        INNER JOIN
+					    (SELECT
+					        *
+					    FROM
+					        nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
+					WHERE
+					    st.name = 'N' AND geo.type_id = 8135
+					        AND (geo.value = '' OR geo.value IS NULL);
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -321,26 +326,26 @@
 			WHERE
 			    nd_geolocationprop IN (SELECT
 			            geo.nd_geolocation_id
-										FROM
-										  project p
-										  INNER JOIN
-										  nd_experiment_project nep ON nep.project_id = p.project_id
-										  INNER JOIN
-										  nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
-										  INNER JOIN
+			        FROM
+			            project p
+			                INNER JOIN
+			            nd_experiment_project nep ON nep.project_id = p.project_id
+			                INNER JOIN
+			            nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
+			                INNER JOIN
 			            project_relationship r ON p.project_id = r.subject_project_id
 			                INNER JOIN
 			            project p2 ON r.object_project_id = p2.project_id
 			                INNER JOIN
 			            study_type st ON p2.study_type_id = st.study_type_id
-										  INNER JOIN
-										  (SELECT
-										     *
-										   FROM
-										     nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
-										WHERE
-										  st.name = 'N' AND geo.type_id = 8135
-										  AND (geo.value = '' OR geo.value IS NULL));
+			                INNER JOIN
+			            (SELECT
+			                *
+			            FROM
+			                nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
+			        WHERE
+			            st.name = 'N' AND geo.type_id = 8135
+			                AND (geo.value = '' OR geo.value IS NULL));
 		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-9" author="vanina">
