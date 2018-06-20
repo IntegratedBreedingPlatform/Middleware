@@ -48,7 +48,8 @@
 				FROM information_schema.REFERENTIAL_CONSTRAINTS
 				where DELETE_RULE = 'CASCADE'
 				AND table_name = 'projectprop'
-				AND CONSTRAINT_NAME = 'projectprop_2_fk2';
+				AND CONSTRAINT_NAME = 'projectprop_2_fk2'
+				AND CONSTRAINT_SCHEMA = database();
 			</sqlCheck>
 		</preConditions>
 		<comment>Remove cascade on projectprop_2_fk2</comment>
