@@ -410,7 +410,7 @@
 				        listCheck.listtype = 'CHECK'
 				        AND listNursery.listtype = 'STUDY'
 				        and listDataNursery.germplasm_id = listDataCheck.germplasm_id
-				        AND (listDataNursery.check_type IS NULL OR listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+				        AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
 				        AND listDataCheck.check_type != 10170
 				        AND listDataCheck.entry_id < (select max(entry_id)
 				                                      from listdata_project lmax
@@ -486,7 +486,7 @@
 						            listDataNursery.germplasm_id = listDataCheck.germplasm_id
 						                AND listDataNursery.list_id != listDataCheck.list_id
 						                AND listNursery.listtype = 'STUDY'
-						                AND (listDataNursery.check_type IS NULL OR listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+						                AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
 						                AND listNursery.projectid = listCheck.projectid))
 				      UNION
 				      SELECT
@@ -513,7 +513,7 @@
 				        listCheck.listtype = 'CHECK'
 				        AND listNursery.listtype = 'STUDY'
 				        and listDataNursery.germplasm_id = listDataCheck.germplasm_id
-				        AND (listDataNursery.check_type IS NULL OR listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
+				        AND (listDataNursery.check_type = '' OR listDataNursery.check_type = 0)
 				        AND listDataCheck.check_type != 10170
 				        AND listDataCheck.entry_id > (SELECT max(entry_id)
 				                                      from listdata_project lmax
