@@ -16,7 +16,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE project p SET p.created_by =
-				(SELECT userid FROM users WHERE uname='admin')
+			(SELECT userid FROM users WHERE uname='admin')
 			WHERE NAME LIKE '%template' AND program_uuid IS NULL;
 		</sql>
 	</changeSet>
@@ -54,13 +54,13 @@
 		</preConditions>
 		<comment>Remove cascade on projectprop_2_fk2</comment>
 		<sql dbms="mysql" splitStatements="true">
-				ALTER TABLE projectprop
-				DROP FOREIGN KEY projectprop_2_fk2;
-				ALTER TABLE projectprop
-				ADD CONSTRAINT projectprop_2_fk2
-				  FOREIGN KEY (type_id)
-				  REFERENCES cvterm (cvterm_id)
-				  ON DELETE NO ACTION;
+			ALTER TABLE projectprop
+			DROP FOREIGN KEY projectprop_2_fk2;
+			ALTER TABLE projectprop
+			ADD CONSTRAINT projectprop_2_fk2
+			FOREIGN KEY (type_id)
+			REFERENCES cvterm (cvterm_id)
+			ON DELETE NO ACTION;
 		</sql>
 	</changeSet>
 	<changeSet author="cuenyad" id="v9.2.0-2">
@@ -77,12 +77,12 @@
 	<changeSet author="vanina" id="v9.2.0-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-					SELECT COUNT(*)
-					FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-					WHERE TABLE_NAME = 'project'
-					AND CONSTRAINT_NAME = 'study_type_fk'
-					AND TABLE_SCHEMA = DATABASE();
-				</sqlCheck>
+				SELECT COUNT(*)
+				FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE TABLE_NAME = 'project'
+				AND CONSTRAINT_NAME = 'study_type_fk'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
 		</preConditions>
 		<comment>Remove study_type_fk from project table</comment>
 		<sql dbms="mysql" splitStatements="true">
@@ -92,17 +92,17 @@
 	<changeSet author="vanina" id="v9.2.0-20">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-						SELECT COUNT(*)
-						FROM INFORMATION_SCHEMA.STATISTICS
-						WHERE TABLE_SCHEMA = DATABASE()
-						AND TABLE_NAME = 'project'
-						AND INDEX_NAME = 'study_type_fk_idx';
-					</sqlCheck>
+				SELECT COUNT(*)
+				FROM INFORMATION_SCHEMA.STATISTICS
+				WHERE TABLE_SCHEMA = DATABASE()
+				AND TABLE_NAME = 'project'
+				AND INDEX_NAME = 'study_type_fk_idx';
+			</sqlCheck>
 		</preConditions>
 		<comment>Remove study_type_fk_idx from project table</comment>
 		<sql dbms="mysql" splitStatements="true">
-				ALTER TABLE project DROP INDEX study_type_fk_idx;
-			</sql>
+			ALTER TABLE project DROP INDEX study_type_fk_idx;
+		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-4">
 		<preConditions onFail="MARK_RAN">
@@ -113,14 +113,14 @@
 			DROP TABLE study_type;
 
 			CREATE TABLE study_type (
-			  study_type_id INT NOT NULL AUTO_INCREMENT,
-			  label VARCHAR(45) NOT NULL,
-			  name VARCHAR(45) NOT NULL,
-			  cvterm_id INT NULL,
-			  visible TINYINT NOT NULL,
-			  PRIMARY KEY (study_type_id),
-			  UNIQUE INDEX label_UNIQUE (label ASC),
-			  UNIQUE INDEX name_UNIQUE (name ASC));
+			study_type_id INT NOT NULL AUTO_INCREMENT,
+			label VARCHAR(45) NOT NULL,
+			name VARCHAR(45) NOT NULL,
+			cvterm_id INT NULL,
+			visible TINYINT NOT NULL,
+			PRIMARY KEY (study_type_id),
+			UNIQUE INDEX label_UNIQUE (label ASC),
+			UNIQUE INDEX name_UNIQUE (name ASC));
 
 			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Nursery", "N", 10000, 1);
 			INSERT INTO study_type (label, name, cvterm_id, visible) VALUES ("Hybridization Nursery", "HB", 10001, 0);
@@ -144,18 +144,18 @@
 		<comment>Add study_type_id to project table. Insert index and fk</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE project
-			  ADD COLUMN study_type_id INT;
+			ADD COLUMN study_type_id INT;
 
 			UPDATE project p SET p.study_type_id = (SELECT st.study_type_id FROM study_type st where st.name = p.study_type);
 
 			ALTER TABLE project DROP COLUMN study_type;
 
 			ALTER TABLE project
-			  ADD CONSTRAINT study_type_fk
+			ADD CONSTRAINT study_type_fk
 			FOREIGN KEY (study_type_id)
 			REFERENCES study_type (study_type_id)
-			  ON DELETE NO ACTION
-			  ON UPDATE NO ACTION;
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
 		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-6" author="clarysabel">
@@ -177,20 +177,20 @@
 			<not>
 				<sqlCheck expectedResult="0">
 					SELECT
-					    COUNT(1)
+					COUNT(1)
 					FROM
-					    project p
-					        INNER JOIN
-					    projectprop pp ON p.project_id = pp.project_id
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
+					project p
+					INNER JOIN
+					projectprop pp ON p.project_id = pp.project_id
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
 					WHERE
-					    variable_id = 8135 AND (value = '' or value IS NULL)
-					        AND st.name = 'N';
+					variable_id = 8135 AND (value = '' or value IS NULL)
+					AND st.name = 'N';
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -198,26 +198,26 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop
 			SET
-			    value = 10169
+			value = 10169
 			WHERE
-			    projectprop_id IN (SELECT
-			            pp.projectprop_id
-			        FROM
-			            project p
-			                INNER JOIN
-			            (SELECT
-			                *
-			            FROM
-			                projectprop) pp ON p.project_id = pp.project_id
-			                INNER JOIN
-			            project_relationship r ON p.project_id = r.subject_project_id
-			                INNER JOIN
-			            project p2 ON r.object_project_id = p2.project_id
-			                INNER JOIN
-			            study_type st ON p2.study_type_id = st.study_type_id
-			        WHERE
-			            variable_id = 8135 AND (value = '' or value IS NULL)
-			                AND st.name = 'N');
+			projectprop_id IN (SELECT
+			pp.projectprop_id
+			FROM
+			project p
+			INNER JOIN
+			(SELECT
+			*
+			FROM
+			projectprop) pp ON p.project_id = pp.project_id
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			variable_id = 8135 AND (value = '' or value IS NULL)
+			AND st.name = 'N');
 		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-7.1" author="vanina">
@@ -225,28 +225,28 @@
 			<not>
 				<sqlCheck expectedResult="0">
 					SELECT
-					    COUNT(1)
+					COUNT(1)
 					FROM
-					    project p
-					        INNER JOIN
-					    projectprop pp ON pp.project_id = p.project_id
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
+					project p
+					INNER JOIN
+					projectprop pp ON pp.project_id = p.project_id
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
 					WHERE
-					    pp.variable_id = 8160
-					        AND pp.value = 10080
-					        AND st.name = 'N'
-					        AND NOT EXISTS( SELECT
-					            1
-					        FROM
-					            projectprop PROP
-					        WHERE
-					            PROP.project_id = P.PROJECT_ID
-					                AND PROP.variable_id = 8135);
+					pp.variable_id = 8160
+					AND pp.value = 10080
+					AND st.name = 'N'
+					AND NOT EXISTS( SELECT
+					1
+					FROM
+					projectprop PROP
+					WHERE
+					PROP.project_id = P.PROJECT_ID
+					AND PROP.variable_id = 8135);
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -254,40 +254,40 @@
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO projectprop (PROJECT_ID, TYPE_ID, VALUE, RANK, VARIABLE_ID, ALIAS)
 			SELECT
-			    P.PROJECT_ID,
-			    1806,
-			    10169,
-			    (SELECT
-			            IF(MAX(ppR.rank) IS NULL,
-			                    1,
-			                    MAX(ppR.rank) + 1)
-			        FROM
-			            projectprop ppR
-			        WHERE
-			            p.project_id = ppR.project_id),
-			    8135,
-			    'EXPT_DESIGN'
+			P.PROJECT_ID,
+			1806,
+			10169,
+			(SELECT
+			IF(MAX(ppR.rank) IS NULL,
+			1,
+			MAX(ppR.rank) + 1)
 			FROM
-			    project p
-			        INNER JOIN
-			    projectprop pp ON pp.project_id = p.project_id
-			        INNER JOIN
-			    project_relationship r ON p.project_id = r.subject_project_id
-			        INNER JOIN
-			    project p2 ON r.object_project_id = p2.project_id
-			        INNER JOIN
-			    study_type st ON p2.study_type_id = st.study_type_id
+			projectprop ppR
 			WHERE
-			    pp.variable_id = 8160
-			        AND pp.value = 10080
-			        AND st.name = 'N'
-			        AND NOT EXISTS( SELECT
-			            1
-			        FROM
-			            projectprop PROP
-			        WHERE
-			            PROP.project_id = P.PROJECT_ID
-			                AND PROP.variable_id = 8135);
+			p.project_id = ppR.project_id),
+			8135,
+			'EXPT_DESIGN'
+			FROM
+			project p
+			INNER JOIN
+			projectprop pp ON pp.project_id = p.project_id
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			pp.variable_id = 8160
+			AND pp.value = 10080
+			AND st.name = 'N'
+			AND NOT EXISTS( SELECT
+			1
+			FROM
+			projectprop PROP
+			WHERE
+			PROP.project_id = P.PROJECT_ID
+			AND PROP.variable_id = 8135);
 		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-8" author="vanina">
@@ -295,27 +295,27 @@
 			<not>
 				<sqlCheck expectedResult="0">
 					SELECT
-					    COUNT(1)
+					COUNT(1)
 					FROM
-					    project p
-					        INNER JOIN
-					    nd_experiment_project nep ON nep.project_id = p.project_id
-					        INNER JOIN
-					    nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
-					        INNER JOIN
-					    (SELECT
-					        *
-					    FROM
-					        nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
+					project p
+					INNER JOIN
+					nd_experiment_project nep ON nep.project_id = p.project_id
+					INNER JOIN
+					nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
+					INNER JOIN
+					(SELECT
+					*
+					FROM
+					nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
 					WHERE
-					    st.name = 'N' AND geo.type_id = 8135
-					        AND (geo.value = '' OR geo.value IS NULL);
+					st.name = 'N' AND geo.type_id = 8135
+					AND (geo.value = '' OR geo.value IS NULL);
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -323,30 +323,30 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE nd_geolocationprop
 			SET
-			    VALUE = 10169
+			VALUE = 10169
 			WHERE
-			    nd_geolocationprop_id IN (SELECT
-			            geo.nd_geolocationprop_id
-			        FROM
-			            project p
-			                INNER JOIN
-			            nd_experiment_project nep ON nep.project_id = p.project_id
-			                INNER JOIN
-			            nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
-			                INNER JOIN
-			            project_relationship r ON p.project_id = r.subject_project_id
-			                INNER JOIN
-			            project p2 ON r.object_project_id = p2.project_id
-			                INNER JOIN
-			            study_type st ON p2.study_type_id = st.study_type_id
-			                INNER JOIN
-			            (SELECT
-			                *
-			            FROM
-			                nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
-			        WHERE
-			            st.name = 'N' AND geo.type_id = 8135
-			                AND (geo.value = '' OR geo.value IS NULL));
+			nd_geolocationprop_id IN (SELECT
+			geo.nd_geolocationprop_id
+			FROM
+			project p
+			INNER JOIN
+			nd_experiment_project nep ON nep.project_id = p.project_id
+			INNER JOIN
+			nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			INNER JOIN
+			(SELECT
+			*
+			FROM
+			nd_geolocationprop) geo ON geo.nd_geolocation_id = e.nd_geolocation_id
+			WHERE
+			st.name = 'N' AND geo.type_id = 8135
+			AND (geo.value = '' OR geo.value IS NULL));
 		</sql>
 	</changeSet>
 	<changeSet id="v9.2.0-9" author="vanina">
@@ -649,18 +649,18 @@
 					COUNT(*)
 					from cvtermprop
 					where value = 'Nursery Condition' and cvtermprop_id in (SELECT cvtermprop_id
-                                                    FROM cvterm cvt
-                                                      INNER JOIN  (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
-                                                    WHERE cvt.cv_id = 1040 -- variable
-                                                          AND cvtp.type_id = 1800 -- variable type
-                                                          AND cvtp.value IN (
-                                                      'Nursery Condition'
-                                                      , 'Trial Condition'
-                                                    )
-                                                    group by cvt.cvterm_id
-                                                    having count(1) = 2);
+					FROM cvterm cvt
+					INNER JOIN  (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+					WHERE cvt.cv_id = 1040 -- variable
+					AND cvtp.type_id = 1800 -- variable type
+					AND cvtp.value IN (
+					'Nursery Condition'
+					, 'Trial Condition'
+					)
+					group by cvt.cvterm_id
+					having count(1) = 2);
 				</sqlCheck>
-				</not>
+			</not>
 		</preConditions>
 		<comment>
 			Remove 'Nursery Condition' from variables that are have both trial and nursery conditions
@@ -668,16 +668,16 @@
 		<sql dbms="mysql" splitStatements="false">
 			delete from cvtermprop
 			where value = 'Nursery Condition' and cvtermprop_id in (SELECT cvtermprop_id
-												FROM cvterm cvt
-												  INNER JOIN (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
-												WHERE cvt.cv_id = 1040 -- variable
-													  AND cvtp.type_id = 1800 -- variable type
-													  AND cvtp.value IN (
-												  'Nursery Condition'
-												  , 'Trial Condition'
-												)
-												group by cvt.cvterm_id
-												having count(1) = 2);
+			FROM cvterm cvt
+			INNER JOIN (select * from cvtermprop) cvtp ON cvt.cvterm_id = cvtp.cvterm_id
+			WHERE cvt.cv_id = 1040 -- variable
+			AND cvtp.type_id = 1800 -- variable type
+			AND cvtp.value IN (
+			'Nursery Condition'
+			, 'Trial Condition'
+			)
+			group by cvt.cvterm_id
+			having count(1) = 2);
 
 		</sql>
 	</changeSet>
@@ -688,7 +688,7 @@
 				SELECT
 				COUNT(*)
 				FROM
-					cvterm
+				cvterm
 				WHERE cvterm_id = 1802 AND name = 'Trial Condition';
 			</sqlCheck>
 		</preConditions>
@@ -706,7 +706,7 @@
 					SELECT
 					COUNT(*)
 					FROM
-						projectprop
+					projectprop
 					WHERE type_id = 1803;
 				</sqlCheck>
 			</not>
@@ -724,7 +724,7 @@
 				SELECT
 				COUNT(*)
 				FROM
-					cvterm
+				cvterm
 				WHERE cvterm_id = 1803;
 			</sqlCheck>
 		</preConditions>
@@ -739,11 +739,11 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-						SELECT
-						COUNT(*)
-						FROM
-							cvtermprop
-						where value = 'Nursery Condition' or value = 'Trial Condition';
+					SELECT
+					COUNT(*)
+					FROM
+					cvtermprop
+					where value = 'Nursery Condition' or value = 'Trial Condition';
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -758,285 +758,285 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-						SELECT
-						COUNT(*)
-						FROM
-							projectprop
-						where alias != 'TRIAL_INSTANCE' and variable_id = 8170;
-					</sqlCheck>
+					SELECT
+					COUNT(*)
+					FROM
+					projectprop
+					where alias != 'TRIAL_INSTANCE' and variable_id = 8170;
+				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>Update projectprop table where TRIAL INSTANCE alias is not trial instance</comment>
 		<sql dbms="mysql" splitStatements="false">
-				update projectprop set alias = 'TRIAL_INSTANCE' where variable_id = 8170 and alias != 'TRIAL_INSTANCE';
-			</sql>
+			update projectprop set alias = 'TRIAL_INSTANCE' where variable_id = 8170 and alias != 'TRIAL_INSTANCE';
+		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-21">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-						select count(1)
-						from project p
-						  inner join nd_experiment_project nep on (nep.project_id = p.project_id)
-						  inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
-						  inner join study_type st on p.study_type_id = st.study_type_id
-						where not exists(select 1
-						                 from nd_geolocationprop ngp
-						                 where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8135)
-						      and st.name = 'N';
-					</sqlCheck>
+					select count(1)
+					from project p
+					inner join nd_experiment_project nep on (nep.project_id = p.project_id)
+					inner join nd_experiment e on (e.nd_experiment_id = nep.nd_experiment_id)
+					inner join study_type st on p.study_type_id = st.study_type_id
+					where not exists(select 1
+					from nd_geolocationprop ngp
+					where ngp.nd_geolocation_id = e.nd_geolocation_id and ngp.type_id = 8135)
+					and st.name = 'N';
+				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>Insert into nd_geolocationprop table missing experimental design row</comment>
 		<sql dbms="mysql" splitStatements="true">
-				INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
-				SELECT DISTINCT
-				    e.nd_geolocation_id,
-				    8135,
-				    10169,
-				    (SELECT
-				            IF(MAX(ngp.rank) IS NULL,
-				                    1,
-				                    MAX(ngp.rank) + 1)
-				        FROM
-				            nd_geolocationprop ngp
-				        WHERE
-				            ngp.nd_geolocation_id = e.nd_geolocation_id)
-				FROM
-				    project p
-				        INNER JOIN
-				    nd_experiment_project nep ON (nep.project_id = p.project_id)
-				        INNER JOIN
-				    nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
-				        INNER JOIN
-				    project_relationship r ON p.project_id = r.subject_project_id
-				        INNER JOIN
-				    project p2 ON r.object_project_id = p2.project_id
-				        INNER JOIN
-				    study_type st ON p2.study_type_id = st.study_type_id
-				WHERE
-				    NOT EXISTS( SELECT
-				            1
-				        FROM
-				            nd_geolocationprop ngp
-				        WHERE
-				            ngp.nd_geolocation_id = e.nd_geolocation_id
-				                AND ngp.type_id = 8135)
-				        AND st.name = 'N';
-			</sql>
+			INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+			SELECT DISTINCT
+			e.nd_geolocation_id,
+			8135,
+			10169,
+			(SELECT
+			IF(MAX(ngp.rank) IS NULL,
+			1,
+			MAX(ngp.rank) + 1)
+			FROM
+			nd_geolocationprop ngp
+			WHERE
+			ngp.nd_geolocation_id = e.nd_geolocation_id)
+			FROM
+			project p
+			INNER JOIN
+			nd_experiment_project nep ON (nep.project_id = p.project_id)
+			INNER JOIN
+			nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			NOT EXISTS( SELECT
+			1
+			FROM
+			nd_geolocationprop ngp
+			WHERE
+			ngp.nd_geolocation_id = e.nd_geolocation_id
+			AND ngp.type_id = 8135)
+			AND st.name = 'N';
+		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-22">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-							SELECT
-							    COUNT(1)
-							FROM
-							    project p
-							        INNER JOIN
-							    projectprop pp ON p.project_id = pp.project_id
-							        INNER JOIN
-							    nd_experiment_project nep ON nep.project_id = p.project_id
-							        INNER JOIN
-							     nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
-							        INNER JOIN
-							    project_relationship r ON p.project_id = r.subject_project_id
-							        INNER JOIN
-							    project p2 ON r.object_project_id = p2.project_id
-							         INNER JOIN
-							     study_type st ON p2.study_type_id = st.study_type_id
-							WHERE
-							    pp.variable_id = 8411
-							       AND NOT EXISTS( SELECT
-							            1
-							        FROM
-							            nd_geolocationprop ngp
-							        WHERE
-							            ngp.nd_geolocation_id = e.nd_geolocation_id
-							                AND ngp.type_id = 8411)
-							         AND st.name = 'N';
-						</sqlCheck>
+					SELECT
+					COUNT(1)
+					FROM
+					project p
+					INNER JOIN
+					projectprop pp ON p.project_id = pp.project_id
+					INNER JOIN
+					nd_experiment_project nep ON nep.project_id = p.project_id
+					INNER JOIN
+					nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
+					WHERE
+					pp.variable_id = 8411
+					AND NOT EXISTS( SELECT
+					1
+					FROM
+					nd_geolocationprop ngp
+					WHERE
+					ngp.nd_geolocation_id = e.nd_geolocation_id
+					AND ngp.type_id = 8411)
+					AND st.name = 'N';
+				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>Insert into nd_geolocationprop table missing check start row</comment>
 		<sql dbms="mysql" splitStatements="true">
-					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
-					SELECT DISTINCT
-					    e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
-					FROM
-					    project p
-					        INNER JOIN
-					    projectprop pp ON p.project_id = pp.project_id
-					        INNER JOIN
-					    nd_experiment_project nep ON nep.project_id = p.project_id
-					        INNER JOIN
-					    nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
-					WHERE
-					    pp.variable_id = 8411
-					        AND NOT EXISTS( SELECT
-					            1
-					        FROM
-					            nd_geolocationprop ngp
-					        WHERE
-					            ngp.nd_geolocation_id = e.nd_geolocation_id
-					                AND ngp.type_id = 8411)
-					        AND st.name = 'N';
-	                </sql>
+			INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+			SELECT DISTINCT
+			e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
+			FROM
+			project p
+			INNER JOIN
+			projectprop pp ON p.project_id = pp.project_id
+			INNER JOIN
+			nd_experiment_project nep ON nep.project_id = p.project_id
+			INNER JOIN
+			nd_experiment e ON e.nd_experiment_id = nep.nd_experiment_id
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			pp.variable_id = 8411
+			AND NOT EXISTS( SELECT
+			1
+			FROM
+			nd_geolocationprop ngp
+			WHERE
+			ngp.nd_geolocation_id = e.nd_geolocation_id
+			AND ngp.type_id = 8411)
+			AND st.name = 'N';
+		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-23">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-							 SELECT
-							    COUNT(1)
-							FROM
-							    project p
-							        INNER JOIN
-							    projectprop pp ON p.project_id = pp.project_id
-							        INNER JOIN
-							    nd_experiment_project nep ON (nep.project_id = p.project_id)
-							        INNER JOIN
-							    nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
-							        INNER JOIN
-							    project_relationship r ON p.project_id = r.subject_project_id
-							        INNER JOIN
-							    project p2 ON r.object_project_id = p2.project_id
-							        INNER JOIN
-							    study_type st ON p2.study_type_id = st.study_type_id
-							WHERE
-							    pp.variable_id = 8412
-							        AND NOT EXISTS( SELECT
-							            1
-							        FROM
-							            nd_geolocationprop ngp
-							        WHERE
-							            ngp.nd_geolocation_id = e.nd_geolocation_id
-							                AND ngp.type_id = 8412)
-							        AND st.name = 'N';
-						</sqlCheck>
+					SELECT
+					COUNT(1)
+					FROM
+					project p
+					INNER JOIN
+					projectprop pp ON p.project_id = pp.project_id
+					INNER JOIN
+					nd_experiment_project nep ON (nep.project_id = p.project_id)
+					INNER JOIN
+					nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
+					WHERE
+					pp.variable_id = 8412
+					AND NOT EXISTS( SELECT
+					1
+					FROM
+					nd_geolocationprop ngp
+					WHERE
+					ngp.nd_geolocation_id = e.nd_geolocation_id
+					AND ngp.type_id = 8412)
+					AND st.name = 'N';
+				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>Insert into nd_geolocationprop table missing check interval row</comment>
 		<sql dbms="mysql" splitStatements="true">
-					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
-					SELECT DISTINCT
-					    e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
-					FROM
-					    project p
-					        INNER JOIN
-					    projectprop pp ON p.project_id = pp.project_id
-					        INNER JOIN
-					    nd_experiment_project nep ON (nep.project_id = p.project_id)
-					        INNER JOIN
-					    nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
-					WHERE
-					    pp.variable_id = 8412
-					        AND NOT EXISTS( SELECT
-					            1
-					        FROM
-					            nd_geolocationprop ngp
-					        WHERE
-					            ngp.nd_geolocation_id = e.nd_geolocation_id
-					                AND ngp.type_id = 8412)
-					        AND st.name = 'N';
+			INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+			SELECT DISTINCT
+			e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
+			FROM
+			project p
+			INNER JOIN
+			projectprop pp ON p.project_id = pp.project_id
+			INNER JOIN
+			nd_experiment_project nep ON (nep.project_id = p.project_id)
+			INNER JOIN
+			nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			pp.variable_id = 8412
+			AND NOT EXISTS( SELECT
+			1
+			FROM
+			nd_geolocationprop ngp
+			WHERE
+			ngp.nd_geolocation_id = e.nd_geolocation_id
+			AND ngp.type_id = 8412)
+			AND st.name = 'N';
 		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-24">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-							SELECT
-							    COUNT(1)
-							FROM
-							    project p
-							        INNER JOIN
-							    projectprop pp ON p.project_id = pp.project_id
-							        INNER JOIN
-							    nd_experiment_project nep ON (nep.project_id = p.project_id)
-							        INNER JOIN
-							    nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
-							        INNER JOIN
-							    project_relationship r ON p.project_id = r.subject_project_id
-							        INNER JOIN
-							    project p2 ON r.object_project_id = p2.project_id
-							        INNER JOIN
-							    study_type st ON p2.study_type_id = st.study_type_id
-							WHERE
-							    pp.variable_id = 8413
-							        AND NOT EXISTS( SELECT
-							            1
-							        FROM
-							            nd_geolocationprop ngp
-							        WHERE
-							            ngp.nd_geolocation_id = e.nd_geolocation_id
-							                AND ngp.type_id = 8413)
-							        AND st.name = 'N';
-						</sqlCheck>
+					SELECT
+					COUNT(1)
+					FROM
+					project p
+					INNER JOIN
+					projectprop pp ON p.project_id = pp.project_id
+					INNER JOIN
+					nd_experiment_project nep ON (nep.project_id = p.project_id)
+					INNER JOIN
+					nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
+					WHERE
+					pp.variable_id = 8413
+					AND NOT EXISTS( SELECT
+					1
+					FROM
+					nd_geolocationprop ngp
+					WHERE
+					ngp.nd_geolocation_id = e.nd_geolocation_id
+					AND ngp.type_id = 8413)
+					AND st.name = 'N';
+				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>Insert into nd_geolocationprop table missing check plan row</comment>
 		<sql dbms="mysql" splitStatements="true">
-					INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
-					  SELECT DISTINCT
-						    e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
-						FROM
-						    project p
-						        INNER JOIN
-						    projectprop pp ON p.project_id = pp.project_id
-						        INNER JOIN
-						    nd_experiment_project nep ON (nep.project_id = p.project_id)
-						        INNER JOIN
-						    nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
-						        INNER JOIN
-						    project_relationship r ON p.project_id = r.subject_project_id
-						        INNER JOIN
-						    project p2 ON r.object_project_id = p2.project_id
-						        INNER JOIN
-						    study_type st ON p2.study_type_id = st.study_type_id
-						WHERE
-						    pp.variable_id = 8413
-						        AND NOT EXISTS( SELECT
-						            1
-						        FROM
-						            nd_geolocationprop ngp
-						        WHERE
-						            ngp.nd_geolocation_id = e.nd_geolocation_id
-						                AND ngp.type_id = 8413)
-						        AND st.name = 'N';
-				</sql>
+			INSERT INTO nd_geolocationprop (nd_geolocation_id, type_id, value, rank)
+			SELECT DISTINCT
+			e.nd_geolocation_id, pp.variable_id, pp.value, pp.rank
+			FROM
+			project p
+			INNER JOIN
+			projectprop pp ON p.project_id = pp.project_id
+			INNER JOIN
+			nd_experiment_project nep ON (nep.project_id = p.project_id)
+			INNER JOIN
+			nd_experiment e ON (e.nd_experiment_id = nep.nd_experiment_id)
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			pp.variable_id = 8413
+			AND NOT EXISTS( SELECT
+			1
+			FROM
+			nd_geolocationprop ngp
+			WHERE
+			ngp.nd_geolocation_id = e.nd_geolocation_id
+			AND ngp.type_id = 8413)
+			AND st.name = 'N';
+		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-25">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
 					SELECT
-					    COUNT(1)
+					COUNT(1)
 					FROM
-					    projectprop pp
-					        INNER JOIN
-					    project p ON pp.project_id = p.project_id
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
+					projectprop pp
+					INNER JOIN
+					project p ON pp.project_id = p.project_id
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
 					WHERE
-					    pp.variable_id = 8255
-					        AND alias != 'ENTRY_TYPE'
-					        AND st.name = 'N';
+					pp.variable_id = 8255
+					AND alias != 'ENTRY_TYPE'
+					AND st.name = 'N';
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -1044,27 +1044,27 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop
 			SET
-			    alias = 'ENTRY_TYPE'
+			alias = 'ENTRY_TYPE'
 			WHERE
-			    projectprop_id IN (SELECT
-			            pp.projectprop_id
-			        FROM
-			            (SELECT
-			                *
-			            FROM
-			                projectprop) pp
-			                INNER JOIN
-			            project p ON pp.project_id = p.project_id
-			                INNER JOIN
-			            project_relationship r ON p.project_id = r.subject_project_id
-			                INNER JOIN
-			            project p2 ON r.object_project_id = p2.project_id
-			                INNER JOIN
-			            study_type st ON p2.study_type_id = st.study_type_id
-			        WHERE
-			            pp.variable_id = 8255
-			                AND alias != 'ENTRY_TYPE'
-			                AND st.name = 'N');
+			projectprop_id IN (SELECT
+			pp.projectprop_id
+			FROM
+			(SELECT
+			*
+			FROM
+			projectprop) pp
+			INNER JOIN
+			project p ON pp.project_id = p.project_id
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			WHERE
+			pp.variable_id = 8255
+			AND alias != 'ENTRY_TYPE'
+			AND st.name = 'N');
 		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-26">
@@ -1072,28 +1072,28 @@
 			<not>
 				<sqlCheck expectedResult="0">
 					SELECT
-					    COUNT(1)
+					COUNT(1)
 					FROM
-					    project p
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
-					        INNER JOIN
-					    projectprop prop ON p.project_id = prop.project_id
+					project p
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
+					INNER JOIN
+					projectprop prop ON p.project_id = prop.project_id
 					WHERE
-					    prop.variable_id = 8160
-					        AND prop.value = 10090
-					        AND st.name = 'N'
-					        AND NOT EXISTS( SELECT
-					            1
-					        FROM
-					            projectprop pp
-					        WHERE
-					            p.project_id = pp.project_id
-					                AND pp.variable_id = 8255);
+					prop.variable_id = 8160
+					AND prop.value = 10090
+					AND st.name = 'N'
+					AND NOT EXISTS( SELECT
+					1
+					FROM
+					projectprop pp
+					WHERE
+					p.project_id = pp.project_id
+					AND pp.variable_id = 8255);
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -1101,40 +1101,40 @@
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO projectprop (project_id, type_id, value, rank, variable_id, alias)
 			SELECT
-			  p.project_id,
-			  1804,
-			  NULL,
-			  (SELECT
-			     IF(MAX(pp.rank) IS NULL,
-			        1,
-			        MAX(pp.rank) + 1)
-			   FROM
-			     projectprop pp
-			   WHERE
-			     p.project_id = pp.project_id),
-			  8255,
-			  'ENTRY_TYPE'
+			p.project_id,
+			1804,
+			NULL,
+			(SELECT
+			IF(MAX(pp.rank) IS NULL,
+			1,
+			MAX(pp.rank) + 1)
 			FROM
-			  project p
-			  INNER JOIN
-			  project_relationship r ON p.project_id = r.subject_project_id
-			  INNER JOIN
-			  project p2 ON r.object_project_id = p2.project_id
-			  INNER JOIN
-			  study_type st ON p2.study_type_id = st.study_type_id
-			  INNER JOIN
-              projectprop prop on p.project_id = prop.project_id
-				WHERE
-				prop.variable_id = 8160
-				AND prop.value = 10090
-			  AND st.name = 'N'
-			  AND NOT EXISTS( SELECT
-			                    1
-			                  FROM
-			                    projectprop pp
-			                  WHERE
-			                    p.project_id = pp.project_id
-			                    AND pp.variable_id = 8255);
+			projectprop pp
+			WHERE
+			p.project_id = pp.project_id),
+			8255,
+			'ENTRY_TYPE'
+			FROM
+			project p
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			INNER JOIN
+			projectprop prop on p.project_id = prop.project_id
+			WHERE
+			prop.variable_id = 8160
+			AND prop.value = 10090
+			AND st.name = 'N'
+			AND NOT EXISTS( SELECT
+			1
+			FROM
+			projectprop pp
+			WHERE
+			p.project_id = pp.project_id
+			AND pp.variable_id = 8255);
 		</sql>
 	</changeSet>
 	<changeSet author="vanina" id="v9.2.0-27">
@@ -1142,83 +1142,346 @@
 			<not>
 				<sqlCheck expectedResult="0">
 					SELECT
-					    COUNT(*)
+					COUNT(*)
 					FROM
-					    project p
-					        INNER JOIN
-					    project_relationship r ON p.project_id = r.subject_project_id
-					        INNER JOIN
-					    project p2 ON r.object_project_id = p2.project_id
-					        INNER JOIN
-					    study_type st ON p2.study_type_id = st.study_type_id
-					        INNER JOIN
-					    nd_experiment_project nep ON nep.project_id = p.project_id
-					        INNER JOIN
-					    nd_experiment ne ON nep.nd_experiment_id = ne.nd_experiment_id
-					        INNER JOIN
-					    nd_experiment_stock nes ON nes.nd_experiment_id = ne.nd_experiment_id
-					        INNER JOIN
-					    stock s ON s.stock_id = nes.stock_id
-					        INNER JOIN
-					    projectprop prop ON p.project_id = prop.project_id
+					project p
+					INNER JOIN
+					project_relationship r ON p.project_id = r.subject_project_id
+					INNER JOIN
+					project p2 ON r.object_project_id = p2.project_id
+					INNER JOIN
+					study_type st ON p2.study_type_id = st.study_type_id
+					INNER JOIN
+					nd_experiment_project nep ON nep.project_id = p.project_id
+					INNER JOIN
+					nd_experiment ne ON nep.nd_experiment_id = ne.nd_experiment_id
+					INNER JOIN
+					nd_experiment_stock nes ON nes.nd_experiment_id = ne.nd_experiment_id
+					INNER JOIN
+					stock s ON s.stock_id = nes.stock_id
+					INNER JOIN
+					projectprop prop ON p.project_id = prop.project_id
 					WHERE
-					    prop.variable_id = 8160
-					        AND prop.value = 10090
-					        AND st.name = 'N'
-					        AND NOT EXISTS( SELECT
-					            1
-					        FROM
-					            stockprop sp
-					        WHERE
-					            s.stock_id = sp.stock_id
-					                AND sp.type_id = 8255);
+					prop.variable_id = 8160
+					AND prop.value = 10090
+					AND st.name = 'N'
+					AND NOT EXISTS( SELECT
+					1
+					FROM
+					stockprop sp
+					WHERE
+					s.stock_id = sp.stock_id
+					AND sp.type_id = 8255);
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>Insert into stockprop table missing entry type row</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO stockprop (stock_id, type_id, value, rank)
-			  SELECT DISTINCT
-			    s.stock_id,
-			    8255,
-			    10170,
-			    (SELECT
-			       IF(MAX(sp.rank) IS NULL,
-			          1,
-			          MAX(sp.rank) + 1)
-			     FROM
-			       stockprop sp
-			     WHERE
-			       s.stock_id = sp.stock_id)
-			  FROM
-			    project p
-			    INNER JOIN
-			    project_relationship r ON p.project_id = r.subject_project_id
-			    INNER JOIN
-			    project p2 ON r.object_project_id = p2.project_id
-			    INNER JOIN
-			    study_type st ON p2.study_type_id = st.study_type_id
-			    INNER JOIN
-			    nd_experiment_project nep ON nep.project_id = p.project_id
-			    INNER JOIN
-			    nd_experiment ne ON nep.nd_experiment_id = ne.nd_experiment_id
-			    INNER JOIN
-			    nd_experiment_stock nes ON nes.nd_experiment_id = ne.nd_experiment_id
-			    INNER JOIN
-			    stock s ON s.stock_id = nes.stock_id
-			    INNER JOIN
-                projectprop prop on p.project_id = prop.project_id
-				WHERE
-				prop.variable_id = 8160
-				AND prop.value = 10090
-			    AND st.name = 'N'
-			    AND NOT EXISTS( SELECT
-			                      1
-			                    FROM
-			                      stockprop sp
-			                    WHERE
-			                      s.stock_id = sp.stock_id
-			                      AND sp.type_id = 8255);
+			SELECT DISTINCT
+			s.stock_id,
+			8255,
+			10170,
+			(SELECT
+			IF(MAX(sp.rank) IS NULL,
+			1,
+			MAX(sp.rank) + 1)
+			FROM
+			stockprop sp
+			WHERE
+			s.stock_id = sp.stock_id)
+			FROM
+			project p
+			INNER JOIN
+			project_relationship r ON p.project_id = r.subject_project_id
+			INNER JOIN
+			project p2 ON r.object_project_id = p2.project_id
+			INNER JOIN
+			study_type st ON p2.study_type_id = st.study_type_id
+			INNER JOIN
+			nd_experiment_project nep ON nep.project_id = p.project_id
+			INNER JOIN
+			nd_experiment ne ON nep.nd_experiment_id = ne.nd_experiment_id
+			INNER JOIN
+			nd_experiment_stock nes ON nes.nd_experiment_id = ne.nd_experiment_id
+			INNER JOIN
+			stock s ON s.stock_id = nes.stock_id
+			INNER JOIN
+			projectprop prop on p.project_id = prop.project_id
+			WHERE
+			prop.variable_id = 8160
+			AND prop.value = 10090
+			AND st.name = 'N'
+			AND NOT EXISTS( SELECT
+			1
+			FROM
+			stockprop sp
+			WHERE
+			s.stock_id = sp.stock_id
+			AND sp.type_id = 8255);
+		</sql>
+	</changeSet>
+	<changeSet author="aldrin" id="v9.2.0-28">
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="0">
+				<![CDATA[Select count(*) from `location` Where lname = 'Unspecified Location';]]>
+			</sqlCheck>
+		</preConditions>
+		<comment>Automatically add location name ([8190] LOCATION_ID variable) to existing studies.</comment>
+		<sql dbms="mysql">
+			<![CDATA[
+			-- FOR EXISTING STUDIES
+
+			INSERT INTO `location`
+						(
+									`ltype`,
+									`nllp`,
+									`lname`,
+									`labbr`,
+									`snl3id`,
+									`snl2id`,
+									`snl1id`,
+									`cntryid`,
+									`lrplce`,
+									`nnpid`
+						)
+						VALUES
+						(
+									'405',
+									'1',
+									'Unspecified Location',
+									'NOLOC',
+									'0',
+									'0',
+									'0',
+									'0',
+									'0',
+									'0'
+						);
+
+			-- Create LOCATION_ID variable entries in ENVIRONMENT (SUMMARY) DATASET
+
+			INSERT INTO projectprop
+						(
+									project_id,
+									type_id,
+									value,
+									rank,
+									variable_id,
+									alias
+						)
+			SELECT     project.project_id,
+					   1806,
+					   (
+							  SELECT locid
+							  FROM   location
+							  WHERE  lname = 'Unspecified Location'),
+					   CASE
+								  WHEN Max(projectpropRank.rank) IS NULL THEN 1
+								  ELSE Max(projectpropRank.rank) + 1
+					   end AS rank,
+					   8190,
+					   'LOCATION_NAME'
+			FROM       project
+			INNER JOIN projectprop projectprop_dataset
+			ON         projectprop_dataset.project_id = project.project_id
+			AND        projectprop_dataset.variable_id = 8160
+			AND        projectprop_dataset.value = 10080
+			INNER JOIN project_relationship
+			ON         project.project_id = project_relationship.subject_project_id
+			INNER JOIN project projectTrial
+			ON         projectTrial.project_id = project_relationship.object_project_id
+			LEFT JOIN  projectprop
+			ON         project.project_id = projectprop.project_id
+			AND        projectprop.variable_id = 8190
+			LEFT JOIN  projectprop projectpropRank
+			ON         project.project_id = projectpropRank.project_id
+			WHERE      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
+			AND        projectprop.variable_id IS NULL
+			GROUP BY   project_id;
+
+			-- Create LOCATION_ID variable entries at INSTANCE/ENVIRONMENT level
+
+			INSERT INTO nd_geolocationprop
+						(
+									nd_geolocation_id,
+									type_id,
+									value,
+									rank
+						)
+			SELECT     nd_geolocation.nd_geolocation_id,
+					   8190,
+					   CASE
+								  WHEN projectprop_study.value IS NOT NULL
+								  AND        projectprop_study.value <> '' THEN projectprop_study.value
+								  ELSE
+										(
+										SELECT locid
+										FROM   location
+										WHERE  lname = 'Unspecified Location')
+					   end,
+					   CASE
+								  WHEN Max(gpRank.rank) IS NULL THEN 1
+								  ELSE Max(gpRank.rank) + 1
+					   end AS rank
+			FROM       project
+			INNER JOIN projectprop projectprop_dataset
+			ON         projectprop_dataset.project_id = project.project_id
+			AND        projectprop_dataset.variable_id = 8160
+			AND        projectprop_dataset.value = 10080
+			INNER JOIN project_relationship
+			ON         project.project_id = project_relationship.subject_project_id
+			INNER JOIN project projectTrial
+			ON         projectTrial.project_id = project_relationship.object_project_id
+			INNER JOIN nd_experiment_project
+			ON         project.project_id = nd_experiment_project.project_id
+			INNER JOIN nd_experiment
+			ON         nd_experiment.nd_experiment_id = nd_experiment_project.nd_experiment_id
+			INNER JOIN nd_geolocation
+			ON         nd_geolocation.nd_geolocation_id = nd_experiment.nd_geolocation_id
+			LEFT JOIN  nd_geolocationprop
+			ON         nd_geolocationprop.nd_geolocation_id = nd_geolocation.nd_geolocation_id
+			AND        nd_geolocationprop.type_id = 8190
+			LEFT JOIN  nd_geolocationprop gpRank
+			ON         gpRank.nd_geolocation_id = nd_geolocation.nd_geolocation_id
+			LEFT JOIN  projectprop projectprop_study
+			ON         projectprop_study.project_id = projectTrial.project_id
+			AND        projectprop_study.variable_id = 8190
+			WHERE      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template')
+			AND        nd_geolocationprop.type_id IS NULL
+			GROUP BY   nd_geolocation_id;
+
+			-- Update LOCATION_ID variable's value to 'Unspecified Location' if the existing variables have no value
+
+			UPDATE nd_geolocationprop
+			SET    nd_geolocationprop.value =
+				   (
+						  SELECT locid
+						  FROM   location
+						  WHERE  lname = 'Unspecified Location')
+			WHERE  nd_geolocationprop.type_id = 8190
+			AND    nd_geolocationprop.type_id IS NOT NULL
+			AND    (
+						  nd_geolocationprop.value = ''
+				   OR     nd_geolocationprop.value IS NULL);
+
+			-- Preserve the alias of location name
+
+			UPDATE projectprop
+			INNER JOIN project
+			ON         project.project_id = projectprop.project_id
+			INNER JOIN projectprop projectprop_dataset
+			ON         projectprop_dataset.project_id = project.project_id
+			AND        projectprop_dataset.variable_id = 8160
+			AND        projectprop_dataset.value = 10080
+			INNER JOIN project_relationship
+			ON         project.project_id = project_relationship.subject_project_id
+			INNER JOIN project projectTrial
+			ON         projectTrial.project_id = project_relationship.object_project_id
+			LEFT JOIN  projectprop projectprop_location_name
+			ON         project.project_id = projectprop_location_name.project_id
+			AND        projectprop_location_name.variable_id = 8180
+			LEFT JOIN  projectprop projectprop_location_name_study_level
+			ON         projectTrial.project_id = projectprop_location_name_study_level.project_id
+			AND        projectprop_location_name_study_level.variable_id = 8180
+			SET        projectprop.alias =
+					   CASE
+								  WHEN projectprop_location_name_study_level.alias IS NOT NULL THEN projectprop_location_name_study_level.alias
+								  WHEN projectprop_location_name.alias IS NOT NULL THEN projectprop_location_name.alias
+								  ELSE 'LOCATION_NAME'
+					   end
+			WHERE      projectprop.variable_id = 8190
+			AND      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
+
+			-- Delete LOCATION_NAME variable at ENVIRONMENT DETAILS (Instance Level)
+
+			DELETE projectprop
+			FROM       project
+			inner join projectprop projectprop_dataset
+			ON         projectprop_dataset.project_id = project.project_id
+			AND        projectprop_dataset.variable_id = 8160
+			AND        projectprop_dataset.value = 10080
+			INNER JOIN project_relationship
+			ON         project.project_id = project_relationship.subject_project_id
+			INNER JOIN project projecttrial
+			ON         projecttrial.project_id = project_relationship.object_project_id
+			LEFT JOIN  projectprop
+			ON         project.project_id = projectprop.project_id
+			AND        projectprop.variable_id = 8180
+			WHERE      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
+
+			DELETE
+			FROM   nd_geolocationprop
+			WHERE  type_id = 8180;
+
+			-- Delete LOCATION_NAME/ID variables at TRIAL SETTINGS (Study Level)
+
+			DELETE projectprop
+			FROM       project
+			inner join projectprop projectprop_dataset
+			ON         projectprop_dataset.project_id = project.project_id
+			AND        projectprop_dataset.variable_id = 8160
+			AND        projectprop_dataset.value = 10080
+			INNER JOIN project_relationship
+			ON         project.project_id = project_relationship.subject_project_id
+			INNER JOIN project projecttrial
+			ON         projecttrial.project_id = project_relationship.object_project_id
+			LEFT JOIN  projectprop
+			ON         projecttrial.project_id = projectprop.project_id
+			AND        (
+								  projectprop.variable_id = 8180
+					   OR         projectprop.variable_id = 8190)
+			AND      projectTrial.study_type_id in (1,6)
+			AND        projectTrial.name not in ('Basic Trial Template', 'Basic nursery template');
+
+			]]>
+		</sql>
+	</changeSet>
+	<changeSet author="aldrin" id="v9.2.0-29">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM projectprop
+				WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+				AND variable_id = 8190 AND alias = 'SITE_ID';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Rename the alias of Location ID variable of Nursery/Trial template to 'SITE'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop SET alias = 'SITE'
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+			AND variable_id = 8190;
+
+			UPDATE projectprop SET alias = 'SITE'
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Nursery Template-ENVIRONMENT')
+			AND variable_id = 8190;
+
+		</sql>
+	</changeSet>
+	<changeSet author="aldrin" id="v9.2.0-30">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM projectprop
+				WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+				AND variable_id = 8180;
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Delete the Location Name variable in Basic Nursery/Trial template.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM projectprop
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Trial Template-ENVIRONMENT')
+			AND variable_id = 8180;
+
+			DELETE FROM  projectprop
+			WHERE project_id IN (SELECT project_id FROM  project where `name` = 'Basic Nursery Template-ENVIRONMENT')
+			AND variable_id = 8180;
 		</sql>
 	</changeSet>
 </databaseChangeLog>
