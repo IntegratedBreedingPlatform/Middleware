@@ -362,7 +362,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "    inner join project proj on proj.project_id = ndep.project_id \n"
 					+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-					+ "	   left outer join location loc on geoprop.value = loc.locid \n"
+					+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
 					+ " where \n"
 					+ "    proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id "
 					+ "    		where (pr.object_project_id = :studyId and name like '%ENVIRONMENT')) \n"

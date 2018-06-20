@@ -72,7 +72,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 	private static final String LOCATION_ID_DOESNT_EXISTS = "error.location.id.doesnt.exists";
 	public static final int NURSERY_STUDY_TYPE_ID = 1;
-	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
 
@@ -276,7 +275,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// Location Name is mandatory when creating a new study, so we need to automatically
 		// add Location Name variable if is not available in the imported workbook.
-		this.addLocationIDVariableInConditionsIfNotExists(workbook, programUUID);
+		this.addLocationIDVariableIfNotExists(workbook, workbook.getConditions(), programUUID);
 		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(workbook.getConditions());
 		this.assignLocationIdVariableToEnvironmentDetailSection(workbook);
 
@@ -298,44 +297,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void addLocationIDVariableInFactorsIfNotExists(final Workbook workbook, final String programUUID) {
+	public void addLocationIDVariableIfNotExists(final Workbook workbook, final List<MeasurementVariable> measurementVariables,
+			final String programUUID) {
 
-		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
-		final List<MeasurementVariable> workbookFactors = workbook.getFactors();
+		final List<MeasurementVariable> combinedVariables = new ArrayList<>();
+		combinedVariables.addAll(workbook.getConditions());
+		combinedVariables.addAll(workbook.getFactors());
 
-		final MeasurementVariable locationIdVariable = this.createLocationVariable(programUUID);
-
-		final boolean locationIdExistsInCondition =
-				this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookConditions).isPresent();
-		final boolean locationIdExistsInFactors =
-				this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookFactors).isPresent();
+		final boolean locationIdExists = this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), combinedVariables).isPresent();
 
 		// If LOCATION_ID variable is not existing in both Condition and Factors Section of workbook
 		// Automatically add LOCATION_ID variable as it is required in creating a new Study.
-		if (!locationIdExistsInCondition && !locationIdExistsInFactors) {
-			workbookFactors.add(locationIdVariable);
+		if (!locationIdExists) {
+			final MeasurementVariable locationIdVariable = this.createLocationVariable(programUUID);
+			measurementVariables.add(locationIdVariable);
 		}
-	}
-
-	@Override
-	public void addLocationIDVariableInConditionsIfNotExists(final Workbook workbook, final String programUUID) {
-
-		final List<MeasurementVariable> workbookConditions = workbook.getConditions();
-		final List<MeasurementVariable> workbookFactors = workbook.getFactors();
-
-		final MeasurementVariable locationIdVariable = this.createLocationVariable(programUUID);
-
-		final boolean locationIdExistsInCondition =
-				this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookConditions).isPresent();
-		final boolean locationIdExistsInFactors =
-				this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbookFactors).isPresent();
-
-		// If LOCATION_ID variable is not existing in both Condition and Factors Section of workbook
-		// Automatically add LOCATION_ID variable as it is required in creating a new Study.
-		if (!locationIdExistsInCondition && !locationIdExistsInFactors) {
-			workbookConditions.add(locationIdVariable);
-		}
-
 	}
 
 	@Override
@@ -428,7 +404,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	protected String retrieveLocIdOfUnspecifiedLocation() {
 
 		String unspecifiedLocationId = "";
-		final List<Location> locations = locationDataManager.getLocationsByName(UNSPECIFIED_LOCATION, Operation.EQUAL);
+		final List<Location> locations = locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}

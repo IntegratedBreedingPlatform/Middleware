@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import com.gargoylesoftware.htmlunit.javascript.host.geo.Geolocation;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
@@ -338,7 +337,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final int unspecifiedLocationlocid = 111;
 		unspecifiedLocation.setLocid(unspecifiedLocationlocid);
 		final List<Location> locations = Arrays.asList(unspecifiedLocation);
-		Mockito.when(locationDAO.getByName(WorkbookSaver.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
+		Mockito.when(locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
 
 		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
 
@@ -357,7 +356,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		locationVariable.setValue(locationIdVariableValue);
 		variableList.add(locationVariable);
 
-		Mockito.verify(locationDAO, Mockito.times(0)).getByName(WorkbookSaver.UNSPECIFIED_LOCATION, Operation.EQUAL);
+		Mockito.verify(locationDAO, Mockito.times(0)).getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 
 		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
 

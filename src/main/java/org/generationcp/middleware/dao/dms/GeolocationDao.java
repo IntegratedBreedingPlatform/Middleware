@@ -602,7 +602,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 				+ "    inner join project_relationship pr on proj.project_id = pr.subject_project_id \n"
 				+ "    inner join project pmain on pmain.project_id = pr.object_project_id and pr.type_id = 1150 \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid \n"
+				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
 				+ " where nde.type_id = 1020 and pmain.project_id = :studyId \n"
 				+ "    group by geoloc.nd_geolocation_id " + "    order by geoloc.nd_geolocation_id asc \n";
 

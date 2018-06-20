@@ -172,9 +172,7 @@ public interface DataImportService {
 	 */
 	boolean checkForOutOfBoundsData(Workbook workbook, String programUUID);
 
-	void addLocationIDVariableInFactorsIfNotExists(Workbook workbook, String programUUID);
-
-	void addLocationIDVariableInConditionsIfNotExists(Workbook workbook, String programUUID);
+	void addLocationIDVariableIfNotExists(Workbook workbook, List<MeasurementVariable> measurementVariables, String programUUID);
 
 	void removeLocationNameVariableIfExists(Workbook workbook);
 

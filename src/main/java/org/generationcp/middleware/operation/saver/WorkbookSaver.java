@@ -75,7 +75,6 @@ public class WorkbookSaver extends Saver {
 	private static final String HEADERMAP = "headerMap";
 	private static final String VARIABLETYPEMAP = "variableTypeMap";
 	private static final String MEASUREMENTVARIABLEMAP = "measurementVariableMap";
-	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 
 	public WorkbookSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -516,7 +515,7 @@ public class WorkbookSaver extends Saver {
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
 		if (locationIdVariable != null && StringUtils.isEmpty(locationIdVariable.getValue())) {
 			String unspecifiedLocationLocId = "";
-			final List<Location> locations = locationDAO.getByName(UNSPECIFIED_LOCATION, Operation.EQUAL);
+			final List<Location> locations = locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 			if (!locations.isEmpty()) {
 				unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
 			}
@@ -852,16 +851,6 @@ public class WorkbookSaver extends Saver {
 		}
 		return false;
 
-	}
-
-	private DMSVariableType createOccVariableType(final int rank, final String programUUID) {
-		final VariableInfo info = new VariableInfo();
-		info.setLocalName("TRIAL_INSTANCE");
-		info.setLocalDescription("TRIAL_INSTANCE");
-		info.setStdVariableId(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		info.setRank(rank);
-		info.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
-		return this.getVariableTypeBuilder().create(info, programUUID);
 	}
 
 	protected VariableTypeList propagateTrialFactorsIfNecessary(final VariableTypeList effectVariables,
