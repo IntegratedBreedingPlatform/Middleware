@@ -1,20 +1,16 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -52,11 +48,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -93,9 +92,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
 					+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
-
-
-	public static final String TRIAL_TYPE = StudyType.T.getName();
 
 	private MeasurementVariableService measurementVariableService;
 
@@ -164,16 +160,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final List<StudySummary> studySummaries = new ArrayList<>();
 
-		StringBuffer sql = new StringBuffer()
-		.append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ")
-		.append("	p.program_uuid AS programUUID, p.study_type AS studyType, p.objective AS objective, ")
-		.append("	p.start_date AS startDate, p.end_date AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason"
-			+ ".value AS season ")
-		.append(" FROM project p ")
-		.append("  LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.type_id = ").append(TermId.PI_NAME.getId())
-		.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ").append(TermId.TRIAL_LOCATION.getId())
-		.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ").append(TermId.SEASON_VAR_TEXT.getId())
-		.append(" WHERE p.deleted = 0");
+		final StringBuffer sql = new StringBuffer().append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ").append(
+			"	p.program_uuid AS programUUID, st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible ")
+			.append("as visible, st.cvterm_id as cvtermId, p.objective AS objective, ")
+			.append("	p.start_date AS startDate, p.end_date AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason")
+			.append(".value AS season ").append(" FROM project p ")
+			.append("  LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.type_id = ").append(TermId.PI_NAME.getId())
+			.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ")
+			.append(TermId.TRIAL_LOCATION.getId())
+			.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ")
+			.append(TermId.SEASON_VAR_TEXT.getId()).append(" INNER JOIN study_type st ON p.study_type = st.study_type_id ")
+			.append(" WHERE p.deleted = 0");
 
 		if (!StringUtils.isEmpty(serchParameters.getProgramUniqueId())) {
 			sql.append(" AND p.program_uuid = '").append(serchParameters.getProgramUniqueId().trim()).append("'");
@@ -188,13 +185,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 			sql.append(" AND ppSeason.value LIKE '%").append(serchParameters.getSeason().trim()).append("%'");
 		}
 
-		List<Object[]> list = null;
+		final List<Object[]> list;
 		try {
 
-			final Query query =
-					this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
-					.addScalar("programUUID").addScalar("studyType").addScalar("objective").addScalar("startDate")
-					.addScalar("endDate").addScalar("piName").addScalar("location").addScalar("season");
+			final Query query = this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
+				.addScalar("programUUID").addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("visible")
+				.addScalar("cvTermId").addScalar("objective").addScalar("startDate").addScalar("endDate").addScalar("piName")
+				.addScalar("location").addScalar("season");
 
 			list = query.list();
 		} catch (final HibernateException e) {
@@ -207,17 +204,22 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final String name = (String) row[1];
 				final String title = (String) row[2];
 				final String programUUID = (String) row[3];
-				final String studyType = (String) row[4];
-				final String objective = (String) row[5];
-				final String startDate = (String) row[6];
-				final String endDate = (String) row[7];
-				final String pi = (String) row[8];
-				final String location = (String) row[9];
-				final String season = (String) row[10];
+				final Integer studyTypeId = (Integer) row[4];
+				final String label = (String) row[5];
+				final String studyTypeName = (String) row[6];
+				final boolean visible = ((Byte) row[7]) == 1;
+				final Integer cvtermId = (Integer) row[8];
+				final String objective = (String) row[9];
+				final String startDate = (String) row[10];
+				final String endDate = (String) row[11];
+				final String pi = (String) row[12];
+				final String location = (String) row[13];
+				final String season = (String) row[14];
+
+				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 
 				final StudySummary studySummary =
-						new StudySummary(id, name, title, objective, StudyType.getStudyTypeByName(studyType), startDate,
-								endDate, programUUID, pi, location, season);
+					new StudySummary(id, name, title, objective, studyTypeDto, startDate, endDate, programUUID, pi, location, season);
 
 				studySummaries.add(studySummary);
 			}
@@ -425,9 +427,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			for (final Object[] row : results) {
 				final List<String> entry = Lists.newArrayList();
 
-				if (year != null) {
-					entry.add(year);
-				}
+				entry.add(year);
 
 				final int lastFixedColumn = 18;
 
@@ -511,7 +511,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
 					} else {
-						entry.add((String) rowValue);
+						entry.add((String) null);
 					}
 
 					// get every other column skipping over PhenotypeId column
@@ -540,15 +540,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setMetadata(studyMetadata);
 				final List<UserDto> users = new ArrayList<>();
 				final Map<String, String> properties = new HashMap<>();
-				if (studyMetadata.getStudyType().equalsIgnoreCase(StudyServiceImpl.TRIAL_TYPE)) {
-					users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-					properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
-					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
-				} else {
-					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
-				}
+
+				users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+				users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
+				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;

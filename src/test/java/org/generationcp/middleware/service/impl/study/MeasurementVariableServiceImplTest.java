@@ -31,7 +31,7 @@ public class MeasurementVariableServiceImplTest {
 	 * Run the {@link MeasurementVariableServiceImpl}.getTraits() method and makes sure the query returns appropriate values.
 	 */
 	@Test
-	public void traitsQueryRetrievesTrialRelatedTraits() throws Exception {
+	public void traitsQueryRetrievesStudyRelatedTraits() throws Exception {
 		final Session session = Mockito.mock(Session.class);
 
 		final MeasurementVariableServiceImpl trailTraits = new MeasurementVariableServiceImpl(session);

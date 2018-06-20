@@ -26,7 +26,7 @@ import org.mockito.MockitoAnnotations;
 import com.beust.jcommander.internal.Lists;
 
 /**
- * The class <code>TrialMeasurementsTest</code> contains tests for the class <code>{@link StudyMeasurements}</code>.
+ * The class <code>StudyMeasurementsTest</code> contains tests for the class <code>{@link StudyMeasurements}</code>.
  *
  */
 public class StudyMeasurementsTest {

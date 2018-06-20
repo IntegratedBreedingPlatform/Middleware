@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CvTermDaoTest extends IntegrationTestBase {
@@ -48,17 +47,17 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTermIdsWithTypeByNameOrSynonyms() throws Exception {
-		Map<String, VariableType> expectedStdVarWithTypeMap = this.createVarNameWithTypeMapTestData();
+		final Map<String, VariableType> expectedStdVarWithTypeMap = this.createVarNameWithTypeMapTestData();
 
-		List<String> nameOrSynonyms = new ArrayList<String>();
+		final List<String> nameOrSynonyms = new ArrayList<String>();
 		nameOrSynonyms.addAll(expectedStdVarWithTypeMap.keySet());
 
-		Map<String, Map<Integer, VariableType>> results =
+		final Map<String, Map<Integer, VariableType>> results =
 				CvTermDaoTest.dao.getTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms, CvId.VARIABLES.getId());
 
 		Debug.println(0, "testGetTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
-		for (String name : nameOrSynonyms) {
-			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
+		for (final String name : nameOrSynonyms) {
+			final Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
 			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
 			if (actualStdVarIdWithTypeMap != null) {
 				final VariableType variableType = expectedStdVarWithTypeMap.get(name);
@@ -69,7 +68,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	private Map<String, VariableType> createVarNameWithTypeMapTestData() {
-		Map<String, VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
+		final Map<String, VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
 		varNameWithTypeMap.put("TRIAL_INSTANCE", VariableType.ENVIRONMENT_DETAIL);
 		varNameWithTypeMap.put("ENTRY_NO", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("DESIGNATION", VariableType.GERMPLASM_DESCRIPTOR);
@@ -77,57 +76,57 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
 		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
-		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRIAL_CONDITION);
+		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.STUDY_CONDITION);
 		return varNameWithTypeMap;
 	}
 
 	@Test
 	public void testFilterByColumnValue() throws Exception {
-		List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValue("name", "Collaborator");
+		final List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValue("name", "Collaborator");
 		Assert.assertEquals(cvTerms.size(), 1);
 	}
 
 	@Test
 	public void testFilterByColumnValues() throws Exception {
-		List<Integer> ids = Arrays.asList(2020, 2030);
-		List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValues("cvTermId", ids);
+		final List<Integer> ids = Arrays.asList(2020, 2030);
+		final List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValues("cvTermId", ids);
 		Assert.assertEquals(cvTerms.size(), 2);
 	}
 
 	@Test
 	public void testGetByNameAndCvId() throws Exception {
 		CVTerm cvterm = CvTermDaoTest.dao.getByNameAndCvId("User", CvId.PROPERTIES.getId());
-		Assert.assertTrue(cvterm.getCvTermId() == 2002);
+		Assert.assertEquals(2002, (int) cvterm.getCvTermId());
 		Debug.println(0, "testGetByNameAndCvId(\"User\", " + CvId.PROPERTIES.getId() + "): " + cvterm);
 
 		cvterm = CvTermDaoTest.dao.getByNameAndCvId("DBCV", CvId.SCALES.getId());
 		Debug.println(0, "testGetByNameAndCvId(\"DBCV\", " + CvId.SCALES.getId() + "): " + cvterm);
-		Assert.assertTrue(cvterm.getCvTermId() == 6000);
+		Assert.assertEquals(6000, (int) cvterm.getCvTermId());
 
 		cvterm = CvTermDaoTest.dao.getByNameAndCvId("Assigned", CvId.METHODS.getId());
 		Debug.println(0, "testGetByNameAndCvId(\"Assigned\", " + CvId.METHODS.getId() + "): " + cvterm);
-		Assert.assertTrue(cvterm.getCvTermId() == 4030);
+		Assert.assertEquals(4030, (int) cvterm.getCvTermId());
 
 	}
 
 	@Test
 	public void testGetTermsByNameOrSynonym() throws Exception {
-		List<Integer> termIds = CvTermDaoTest.dao.getTermsByNameOrSynonym("Cooperator", 1010);
+		final List<Integer> termIds = CvTermDaoTest.dao.getTermsByNameOrSynonym("Cooperator", 1010);
 		Debug.println(0, "testGetTermsByNameOrSynonym(): " + termIds);
 	}
 
 	@Test
 	public void testGetStandardVariableIdsWithTypeByProperties() throws Exception {
-		Map<String, VariableType> expectedVarWithTypeMap = this.createVarNameWithTypeMapTestData();
+		final Map<String, VariableType> expectedVarWithTypeMap = this.createVarNameWithTypeMapTestData();
 
-		List<String> propertyNames = new ArrayList<String>();
+		final List<String> propertyNames = new ArrayList<String>();
 		propertyNames.addAll(expectedVarWithTypeMap.keySet());
 
-		Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao.getStandardVariableIdsWithTypeByProperties(propertyNames);
+		final Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao.getStandardVariableIdsWithTypeByProperties(propertyNames);
 
 		Debug.println(0, "testGetStandardVariableIdsByProperties(nameOrSynonyms=" + propertyNames + ") RESULTS:");
-		for (String name : propertyNames) {
-			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
+		for (final String name : propertyNames) {
+			final Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
 			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
 			if (actualStdVarIdWithTypeMap != null) {
 				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(expectedVarWithTypeMap.get(name)));
@@ -137,30 +136,30 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetOntologyTraitClasses() throws Exception {
-		List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
+		final List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
 		Assert.assertTrue(traitClasses.size() > 0);
 		Debug.println(4, "testGetOntologyTraitClasses(): ");
-		for (TraitClassReference trait : traitClasses) {
+		for (final TraitClassReference trait : traitClasses) {
 			Debug.println(8, trait.toString());
 		}
 	}
 
 	@Test
 	public void testGetOntologyResearchClasses() throws Exception {
-		List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
+		final List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
 		Assert.assertTrue(traitClasses.size() > 0);
 		Debug.println(4, "testGetTraitClasses(): ");
-		for (TraitClassReference trait : traitClasses) {
+		for (final TraitClassReference trait : traitClasses) {
 			Debug.println(8, trait.toString());
 		}
 	}
 
 	@Test
 	public void testGetAllTraitClasses() throws Exception {
-		List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getAllTraitClasses();
+		final List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getAllTraitClasses();
 		Assert.assertTrue(traitClasses.size() > 0);
 		Debug.println(4, "testGetAllTraitClasses(): ");
-		for (TraitClassReference trait : traitClasses) {
+		for (final TraitClassReference trait : traitClasses) {
 			Debug.println(8, trait.toString());
 		}
 	}
@@ -168,16 +167,16 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetPropertiesOfTraitClasses() throws Exception {
 
-		List<Integer> traitClassIds = Arrays.asList(1340, 1345, 1350, 1360, 1370, 1380, 1410, 22568);
+		final List<Integer> traitClassIds = Arrays.asList(1340, 1345, 1350, 1360, 1370, 1380, 1410, 22568);
 
-		Map<Integer, List<PropertyReference>> traitClassProperties = CvTermDaoTest.dao.getPropertiesOfTraitClasses(traitClassIds);
+		final Map<Integer, List<PropertyReference>> traitClassProperties = CvTermDaoTest.dao.getPropertiesOfTraitClasses(traitClassIds);
 		Assert.assertTrue(traitClassProperties.size() > 0);
 		Debug.println(4, "testGetPropertiesOfTraitClasses(): ");
-		for (Integer traitClassId : traitClassIds) {
-			List<PropertyReference> properties = traitClassProperties.get(traitClassId);
+		for (final Integer traitClassId : traitClassIds) {
+			final List<PropertyReference> properties = traitClassProperties.get(traitClassId);
 			if (properties != null) {
 				Debug.println(4, traitClassId + " (size = " + properties.size() + ") : " + properties);
-				for (PropertyReference property : properties) {
+				for (final PropertyReference property : properties) {
 					property.print(4);
 				}
 			} else {
@@ -189,13 +188,13 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStandardVariablesOfProperties() throws Exception {
 
-		List<Integer> propertyIds = Arrays.asList(1340, 2000, 2002, 2010, 2012, 2015, 2270);
+		final List<Integer> propertyIds = Arrays.asList(1340, 2000, 2002, 2010, 2012, 2015, 2270);
 
-		Map<Integer, List<StandardVariableReference>> propertyVariables = CvTermDaoTest.dao.getStandardVariablesOfProperties(propertyIds);
+		final Map<Integer, List<StandardVariableReference>> propertyVariables = CvTermDaoTest.dao.getStandardVariablesOfProperties(propertyIds);
 		Assert.assertTrue(propertyVariables.size() > 0);
 		Debug.println(4, "testGetStandardVariablesOfProperties(): ");
-		for (Integer id : propertyIds) {
-			List<StandardVariableReference> properties = propertyVariables.get(id);
+		for (final Integer id : propertyIds) {
+			final List<StandardVariableReference> properties = propertyVariables.get(id);
 			if (properties != null) {
 				Debug.println(4, id + " (size = " + properties.size() + ") : " + properties);
 			} else {
@@ -206,74 +205,74 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllByCvId_CvIdAsInt() {
-		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(CvId.METHODS.getId(), true);
+		final List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(CvId.METHODS.getId(), true);
 		Assert.assertNotNull(nonObsoleteMethods);
-		for (CVTerm cvTerm : nonObsoleteMethods) {
-			Assert.assertTrue("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue() == CvId.METHODS.getId());
+		for (final CVTerm cvTerm : nonObsoleteMethods) {
+			Assert.assertEquals("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue(), CvId.METHODS.getId());
 			Assert.assertFalse("Method " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
 		}
 	}
 
 	@Test
 	public void testGetAllByCvId_FilterObsolete() {
-		List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
+		final List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
 		Assert.assertNotNull(nonObsoleteProperties);
-		for (CVTerm cvTerm : nonObsoleteProperties) {
-			Assert.assertTrue("All properties should have cv id " + CvId.PROPERTIES.getId(),
-					cvTerm.getCv().intValue() == CvId.PROPERTIES.getId());
+		for (final CVTerm cvTerm : nonObsoleteProperties) {
+			Assert.assertEquals("All properties should have cv id " + CvId.PROPERTIES.getId(), cvTerm.getCv().intValue(),
+				CvId.PROPERTIES.getId());
 			Assert.assertFalse("Property " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
 		}
 	}
 
 	@Test
 	public void testGetAllByCvId_DontFilterObsolete() {
-		List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
-		List<CVTerm> allProperties = dao.getAllByCvId(CvId.PROPERTIES, false);
+		final List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
+		final List<CVTerm> allProperties = dao.getAllByCvId(CvId.PROPERTIES, false);
 		Assert.assertNotNull(allProperties);
 		int numberOfObsoleteProperties = 0;
-		for (CVTerm cvTerm : allProperties) {
-			Assert.assertTrue("All properties should have cv id " + CvId.PROPERTIES.getId(),
-					cvTerm.getCv().intValue() == CvId.PROPERTIES.getId());
+		for (final CVTerm cvTerm : allProperties) {
+			Assert.assertEquals("All properties should have cv id " + CvId.PROPERTIES.getId(), cvTerm.getCv().intValue(),
+				CvId.PROPERTIES.getId());
 			if(cvTerm.isObsolete()) {
 				numberOfObsoleteProperties++;
 			}
 		}
-		int expectedNumberOfNonObsoleteProperties = nonObsoleteProperties.size();
-		int actualNumberOfNonObsoleteProperties = allProperties.size() - numberOfObsoleteProperties;
+		final int expectedNumberOfNonObsoleteProperties = nonObsoleteProperties.size();
+		final int actualNumberOfNonObsoleteProperties = allProperties.size() - numberOfObsoleteProperties;
 		Assert.assertEquals("Non-obsolete properties should be " + expectedNumberOfNonObsoleteProperties,
 				expectedNumberOfNonObsoleteProperties, actualNumberOfNonObsoleteProperties);
 	}
 
 	@Test
 	public void testGetAllByCvId_ListOfCvTermIds_FilterObsolete() {
-		List<Integer> termIds = Arrays.asList(METHOD_APPLIED, METHOD_ASSIGNED, METHOD_ENUMERATED);
-		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(termIds, CvId.METHODS, true);
+		final List<Integer> termIds = Arrays.asList(METHOD_APPLIED, METHOD_ASSIGNED, METHOD_ENUMERATED);
+		final List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(termIds, CvId.METHODS, true);
 		Assert.assertNotNull(nonObsoleteMethods);
 		Assert.assertEquals("Methods " + termIds.toString() + " should all be non-obsolete", 3, nonObsoleteMethods.size());
-		for (CVTerm cvTerm : nonObsoleteMethods) {
-			Assert.assertTrue("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue() == CvId.METHODS.getId());
+		for (final CVTerm cvTerm : nonObsoleteMethods) {
+			Assert.assertEquals("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue(), CvId.METHODS.getId());
 			Assert.assertFalse("Method " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
 		}
 	}
 
 	@Test
 	public void testGetAllByCvId_ListOfCvTermIds_DontFilterObsolete() {
-		boolean filterObsolete = false;
-		List<CVTerm> allProperties = dao.getAllByCvId(CvId.PROPERTIES, filterObsolete);
-		List<Integer> obsoletePropertyIds = new ArrayList<>();
-		for (CVTerm cvTerm : allProperties) {
+		final boolean filterObsolete = false;
+		final List<CVTerm> allProperties = dao.getAllByCvId(CvId.PROPERTIES, false);
+		final List<Integer> obsoletePropertyIds = new ArrayList<>();
+		for (final CVTerm cvTerm : allProperties) {
 			if (cvTerm.isObsolete()) {
 				obsoletePropertyIds.add(cvTerm.getCvTermId());
 			}
 		}
 		if (!obsoletePropertyIds.isEmpty()) {
-			List<CVTerm> obsoleteProperties = dao.getAllByCvId(obsoletePropertyIds, CvId.PROPERTIES, filterObsolete);
+			final List<CVTerm> obsoleteProperties = dao.getAllByCvId(obsoletePropertyIds, CvId.PROPERTIES, false);
 			Assert.assertNotNull(obsoleteProperties);
 			Assert.assertEquals("Obsolete properties should be " + obsoletePropertyIds.size(), obsoletePropertyIds.size(),
 					obsoleteProperties.size());
-			for (CVTerm cvTerm : obsoleteProperties) {
-				Assert.assertTrue("All properties should have cv id " + CvId.PROPERTIES.getId(),
-						cvTerm.getCv().intValue() == CvId.PROPERTIES.getId());
+			for (final CVTerm cvTerm : obsoleteProperties) {
+				Assert.assertEquals("All properties should have cv id " + CvId.PROPERTIES.getId(), cvTerm.getCv().intValue(),
+					CvId.PROPERTIES.getId());
 				Assert.assertTrue("Property " + cvTerm.getCvTermId() + " should be obsolete", cvTerm.isObsolete());
 			}
 		}

@@ -26,10 +26,8 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -40,7 +38,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -204,26 +201,7 @@ public interface FieldbookService {
 	Integer getGermplasmIdByName(String name);
 
 	/**
-	 * Gets the data set.
-	 *
-	 * @param id
-	 *            the id
-	 * @return the data set
-	 */
-	Workbook getNurseryDataSet(int id);
-
-	/**
-	 * Gets the data set.
-	 *
-	 * @param id
-	 *            the id
-	 * @return the data set
-	 */
-	Workbook getTrialDataSet(int id);
-
-	/**
-	 * Given a workbook already loaded via {@link WorkbookBuilder#create(int)} -
-	 * which does not load observations now - this is a helper method to trigger
+	 * Given a workbook already loaded which does not load observations now - this is a helper method to trigger
 	 * loading the observations collection IF AND WHEN NEEDED. This method is a
 	 * stop gap mecahnism to lazy load the observations collection until we can
 	 * gradually refactor all code so that entire set of observations (plots)
@@ -422,13 +400,10 @@ public interface FieldbookService {
 	 *
 	 * @param id
 	 *            the id
-	 * @param isNursery
-	 *            the is nursery
 	 * @return the nursery variable settings
 	 */
 
-	Workbook getStudyVariableSettings(int id, boolean isNursery);
-
+	Workbook getStudyVariableSettings(int id);
 	/**
 	 * Gets the germplasms.
 	 *
@@ -595,13 +570,11 @@ public interface FieldbookService {
 	/**
 	 * Get study details.
 	 *
-	 * @param studyType
-	 *            the study type
 	 * @param studyId
 	 *            the study id
 	 * @return the study details
 	 */
-	StudyDetails getStudyDetails(StudyType studyType, int studyId);
+	StudyDetails getStudyDetails(int studyId);
 
 	/**
 	 * Get the block id of a particular trial instance in a dataset.
@@ -769,18 +742,16 @@ public interface FieldbookService {
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
 			PhenotypicType role, String programUUID);
 
-	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID);
+	void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID);
 
 	/**
 	 * Return the measurement rows of a given dataset.
 	 *
 	 * @param datasetId
 	 *            the dataset id
-	 * @param isTrial
-	 *            the is trial
 	 * @return the complete dataset
 	 */
-	Workbook getCompleteDataset(int datasetId, boolean isTrial);
+	Workbook getCompleteDataset(int datasetId);
 
 	/**
 	 * Gets the germplasm name types.
@@ -908,7 +879,8 @@ public interface FieldbookService {
 	 */
 	long countListDataProjectByListIdAndEntryType(int listId, SystemDefinedEntryType systemDefinedEntryType);
 
-	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId);
+	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId, final String instanceNumber);
+
 
 	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
 
@@ -971,13 +943,13 @@ public interface FieldbookService {
 	 */
 	Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
-	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
-	public List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
+	List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
 
-	public String getPlotCodePrefix(final String cropName);
+	String getPlotCodePrefix(final String cropName);
 
-	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
+	List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
 
 	List<Location> getLocationsByProgramUUID(String programUUID);
 
@@ -1004,4 +976,5 @@ public interface FieldbookService {
 	 */
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
+	Workbook getStudyDataSet(int studyID);
 }

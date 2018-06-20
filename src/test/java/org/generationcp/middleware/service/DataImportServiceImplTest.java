@@ -8,10 +8,10 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -84,7 +86,7 @@ public class DataImportServiceImplTest {
 	public void init() {
 
 		this.workbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO,
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("N"), STUDY_NAME, TRIAL_NO,
 						IS_MULTIPLE_LOCATION);
 
 		this.mockStandardVariable(TEST_VARIABLE_TERM_ID, TEST_VARIABLE_NAME, TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME,
@@ -95,7 +97,7 @@ public class DataImportServiceImplTest {
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, PROGRAM_UUID);
 		this.mockStandardVariable(TermId.ENTRY_NO.getId(), WorkbookTestDataInitializer.ENTRY, WorkbookTestDataInitializer.GERMPLASM_ENTRY,
 				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED, PROGRAM_UUID);
-		this.mockStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), WorkbookTestDataInitializer.TRIAL_NAME,
+		this.mockStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), WorkbookTestDataInitializer.STUDY_NAME,
 				WorkbookTestDataInitializer.TRIAL, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
 				PROGRAM_UUID);
 
@@ -234,10 +236,10 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testSetRequiredFieldsForTrial() {
+	public void testSetRequiredFieldsForStudy() {
 
 		final Workbook trialWorkbook = WorkbookTestDataInitializer
-				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.T, STUDY_NAME, TRIAL_NO, true);
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, new StudyTypeDto("T"), STUDY_NAME, TRIAL_NO, true);
 
 		this.dataImportService.setRequiredFields(trialWorkbook);
 
@@ -256,30 +258,6 @@ public class DataImportServiceImplTest {
 		Assert.assertTrue(optionalEntryNo.get().isRequired());
 		Assert.assertTrue(optionalGid.get().isRequired());
 		Assert.assertTrue(optionalTrialInstance.get().isRequired());
-		Assert.assertFalse(optionalPlotNNo.isPresent());
-
-	}
-
-	@Test
-	public void testSetRequiredFieldsForNursery() {
-
-		this.dataImportService.setRequiredFields(this.workbook);
-
-		final Optional<MeasurementVariable> optionalPlotNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), this.workbook.getFactors());
-		final Optional<MeasurementVariable> optionalEntryNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
-		final Optional<MeasurementVariable> optionalGid =
-				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), this.workbook.getFactors());
-		final Optional<MeasurementVariable> optionalTrialInstance =
-				dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), this.workbook.getTrialVariables());
-		final Optional<MeasurementVariable> optionalPlotNNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), this.workbook.getFactors());
-
-		Assert.assertTrue(optionalPlotNo.get().isRequired());
-		Assert.assertTrue(optionalEntryNo.get().isRequired());
-		Assert.assertTrue(optionalGid.get().isRequired());
-		Assert.assertFalse(optionalTrialInstance.get().isRequired());
 		Assert.assertFalse(optionalPlotNNo.isPresent());
 
 	}
@@ -442,7 +420,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsAllGidsExist() {
 
 		// The count of matched record in germplasm should match the number of observation in data file.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Mockito.anySet()))
+		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySet()))
 				.thenReturn(Long.valueOf(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS));
 
 		final List<Message> messages = new ArrayList<>();
@@ -456,7 +434,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsDoNotExist() {
 
 		// Retun a number not equal to no of observation to simulate that there are gids that do not exist in the database.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Mockito.anySet())).thenReturn(Long.valueOf(0L));
+		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySet())).thenReturn(Long.valueOf(0L));
 
 		final List<Message> messages = new ArrayList<>();
 		this.dataImportService.checkForInvalidGids(this.workbook, messages);
@@ -473,7 +451,7 @@ public class DataImportServiceImplTest {
 		// Remove the GID variable to simulate that GID doesnt exist in the data file
 		final Iterator<MeasurementVariable> iterator = this.workbook.getFactors().iterator();
 		while (iterator.hasNext()) {
-			if (iterator.next().getName() == WorkbookTestDataInitializer.GID) {
+			if (Objects.equals(iterator.next().getName(), WorkbookTestDataInitializer.GID)) {
 				iterator.remove();
 			}
 		}
@@ -641,7 +619,7 @@ public class DataImportServiceImplTest {
 		// Expecting that measurementVariables list has 1 item.
 		// The added variable should not be deleted from the list because it is not obsolete.
 		Assert.assertEquals(1, measurementVariables.size());
-		Assert.assertTrue(adObsolete.equals(measurementVariables.get(0)));
+		Assert.assertEquals(adObsolete, measurementVariables.get(0));
 
 	}
 

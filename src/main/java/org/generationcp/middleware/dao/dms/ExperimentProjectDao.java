@@ -83,12 +83,12 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows)
-			throws MiddlewareQueryException {
+	public List<ExperimentProject> getExperimentProjects(final int projectId, final List<TermId> types, final int start,
+		final int numOfRows, final boolean firstInstances) throws MiddlewareQueryException {
 		try {
 
-			List<Integer> lists = new ArrayList<Integer>();
-			for (TermId termId : types) {
+			final List<Integer> lists = new ArrayList<>();
+			for (final TermId termId : types) {
 				lists.add(termId.getId());
 			}
 
@@ -100,6 +100,9 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			queryString.append("left outer join exp.experimentStocks as es ");
 			queryString.append("left outer join es.stock as st ");
 			queryString.append("where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids) ");
+			if(firstInstances){
+				queryString.append("and ep.experiment.geoLocation.description = 1 ");
+			}
 			queryString.append("order by (ep.experiment.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");

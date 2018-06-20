@@ -17,7 +17,6 @@ import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ public class StudyBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Study createStudy(final int studyId) throws MiddlewareException {
+	public Study createStudy(final int studyId) {
 		Study study = null;
 		final DmsProject project = this.getDmsProjectDao().getById(studyId);
 		if (project != null) {
@@ -40,7 +39,7 @@ public class StudyBuilder extends Builder {
 		return study;
 	}
 
-	public Study createStudy(final int studyId, final boolean hasVariabletype) throws MiddlewareException {
+	public Study createStudy(final int studyId, final boolean hasVariabletype) {
 		final Monitor monitor = MonitorFactory.start("Build Study");
 		try {
 			Study study = null;
@@ -54,11 +53,11 @@ public class StudyBuilder extends Builder {
 		}
 	}
 
-	public Study createStudy(final DmsProject project) throws MiddlewareException {
+	public Study createStudy(final DmsProject project) {
 		final Study study = new Study();
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
-		study.setStudyType(project.getStudyType());
+		study.setStudyType(this.getStudyTypeBuilder().createStudyTypeDto(project.getStudyType()));
 		study.setDescription(project.getDescription());
 		study.setStartDate(project.getStartDate());
 		study.setEndDate(project.getEndDate());
@@ -80,11 +79,11 @@ public class StudyBuilder extends Builder {
 		return study;
 	}
 
-	public Study createStudy(final DmsProject project, final boolean hasVariableType) throws MiddlewareException {
+	public Study createStudy(final DmsProject project, final boolean hasVariableType) {
 		final Study study = new Study();
 		study.setId(project.getProjectId());
 		study.setProgramUUID(project.getProgramUUID());
-		study.setStudyType(project.getStudyType());
+		study.setStudyType(this.getStudyTypeBuilder().createStudyTypeDto((project.getStudyType())));
 		study.setDescription(project.getDescription());
 		study.setStartDate(project.getStartDate());
 		study.setEndDate(project.getEndDate());

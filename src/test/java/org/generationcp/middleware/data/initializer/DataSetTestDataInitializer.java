@@ -8,24 +8,24 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 
 public class DataSetTestDataInitializer {
 
-	private static final int TRIAL_DATASET_ID = 2;
+	private static final int STUDY_DATASET_ID = 2;
 	private static final int MEASUREMENT_DATASET_ID = 3;
 	private static final int MEANS_DATASET_ID = 4;
 
-	public static List<DataSet> createTrialDatasetsTestData(final String datasetName) {
+	public static List<DataSet> createStudyDatasetsTestData(final String datasetName) {
 		final List<DataSet> trialDatasets = new ArrayList<>();
-		trialDatasets.add(DataSetTestDataInitializer.createTrialDatasetTestData(datasetName));
+		trialDatasets.add(DataSetTestDataInitializer.createStudyDatasetTestData(datasetName));
 		return trialDatasets;
 	}
 
-	public static DataSet createTrialDatasetTestData(final String datasetName) {
-		final DataSet trialDataset = new DataSet();
-		trialDataset.setName(datasetName);
-		trialDataset.setDescription(datasetName);
-		trialDataset.setDataSetType(DataSetType.SUMMARY_DATA);
-		trialDataset.setId(DataSetTestDataInitializer.TRIAL_DATASET_ID);
-		trialDataset.setVariableTypes(VariableTypeListTestDataInitializer.createTrialVariableTypesTestData());
-		return trialDataset;
+	public static DataSet createStudyDatasetTestData(final String datasetName) {
+		final DataSet dataSet = new DataSet();
+		dataSet.setName(datasetName);
+		dataSet.setDescription(datasetName);
+		dataSet.setDataSetType(DataSetType.SUMMARY_DATA);
+		dataSet.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
+		dataSet.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
+		return dataSet;
 	}
 
 	public static List<DataSet> createPlotDatasetsTestData(final String datasetName) {
@@ -34,14 +34,14 @@ public class DataSetTestDataInitializer {
 		return plotDatasets;
 	}
 
-	public static DataSet createPlotDatasetTestData(final String datasetName, final boolean isTrial) {
+	public static DataSet createPlotDatasetTestData(final String datasetName, final boolean isStudy) {
 		final DataSet plotDataset = new DataSet();
 		plotDataset.setName(datasetName);
 		plotDataset.setDescription(datasetName);
 		plotDataset.setDataSetType(DataSetType.PLOT_DATA);
-		if (isTrial) {
-			plotDataset.setId(DataSetTestDataInitializer.TRIAL_DATASET_ID);
-			plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createTrialVariableTypesTestData());
+		if (isStudy) {
+			plotDataset.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
+			plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
 		} else {
 			plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createPlotVariableTypesTestData());
 			plotDataset.setId(DataSetTestDataInitializer.MEASUREMENT_DATASET_ID);

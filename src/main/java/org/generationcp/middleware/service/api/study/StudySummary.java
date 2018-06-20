@@ -4,7 +4,7 @@ package org.generationcp.middleware.service.api.study;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 
 /**
  * Summary information about a study (Trials and Nurseries).
@@ -16,7 +16,7 @@ public class StudySummary {
 	private String name;
 	private String title;
 	private String objective;
-	private StudyType type;
+	private StudyTypeDto type;
 	private String startDate;
 	private String endDate;
 	private String programUUID;
@@ -28,8 +28,9 @@ public class StudySummary {
 
 	}
 
-	public StudySummary(Integer id, String name, String title, String objective, StudyType type, String startDate, String endDate,
-			String programUUID, String principalInvestigator, String location, String season) {
+	public StudySummary(
+		final Integer id, final String name, final String title, final String objective, final StudyTypeDto type, final String startDate, final String endDate,
+			final String programUUID, final String principalInvestigator, final String location, final String season) {
 		this.id = id;
 		this.name = name;
 		this.title = title;
@@ -43,7 +44,7 @@ public class StudySummary {
 		this.season = season;
 	}
 
-	public StudySummary(Integer studyId) {
+	public StudySummary(final Integer studyId) {
 		this.id = studyId;
 	}
 
@@ -51,7 +52,7 @@ public class StudySummary {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -59,7 +60,7 @@ public class StudySummary {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -67,7 +68,7 @@ public class StudySummary {
 		return this.title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -75,15 +76,15 @@ public class StudySummary {
 		return this.objective;
 	}
 
-	public void setObjective(String objective) {
+	public void setObjective(final String objective) {
 		this.objective = objective;
 	}
 
-	public StudyType getType() {
+	public StudyTypeDto getType() {
 		return this.type;
 	}
 
-	public void setType(StudyType type) {
+	public void setType(final StudyTypeDto type) {
 		this.type = type;
 	}
 
@@ -91,7 +92,7 @@ public class StudySummary {
 		return this.startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
 	}
 
@@ -99,7 +100,7 @@ public class StudySummary {
 		return this.endDate;
 	}
 
-	public void setEndDate(String endDate) {
+	public void setEndDate(final String endDate) {
 		this.endDate = endDate;
 	}
 
@@ -107,7 +108,7 @@ public class StudySummary {
 		return this.programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 
@@ -115,7 +116,7 @@ public class StudySummary {
 		return this.principalInvestigator;
 	}
 
-	public void setPrincipalInvestigator(String principalInvestigator) {
+	public void setPrincipalInvestigator(final String principalInvestigator) {
 		this.principalInvestigator = principalInvestigator;
 	}
 
@@ -123,7 +124,7 @@ public class StudySummary {
 		return this.location;
 	}
 
-	public void setLocation(String location) {
+	public void setLocation(final String location) {
 		this.location = location;
 	}
 
@@ -131,7 +132,7 @@ public class StudySummary {
 		return this.season;
 	}
 
-	public void setSeason(String season) {
+	public void setSeason(final String season) {
 		this.season = season;
 	}
 
@@ -145,7 +146,7 @@ public class StudySummary {
 		if (!(other instanceof StudySummary)) {
 			return false;
 		}
-		StudySummary castOther = (StudySummary) other;
+		final StudySummary castOther = (StudySummary) other;
 		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 
