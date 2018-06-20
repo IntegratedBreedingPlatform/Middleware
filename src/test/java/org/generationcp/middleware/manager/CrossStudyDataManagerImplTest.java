@@ -38,22 +38,22 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	private CrossStudyDataManager crossStudyDataManager;
 
 	@Test
-	public void testGetAllTrialEnvironments() {
+	public void testGetAllStudyEnvironments() {
 		final TrialEnvironments environments = this.crossStudyDataManager.getAllTrialEnvironments(	);
 		environments.print(IntegrationTestBase.INDENT);
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + environments.size());
 	}
 
 	@Test
-	public void testCountAllTrialEnvironments() {
+	public void testCountAllStudyEnvironments() {
 		final long count = this.crossStudyDataManager.countAllTrialEnvironments();
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + count);
 	}
 
 	@Test
-	public void testGetPropertiesForTrialEnvironments() {
+	public void testGetPropertiesForStudyEnvironments() {
 		final List<Integer> environmentIds = Arrays.asList(5770, 10081, -1);
-		Debug.println("testGetPropertiesForTrialEnvironments = " + environmentIds);
+		Debug.println("testGetPropertiesForStudyEnvironments = " + environmentIds);
 		final List<TrialEnvironmentProperty> properties = this.crossStudyDataManager.getPropertiesForTrialEnvironments(environmentIds);
 		for (final TrialEnvironmentProperty property : properties) {
 			property.print(0);
@@ -62,9 +62,9 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudiesForTrialEnvironments() {
+	public void testGetStudiesForStudyEnvironments() {
 		final List<Integer> environmentIds = Arrays.asList(5770, 10081);
-		Debug.println(IntegrationTestBase.INDENT, "testGetStudiesForTrialEnvironments = " + environmentIds);
+		Debug.println(IntegrationTestBase.INDENT, "testGetStudiesForStudyEnvironments = " + environmentIds);
 		final List<StudyReference> studies = this.crossStudyDataManager.getStudiesForTrialEnvironments(environmentIds);
 		for (final StudyReference study : studies) {
 			study.print(IntegrationTestBase.INDENT);

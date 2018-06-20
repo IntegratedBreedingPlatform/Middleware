@@ -187,10 +187,6 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	boolean isPersonWithEmailExists(String email);
 
@@ -198,10 +194,6 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param email
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	Person getPersonByEmail(String email);
 
@@ -213,10 +205,6 @@ public interface WorkbenchDataManager {
 	 * @param username
 	 * @param email
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	boolean isPersonWithUsernameAndEmailExists(String username, String email);
 
@@ -241,10 +229,6 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param username
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	UserInfo getUserInfoByUsername(String username);
 
@@ -570,10 +554,6 @@ public interface WorkbenchDataManager {
 	 * @param cropName
 	 * @param toolId
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
 
@@ -622,10 +602,6 @@ public interface WorkbenchDataManager {
 	 * Gets the all Users Sorted
 	 *
 	 * @return
-<<<<<<< HEAD
-=======
-	 * @
->>>>>>> master
 	 */
 	List<UserDto> getAllUsersSortedByLastName();
 

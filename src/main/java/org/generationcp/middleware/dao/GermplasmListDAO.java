@@ -100,7 +100,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
 	
-	private static final List<String> SNAPSHOT_LIST_TYPES = Arrays.asList(GermplasmListType.NURSERY.name(), GermplasmListType.TRIAL.name(), 
+	private static final List<String> SNAPSHOT_LIST_TYPES = Arrays.asList(GermplasmListType.STUDY.name(),
 			GermplasmListType.CHECK.name(), GermplasmListType.ADVANCED.name(), GermplasmListType.CROSSES.name(), GermplasmListType.CRT_CROSS.name(),
 			GermplasmListType.IMP_CROSS.name());
 	

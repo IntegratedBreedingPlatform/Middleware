@@ -68,7 +68,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 		// setup test data
 		studyId = this.createNurseryTestData();
-		this.testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, 0);
+		this.testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.STUDY, 0, "1");
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 		final List<ListDataProject> listDataProjects =
 				this.createListDataProject(this.testListDataProject.getList(), noOfTestEntries, noOfCheckEntries);
-		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.NURSERY, listId, listDataProjects, userId);
+		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, userId);
 
 		Assert.assertEquals(String.format("There are only {0} check entries in the list", noOfCheckEntries), noOfCheckEntries,
 				this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.CHECK_ENTRY));

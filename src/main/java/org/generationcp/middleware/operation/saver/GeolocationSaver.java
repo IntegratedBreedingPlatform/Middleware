@@ -31,21 +31,17 @@ public class GeolocationSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row, boolean isNursery) {
-		return this.saveGeolocation(variableList, row, isNursery, true);
+	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row) {
+		return this.saveGeolocation(variableList, row, true);
 	}
 
-	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row, boolean isNursery, boolean isCreate) {
+	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row, boolean isCreate) {
 		Integer locationId = null;
 		if (row != null && !isCreate && row.getLocationId() != 0) {
 			locationId = (int) row.getLocationId();
 		}
 		final Geolocation geolocation = this.createOrUpdate(variableList, row, locationId);
 		if (geolocation != null) {
-			if (isNursery && geolocation.getDescription() == null) {
-				// OCC should have a default value of 1
-				geolocation.setDescription("1");
-			}
 			if (isCreate) {
 				this.getGeolocationDao().save(geolocation);
 			} else {
@@ -175,11 +171,11 @@ public class GeolocationSaver extends Saver {
 		return geolocation;
 	}
 
-	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery, String programUUID) {
+	public Geolocation updateGeolocationInformation(MeasurementRow row, String programUUID) {
 		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(row.getMeasurementVariables(), programUUID);
 		VariableList variableList = this.getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
 
-		return this.saveGeolocation(variableList, row, isNursery, false);
+		return this.saveGeolocation(variableList, row, false);
 	}
 
 	public void setGeolocation(Geolocation geolocation, int termId, String value) {
@@ -200,8 +196,7 @@ public class GeolocationSaver extends Saver {
 		}
 	}
 
-	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, VariableList variableList, MeasurementRow row,
-			boolean isNursery, boolean isDeleteTrialObservations, String programUUID) {
+	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, VariableList variableList, MeasurementRow row, boolean isDeleteTrialObservations, String programUUID) {
 		Geolocation geolocation = null;
 
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
@@ -212,9 +207,6 @@ public class GeolocationSaver extends Saver {
 					trialInstanceNumber = value;
 					break;
 				}
-			}
-			if (isNursery && trialInstanceNumber == null) {
-				trialInstanceNumber = "1";
 			}
 			// check if existing
 			Integer locationId =

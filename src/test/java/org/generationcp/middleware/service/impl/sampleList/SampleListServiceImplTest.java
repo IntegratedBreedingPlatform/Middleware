@@ -578,7 +578,7 @@ public class SampleListServiceImplTest {
 
 		Mockito.when(this.studyService.getStudy(studyId)).thenReturn(this.study);
 		Mockito.when(this.studyMeasurements.getSampleObservations(studyId, instanceIds, selectionVariableId)).thenReturn(observationDtos);
-		Mockito.when(this.study.getName()).thenReturn("Maizing_Trial");
+		Mockito.when(this.study.getName()).thenReturn("Maizing_Study");
 		Mockito.when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
 		Mockito.when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
 		Mockito.when(this.sampleService
@@ -622,7 +622,7 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testGetSampleLists() {
-		final Integer trialId = 1;
+		final Integer studyId = 1;
 		final List<SampleListDTO> list = new ArrayList<>();
 
 		final SampleListDTO sampleListDTO = new SampleListDTO();
@@ -630,8 +630,8 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setListName("Test");
 		list.add(sampleListDTO);
 
-		Mockito.when(this.sampleListService.getSampleLists(trialId)).thenReturn(list);
-		final List<SampleListDTO> result = this.sampleListService.getSampleLists(trialId);
+		Mockito.when(this.sampleListService.getSampleLists(studyId)).thenReturn(list);
+		final List<SampleListDTO> result = this.sampleListService.getSampleLists(studyId);
 		final SampleListDTO dto = result.get(0);
 		Assert.assertEquals(1, result.size());
 		Assert.assertNotNull(dto);

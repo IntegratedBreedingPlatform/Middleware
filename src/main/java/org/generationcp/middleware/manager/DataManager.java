@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -31,6 +27,7 @@ import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
 import org.generationcp.middleware.operation.builder.StudyFactorBuilder;
 import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
+import org.generationcp.middleware.operation.builder.StudyTypeBuilder;
 import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
@@ -61,6 +58,10 @@ import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * The Class DataManager. Superclass of DataManager implementations. Contains generic implementation of retrieval methods. Contains getters
  * of Builder, Saver, Searcher objects.
@@ -75,11 +76,11 @@ public abstract class DataManager extends DatabaseBroker {
 	public DataManager() {
 	}
 
-	public DataManager(HibernateSessionProvider sessionProvider) {
+	public DataManager(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
-	public DataManager(HibernateSessionProvider sessionProvider, String databaseName) {
+	public DataManager(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
 	}
 
@@ -94,11 +95,11 @@ public abstract class DataManager extends DatabaseBroker {
 		if (parameters == null) {
 			parameters = new Object[] {};
 		}
-		Class[] parameterTypes = new Class[parameters.length];
+		final Class[] parameterTypes = new Class[parameters.length];
 		for (int i = 0; i < parameters.length; i++) {
-			Class parameterClass = parameters[i].getClass();
+			final Class parameterClass = parameters[i].getClass();
 			if (parameterClass.isPrimitive()) {
-				String parameterClassName = parameterClass.getName();
+				final String parameterClassName = parameterClass.getName();
 				if (parameterClassName.equals("boolean")) {
 					parameterTypes[i] = Boolean.TYPE;
 				} else if (parameterClassName.equals("byte")) {
@@ -132,7 +133,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * 
 	 * <pre>
 	 * <code>
-	 *      public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
+	 *      public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) {
 	 *          List<String> methods = Arrays.asList("countByCountry", "getByCountry");
 	 *          return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country},
 	 *                                      new Class[]{Country.class});
@@ -155,16 +156,17 @@ public abstract class DataManager extends DatabaseBroker {
 	// Ideally this method is removed entirely but is referenced in may places - something for later..
 	@Deprecated
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters,
-			Class[] parameterTypes) throws MiddlewareQueryException {
+	public List getFromCentralAndLocalByMethod(
+		final GenericDAO dao, final List<String> methods, final int start, final int numOfRows, final Object[] parameters,
+			final Class[] parameterTypes) {
 
-		List toReturn = new ArrayList();
+		final List toReturn = new ArrayList();
 
 		// Get get method parameter types and parameters
-		Class[] getMethodParameterTypes = new Class[parameters.length + 2];
-		Object[] getMethodParameters = new Object[parameters.length + 2];
+		final Class[] getMethodParameterTypes = new Class[parameters.length + 2];
+		final Object[] getMethodParameters = new Object[parameters.length + 2];
 
-		int i = 0;
+		int i;
 		for (i = 0; i < parameters.length; i++) {
 			getMethodParameterTypes[i] = parameterTypes[i];
 			getMethodParameters[i] = parameters[i];
@@ -174,13 +176,13 @@ public abstract class DataManager extends DatabaseBroker {
 		getMethodParameters[i] = start;
 		getMethodParameters[i + 1] = numOfRows;
 
-		String getMethodName = methods.get(1);
+		final String getMethodName = methods.get(1);
 		try {
-			java.lang.reflect.Method getMethod = dao.getClass().getMethod(getMethodName, getMethodParameterTypes);
+			final java.lang.reflect.Method getMethod = dao.getClass().getMethod(getMethodName, getMethodParameterTypes);
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters));
 
-		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
+		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
 			// NoSuchMethodException
 			this.logAndThrowException("Error in gettting all from central and local using " + getMethodName + ": " + e.getMessage(), e);
 		}
@@ -196,7 +198,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *
 	 * <pre>
 	 * <code>
-	 *      public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
+	 *      public List<Location> getLocationsByType(Integer type) {
 	 *          return (List<Location>) getAllByMethod(getLocationDao(), "getByType", new Object[]{type},
 	 *                      new Class[]{Integer.class});
 	 *      }
@@ -213,15 +215,15 @@ public abstract class DataManager extends DatabaseBroker {
 	 */
 	@Deprecated
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public List getAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
+	public List getAllByMethod(final GenericDAO dao, final String methodName, final Object[] parameters, final Class[] parameterTypes)
 			throws MiddlewareQueryException {
 
-		List toReturn = new ArrayList();
+		final List toReturn = new ArrayList();
 		try {
-			java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+			final java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((List) method.invoke(dao, parameters));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
 		}
 		return toReturn;
@@ -235,7 +237,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *
 	 * <pre>
 	 * <code>
-	 *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+	 *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) {
 	 *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows},
 	 *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
 	 *    }
@@ -251,14 +253,14 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public List getFromInstanceByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
+	public List getFromInstanceByMethod(final GenericDAO dao, final String methodName, final Object[] parameters, final Class[] parameterTypes)
 			throws MiddlewareQueryException {
-		List toReturn = new ArrayList();
+		final List toReturn = new ArrayList();
 		try {
-			java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+			final java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((List) method.invoke(dao, parameters));
-		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
+		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
 			// NoSuchMethodException
 			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
 		}
@@ -273,7 +275,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *
 	 * <pre>
 	 * <code>
-	 *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+	 *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) {
 	 *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows},
 	 *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
 	 *    }
@@ -291,14 +293,14 @@ public abstract class DataManager extends DatabaseBroker {
 	 */
 	@Deprecated
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public List getFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)
+	public List getFromInstanceByMethod(final GenericDAO dao, final Database instance, final String methodName, final Object[] parameters, final Class[] parameterTypes)
 			throws MiddlewareQueryException {
-		List toReturn = new ArrayList();
+		final List toReturn = new ArrayList();
 		try {
-			java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+			final java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((List) method.invoke(dao, parameters));
-		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
+		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
 			// NoSuchMethodException
 			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
 		}
@@ -313,7 +315,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *
 	 * <pre>
 	 * <code>
-	 *     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+	 *     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) {
 	 *        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId",
 	 *                new Object[]{datasetId}, new Class[]{Integer.class});
 	 *
@@ -331,14 +333,14 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public List getFromInstanceByIdAndMethod(GenericDAO dao, Integer id, String methodName, Object[] parameters, Class[] parameterTypes)
+	public List getFromInstanceByIdAndMethod(final GenericDAO dao, final Integer id, final String methodName, final Object[] parameters, final Class[] parameterTypes)
 			throws MiddlewareQueryException {
-		List toReturn = new ArrayList();
+		final List toReturn = new ArrayList();
 		try {
-			java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+			final java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((List) method.invoke(dao, parameters));
-		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
+		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
 			// NoSuchMethodException
 			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
 		}
@@ -353,7 +355,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *
 	 * <pre>
 	 * <code>
-	 *     public long countAllLocations() throws MiddlewareQueryException {
+	 *     public long countAllLocations() {
 	 *          return countAll(getLocationDao());
 	 *     }
 	 * <code>
@@ -364,7 +366,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
-	public long countAll(GenericDAO dao) throws MiddlewareQueryException {
+	public long countAll(final GenericDAO dao) {
 		long count = 0;
 		dao.setSession(this.getActiveSession());
 		count = count + dao.countAll();
@@ -379,7 +381,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *
 	 * <pre>
 	 * <code>
-	 *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
+	 *  public long countLocationsByCountry(Country country) {
 	 *      return countAllByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class});
 	 *  }
 	 *  </code>
@@ -395,14 +397,14 @@ public abstract class DataManager extends DatabaseBroker {
 	 */
 	@SuppressWarnings("rawtypes")
 	@Deprecated
-	public long countAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
+	public long countAllByMethod(final GenericDAO dao, final String methodName, final Object[] parameters, final Class[] parameterTypes)
 			throws MiddlewareQueryException {
 		long count = 0;
 		try {
-			java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
+			final java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
 			dao.setSession(this.getActiveSession());
 			count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException("Error in counting: " + e.getMessage(), e);
 		}
 		return count;
@@ -416,7 +418,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *
 	 * <pre>
 	 * <code>
-	 *     public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
+	 *     public long countAllGermplasm(Database instance) {
 	 *        return super.countFromInstance(getGermplasmDao(), instance);
 	 *    }
 	 * </code>
@@ -428,7 +430,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
-	public long countFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
+	public long countFromInstance(final GenericDAO dao, final Database instance) {
 		long count = 0;
 		dao.setSession(this.getActiveSession());
 		count = count + dao.countAll();
@@ -444,7 +446,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * <pre>
 	 * <code>
 	 *      public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
-	 *            throws MiddlewareQueryException {
+	 *            {
 	 *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition",
 	 *                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
 	 *    }
@@ -460,14 +462,14 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
-	public long countFromInstanceByIdAndMethod(GenericDAO dao, Integer id, String methodName, Object[] parameters, Class[] parameterTypes)
+	public long countFromInstanceByIdAndMethod(final GenericDAO dao, final Integer id, final String methodName, final Object[] parameters, final Class[] parameterTypes)
 			throws MiddlewareQueryException {
 		long count = 0;
 		try {
-			java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
+			final java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
 			dao.setSession(this.getActiveSession());
 			count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
+		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
 			// NoSuchMethodException
 			this.logAndThrowException("Error in counting: " + e.getMessage(), e);
 		}
@@ -475,23 +477,23 @@ public abstract class DataManager extends DatabaseBroker {
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public Object save(GenericDAO dao, Object entity) throws MiddlewareQueryException {
+	public Object save(final GenericDAO dao, final Object entity) {
 
 		try {
-			Object recordSaved = dao.save(entity);
+			final Object recordSaved = dao.save(entity);
 			return recordSaved;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n"
 					+ e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public Object saveOrUpdate(GenericDAO dao, Object entity) throws MiddlewareQueryException {
+	public Object saveOrUpdate(final GenericDAO dao, final Object entity) {
 		try {
-			Object recordSaved = dao.saveOrUpdate(entity);
+			final Object recordSaved = dao.saveOrUpdate(entity);
 			return recordSaved;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n"
 					+ e.getMessage(), e);
 		}
@@ -505,7 +507,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @param e The origin of the exception
 	 * @throws MiddlewareQueryException
 	 */
-	protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
+	protected void logAndThrowException(final String message, final Throwable e) {
 		DataManager.LOG.error(e.getMessage(), e);
 		throw new MiddlewareQueryException(message, e);
 	}
@@ -517,9 +519,9 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @param ids The positive list of ids
 	 * @return the positive ids from the given list
 	 */
-	protected List<Integer> getPositiveIds(List<Integer> ids) {
-		List<Integer> positiveIds = new ArrayList<>();
-		for (Integer id : ids) {
+	protected List<Integer> getPositiveIds(final List<Integer> ids) {
+		final List<Integer> positiveIds = new ArrayList<>();
+		for (final Integer id : ids) {
 			if (id >= 0) {
 				positiveIds.add(id);
 			}
@@ -527,11 +529,11 @@ public abstract class DataManager extends DatabaseBroker {
 		return positiveIds;
 	}
 
-	void doInTransaction(Work work) throws MiddlewareQueryException {
+	void doInTransaction(final Work work) {
 
 		try {
 			work.doWork();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with " + work.getName() + e.getMessage(), e);
 		}
 	}
@@ -550,6 +552,10 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final StudyBuilder getStudyBuilder() {
 		return new StudyBuilder(this.sessionProvider);
+	}
+
+	protected final StudyTypeBuilder getStudyTypeBuilder() {
+		return new StudyTypeBuilder();
 	}
 
 	protected final DataSetBuilder getDataSetBuilder() {

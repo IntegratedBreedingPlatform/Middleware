@@ -29,7 +29,7 @@ public class FieldMapDataUtil {
 	private static final String FIELDBOOK_NAME = "test fieldbook";
 
 	public static final int DATASET_ID = 1;
-	private static final String DATASET_NAME = "test-trial-PLOT";
+	private static final String DATASET_NAME = "test-study-PLOT";
 
 	// data for TrialInstanceInfo
 	public static final int BLOCK_ID = -1;
@@ -55,26 +55,25 @@ public class FieldMapDataUtil {
 	public static final int MACHINE_ROW_CAPACITY = 2;
 	public static final int FIELD_ID = -2;
 
-	public static List<FieldMapInfo> createFieldMapInfoList(boolean isTrial) {
-		List<FieldMapInfo> fieldMapInfoList = new ArrayList<FieldMapInfo>();
-		FieldMapInfo fieldMapInfo = new FieldMapInfo();
+	public static List<FieldMapInfo> createFieldMapInfoList() {
+		final List<FieldMapInfo> fieldMapInfoList = new ArrayList<FieldMapInfo>();
+		final FieldMapInfo fieldMapInfo = new FieldMapInfo();
 
-		ArrayList<FieldMapDatasetInfo> datasets = FieldMapDataUtil.createFieldMapDatasetInfo(isTrial);
+		final ArrayList<FieldMapDatasetInfo> datasets = FieldMapDataUtil.createFieldMapDatasetInfo();
 		fieldMapInfo.setDatasets(datasets);
 		fieldMapInfo.setFieldbookId(FieldMapDataUtil.FIELDBOOK_ID);
 		fieldMapInfo.setFieldbookName(FieldMapDataUtil.FIELDBOOK_NAME);
-		fieldMapInfo.setTrial(isTrial);
 		fieldMapInfoList.add(fieldMapInfo);
 
 		return fieldMapInfoList;
 	}
 
-	private static ArrayList<FieldMapDatasetInfo> createFieldMapDatasetInfo(boolean isTrial) {
-		ArrayList<FieldMapDatasetInfo> datasets = new ArrayList<FieldMapDatasetInfo>();
+	private static ArrayList<FieldMapDatasetInfo> createFieldMapDatasetInfo() {
+		final ArrayList<FieldMapDatasetInfo> datasets = new ArrayList<FieldMapDatasetInfo>();
 
-		FieldMapDatasetInfo dataset = new FieldMapDatasetInfo();
+		final FieldMapDatasetInfo dataset = new FieldMapDatasetInfo();
 
-		ArrayList<FieldMapTrialInstanceInfo> trialInstances = new ArrayList<FieldMapTrialInstanceInfo>();
+		final ArrayList<FieldMapTrialInstanceInfo> trialInstances = new ArrayList<FieldMapTrialInstanceInfo>();
 		trialInstances.add(FieldMapDataUtil.createFieldMapTrialInstanceInfo());
 
 		dataset.setDatasetId(FieldMapDataUtil.DATASET_ID);
@@ -86,7 +85,7 @@ public class FieldMapDataUtil {
 	}
 
 	private static FieldMapTrialInstanceInfo createFieldMapTrialInstanceInfo() {
-		FieldMapTrialInstanceInfo trialInstanceInfo = new FieldMapTrialInstanceInfo();
+		final FieldMapTrialInstanceInfo trialInstanceInfo = new FieldMapTrialInstanceInfo();
 
 		trialInstanceInfo.setBlockId(FieldMapDataUtil.BLOCK_ID);
 		trialInstanceInfo.setBlockName(FieldMapDataUtil.BLOCK_NAME);
@@ -100,9 +99,9 @@ public class FieldMapDataUtil {
 	}
 
 	private static List<FieldMapLabel> createFieldMapLabels() {
-		List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
+		final List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
 
-		FieldMapLabel label = new FieldMapLabel();
+		final FieldMapLabel label = new FieldMapLabel();
 		label.setBlockNo(FieldMapDataUtil.BLOCK_NO);
 		label.setColumn(FieldMapDataUtil.COLUMN);
 		label.setDatasetId(FieldMapDataUtil.DATASET_ID);
