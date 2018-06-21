@@ -134,7 +134,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				.put(GROUP_SOURCE_PREFERRED_NAME, "LEFT JOIN names groupSource ON g.gpid1 = groupSource.gid AND groupSource.nstat = 1 \n");
 		fromClauseColumnsMap.put(IMMEDIATE_SOURCE_GID, " ");
 		fromClauseColumnsMap.put(IMMEDIATE_SOURCE_PREFERRED_NAME,
-				"LEFT JOIN names immediateSource ON g.gpid1 = immediateSource.gid AND immediateSource.nstat = 1 \n");
+				"LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 \n");
 
 	}
 
