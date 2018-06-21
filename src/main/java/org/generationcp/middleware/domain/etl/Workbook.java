@@ -29,6 +29,7 @@ import java.util.Set;
 public class Workbook {
 
 	public static final String STUDY_LABEL = "STUDY";
+	public static final String DEFAULT_LOCATION_ID_VARIABLE_ALIAS = "LOCATION_NAME";
 
 	private StudyDetails studyDetails;
 

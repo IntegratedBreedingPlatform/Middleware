@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;

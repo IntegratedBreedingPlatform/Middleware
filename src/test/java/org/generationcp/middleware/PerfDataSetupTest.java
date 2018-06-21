@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -87,7 +88,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		person.setPhone("02121212121");
 		this.workbenchDataManager.addPerson(person);
 
-		final User workbenchUser = new User();
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setInstalid(1);
 		workbenchUser.setStatus(1);
 		workbenchUser.setAccess(1);
@@ -98,7 +99,8 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		workbenchUser.setPersonid(person.getId());
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
-		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, "ADMIN")));
+		// Role ID 1 = ADMIN
+		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, 1)));
 
 		this.workbenchDataManager.addUser(workbenchUser);
 
@@ -121,7 +123,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 		// this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
-		final User cropDBUser = workbenchUser.copy();
+		final User cropDBUser = workbenchUser.copyToUser();
 		final Person cropDBPerson = person.copy();
 		this.userDataManager.addPerson(cropDBPerson);
 		cropDBUser.setPersonid(cropDBPerson.getId());
