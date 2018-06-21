@@ -10,6 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -243,7 +244,7 @@ public class StudyServiceImplTest {
 		user.setEmail("a@a.com");
 		user.setFirstName("name");
 		user.setLastName("last");
-		user.setRole("ADMIN");
+		user.setRole(new Role(1, "ADMIN"));
 		user.setUserId(1);
 		final List<UserDto> users = new ArrayList<>();
 		users.add(user);
@@ -285,7 +286,7 @@ public class StudyServiceImplTest {
 		user.setEmail("a@a.com");
 		user.setFirstName("name");
 		user.setLastName("last");
-		user.setRole("ADMIN");
+		user.setRole(new Role(1, "ADMIN"));
 		user.setUserId(1);
 		final List<UserDto> users1 = new ArrayList<>();
 		users1.add(user);

@@ -18,9 +18,9 @@ import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -57,7 +57,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
 	
 	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByUser(User user) {
+	public List<Project> getProjectsByUser(WorkbenchUser user) {
 		try {
 			if (user != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
@@ -72,8 +72,8 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<User> getUsersByProjectId(final Long projectId) {
-		final List<User> users = new ArrayList<>();
+	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
+		final List<WorkbenchUser> users = new ArrayList<>();
 		try {
 			if (projectId != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserInfoDAO.GET_USERS_BY_PROJECT_ID);
@@ -91,7 +91,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 					final Integer personId = (Integer) user[7];
 					final Integer aDate = (Integer) user[8];
 					final Integer cDate = (Integer) user[9];
-					final User u = new User(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
+					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
 					users.add(u);
 				}
 			}
