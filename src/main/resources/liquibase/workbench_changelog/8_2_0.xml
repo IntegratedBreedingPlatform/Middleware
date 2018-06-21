@@ -12,5 +12,4 @@
 		</preConditions>
 		<dropTable cascadeConstraints="true"  tableName="workbench_setting"/>
 	</changeSet>
-	
 </databaseChangeLog>

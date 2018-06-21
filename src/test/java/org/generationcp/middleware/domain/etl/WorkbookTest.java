@@ -11,24 +11,23 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
-import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.common.collect.Lists;
+import static org.junit.Assert.assertEquals;
 
 public class WorkbookTest {
 
 	@Test
-	public void testGetMeasurementDatasetVariablesViewForTrial() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.T);
+	public void testGetMeasurementDatasetVariablesView() {
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyTypeDto.getTrialDto());
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
@@ -54,18 +53,6 @@ public class WorkbookTest {
 						variates.get(i - noOfFactors).getTermId());
 			}
 		}
-	}
-
-	@Test
-	public void testGetMeasurementDatasetVariablesViewForNursery() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
-
-		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
-		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
-
-		Assert.assertEquals("MeasurementDatasetVariablesView size should be the total no of non trial factors, variates",
-				totalMeasurementVariableCount, list.size());
-
 	}
 
 	@Test
@@ -115,19 +102,10 @@ public class WorkbookTest {
 	}
 
 	@Test
-	public void testGetTrialObservationByTrialInstanceNoForNursery() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
-		WorkbookTestDataInitializer.createTrialObservations(1, workbook);
-
-		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
-		Assert.assertNotNull("Expecting that every Nursery created has by default 1 instance level observation.", trialObservation);
-	}
-
-	@Test
-	public void testGetTrialObservationByTrialInstanceNoForTrial() {
+	public void testGetTrialObservationByTrialInstanceNo() {
 		final int noOfInstances = 2;
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
-		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyTypeDto.getTrialDto());
+		WorkbookTestDataInitializer.createObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {
 			final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(trialInstanceNo);
@@ -145,7 +123,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testHasExistingExperimentalDesign() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		final List<MeasurementVariable> expVariables = new ArrayList<>();
 
 		// we add an RCBD variable which is an experimental design variable
@@ -157,7 +135,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testNoExistingExperimentalDesign() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		Assert.assertFalse("Expected hasExistingExperimentalDesign() to return false when there is no design but it didn't.",
 				workbook.hasExistingExperimentalDesign());
 	}
@@ -179,11 +157,11 @@ public class WorkbookTest {
 
 		workbook.setConditions(Lists.newArrayList(locationMV, seasonMV));
 
-		MeasurementVariable location = workbook.findConditionById(TermId.LOCATION_ABBR.getId());
+		final MeasurementVariable location = workbook.findConditionById(TermId.LOCATION_ABBR.getId());
 		Assert.assertNotNull(location);
 		Assert.assertEquals(locationMV, location);
 
-		MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
+		final MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
 		Assert.assertNotNull(season);
 		Assert.assertEquals(seasonMV, season);
 	}

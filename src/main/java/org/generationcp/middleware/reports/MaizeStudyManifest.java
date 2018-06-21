@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import java.util.List;
 import java.util.Map;
 
-public class MaizeTrialManifest extends AbstractDynamicReporter {
+public class MaizeStudyManifest extends AbstractDynamicReporter {
 
 	public static final String PLANTING_DATE_REPORT_KEY = "plantingDate";
 	public static final String DISTANCE_BETWEEN_STATIONS_REPORT_KEY = "distanceBetweenStations";
@@ -28,7 +28,7 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 
 	@Override
 	public Reporter createReporter() {
-		final Reporter r = new MaizeTrialManifest();
+		final Reporter r = new MaizeStudyManifest();
 		r.setFileNameExpression("Maize_TRIAL_{trialName}");
 		return r;
 	}
@@ -44,7 +44,7 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 	}
 
 	@Override
-	public Map<String, Object> buildJRParams(final Map<String, Object> args, String studyName) {
+	public Map<String, Object> buildJRParams(final Map<String, Object> args, final String studyName) {
 		final Map<String, Object> params = super.buildJRParams(args, studyName);
 
 		params.put(MAIZE_MANIFEST_PROGRAM_KEY, args.get(PROGRAM_NAME_ARG_KEY));

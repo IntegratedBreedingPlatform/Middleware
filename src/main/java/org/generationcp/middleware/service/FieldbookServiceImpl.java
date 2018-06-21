@@ -34,8 +34,8 @@ import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -111,13 +111,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfTrial(final List<Integer> trialIdList,
 			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionProperties);
+		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, crossExpansionProperties);
 	}
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfNursery(final List<Integer> nurseryIdList,
 			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, crossExpansionProperties);
+		return this.getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, crossExpansionProperties);
 	}
 
 	@Override
@@ -203,15 +203,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getNurseryDataSet(final int id) {
-		final Workbook workbook = this.getWorkbookBuilder().create(id, StudyType.N);
-		this.setOrderVariableByRank(workbook);
-		return workbook;
-	}
-
-	@Override
-	public Workbook getTrialDataSet(final int id) {
-		final Workbook workbook = this.getWorkbookBuilder().create(id, StudyType.T);
+	public Workbook getStudyDataSet(final int id) {
+		final Workbook workbook = this.getWorkbookBuilder().create(id);
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
@@ -301,7 +294,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	protected void saveOrUpdateTrialDesignData(final ExperimentPropertySaver experimentPropertySaver, final ExperimentModel experimentModel,
 			final MeasurementData measurementData, final int termId) {
 
-		String value = "";
+		final String value;
 		if (measurementData.isCategorical()) {
 			// If the variable is categorical, the variable's categorical value should be saved as categorical id.
 			value = measurementData.getcValueId();
@@ -557,7 +550,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		if (stdVarId != null) {
 			return this.getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
 		}
-		return new ArrayList<ValueReference>();
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -573,7 +566,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<ValueReference> getAllNurseryTypes(final String programUUID) {
 
-		final List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
+		final List<ValueReference> nurseryTypes = new ArrayList<>();
 
 		final StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId(), programUUID);
 		final List<Enumeration> validValues = stdVar.getEnumerations();
@@ -671,7 +664,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final boolean isRemoveProperties) {
 		// delete variables not in the list of filtered variables by property
 		final Iterator<Integer> iter = variableIds.iterator();
-		boolean inList = false;
+		boolean inList;
 
 		if (isRemoveProperties) {
 			// remove variables having the specified properties from the list
@@ -701,8 +694,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getStudyVariableSettings(final int id, final boolean isNursery) {
-		return this.getWorkbookBuilder().createStudyVariableSettings(id, isNursery);
+	public Workbook getStudyVariableSettings(final int id) {
+		return this.getWorkbookBuilder().createStudyVariableSettings(id);
 	}
 
 	@Override
@@ -888,8 +881,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public StudyDetails getStudyDetails(final StudyType studyType, final int studyId) {
-		return this.getStudyDataManager().getStudyDetails(studyType, studyId);
+	public StudyDetails getStudyDetails(final int studyId) {
+		return this.getStudyDataManager().getStudyDetails(studyId);
 	}
 
 	@Override
@@ -976,7 +969,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(final String property, final String scale,
 			final String method, final PhenotypicType role, final String programUUID) {
 		final MeasurementVariable variable = null;
-		StandardVariable standardVariable = null;
+		final StandardVariable standardVariable;
 		final Integer id = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
 		if (id != null) {
 			standardVariable = this.getStandardVariableBuilder().create(id, programUUID);
@@ -992,8 +985,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getCompleteDataset(final int datasetId, final boolean isTrial) {
-		final Workbook workbook = this.getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
+	public Workbook getCompleteDataset(final int datasetId) {
+		final Workbook workbook = this.getDataSetBuilder().buildCompleteDataset(datasetId);
 		this.setOrderVariableByRank(workbook, datasetId);
 		return workbook;
 	}
@@ -1093,8 +1086,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public ListDataProject getListDataProjectByStudy(final int projectId, final GermplasmListType type, final int plotId) {
-		return this.getListDataProjectDAO().getByStudy(projectId, type, plotId);
+	public ListDataProject getListDataProjectByStudy(final int projectId, final GermplasmListType type, final int plotId, final String instanceNumber) {
+		return this.getListDataProjectDAO().getByStudy(projectId, type, plotId, instanceNumber);
 	}
 
 	@Override

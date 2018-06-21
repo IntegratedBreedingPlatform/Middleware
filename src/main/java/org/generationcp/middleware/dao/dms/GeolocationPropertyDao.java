@@ -78,6 +78,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		return results;
 	}
 
+	//FIXME
 	public String getGeolocationPropValue(int stdVarId, int studyId) throws MiddlewareQueryException {
 		try {
 			StringBuilder sql =

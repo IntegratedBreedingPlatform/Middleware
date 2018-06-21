@@ -11,11 +11,11 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.generationcp.middleware.util.Debug;
 
 /**
  *
@@ -36,9 +36,6 @@ public class FieldMapInfo implements Serializable {
 	/** The fieldbook name. */
 	private String fieldbookName;
 
-	/** The is trial. */
-	private boolean isTrial; // false if this is for nursery
-
 	/** The datasets. */
 	private List<FieldMapDatasetInfo> datasets;
 
@@ -46,7 +43,7 @@ public class FieldMapInfo implements Serializable {
 	 * Instantiates a new field map info.
 	 */
 	public FieldMapInfo() {
-		this.isTrial = false; // not a trial by default
+
 	}
 
 	/**
@@ -56,17 +53,16 @@ public class FieldMapInfo implements Serializable {
 	 * @param fieldbookName the fieldbook name
 	 * @param labels the labels
 	 */
-	public FieldMapInfo(Integer fieldbookId, String fieldbookName, List<FieldMapLabel> labels) {
-		this.isTrial = false;
+	public FieldMapInfo(final Integer fieldbookId, final String fieldbookName, final List<FieldMapLabel> labels) {
 		this.fieldbookId = fieldbookId;
 		this.fieldbookName = fieldbookName;
 	}
 
 	public List<FieldMapDatasetInfo> getDatasetsWithFieldMap() {
-		List<FieldMapDatasetInfo> info = new ArrayList<FieldMapDatasetInfo>();
+		final List<FieldMapDatasetInfo> info = new ArrayList<FieldMapDatasetInfo>();
 
 		if (this.getDatasets() != null && !this.getDatasets().isEmpty()) {
-			for (FieldMapDatasetInfo dataset : this.getDatasets()) {
+			for (final FieldMapDatasetInfo dataset : this.getDatasets()) {
 				if (!dataset.getTrialInstancesWithFieldMap().isEmpty()) {
 					info.add(dataset);
 				}
@@ -90,7 +86,7 @@ public class FieldMapInfo implements Serializable {
 	 *
 	 * @param fieldbookId the new fieldbook id
 	 */
-	public void setFieldbookId(Integer fieldbookId) {
+	public void setFieldbookId(final Integer fieldbookId) {
 		this.fieldbookId = fieldbookId;
 	}
 
@@ -108,26 +104,8 @@ public class FieldMapInfo implements Serializable {
 	 *
 	 * @param fieldbookName the new fieldbook name
 	 */
-	public void setFieldbookName(String fieldbookName) {
+	public void setFieldbookName(final String fieldbookName) {
 		this.fieldbookName = fieldbookName;
-	}
-
-	/**
-	 * Checks if is trial.
-	 *
-	 * @return true, if is trial
-	 */
-	public boolean isTrial() {
-		return this.isTrial;
-	}
-
-	/**
-	 * Sets the trial.
-	 *
-	 * @param isTrial the new trial
-	 */
-	public void setTrial(boolean isTrial) {
-		this.isTrial = isTrial;
 	}
 
 	/**
@@ -144,7 +122,7 @@ public class FieldMapInfo implements Serializable {
 	 *
 	 * @param datasets the new datasets
 	 */
-	public void setDatasets(List<FieldMapDatasetInfo> datasets) {
+	public void setDatasets(final List<FieldMapDatasetInfo> datasets) {
 		this.datasets = datasets;
 	}
 
@@ -154,8 +132,8 @@ public class FieldMapInfo implements Serializable {
 	 * @param datasetId the dataset id
 	 * @return the data set
 	 */
-	public FieldMapDatasetInfo getDataSet(Integer datasetId) {
-		for (FieldMapDatasetInfo dataset : this.datasets) {
+	public FieldMapDatasetInfo getDataSet(final Integer datasetId) {
+		for (final FieldMapDatasetInfo dataset : this.datasets) {
 			if (datasetId.equals(dataset.getDatasetId())) {
 				return dataset;
 			}
@@ -170,12 +148,10 @@ public class FieldMapInfo implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("FieldMapInfo [fieldbookName=");
 		builder.append(this.fieldbookName);
-		builder.append(", isTrial=");
-		 builder.append(this.isTrial);
-		 builder.append("]");
+		builder.append("]");
 		return builder.toString();
 	}
 
@@ -188,9 +164,8 @@ public class FieldMapInfo implements Serializable {
 		Debug.println(indent, "FieldMapInfo: ");
 		indent = indent + 3;
 		Debug.println(indent, "Fieldbook Name: " + this.fieldbookName);
-		Debug.println(indent, "Is Trial = " + this.isTrial);
 		if (this.datasets != null) {
-			for (FieldMapDatasetInfo datasetInfo : this.datasets) {
+			for (final FieldMapDatasetInfo datasetInfo : this.datasets) {
 				datasetInfo.print(indent);
 			}
 		}
