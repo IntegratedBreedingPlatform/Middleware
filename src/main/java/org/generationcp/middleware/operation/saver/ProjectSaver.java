@@ -11,11 +11,11 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
@@ -28,19 +28,20 @@ public class ProjectSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public DmsProject save(final DmsProject project) throws MiddlewareQueryException {
+	public DmsProject save(final DmsProject project) {
 		final DmsProjectDao projectDao = this.getDmsProjectDao();
 		return projectDao.save(project);
 	}
 
-	public DmsProject create(final StudyValues studyValues, final StudyType studyType, final String description, final String startDate,
+	public DmsProject create(final StudyValues studyValues, final StudyTypeDto studyType, final String description, final String startDate,
 		final String endDate, final String objective, final String name, final String createdBy) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
+			final StudyTypeDAO studyTypeDAO = this.getStudyTypeDao();
 			project = new DmsProject();
 			project.setName(name);
-			project.setStudyType(studyType);
+			project.setStudyType(studyTypeDAO.getById(studyType.getId()));
 			project.setCreatedBy(createdBy);
 			if (startDate != null && startDate.contains("-")) {
 				project.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
@@ -60,7 +61,7 @@ public class ProjectSaver extends Saver {
 		return project;
 	}
 
-	private void mapStudytoProject(final String name, final String description, final DmsProject project, final String objective) throws MiddlewareException {
+	private void mapStudytoProject(final String name, final String description, final DmsProject project, final String objective) {
 		final StringBuffer errorMessage = new StringBuffer("");
 
 		if (name != null && !name.equals("")) {
@@ -83,10 +84,6 @@ public class ProjectSaver extends Saver {
 			throw new MiddlewareException(errorMessage.toString());
 		}
 
-	}
-
-	private String getStringValue(final StudyValues studyValues, final int termId) {
-		return studyValues.getVariableList().findById(termId).getValue();
 	}
 
 	/**

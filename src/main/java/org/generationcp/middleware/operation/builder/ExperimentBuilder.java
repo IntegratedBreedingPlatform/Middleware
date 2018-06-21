@@ -92,22 +92,43 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes)
-			throws MiddlewareQueryException {
+		throws MiddlewareQueryException {
 		Monitor monitor = MonitorFactory.start("Build Experiments");
 		try {
-			final List<Experiment> experiments = new ArrayList<>();
-			final List<ExperimentProject> experimentProjects =
-					this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
-			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
-			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
 
-			for (final ExperimentProject experimentProject : experimentProjects) {
-				experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
-			}
+			final List<ExperimentProject> experimentProjects =
+				this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows, false);
+			final List<Experiment> experiments = buildExperiment(experimentProjects, variableTypes);
 			return experiments;
 		} finally {
 			LOG.debug("" + monitor.stop());
 		}
+	}
+
+	public List<Experiment> build(final int projectId, final List<TermId> types, final int start, final int numOfRows,
+		final VariableTypeList variableTypes, final boolean firstInstance) throws MiddlewareQueryException {
+		Monitor monitor = MonitorFactory.start("Build Experiments");
+		try {
+			final List<ExperimentProject> experimentProjects =
+				this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows, firstInstance);
+			final List<Experiment> experiments = buildExperiment(experimentProjects, variableTypes);
+
+			return experiments;
+		} finally {
+			LOG.debug("" + monitor.stop());
+		}
+	}
+
+	private List<Experiment> buildExperiment(final List<ExperimentProject> experimentProjects, final VariableTypeList variableTypes) {
+		final List<Experiment> experiments = new ArrayList<>();
+
+		// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
+		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
+
+		for (final ExperimentProject experimentProject : experimentProjects) {
+			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+		}
+		return experiments;
 	}
 
 	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes) throws MiddlewareQueryException {

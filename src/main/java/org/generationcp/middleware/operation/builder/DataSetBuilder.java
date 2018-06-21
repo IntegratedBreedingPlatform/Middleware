@@ -27,7 +27,6 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -44,31 +43,31 @@ import com.jamonapi.MonitorFactory;
 public class DataSetBuilder extends Builder {
 
 	// ready for Sring autowiring :-)
-	private DmsProjectDao dmsProjectDao;
-	private StudyDataManager studyDataManager;
+	private final DmsProjectDao dmsProjectDao;
+	private final StudyDataManager studyDataManager;
 
 	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(),
 			TermId.DATASET_TYPE.getId());
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetBuilder.class);
 
-	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal) {
+	public DataSetBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 		this.dmsProjectDao = this.getDmsProjectDao();
 		this.studyDataManager = this.getStudyDataManager();
 	}
 
-	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal, DmsProjectDao dmsProjectDao, StudyDataManager studyDataManager) {
+	public DataSetBuilder(final HibernateSessionProvider sessionProviderForLocal, final DmsProjectDao dmsProjectDao, final StudyDataManager studyDataManager) {
 		super(sessionProviderForLocal);
 		this.dmsProjectDao = dmsProjectDao;
 		this.studyDataManager = studyDataManager;
 	}
 
-	public DataSet build(int dataSetId) throws MiddlewareException {
-		Monitor monitor = MonitorFactory.start("Build DataSet. dataSetId: " + dataSetId);
+	public DataSet build(final int dataSetId)  {
+		final Monitor monitor = MonitorFactory.start("Build DataSet. dataSetId: " + dataSetId);
 		try {
 			DataSet dataSet = null;
-			DmsProject project = this.dmsProjectDao.getById(dataSetId);
+			final DmsProject project = this.dmsProjectDao.getById(dataSetId);
 			if (project != null) {
 				dataSet = this.createDataSet(project);
 			}
@@ -79,20 +78,20 @@ public class DataSetBuilder extends Builder {
 
 	}
 
-	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareException {
-		VariableTypeList variableTypeList = new VariableTypeList();
-		DmsProject project = this.dmsProjectDao.getById(dataSetId);
+	public VariableTypeList getVariableTypes(final int dataSetId)  {
+		final VariableTypeList variableTypeList = new VariableTypeList();
+		final DmsProject project = this.dmsProjectDao.getById(dataSetId);
 		if (project != null) {
-			Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
-			for (VariableInfo variableInfo : variableInfoList) {
+			final Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
+			for (final VariableInfo variableInfo : variableInfoList) {
 				variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
 			}
 		}
 		return variableTypeList.sort();
 	}
 
-	private DataSet createDataSet(DmsProject project) throws MiddlewareException {
-		DataSet dataSet = new DataSet();
+	private DataSet createDataSet(final DmsProject project)  {
+		final DataSet dataSet = new DataSet();
 		dataSet.setId(project.getProjectId());
 		dataSet.setName(project.getName());
 		dataSet.setDescription(project.getDescription());
@@ -103,27 +102,27 @@ public class DataSetBuilder extends Builder {
 		return dataSet;
 	}
 
-	private Set<Integer> getLocationIds(Integer projectId) {
+	private Set<Integer> getLocationIds(final Integer projectId) {
 		return this.getGeolocationDao().getLocationIds(projectId);
 	}
 
-	private VariableTypeList getVariableTypes(DmsProject project) throws MiddlewareException {
-		VariableTypeList variableTypes = new VariableTypeList();
+	private VariableTypeList getVariableTypes(final DmsProject project)  {
+		final VariableTypeList variableTypes = new VariableTypeList();
 
-		Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
-		for (VariableInfo variableInfo : variableInfoList) {
+		final Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
+		for (final VariableInfo variableInfo : variableInfoList) {
 			variableTypes.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
 		}
 		return variableTypes.sort();
 	}
 
-	private int getStudyId(DmsProject project) {
-		DmsProject study = project.getRelatedTos().get(0).getObjectProject();
+	private int getStudyId(final DmsProject project) {
+		final DmsProject study = project.getRelatedTos().get(0).getObjectProject();
 		return study.getProjectId();
 	}
 
-	private DataSetType getDataSetType(DmsProject project) {
-		for (ProjectProperty property : project.getProperties()) {
+	private DataSetType getDataSetType(final DmsProject project) {
+		for (final ProjectProperty property : project.getProperties()) {
 			if (TermId.DATASET_TYPE.getId() == property.getTypeId()) {
 				return DataSetType.findById(Integer.valueOf(property.getValue()));
 			}
@@ -131,12 +130,12 @@ public class DataSetBuilder extends Builder {
 		return null;
 	}
 
-	public DmsProject getTrialDataset(int studyId) {
-		List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
+	public DmsProject getTrialDataset(final int studyId) {
+		final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
 		if (datasetReferences == null || datasetReferences.isEmpty()) {
 			throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
 		}
-		for (DatasetReference datasetReference : datasetReferences) {
+		for (final DatasetReference datasetReference : datasetReferences) {
 			if (datasetReference.getName().endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) {
 				return this.getDmsProjectById(datasetReference.getId());
 			}
@@ -149,11 +148,11 @@ public class DataSetBuilder extends Builder {
 		throw new MiddlewareQueryException("no.trial.dataset.found", "Study exists but no environment dataset for " + studyId);
 	}
 
-	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException {
-		DataSet dataset = this.build(datasetId);
-		List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
-		boolean isMeasurementDataset = this.isMeasurementDataset(dataset);
-		VariableTypeList variables = null;
+	public Workbook buildCompleteDataset(final int datasetId)  {
+		final DataSet dataset = this.build(datasetId);
+		final List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
+		final boolean isMeasurementDataset = this.isMeasurementDataset(dataset);
+		VariableTypeList variables;
 		if (isMeasurementDataset) {
 			variables = this.filterVariables(dataset.getVariableTypes(), siblingVariables);
 		} else {
@@ -161,18 +160,18 @@ public class DataSetBuilder extends Builder {
 		}
 
 		// We need to set the role of the variables based on the experiments before filtering them based on role
-		long expCount = this.getStudyDataManager().countExperiments(datasetId);
-		List<Experiment> experiments = this.getStudyDataManager().getExperiments(datasetId, 0, (int) expCount, variables);
+		final long expCount = this.getStudyDataManager().countExperiments(datasetId);
+		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(datasetId, 0, (int) expCount, variables);
 
-		variables = this.filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
+		variables = this.filterDatasetVariables(variables, isMeasurementDataset);
 
-		List<MeasurementVariable> factorList = this.getMeasurementVariableTransformer().transform(variables.getFactors(), true);
-		List<MeasurementVariable> variateList = this.getMeasurementVariableTransformer().transform(variables.getVariates(), false, true);
-		Workbook workbook = new Workbook();
+		final List<MeasurementVariable> factorList = this.getMeasurementVariableTransformer().transform(variables.getFactors(), true);
+		final List<MeasurementVariable> variateList = this.getMeasurementVariableTransformer().transform(variables.getVariates(), false);
+		final Workbook workbook = new Workbook();
 		workbook.setObservations(this.getWorkbookBuilder().buildDatasetObservations(experiments, variables, factorList, variateList));
 		workbook.setFactors(factorList);
 		workbook.setVariates(variateList);
-		List<MeasurementVariable> measurementDatasetVariables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> measurementDatasetVariables = new ArrayList<>();
 		measurementDatasetVariables.addAll(factorList);
 		measurementDatasetVariables.addAll(variateList);
 		workbook.setMeasurementDatasetVariables(measurementDatasetVariables);
@@ -180,16 +179,16 @@ public class DataSetBuilder extends Builder {
 		return workbook;
 	}
 
-	private VariableTypeList filterDatasetVariables(VariableTypeList variables, boolean isNursery, boolean isMeasurementDataset) {
-		VariableTypeList newVariables = new VariableTypeList();
+	private VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
+		final VariableTypeList newVariables = new VariableTypeList();
 		if (variables != null) {
-			for (DMSVariableType variable : variables.getVariableTypes()) {
-				boolean partOfHiddenDatasetColumns = DataSetBuilder.HIDDEN_DATASET_COLUMNS.contains(variable.getId());
-				boolean isOccAndNurseryAndMeasurementDataset =
-						variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isNursery && isMeasurementDataset;
-				boolean isMeasurementDatasetAndIsTrialFactors =
+			for (final DMSVariableType variable : variables.getVariableTypes()) {
+				final boolean partOfHiddenDatasetColumns = DataSetBuilder.HIDDEN_DATASET_COLUMNS.contains(variable.getId());
+				final boolean isOccAndNurseryAndMeasurementDataset =
+						variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isMeasurementDataset;
+				final boolean isMeasurementDatasetAndIsTrialFactors =
 						isMeasurementDataset && PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole();
-				boolean isTrialAndOcc = !isNursery && variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId();
+				final boolean isTrialAndOcc = variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId();
 				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors
 						|| isTrialAndOcc) {
 					newVariables.add(variable);
@@ -199,22 +198,22 @@ public class DataSetBuilder extends Builder {
 		return newVariables;
 	}
 
-	private boolean isMeasurementDataset(DataSet dataset) {
-		String datasetName = dataset.getName();
-		DataSetType datasetType = dataset.getDataSetType();
+	private boolean isMeasurementDataset(final DataSet dataset) {
+		final String datasetName = dataset.getName();
+		final DataSetType datasetType = dataset.getDataSetType();
 
 		return datasetName.toUpperCase().startsWith("MEASUREMENT EFEC_") || datasetName.toUpperCase().startsWith("MEASUREMENT EFECT_")
 				|| !datasetName.toUpperCase().startsWith("TRIAL_") && datasetType == DataSetType.PLOT_DATA;
 	}
 
-	private List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
+	private List<Integer> getVariablesOfSiblingDatasets(final int datasetId) {
 		return this.getProjectPropertyDao().getVariablesOfSiblingDatasets(datasetId);
 	}
 
-	private VariableTypeList filterVariables(VariableTypeList variables, List<Integer> filters) {
-		VariableTypeList newList = new VariableTypeList();
+	private VariableTypeList filterVariables(final VariableTypeList variables, final List<Integer> filters) {
+		final VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
-			for (DMSVariableType variable : variables.getVariableTypes()) {
+			for (final DMSVariableType variable : variables.getVariableTypes()) {
 				if (!filters.contains(variable.getId()) || variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					newList.add(variable);
 				}
@@ -223,7 +222,7 @@ public class DataSetBuilder extends Builder {
 		return newList;
 	}
 
-	protected DmsProject getDmsProjectById(int studyId) throws MiddlewareQueryException {
+	protected DmsProject getDmsProjectById(final int studyId) {
 		return this.dmsProjectDao.getById(studyId);
 	}
 

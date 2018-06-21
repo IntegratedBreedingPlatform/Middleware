@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -22,9 +21,9 @@ import org.mockito.MockitoAnnotations;
 
 public class DataSetBuilderTest {
 
-	private static int STUDY_ID_WITHTRIAL = 1;
-	private static int STUDY_ID_NOTRIAL = 2;
-	private static int STUDY_ID_NODATASETS = 3;
+	private static final int STUDY_ID_WITH_STUDY = 1;
+	private static final int STUDY_ID_NO_STUDY = 2;
+	private static final int STUDY_ID_NODATASETS = 3;
 
 	@Mock
 	HibernateSessionProvider hibernateSessionProvider;
@@ -41,11 +40,11 @@ public class DataSetBuilderTest {
 
 		this.studyDataManager = Mockito.mock(StudyDataManagerImpl.class);
 		this.dmsProjectDao = Mockito.mock(DmsProjectDao.class);
-		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_WITHTRIAL)).thenReturn(generateDatasetReferences(true));
-		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NOTRIAL)).thenReturn(generateDatasetReferences(false));
+		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_WITH_STUDY)).thenReturn(generateDatasetReferences(true));
+		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NO_STUDY)).thenReturn(generateDatasetReferences(false));
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NODATASETS)).thenReturn(new ArrayList<DatasetReference>());
 		Mockito.when(this.dmsProjectDao.getById(4)).thenReturn(generateDmsProject(4));
-		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NOTRIAL, DataSetType.SUMMARY_DATA)).thenReturn(generateDatasetReference(3));
+		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NO_STUDY, DataSetType.SUMMARY_DATA)).thenReturn(generateDatasetReference(3));
 		Mockito.when(this.dmsProjectDao.getById(3)).thenReturn(generateDmsProject(3));
 
 		MockitoAnnotations.initMocks(this);
@@ -56,51 +55,51 @@ public class DataSetBuilderTest {
 	}
 
 	@Test
-	public void testGetTrialDataSetByUsingName() {
-		DmsProject trialDataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_WITHTRIAL);
-		Assert.assertTrue("The Trial Dataset's project id should be 4", "4".equals(trialDataset.getProjectId().toString()));
+	public void testGetStudyDataSetByUsingName() {
+		final DmsProject dataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_WITH_STUDY);
+		Assert.assertEquals("The Study Dataset's project id should be 4", "4", dataset.getProjectId().toString());
 	}
 
 	@Test
-	public void testGetTrialDataSetByUsingDatasetType() {
-		DmsProject trialDataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_NOTRIAL);
-		Assert.assertTrue("The Trial Dataset's project id should be 3", "3".equals(trialDataset.getProjectId().toString()));
+	public void testGetStudyDataSetByUsingDatasetType() {
+		final DmsProject dataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_NO_STUDY);
+		Assert.assertEquals("The Study Dataset's project id should be 3", "3", dataset.getProjectId().toString());
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
-	public void testGetTrialDataSetExceptionCase() {
-		DmsProject trialDataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_NODATASETS);
+	public void testGetStudyDataSetExceptionCase() {
+		final DmsProject dataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_NODATASETS);
 	}
 
-	private List<DatasetReference> generateDatasetReferences(boolean includeTrialDataset) {
+	private List<DatasetReference> generateDatasetReferences(final boolean includeStudyDataset) {
 
-		List<DatasetReference> dsRefs = new ArrayList<DatasetReference>();
+		final List<DatasetReference> dsRefs = new ArrayList<DatasetReference>();
 
-		DatasetReference ref1 = new DatasetReference(1, "TestTrial");
-		DatasetReference ref3 = new DatasetReference(3, "TestTrial-DUMMY");
-		DatasetReference ref4 = new DatasetReference(2, "TestTrial-PLOTDATA");
+		final DatasetReference ref1 = new DatasetReference(1, "TestStudy");
+		final DatasetReference ref3 = new DatasetReference(3, "TestStudy-DUMMY");
+		final DatasetReference ref4 = new DatasetReference(2, "TestStudy-PLOTDATA");
 
 		dsRefs.add(ref1);
 		dsRefs.add(ref3);
 		dsRefs.add(ref4);
 
-		// this allows us to run tests with and without a Trial dataset present
-		if (includeTrialDataset) {
-			DatasetReference ref2 = new DatasetReference(4, "TestTrial-ENVIRONMENT");
+		// this allows us to run tests with and without a Study dataset present
+		if (includeStudyDataset) {
+			final DatasetReference ref2 = new DatasetReference(4, "TestStudy-ENVIRONMENT");
 			dsRefs.add(ref2);
 		}
 
 		return dsRefs;
 	}
 
-	private DmsProject generateDmsProject(int id) {
-		DmsProject dmsProject = new DmsProject();
+	private DmsProject generateDmsProject(final int id) {
+		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(id);
 		return dmsProject;
 	}
 
-	private DatasetReference generateDatasetReference(int id) {
-		DatasetReference dsr = new DatasetReference(id, "Name");
+	private DatasetReference generateDatasetReference(final int id) {
+		final DatasetReference dsr = new DatasetReference(id, "Name");
 		return dsr;
 	}
 

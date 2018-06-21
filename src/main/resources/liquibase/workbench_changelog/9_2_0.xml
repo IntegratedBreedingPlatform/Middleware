@@ -6,7 +6,42 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="darla" id="v9.2.0-1">
+    <changeSet author="cuenyad" id="v9.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="2">
+                SELECT COUNT(*) FROM workbench_sidebar_category_link WHERE sidebar_category_link_id IN (3,4);
+            </sqlCheck>
+        </preConditions>
+        <comment>Removing Nursery and Trial Manager side menu</comment>
+        <sql dbms="mysql" splitStatements="true">
+            DELETE FROM workbench_sidebar_category_link WHERE sidebar_category_link_id IN (3,4);
+        </sql>
+    </changeSet>
+    <changeSet author="cuenyad" id="v9.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) = 0 FROM workbench_tool where group_name="study_manager_fieldbook_web";
+			</sqlCheck>
+		</preConditions>
+		<comment>Adding Manager Study</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path)
+			VALUES ("study_manager_fieldbook_web", "study_manager_fieldbook_web", "Fieldbook Web - Study Manager", "8.2", "WEB", "Fieldbook/TrialManager");
+		</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v9.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM workbench_sidebar_category_link where tool_name="study_manager_fieldbook_web";
+			</sqlCheck>
+		</preConditions>
+		<comment>Adding Manager Study</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title) VALUES ('study_manager_fieldbook_web', '1', 'manage_trials', 'Manage Studies');
+		</sql>
+	</changeSet>
+	
+		<changeSet author="darla" id="v9.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="role"/>
@@ -28,7 +63,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-2">
+	<changeSet author="darla" id="v9.2.0-5">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="users_roles" columnName="role"/>
 			<not>
@@ -47,7 +82,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-3">
+	<changeSet author="darla" id="v9.2.0-6">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="users_roles" columnName="role_id"/>
 			<tableExists tableName="role"/>
@@ -64,7 +99,7 @@
 			onUpdate="NO ACTION"/>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-4">
+	<changeSet author="darla" id="v9.2.0-7">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="users_roles" columnName="role"/>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'users_roles' AND CONSTRAINT_NAME='fk_user_role_id' and TABLE_SCHEMA = DATABASE();</sqlCheck>
@@ -75,7 +110,7 @@
             tableName="users_roles"/>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-5">
+	<changeSet author="darla" id="v9.2.0-8">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM workbench_tool 
@@ -92,7 +127,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-6">
+	<changeSet author="darla" id="v9.2.0-9">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM workbench_sidebar_category_link 
@@ -109,7 +144,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-7">
+	<changeSet author="darla" id="v9.2.0-10">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM workbench_sidebar_category_link 
@@ -124,7 +159,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-8">
+	<changeSet author="darla" id="v9.2.0-11">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="workbench_sidebar_category_link_role"/>
@@ -144,7 +179,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-9">
+	<changeSet author="darla" id="v9.2.0-12">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM workbench_sidebar_category_link_role;

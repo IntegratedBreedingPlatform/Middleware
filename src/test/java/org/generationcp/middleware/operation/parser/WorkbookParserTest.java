@@ -14,13 +14,12 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
-import org.generationcp.middleware.util.Util;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,13 +37,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkbookParserTest {
@@ -63,7 +62,7 @@ public class WorkbookParserTest {
 			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL123"};
 	public static final String CREATED_BY = "1";
 
-	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Mock
 	private File file;
@@ -89,7 +88,7 @@ public class WorkbookParserTest {
 	@After
 	public void afterEachTest() {
 		final long elapsedTime = System.nanoTime() - this.startTime;
-		this.LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
+		this.log.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
 				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
 	}
 
@@ -166,7 +165,7 @@ public class WorkbookParserTest {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
 		final Date startDate = this.workbookParser.validateDate("fdsf",true, new Message("error.start.date.invalid"));
 		Assert.assertNull(startDate);
-		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
+		Assert.assertEquals(1, this.workbookParser.getErrorMessages().size());
 		Assert.assertEquals("error.start.date.invalid", this.workbookParser.getErrorMessages().get(0).getMessageKey());
 	}
 	
@@ -175,7 +174,7 @@ public class WorkbookParserTest {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
 		final Date startDate = this.workbookParser.validateDate("", true, new Message("error.start.date.invalid"));
 		Assert.assertNull(startDate);
-		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
+		Assert.assertEquals(1, this.workbookParser.getErrorMessages().size());
 		Assert.assertEquals("error.start.date.is.empty", this.workbookParser.getErrorMessages().get(0).getMessageKey());
 	}
 	
@@ -192,7 +191,7 @@ public class WorkbookParserTest {
 		this.workbookParser.setErrorMessages(new ArrayList<Message>());
 		final Date endDate = this.workbookParser.validateDate("fdsf", false, new Message("error.end.date.invalid"));
 		Assert.assertNull(endDate);
-		Assert.assertTrue(this.workbookParser.getErrorMessages().size() == 1);
+		Assert.assertEquals(1, this.workbookParser.getErrorMessages().size());
 		Assert.assertEquals("error.end.date.invalid", this.workbookParser.getErrorMessages().get(0).getMessageKey());
 	}
 
@@ -231,7 +230,7 @@ public class WorkbookParserTest {
 			Assert.fail("Validation exception should have been thrown");
 		} catch (final WorkbookParserException e) {
 			final String errorMessage = "Incorrect headers for " + sectionName;
-			Assert.assertTrue("Should have thrown validation exception but did not", errorMessage.equals(e.getMessage()));
+			Assert.assertEquals("Should have thrown validation exception but did not", errorMessage, e.getMessage());
 		}
 	}
 
@@ -398,20 +397,20 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
-		// If the Section is CONSTANT and the study is Trial, the variable type should be TRIAL_CONDITION
-		Assert.assertEquals(VariableType.TRIAL_CONDITION, measurementVariable.getVariableType());
+		// If the Section is CONSTANT and the study is Study, the variable type should be STUDY_CONDITION
+		Assert.assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
-		studyDetails.setStudyType(StudyType.N);
+		studyDetails.setStudyType(StudyTypeDto.getNurseryDto());
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
-		// If the Section is CONSTANT and the study is Nursery, the variable type should be NURSERY_CONDITION
-		Assert.assertEquals(VariableType.NURSERY_CONDITION, measurementVariable.getVariableType());
+		// If the Section is CONSTANT and the study is Nursery, the variable type should be STUDY_CONDITION
+		Assert.assertEquals(VariableType.STUDY_CONDITION, measurementVariable.getVariableType());
 
 	}
 
@@ -420,7 +419,7 @@ public class WorkbookParserTest {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
 		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -733,7 +732,7 @@ public class WorkbookParserTest {
 		Assert.assertEquals(mv.getLabel(), row.getCell(7).getStringCellValue());
 
 		// Assert variable type based on property name
-		Assert.assertEquals(mv.getVariableType(), VariableType.SELECTION_METHOD);
+		Assert.assertEquals(VariableType.SELECTION_METHOD, mv.getVariableType());
 	}
 
 	@Test
@@ -957,9 +956,9 @@ public class WorkbookParserTest {
 		;
 		Assert.assertEquals("columnPlantHeight and columnEarPH are deleted, so columnEarSel is now on the second column ", columnEarSel,
 				headerRow.getCell(1).getStringCellValue());
-		Assert.assertEquals("No cell should be on the third column", null, headerRow.getCell(2));
-		Assert.assertEquals("No cell should be on the fourth column", null, headerRow.getCell(3));
-		Assert.assertEquals("No cell should be on the fifth column", null, headerRow.getCell(4));
+		Assert.assertNull("No cell should be on the third column", headerRow.getCell(2));
+		Assert.assertNull("No cell should be on the fourth column", headerRow.getCell(3));
+		Assert.assertNull("No cell should be on the fifth column", headerRow.getCell(4));
 
 		// Verify the data row
 		Assert.assertEquals("columnTrialInstance data is deleted, so columnPlotNo data is now on the first column", columnData2,
@@ -967,9 +966,9 @@ public class WorkbookParserTest {
 		;
 		Assert.assertEquals("columnPlantHeight and columnEarPH data are deleted, so columnEarSel data is now on the second column ",
 				columnData5, dataRow.getCell(1).getStringCellValue());
-		Assert.assertEquals("No cell should be on the third column", null, dataRow.getCell(2));
-		Assert.assertEquals("No cell should be on the fourth column", null, dataRow.getCell(3));
-		Assert.assertEquals("No cell should be on the fifth column", null, dataRow.getCell(4));
+		Assert.assertNull("No cell should be on the third column", dataRow.getCell(2));
+		Assert.assertNull("No cell should be on the fourth column", dataRow.getCell(3));
+		Assert.assertNull("No cell should be on the fifth column", dataRow.getCell(4));
 
 	}
 
@@ -1110,7 +1109,7 @@ public class WorkbookParserTest {
 		for (int i = 0; i < allVariables.size(); i++) {
 			final HSSFCell cell = row2.createCell(i);
 
-			if (allVariables.get(i).getDataTypeId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+			if (Objects.equals(allVariables.get(i).getDataTypeId(), DataType.CATEGORICAL_VARIABLE.getId())) {
 				cell.setCellValue(withInvalidValues ? "6" : CREATED_BY);
 			} else {
 				cell.setCellValue(CREATED_BY);

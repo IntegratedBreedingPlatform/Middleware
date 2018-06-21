@@ -1,18 +1,15 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -32,16 +29,18 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class StudySearchDaoTest extends IntegrationTestBase {
 
-	public static final String TEST_TRIAL_SUFFIX = "Test Trial Sample";
-	public static final String TEST_TRIAL_NAME_1 = "1 " + TEST_TRIAL_SUFFIX;
-	public static final String TEST_TRIAL_NAME_2 = "2 " + TEST_TRIAL_SUFFIX;
-	public static final String TEST_TRIAL_NAME_3 = "3 " + TEST_TRIAL_SUFFIX;
-	public static final String TEST_TRIAL_NAME_4 = "4 " + TEST_TRIAL_SUFFIX;
-	public static final String TEST_TRIAL_NAME_5 = "5 " + TEST_TRIAL_SUFFIX;
+	public static final String TEST_STUDY_SUFFIX = "Test Study Sample";
+	public static final String TEST_STUDY_NAME_1 = "1 " + TEST_STUDY_SUFFIX;
+	public static final String TEST_STUDY_NAME_2 = "2 " + TEST_STUDY_SUFFIX;
+	public static final String TEST_STUDY_NAME_3 = "3 " + TEST_STUDY_SUFFIX;
+	public static final String TEST_STUDY_NAME_4 = "4 " + TEST_STUDY_SUFFIX;
+	public static final String TEST_STUDY_NAME_5 = "5 " + TEST_STUDY_SUFFIX;
 	private static final String PROGRAM_UUID = "700e62d7-09b2-46af-a79c-b19ba4850681";
 	private static final int NO_OF_TEST_STUDIES = 5;
 	private static final int LUXEMBOURG_COUNTRY_LOCATION_ID = 127;
@@ -69,8 +68,8 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	private final String cropPrefix = "ABCD";
 	
-	private List<StudyReference> dryStudies = new ArrayList<>();
-	private List<StudyReference> wetStudies = new ArrayList<>();
+	private final List<StudyReference> dryStudies = new ArrayList<>();
+	private final List<StudyReference> wetStudies = new ArrayList<>();
 	
 
 	@Before
@@ -86,7 +85,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesByNameNoMatch() {
 
-		final String studyNameSearchKeyword = "TestTrialSample";
+		final String studyNameSearchKeyword = "TestStudySample";
 
 		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
 
@@ -97,7 +96,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesByNameExactMatches() {
 
-		final String studyNameSearchKeyword = "1 Test Trial Sample";
+		final String studyNameSearchKeyword = "1 Test Study Sample";
 
 		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
 
@@ -139,21 +138,21 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesByNameMatchesContaining() {
 
-		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(TEST_TRIAL_SUFFIX, StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
+		final List<StudyReference> studies = this.studySearchDao.getStudiesByName(TEST_STUDY_SUFFIX, StudySearchMatchingOption.MATCHES_CONTAINING, StudySearchDaoTest.PROGRAM_UUID);
 
 		Assert.assertEquals("Study count should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES, StudySearchDaoTest.NO_OF_TEST_STUDIES,
 				studies.size());
 
 		for (final StudyReference studyReference : studies) {
-			Assert.assertTrue("The returned Study name should contain " + TEST_TRIAL_SUFFIX,
-					studyReference.getName().contains(TEST_TRIAL_SUFFIX));
+			Assert.assertTrue("The returned Study name should contain " + TEST_STUDY_SUFFIX,
+					studyReference.getName().contains(TEST_STUDY_SUFFIX));
 		}
 	}
 	
 	@Test
 	public void testGetStudiesByNameExcludingDeletedStudies() throws UnpermittedDeletionException {
 
-		final String studyNameSearchKeyword = "1 Test Trial Sample";
+		final String studyNameSearchKeyword = "1 Test Study Sample";
 
 		List<StudyReference> studiesByName = this.studySearchDao.getStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("Study count should be one.", 1, studiesByName.size());
@@ -191,11 +190,10 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesByLocationIdsExcludingDeletedStudies() throws UnpermittedDeletionException {
 		final ArrayList<Integer> locationIds = Lists.newArrayList(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID);
-		List<StudyReference> studyReferences = this.studySearchDao.getStudiesByLocationIds(
-				locationIds, StudySearchDaoTest.PROGRAM_UUID);
+		List<StudyReference> studyReferences = this.studySearchDao.getStudiesByLocationIds(locationIds, StudySearchDaoTest.PROGRAM_UUID);
 		final Integer previousCount = studyReferences.size();
 		Assert.assertEquals("There should be " + StudySearchDaoTest.NO_OF_TEST_STUDIES + " studies that are in Luxembourg",
-				StudySearchDaoTest.NO_OF_TEST_STUDIES - 1, studyReferences.size());
+			StudySearchDaoTest.NO_OF_TEST_STUDIES - 1, studyReferences.size());
 
 		// Delete test study
 		final StudyReference studyToDelete = studyReferences.get(0);
@@ -275,7 +273,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 				this.studySearchDao.getStudiesByStartDate(20201201, StudySearchDaoTest.PROGRAM_UUID);
 		Assert.assertEquals("There should be 1 study created in December 1 2020", 1, studies.size());
 
-		Assert.assertEquals(StudySearchDaoTest.TEST_TRIAL_NAME_3, studies.get(0).getName());
+		Assert.assertEquals(StudySearchDaoTest.TEST_STUDY_NAME_3, studies.get(0).getName());
 
 	}
 	
@@ -319,7 +317,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public void testSearchStudiesWithNameStartDateLocationAndSeasonFilters() {
 		final List<Integer> locationIds = Arrays.asList(LUXEMBOURG_COUNTRY_LOCATION_ID);
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		filter.setSeason(Season.DRY);
@@ -333,7 +331,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public void testSearchStudiesWithNameStartDateAndLocationFilters() {
 		final List<Integer> locationIds = Arrays.asList(LUXEMBOURG_COUNTRY_LOCATION_ID);
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		filter.setStartDate(202001);
@@ -345,7 +343,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testSearchStudiesWithNameStartDateAndSeasonFilters() {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		filter.setSeason(Season.DRY);
@@ -359,7 +357,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testSearchStudiesWithNameStartDateFilters() {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		filter.setStartDate(202001);
@@ -372,7 +370,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public void testSearchStudiesWithNameLocationAndSeasonFilters() {
 		final List<Integer> locationIds = Arrays.asList(LUXEMBOURG_COUNTRY_LOCATION_ID);
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		filter.setSeason(Season.WET);
@@ -385,7 +383,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public void testSearchStudiesWithNameAndLocationFilters() {
 		final List<Integer> locationIds = Arrays.asList(LUXEMBOURG_COUNTRY_LOCATION_ID);
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		
@@ -396,7 +394,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testSearchStudiesWithNameAndSeasonFilters() {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		filter.setSeason(Season.DRY);
@@ -408,7 +406,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testSearchStudiesWithNameFilter() {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		
@@ -476,7 +474,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public void testSearchStudiesWithLocationFilter() {
 		final List<Integer> locationIds = Arrays.asList(LUXEMBOURG_COUNTRY_LOCATION_ID);
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		
@@ -487,7 +485,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testSearchStudiesWithSeasonFilter() {
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setName(StudySearchDaoTest.TEST_TRIAL_SUFFIX);
+		filter.setName(StudySearchDaoTest.TEST_STUDY_SUFFIX);
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.MATCHES_CONTAINING);
 		filter.setProgramUUID(StudySearchDaoTest.PROGRAM_UUID);
 		filter.setSeason(Season.DRY);
@@ -514,19 +512,19 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// First 3 studies have location and season variables at study level
 		// We need to add datasets to studies because search queries expect "Belongs to Study" record in project_relationship
-		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_1, StudyType.T,
+		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_1, StudyTypeDto.getTrialDto(),
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());
 		this.dryStudies.add(studyReference1);
 
-		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_2, StudyType.T,
+		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_2, StudyTypeDto.getTrialDto(),
 				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference2.getId());
 		this.wetStudies.add(studyReference2);
 
-		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_3, StudyType.T,
+		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_3, StudyTypeDto.getTrialDto(),
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference3.getId());
@@ -534,12 +532,12 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// This study has season and location variables at environment level
 		final StudyReference studyReference4 =
-				studyTestDataInitializer.addTestStudy(StudyType.T, StudySearchDaoTest.TEST_TRIAL_NAME_4, this.cropPrefix);
+				studyTestDataInitializer.addTestStudy(StudyTypeDto.getTrialDto(), StudySearchDaoTest.TEST_STUDY_NAME_4, this.cropPrefix);
 		studyTestDataInitializer.addEnvironmentDataset(studyReference4.getId(),
 				String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), String.valueOf(TermId.SEASON_DRY.getId()));
 		this.dryStudies.add(studyReference4);
 		
-		final StudyReference studyReference5 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_TRIAL_NAME_5, StudyType.T,
+		final StudyReference studyReference5 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_5, StudyTypeDto.getTrialDto(),
 				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.BANGLADESH_COUNTRY_LOCATION_ID), "20200103",
 				this.cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference5.getId());

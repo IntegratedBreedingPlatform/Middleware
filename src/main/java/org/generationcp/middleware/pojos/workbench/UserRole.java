@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ public class UserRole {
 	private WorkbenchUser user;
 
 	@ManyToOne
-	@JoinColumn(name = "role_id", nullable=false)
+	@JoinColumn(name = "role_id", nullable = false)
 	private Role role;
 
 	public UserRole() {
@@ -68,7 +69,7 @@ public class UserRole {
 
 	@Override
 	public String toString() {
-		return "UserRole [User=" + this.user + ", Role=" + this.role + "]";
+		return "UserRole [User=" + this.user.getUserid() + ", Role=" + this.role + "]";
 	}
 	
 	public String getCapitalizedRole() {
