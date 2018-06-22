@@ -219,7 +219,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-10">
+	<changeSet author="darla" id="v9.2.0-13">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM role where description = 'SUPERADMIN';
@@ -231,7 +231,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-11">
+	<changeSet author="darla" id="v9.2.0-14">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*)
@@ -253,7 +253,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="darla" id="v9.2.0-12">
+	<changeSet author="darla" id="v9.2.0-15">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM workbench_sidebar_category_link_role lrole
