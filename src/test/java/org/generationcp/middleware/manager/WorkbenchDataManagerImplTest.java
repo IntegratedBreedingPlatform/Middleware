@@ -761,8 +761,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		for (final WorkbenchSidebarCategoryLink link : sidebarLinks) {
 			if ("manage_program".equals(link.getSidebarLinkName())) {
 				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
-				Assert.assertEquals(1, roles.size());
+				Assert.assertEquals(2, roles.size());
 				Assert.assertEquals("ADMIN", roles.get(0).getRole().getCapitalizedRole());
+				Assert.assertEquals(Role.SUPERADMIN, roles.get(1).getRole().getCapitalizedRole());
 			
 			} else if ("backup_restore".equals(link.getSidebarLinkName())) {
 				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
@@ -774,6 +775,11 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			}
 			
 		}
+	}@Test
+	public void testGetAllRoles() {
+		final List<Role> roles = this.workbenchDataManager.getAllRoles();
+		Assert.assertNotNull(roles);
+		Assert.assertEquals(5, roles.size());
 	}
 	
 	@Test
@@ -781,6 +787,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Role> assignableRoles = this.workbenchDataManager.getAssignableRoles();
 		Assert.assertNotNull(assignableRoles);
 		Assert.assertEquals(4, assignableRoles.size());
+		for (final Role role : assignableRoles){
+			Assert.assertNotEquals(Role.SUPERADMIN, role.getCapitalizedRole());
+		}
 	}
 	
 	@Test

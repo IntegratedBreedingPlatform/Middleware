@@ -1000,4 +1000,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.getWorkbenchUserDao().isSuperAdminUser(userId);
 	}
 
+	@Override
+	public List<Role> getAllRoles() {
+		return this.getRoleDao().getAll();
+	}
+
 }

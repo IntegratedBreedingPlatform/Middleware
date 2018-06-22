@@ -646,6 +646,13 @@ public interface WorkbenchDataManager {
 	List<Role> getAssignableRoles();
 	
 	/**
+	 * Returns list of roles
+	 * 
+	 * @return
+	 */
+	List<Role> getAllRoles();
+	
+	/**
 	 * Return users with SUPERADMIN role
 	 * @return
 	 */
