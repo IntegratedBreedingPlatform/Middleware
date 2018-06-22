@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="nahuel" id="v9.3.0-1">
+		<preConditions onFail="MARK_RAN" >
+			<not>
+				<tableExists tableName="formula"></tableExists>
+				<tableExists tableName="formula_input"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create tables to compute derived variables
+		</comment>
+		<createTable tableName="formula">
+			<column name="formula_id" type="INT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true"  />
+			</column>
+			<column name="target_variable_id" type="INT" >
+				<constraints nullable="false"
+							 foreignKeyName="fk_target_variable_id"
+							 referencedColumnNames="cvterm_id"
+							 referencedTableName="cvterm"/>
+			</column>
+			<column name="definition" type="varchar(255)" >
+				<constraints nullable="false" />
+			</column>
+			<column name="active" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="1" >
+				<constraints nullable="false" />
+			</column>
+			<column name="name" type="varchar(255)" >
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="varchar(255)" >
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="formula_input">
+			<column name="formula_id" type="INT" >
+				<constraints nullable="false"
+							 foreignKeyName="fk_formula_input_formula_id"
+							 referencedTableName="formula"
+							 referencedColumnNames="formula_id" />
+			</column>
+			<column name="variable_id" type="INT" >
+				<constraints nullable="false"
+							 foreignKeyName="fk_formula_input_variable_id"
+							 referencedTableName="cvterm"
+							 referencedColumnNames="cvterm_id" />
+			</column>
+		</createTable>
+		<modifySql dbms="mysql">
+			<append value="ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci" />
+		</modifySql>
+	</changeSet>
+
+</databaseChangeLog>
