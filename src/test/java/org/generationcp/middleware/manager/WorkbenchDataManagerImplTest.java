@@ -771,7 +771,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 				
 			} else if ("about_bms".equals(link.getSidebarLinkName())) {
 				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
-				Assert.assertEquals(4, roles.size());
+				Assert.assertEquals(5, roles.size());
 			}
 			
 		}
