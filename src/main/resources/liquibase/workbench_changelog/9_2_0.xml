@@ -218,5 +218,59 @@
 			 AND role.description   = 'READONLY';
 		</sql>
 	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM role where description = 'SUPERADMIN';
+			</sqlCheck>
+		</preConditions>
+		<comment>Insert SUPERADMIN role</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `role` VALUES (5, 'SuperAdmin');
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-14">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*)
+				FROM users_roles urole
+				INNER JOIN users ON users.userid = urole.userid	
+				INNER JOIN role r ON r.id = urole.role_id
+				WHERE users.uname = 'admin'
+  				AND r.description = 'SUPERADMIN';
+			</sqlCheck>
+		</preConditions>
+		<comment>Assign user with "admin" username SUPERADMIN role</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE users_roles urole
+			INNER JOIN users ON users.userid = urole.userid
+			INNER JOIN role 
+			  SET urole.role_id = role.id
+			WHERE users.uname = 'admin'
+  			  AND role.description = 'SUPERADMIN';
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v9.2.0-15">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM workbench_sidebar_category_link_role lrole
+				INNER JOIN role on role.id = lrole.role_id
+				WHERE role.description = 'SUPERADMIN';
+			</sqlCheck>
+		</preConditions>
+		<comment>Configuration for sidebar links access for SUPERADMIN role</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+			SELECT `sidebar_category_link_id`, role.id
+			  FROM `workbench_sidebar_category_link` link
+			 INNER JOIN role
+			 WHERE link.tool_name NOT IN ('backup_restore') 
+			   AND role.description = 'SUPERADMIN';
+		</sql>
+	</changeSet>
+	
 
 </databaseChangeLog>
