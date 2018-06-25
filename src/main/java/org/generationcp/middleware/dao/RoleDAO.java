@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 public class RoleDAO extends GenericDAO<Role, Integer> {
 	
-	protected static final String SUPERADMIN = "SUPERADMIN";
 	private static final Logger LOG = LoggerFactory.getLogger(RoleDAO.class);
 	
 	@SuppressWarnings("unchecked")
@@ -22,7 +21,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 		
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Role.class);
-			criteria.add(Restrictions.ne("description", SUPERADMIN));
+			criteria.add(Restrictions.ne("description", Role.SUPERADMIN));
 			toReturn = criteria.list();
 			
 		} catch (final HibernateException e) {
