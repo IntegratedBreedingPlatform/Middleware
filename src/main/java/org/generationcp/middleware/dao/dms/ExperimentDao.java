@@ -378,7 +378,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("left outer join es.stock as st ");
 			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
 			if(firstInstance) {
-				queryString.append("and ep.experiment.geoLocation.description = 1 ");
+				queryString.append("and exp.geoLocation.description = 1 ");
 			}
 			queryString.append("order by (exp.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
