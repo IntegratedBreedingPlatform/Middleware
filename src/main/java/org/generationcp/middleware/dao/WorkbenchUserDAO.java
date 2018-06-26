@@ -200,4 +200,39 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<WorkbenchUser> getSuperAdminUsers() {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+			criteria.createAlias("roles.role", "role");
+			criteria.add(Restrictions.eq("role.description", Role.SUPERADMIN));
+			return criteria.list();
+			
+		} catch (final HibernateException e) {
+			final String message = "Error with getSuperAdminUsers query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean isSuperAdminUser(final Integer userId) {
+		try {
+			if (userId != null) {
+				final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+				criteria.createAlias("roles.role", "role");
+				criteria.add(Restrictions.eq("role.description", Role.SUPERADMIN));
+				criteria.add(Restrictions.eq("userid", userId));
+				
+				final List<WorkbenchUser> users = criteria.list();
+				return !users.isEmpty();
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with isSuperAdminUser(userid=" + userId + ") query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return false;
+	}
+	
 }
