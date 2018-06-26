@@ -13,7 +13,6 @@ package org.generationcp.middleware.service;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
@@ -26,7 +25,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
@@ -40,7 +38,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -183,7 +180,7 @@ public class FieldbookServiceImplTest {
 	}
 
 	@Test
-	public void testSaveOrUpdateTrialDesignDataFactorIsCategorical() {
+	public void testSaveOrUpdateStudyDesignDataFactorIsCategorical() {
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
@@ -205,7 +202,7 @@ public class FieldbookServiceImplTest {
 	}
 
 	@Test
-	public void testSaveOrUpdateTrialDesignDataFactorIsNotCategorical() {
+	public void testSaveOrUpdateStudyDesignDataFactorIsNotCategorical() {
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());

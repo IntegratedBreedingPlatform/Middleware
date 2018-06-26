@@ -25,9 +25,9 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Message;
@@ -45,11 +45,11 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 public class WorkbookParser {
 
@@ -88,25 +88,25 @@ public class WorkbookParser {
 	private int maxRowLimit = DEFAULT_MAX_ROW_LIMIT;
 
 	private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
-	public static final String[] DEFAULT_EXPECTED_VARIABLE_HEADERS =
+	protected static final String[] DEFAULT_EXPECTED_VARIABLE_HEADERS =
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.LABEL};
-	public static final String[] EXPECTED_VARIATE_HEADERS =
+	protected static final String[] EXPECTED_VARIATE_HEADERS =
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, "", WorkbookParser.SAMPLE_LEVEL};
-	public static final String[] EXPECTED_VARIATE_HEADERS_2 =
+	protected static final String[] EXPECTED_VARIATE_HEADERS_2 =
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.SAMPLE_LEVEL};
-	public static final String[] EXPECTED_CONSTANT_HEADERS =
+	protected static final String[] EXPECTED_CONSTANT_HEADERS =
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.SAMPLE_LEVEL};
-	public static final String[] EXPECTED_CONSTANT_HEADERS_2 =
+	protected static final String[] EXPECTED_CONSTANT_HEADERS_2 =
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, ""};
-	public static final String[] EXPECTED_FACTOR_HEADERS =
+	protected static final String[] EXPECTED_FACTOR_HEADERS =
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, "NESTED IN", WorkbookParser.LABEL};
-	public static final String[] EXPECTED_FACTOR_HEADERS_2 =
+	protected static final String[] EXPECTED_FACTOR_HEADERS_2 =
 			new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY, WorkbookParser.SCALE, WorkbookParser.METHOD,
 					WorkbookParser.DATA_TYPE, "", WorkbookParser.LABEL};
 
@@ -131,7 +131,7 @@ public class WorkbookParser {
 	 */
 	public Workbook loadFileToExcelWorkbook(final File file) throws WorkbookParserException {
 
-		Workbook excelWorkbook = null;
+		final Workbook excelWorkbook;
 
 		try {
 			excelWorkbook = convertExcelFileToProperFormat(file);
@@ -304,10 +304,10 @@ public class WorkbookParser {
 						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
 
 		// determine study type
-		final String studyType = WorkbookParser
+		final String studyTypeName = WorkbookParser
 				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX - rowAdjustMent,
 						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		StudyType studyTypeValue = StudyType.getStudyTypeByName(studyType);
+		final StudyTypeDto studyTypeValue = new StudyTypeDto(studyTypeName);
 
 		// GCP-6991 and GCP-6992
 		if (study == null || StringUtils.isEmpty(study)) {
@@ -332,10 +332,6 @@ public class WorkbookParser {
 		final Date currentDate = Util.getCurrentDate();
 		if (startDate != null && startDate.after(currentDate)) {
 			this.errorMessages.add(new Message("error.start.is.after.current.date"));
-		}
-
-		if (studyTypeValue == null) {
-			studyTypeValue = StudyType.N;
 		}
 
 		final StudyDetails studyDetails =
@@ -386,7 +382,7 @@ public class WorkbookParser {
 
 			// Check if headers are correct
 
-			String[] expectedHeaders = null;
+			final String[] expectedHeaders;
 			String[] expectedHeaders2 = null;
 
 			if (Section.FACTOR.toString().equals(name)) {
@@ -409,7 +405,7 @@ public class WorkbookParser {
 			if (!valid && expectedHeaders2 != null) {
 				valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, expectedHeaders2);
 			}
-			if (!valid && expectedHeaders != WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS) {
+			if (!valid && !Arrays.equals(expectedHeaders, WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS)) {
 				valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased,
 						WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS);
 			}
@@ -486,13 +482,8 @@ public class WorkbookParser {
 
 		// NOTE: Explicitly setting variable type
 		if (Section.CONSTANT.toString().equals(name) && workbook != null) {
-			final StudyType studyType = workbook.getStudyDetails().getStudyType();
-
-			if (Objects.equals(studyType, StudyType.N)) {
-				measurementVariable.setVariableType(VariableType.NURSERY_CONDITION);
-			} else if (Objects.equals(studyType, StudyType.T)) {
-				measurementVariable.setVariableType(VariableType.TRIAL_CONDITION);
-			}
+			final StudyTypeDto studyType = workbook.getStudyDetails().getStudyType();
+			measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
 		} else {
 			measurementVariable
 					.setVariableType(OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable.getProperty()));
@@ -653,7 +644,7 @@ public class WorkbookParser {
 					WorkbookParser.getCellStringValue(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRowZeroBased, col);
 			if (col < factors.size()) {
 
-				if (columnName == null || !factors.get(col).getName().equalsIgnoreCase(columnName)) {
+				if (!factors.get(col).getName().equalsIgnoreCase(columnName)) {
 					throw new WorkbookParserException("Incorrect header for observations.");
 				} else {
 					variables.add(factors.get(col));
@@ -785,7 +776,7 @@ public class WorkbookParser {
 	}
 
 	private static Boolean rowIsEmpty(final Workbook wb, final Integer sheet, final Integer row, final int len) {
-		Integer col = 0;
+		Integer col;
 		for (col = 0; col < len; col++) {
 			final String value = WorkbookParser.getCellStringValue(wb, sheet, row, col);
 			if (value != null && !"".equals(value)) {

@@ -23,8 +23,8 @@ public class VariableTypeListDataUtil {
 	private static final String ENTRY_NO = "ENTRY_NO";
 	private static final String TRIAL_INSTANCE_STORAGE = "TRIAL_INSTANCE_STORAGE";
 
-	public static VariableTypeList createPlotVariableTypeList(boolean isAddTrialInstanceStorage) {
-		VariableTypeList list = new VariableTypeList();
+	public static VariableTypeList createPlotVariableTypeList(final boolean isAddTrialInstanceStorage) {
+		final VariableTypeList list = new VariableTypeList();
 		DMSVariableType variable;
 		StandardVariable stdVar;
 		if (isAddTrialInstanceStorage) {
@@ -83,16 +83,16 @@ public class VariableTypeListDataUtil {
 		return list;
 	}
 
-	private static StandardVariable createStandardVariable(int id, String name, int storedInId, String storedInName, String storedInDef) {
+	private static StandardVariable createStandardVariable(final int id, final String name, final int storedInId, final String storedInName, final String storedInDef) {
 		// set only id, name and stored in for now
-		StandardVariable stdVar = new StandardVariable();
+		final StandardVariable stdVar = new StandardVariable();
 		stdVar.setId(id);
 		stdVar.setName(name);
 		return stdVar;
 	}
 
-	public static VariableTypeList createTrialVariableTypeList(boolean hasTrialEnvironmentAndConstants) {
-		VariableTypeList list = new VariableTypeList();
+	public static VariableTypeList createVariableTypeList(final boolean hasEnvironmentAndConstants) {
+		final VariableTypeList list = new VariableTypeList();
 		DMSVariableType variable;
 		StandardVariable stdVar;
 
@@ -104,7 +104,7 @@ public class VariableTypeListDataUtil {
 		stdVar.setPhenotypicType(variable.getRole());
 		list.add(variable);
 
-		if (hasTrialEnvironmentAndConstants) {
+		if (hasEnvironmentAndConstants) {
 			stdVar =
 					VariableTypeListDataUtil.createStandardVariable(-1, VariableTypeListDataUtil.ALTITUDE, TermId.ALTITUDE_STORAGE.getId(),
 							"", "");

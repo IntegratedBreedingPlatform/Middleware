@@ -11,8 +11,9 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import org.generationcp.middleware.domain.oms.StudyType;
+
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
@@ -36,7 +37,7 @@ public class Study implements Serializable {
 	
 	private String programUUID;
 
-	private StudyType studyType;
+	private StudyTypeDto studyType;
 
 	private String description;
 
@@ -53,7 +54,7 @@ public class Study implements Serializable {
 	public Study() {
 	}
 
-	public Study(final int id, final VariableList conditions, final VariableList constants, final StudyType studyType, final String description) {
+	public Study(final int id, final VariableList conditions, final VariableList constants, final StudyTypeDto studyType, final String description) {
 		this.id = id;
 		this.conditions = conditions;
 		this.constants = constants;
@@ -89,7 +90,7 @@ public class Study implements Serializable {
 		return this.getDisplayValueAsInt(TermId.PI_ID);
 	}
 
-	public StudyType getType() {
+	public StudyTypeDto getType() {
 		return studyType;
 	}
 
@@ -185,7 +186,7 @@ public class Study implements Serializable {
 		this.programUUID = programUUID;
 	}
 
-	public void setStudyType(final StudyType studyType) {
+	public void setStudyType(final StudyTypeDto studyType) {
 		this.studyType = studyType;
 	}
 
@@ -209,7 +210,7 @@ public class Study implements Serializable {
 		this.studyUpdate = studyUpdate;
 	}
 
-	public StudyType getStudyType() {
+	public StudyTypeDto getStudyType() {
 		return this.studyType;
 	}
 

@@ -18,11 +18,8 @@ public enum VariableType {
 	ANALYSIS(1801, "Analysis",
 			"Variable to be used only in analysis (for example derived variables).",
 			PhenotypicType.VARIATE),
-	TRIAL_CONDITION(1802, "Trial Condition",
-			"Observations made of conditions in an individual environment involved in a trial.",
-			PhenotypicType.VARIATE),
-	NURSERY_CONDITION(1803, "Nursery Condition",
-			"Observations made of conditions in a nursery.",
+	STUDY_CONDITION(1802, "Study Condition",
+			"Observations made of conditions in an individual environment involved in a study.",
 			PhenotypicType.VARIATE),
 	GERMPLASM_DESCRIPTOR(1804, "Germplasm Descriptor",
 			"Information to be recorded about each germplasm in a study.",
@@ -48,12 +45,12 @@ public enum VariableType {
 	ANALYSIS_SUMMARY(1811, "Analysis Summary",
 			"Analysis Summary Variables", PhenotypicType.VARIATE);
 
-	private Integer id;
-	private String name;
-	private String description;
-	private PhenotypicType role;
+	private final Integer id;
+	private final String name;
+	private final String description;
+	private final PhenotypicType role;
 
-	VariableType(Integer id, String name, String description, PhenotypicType role) {
+	VariableType(final Integer id, final String name, final String description, final PhenotypicType role) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
@@ -64,7 +61,7 @@ public enum VariableType {
 	private static final Map<String, VariableType> byName = new HashMap<>();
 
 	static {
-		for (VariableType e : VariableType.values()) {
+		for (final VariableType e : VariableType.values()) {
 			if (VariableType.byId.put(e.getId(), e) != null) {
 				throw new IllegalArgumentException("duplicate id: " + e.getId());
 			}
@@ -91,17 +88,17 @@ public enum VariableType {
 		return this.role;
 	}
 
-	public static VariableType getById(Integer id) {
+	public static VariableType getById(final Integer id) {
 		return VariableType.byId.get(id);
 	}
 
-	public static VariableType getByName(String name) {
+	public static VariableType getByName(final String name) {
 		return VariableType.byName.get(name);
 	}
 
-	public static Set<Integer> getVariableTypesIdsByPhenotype(PhenotypicType phenotype) {
-		Set<Integer> variableTypes = new HashSet<>();
-		for (VariableType variableType : VariableType.values()) {
+	public static Set<Integer> getVariableTypesIdsByPhenotype(final PhenotypicType phenotype) {
+		final Set<Integer> variableTypes = new HashSet<>();
+		for (final VariableType variableType : VariableType.values()) {
 			if (variableType.getRole().equals(phenotype)) {
 				variableTypes.add(variableType.getId());
 			}
@@ -110,8 +107,8 @@ public enum VariableType {
 	}
 
 	public static List<Integer> ids() {
-		List<Integer> variableTypeIds = new ArrayList<Integer>();
-		for (VariableType variableType : VariableType.values()) {
+		final List<Integer> variableTypeIds = new ArrayList<Integer>();
+		for (final VariableType variableType : VariableType.values()) {
 			variableTypeIds.add(variableType.getId());
 		}
 		return variableTypeIds;

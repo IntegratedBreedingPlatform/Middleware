@@ -40,10 +40,10 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
-	private static final String FIELDBOOK_FILE_IBD_VALID = "Trial457-3-1_Valid_IBD.xls";
+	private static final String FIELDBOOK_FILE_IBD_VALID = "Study457-3-1_Valid_IBD.xls";
 	private static final String FIELDBOOK_FILE_CATVARIATES_ONLY = "FieldbookFile_CategoricalVariatesOnly.xls";
 	private static final Integer CREATED_BY = 1;
-	private Map<Integer, Map<String, Object>> studies = new HashMap<Integer, Map<String, Object>>();
+	private final Map<Integer, Map<String, Object>> studies = new HashMap<Integer, Map<String, Object>>();
 	private boolean testDataLoaded = false;
 
 	private static final String DATASETS = "datasets";
@@ -66,16 +66,16 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private void importFieldbookFile(final String fieldbookFileIbdValid, final String cropPrefix) throws Exception {
 
 		if (!this.testDataLoaded) {
-			String fileLocation = PhenotypeDaoIntegrationTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
-			File file = new File(fileLocation);
-			Workbook workbook = this.dataImportService.parseWorkbook(file, PhenotypeDaoIntegrationTest.CREATED_BY);
+			final String fileLocation = PhenotypeDaoIntegrationTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
+			final File file = new File(fileLocation);
+			final Workbook workbook = this.dataImportService.parseWorkbook(file, PhenotypeDaoIntegrationTest.CREATED_BY);
 			workbook.print(IntegrationTestBase.INDENT);
 
-			int studyId = this.dataImportService.saveDataset(workbook, null, cropPrefix);
+			final int studyId = this.dataImportService.saveDataset(workbook, null, cropPrefix);
 
-			List<DatasetReference> datasetRefences = this.studyDataManager.getDatasetReferences(studyId);
+			final List<DatasetReference> datasetRefences = this.studyDataManager.getDatasetReferences(studyId);
 
-			Map<String, Object> studyDetails = new HashMap<String, Object>();
+			final Map<String, Object> studyDetails = new HashMap<String, Object>();
 			studyDetails.put(PhenotypeDaoIntegrationTest.DATASETS, datasetRefences);
 			studyDetails.put(PhenotypeDaoIntegrationTest.WORKBOOK, workbook);
 			this.studies.put(studyId, studyDetails);
@@ -87,28 +87,27 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testContainsAtLeast2CommonEntriesWithValues() throws Exception {
 		int locationId = 0;
-		int trialId = 0;
 		int plotId = 0;
 
 		for (Integer studyId : this.studies.keySet()) {
 
-			Map<String, Object> studyDetails = this.studies.get(studyId);
-			Workbook workbook = (Workbook) studyDetails.get(PhenotypeDaoIntegrationTest.WORKBOOK);
-			List<DatasetReference> datasetRefences = (List<DatasetReference>) studyDetails.get(PhenotypeDaoIntegrationTest.DATASETS);
+			final Map<String, Object> studyDetails = this.studies.get(studyId);
+			final Workbook workbook = (Workbook) studyDetails.get(PhenotypeDaoIntegrationTest.WORKBOOK);
+			final List<DatasetReference> datasetRefences = (List<DatasetReference>) studyDetails.get(PhenotypeDaoIntegrationTest.DATASETS);
 
 			locationId = (int) workbook.getObservations().get(0).getLocationId();
 
-			for (DatasetReference datasetReference : datasetRefences) {
+			for (final DatasetReference datasetReference : datasetRefences) {
 				if (datasetReference.getName().endsWith("PLOTDATA")) {
 					plotId = datasetReference.getId();
 				} else if (datasetReference.getName().endsWith("ENVIRONMENT")) {
-					trialId = datasetReference.getId();
+					studyId = datasetReference.getId();
 				}
 			}
 			Assert.assertTrue("The plot dataset should have at least 2 common entries for analysis",
 					this.dao.containsAtLeast2CommonEntriesWithValues(plotId, locationId, TermId.ENTRY_NO.getId()));
 			Assert.assertFalse("The trial dataset does not contain entries for analysis",
-					this.dao.containsAtLeast2CommonEntriesWithValues(trialId, locationId, TermId.ENTRY_NO.getId()));
+					this.dao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.ENTRY_NO.getId()));
 		}
 	}
 }

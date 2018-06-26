@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -16,17 +15,17 @@ public class FieldbookServiceTest {
 
 	@Test
 	public void testSetOrderVariableByRankIfWorkbookIsNull() throws MiddlewareException {
-		FieldbookServiceImpl impl = Mockito.mock(FieldbookServiceImpl.class);
+		final FieldbookServiceImpl impl = Mockito.mock(FieldbookServiceImpl.class);
 		Assert.assertFalse("Should return false since the workbook is null", impl.setOrderVariableByRank(null));
 	}
 
 	@Test
 	public void testSetOrderVariableByRankIfWorkbookIsNotNull() throws MiddlewareException {
-		FieldbookServiceImpl impl = Mockito.spy(new FieldbookServiceImpl());
+		final FieldbookServiceImpl impl = Mockito.spy(new FieldbookServiceImpl());
 		Mockito.when(impl.getWorkbookBuilder()).thenReturn(Mockito.mock(WorkbookBuilder.class));
 		Mockito.when(impl.getProjectPropertyDao()).thenReturn(Mockito.mock(ProjectPropertyDao.class));
-		Workbook workbook = new Workbook();
-		StudyDetails studyDetails = new StudyDetails();
+		final Workbook workbook = new Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setId(1);
 		studyDetails.setStudyName("Test Name");
 		workbook.setStudyDetails(studyDetails);
@@ -35,18 +34,18 @@ public class FieldbookServiceTest {
 
 	@Test
 	public void testGetCompleteDataset() throws MiddlewareException {
-		FieldbookServiceImpl impl = Mockito.spy(new FieldbookServiceImpl());
+		final FieldbookServiceImpl impl = Mockito.spy(new FieldbookServiceImpl());
 		Mockito.when(impl.getWorkbookBuilder()).thenReturn(Mockito.mock(WorkbookBuilder.class));
 		Mockito.when(impl.getProjectPropertyDao()).thenReturn(Mockito.mock(ProjectPropertyDao.class));
-		DataSetBuilder builder = Mockito.mock(DataSetBuilder.class);
+		final DataSetBuilder builder = Mockito.mock(DataSetBuilder.class);
 		Mockito.when(impl.getDataSetBuilder()).thenReturn(builder);
-		Workbook workbook = new Workbook();
-		StudyDetails studyDetails = new StudyDetails();
+		final Workbook workbook = new Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setId(1);
 		studyDetails.setStudyName("Test Name");
 		workbook.setStudyDetails(studyDetails);
-		Mockito.when(builder.buildCompleteDataset(Matchers.anyInt(), Matchers.anyBoolean())).thenReturn(workbook);
-		impl.getCompleteDataset(1, true);
+		Mockito.when(builder.buildCompleteDataset(Matchers.anyInt())).thenReturn(workbook);
+		impl.getCompleteDataset(1);
 		Mockito.verify(impl, Mockito.times(1)).setOrderVariableByRank(Matchers.any(Workbook.class), Matchers.anyInt());
 
 	}

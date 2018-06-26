@@ -14,8 +14,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
@@ -143,7 +144,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		person.setPhone("02121212121");
 		this.workbenchDataManager.addPerson(person);
 
-		final User workbenchUser = new User();
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setInstalid(1);
 		workbenchUser.setStatus(1);
 		workbenchUser.setAccess(1);
@@ -155,7 +156,8 @@ public class DataSetupTest extends IntegrationTestBase {
 		workbenchUser.setPersonid(person.getId());
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
-		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, "ADMIN")));
+		// Role ID 1 = ADMIN
+		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, 1)));
 
 		this.workbenchDataManager.addUser(workbenchUser);
 
@@ -178,7 +180,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 //		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
-		final User cropDBUser = workbenchUser.copy();
+		final User cropDBUser = workbenchUser.copyToUser();
 		final Person cropDBPerson = person.copy();
 		this.userDataManager.addPerson(cropDBPerson);
 		cropDBUser.setPersonid(cropDBPerson.getId());
@@ -230,7 +232,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		final Workbook workbook = new Workbook();
 		// Basic Details
 		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.N);
+		studyDetails.setStudyType(StudyTypeDto.getNurseryDto());
 		studyDetails.setStudyName("Test Nursery " + randomInt);
 		studyDetails.setObjective(studyDetails.getStudyName() + " Objective");
 		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
@@ -369,10 +371,10 @@ public class DataSetupTest extends IntegrationTestBase {
 		}
 		// Add listdata_project entries
 		final int nurseryListId = this.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId,
-				GermplasmListType.NURSERY, germplasmListId, listDataProjects, 1);
+				GermplasmListType.STUDY, germplasmListId, listDataProjects, 1);
 
 		// Load and check some basics
-		final Workbook nurseryWorkbook = this.middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);
+		final Workbook nurseryWorkbook = this.middlewareFieldbookService.getStudyDataSet(nurseryStudyId);
 		Assert.assertNotNull(nurseryWorkbook);
 
 		final StudyDetails nurseryStudyDetails = nurseryWorkbook.getStudyDetails();

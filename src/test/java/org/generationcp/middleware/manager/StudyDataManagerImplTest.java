@@ -30,13 +30,13 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -46,6 +46,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
@@ -61,7 +62,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 public class StudyDataManagerImplTest extends IntegrationTestBase {
+
+	private static final int PRESUMABLY_NON_EXISTENT_STUDY_ID = -1000000;
 
 	private static final String LOCATION_NAME = "LOCATION NAME";
 
@@ -72,6 +81,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private static final int START_DATE = 20140627;
 
 	private static final String BASIC_NURSERY_TEMPLATE = "Basic nursery template";
+	private static final int PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID = -10000;
 
 	private StudyDataManagerImpl manager;
 
@@ -113,6 +123,13 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				this.locationManager);
 
 		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
+
+		final StudyType studyType = new StudyType();
+		studyType.setStudyTypeId(6);
+		studyType.setLabel(StudyTypeDto.TRIAL_LABEL);
+		studyType.setName(StudyTypeDto.TRIAL_NAME);
+		studyType.setCvTermId(10010);
+		studyType.setVisible(true);
 	}
 
 	@Test
@@ -155,7 +172,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		filter.setName("FooFoo");
 		StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		Assert.assertTrue("The size should be zero since the name is invalid", resultSet.size() == 0);
+		Assert.assertEquals("The size should be zero since the name is invalid", 0, resultSet.size());
 
 		filter.setName(StudyDataManagerImplTest.BASIC_NURSERY_TEMPLATE);
 		resultSet = this.manager.searchStudies(filter, 10);
@@ -198,11 +215,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetRootFolders() throws Exception {
-		final List<Reference> rootFolders =
-				this.manager.getRootFolders(this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+		final List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(rootFolders);
-		Assert.assertFalse("Root folders should not be empty because it contains the templates for Nursery and Trial.",
-				rootFolders.isEmpty());
+		Assert.assertFalse("Root folders should not be empty because it contains the templates for Studies.", rootFolders.isEmpty());
 	}
 
 	@Test
@@ -212,11 +227,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
 		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 
-		final List<Reference> childrenNodes = this.manager
-				.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+		final List<Reference> childrenNodes =
+				this.manager.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
-		Assert.assertTrue("The id of the subFolder should be " + subFolderID, subFolderID == childrenNodes.get(0).getId());
+		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
 	}
 
 	@Test
@@ -254,9 +269,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DataSet dataset = this.manager.getDataSet(datasetReference.getId());
 		final int propertyId = 2120;
 		final VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
-		Assert.assertTrue(
-				"The size should be 1 since we added 1 factor, with property id = " + propertyId + ", in the set up of the data set",
-				factors.size() == 1);
+		Assert.assertEquals(
+				"The size should be 1 since we added 1 factor, with property id = " + propertyId + ", in the set up of the data set", 1,
+				factors.size());
 	}
 
 	@Test
@@ -264,7 +279,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DatasetReference datasetReference = this.studyTDI.addTestDataset(this.studyReference.getId());
 		final DataSet dataset = this.manager.getDataSet(datasetReference.getId());
 		final VariableTypeList factors = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
-		Assert.assertTrue("The size should be 3 since we added 3 factors in the set up of the data set", factors.size() == 3);
+		Assert.assertEquals("The size should be 3 since we added 3 factors in the set up of the data set", 3, factors.size());
 	}
 
 	@Test
@@ -288,11 +303,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllStudyDetails() throws Exception {
-		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+		final List<StudyDetails> nurseryStudyDetails =
+				this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
+		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
 		final List<StudyDetails> updatedNurseryStudyDetails =
-				this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+				this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
 		Assert.assertEquals("The size after adding new nursery should be equal to the size before adding a new nursery + 1",
 				sizeAfterAddingNewNursery, sizeBeforeAddingNewNursery + 1);
@@ -310,11 +326,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetFieldMapInfoOfTrial() throws MiddlewareQueryException {
+	public void testGetFieldMapInfoOfStudy() throws MiddlewareQueryException {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
-				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties);
+				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyDataManagerImplTest.crossExpansionProperties);
 		// compare the size to the minimum possible value of field map infos' size
 		Assert.assertTrue("The size should be greater than 0", fieldMapInfos.size() > 0);
 	}
@@ -336,7 +352,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		tree = this.manager.getFolderTree();
 		final int newSize = tree.size();
 		//Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
-		Assert.assertTrue("The new size should be equal the  size before + the newly added folder", newSize == (sizeBefore + 1));
+		Assert.assertEquals("The new size should be equal the  size before + the newly added folder", newSize, (sizeBefore + 1));
 	}
 
 	@Test
@@ -348,7 +364,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
 						false, null, FieldMapDataUtil.FIELD_ID);
 
-		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 
 		this.manager.setLocationDataManager(locationDataManager);
 
@@ -404,7 +420,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
 						false, null, FieldMapDataUtil.FIELD_ID);
 
-		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
 		trialInstance.setBlockId(null);
 
@@ -428,7 +444,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyType() {
 		try {
-			Assert.assertEquals("Study type returned did not match.", StudyType.T, this.manager.getStudyType(this.studyReference.getId()));
+			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(),
+					this.manager.getStudyType(this.studyReference.getStudyType().getId()));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -437,8 +454,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyTypeNullEdgeCase() {
 		try {
-			final int PRESUMABLY_NON_EXISTENT_STUDY_ID = -1000000;
-			Assert.assertNull("Expected null return value but was non null.", this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_ID));
+			Assert.assertNull("Expected null return value but was non null.",
+					this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -450,10 +467,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.studyTDI.createFolderTestData(uniqueId);
 		this.studyTDI.addTestStudy(uniqueId, cropPrefix);
 
-		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
+		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
 		final int sizeBeforeDelete = programStudiesAndFolders.size();
 		this.manager.deleteProgramStudies(uniqueId);
-		programStudiesAndFolders = this.manager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
+		programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
 		final int sizeAfterDelete = programStudiesAndFolders.size();
 
 		Assert.assertTrue("The size after the delete should be less than the size before.", sizeAfterDelete < sizeBeforeDelete);
@@ -462,23 +479,24 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyDetails() throws Exception {
-		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+		final List<StudyDetails> trialStudyDetails =
+				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
-		final List<StudyDetails> updatedTrialStudyDetails =
-				this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
-		final int sizeAfterAddingNewTrial = updatedTrialStudyDetails.size();
-		Assert.assertEquals("The size after adding new trial should be equal to the size before adding a new trial + 1",
-				sizeAfterAddingNewTrial, sizeBeforeAddingNewTrial + 1);
+		this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY", cropPrefix);
+		final List<StudyDetails> updatedStudyDetails =
+				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
+		final int sizeAfterAddingNewStudy = updatedStudyDetails.size();
+		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
+				sizeAfterAddingNewStudy, sizeBeforeAddingNewTrial + 1);
 	}
 
 	@Test
-	public void testGetNurseryAndTrialStudyDetails() throws Exception {
+	public void testGetStudyStudyDetails() throws Exception {
 		final List<StudyDetails> studyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
-		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
-		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
+		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
+		this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL", cropPrefix);
 		final List<StudyDetails> newStudyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
@@ -488,7 +506,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareException {
-		final StudyDetails studyDetails = this.manager.getStudyDetails(StudyType.T, this.studyReference.getId());
+		final StudyDetails studyDetails = this.manager.getStudyDetails(this.studyReference.getId());
 		Assert.assertNotNull("Study should not be null", studyDetails);
 		Assert.assertEquals("Study should have the id " + this.studyReference.getId(), studyDetails.getId(), studyDetails.getId());
 	}
@@ -517,7 +535,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String uniqueId = this.commonTestProject.getUniqueID();
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
 
-		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
+		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId);
 		Assert.assertTrue("The folder should be empty", isEmpty);
 	}
 
@@ -526,12 +544,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String uniqueId = this.commonTestProject.getUniqueID();
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
 		this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
-		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
+		final boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId);
 		Assert.assertFalse("The folder should not be empty", isEmpty);
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevel() {
+	public void testIsVariableUsedInStudyEnvironmentInOtherProgramsVariableExistsInStudyLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -552,14 +570,17 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(
-				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertTrue(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
+						""));
+		Assert.assertFalse(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
+						programUUID));
 
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
+	public void testIsVariableUsedInStudyEnvironmentInOtherProgramsVariableExistsInStudyLevelStudyIsDeleted() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -581,14 +602,17 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(
-				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
+						""));
+		Assert.assertFalse(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
+						programUUID));
 
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevel() {
+	public void testIsVariableUsedInStudEnvironmentInOtherProgramsVariableExistsInEnvironmentLevel() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -612,7 +636,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variable.setVariableType(dmsVariableType);
 		variable.setValue(locationNameIdValue);
 		variableList.add(variable);
-		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
 
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
@@ -627,7 +651,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsVariableUsedInStudyOrTrialEnvironmentInOtherProgramsVariableExistsInTrialEnvironmentLevelStudyIsDeleted() {
+	public void testIsVariableUsedInStudyEnvironmentInOtherProgramsVariableExistsInEnvironmentLevelStudyIsDeleted() {
 
 		// Create project record
 		final DmsProject project = new DmsProject();
@@ -652,7 +676,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variable.setVariableType(dmsVariableType);
 		variable.setValue(locationNameIdValue);
 		variableList.add(variable);
-		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false, true);
+		final Geolocation geolocation = this.manager.getGeolocationSaver().saveGeolocation(variableList, null, false);
 
 		// Create experiment record
 		final ExperimentModel experimentModel = new ExperimentModel();
@@ -681,6 +705,39 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final String startDate = this.manager.getProjectStartDateByProjectId(project.getProjectId());
 		Assert.assertEquals(project.getStartDate(), startDate);
+	}
+
+	@Test
+	public void testIsLocationIdVariable() throws Exception {
+
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+
+		Assert.assertTrue(this.manager.isLocationIdVariable(this.studyReference.getId(), "LOCATION_NAME"));
+		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "EXPERIMENT_DESIGN_FACTOR"));
+		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "DUMMY NAME"));
+
+	}
+
+	@Test
+	public void testCreateInstanceLocationIdToNameMapFromStudy() throws Exception {
+
+		final String afghanistanLocationId = "1";
+		final String albaniaLocationId = "2";
+		final String algeriaLocationId = "3";
+
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), afghanistanLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), albaniaLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), algeriaLocationId, "1");
+
+		final Map<String, String> result = this.manager.createInstanceLocationIdToNameMapFromStudy(this.studyReference.getId());
+
+		Assert.assertEquals(3, result.size());
+		Assert.assertEquals("Afghanistan", result.get(afghanistanLocationId));
+		Assert.assertEquals("Albania", result.get(albaniaLocationId));
+		Assert.assertEquals("Algeria", result.get(algeriaLocationId));
+
 	}
 
 }

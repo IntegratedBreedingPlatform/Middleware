@@ -46,7 +46,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
 			+ "   INNER JOIN project p ON l.projectid = p.project_id \n" + " WHERE ldp.germplasm_id IN (:gids) \n"
 			+ "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n" + "       AND l.listtype IN ('"
-			+ GermplasmListType.NURSERY.name() + "', '" + GermplasmListType.TRIAL.name() + "', '"
+			+ GermplasmListType.STUDY.name() + "', '"
 			+ GermplasmListType.CHECK.name() + "') \n" + " GROUP BY ldp.germplasm_id";
 
 	public void deleteByListId(final int listId) {
@@ -127,34 +127,38 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return result;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public ListDataProject getByStudy(final int studyId, final GermplasmListType listType, final int plotNo) {
+	public ListDataProject getByStudy(final int studyId, final GermplasmListType listType, final int plotNo, final String instanceNumber) {
 		try {
 
 			final String queryStr = "select ldp.* FROM nd_experiment e,"
-					+ " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
-					+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms"
-					+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
-					+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
-					+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"
-					+ " AND e.project_id = pr.subject_project_id"
-					+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
-					+ " AND nd_stock.nd_experiment_id = nd_ep.nd_experiment_id"
-					+ " AND stock.stock_id = nd_stock.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
-					+ " AND nd_ep.value = :PLOT_NO" + " AND ( EXISTS (" + " SELECT 1" + " FROM listnms cl"
-					+ " WHERE cl.listid = ldp.list_id" + " AND cl.listtype = 'CHECK'" + " AND NOT EXISTS ("
-					+ " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id" + " AND nl.listtype = :LIST_TYPE"
-					+ " )) OR EXISTS (" + " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id"
-					+ " AND nl.listtype = :LIST_TYPE" + " ))";
+				+ " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
+				+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms, nd_geolocation geo"
+				+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
+				+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
+				+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"
+				+ " AND e.project_id = pr.subject_project_id"
+				+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
+				+ " AND nd_stock.nd_experiment_id = nd_ep.nd_experiment_id"
+				+ " AND stock.stock_id = nd_stock.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
+				+ " AND nd_ep.value = :PLOT_NO"
+				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
+				+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"
+				+ " AND geo.description = :INSTANCE_NUMBER"
+				+ " AND ( EXISTS (" + " SELECT 1" + " FROM listnms cl"
+				+ " WHERE cl.listid = ldp.list_id" + " AND cl.listtype = 'CHECK'" + " AND NOT EXISTS ("
+				+ " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id" + " AND nl.listtype = :LIST_TYPE"
+				+ " )) OR EXISTS (" + " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id"
+				+ " AND nl.listtype = :LIST_TYPE" + " ))";
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryStr);
 			query.addEntity("ldp", ListDataProject.class);
 			query.setParameter("LIST_TYPE", listType.name());
 			query.setParameter("STUDY_ID", studyId);
 			query.setParameter("PLOT_NO", plotNo);
+			query.setParameter("INSTANCE_NUMBER", instanceNumber);
 			query.setParameter("DATASET_TYPE", DataSetType.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
-					new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
 
 			final List resultList = query.list();
 			if (!resultList.isEmpty()) {
@@ -163,7 +167,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
+				"Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}
 
 		return null;

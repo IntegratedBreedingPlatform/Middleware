@@ -61,7 +61,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	@Test
 	public void testTransform_FactorList() throws Exception {
 		final boolean isFactor = true;
-		final boolean isInTrialDataset = false;
+		final boolean isInDataset = false;
 		final VariableTypeList varTypeList = this.createFactorVariableTypeList();
 		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
@@ -70,7 +70,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 			Assert.assertTrue("Measurement variable should be a factor", measurementVariable.isFactor());
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
-			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
+			this.validateMeasurementVariable(measurementVariable, variableType, isInDataset);
 			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
 			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
 					measurementVariable.getVariableType());
@@ -79,7 +79,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	}
 
 	public void validateMeasurementVariable(final MeasurementVariable measurementVariable, final DMSVariableType variableType,
-			final boolean isInTrialDataset) {
+			final boolean isInDataset) {
 		final StandardVariable stdVariable = variableType.getStandardVariable();
 		Assert.assertEquals("Name should be " + variableType.getLocalName(), variableType.getLocalName(), measurementVariable.getName());
 		Assert.assertEquals("Description should be " + stdVariable.getDescription(), stdVariable.getDescription(),
@@ -93,7 +93,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		Assert.assertEquals("Data Type should be " + stdVariable.getDataType().getName(), stdVariable.getDataType().getName(),
 				measurementVariable.getDataType());
 
-		final String label = this.getLabel(stdVariable.getPhenotypicType(), isInTrialDataset);
+		final String label = this.getLabel(stdVariable.getPhenotypicType(), isInDataset);
 		Assert.assertEquals("Label should be " + label, label, measurementVariable.getLabel());
 		final List<ValueReference> possibleValues = this.getPossibleValues(stdVariable.getEnumerations());
 		Assert.assertEquals("Possible values should be " + possibleValues, possibleValues, measurementVariable.getPossibleValues());
@@ -111,8 +111,8 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		}
 	}
 
-	private String getLabel(final PhenotypicType role, final boolean isInTrialDataset) {
-		if (isInTrialDataset) {
+	private String getLabel(final PhenotypicType role, final boolean isInDataset) {
+		if (isInDataset) {
 			return PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 		}
 
@@ -160,16 +160,16 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	@Test
 	public void testTransform_VariateList() throws Exception {
 		final boolean isFactor = false;
-		final boolean isInTrialDataset = false;
+		final boolean isInDataset = false;
 		final VariableTypeList varTypeList = this.createVariateVariableTypeList();
-		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInTrialDataset);
+		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
 		int index = 0;
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
-			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
+			this.validateMeasurementVariable(measurementVariable, variableType, isInDataset);
 			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
 			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
 					measurementVariable.getVariableType());
@@ -180,16 +180,16 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	@Test
 	public void testTransform_TrialConstantList() throws Exception {
 		final boolean isFactor = false;
-		final boolean isInTrialDataset = true;
+		final boolean isInDataset = true;
 		final VariableTypeList varTypeList = this.createTrialConstantVariableTypeList();
-		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInTrialDataset);
+		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInDataset);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
 		int index = 0;
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
-			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
+			this.validateMeasurementVariable(measurementVariable, variableType, isInDataset);
 			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
 			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
 					measurementVariable.getVariableType());

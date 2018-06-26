@@ -194,11 +194,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// Delete experiments
 			SQLQuery statement =
 					this.getSession().createSQLQuery("delete e, es, epheno, pheno, eprop " + "from nd_experiment e "
-									+ "left join nd_experiment_stock es on e.nd_experiment_id = es.nd_experiment_id "
-									+ "left join nd_experiment_phenotype epheno on e.nd_experiment_id = epheno.nd_experiment_id "
-									+ "left join phenotype pheno on epheno.phenotype_id = pheno.phenotype_id "
-									+ "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id "
-									+ "where e.nd_experiment_id in (" + experimentIds + ") ");
+							+ "left join nd_experiment_stock es on e.nd_experiment_id = es.nd_experiment_id "
+							+ "left join nd_experiment_phenotype epheno on e.nd_experiment_id = epheno.nd_experiment_id "
+							+ "left join phenotype pheno on epheno.phenotype_id = pheno.phenotype_id "
+							+ "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id "
+							+ "where e.nd_experiment_id in (" + experimentIds + ") ");
 			statement.executeUpdate();
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteExperimentsByLocation=" + experimentIds + " in DataSetDao: " + e.getMessage(), e);
@@ -361,7 +361,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentModel> getExperiments(int projectId, List<TermId> types, int start, int numOfRows)
+	public List<ExperimentModel> getExperiments(int projectId, List<TermId> types, int start, int numOfRows, final boolean firstInstance)
 			throws MiddlewareQueryException {
 		try {
 
@@ -377,6 +377,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("left outer join exp.experimentStocks as es ");
 			queryString.append("left outer join es.stock as st ");
 			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
+			if(firstInstance) {
+				queryString.append("and ep.experiment.geoLocation.description = 1 ");
+			}
 			queryString.append("order by (exp.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");

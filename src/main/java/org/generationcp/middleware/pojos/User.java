@@ -12,11 +12,8 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,18 +21,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -43,50 +36,32 @@ import org.hibernate.annotations.NotFoundAction;
  * POJO for users table.
  *
  */
-@NamedQueries({@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM User s WHERE s.name = :name"),
-		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM User s WHERE s.name LIKE :name"),
-		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM User s WHERE s.name = :name"),
-		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM User s WHERE s.name LIKE :name"),
-		@NamedQuery(name = "getByFullName",
-		query = "SELECT u FROM User u, Person p WHERE u.personid = p.id AND (CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
+@NamedQueries({
+	@NamedQuery(name = "getByFullName",
+	query = "SELECT u FROM User u, Person p WHERE u.personid = p.id AND (CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 })
-@NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
-		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = User.class)})
 @Entity
 @Table(name = "users")
 public class User implements Serializable, BeanFormState {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
-	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
-	public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
-	public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
+	
 	public static final String GET_BY_FULLNAME = "getByFullName";
-	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
-
-	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.role, users.ustatus, person.pemail \n"
-		+ "FROM users \n"
-		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
-		+ "INNER JOIN persons person ON person.personid = users.personid \n "
-		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
-		+ "INNER JOIN users_roles role ON role.userid = users.userid "
-		+ "WHERE pp.project_uuid = :project_uuid \n "
-		+ "GROUP BY users.userid";
 
 	public static final String GET_USERS_ASSOCIATED_TO_STUDY = "SELECT DISTINCT \n"
 			+ "  person.personid AS personId, \n"
 			+ "  person.fname    AS fName, \n"
 			+ "  person.lname    AS lName, \n"
 			+ "  person.pemail   AS email, \n"
-			+ "  role.role       AS role \n"
+			+ "  role.id    AS roleId \n"
+			+ "  role.description       AS roleName \n"
 			+ "FROM cvterm scale INNER JOIN cvterm_relationship r ON (r.object_id = scale.cvterm_id) \n"
 			+ "  INNER JOIN cvterm variable ON (r.subject_id = variable.cvterm_id) \n"
 			+ "  INNER JOIN projectprop pp ON (pp.variable_id = variable.cvterm_id) \n"
 			+ "  INNER JOIN workbench.persons person ON (pp.value = person.personid) \n"
 			+ "  INNER JOIN workbench.users user ON (user.personid = person.personid) \n"
-			+ "  LEFT JOIN workbench.users_roles role ON (role.userid = user.userid) \n"
+			+ "  LEFT JOIN workbench.users_roles urole ON (urole.userid = user.userid) \n"
+			+ "  LEFT JOIN workbench.role ON (role.id = urole.role_id) \n"
 			+ "WHERE pp.project_id = :studyId AND r.object_id = 1901";
 
 	@Id
@@ -121,10 +96,6 @@ public class User implements Serializable, BeanFormState {
 
 	@Column(name = "cdate")
 	private Integer cdate;
-
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@NotFound(action = NotFoundAction.IGNORE)
-	private List<UserRole> roles;
 
 	@Transient
 	private Boolean isnew = false;
@@ -282,14 +253,6 @@ public class User implements Serializable, BeanFormState {
 		this.isnew = val;
 	}
 
-	public List<UserRole> getRoles() {
-		return this.roles;
-	}
-
-	public void setRoles(List<UserRole> roles) {
-		this.roles = roles;
-	}
-
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.userid).hashCode();
@@ -369,15 +332,4 @@ public class User implements Serializable, BeanFormState {
 
 	}
 
-	public boolean hasRole(String role) {
-		if (!Objects.equals(this.roles,null)) {
-			for (UserRole userRole : this.roles) {
-				if (userRole.getRole().equals(role)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
 }

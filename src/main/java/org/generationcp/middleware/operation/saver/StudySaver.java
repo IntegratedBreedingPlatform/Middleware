@@ -14,7 +14,7 @@ package org.generationcp.middleware.operation.saver;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
@@ -35,7 +35,7 @@ public class StudySaver extends Saver {
 	 * table if saveStudyExperiment is true.
 	 */
 	public DmsProject saveStudy(final int parentId, final VariableTypeList variableTypeList, final StudyValues studyValues, final boolean saveStudyExperiment,
-		final String programUUID, final String cropPrefix, final StudyType studyType, final String description, final String startDate,
+		final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description, final String startDate,
 		final String endDate, final String objective, final String name, final String createdBy) throws Exception {
 
 		DmsProject project = this.getProjectSaver().create(studyValues, studyType, description, startDate, endDate, objective, name,
