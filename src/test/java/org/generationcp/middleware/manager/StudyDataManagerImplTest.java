@@ -571,8 +571,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertTrue(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						""));
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(this.manager
 				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
 						programUUID));
@@ -603,8 +602,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						""));
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(this.manager
 				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
 						programUUID));
@@ -731,6 +729,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), albaniaLocationId, "1");
 		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), algeriaLocationId, "1");
 
+		this.sessionProvder.getSession().flush();
 		final Map<String, String> result = this.manager.createInstanceLocationIdToNameMapFromStudy(this.studyReference.getId());
 
 		Assert.assertEquals(3, result.size());
