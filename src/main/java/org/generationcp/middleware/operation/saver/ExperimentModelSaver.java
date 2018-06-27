@@ -42,7 +42,6 @@ public class ExperimentModelSaver extends Saver {
 		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
 
 		this.getExperimentDao().save(experimentModel);
-//		this.addExperimentProject(experimentModel, projectId);
 		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 	}
 
@@ -79,7 +78,6 @@ public class ExperimentModelSaver extends Saver {
 			ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
 
 			this.getExperimentDao().save(experimentModel);
-//			this.addExperimentProject(experimentModel, projectId);
 			this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 		}
 	}
