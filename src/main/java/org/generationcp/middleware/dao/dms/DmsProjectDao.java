@@ -199,7 +199,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final Query query =
 				this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name").addScalar("description")
-					.addScalar("is_study").addScalar("program_uuid").addScalar("studyType").addScalar("label").addScalar("name")
+					.addScalar("is_study").addScalar("program_uuid").addScalar("studyType").addScalar("label")
 					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId");
 			query.setParameter("folderId", folderId);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
@@ -234,8 +234,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Integer studyTypeId = (Integer) row[5];
 				final String label = (String) row[6];
 				final String studyTypeName = (String) row[7];
-				final boolean visible = ((Byte) row[9]) == 1;
-				final Integer cvtermId = (Integer) row[10];
+				final boolean visible = ((Byte) row[8]) == 1;
+				final Integer cvtermId = (Integer) row[9];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto));
 			} else {
