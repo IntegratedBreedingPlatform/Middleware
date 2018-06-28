@@ -273,7 +273,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 					+ "WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = 1190 "
 					+ "AND EXISTS ( SELECT 1 " + " 	 FROM phenotype p "
 					+ " 	INNER JOIN nd_experiment_phenotype eph on eph.phenotype_id = p.phenotype_id "
-					+ "     INNER JOIN nd_experiment_project ep on ep.nd_experiment_id = eph.nd_experiment_id "
+					+ "     INNER JOIN nd_experiment ep on ep.nd_experiment_id = eph.nd_experiment_id "
 					+ "     WHERE cvalue_id = v.cvterm_id "
 					+ "       AND ep.project_id not in (SELECT p.project_id FROM project p WHERE p.deleted = 1))");
 			query.setParameter("scaleId", scaleId);

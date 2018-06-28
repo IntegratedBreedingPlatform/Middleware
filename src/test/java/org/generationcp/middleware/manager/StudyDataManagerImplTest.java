@@ -45,7 +45,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -57,6 +56,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -507,22 +511,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Study should have the id " + this.studyReference.getId(), studyDetails.getId(), studyDetails.getId());
 	}
 
-	@Test
-	public void testGetGeolocationIdByProjectIdAndTrialInstanceNumber() {
-		try {
-			final Integer projectId = 25007;
-			final String trialInstanceNumberExpected = "1";
-			final Integer geolocationId =
-					this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumberExpected);
-			if (geolocationId != null) {
-				final String trialInstanceNumberActual = this.manager.getTrialInstanceNumberByGeolocationId(geolocationId);
-				Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
-			}
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Unexpected exception: " + e.getMessage());
-		}
-	}
-
 	@Ignore
 	@Test
 	public void testGetTrialInstanceNumberByGeolocationId() {
@@ -537,49 +525,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	@Ignore
-	public void testSaveGeolocationProperty() throws MiddlewareQueryException {
-		final Integer stdVarId = TermId.EXPERIMENT_DESIGN_FACTOR.getId();
-		final Integer studyId = 25019;
-		final String expDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
-		String newExpDesign = null;
-		if (expDesign != null) {
-			if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
-				newExpDesign = Integer.toString(TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId());
-			} else if (TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
-				newExpDesign = Integer.toString(TermId.RANDOMIZED_COMPLETE_BLOCK.getId());
-			}
-			// update experimental design value
-			final int ndGeolocationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(studyId, "1");
-			this.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, newExpDesign);
-			String actualExpDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
-			Assert.assertEquals(newExpDesign, actualExpDesign);
-			Assert.assertNotEquals(expDesign, actualExpDesign);
-			// revert to previous value
-			this.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, expDesign);
-			actualExpDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
-			Assert.assertEquals(expDesign, actualExpDesign);
-			Assert.assertNotEquals(newExpDesign, actualExpDesign);
-		}
-	}
-
-	@Test
 	public void testGetAllSharedProjectNames() throws MiddlewareQueryException {
 		final List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
 		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
-	}
-
-	@Test
-	public void testCheckIfAnyLocationIDsExistInExperimentsReturnFalse() {
-
-		final Integer locationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(StudyTestDataInitializer.STUDY_ID, "999");
-		final List<Integer> locationIds = new ArrayList<>();
-		locationIds.add(locationId);
-
-		final boolean returnValue =
-				this.manager.checkIfAnyLocationIDsExistInExperiments(StudyTestDataInitializer.STUDY_ID, DataSetType.PLOT_DATA, locationIds);
-
-		Assert.assertFalse("The return value should be false", returnValue);
 	}
 
 	@Test
@@ -623,8 +571,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertTrue(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						""));
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(this.manager
 				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
 						programUUID));
@@ -655,8 +602,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						""));
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(this.manager
 				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
 						programUUID));
@@ -694,22 +640,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
+		experimentModel.setProject(project);
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
-		// Create experimentproject record
-		final ExperimentProject experimentProject = new ExperimentProject();
-		experimentProject.setExperiment(experimentModel);
-		experimentProject.setProjectId(project.getProjectId());
-		experimentProject.setExperimentProjectId(1);
-		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
-		this.manager.getExperimentProjectDao().save(experimentProject);
-
-		Assert.assertTrue(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						""));
-		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						programUUID));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
@@ -745,22 +680,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
+		experimentModel.setProject(project);
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
-		// Create experimentproject record
-		final ExperimentProject experimentProject = new ExperimentProject();
-		experimentProject.setExperiment(experimentModel);
-		experimentProject.setProjectId(project.getProjectId());
-		experimentProject.setExperimentProjectId(1);
-		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
-		this.manager.getExperimentProjectDao().save(experimentProject);
-
-		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						""));
-		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						programUUID));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(
+				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
 
@@ -804,6 +729,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), albaniaLocationId, "1");
 		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), algeriaLocationId, "1");
 
+		this.sessionProvder.getSession().flush();
 		final Map<String, String> result = this.manager.createInstanceLocationIdToNameMapFromStudy(this.studyReference.getId());
 
 		Assert.assertEquals(3, result.size());
