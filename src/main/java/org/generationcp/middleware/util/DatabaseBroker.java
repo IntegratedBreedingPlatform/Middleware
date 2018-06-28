@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -604,6 +605,14 @@ public class DatabaseBroker {
 		final NamingConfigurationDAO namingConfigurationDAO = new NamingConfigurationDAO();
 		namingConfigurationDAO.setSession(this.getActiveSession());
 		return namingConfigurationDAO;
+	}
+
+	public FormulaDAO getFormulaDao() {
+
+		final FormulaDAO formulaDao = new FormulaDAO();
+		formulaDao.setSession(this.getActiveSession());
+		return formulaDao;
+
 	}
 
 

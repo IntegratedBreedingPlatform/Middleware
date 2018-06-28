@@ -1,11 +1,15 @@
 
 package org.generationcp.middleware.domain.ontology;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Extends {@link Term} The Variable with term, property, scale, method.
@@ -31,6 +35,10 @@ public class Variable extends Term {
 	private Method method;
 	private Property property;
 	private Scale scale;
+
+	private Formula formula;
+
+	private List<CVTerm> formulaInputVariables = new ArrayList<>();
 
 	private Boolean isFavorite;
 
@@ -95,6 +103,14 @@ public class Variable extends Term {
 		this.scale = scale;
 	}
 
+	public Formula getFormula() {
+		return formula;
+	}
+
+	public void setFormula(Formula formula) {
+		this.formula = formula;
+	}
+
 	/**
 	 * @return negative value if unknown else the actual number of studies that have used the variable.
 	 */
@@ -157,6 +173,14 @@ public class Variable extends Term {
 		this.hasUsage = hasUsage;
   	}
 
+	public List<CVTerm> getFormulaInputVariables() {
+		return formulaInputVariables;
+	}
+
+	public void addFormulaInputVariables(final List<CVTerm> formulaInputVariables) {
+		this.formulaInputVariables.addAll(formulaInputVariables);
+	}
+
 	@Override
 	public String toString() {
 		return "Variable{" + "alias='" + this.alias + '\'' + ", variableTypes=" + this.variableTypes + ", property=" + this.property
@@ -205,5 +229,10 @@ public class Variable extends Term {
 		if (this.observations != null) {
 			Debug.println(indent + 3, "observations:" + this.observations);
 		}
+
+		if (this.formula != null) {
+			Debug.println(indent + 3, "formula:" + this.formula);
+		}
 	}
+
 }

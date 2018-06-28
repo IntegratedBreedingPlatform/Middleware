@@ -1,19 +1,10 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -38,6 +29,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableInfoDaoElements;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -54,10 +46,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -475,6 +475,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				} else if (property.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
 					variable.getProperty().setCropOntologyId(property.getValue());
 				}
+			}
+
+			// Formula
+			final Formula formula = this.getFormulaDao().getByTargetVariableId(id);
+			if (formula != null) {
+				variable.setFormula(formula);
+				// Add the lazy-loaded Input Variables data to Variable so that it is readily available
+				// the next time it is retrieved from variable cache.
+				variable.addFormulaInputVariables(formula.getInputs());
 			}
 
 			// Variable alias and expected range
