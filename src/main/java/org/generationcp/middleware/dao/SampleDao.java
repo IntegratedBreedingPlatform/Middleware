@@ -90,8 +90,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
 		}
-
-		criteria.setProjection(Projections.rowCount());
+		criteria.createAlias(SAMPLE_PLANT, PLANT)
+				.createAlias("sample.sampleList", "sampleList")
+				.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
+				.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
 	}
 
