@@ -154,7 +154,7 @@ public class ManagerFactory implements Serializable {
 
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.sessionProvider);
+				this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
 	}
 
 	public PresetDataManager getPresetDataManager() {

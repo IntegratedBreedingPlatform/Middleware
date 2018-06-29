@@ -2,8 +2,8 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -20,6 +20,7 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("targetCVTerm.cvTermId", variableId));
+			criteria.setFetchMode("inputs", FetchMode.JOIN);
 
 			formula = (Formula) criteria.uniqueResult();
 

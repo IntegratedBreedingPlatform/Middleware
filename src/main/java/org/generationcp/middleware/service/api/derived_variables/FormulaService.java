@@ -1,12 +1,13 @@
 package org.generationcp.middleware.service.api.derived_variables;
 
-import org.generationcp.middleware.pojos.derived_variables.Formula;
+import com.google.common.base.Optional;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
 
 /**
  * Formula used by Derived Variables
  */
 public interface FormulaService {
 
-	public Formula getByTargetId(Integer targetId);
+	public Optional<FormulaDto> getByTargetId(Integer targetId);
 
 }

@@ -2,6 +2,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
@@ -12,6 +13,8 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -36,6 +39,8 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
+import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
@@ -44,8 +49,10 @@ import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +70,7 @@ import java.util.Set;
  * Implements {@link OntologyVariableDataManagerImpl}
  */
 @Transactional
+@Configurable
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
@@ -81,6 +89,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Autowired
 	private OntologyScaleDataManager scaleManager;
 
+	@Autowired
+	private FormulaService formulaService;
+
 	private static final Logger LOG = LoggerFactory.getLogger(OntologyVariableDataManagerImpl.class);
 
 	public OntologyVariableDataManagerImpl() {
@@ -92,15 +103,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		this.propertyManager = new OntologyPropertyDataManagerImpl(sessionProvider);
 		this.methodManager = new OntologyMethodDataManagerImpl(sessionProvider);
 		this.scaleManager = new OntologyScaleDataManagerImpl(sessionProvider);
+		this.formulaService = new FormulaServiceImpl(sessionProvider);
 	}
 
 	public OntologyVariableDataManagerImpl(final OntologyMethodDataManager methodDataManager,
-			final OntologyPropertyDataManager propertyDataManager, final OntologyScaleDataManager scaleDataManager,
+			final OntologyPropertyDataManager propertyDataManager, final OntologyScaleDataManager scaleDataManager, final FormulaService formulaService,
 			final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		this.methodManager = methodDataManager;
 		this.propertyManager = propertyDataManager;
 		this.scaleManager = scaleDataManager;
+		this.formulaService = formulaService;
 	}
 
 	@Override
@@ -478,12 +491,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Formula
-			final Formula formula = this.getFormulaDao().getByTargetVariableId(id);
-			if (formula != null) {
-				variable.setFormula(formula);
-				// Add the lazy-loaded Input Variables data to Variable so that it is readily available
-				// the next time it is retrieved from variable cache.
-				variable.addFormulaInputVariables(formula.getInputs());
+			final Optional<FormulaDto> formula = this.formulaService.getByTargetId(id);
+			if (formula.isPresent()) {
+				variable.setFormula(formula.get());
 			}
 
 			// Variable alias and expected range

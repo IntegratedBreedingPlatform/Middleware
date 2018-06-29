@@ -36,9 +36,7 @@ public class Variable extends Term {
 	private Property property;
 	private Scale scale;
 
-	private Formula formula;
-
-	private List<CVTerm> formulaInputVariables = new ArrayList<>();
+	private FormulaDto formula;
 
 	private Boolean isFavorite;
 
@@ -103,11 +101,11 @@ public class Variable extends Term {
 		this.scale = scale;
 	}
 
-	public Formula getFormula() {
+	public FormulaDto getFormula() {
 		return formula;
 	}
 
-	public void setFormula(Formula formula) {
+	public void setFormula(FormulaDto formula) {
 		this.formula = formula;
 	}
 
@@ -172,14 +170,6 @@ public class Variable extends Term {
   	public void setHasUsage(Boolean hasUsage) {
 		this.hasUsage = hasUsage;
   	}
-
-	public List<CVTerm> getFormulaInputVariables() {
-		return formulaInputVariables;
-	}
-
-	public void addFormulaInputVariables(final List<CVTerm> formulaInputVariables) {
-		this.formulaInputVariables.addAll(formulaInputVariables);
-	}
 
 	@Override
 	public String toString() {
