@@ -43,6 +43,7 @@ public class FormulaServiceImpl implements FormulaService {
 		final FormulaDto formulaDto = new FormulaDto();
 
 		formulaDto.setName(formula.getName());
+		formulaDto.setTargetTermId(formula.getTargetCVTerm().getCvTermId());
 		formulaDto.setFormulaId(formula.getFormulaId());
 		formulaDto.setDefinition(formula.getDefinition());
 		formulaDto.setDescription(formula.getDescription());
