@@ -241,7 +241,7 @@ public class PhenotypeSaver extends Saver {
 			}
 			this.getPhenotypeDao().saveOrUpdate(phenotype);
 			if (isInsert) {
-				int experimentId = this.getExperimentProjectDao().getExperimentIdByProjectId(projectId);
+				int experimentId = this.getExperimentDao().getExperimentIdByProjectId(projectId);
 				this.saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
 			}
 		}

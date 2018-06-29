@@ -83,10 +83,8 @@ public class ExperimentModel implements Serializable {
 	@BatchSize(size = 5000)
 	private List<ExperimentProperty> properties;
 
-	@ManyToOne
-	@JoinTable(name = "nd_experiment_project",
-	joinColumns = {@JoinColumn(name = "nd_experiment_id", insertable = false, updatable = false)},
-	inverseJoinColumns = {@JoinColumn(name = "project_id", insertable = false, updatable = false)})
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project_id")
 	private DmsProject project;
 
 	//FIXME Should this not be a OneToOne? Can one experiment have multiple stock (germplasm) rows?

@@ -11,13 +11,9 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.base.Strings;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -29,7 +25,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -40,8 +35,11 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ExperimentBuilder extends Builder {
 	
@@ -52,36 +50,36 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	public long count(int dataSetId) throws MiddlewareQueryException {
-		return this.getExperimentProjectDao().count(dataSetId);
+		return this.getExperimentDao().count(dataSetId);
 	}
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes)
 			throws MiddlewareQueryException {
 		final List<Experiment> experiments = new ArrayList<>();
-		final List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
-		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
-		for (final ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+		final List<ExperimentModel> experimentModels =
+				this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
+		for (final ExperimentModel experimentModel : experimentModels) {
+			experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap));
 		}
 		return experiments;
 	}
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes,
 			boolean hasVariableType) throws MiddlewareQueryException {
-		List<Experiment> experiments = new ArrayList<>();
-		List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
-		for (ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
+		final List<Experiment> experiments = new ArrayList<>();
+		final List<ExperimentModel> experimentModels =
+				this.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
+		for (final ExperimentModel experimentModel : experimentModels) {
+			experiments.add(this.createExperiment(experimentModel, variableTypes, hasVariableType));
 		}
 		return experiments;
 	}
 
-	private Map<Integer, StockModel> getStockModelMap(List<ExperimentProject> experimentProjects) throws MiddlewareQueryException {
+	private Map<Integer, StockModel> getStockModelMap(List<ExperimentModel> experimentModels) throws MiddlewareQueryException {
 		final Map<Integer, StockModel> stockModelMap = new HashMap<>();
-		for (final ExperimentProject experimentProject : experimentProjects) {
-			List<ExperimentStock> experimentStocks = experimentProject.getExperiment().getExperimentStocks();
+		for (final ExperimentModel experimentModel : experimentModels) {
+			List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
 			if (experimentStocks != null && experimentStocks.size() == 1) {
 				StockModel stock = experimentStocks.get(0).getStock();
 				Integer stockId = stock.getStockId();
@@ -95,10 +93,15 @@ public class ExperimentBuilder extends Builder {
 		throws MiddlewareQueryException {
 		Monitor monitor = MonitorFactory.start("Build Experiments");
 		try {
+			final List<Experiment> experiments = new ArrayList<>();
+			final List<ExperimentModel> experimentModels =
+					this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, false);
+			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
+			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
 
-			final List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows, false);
-			final List<Experiment> experiments = buildExperiment(experimentProjects, variableTypes);
+			for (final ExperimentModel experimentModel : experimentModels) {
+				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap));
+			}
 			return experiments;
 		} finally {
 			LOG.debug("" + monitor.stop());
@@ -106,29 +109,23 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	public List<Experiment> build(final int projectId, final List<TermId> types, final int start, final int numOfRows,
-		final VariableTypeList variableTypes, final boolean firstInstance) throws MiddlewareQueryException {
+			final VariableTypeList variableTypes, final boolean firstInstance) throws MiddlewareQueryException {
 		Monitor monitor = MonitorFactory.start("Build Experiments");
 		try {
-			final List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows, firstInstance);
-			final List<Experiment> experiments = buildExperiment(experimentProjects, variableTypes);
+			final List<Experiment> experiments = new ArrayList<>();
 
+			final List<ExperimentModel> experimentModels =
+					this.getExperimentDao().getExperiments(projectId, types, start, numOfRows, firstInstance);
+			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
+			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
+
+			for (final ExperimentModel experimentModel : experimentModels) {
+				experiments.add(this.createExperiment(experimentModel, variableTypes, stockModelMap));
+			}
 			return experiments;
 		} finally {
 			LOG.debug("" + monitor.stop());
 		}
-	}
-
-	private List<Experiment> buildExperiment(final List<ExperimentProject> experimentProjects, final VariableTypeList variableTypes) {
-		final List<Experiment> experiments = new ArrayList<>();
-
-		// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
-		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
-
-		for (final ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
-		}
-		return experiments;
 	}
 
 	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes) throws MiddlewareQueryException {
