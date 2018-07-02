@@ -430,6 +430,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareQueryException("Error in getAllVariables", e);
 		}
 
+		final List<FormulaDto> formulaDtoList = this.formulaService.getByTargetIds(map.keySet());
+		for (final FormulaDto formulaDto : formulaDtoList) {
+			map.get(formulaDto.getTargetTermId()).setFormula(formulaDto);
+		}
+
 		final List<Variable> variables = new ArrayList<>(map.values());
 
 		// sort variable list by variable name

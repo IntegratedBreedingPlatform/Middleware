@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Transactional
 @Service
@@ -37,6 +38,17 @@ public class FormulaServiceImpl implements FormulaService {
 			return Optional.of(convertToFormulaDto(formula));
 		}
 		return Optional.absent();
+	}
+
+	@Override
+	public List<FormulaDto> getByTargetIds(final Set<Integer> variableIds) {
+
+		final List<FormulaDto> formulaDtos = new ArrayList<>();
+		final List<Formula> formulas = this.getFormulaDAO().getByTargetVariableIds(variableIds);
+		for (final Formula formula : formulas) {
+			formulaDtos.add(convertToFormulaDto(formula));
+		}
+		return formulaDtos;
 	}
 
 	protected FormulaDto convertToFormulaDto(final Formula formula) {
