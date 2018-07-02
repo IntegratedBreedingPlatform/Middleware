@@ -23,7 +23,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -93,21 +92,19 @@ public class ExperimentModel implements Serializable {
 	@BatchSize(size = 5000)
 	private List<ExperimentStock> experimentStocks;
 
-	@OneToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "nd_experiment_phenotype", joinColumns = @JoinColumn(name = "nd_experiment_id"), inverseJoinColumns = @JoinColumn(
-			name = "phenotype_id"))
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 5000)
 	private List<Phenotype> phenotypes;
 
 	public ExperimentModel() {
 	}
 
-	public ExperimentModel(Integer ndExperimentId) {
+	public ExperimentModel(final Integer ndExperimentId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
 	}
 
-	public ExperimentModel(Integer ndExperimentId, Geolocation geoLocation, Integer typeId) {
+	public ExperimentModel(final Integer ndExperimentId, final Geolocation geoLocation, final Integer typeId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
 		this.geoLocation = geoLocation;
@@ -118,7 +115,7 @@ public class ExperimentModel implements Serializable {
 		return this.ndExperimentId;
 	}
 
-	public void setNdExperimentId(Integer ndExperimentId) {
+	public void setNdExperimentId(final Integer ndExperimentId) {
 		this.ndExperimentId = ndExperimentId;
 	}
 
@@ -126,7 +123,7 @@ public class ExperimentModel implements Serializable {
 		return this.geoLocation;
 	}
 
-	public void setGeoLocation(Geolocation geoLocation) {
+	public void setGeoLocation(final Geolocation geoLocation) {
 		this.geoLocation = geoLocation;
 	}
 
@@ -134,7 +131,7 @@ public class ExperimentModel implements Serializable {
 		return this.typeId;
 	}
 
-	public void setTypeId(Integer typeId) {
+	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -142,7 +139,7 @@ public class ExperimentModel implements Serializable {
 		return this.properties;
 	}
 
-	public void setProperties(List<ExperimentProperty> properties) {
+	public void setProperties(final List<ExperimentProperty> properties) {
 		this.properties = properties;
 	}
 
@@ -150,7 +147,7 @@ public class ExperimentModel implements Serializable {
 		return this.project;
 	}
 
-	public void setProject(DmsProject project) {
+	public void setProject(final DmsProject project) {
 		this.project = project;
 	}
 
@@ -158,7 +155,7 @@ public class ExperimentModel implements Serializable {
 		return this.experimentStocks;
 	}
 
-	public void setExperimentStocks(List<ExperimentStock> experimentStocks) {
+	public void setExperimentStocks(final List<ExperimentStock> experimentStocks) {
 		this.experimentStocks = experimentStocks;
 	}
 
@@ -166,11 +163,11 @@ public class ExperimentModel implements Serializable {
 		return this.phenotypes;
 	}
 
-	public void setPhenotypes(List<Phenotype> phenotypes) {
+	public void setPhenotypes(final List<Phenotype> phenotypes) {
 		this.phenotypes = phenotypes;
 	}
 
-	public void setPlotId(String plotId) {
+	public void setPlotId(final String plotId) {
 		this.plotId = plotId;
 	}
 
@@ -189,7 +186,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -199,7 +196,7 @@ public class ExperimentModel implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		ExperimentModel other = (ExperimentModel) obj;
+		final ExperimentModel other = (ExperimentModel) obj;
 		if (this.geoLocation == null) {
 			if (other.geoLocation != null) {
 				return false;
@@ -226,7 +223,7 @@ public class ExperimentModel implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Experiment [ndExperimentId=");
 		builder.append(this.ndExperimentId);
 		builder.append(", geoLocationId=");
