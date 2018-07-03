@@ -1215,4 +1215,29 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return null;
 
 	}
+
+	/**
+	 * Returns list of root or top-level folders and studies.
+	 *
+	 * @param programUUID program's unique id
+	 * @param studyTypeId
+	 * @return List of Folder POJOs or empty list if none found
+	 */
+	@Override
+	public List<Reference> getRootFoldersByStudyType(final String programUUID, final Integer studyTypeId) {
+		return this.getDmsProjectDao().getRootFoldersByStudyType(programUUID, studyTypeId);
+	}
+
+	/**
+	 * Returns list of children of a folder given its ID.
+	 *
+	 * @param folderId    The id of the folder to match
+	 * @param programUUID unique id of the program
+	 * @param studyTypeId
+	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
+	 */
+	@Override
+	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
+		return this.getDmsProjectDao().getChildrenOfFolderByStudyType(folderId, programUUID, studyTypeId);
+	}
 }

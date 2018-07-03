@@ -96,8 +96,7 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 
 	@Override
 	public String toString() {
-		return "StudyTypeDto{" + "id=" + id + ", label='" + label + '\'' + ", name='" + name + '\'' + ", cvTermId=" + cvTermId
-			+ ", visible=" + visible + '}';
+		return this.getLabel();
 	}
 
 	@Override

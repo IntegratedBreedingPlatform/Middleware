@@ -6,8 +6,10 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.type.Type;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +39,8 @@ public class DmsProjectDaoTest {
 		this.mockQuery = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER)).thenReturn(this.mockQuery);
 		Mockito.when(this.mockQuery.addScalar(Mockito.anyString())).thenReturn(this.mockQuery);
+		Mockito.when(this.mockQuery.addScalar(Mockito.anyString(), Mockito.any(Type.class))).thenReturn(this.mockQuery);
+
 	}
 
 	/**
@@ -55,12 +59,12 @@ public class DmsProjectDaoTest {
 		mockQueryResult.add(mockDBRow2);
 
 		final Object[] mockDBRow3 =
-			new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, 1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME, null,
+			new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, 1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME,
 				Byte.valueOf("1"), 1};
 		mockQueryResult.add(mockDBRow3);
 
 		final Object[] mockDBRow4 =
-			new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, 2, StudyTypeDto.TRIAL_LABEL, StudyTypeDto.TRIAL_NAME, null,
+			new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, 2, StudyTypeDto.TRIAL_LABEL, StudyTypeDto.TRIAL_NAME,
 				Byte.valueOf("1"), 1};
 		mockQueryResult.add(mockDBRow4);
 

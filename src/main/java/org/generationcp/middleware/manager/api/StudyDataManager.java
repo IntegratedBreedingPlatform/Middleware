@@ -825,4 +825,21 @@ public interface StudyDataManager {
 
 	StudyTypeDto getStudyTypeByStudyId(Integer studyIdentifier);
 
+	/**
+	 * Returns list of root or top-level folders and studies.
+	 *
+	 * @param programUUID program's unique id
+	 * @return List of Folder POJOs or empty list if none found
+	 */
+	List<Reference> getRootFoldersByStudyType(String programUUID, Integer studyTypeId);
+
+	/**
+	 * Returns list of children of a folder given its ID.
+	 *
+	 * @param folderId    The id of the folder to match
+	 * @param programUUID unique id of the program
+	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
+	 */
+	List<Reference> getChildrenOfFolderByStudyType(int folderId, String programUUID, Integer studyTypeId);
+
 }
