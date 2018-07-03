@@ -813,4 +813,25 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testGetRootFoldersByStudyType() throws Exception {
+		final List<Reference> rootFolders = this.manager.getRootFoldersByStudyType(this.commonTestProject.getUniqueID(), null);
+		Assert.assertNotNull(rootFolders);
+		Assert.assertFalse("Root folders should not be empty because it contains the templates for Studies.", rootFolders.isEmpty());
+	}
+
+	@Test
+	public void testGetChildrenOfFolderByStudyType() throws Exception {
+
+		final String uniqueId = this.commonTestProject.getUniqueID();
+		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
+		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
+
+		final List<Reference> childrenNodes =
+				this.manager.getChildrenOfFolderByStudyType(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), null);
+		Assert.assertNotNull(childrenNodes);
+		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
+		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
+	}
+
 }
