@@ -168,7 +168,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ")
 			.append(TermId.TRIAL_LOCATION.getId())
 			.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ")
-			.append(TermId.SEASON_VAR_TEXT.getId()).append(" INNER JOIN study_type st ON p.study_type = st.study_type_id ")
+			.append(TermId.SEASON_VAR_TEXT.getId()).append(" INNER JOIN study_type st ON p.study_type_id = st.study_type_id ")
 			.append(" WHERE p.deleted = 0");
 
 		if (!StringUtils.isEmpty(serchParameters.getProgramUniqueId())) {
