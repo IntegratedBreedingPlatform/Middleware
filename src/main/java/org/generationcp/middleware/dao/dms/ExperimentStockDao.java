@@ -76,8 +76,7 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(sql);
 		if (programUUID != null) {
-			sb.append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ");
-			sb.append("INNER JOIN project p ON p.project_id = ep.project_id and p.program_uuid = :programUUID ");
+			sb.append("INNER JOIN project p ON p.project_id = e.project_id and p.program_uuid = :programUUID ");
 		}
 		sb.append(" ORDER BY s.dbxref_id ");
 		try {
@@ -112,9 +111,9 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 	public long countStocksByDatasetId(final int datasetId) {
 
 		final StringBuilder sql = new StringBuilder();
-		sql.append("SELECT COUNT(DISTINCT es.stock_id) FROM nd_experiment_project ep ")
-				.append(" INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = ep.nd_experiment_id ")
-				.append(" WHERE ep.project_id = :datasetId");
+		sql.append("SELECT COUNT(DISTINCT es.stock_id) FROM nd_experiment e ")
+				.append(" INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ")
+				.append(" WHERE e.project_id = :datasetId");
 
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());

@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
@@ -20,6 +21,7 @@ import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -51,6 +53,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private StockDao stockDao;
 	private ExperimentStockDao experimentStockDao;
 	private PersonDAO personDAO;
+	private DmsProjectDao dmsProjectDao;
 
 	private Integer listId;
 
@@ -82,6 +85,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.personDAO = new PersonDAO();
 		this.personDAO.setSession(this.sessionProvder.getSession());
+
+		this.dmsProjectDao = new DmsProjectDao();
+		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 
 		this.listId = this.createSampleListForFilter("TEST-LIST-FOR-SAMPLE-DAO-1");
 	}
@@ -162,6 +168,11 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 	private Integer createSampleListForFilter(final String listName) {
 
+		final DmsProject project = new DmsProject();
+		project.setName("Test Project");
+		project.setDescription("Test Project");
+		dmsProjectDao.save(project);
+
 		User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
 		if (user == null) {
 			// FIXME fresh db doesn't have admin user in crop. BMS-886
@@ -190,6 +201,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setPlotId("PLOT-ID" + i);
+			experimentModel.setProject(project);
 			experimentDao.saveOrUpdate(experimentModel);
 
 			final StockModel stockModel = new StockModel();

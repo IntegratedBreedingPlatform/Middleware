@@ -32,7 +32,7 @@ public class StudySaver extends Saver {
 
 	/**
 	 * Saves a study. Creates an entry in project, projectprop and project_relationship tables (default) Creates an entry in nd_experiment
-	 * and nd_experiment_project tables if saveStudyExperiment is true.
+	 * table if saveStudyExperiment is true.
 	 */
 	public DmsProject saveStudy(final int parentId, final VariableTypeList variableTypeList, final StudyValues studyValues, final boolean saveStudyExperiment,
 		final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description, final String startDate,
@@ -54,7 +54,7 @@ public class StudySaver extends Saver {
 	}
 
 	/**
-	 * Creates an entry in nd_experiment and nd_experiment_project tables if saveStudyExperiment is true.
+	 * Creates an entry in nd_experiment table if saveStudyExperiment is true.
 	 */
 	public void saveStudyExperiment(final int projectId, final StudyValues values, final String cropPrefix) throws Exception {
 		try {

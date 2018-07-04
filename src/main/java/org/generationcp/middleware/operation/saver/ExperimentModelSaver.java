@@ -20,8 +20,8 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -42,13 +42,12 @@ public class ExperimentModelSaver extends Saver {
 		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
 
 		this.getExperimentDao().save(experimentModel);
-		this.addExperimentProject(experimentModel, projectId);
 		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 	}
 
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) {
 		int experimentId =
-				this.getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
+				this.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
 
 		// update if existing
@@ -79,7 +78,6 @@ public class ExperimentModelSaver extends Saver {
 			ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
 
 			this.getExperimentDao().save(experimentModel);
-			this.addExperimentProject(experimentModel, projectId);
 			this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 		}
 	}
@@ -104,6 +102,9 @@ public class ExperimentModelSaver extends Saver {
 
 	private ExperimentModel create(int projectId, Values values, TermId expType, String cropPrefix) {
 		ExperimentModel experimentModel = new ExperimentModel();
+		final DmsProject project = new DmsProject();
+		project.setProjectId(projectId);
+		experimentModel.setProject(project);
 		experimentModel.setTypeId(expType.getId());
 		experimentModel.setProperties(this.createTrialDesignExperimentProperties(experimentModel, values.getVariableList()));
 
@@ -173,14 +174,6 @@ public class ExperimentModelSaver extends Saver {
 		experimentProperty.setRank(variable.getVariableType().getRank());
 
 		return experimentProperty;
-	}
-
-
-	private void addExperimentProject(ExperimentModel experimentModel, int projectId) {
-		ExperimentProject exproj = new ExperimentProject();
-		exproj.setProjectId(projectId);
-		exproj.setExperiment(experimentModel);
-		this.getExperimentProjectDao().save(exproj);
 	}
 
 	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) {

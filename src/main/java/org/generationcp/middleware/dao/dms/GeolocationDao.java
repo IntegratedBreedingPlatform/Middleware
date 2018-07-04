@@ -59,8 +59,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			+ " INNER JOIN nd_experiment e on e.nd_geolocation_id = gp.nd_geolocation_id "
 			+ "       AND e.nd_experiment_id = " + "		( " + "			SELECT MIN(nd_experiment_id) "
 			+ "			  FROM nd_experiment min" + "			 WHERE min.nd_geolocation_id = gp.nd_geolocation_id"
-			+ "		) " + " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id"
-			+ " INNER JOIN project_relationship pr ON (pr.object_project_id = ep.project_id OR pr.subject_project_id = ep.project_id) "
+			+ "		) "
+			+ " INNER JOIN project_relationship pr ON (pr.object_project_id = e.project_id OR pr.subject_project_id = e.project_id) "
 			+ "		AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
 			+ " INNER JOIN project p ON p.project_id = pr.object_project_id "
 			+ "  LEFT JOIN location l ON l.locid = gp.value " + "  LEFT JOIN location prov ON prov.locid = l.snl1id "
@@ -70,9 +70,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		try {
 			final String sql = "SELECT DISTINCT g.*" + " FROM nd_geolocation g"
 					+ " INNER JOIN nd_experiment se ON se.nd_geolocation_id = g.nd_geolocation_id"
-					+ " INNER JOIN nd_experiment_project sep ON sep.nd_experiment_id = se.nd_experiment_id"
 					+ " INNER JOIN project_relationship pr ON pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-					+ " AND pr.object_project_id = sep.project_id AND pr.subject_project_id = :projectId";
+					+ " AND pr.object_project_id = se.project_id AND pr.subject_project_id = :projectId";
 			final Query query = this.getSession().createSQLQuery(sql).addEntity(this.getPersistentClass())
 					.setParameter("projectId", projectId);
 			return (Geolocation) query.uniqueResult();
@@ -91,8 +90,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		try {
 
 			final String sql = "SELECT DISTINCT e.nd_geolocation_id" + " FROM nd_experiment e"
-					+ " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id"
-					+ " WHERE ep.project_id = :projectId ORDER BY e.nd_geolocation_id";
+					+ " WHERE e.project_id = :projectId ORDER BY e.nd_geolocation_id";
 			final Query query = this.getSession().createSQLQuery(sql).setParameter("projectId", datasetId);
 			final List<Integer> ids = query.list();
 			for (final Integer id : ids) {
@@ -135,8 +133,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		final Set<Integer> locationIds = new HashSet<>();
 		try {
 			final String sql = "SELECT DISTINCT e.nd_geolocation_id"
-					+ " FROM nd_experiment e, nd_experiment_project ep "
-					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id " + "   and ep.project_id = " + projectId;
+					+ " FROM nd_experiment e "
+					+ " WHERE e.project_id = " + projectId;
 			final Query query = this.getSession().createSQLQuery(sql);
 			locationIds.addAll(query.list());
 
@@ -303,8 +301,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ "	LEFT JOIN location l ON l.locid = gp.value "
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id "
 					+ "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
-					+ "	INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
-					+ "	INNER JOIN project_relationship pr ON pr.subject_project_id = ep.project_id AND pr.type_id = "
+					+ "	INNER JOIN project_relationship pr ON pr.subject_project_id = e.project_id AND pr.type_id = "
 					+ TermId.BELONGS_TO_STUDY.getId() + " "
 					+ "	INNER JOIN project p ON p.project_id = pr.object_project_id ";
 
@@ -394,8 +391,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " FROM project p"
 					+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = "
 					+ TermId.BELONGS_TO_STUDY.getId()
-					+ " INNER JOIN nd_experiment_project ep ON (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id)"
-					+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id"
+					+ " INNER JOIN nd_experiment e ON (e.project_id = p.project_id OR e.project_id = pr.subject_project_id)"
 					+ " INNER JOIN nd_experiment_phenotype eph ON eph.nd_experiment_id = e.nd_experiment_id"
 					+ " INNER JOIN phenotype ph ON eph.phenotype_id = ph.phenotype_id"
 					+ " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
@@ -435,14 +431,13 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			final String locationDescription, final String programUUID) {
 		try {
 			final String sql = "SELECT DISTINCT e.nd_geolocation_id"
-					+ " FROM nd_experiment e, nd_experiment_project ep, project p, nd_geolocation g, project_relationship pr "
-					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id "
-					+ "   and ep.project_id = pr.subject_project_id " + "   and pr.type_id = "
+					+ " FROM nd_experiment e, project p, nd_geolocation g, project_relationship pr "
+					+ " WHERE e.project_id = pr.subject_project_id " + "   and pr.type_id = "
 					+ TermId.BELONGS_TO_STUDY.getId()
-					// link to the dataset instead
-					+ "   and pr.object_project_id = p.project_id "
-					+ "   and e.nd_geolocation_id = g.nd_geolocation_id " + "   and p.name = :projectName"
-					+ "   and p.program_uuid = :programUUID" + "   and g.description = :locationDescription";
+				// link to the dataset instead
+				+ "   and pr.object_project_id = p.project_id "
+				+ "   and e.nd_geolocation_id = g.nd_geolocation_id " + "   and p.name = :projectName"
+				+ "   and p.program_uuid = :programUUID" + "   and g.description = :locationDescription";
 			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameter("projectName", projectName);
 			query.setParameter("locationDescription", locationDescription);
@@ -597,8 +592,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 				+ "    max(if(geoprop.type_id = 8370, geoprop.value, null)) as CROP_SEASON \n" + " from  \n"
 				+ " nd_geolocation geoloc \n"
 				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
-				+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    inner join project_relationship pr on proj.project_id = pr.subject_project_id \n"
 				+ "    inner join project pmain on pmain.project_id = pr.object_project_id and pr.type_id = 1150 \n"
 				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
@@ -651,8 +645,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 				final String sql = "SELECT g.* " + //
 						" FROM nd_geolocation g " + //
 						" INNER JOIN nd_experiment exp ON (exp.nd_geolocation_id = g.nd_geolocation_id) " + //
-						" INNER JOIN nd_experiment_project ndproj ON (ndproj.nd_experiment_id = exp.nd_experiment_id) " + //
-						" INNER JOIN project_relationship pr ON (pr.subject_project_id = ndproj.project_id) " + //
+						" INNER JOIN project_relationship pr ON (pr.subject_project_id = exp.project_id) " + //
 						" INNER JOIN project envdataset on (envdataset.project_id = pr.subject_project_id) " + //
 						" WHERE pr.object_project_id = :studyId and envdataset.name like '%-ENVIRONMENT' ";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);

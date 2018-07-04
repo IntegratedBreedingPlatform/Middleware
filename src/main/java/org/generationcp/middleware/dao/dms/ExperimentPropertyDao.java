@@ -70,11 +70,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final StringBuilder sql =
 					new StringBuilder()
 							.append(" SELECT ")
-							.append(" eproj.project_id AS datasetId ")
+							.append(" nde.project_id AS datasetId ")
 							.append(" , proj.name AS datasetName ")
 							.append(" , geo.nd_geolocation_id AS geolocationId ")
 							.append(" , site.value AS siteName ")
-							.append(" , eproj.nd_experiment_id AS experimentId ")
+							.append(" , nde.nd_experiment_id AS experimentId ")
 							.append(" , s.uniqueName AS entryNumber ")
 							.append(" , s.name AS germplasmName ")
 							.append(" , epropRep.value AS rep ")
@@ -94,29 +94,29 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , ldp.group_name AS pedigree ")
 							.append (" , geo.plot_id as plotId ")
 							.append(" FROM ")
-							.append(" nd_experiment_project eproj ")
+							.append(" nd_experiment nde ")
 							.append(" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ")
 							.append(TermId.BELONGS_TO_STUDY.getId())
 							.append(" INNER JOIN project st ON st.project_id = pr.object_project_id ")
-							.append(" INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
-							.append("       AND eproj.project_id = pr.subject_project_id ")
+							.append(" INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id  ")
+							.append("       AND nde.project_id = pr.subject_project_id ")
 							.append(" INNER JOIN stock s ON es.stock_id = s.stock_id ")
-							.append(" LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id ")
+							.append(" LEFT JOIN nd_experimentprop epropRep ON nde.nd_experiment_id = epropRep.nd_experiment_id ")
 							.append("       AND epropRep.type_id =  " + TermId.REP_NO.getId()
-									+ "  AND eproj.project_id = pr.subject_project_id ")
+									+ "  AND nde.project_id = pr.subject_project_id ")
 							// 8210
 							.append("       AND epropRep.value IS NOT NULL  AND epropRep.value <> '' ")
-							.append(" LEFT JOIN nd_experimentprop epropBlock ON eproj.nd_experiment_id = epropBlock.nd_experiment_id ")
+							.append(" LEFT JOIN nd_experimentprop epropBlock ON nde.nd_experiment_id = epropBlock.nd_experiment_id ")
 							.append("       AND epropBlock.type_id =  " + TermId.BLOCK_NO.getId()
-									+ "  AND eproj.project_id = pr.subject_project_id ")
+									+ "  AND nde.project_id = pr.subject_project_id ")
 							// 8220
 							.append("       AND epropBlock.value IS NOT NULL  AND epropBlock.value <> '' ")
-							.append(" INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id ")
+							.append(" INNER JOIN nd_experimentprop epropPlot ON nde.nd_experiment_id = epropPlot.nd_experiment_id ")
 							.append("       AND epropPlot.type_id IN (" + TermId.PLOT_NO.getId() + ", " + TermId.PLOT_NNO.getId() + ")  ")
 							// 8200, 8380
-							.append("       AND eproj.project_id = pr.subject_project_id ")
+							.append("       AND nde.project_id = pr.subject_project_id ")
 							.append("       AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
-							.append(" INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id ")
+							.append(" INNER JOIN nd_experiment geo ON nde.nd_experiment_id = geo.nd_experiment_id ")
 							.append("       AND geo.type_id = ").append(TermId.PLOT_EXPERIMENT.getId())
 							.append(" INNER JOIN nd_geolocation inst ON geo.nd_geolocation_id = inst.nd_geolocation_id ")
 							.append(" LEFT JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
@@ -125,16 +125,16 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("    AND siteId.type_id = ").append(TermId.LOCATION_ID.getId())
 							.append(" LEFT JOIN nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ")
 							.append("       AND blk.type_id = ").append(TermId.BLOCK_ID.getId())
-							.append(" INNER JOIN project proj on proj.project_id = eproj.project_id ")
-							.append(" LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = eproj.nd_experiment_id ")
+							.append(" INNER JOIN project proj on proj.project_id = nde.project_id ")
+							.append(" LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = nde.nd_experiment_id ")
 							.append("       AND row.type_id = ").append(TermId.RANGE_NO.getId())
-							.append(" LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = eproj.nd_experiment_id ")
+							.append(" LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = nde.nd_experiment_id ")
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
 							.append(" LEFT JOIN listnms lnms ON lnms.projectid = pr.object_project_id AND lnms.listtype in ('STUDY')")
 							.append(" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id")
-							.append(" ORDER BY casted_trialInstance, inst.description, eproj.nd_experiment_id ").append(order);
+							.append(" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ").append(order);
 
 			final Query query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName")
@@ -178,8 +178,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" FROM ").append("  nd_geolocationprop blk ")
 							.append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ")
 							.append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
-							.append("  INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = e.nd_experiment_id ")
-							.append("  INNER JOIN project p ON p.project_id = eproj.project_id ")
+							.append("  INNER JOIN project p ON p.project_id = e.project_id ")
 							.append("  INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id ")
 							.append("     AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
 							.append("  INNER JOIN project st ON st.project_id = pr.object_project_id ")
@@ -210,11 +209,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
 						.append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
 						.append(" AND bexp.nd_geolocation_id = :geolocationId ")
-						.append(" INNER JOIN nd_experiment_project bep ON bep.nd_experiment_id = bexp.nd_experiment_id ")
-						.append(" AND bep.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
+						.append(" AND bexp.project_id = :datasetId ").append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId())
 						.append(")");
 			}
-			sql.append(" ORDER BY eproj.nd_experiment_id ").append(order);
+			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
 
 			final Query query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
@@ -248,9 +246,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			final StringBuilder sql =
 					new StringBuilder().append("SELECT COUNT(eprop.nd_experimentprop_id) ").append("FROM nd_experiment e ")
-							.append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
 							.append("INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id ")
-							.append("WHERE ep.project_id = ").append(datasetId).append(" AND eprop.type_id NOT IN (")
+							.append("WHERE e.project_id = ").append(datasetId).append(" AND eprop.type_id NOT IN (")
 							.append(nonEditableFactors).append(")");
 			final Query query = this.getSession().createSQLQuery(sql.toString());
 
@@ -491,10 +488,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final StringBuilder sql =
 					new StringBuilder().append("SELECT DISTINCT levelprop.value level_value, ep.value ")
 							.append(" FROM nd_experimentprop ep ")
-							.append(" INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = ep.nd_experiment_id ")
-							.append("   AND eproj.project_id = ").append(measurementDatasetId)
 							.append(" INNER JOIN nd_experimentprop levelprop ON levelprop.nd_experiment_id = ep.nd_experiment_id ")
 							.append("   AND levelprop.type_id = ").append(levelId).append(" WHERE ep.type_id = ").append(amountId)
+							.append("   AND ep.project_id = ").append(measurementDatasetId)
 							.append(" ORDER BY CAST(levelprop.value AS UNSIGNED) ");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
@@ -526,8 +522,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final StringBuilder sql =
 					new StringBuilder().append("DELETE FROM nd_experimentprop ").append(" WHERE nd_experiment_id IN ( ")
 							.append(" SELECT e.nd_experiment_id ").append(" FROM nd_experiment e ")
-							.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
-							.append(" AND ep.project_id = ").append(projectId);
+							.append(" AND e.project_id = ").append(projectId);
 			sql.append(") ").append(" AND type_id =").append(termId);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());

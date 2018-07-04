@@ -962,7 +962,7 @@ public class WorkbookSaver extends Saver {
 
 	/**
 	 * Saves experiments creating entries in the following tables:
-	 * nd_geolocation, nd_geolocationprop, nd_experiment, nd_experiment_project,
+	 * nd_geolocation, nd_geolocationprop, nd_experiment,
 	 * nd_experimentprop nd_experiment_stock, stock, stockprop,
 	 * nd_experiment_phenotype and phenotype
 	 *
@@ -1076,7 +1076,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private boolean checkIfHasExistingStudyExperiment(final int studyId) {
-		final Integer experimentId = this.getExperimentProjectDao().getExperimentIdByProjectId(studyId);
+		final Integer experimentId = this.getExperimentDao().getExperimentIdByProjectId(studyId);
 		return experimentId != null;
 	}
 
