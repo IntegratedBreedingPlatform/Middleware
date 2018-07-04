@@ -11,16 +11,18 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_phenotype
@@ -38,8 +40,7 @@ public class Phenotype implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
-	pkColumnValue = "phenotype", allocationSize = 500)
+	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value", pkColumnValue = "phenotype", allocationSize = 500)
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "phenotypeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "phenotype_id")
@@ -70,11 +71,15 @@ public class Phenotype implements Serializable {
 	@Column(name = "assay_id")
 	private Integer assayId;
 
+	@ManyToOne
+	@JoinColumn(name = "nd_experiment_id", nullable = false)
+	private ExperimentModel experiment;
+
 	public Phenotype() {
 	}
 
-	public Phenotype(Integer phenotypeId, String uniqueName, String name, Integer observableId, Integer attributeId, String value,
-			Integer cValueId, Integer assayId) {
+	public Phenotype(final Integer phenotypeId, final String uniqueName, final String name, final Integer observableId,
+		final Integer attributeId, final String value, final Integer cValueId, final Integer assayId) {
 		this.phenotypeId = phenotypeId;
 		this.uniqueName = uniqueName;
 		this.name = name;
@@ -89,7 +94,7 @@ public class Phenotype implements Serializable {
 		return this.phenotypeId;
 	}
 
-	public void setPhenotypeId(Integer phenotypeId) {
+	public void setPhenotypeId(final Integer phenotypeId) {
 		this.phenotypeId = phenotypeId;
 	}
 
@@ -97,7 +102,7 @@ public class Phenotype implements Serializable {
 		return this.uniqueName;
 	}
 
-	public void setUniqueName(String uniqueName) {
+	public void setUniqueName(final String uniqueName) {
 		this.uniqueName = uniqueName;
 	}
 
@@ -105,7 +110,7 @@ public class Phenotype implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -113,7 +118,7 @@ public class Phenotype implements Serializable {
 		return this.observableId;
 	}
 
-	public void setObservableId(Integer observableId) {
+	public void setObservableId(final Integer observableId) {
 		this.observableId = observableId;
 	}
 
@@ -121,7 +126,7 @@ public class Phenotype implements Serializable {
 		return this.attributeId;
 	}
 
-	public void setAttributeId(Integer attributeId) {
+	public void setAttributeId(final Integer attributeId) {
 		this.attributeId = attributeId;
 	}
 
@@ -129,7 +134,7 @@ public class Phenotype implements Serializable {
 		return this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -137,7 +142,7 @@ public class Phenotype implements Serializable {
 		return this.cValueId;
 	}
 
-	public void setcValue(Integer cValueId) {
+	public void setcValue(final Integer cValueId) {
 		this.cValueId = cValueId;
 	}
 
@@ -145,117 +150,43 @@ public class Phenotype implements Serializable {
 		return this.assayId;
 	}
 
-	public void setAssayId(Integer assayId) {
+	public void setAssayId(final Integer assayId) {
 		this.assayId = assayId;
+	}
+
+	public ExperimentModel getExperiment() {
+		return experiment;
+	}
+
+	public void setExperiment(final ExperimentModel experiment) {
+		this.experiment = experiment;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Phenotype))
+			return false;
+		final Phenotype phenotype = (Phenotype) o;
+		return Objects.equals(getPhenotypeId(), phenotype.getPhenotypeId()) && Objects.equals(getUniqueName(), phenotype.getUniqueName())
+			&& Objects.equals(getName(), phenotype.getName()) && Objects.equals(getObservableId(), phenotype.getObservableId()) && Objects
+			.equals(getAttributeId(), phenotype.getAttributeId()) && Objects.equals(getValue(), phenotype.getValue()) && Objects
+			.equals(getcValueId(), phenotype.getcValueId()) && Objects.equals(getAssayId(), phenotype.getAssayId()) && Objects
+			.equals(getExperiment(), phenotype.getExperiment());
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (this.assayId == null ? 0 : this.assayId.hashCode());
-		result = prime * result + (this.attributeId == null ? 0 : this.attributeId.hashCode());
-		result = prime * result + (this.cValueId == null ? 0 : this.cValueId.hashCode());
-		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
-		result = prime * result + (this.observableId == null ? 0 : this.observableId.hashCode());
-		result = prime * result + (this.phenotypeId == null ? 0 : this.phenotypeId.hashCode());
-		result = prime * result + (this.uniqueName == null ? 0 : this.uniqueName.hashCode());
-		result = prime * result + (this.value == null ? 0 : this.value.hashCode());
-		return result;
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-		Phenotype other = (Phenotype) obj;
-		if (this.assayId == null) {
-			if (other.assayId != null) {
-				return false;
-			}
-		} else if (!this.assayId.equals(other.assayId)) {
-			return false;
-		}
-		if (this.attributeId == null) {
-			if (other.attributeId != null) {
-				return false;
-			}
-		} else if (!this.attributeId.equals(other.attributeId)) {
-			return false;
-		}
-		if (this.cValueId == null) {
-			if (other.cValueId != null) {
-				return false;
-			}
-		} else if (!this.cValueId.equals(other.cValueId)) {
-			return false;
-		}
-		if (this.name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!this.name.equals(other.name)) {
-			return false;
-		}
-		if (this.observableId == null) {
-			if (other.observableId != null) {
-				return false;
-			}
-		} else if (!this.observableId.equals(other.observableId)) {
-			return false;
-		}
-		if (this.phenotypeId == null) {
-			if (other.phenotypeId != null) {
-				return false;
-			}
-		} else if (!this.phenotypeId.equals(other.phenotypeId)) {
-			return false;
-		}
-		if (this.uniqueName == null) {
-			if (other.uniqueName != null) {
-				return false;
-			}
-		} else if (!this.uniqueName.equals(other.uniqueName)) {
-			return false;
-		}
-		if (this.value == null) {
-			if (other.value != null) {
-				return false;
-			}
-		} else if (!this.value.equals(other.value)) {
-			return false;
-		}
-		return true;
+		return Objects.hash(getPhenotypeId(), getUniqueName(), getName(), getObservableId(), getAttributeId(), getValue(), getcValueId(),
+			getAssayId(), getExperiment());
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Phenotype [phenotypeId=");
-		builder.append(this.phenotypeId);
-		builder.append(", uniqueName=");
-		builder.append(this.uniqueName);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", observableId=");
-		builder.append(this.observableId);
-		builder.append(", attributeId=");
-		builder.append(this.attributeId);
-		builder.append(", value=");
-		builder.append(this.value);
-		builder.append(", cValue=");
-		builder.append(this.cValueId);
-		builder.append(", assayId=");
-		builder.append(this.assayId);
-		builder.append("]");
-		return builder.toString();
+		return "Phenotype{" + "phenotypeId=" + phenotypeId + ", uniqueName='" + uniqueName + '\'' + ", name='" + name + '\''
+			+ ", observableId=" + observableId + ", attributeId=" + attributeId + ", value='" + value + '\'' + ", cValueId=" + cValueId
+			+ ", assayId=" + assayId + ", experiment=" + experiment + '}';
 	}
-
 }

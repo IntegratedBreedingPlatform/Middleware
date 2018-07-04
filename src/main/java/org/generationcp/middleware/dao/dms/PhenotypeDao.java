@@ -62,15 +62,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	private static final String GET_OBSERVATIONS = "SELECT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
 			+ "FROM nd_experiment e " + "INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
 			+ "INNER JOIN stock s ON es.stock_id = s.stock_id "
-			+ "INNER JOIN nd_experiment_phenotype ep ON e.nd_experiment_id = ep.nd_experiment_id "
-			+ "INNER JOIN phenotype p ON ep.phenotype_id = p.phenotype_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+			+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 			+ "AND p.observable_id IN (:traitIds) ";
 
 	private static final String COUNT_OBSERVATIONS =
 			"SELECT COUNT(*) " + "FROM nd_experiment e " + "INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
 					+ "INNER JOIN stock s ON es.stock_id = s.stock_id "
-					+ "INNER JOIN nd_experiment_phenotype ep ON e.nd_experiment_id = ep.nd_experiment_id "
-					+ "INNER JOIN phenotype p ON ep.phenotype_id = p.phenotype_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+					+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 					+ "AND p.observable_id IN (:traitIds) ";
 
 	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
@@ -84,15 +82,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 							+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
 							+ "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
 							+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
-							+ "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
-							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "    INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id "
 							+ "    INNER JOIN stock s ON es.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 							+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("numericVariableIds", numericVariableIds);
 
-			List<Object[]> list;
+			final List<Object[]> list;
 
 			if (!environmentIds.isEmpty() && !numericVariableIds.isEmpty()) {
 				list = query.list();
@@ -126,8 +123,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
 							+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
 							+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-							+ "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
-							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "    INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id "
 							+ "    INNER JOIN stock s ON es.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 							+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ");
@@ -164,8 +160,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					.createSQLQuery("SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
 							+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
 							+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-							+ "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
-							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "    INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id "
 							+ "    INNER JOIN stock s ON es.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 							+ "GROUP by p.observable_id ");
@@ -203,8 +198,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 					.createSQLQuery("SELECT p.observable_id, p.value * 1 " + "FROM phenotype p "
-							+ "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
-							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("traitIds", traitIds);
@@ -245,8 +239,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 					.createSQLQuery("SELECT p.observable_id, p.value * 1 " + "FROM phenotype p "
-							+ "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
-							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id = :traitId ");
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameter("traitId", trait);
@@ -295,8 +288,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 					.createSQLQuery("SELECT DISTINCT p.observable_id, p.value " + "FROM phenotype p "
-							+ "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
-							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) "
 							+ "ORDER BY p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
@@ -341,8 +333,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 					.createSQLQuery("SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount " + "FROM phenotype p "
-							+ "INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
-							+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+							+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
 							+ "  AND e.nd_geolocation_id IN (:environmentIds) " + "GROUP BY p.observable_id, p.cvalue_id ");
 			query.setParameterList("traitIds", traitIds);
@@ -462,8 +453,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname, gp.value as locationId ");
 			queryString.append("FROM phenotype p ");
-			queryString.append("INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ");
-			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id ");
+			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ");
 			queryString.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
 					+ TermId.LOCATION_ID.getId() + " ");
 			queryString.append(" LEFT JOIN location l ON l.locid = gp.value ");
@@ -517,8 +507,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		final StringBuilder sql = new StringBuilder()
 				.append("SELECT DISTINCT e.nd_geolocation_id as nd_geolocation_id, p.observable_id as observable_id, trait.name as name, property.name as property, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id ")
-				.append("	FROM phenotype p ").append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-				.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id  AND e.nd_geolocation_id IN (:environmentIds) AND e.type_id in (:experimentTypes)")
+				.append("	FROM phenotype p ")
+				.append("	INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id  AND e.nd_geolocation_id IN (:environmentIds) AND e.type_id in (:experimentTypes)")
 				.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
 				.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id  AND cr_type.type_id = 1105 ")
 				.append("	LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
@@ -565,10 +555,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			this.getSession().flush();
 
 			// Delete phenotypes and experiment phenotypes
-			final String sql = "delete pheno, epheno" + " from nd_experiment e,"
-					+ " nd_experiment_phenotype epheno, phenotype pheno" + " where e.project_id = " + projectId
+			final String sql = "delete pheno " + " from nd_experiment e,"
+					+ "  phenotype pheno" + " where e.project_id = " + projectId
 					+ " and e.nd_geolocation_id = " + locationId + " and e.nd_experiment_id = e.nd_experiment_id"
-					+ " and e.nd_experiment_id = epheno.nd_experiment_id" + " and epheno.phenotype_id = pheno.phenotype_id";
+					+ " and e.nd_experiment_id = pheno.nd_experiment_id";
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
 			statement.executeUpdate();
 
@@ -589,10 +579,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			// update the value of phenotypes
 			final String sql =
-				"UPDATE nd_experiment exp" + "INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  "
+				"UPDATE nd_experiment exp " + " INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp"
+					+ ".nd_experiment_id  "
 					+ "INNER JOIN stock ON expstock.stock_id = stock.stock_id "
-					+ "INNER JOIN nd_experiment_phenotype expp ON exp.nd_experiment_id = expp.nd_experiment_id  "
-					+ "INNER JOIN phenotype pheno ON expp.phenotype_id = pheno.phenotype_id " + "SET pheno.value = '" + value + "'"
+					+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id " + "SET pheno.value = '" + value + "'"
 					+ " WHERE exp.project_id = " + projectId + " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 "
 					+ " AND stock.stock_id = " + stockId + " AND pheno.observable_id = " + cvTermId;
 
@@ -614,8 +604,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM nd_experiment e "
 					+ "INNER JOIN nd_experiment exp ON e.nd_experiment_id = exp.nd_experiment_id "
 					+ "INNER JOIN nd_experimentprop expprop ON expprop.nd_experiment_id = exp.nd_experiment_id "
-					+ "INNER JOIN nd_experiment_phenotype expp ON e.nd_experiment_id = expp.nd_experiment_id  "
-					+ "INNER JOIN phenotype pheno ON expp.phenotype_id = pheno.phenotype_id " + "WHERE e.project_id = :projectId "
+					+ "INNER JOIN phenotype pheno ON  exp.nd_experiment_id = pheno.nd_experiment_id " + "WHERE ep.project_id = :projectId "
 					+ "AND exp.nd_geolocation_id = :locationId " + "AND pheno.observable_id IN (:cvTermIds) "
 					+ "AND expprop.value IN (:plotNos) " + "AND exp.type_id = 1155 " + "AND expprop.type_id in (8200, 8380)";
 
@@ -647,8 +636,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM "
 					+ "nd_experiment exp "
 					+ "INNER JOIN nd_experimentprop expprop ON expprop.nd_experiment_id = exp.nd_experiment_id "
-					+ "INNER JOIN nd_experiment_phenotype expp ON exp.nd_experiment_id = expp.nd_experiment_id  "
-					+ "INNER JOIN phenotype pheno ON expp.phenotype_id = pheno.phenotype_id " + "WHERE exp.project_id = :projectId "
+					+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id " + "WHERE exp.project_id = :projectId "
 					+ "AND exp.nd_geolocation_id = :locationId " + "AND pheno.observable_id IN (:cvTermIds) "
 					+ "AND expprop.value = :plotNo " + "AND exp.type_id = 1155 " + "AND expprop.type_id in (8200, 8380)";
 
@@ -676,8 +664,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final StringBuilder sql = new StringBuilder();
 
 				sql.append("SELECT COUNT(p.phenotype_id) FROM phenotype p ")
-						.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-						.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id ")
+						.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
 						.append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
 				for (int i = 0; i < variateIds.size(); i++) {
 					if (i > 0) {
@@ -703,8 +690,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final StringBuilder sql = new StringBuilder();
 
 				sql.append("SELECT COUNT(p.phenotype_id) FROM phenotype p ")
-						.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-						.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id ")
+						.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
 						.append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
 				for (int i = 0; i < variateIds.size(); i++) {
 					if (i > 0) {
@@ -731,8 +717,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final StringBuilder sql = new StringBuilder();
 
 			sql.append("SELECT COUNT(p.phenotype_id), p.observable_id FROM phenotype p ")
-					.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-					.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id ")
+					.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
 					.append("WHERE e.project_id = ").append(projectId).append(" AND (p.value <> '' OR p.cvalue_id > 0) ")
 					.append(" GROUP BY p.observable_id ");
 			final Query query = this.getSession().createSQLQuery(sql.toString());
@@ -776,8 +761,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			this.getSession().flush();
 
 			final StringBuilder sql = new StringBuilder().append("DELETE FROM phenotype ").append(" WHERE phenotype_id IN ( ")
-					.append(" SELECT eph.phenotype_id ").append(" FROM nd_experiment_phenotype eph ")
-					.append(" INNER JOIN nd_experiment ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
+					.append(" SELECT ph.phenotype_id ").append(" FROM (SELECT * FROM phenotype) ph ")
+					.append(" INNER JOIN nd_experiment ep ON ep.nd_experiment_id = ph.nd_experiment_id ")
 					.append(" AND ep.project_id IN (");
 			for (int i = 0; i < ids.size(); i++) {
 				if (i > 0) {
@@ -799,8 +784,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public Integer getPhenotypeIdByProjectAndType(final int projectId, final int typeId) {
 		try {
 			final StringBuilder sql = new StringBuilder().append(" SELECT p.phenotype_id ").append(" FROM phenotype p ")
-					.append(" INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ")
-					.append(" INNER JOIN nd_experiment ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
+					.append(" INNER JOIN nd_experiment ep ON ep.nd_experiment_id = p.nd_experiment_id ")
 					.append("   AND ep.project_id = ").append(projectId).append(" WHERE p.observable_id = ").append(typeId);
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			final List<Integer> list = query.list();
@@ -819,8 +803,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final StringBuilder sql = new StringBuilder()
 					.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id ")
-					.append(" FROM phenotype p ").append(" INNER JOIN nd_experiment_phenotype ep ON ep.phenotype_id = p.phenotype_id ")
-					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id ")
+					.append(" FROM phenotype p ")
+					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
 					.append("   AND e.project_id = ").append(projectId).append(" WHERE p.observable_id in ( ").append(typeId)
 					.append(") AND e.nd_experiment_id = ").append(experimentId);
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
@@ -857,8 +841,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.append(" FROM nd_experiment nd_exp ")
 				.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
 				.append(" INNER JOIN stock ON nd_exp_stock.stock_id = stock.stock_id ")
-				.append(" LEFT JOIN nd_experiment_phenotype nd_exp_pheno ON nd_exp.nd_experiment_id = nd_exp_pheno.nd_experiment_id ")
-				.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ").append(" where nd_exp.project_id = ")
+				.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ").append(" where a.project_id = ")
 				.append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
 				.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
 				.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ").append(" group by nd_exp.nd_geolocation_id, ")
@@ -875,8 +858,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final StringBuilder sql = new StringBuilder()
 					.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id ")
-					.append(" FROM phenotype p ").append(" INNER JOIN nd_experiment_phenotype ep ON ep.phenotype_id = p.phenotype_id ")
-					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id ")
+					.append(" FROM phenotype p ")
+					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
 					.append("   AND e.project_id = ").append(projectId).append(" WHERE p.observable_id = ").append(typeId);
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
