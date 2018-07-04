@@ -25,7 +25,7 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("targetCVTerm.cvTermId", variableId));
 			criteria.setMaxResults(1); // Only one formula per target for now
-			criteria.setFetchMode("inputs", FetchMode.JOIN);
+			criteria.setFetchMode("inputs", FetchMode.SELECT);
 
 			formula = (Formula) criteria.uniqueResult();
 
@@ -43,17 +43,21 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 
 		List<Formula> formulas = new ArrayList<>();
 
-		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.in("targetCVTerm.cvTermId", variableIds));
-			criteria.setFetchMode("inputs", FetchMode.JOIN);
+		if (!variableIds.isEmpty()) {
 
-			formulas = criteria.list();
+			try {
+				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+				criteria.add(Restrictions.in("targetCVTerm.cvTermId", variableIds));
+				criteria.setFetchMode("inputs", FetchMode.JOIN);
 
-		} catch (HibernateException e) {
-			final String message = "Error in getByTargetVariableIds(" + variableIds + ")";
-			FormulaDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
+				formulas = criteria.list();
+
+			} catch (HibernateException e) {
+				final String message = "Error in getByTargetVariableIds(" + variableIds + ")";
+				FormulaDAO.LOG.error(message, e);
+				throw new MiddlewareQueryException(message, e);
+			}
+
 		}
 
 		return formulas;

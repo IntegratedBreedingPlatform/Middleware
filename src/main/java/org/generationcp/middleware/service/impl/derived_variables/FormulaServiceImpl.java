@@ -51,6 +51,29 @@ public class FormulaServiceImpl implements FormulaService {
 		return formulaDtos;
 	}
 
+	@Override
+	public List<FormulaVariable> getAllFormulaVariables(final Set<Integer> variableIds) {
+		final List<FormulaVariable> formulaVariables = new ArrayList<>();
+		for (final FormulaDto formulaDto : getByTargetIds(variableIds)) {
+			formulaVariables.addAll(formulaDto.getInputs());
+			formulaVariables.addAll(getFormulaVariables(formulaDto));
+		}
+		return formulaVariables;
+	}
+
+	protected List<FormulaVariable> getFormulaVariables(final FormulaDto formulaDto) {
+		final List<FormulaVariable> formulaVariables = new ArrayList<>();
+		for (final FormulaVariable formulaVariable : formulaDto.getInputs()) {
+			final Optional<FormulaDto> formulaOptional = getByTargetId(formulaVariable.getId());
+			if (formulaOptional.isPresent()) {
+				formulaVariables.addAll(formulaOptional.get().getInputs());
+				// If the argument variable is itself a derived trait, include its argument variables.
+				formulaVariables.addAll(getFormulaVariables(formulaOptional.get()));
+			}
+		}
+		return formulaVariables;
+	}
+
 	protected FormulaDto convertToFormulaDto(final Formula formula) {
 		final FormulaDto formulaDto = new FormulaDto();
 
