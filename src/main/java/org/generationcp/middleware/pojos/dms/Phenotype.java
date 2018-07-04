@@ -11,7 +11,16 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -31,8 +40,7 @@ public class Phenotype implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
-	pkColumnValue = "phenotype", allocationSize = 500)
+	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value", pkColumnValue = "phenotype", allocationSize = 500)
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "phenotypeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "phenotype_id")
@@ -70,8 +78,8 @@ public class Phenotype implements Serializable {
 	public Phenotype() {
 	}
 
-	public Phenotype(final Integer phenotypeId, final String uniqueName, final String name, final Integer observableId, final Integer attributeId, final String value,
-			final Integer cValueId, final Integer assayId) {
+	public Phenotype(final Integer phenotypeId, final String uniqueName, final String name, final Integer observableId,
+		final Integer attributeId, final String value, final Integer cValueId, final Integer assayId) {
 		this.phenotypeId = phenotypeId;
 		this.uniqueName = uniqueName;
 		this.name = name;
@@ -147,35 +155,38 @@ public class Phenotype implements Serializable {
 	}
 
 	public ExperimentModel getExperiment() {
-	  return experiment;
+		return experiment;
 	}
 
 	public void setExperiment(final ExperimentModel experiment) {
-	  this.experiment = experiment;
+		this.experiment = experiment;
 	}
 
-  @Override public boolean equals(final Object o) {
-	  if (this == o)
-		return true;
-	  if (!(o instanceof Phenotype))
-		return false;
-	  final Phenotype phenotype = (Phenotype) o;
-	  return Objects.equals(getPhenotypeId(), phenotype.getPhenotypeId()) && Objects.equals(getUniqueName(), phenotype.getUniqueName())
-			  && Objects.equals(getName(), phenotype.getName()) && Objects.equals(getObservableId(), phenotype.getObservableId()) && Objects
-			  .equals(getAttributeId(), phenotype.getAttributeId()) && Objects.equals(getValue(), phenotype.getValue()) && Objects
-			  .equals(getcValueId(), phenotype.getcValueId()) && Objects.equals(getAssayId(), phenotype.getAssayId()) && Objects
-			  .equals(getExperiment(), phenotype.getExperiment());
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Phenotype))
+			return false;
+		final Phenotype phenotype = (Phenotype) o;
+		return Objects.equals(getPhenotypeId(), phenotype.getPhenotypeId()) && Objects.equals(getUniqueName(), phenotype.getUniqueName())
+			&& Objects.equals(getName(), phenotype.getName()) && Objects.equals(getObservableId(), phenotype.getObservableId()) && Objects
+			.equals(getAttributeId(), phenotype.getAttributeId()) && Objects.equals(getValue(), phenotype.getValue()) && Objects
+			.equals(getcValueId(), phenotype.getcValueId()) && Objects.equals(getAssayId(), phenotype.getAssayId()) && Objects
+			.equals(getExperiment(), phenotype.getExperiment());
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 
-	  return Objects.hash(getPhenotypeId(), getUniqueName(), getName(), getObservableId(), getAttributeId(), getValue(), getcValueId(),
-			  getAssayId(), getExperiment());
+		return Objects.hash(getPhenotypeId(), getUniqueName(), getName(), getObservableId(), getAttributeId(), getValue(), getcValueId(),
+			getAssayId(), getExperiment());
 	}
 
-	@Override public String toString() {
-	  return "Phenotype{" + "phenotypeId=" + phenotypeId + ", uniqueName='" + uniqueName + '\'' + ", name='" + name + '\'' + ", observableId="
-			  + observableId + ", attributeId=" + attributeId + ", value='" + value + '\'' + ", cValueId=" + cValueId + ", assayId=" + assayId
-			  + ", experiment=" + experiment + '}';
+	@Override
+	public String toString() {
+		return "Phenotype{" + "phenotypeId=" + phenotypeId + ", uniqueName='" + uniqueName + '\'' + ", name='" + name + '\''
+			+ ", observableId=" + observableId + ", attributeId=" + attributeId + ", value='" + value + '\'' + ", cValueId=" + cValueId
+			+ ", assayId=" + assayId + ", experiment=" + experiment + '}';
 	}
 }

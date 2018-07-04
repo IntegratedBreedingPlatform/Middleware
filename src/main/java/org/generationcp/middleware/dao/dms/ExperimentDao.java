@@ -103,7 +103,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("project.projectId", projectId));
 			criteria.add(Restrictions.eq("geoLocation.locationId", locationId));
-			@SuppressWarnings("rawtypes") final List list = criteria.list();
+			final List<ExperimentModel> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
 				return (ExperimentModel) list.get(0);
 			}
@@ -192,7 +192,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			
 			// Delete experiments
 			final SQLQuery statement =
-					this.getSession().createSQLQuery("delete e, ep, es, pheno, eprop " + "from nd_experiment e "
+					this.getSession().createSQLQuery("delete e, es, pheno, eprop " + "from nd_experiment e "
 							+ "left join nd_experiment_stock es on e.nd_experiment_id = es.nd_experiment_id "
 							+ "left join phenotype pheno on pheno.nd_experiment_id = e.nd_experiment_id "
 							+ "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id "
