@@ -86,7 +86,9 @@ public class FormulaServiceImpl implements FormulaService {
 
 		final List<FormulaVariable> inputs = new ArrayList<>();
 		for (final CVTerm cvTerm : formula.getInputs()) {
-			inputs.add(convertToFormulaVariable(cvTerm));
+			final FormulaVariable formulaVariable = convertToFormulaVariable(cvTerm);
+			formulaVariable.setTargetTermId(formulaDto.getTargetTermId());
+			inputs.add(formulaVariable);
 		}
 		formulaDto.setInputs(inputs);
 
