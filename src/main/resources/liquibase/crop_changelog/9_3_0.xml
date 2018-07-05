@@ -281,4 +281,9 @@
 			<append value="ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci" />
 		</modifySql>
 	</changeSet>
+
+	<changeSet author="nahuel" id="v9.3.0-2">
+		<addPrimaryKey tableName="formula_input" columnNames="formula_id, variable_id"></addPrimaryKey>
+	</changeSet>
+
 </databaseChangeLog>
