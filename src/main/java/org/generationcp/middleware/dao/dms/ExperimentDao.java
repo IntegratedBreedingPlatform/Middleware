@@ -189,12 +189,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
+
+		  // Delete phenotypes first because the foreign key with nd_experiment
+		  final Query firstStatement =
+				  this.getSession()
+						  .createSQLQuery("DELETE pheno FROM nd_experiment e"
+								  + "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
+								  + "  where e.nd_experiment_id in (" + experimentIds + ") ");
+		  firstStatement.executeUpdate();
 			
 			// Delete experiments
 			final SQLQuery statement =
-					this.getSession().createSQLQuery("delete e, es, pheno, eprop " + "from nd_experiment e "
+					this.getSession().createSQLQuery("delete e, es, eprop " + "from nd_experiment e "
 							+ "left join nd_experiment_stock es on e.nd_experiment_id = es.nd_experiment_id "
-							+ "left join phenotype pheno on pheno.nd_experiment_id = e.nd_experiment_id "
 							+ "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id "
 							+ "where e.nd_experiment_id in (" + experimentIds + ") ");
 			statement.executeUpdate();
@@ -211,12 +218,20 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// statement
 			this.getSession().flush();
 
-			// Delete experiments
+		  // Delete phenotypes first because the foreign key with nd_experiment
+		  final Query firstStatement =
+				  this.getSession()
+						  .createSQLQuery("DELETE pheno FROM nd_experiment e"
+								  + "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
+								  + "  WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
+		  firstStatement.executeUpdate();
+
+
+		  // Delete experiments
 			final Query statement =
 					this.getSession()
-					.createSQLQuery("DELETE e, es, pheno, eprop " + "FROM nd_experiment e "
+					.createSQLQuery("DELETE e, es, eprop " + "FROM nd_experiment e "
 							+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
-							+ "LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
 							+ "WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
 			statement.executeUpdate();
@@ -234,20 +249,27 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// statement
 			this.getSession().flush();
 
-			// Delete experiments
-			final Query statement =
-					this.getSession()
-					.createSQLQuery(
-							"DELETE g, gp, e, es, pheno, eprop " + "FROM nd_geolocation g "
-									+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
-									+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
-									+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
-									+ "LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id "
-									+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-									+ "WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
 
-			statement.executeUpdate();
+		  // Delete phenotypes first because the foreign key with nd_experiment
+		  final Query firstStatement =
+				  this.getSession()
+						  .createSQLQuery("DELETE pheno FROM nd_experiment e"
+								  + "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
+								  + "  WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
+		  firstStatement.executeUpdate();
 
+		  // Delete experiments
+		  final Query statement =
+				  this.getSession()
+						  .createSQLQuery(
+								  "DELETE g, gp, e, es, eprop " + "FROM nd_geolocation g "
+										  + "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
+										  + "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
+										  + "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
+										  + "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
+										  + "WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
+
+		  statement.executeUpdate();
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in deleteTrialExperimentsOfStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
 		}
