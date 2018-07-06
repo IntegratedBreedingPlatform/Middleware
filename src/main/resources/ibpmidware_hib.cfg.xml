@@ -90,7 +90,6 @@
         <mapping class="org.generationcp.middleware.pojos.dms.StockProperty"/>
         <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
         <mapping class="org.generationcp.middleware.pojos.dms.PhenotypeOutlier"/>
-        <mapping class="org.generationcp.middleware.pojos.dms.ExperimentPhenotype"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProgramFavorite"/>

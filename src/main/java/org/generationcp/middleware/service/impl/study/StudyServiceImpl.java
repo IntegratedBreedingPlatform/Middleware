@@ -78,8 +78,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 					+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
 					+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
-					+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+					+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
 					+ "							INNER JOIN project p ON p.project_id = pr.subject_project_id "
@@ -88,8 +87,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
 			StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
-					+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+					+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
 
 	private MeasurementVariableService measurementVariableService;

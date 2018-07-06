@@ -80,13 +80,7 @@ import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.dao.oms.CVDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
-import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
-import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
-import org.generationcp.middleware.dao.oms.StandardVariableDao;
-import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.dao.oms.*;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
@@ -263,12 +257,6 @@ public class DatabaseBroker {
 		final PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
 		phenotypeOutlierDao.setSession(this.getActiveSession());
 		return phenotypeOutlierDao;
-	}
-
-	public ExperimentPhenotypeDao getExperimentPhenotypeDao() {
-		final ExperimentPhenotypeDao experimentPhenotypeDao = new ExperimentPhenotypeDao();
-		experimentPhenotypeDao.setSession(this.getActiveSession());
-		return experimentPhenotypeDao;
 	}
 
 	public CvTermPropertyDao getCvTermPropertyDao() {

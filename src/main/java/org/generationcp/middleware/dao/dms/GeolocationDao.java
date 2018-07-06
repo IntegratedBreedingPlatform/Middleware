@@ -392,8 +392,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = "
 					+ TermId.BELONGS_TO_STUDY.getId()
 					+ " INNER JOIN nd_experiment e ON (e.project_id = p.project_id OR e.project_id = pr.subject_project_id)"
-					+ " INNER JOIN nd_experiment_phenotype eph ON eph.nd_experiment_id = e.nd_experiment_id"
-					+ " INNER JOIN phenotype ph ON eph.phenotype_id = ph.phenotype_id"
+					+ " INNER JOIN phenotype ph ON ph.nd_experiment_id = e.nd_experiment_id"
 					+ " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
 					+ TermId.LOCATION_ID.getId() + " LEFT JOIN location l ON l.locid = gp.value"
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id"

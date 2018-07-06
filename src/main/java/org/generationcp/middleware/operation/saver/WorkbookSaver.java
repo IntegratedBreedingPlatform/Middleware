@@ -41,7 +41,6 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.PhenotypeException;
-import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
@@ -964,7 +963,7 @@ public class WorkbookSaver extends Saver {
 	 * Saves experiments creating entries in the following tables:
 	 * nd_geolocation, nd_geolocationprop, nd_experiment,
 	 * nd_experimentprop nd_experiment_stock, stock, stockprop,
-	 * nd_experiment_phenotype and phenotype
+	 * and phenotype
 	 *
 	 * @param workbook
 	 * @throws Exception

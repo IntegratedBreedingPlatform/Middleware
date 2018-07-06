@@ -44,35 +44,33 @@ public class PhenotypeQuery {
 	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id in (:studyDbIds) ";
 
 	public static final String PHENOTYPE_SEARCH_OBSERVATION_FILTER = " AND exists(SELECT 1 " //
-		+ " FROM nd_experiment_phenotype ndeph " //
-		+ "   INNER JOIN phenotype ph ON ndeph.phenotype_id = ph.phenotype_id " //
+		+ " FROM phenotype ph " //
 		+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
 		+ "   INNER JOIN nd_experiment ndep ON ndeph.nd_experiment_id = ndep.nd_experiment_id " //
 		+ "   INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
 		+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
 		+ "                             AND pp.variable_id = ph.observable_id " //
 		+ "                             AND pp.type_id = " + VariableType.TRAIT.getId() //
-		+ " WHERE ndeph.nd_experiment_id = nde.nd_experiment_id AND cvt.cvterm_id in (:cvTermIds))" //
+		+ " WHERE ph.nd_experiment_id = nde.nd_experiment_id AND cvt.cvterm_id in (:cvTermIds))" //
 		;
 
 	public static final String PHENOTYPE_SEARCH_OBSERVATIONS = "SELECT " //
-		+ "  ndeph.nd_experiment_id as expid, " //
-		+ "  ndeph.nd_experiment_phenotype_id as nd_exp_phen_id, " //
+		+ "  ph.nd_experiment_id as expid, " //
+		+ "  ph.phenotype_id as phen_id, " //
 		+ "  cvt.cvterm_id as cvterm_id, " //
 		+ "  cvt.name as cvterm_name, " //
 		+ "  ph.value as value , " //
 		+ "  cvp.value as crop_ontology_id "
 		+ " FROM " //
-		+ "  nd_experiment_phenotype ndeph" //
-		+ "  INNER JOIN phenotype ph ON ndeph.phenotype_id = ph.phenotype_id " //
+		+ "  phenotype ph  " //
 		+ "  INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
-		+ "  INNER JOIN nd_experiment ndep ON ndeph.nd_experiment_id = ndep.nd_experiment_id " //
+		+ "  INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
 		+ "  INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
 		+ "  INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
 		+ "                            AND pp.variable_id = ph.observable_id " //
 		+ "                            AND pp.type_id = " + VariableType.TRAIT.getId() //
 		+ "  LEFT JOIN cvtermprop cvp on (cvp.cvterm_id = cvt.cvterm_id and cvp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() + ")"
-		+ " WHERE ndeph.nd_experiment_id in (:ndExperimentIds) " //
+		+ " WHERE ph.nd_experiment_id in (:ndExperimentIds) " //
 		;
 
 
