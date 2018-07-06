@@ -19,7 +19,10 @@ import java.util.Set;
 @Service
 public class FormulaServiceImpl implements FormulaService {
 
-	private final HibernateSessionProvider sessionProvider;
+	private HibernateSessionProvider sessionProvider;
+
+	public FormulaServiceImpl() {
+	}
 
 	public FormulaServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
@@ -100,6 +103,14 @@ public class FormulaServiceImpl implements FormulaService {
 		formulaVariable.setId(cvTerm.getCvTermId());
 		formulaVariable.setName(cvTerm.getName());
 		return formulaVariable;
+	}
+
+	public HibernateSessionProvider getSessionProvider() {
+		return this.sessionProvider;
+	}
+
+	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
 	}
 
 }
