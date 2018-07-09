@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,26 +56,26 @@ public class FormulaServiceImpl implements FormulaService {
 	}
 
 	@Override
-	public List<FormulaVariable> getAllFormulaVariables(final Set<Integer> variableIds) {
-		final List<FormulaVariable> formulaVariables = new ArrayList<>();
+	public Set<FormulaVariable> getAllFormulaVariables(final Set<Integer> variableIds) {
+		final Set<FormulaVariable> formulaVariables = new HashSet<>();
 		for (final FormulaDto formulaDto : getByTargetIds(variableIds)) {
 			formulaVariables.addAll(formulaDto.getInputs());
-			formulaVariables.addAll(getFormulaVariables(formulaDto));
+			fillFormulaVariables(formulaDto, formulaVariables);
 		}
 		return formulaVariables;
 	}
 
-	protected List<FormulaVariable> getFormulaVariables(final FormulaDto formulaDto) {
-		final List<FormulaVariable> formulaVariables = new ArrayList<>();
+	protected void fillFormulaVariables(final FormulaDto formulaDto, final Set<FormulaVariable> formulaVariables) {
 		for (final FormulaVariable formulaVariable : formulaDto.getInputs()) {
 			final Optional<FormulaDto> formulaOptional = getByTargetId(formulaVariable.getId());
 			if (formulaOptional.isPresent()) {
 				formulaVariables.addAll(formulaOptional.get().getInputs());
-				// If the argument variable is itself a derived trait, include its argument variables.
-				formulaVariables.addAll(getFormulaVariables(formulaOptional.get()));
+				if (!formulaVariables.contains(formulaOptional.get())) {
+					// If the argument variable is itself a derived trait, include its argument variables.
+					fillFormulaVariables(formulaOptional.get(), formulaVariables);
+				}
 			}
 		}
-		return formulaVariables;
 	}
 
 	protected FormulaDto convertToFormulaDto(final Formula formula) {

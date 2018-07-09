@@ -23,5 +23,5 @@ public interface FormulaService {
 	 * @param variableIds
 	 * @return
 	 */
-	public List<FormulaVariable> getAllFormulaVariables(Set<Integer> variableIds);
+	public Set<FormulaVariable> getAllFormulaVariables(Set<Integer> variableIds);
 }
