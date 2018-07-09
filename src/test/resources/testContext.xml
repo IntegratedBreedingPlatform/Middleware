@@ -163,16 +163,12 @@
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
-    <bean id="formulaService" class="org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>
-
     <bean id="listDataProjectSaver" class="org.generationcp.middleware.operation.saver.ListDataProjectSaver">
         <constructor-arg ref="cropSessionProvider"/>
     </bean>
     
     <bean id="formulaService" class="org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl">
-        <constructor-arg ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
