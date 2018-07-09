@@ -665,4 +665,8 @@ public interface WorkbenchDataManager {
 	 */
 	boolean isSuperAdminUser(Integer userId);
 
+	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
+
+	void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos);
+
 }

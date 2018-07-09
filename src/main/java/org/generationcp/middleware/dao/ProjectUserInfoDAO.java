@@ -148,6 +148,19 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<ProjectUserInfo> getByProjectIdAndUserIds(Long projectId, List<Integer> userIds) {
+		try {
+			Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
+			criteria.add(Restrictions.eq("project.projectId", projectId));
+			criteria.add(Restrictions.in("userId", userIds));
+			return criteria.list();
+		} catch (HibernateException ex) {
+			throw new MiddlewareQueryException("Error in getByProjectIdAndUserIds(projectId = " + projectId + ", userIds = " + userIds + "):"
+					+ ex.getMessage(), ex);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
 	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
 		final Map<Integer, Person> persons = new HashMap<>();
 		try {

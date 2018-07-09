@@ -265,7 +265,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId);
 			for (final ProjectUserInfo projectUserInfo : projectUserInfos) {
-				this.deleteProjectUserInfoDao(projectUserInfo);
+				this.deleteProjectUserInfo(projectUserInfo);
 			}
 
 		} catch (final Exception e) {
@@ -274,12 +274,25 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 							.getMessage(), e);
 		}
 	}
+	
+	@Override
+	public List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> userIds) {
+		return this.getProjectUserInfoDao().getByProjectIdAndUserIds(projectId, userIds);
+	}
+	
+	@Override
+	public void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos) {
+		ProjectUserInfoDAO dao = this.getProjectUserInfoDao();
+		for(ProjectUserInfo projectUserInfo: projectUserInfos) {
+			dao.makeTransient(projectUserInfo);
+		}
+	}
 
 	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
 		return this.getIbdbUserMapDao().getIbdbUserMapByID(projectId);
 	}
 
-	public void deleteProjectUserInfoDao(final ProjectUserInfo projectUserInfo) {
+	public void deleteProjectUserInfo(final ProjectUserInfo projectUserInfo) {
 
 		try {
 
