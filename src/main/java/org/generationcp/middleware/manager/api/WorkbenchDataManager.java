@@ -680,7 +680,7 @@ public interface WorkbenchDataManager {
 	void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos);
 
 	/**
-	 * Returns ProjectUserInfo List with the given project id and user id
+	 * Returns ProjectUserInfo with the given project id and user id
 	 * @param projectId
 	 * @param userId
 	 * @return
