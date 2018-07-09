@@ -20,24 +20,22 @@ import java.util.Set;
 @Service
 public class FormulaServiceImpl implements FormulaService {
 
+
 	private HibernateSessionProvider sessionProvider;
+	private FormulaDAO formulaDAO;
 
 	public FormulaServiceImpl() {
 	}
 
 	public FormulaServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
-	}
-
-	private FormulaDAO getFormulaDAO() {
-		final FormulaDAO dao = new FormulaDAO();
-		dao.setSession(this.sessionProvider.getSession());
-		return dao;
+		this.formulaDAO = new FormulaDAO();
+		this.formulaDAO.setSession(this.sessionProvider.getSession());
 	}
 
 	@Override
 	public Optional<FormulaDto> getByTargetId(final Integer targetId) {
-		final Formula formula = this.getFormulaDAO().getByTargetVariableId(targetId);
+		final Formula formula = this.formulaDAO.getByTargetVariableId(targetId);
 		if (formula != null) {
 			return Optional.of(convertToFormulaDto(formula));
 		}
@@ -48,7 +46,7 @@ public class FormulaServiceImpl implements FormulaService {
 	public List<FormulaDto> getByTargetIds(final Set<Integer> variableIds) {
 
 		final List<FormulaDto> formulaDtos = new ArrayList<>();
-		final List<Formula> formulas = this.getFormulaDAO().getByTargetVariableIds(variableIds);
+		final List<Formula> formulas = this.formulaDAO.getByTargetVariableIds(variableIds);
 		for (final Formula formula : formulas) {
 			formulaDtos.add(convertToFormulaDto(formula));
 		}
@@ -112,6 +110,10 @@ public class FormulaServiceImpl implements FormulaService {
 
 	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
+	}
+	
+	protected void setFormulaDAO(FormulaDAO formulaDAO) {
+		this.formulaDAO = formulaDAO;
 	}
 
 }
