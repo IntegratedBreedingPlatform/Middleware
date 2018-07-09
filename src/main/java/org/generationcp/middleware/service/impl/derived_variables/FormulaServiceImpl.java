@@ -68,7 +68,7 @@ public class FormulaServiceImpl implements FormulaService {
 			final Optional<FormulaDto> formulaOptional = getByTargetId(formulaVariable.getId());
 			if (formulaOptional.isPresent()) {
 				formulaVariables.addAll(formulaOptional.get().getInputs());
-				if (!formulaVariables.contains(formulaOptional.get())) {
+				if (!formulaVariables.contains(formulaVariable)) {
 					// If the argument variable is itself a derived trait, include its argument variables.
 					fillFormulaVariables(formulaOptional.get(), formulaVariables);
 				}
