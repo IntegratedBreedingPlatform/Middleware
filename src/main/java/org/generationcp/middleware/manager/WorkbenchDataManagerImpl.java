@@ -281,6 +281,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 	
 	@Override
+	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId) {
+		return this.getProjectUserInfoDao().getByProjectIdAndUserId(projectId, userId);
+	}
+	
+	@Override
 	public void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos) {
 		ProjectUserInfoDAO dao = this.getProjectUserInfoDao();
 		for(ProjectUserInfo projectUserInfo: projectUserInfos) {

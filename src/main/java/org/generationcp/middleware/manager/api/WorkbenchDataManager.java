@@ -664,9 +664,27 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	boolean isSuperAdminUser(Integer userId);
-
+	
+	/**
+	 * Returns ProjectUserInfo List with the given project id and user ids
+	 * @param projectId
+	 * @param ids
+	 * @return
+	 */
 	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
-
+	
+	/**
+	 * Deletes the given list of ProjectUserInfoObjects
+	 * @param projectUserInfos
+	 */
 	void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos);
+
+	/**
+	 * Returns ProjectUserInfo List with the given project id and user id
+	 * @param projectId
+	 * @param userId
+	 * @return
+	 */
+	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
 
 }
