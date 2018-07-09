@@ -150,6 +150,48 @@ public class FormulaServiceImplTest {
 		}
 		
 	}
+	
+	@Test
+	public void testGetAllFormulaVariablesWhenFormulaVariableIsDerivedTrait() {
+		final Formula formula1 = this.createTestFormula();
+		final Formula formula2 = this.createTestFormula();
+		final List<Formula> formulaList = Arrays.asList(formula1, formula2);
+		Mockito.doReturn(formulaList).when(this.formulaDao)
+				.getByTargetVariableIds(Matchers.anySetOf(Integer.class));
+		// Setup one input variable to be derived trait itself
+		final CVTerm inputVarWithFormula = formula1.getInputs().get(0);
+		final Formula formula3 = this.createTestFormula();
+		formula3.setTargetCVTerm(inputVarWithFormula);
+		Mockito.doReturn(formula3).when(this.formulaDao).getByTargetVariableId(inputVarWithFormula.getCvTermId()); 
+		
+		final Set<Integer> idsSet = new HashSet<>(Arrays.asList(formula1.getTargetCVTerm().getCvTermId(),
+				formula2.getTargetCVTerm().getCvTermId()));
+		final Set<FormulaVariable> formulaVariables = this.formulaServiceImpl.getAllFormulaVariables(idsSet);
+		Mockito.verify(this.formulaDao).getByTargetVariableIds(idsSet);
+		Assert.assertEquals(6, formulaVariables.size());
+		final ImmutableMap<Integer, FormulaVariable> variablesMap =
+				Maps.uniqueIndex(formulaVariables, new Function<FormulaVariable, Integer>() {
+
+					@Override
+					public Integer apply(FormulaVariable input) {
+						return input.getId();
+					}
+				});
+		final Iterator<Formula> formulaListIterator = formulaList.iterator();
+		while (formulaListIterator.hasNext()) {
+			final Formula expectedInput = formulaListIterator.next();
+			for (final CVTerm input : expectedInput.getInputs()) {
+				Assert.assertNotNull(variablesMap.get(input.getCvTermId()));
+				verifyFormulaVariable(input, variablesMap.get(input.getCvTermId()));
+			}
+		}
+		// Verify that input variables of derived trait that was used as input are included
+		for (final CVTerm input : formula3.getInputs()) {
+			Assert.assertNotNull(variablesMap.get(input.getCvTermId()));
+			verifyFormulaVariable(input, variablesMap.get(input.getCvTermId()));
+		}
+		
+	}
 
 	private Formula createTestFormula() {
 		final Formula formula = new Formula();
