@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.derived_variables.FormulaDaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
@@ -38,13 +39,17 @@ public class FormulaServiceImplTest {
 	@Mock
 	private FormulaDAO formulaDao;
 	
+	@Mock
+	private FormulaDaoFactory factory;
+	
 	@InjectMocks
 	private FormulaServiceImpl formulaServiceImpl;
 	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		this.formulaServiceImpl.setFormulaDAO(this.formulaDao);
+		this.formulaServiceImpl.setFormulaDaoFactory(this.factory);
+		Mockito.doReturn(this.formulaDao).when(this.factory).getFormulaDAO();
 	}
 	
 	@Test
