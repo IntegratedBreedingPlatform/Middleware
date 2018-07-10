@@ -37,7 +37,7 @@ public class FormulaServiceImpl implements FormulaService {
 	public Optional<FormulaDto> getByTargetId(final Integer targetId) {
 		final Formula formula = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableId(targetId);
 		if (formula != null) {
-			return Optional.of(convertToFormulaDto(formula));
+			return Optional.of(this.convertToFormulaDto(formula));
 		}
 		return Optional.absent();
 	}
@@ -48,7 +48,7 @@ public class FormulaServiceImpl implements FormulaService {
 		final List<FormulaDto> formulaDtos = new ArrayList<>();
 		final List<Formula> formulas = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableIds(variableIds);
 		for (final Formula formula : formulas) {
-			formulaDtos.add(convertToFormulaDto(formula));
+			formulaDtos.add(this.convertToFormulaDto(formula));
 		}
 		return formulaDtos;
 	}
@@ -56,21 +56,21 @@ public class FormulaServiceImpl implements FormulaService {
 	@Override
 	public Set<FormulaVariable> getAllFormulaVariables(final Set<Integer> variableIds) {
 		final Set<FormulaVariable> formulaVariables = new HashSet<>();
-		for (final FormulaDto formulaDto : getByTargetIds(variableIds)) {
+		for (final FormulaDto formulaDto : this.getByTargetIds(variableIds)) {
 			formulaVariables.addAll(formulaDto.getInputs());
-			fillFormulaVariables(formulaDto, formulaVariables);
+			this.fillFormulaVariables(formulaDto, formulaVariables);
 		}
 		return formulaVariables;
 	}
 
 	protected void fillFormulaVariables(final FormulaDto formulaDto, final Set<FormulaVariable> formulaVariables) {
 		for (final FormulaVariable formulaVariable : formulaDto.getInputs()) {
-			final Optional<FormulaDto> formulaOptional = getByTargetId(formulaVariable.getId());
+			final Optional<FormulaDto> formulaOptional = this.getByTargetId(formulaVariable.getId());
 			if (formulaOptional.isPresent()) {
 				formulaVariables.addAll(formulaOptional.get().getInputs());
 				if (!formulaVariables.contains(formulaVariable)) {
 					// If the argument variable is itself a derived trait, include its argument variables.
-					fillFormulaVariables(formulaOptional.get(), formulaVariables);
+					this.fillFormulaVariables(formulaOptional.get(), formulaVariables);
 				}
 			}
 		}
@@ -88,7 +88,7 @@ public class FormulaServiceImpl implements FormulaService {
 
 		final List<FormulaVariable> inputs = new ArrayList<>();
 		for (final CVTerm cvTerm : formula.getInputs()) {
-			final FormulaVariable formulaVariable = convertToFormulaVariable(cvTerm);
+			final FormulaVariable formulaVariable = this.convertToFormulaVariable(cvTerm);
 			formulaVariable.setTargetTermId(formulaDto.getTargetTermId());
 			inputs.add(formulaVariable);
 		}
@@ -113,7 +113,7 @@ public class FormulaServiceImpl implements FormulaService {
 	}
 
 	
-	protected void setFormulaDaoFactory(FormulaDaoFactory formulaDaoFactory) {
+	protected void setFormulaDaoFactory(final FormulaDaoFactory formulaDaoFactory) {
 		this.formulaDaoFactory = formulaDaoFactory;
 	}
 
