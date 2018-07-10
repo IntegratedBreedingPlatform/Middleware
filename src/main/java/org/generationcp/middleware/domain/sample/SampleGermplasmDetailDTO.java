@@ -13,6 +13,8 @@ public class SampleGermplasmDetailDTO {
 	private String sampleListName;
 	private String plotId;
 	private String plantBk;
+	private String plateId;
+	private String well;
 	private StudyReference study;
 	private List<Dataset> datasets;
 
@@ -77,6 +79,22 @@ public class SampleGermplasmDetailDTO {
 		if (!datasets.contains(dataset)) {
 			this.datasets.add(dataset);
 		}
+	}
+
+	public String getPlateId() {
+		return plateId;
+	}
+
+	public void setPlateId(final String plateId) {
+		this.plateId = plateId;
+	}
+
+	public String getWell() {
+		return well;
+	}
+
+	public void setWell(final String well) {
+		this.well = well;
 	}
 
 	public class Dataset{
