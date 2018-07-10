@@ -56,6 +56,14 @@ public class Plant implements Serializable {
 	@Column(name = "plant_bk")
 	private String plantBusinessKey;
 
+	@Basic(optional = false)
+	@Column(name = "plate_Id")
+	private String plateId;
+
+	@Basic(optional = false)
+	@Column(name = "well")
+	private String well;
+
 	public Plant() {
 
 	}
@@ -126,5 +134,21 @@ public class Plant implements Serializable {
 	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+	}
+
+	public String getPlateId() {
+		return plateId;
+	}
+
+	public void setPlateId(String plateId) {
+		this.plateId = plateId;
+	}
+
+	public String getWell() {
+		return well;
+	}
+
+	public void setWell(String well) {
+		this.well = well;
 	}
 }
