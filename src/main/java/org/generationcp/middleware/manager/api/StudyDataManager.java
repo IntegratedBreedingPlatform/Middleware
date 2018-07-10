@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -700,15 +701,6 @@ public interface StudyDataManager {
 	void updateVariableOrdering(int datasetId, List<Integer> variableIds);
 
 	/**
-	 * Gets the geolocation id by project id and trial instance number.
-	 *
-	 * @param projectId           - study id or dataset id
-	 * @param trialInstanceNumber instance number
-	 * @return the geolocation id
-	 */
-	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber);
-
-	/**
 	 * Retrieves the trial instance number by geolocation id
 	 *
 	 * @param geolocationId
@@ -818,5 +810,10 @@ public interface StudyDataManager {
 
 	String getProjectStartDateByProjectId(final int projectId);
 
+	boolean isLocationIdVariable(final int studyId, final String variableName);
+
+	BiMap<String, String> createInstanceLocationIdToNameMapFromStudy(final int studyId);
+
 	StudyTypeDto getStudyTypeByStudyId(Integer studyIdentifier);
+
 }

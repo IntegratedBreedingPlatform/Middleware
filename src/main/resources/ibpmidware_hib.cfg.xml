@@ -61,11 +61,14 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectActivity"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.UserRole"/>
+         <mapping class="org.generationcp.middleware.pojos.workbench.Role"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchUser"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.UserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLinkRole"/>
         <mapping class="org.generationcp.middleware.pojos.naming.NamingConfiguration"/>
 
         <!-- Mapping classes for new OMS schema -->
@@ -87,8 +90,6 @@
         <mapping class="org.generationcp.middleware.pojos.dms.StockProperty"/>
         <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
         <mapping class="org.generationcp.middleware.pojos.dms.PhenotypeOutlier"/>
-        <mapping class="org.generationcp.middleware.pojos.dms.ExperimentPhenotype"/>
-        <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProject"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProgramFavorite"/>

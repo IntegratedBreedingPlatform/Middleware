@@ -25,7 +25,7 @@ import org.hibernate.SQLQuery;
  */
 public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 
-	public void delete(int datasetId) throws MiddlewareQueryException {
+	public void delete(final int datasetId) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -41,12 +41,11 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			// Delete experiments
 			statement =
 					this.getSession().createSQLQuery(
-							"delete e, ep, es, epheno, pheno, eprop " + "from nd_experiment e, nd_experiment_project ep, "
-									+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop "
-									+ "where ep.project_id = " + datasetId + "  and e.nd_experiment_id = ep.nd_experiment_id "
+							"delete e, es, pheno, eprop " + "from nd_experiment e, "
+									+ "nd_experiment_stock es, phenotype pheno, nd_experimentprop eprop "
+									+ "where e.project_id = " + datasetId
 									+ "  and e.nd_experiment_id = es.nd_experiment_id "
-									+ "  and e.nd_experiment_id = epheno.nd_experiment_id "
-									+ "  and epheno.phenotype_id = pheno.phenotype_id "
+									+ "  and e.nd_experiment_id = pheno.nd_experiment_id "
 									+ "  and e.nd_experiment_id = eprop.nd_experiment_id");
 			statement.executeUpdate();
 
@@ -57,12 +56,12 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 									+ "  and p.project_id = pp.project_id");
 			statement.executeUpdate();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in delete=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
 		}
 	}
 
-	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
+	public void deleteExperimentsByLocation(final int datasetId, final int locationId) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -72,33 +71,30 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			// Delete experiments
 			SQLQuery statement =
 					this.getSession().createSQLQuery(
-							"delete e, ep, es, epheno, pheno, eprop " + "from nd_experiment e, nd_experiment_project ep, "
-									+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop "
-									+ "where ep.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
-									+ "  and e.nd_experiment_id = ep.nd_experiment_id " + "  and e.nd_experiment_id = es.nd_experiment_id "
-									+ "  and e.nd_experiment_id = epheno.nd_experiment_id "
-									+ "  and epheno.phenotype_id = pheno.phenotype_id "
+							"delete e, es, pheno, eprop " + "from nd_experiment e, "
+									+ "nd_experiment_stock es, phenotype pheno, nd_experimentprop eprop "
+									+ "where e.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
+									+ "  and e.nd_experiment_id = es.nd_experiment_id "
+									+ "  and e.nd_experiment_id = pheno.nd_experiment_id "
 									+ "  and e.nd_experiment_id = eprop.nd_experiment_id");
 			if (statement.executeUpdate() == 0) {
 				statement =
 						this.getSession().createSQLQuery(
-								"delete e, ep, es, epheno, pheno " + "from nd_experiment e, nd_experiment_project ep, "
-										+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno  "
-										+ "where ep.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
-										+ "  and e.nd_experiment_id = ep.nd_experiment_id "
+								"delete e, es, pheno " + "from nd_experiment e, "
+										+ "nd_experiment_stock es, phenotype pheno  "
+										+ "where e.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
 										+ "  and e.nd_experiment_id = es.nd_experiment_id "
-										+ "  and e.nd_experiment_id = epheno.nd_experiment_id "
-										+ "  and epheno.phenotype_id = pheno.phenotype_id ");
+										+ "  and e.nd_experiment_id = pheno.nd_experiment_id ");
 				statement.executeUpdate();
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException(
 					"Error in deleteExperimentsByLocation=" + datasetId + ", " + locationId + " in DataSetDao: " + e.getMessage(), e);
 		}
 	}
 
-	public void deleteExperimentsByLocationAndType(int datasetId, int locationId, int typeId) throws MiddlewareQueryException {
+	public void deleteExperimentsByLocationAndType(final int datasetId, final int locationId, final int typeId) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -106,18 +102,17 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			this.getSession().flush();
 			
 			// Delete experiments
-			SQLQuery statement =
+			final SQLQuery statement =
 					this.getSession().createSQLQuery(
-							"delete e, ep, es, epheno, pheno, eprop " + "from nd_experiment e, nd_experiment_project ep, "
-									+ "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop "
-									+ "where ep.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
-									+ "  and e.type_id = " + typeId + "  and e.nd_experiment_id = ep.nd_experiment_id "
+							"delete e, es, pheno, eprop " + "from nd_experiment e, "
+									+ "nd_experiment_stock es, phenotype pheno, nd_experimentprop eprop "
+									+ "where e.project_id = " + datasetId + "  and e.nd_geolocation_id = " + locationId
+									+ "  and e.type_id = " + typeId
 									+ "  and e.nd_experiment_id = es.nd_experiment_id "
-									+ "  and e.nd_experiment_id = epheno.nd_experiment_id "
-									+ "  and epheno.phenotype_id = pheno.phenotype_id "
+									+ "  and e.nd_experiment_id = pheno.nd_experiment_id "
 									+ "  and e.nd_experiment_id = eprop.nd_experiment_id");
 			statement.executeUpdate();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in deleteExperimentsByLocationAndType=" + datasetId + ", " + locationId + ", " + typeId
 					+ " in DataSetDao: " + e.getMessage(), e);
 		}

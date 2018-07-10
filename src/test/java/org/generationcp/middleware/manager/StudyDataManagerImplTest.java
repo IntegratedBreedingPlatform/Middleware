@@ -45,7 +45,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -61,6 +60,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
@@ -98,7 +103,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
 	private final String cropPrefix = "ABCD";
-
 
 	@Before
 	public void setUp() throws Exception {
@@ -160,7 +164,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will return at least one study, the study that we added in the setup
 		Assert.assertTrue("The size should be greater than 0.", resultSet.size() > 0);
 	}
-	
+
 	@Ignore
 	@Test
 	public void testSearchStudiesForName() throws Exception {
@@ -176,7 +180,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will contain at least one study
 		Assert.assertTrue("The size should be greater than zero", resultSet.size() > 0);
 	}
-	
+
 	@Ignore
 	@Test
 	public void testSearchStudiesForStartDate() throws Exception {
@@ -188,7 +192,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We are sure that the result set will contain the test study we added in the set up
 		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
 	}
-	
+
 	@Ignore
 	@Test
 	public void testSearchStudiesForAll() throws Exception {
@@ -211,11 +215,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetRootFolders() throws Exception {
-		final List<Reference> rootFolders =
-				this.manager.getRootFolders(this.commonTestProject.getUniqueID());
+		final List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(rootFolders);
-		Assert.assertFalse("Root folders should not be empty because it contains the templates for Studies.",
-				rootFolders.isEmpty());
+		Assert.assertFalse("Root folders should not be empty because it contains the templates for Studies.", rootFolders.isEmpty());
 	}
 
 	@Test
@@ -225,8 +227,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
 		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 
-		final List<Reference> childrenNodes = this.manager
-				.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID());
+		final List<Reference> childrenNodes =
+				this.manager.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
@@ -268,8 +270,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final int propertyId = 2120;
 		final VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
 		Assert.assertEquals(
-			"The size should be 1 since we added 1 factor, with property id = " + propertyId + ", in the set up of the data set", 1,
-			factors.size());
+				"The size should be 1 since we added 1 factor, with property id = " + propertyId + ", in the set up of the data set", 1,
+				factors.size());
 	}
 
 	@Test
@@ -301,7 +303,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllStudyDetails() throws Exception {
-		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
+		final List<StudyDetails> nurseryStudyDetails =
+				this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
 		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
 		final List<StudyDetails> updatedNurseryStudyDetails =
@@ -441,8 +444,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyType() {
 		try {
-			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(), this.manager.getStudyType(this
-				.studyReference.getStudyType().getId()));
+			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(),
+					this.manager.getStudyType(this.studyReference.getStudyType().getId()));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -451,8 +454,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyTypeNullEdgeCase() {
 		try {
-			Assert.assertNull("Expected null return value but was non null.", this.manager.getStudyType
-				(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
+			Assert.assertNull("Expected null return value but was non null.",
+					this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -476,8 +479,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyDetails() throws Exception {
-		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject
-			.getUniqueID(), 0, 50);
+		final List<StudyDetails> trialStudyDetails =
+				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
 		this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY", cropPrefix);
 		final List<StudyDetails> updatedStudyDetails =
@@ -508,22 +511,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Study should have the id " + this.studyReference.getId(), studyDetails.getId(), studyDetails.getId());
 	}
 
-	@Test
-	public void testGetGeolocationIdByProjectIdAndTrialInstanceNumber() {
-		try {
-			final Integer projectId = 25007;
-			final String trialInstanceNumberExpected = "1";
-			final Integer geolocationId =
-					this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumberExpected);
-			if (geolocationId != null) {
-				final String trialInstanceNumberActual = this.manager.getTrialInstanceNumberByGeolocationId(geolocationId);
-				Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
-			}
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Unexpected exception: " + e.getMessage());
-		}
-	}
-	
 	@Ignore
 	@Test
 	public void testGetTrialInstanceNumberByGeolocationId() {
@@ -538,49 +525,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	@Ignore
-	public void testSaveGeolocationProperty() throws MiddlewareQueryException {
-		final Integer stdVarId = TermId.EXPERIMENT_DESIGN_FACTOR.getId();
-		final Integer studyId = 25019;
-		final String expDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
-		String newExpDesign = null;
-		if (expDesign != null) {
-			if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
-				newExpDesign = Integer.toString(TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId());
-			} else if (TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
-				newExpDesign = Integer.toString(TermId.RANDOMIZED_COMPLETE_BLOCK.getId());
-			}
-			// update experimental design value
-			final int ndGeolocationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(studyId, "1");
-			this.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, newExpDesign);
-			String actualExpDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
-			Assert.assertEquals(newExpDesign, actualExpDesign);
-			Assert.assertNotEquals(expDesign, actualExpDesign);
-			// revert to previous value
-			this.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, expDesign);
-			actualExpDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
-			Assert.assertEquals(expDesign, actualExpDesign);
-			Assert.assertNotEquals(newExpDesign, actualExpDesign);
-		}
-	}
-
-	@Test
 	public void testGetAllSharedProjectNames() throws MiddlewareQueryException {
 		final List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
 		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
-	}
-
-	@Test
-	public void testCheckIfAnyLocationIDsExistInExperimentsReturnFalse() {
-
-		final Integer locationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(StudyTestDataInitializer.STUDY_ID, "999");
-		final List<Integer> locationIds = new ArrayList<>();
-		locationIds.add(locationId);
-
-		final boolean returnValue =
-				this.manager.checkIfAnyLocationIDsExistInExperiments(StudyTestDataInitializer.STUDY_ID, DataSetType.PLOT_DATA, locationIds);
-
-		Assert.assertFalse("The return value should be false", returnValue);
 	}
 
 	@Test
@@ -623,9 +570,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(
-				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertTrue(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
+						programUUID));
 
 	}
 
@@ -652,9 +601,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(
-				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
+		Assert.assertFalse(this.manager
+				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
+						programUUID));
 
 	}
 
@@ -689,17 +640,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
+		experimentModel.setProject(project);
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
-		// Create experimentproject record
-		final ExperimentProject experimentProject = new ExperimentProject();
-		experimentProject.setExperiment(experimentModel);
-		experimentProject.setProjectId(project.getProjectId());
-		experimentProject.setExperimentProjectId(1);
-		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
-		this.manager.getExperimentProjectDao().save(experimentProject);
-
-		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
 				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
@@ -737,22 +680,15 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
+		experimentModel.setProject(project);
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
-
-		// Create experimentproject record
-		final ExperimentProject experimentProject = new ExperimentProject();
-		experimentProject.setExperiment(experimentModel);
-		experimentProject.setProjectId(project.getProjectId());
-		experimentProject.setExperimentProjectId(1);
-		experimentModel.setNdExperimentId(experimentModel.getNdExperimentId());
-		this.manager.getExperimentProjectDao().save(experimentProject);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
 		Assert.assertFalse(
 				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
 
 	}
-	
+
 	@Test
 	public void testGetProjectStartDateByProjectId() {
 		// Create project record
@@ -764,9 +700,43 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project.setDeleted(false);
 		project.setStartDate("20180403");
 		this.manager.getDmsProjectDao().save(project);
-		
+
 		final String startDate = this.manager.getProjectStartDateByProjectId(project.getProjectId());
 		Assert.assertEquals(project.getStartDate(), startDate);
+	}
+
+	@Test
+	public void testIsLocationIdVariable() throws Exception {
+
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+
+		Assert.assertTrue(this.manager.isLocationIdVariable(this.studyReference.getId(), "LOCATION_NAME"));
+		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "EXPERIMENT_DESIGN_FACTOR"));
+		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "DUMMY NAME"));
+
+	}
+
+	@Test
+	public void testCreateInstanceLocationIdToNameMapFromStudy() throws Exception {
+
+		final String afghanistanLocationId = "1";
+		final String albaniaLocationId = "2";
+		final String algeriaLocationId = "3";
+
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), afghanistanLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), albaniaLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), algeriaLocationId, "1");
+
+		this.sessionProvder.getSession().flush();
+		final Map<String, String> result = this.manager.createInstanceLocationIdToNameMapFromStudy(this.studyReference.getId());
+
+		Assert.assertEquals(3, result.size());
+		Assert.assertEquals("Afghanistan", result.get(afghanistanLocationId));
+		Assert.assertEquals("Albania", result.get(albaniaLocationId));
+		Assert.assertEquals("Algeria", result.get(algeriaLocationId));
+
 	}
 
 }

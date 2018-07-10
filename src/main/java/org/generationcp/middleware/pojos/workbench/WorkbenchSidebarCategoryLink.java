@@ -2,19 +2,22 @@
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-/**
- * Created with IntelliJ IDEA. User: cyrus Date: 11/20/13 Time: 5:49 PM To change this template use File | Settings | File Templates.
- */
+import org.hibernate.annotations.BatchSize;
+
 @Entity
 @Table(name = "workbench_sidebar_category_link")
 public class WorkbenchSidebarCategoryLink implements Serializable {
@@ -40,6 +43,12 @@ public class WorkbenchSidebarCategoryLink implements Serializable {
 
 	@Column(name = "sidebar_link_title")
 	private String sidebarLinkTitle;
+	
+	/**
+	 * List of Roles with permission to access link
+	 */
+	@OneToMany(mappedBy = "sidebarLink", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<WorkbenchSidebarCategoryLinkRole> roles;
 
 	public WorkbenchSidebarCategoryLink() {
 	}
@@ -91,4 +100,48 @@ public class WorkbenchSidebarCategoryLink implements Serializable {
 	public void setWorkbenchSidebarCategory(WorkbenchSidebarCategory workbenchSidebarCategory) {
 		this.workbenchSidebarCategory = workbenchSidebarCategory;
 	}
+
+	
+	public List<WorkbenchSidebarCategoryLinkRole> getRoles() {
+		return roles;
+	}
+
+	
+	public void setRoles(List<WorkbenchSidebarCategoryLinkRole> roles) {
+		this.roles = roles;
+	}
+
+	@Override
+	public String toString() {
+		return "WorkbenchSidebarCategoryLink [sidebarCategoryLinkId=" + sidebarCategoryLinkId + ", tool=" + tool
+				+ ", workbenchSidebarCategory=" + workbenchSidebarCategory + ", sidebarLinkName=" + sidebarLinkName + ", sidebarLinkTitle="
+				+ sidebarLinkTitle + ", roles=" + roles + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((sidebarCategoryLinkId == null) ? 0 : sidebarCategoryLinkId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		WorkbenchSidebarCategoryLink other = (WorkbenchSidebarCategoryLink) obj;
+		if (sidebarCategoryLinkId == null) {
+			if (other.sidebarCategoryLinkId != null)
+				return false;
+		} else if (!sidebarCategoryLinkId.equals(other.sidebarCategoryLinkId))
+			return false;
+		return true;
+	}
+	
+	
 }

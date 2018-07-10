@@ -20,11 +20,11 @@ public interface SampleListService {
 	 *
 	 * @param folderName
 	 * @param parentId
-	 * @param createdBy
+	 * @param username
 	 * @param programUUID
 	 * @return SampleList (Saved Folder)
 	 */
-	Integer createSampleListFolder(final String folderName, final Integer parentId, final User createdBy, final String programUUID);
+	Integer createSampleListFolder(final String folderName, final Integer parentId, final String username, final String programUUID);
 
 	/**
 	 * Update sample list folder name

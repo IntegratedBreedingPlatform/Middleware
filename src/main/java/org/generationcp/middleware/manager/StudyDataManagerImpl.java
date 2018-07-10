@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -178,13 +180,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
-		final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description, final String startDate,
-		final String endDate, final String objective, final String name, final String createdBy) {
+			final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description,
+			final String startDate, final String endDate, final String objective, final String name, final String createdBy) {
 
 		try {
 
-			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID,
-					cropPrefix, studyType, description, startDate, endDate, objective, name, createdBy);
+			final DmsProject project = this.getStudySaver()
+					.saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, cropPrefix, studyType, description,
+							startDate, endDate, objective, name, createdBy);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), programUUID, studyType);
 
@@ -221,7 +224,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows){
+	public List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows) {
 		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, variableTypes, true);
 	}
@@ -425,7 +428,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfStudy(final List<Integer> studyIdList,
-		final CrossExpansionProperties crossExpansionProperties) {
+			final CrossExpansionProperties crossExpansionProperties) {
 		final List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
 		for (final Integer studyId : studyIdList) {
 			final FieldMapInfo fieldMapInfo = new FieldMapInfo();
@@ -531,7 +534,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
-		final List<FieldMapInfo> fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
+		final List<FieldMapInfo> fieldMapInfos =
+				this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
@@ -586,8 +590,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public int addSubFolder(final int parentFolderId, final String name, final String description, final String programUUID,
-		final String objective)
-			 {
+			final String objective) {
 		final DmsProject parentProject = this.getDmsProjectDao().getById(parentFolderId);
 		if (parentProject == null) {
 			throw new MiddlewareQueryException("DMS Project is not existing");
@@ -703,7 +706,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudyDetails> getStudyDetails(final StudyTypeDto studyType, final String programUUID, final int start, final int numOfRows) {
+	public List<StudyDetails> getStudyDetails(final StudyTypeDto studyType, final String programUUID, final int start,
+			final int numOfRows) {
 		final List<StudyDetails> details = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID, start, numOfRows);
 		this.populateSiteAndPersonIfNecessary(details);
 		return details;
@@ -997,11 +1001,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(final int projectId, final String trialInstanceNumber) {
-		return this.getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
-	}
-
-	@Override
 	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
 		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
 		if (geolocation != null) {
@@ -1095,7 +1094,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void saveOrUpdatePhenotypeValue(final int experimentId, final int variableId, final String value, final Phenotype existingPhenotype, final int dataTypeId) {
+	public void saveOrUpdatePhenotypeValue(final int experimentId, final int variableId, final String value,
+			final Phenotype existingPhenotype, final int dataTypeId) {
 		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId);
 	}
 
@@ -1140,7 +1140,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(final String variableId, final String variableValue, final String programUUID) {
+	public boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(final String variableId, final String variableValue,
+			final String programUUID) {
 
 		return this.getDmsProjectDao().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
 
@@ -1176,11 +1177,37 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public boolean isLocationIdVariable(final int studyId, final String variableName) {
+
+		final DataSet trialDataSet = this.findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
+
+		final DMSVariableType dmsVariableType = trialDataSet.findVariableTypeByLocalName(variableName);
+
+		if (dmsVariableType != null) {
+			return dmsVariableType.getId() == TermId.LOCATION_ID.getId();
+		}
+
+		return false;
+
+	}
+
+	@Override
+	public BiMap<String, String> createInstanceLocationIdToNameMapFromStudy(final int studyId) {
+		// Create LocatioName to LocationId Map
+		final BiMap<String, String> map = HashBiMap.create();
+		final List<InstanceMetadata> metadataList = this.getInstanceMetadata(studyId);
+		for (final InstanceMetadata instanceMetadata : metadataList) {
+			map.put(String.valueOf(instanceMetadata.getLocationDbId()), instanceMetadata.getLocationName());
+		}
+		return map;
+	}
+
 	public StudyTypeDto getStudyTypeByStudyId(final Integer studyIdentifier) {
 		final DmsProject study = this.getDmsProjectDao().getById(studyIdentifier);
 		if (study != null && study.getStudyType() != null) {
 			return this.getStudyTypeBuilder().createStudyTypeDto(study.getStudyType());
 		}
 		return null;
+
 	}
 }

@@ -26,12 +26,4 @@ public abstract class Searcher extends DatabaseBroker {
 		super(sessionProvider);
 	}
 
-	protected final ExperimentSearcher getExperimentSearcher() {
-		return new ExperimentSearcher(this.sessionProvider);
-	}
-
-	protected final StudySearcherByNameStartSeasonCountry getProjectSearcher() {
-		return new StudySearcherByNameStartSeasonCountry(this.sessionProvider);
-	}
-
 }
