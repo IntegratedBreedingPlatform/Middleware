@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="vanina" id="v9.3.0-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+				<tableExists tableName="brapi_calls"/>
+			</not>
+        </preConditions>
+        <comment>Create brapi calls table</comment>
+        <sql dbms="mysql" splitStatements="true">
+            CREATE TABLE brapi_calls (
+			  call_name VARCHAR(255) NOT NULL,
+			  data_types VARCHAR(45) NOT NULL,
+			  methods VARCHAR(45) NOT NULL,
+			  versions VARCHAR(45) NOT NULL,
+			  PRIMARY KEY (call_name));
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("token", "json", "POST", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("crops", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("locations", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("phenotypes-search", "json", "POST", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("programs", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("roles", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("roles/assignable", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("samples/{sampleId}", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("studies", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("studies/{studyDbId}", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("studies/{studyDbId}/table", "json, tsv, csv", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("trials", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("trials/{trialDbId}/table", "json", "GET", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("users", "json", "GET, POST", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("users/{id}", "json", "PUT", "1.0");
+        </sql>
+    </changeSet>
+</databaseChangeLog>

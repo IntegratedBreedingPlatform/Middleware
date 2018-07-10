@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
+import org.generationcp.middleware.pojos.workbench.BrapiCall;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -665,4 +666,5 @@ public interface WorkbenchDataManager {
 	 */
 	boolean isSuperAdminUser(Integer userId);
 
+	List<BrapiCall> getBrapiCalls(String dataType, Integer pageSize, Integer pageNumber);
 }
