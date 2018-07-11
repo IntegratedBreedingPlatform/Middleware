@@ -8,7 +8,7 @@ import java.util.Objects;
 
 
 @Entity
-@Table(name = "brapi_call", schema = "workbench")
+@Table(name = "brapi_calls", schema = "workbench")
 public class BrapiCall {
 
 	@Id

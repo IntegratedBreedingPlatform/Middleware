@@ -52,7 +52,7 @@
 			VALUES("studies/{studyDbId}", "json", "GET", "1.0");
 
 			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
-			VALUES("studies/{studyDbId}/table", "json, tsv, csv", "GET", "1.0");
+			VALUES("studies/{studyDbId}/table", "json,tsv,csv", "GET", "1.0");
 
 			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
 			VALUES("trials", "json", "GET", "1.0");
@@ -61,10 +61,13 @@
 			VALUES("trials/{trialDbId}/table", "json", "GET", "1.0");
 
 			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
-			VALUES("users", "json", "GET, POST", "1.0");
+			VALUES("users", "json", "GET,POST", "1.0");
 
 			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
 			VALUES("users/{id}", "json", "PUT", "1.0");
+
+			INSERT INTO brapi_calls (call_name,data_types,methods,versions)
+			VALUES("calls", "json", "GET", "1.0,1.1,1.2");
         </sql>
     </changeSet>
 </databaseChangeLog>
