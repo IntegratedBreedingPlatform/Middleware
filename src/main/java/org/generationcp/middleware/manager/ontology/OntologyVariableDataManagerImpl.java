@@ -70,7 +70,6 @@ import java.util.Set;
  * Implements {@link OntologyVariableDataManagerImpl}
  */
 @Transactional
-@Configurable
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
