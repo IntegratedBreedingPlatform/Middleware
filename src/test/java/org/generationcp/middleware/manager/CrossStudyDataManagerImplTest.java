@@ -62,17 +62,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudiesForStudyEnvironments() {
-		final List<Integer> environmentIds = Arrays.asList(5770, 10081);
-		Debug.println(IntegrationTestBase.INDENT, "testGetStudiesForStudyEnvironments = " + environmentIds);
-		final List<StudyReference> studies = this.crossStudyDataManager.getStudiesForTrialEnvironments(environmentIds);
-		for (final StudyReference study : studies) {
-			study.print(IntegrationTestBase.INDENT);
-		}
-		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + studies.size());
-	}
-
-	@Test
 	public void testGetTraitsForNumericVariates() {
 		final List<Integer> environmentIds = Arrays.asList(10081, 10082, 10083, 10084, 10085, 10086, 10087); // Rice
 		final List<NumericTraitInfo> result = this.crossStudyDataManager.getTraitsForNumericVariates(environmentIds);

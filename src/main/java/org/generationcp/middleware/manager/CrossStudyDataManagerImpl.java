@@ -59,11 +59,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	}
 
 	@Override
-	public List<StudyReference> getStudiesForTrialEnvironments(final List<Integer> environmentIds) {
-		return this.getStudyNodeBuilder().getStudiesForTrialEnvironments(environmentIds);
-	}
-
-	@Override
 	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getTraitsForNumericVariates(environmentIds);
 	}

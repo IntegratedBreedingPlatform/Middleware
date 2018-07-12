@@ -57,8 +57,8 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 			StringBuilder sql =
 					new StringBuilder().append("DELETE FROM stockprop ").append(" WHERE stock_id IN ( ").append(" SELECT s.stock_id ")
 							.append(" FROM stock s ").append(" INNER JOIN nd_experiment_stock e ON s.stock_id = e.stock_id ")
-							.append(" INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id ")
-							.append(" AND ep.project_id = ").append(projectId);
+							.append(" INNER JOIN nd_experiment nde ON e.nd_experiment_id = nde.nd_experiment_id ")
+							.append(" AND nde.project_id = ").append(projectId);
 			sql.append(") ").append(" AND type_id =").append(termId);
 
 			SQLQuery query = this.getSession().createSQLQuery(sql.toString());

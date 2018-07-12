@@ -51,14 +51,6 @@ public interface CrossStudyDataManager {
 	List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds);
 
 	/**
-	 * Get all studies given a list of environments.
-	 *
-	 * @param environmentIds
-	 * @return a list of Study References
-	 */
-	List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds);
-
-	/**
 	 * Retrieves a set of standard variables (traits) used for the numeric variates observed in given list of environments. Numeric variates
 	 * are those with type "Numeric variable" (cvterm ID = 1110) or type "Date variable" (cvterm ID = 1117).
 	 *

@@ -1,23 +1,11 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -28,6 +16,14 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
 
 /**
  * The class <code>ObservationsTest</code> contains tests for the class <code>{@link Observations}</code>.
@@ -74,7 +70,7 @@ public class ObservationsTest {
 
 			// Tick to simulate adding in of the ID
 			@Override
-			public Serializable answer(InvocationOnMock invocation) throws Throwable {
+			public Serializable answer(final InvocationOnMock invocation) throws Throwable {
 				final Object[] arugment = invocation.getArguments();
 				final Phenotype phenotype = (Phenotype) arugment[0];
 				phenotype.setPhenotypeId(GENERATED_PHENOTYPE_ID);
@@ -95,9 +91,6 @@ public class ObservationsTest {
 		verify(this.mockSession, times(1)).save(
 				new Phenotype(new Integer(GENERATED_PHENOTYPE_ID), null, Integer.toString(TEST_TRAIT_ID), new Integer(TEST_TRAIT_ID), null,
 						CHARACTER_TEST_VALUE, null, null));
-
-		verify(this.mockSession, times(1)).save(isA(ExperimentPhenotype.class));
-
 		// add additional test code here
 	}
 
@@ -113,7 +106,7 @@ public class ObservationsTest {
 		when(this.mockSession.save(isA(Phenotype.class))).thenAnswer(new Answer<Serializable>() {
 
 			@Override
-			public Serializable answer(InvocationOnMock invocation) throws Throwable {
+			public Serializable answer(final InvocationOnMock invocation) throws Throwable {
 				final Object[] arugment = invocation.getArguments();
 				final Phenotype phenotype = (Phenotype) arugment[0];
 				phenotype.setPhenotypeId(GENERATED_PHENOTYPE_ID);
@@ -121,7 +114,7 @@ public class ObservationsTest {
 				return 1;
 			}
 		});
-		String programUuid = UUID.randomUUID().toString();
+		final String programUuid = UUID.randomUUID().toString();
 		final Variable mockVariable = Mockito.mock(Variable.class);
 		final Scale mockScale = Mockito.mock(Scale.class);
 		when(mockVariable.getScale()).thenReturn(mockScale);
@@ -136,8 +129,6 @@ public class ObservationsTest {
 		verify(this.mockSession, times(1)).save(
 				new Phenotype(new Integer(GENERATED_PHENOTYPE_ID), null, Integer.toString(TEST_TRAIT_ID), new Integer(TEST_TRAIT_ID), null,
 						TEST_TERM_NAME, new Integer(1234), null));
-		verify(this.mockSession, times(1)).save(isA(ExperimentPhenotype.class));
-
 		// add additional test code here
 	}
 

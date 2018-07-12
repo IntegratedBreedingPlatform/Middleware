@@ -239,6 +239,33 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.assertAddedGermplasmFields(results.get(0), propertyIds);
 
 	}
+	
+	@Test
+	public void testSearchForGermplasmsWithImmediateSourceGIDAndName() throws Exception {
+		//Create a new germplasm with -1 gnpgs
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(germplasmDate, femaleParentGID, maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID, 1, 1,
+						"MethodName", "LocationName");
+
+		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam(gid.toString(), Operation.EQUAL, false, false, false);
+
+		final List<String> propertyIds = new LinkedList<>();
+
+		// Create propertyId list with all addable columns.
+		propertyIds.add(GermplasmSearchDAO.IMMEDIATE_SOURCE_GID);
+		propertyIds.add(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
+
+		this.assertAddedGermplasmFields(results.get(0), propertyIds);
+
+	}
 
 	@Test
 	public void testSearchForGermplasmsWithGermplasmDetailsColumnsOnly() throws Exception {
@@ -1362,6 +1389,22 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			Assert.assertTrue("Result germplasm should not contain Male Parent Preferred Name",
 					StringUtils.isEmpty(germplasm.getMaleParentPreferredName()));
 		}
+		if (propertyIds.contains(GermplasmSearchDAO.IMMEDIATE_SOURCE_GID)) {
+			Assert.assertEquals("Result germplasm should contain Immediate Source GID", String.valueOf(maleParentGID),
+					germplasm.getImmediateSourceGID());
+		} else {
+			Assert.assertTrue("Result germplasm should not contain Immediate Source GID",
+					StringUtils.isEmpty(germplasm.getImmediateSourceGID()));
+		}
+		
+		if (propertyIds.contains(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME)) {
+			Assert.assertEquals("Result germplasm should contain Immediate Source Preferred Name", maleParentPreferredName.getNval(),
+					germplasm.getImmediateSourcePreferredName());
+		} else {
+			Assert.assertTrue("Result germplasm should not contain Immediate Source Preferred Name",
+					StringUtils.isEmpty(germplasm.getImmediateSourcePreferredName()));
+		}
+		
 		if (propertyIds.contains(NOTE_ATTRIBUTE)) {
 			Assert.assertEquals("Result germplasm should contain Note", this.attributeValue,
 					germplasm.getAttributeTypesValueMap().get(NOTE_ATTRIBUTE));

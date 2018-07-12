@@ -63,8 +63,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT = "select count(*) as totalObservationUnits from "
-			+ "nd_experiment nde \n" + "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
-			+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+			+ "nd_experiment nde \n"
+			+ "    inner join project proj on proj.project_id = nde.project_id \n"
 			+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
@@ -74,13 +74,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
 			"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
 					+ " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
-					+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
-					+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
+					+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
+					+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
 					+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
-					+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+					+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
 					+ "							INNER JOIN project p ON p.project_id = pr.subject_project_id "
@@ -89,8 +87,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
 			StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
-					+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+					+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
 
 	private MeasurementVariableService measurementVariableService;
@@ -169,7 +166,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ")
 			.append(TermId.TRIAL_LOCATION.getId())
 			.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ")
-			.append(TermId.SEASON_VAR_TEXT.getId()).append(" INNER JOIN study_type st ON p.study_type = st.study_type_id ")
+			.append(TermId.SEASON_VAR_TEXT.getId()).append(" INNER JOIN study_type st ON p.study_type_id = st.study_type_id ")
 			.append(" WHERE p.deleted = 0");
 
 		if (!StringUtils.isEmpty(serchParameters.getProgramUniqueId())) {
@@ -359,8 +356,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
 					"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
 					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+					+ "    inner join project proj on proj.project_id = nde.project_id \n"
 					+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 					+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
 					+ " where \n"
