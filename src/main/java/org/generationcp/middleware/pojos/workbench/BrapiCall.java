@@ -7,6 +7,7 @@ import javax.persistence.Table;
 import java.util.Objects;
 
 
+@SuppressWarnings("UnqualifiedFieldAccess")
 @Entity
 @Table(name = "brapi_call", schema = "workbench")
 public class BrapiCall {
@@ -89,10 +90,10 @@ public class BrapiCall {
 	@Override
 	public String toString() {
 		return "BrapiCall{" +
-			"call='" + call + '\'' +
-			", datatypes='" + datatypes + '\'' +
-			", methods='" + methods + '\'' +
-			", versions='" + versions + '\'' +
+			"call='" + this.call + '\'' +
+			", datatypes='" + this.datatypes + '\'' +
+			", methods='" + this.methods + '\'' +
+			", versions='" + this.versions + '\'' +
 			'}';
 	}
 }
