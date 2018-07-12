@@ -4,6 +4,15 @@ public class FormulaVariable extends Term {
 
 	private Integer targetTermId;
 
+	public FormulaVariable() {
+	}
+
+	public FormulaVariable(final Integer id, final String name, final int targetTermId) {
+		this.setId(id);
+		this.targetTermId = targetTermId;
+		this.setName(name);
+	}
+
 	public Integer getTargetTermId() {
 		return targetTermId;
 	}
