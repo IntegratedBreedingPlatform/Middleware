@@ -10,6 +10,7 @@ import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -143,7 +144,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("plant.plantNumber"), "plantNo");
 		projectionList.add(Projections.property("sample.sampleName"), "sampleName");
 		projectionList.add(Projections.property("sample.entryNumber"), "entryNumber");
-		projectionList.add(Projections.property("user.name"), "takenBy");
+		projectionList.add(CustomProjections.concatProperties(" ","person.firstName", "person.lastName"), "takenBy");
 		projectionList.add(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey");
 		projectionList.add(Projections.property("plant.plantBusinessKey"), "plantBusinessKey");
 		projectionList.add(Projections.property("experiment.plotId"), "plotId");
@@ -151,7 +152,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("stock.dbxrefId"), "gid");
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample").createAlias("samples.plant", "plant")
-				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN).createAlias("plant.experiment", "experiment")
+				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN).createAlias("user.person", "person")
+				.createAlias("plant.experiment", "experiment")
 				.createAlias("experiment.experimentStocks", "experimentStocks").createAlias("experimentStocks.stock", "stock")
 				.createAlias("experiment.properties", "properties").add(Restrictions.eq("id", sampleListId))
 				.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId())).setProjection(projectionList)
