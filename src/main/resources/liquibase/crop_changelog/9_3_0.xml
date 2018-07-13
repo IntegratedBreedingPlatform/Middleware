@@ -414,22 +414,20 @@
 				<constraints nullable="false"
 							 foreignKeyName="fk_formula_input_formula_id"
 							 referencedTableName="formula"
-							 referencedColumnNames="formula_id" />
+							 referencedColumnNames="formula_id"
+							 primaryKey="true"/>
 			</column>
 			<column name="variable_id" type="INT" >
 				<constraints nullable="false"
 							 foreignKeyName="fk_formula_input_variable_id"
 							 referencedTableName="cvterm"
-							 referencedColumnNames="cvterm_id" />
+							 referencedColumnNames="cvterm_id"
+							 primaryKey="true"/>
 			</column>
 		</createTable>
 		<modifySql dbms="mysql">
 			<append value="ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci" />
 		</modifySql>
-	</changeSet>
-
-	<changeSet author="nahuel" id="v9.3.0-2">
-		<addPrimaryKey tableName="formula_input" columnNames="formula_id, variable_id"></addPrimaryKey>
 	</changeSet>
 
 </databaseChangeLog>
