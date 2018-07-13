@@ -4,10 +4,11 @@ package org.generationcp.middleware.service.impl.study;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -20,9 +21,9 @@ import com.google.common.collect.Maps;
 public class Observations {
 
 	private final Session session;
-	private OntologyVariableDataManager ontologyVariableDataManager;
+	private final OntologyVariableDataManager ontologyVariableDataManager;
 
-	public Observations(final Session session, OntologyVariableDataManager ontologyVariableDataManager) {
+	public Observations(final Session session, final OntologyVariableDataManager ontologyVariableDataManager) {
 		this.session = session;
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
 	}
@@ -53,29 +54,22 @@ public class Observations {
 
 	}
 
-	private Integer insertPhenotype(Variable variable, String triatValue, Integer observeableId, Integer measurementId) {
+	private Integer insertPhenotype(final Variable variable, final String triatValue, final Integer observeableId, final Integer measurementId) {
 
 		final Phenotype phenotype = new Phenotype();
 		// The name is set to the observable id because that database expects them to be the same.
 		phenotype.setName(observeableId.toString());
 		phenotype.setObservableId(observeableId);
 		phenotype.setValue(triatValue);
-		setCategoricalValue(variable, phenotype, triatValue);
+	  	phenotype.setExperiment(this.getExperimentDao().getById(measurementId));
+		this.setCategoricalValue(variable, phenotype, triatValue);
 		this.session.save(phenotype);
 
-		final ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
-		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
-
-		experimentPhenotype.setExperiment(measurementId);
-
-		this.session.save(experimentPhenotype);
 		return phenotype.getPhenotypeId();
-
 	}
 
-	private void setCategoricalValue(Variable variable, Phenotype phenotype, String triatValue) {
-		if (variable.getScale().getDataType().getId() == org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE
-				.getId()) {
+	private void setCategoricalValue(final Variable variable, final Phenotype phenotype, final String triatValue) {
+		if (variable.getScale().getDataType().getId().equals(DataType.CATEGORICAL_VARIABLE.getId())) {
 			// TODO: Please cache the term summary
 			final List<TermSummary> categories = variable.getScale().getCategories();
 			final ImmutableMap<String, TermSummary> uniqueIndex = Maps.uniqueIndex(categories, new Function<TermSummary, String>() {
@@ -84,7 +78,7 @@ public class Observations {
 					return termSummary.getName().trim();
 				}
 			});
-			TermSummary termSummary = uniqueIndex.get(triatValue.trim());
+			final TermSummary termSummary = uniqueIndex.get(triatValue.trim());
 			// This should actually be caught by the validator. This is a back stop.
 			if(termSummary == null) {
 				throw new IllegalArgumentException(String.format("Categorical value with name '%s' for variable with name '%s' does not exist in the Ontology. "
@@ -110,4 +104,9 @@ public class Observations {
 
 	}
 
+	private ExperimentDao getExperimentDao() {
+	  final ExperimentDao experimentDao = new ExperimentDao();
+	  experimentDao.setSession(this.session);
+	  return experimentDao;
+	}
 }

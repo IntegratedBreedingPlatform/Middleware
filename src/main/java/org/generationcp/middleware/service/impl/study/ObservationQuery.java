@@ -115,8 +115,7 @@ class ObservationQuery {
 		+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 		+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
 		+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
-		+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-		+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+		+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
 		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + " WHERE \n"
 		+ "\tp.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId \n"
 		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
@@ -134,7 +133,7 @@ class ObservationQuery {
 	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List)}
 	 * which is used Trial and Nursery Manager
 	 */
-	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, Integer instanceId) {
+	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
 		final String orderByMeasurementVariableId = getOrderByMeasurementVariableId(measurementVariables);
 
@@ -184,7 +183,7 @@ class ObservationQuery {
 
 	private String getColumnNamesFromTraitNames(final List<MeasurementVariableDto> measurementVariables) {
 		final StringBuilder columnNames = new StringBuilder();
-		int size = measurementVariables.size();
+		final int size = measurementVariables.size();
 		for (int i = 0; i < size; i++) {
 			if (i == 0) {
 				columnNames.append(", \n");
@@ -201,7 +200,7 @@ class ObservationQuery {
 	}
 
 	String getObservationsMainQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors, final List<String> designFactors) {
-		StringBuilder sqlBuilder = new StringBuilder();
+		final StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("SELECT \n")
 			.append("    nde.nd_experiment_id,\n")
@@ -221,16 +220,16 @@ class ObservationQuery {
 			.append("    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n")
 			.append("    nde.plot_id as PLOT_ID, \n");
 
-		String traitClauseFormat =
+		final String traitClauseFormat =
 			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
-		for (MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
+		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
 			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
 				measurementVariable.getName(), measurementVariable.getName() + PHENOTYPE_ID));
 		}
 
 		if (!germplasmDescriptors.isEmpty()) {
-			String germplasmDescriptorClauseFormat =
+			final String germplasmDescriptorClauseFormat =
 					"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s', \n";
 			for (final String gpFactor : germplasmDescriptors) {
 				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
@@ -238,7 +237,7 @@ class ObservationQuery {
 		}
 		
 		if (!designFactors.isEmpty()) {
-			String designFactorClauseFormat =
+			final String designFactorClauseFormat =
 					"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
 			for (final String designFactor : designFactors) {
 				sqlBuilder.append(String.format(designFactorClauseFormat, designFactor, designFactor));
@@ -252,8 +251,7 @@ class ObservationQuery {
 			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n")
 			.append("	INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n")
 			.append("	INNER JOIN stock s ON s.stock_id = es.stock_id \n")
-			.append("	LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n")
-			.append("	LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n")
+			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
 			.append("		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");
 
@@ -266,12 +264,12 @@ class ObservationQuery {
 
 	String getOrderingClause(final String sortBy, final String sortOrder) {
 		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : DEFAULT_SORT_COLUMN;
-		String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : DEFAULT_SORT_ORDER;
+		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : DEFAULT_SORT_ORDER;
 		/**
 		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
 		 * with 1 so that they turn into number and are sorted as numbers rather than strings.
 		 */
-		List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW", "COL", "BLOCK_NO");
+		final List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW", "COL", "BLOCK_NO");
 		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
 			orderColumn = "(1 * " + orderColumn + ")";
 		}
@@ -296,7 +294,7 @@ class ObservationQuery {
 	private String getVariableDetailsJoin(final List<MeasurementVariableDto> measurementVariables) {
 
 		final StringBuilder leftOuterJoinQuery = new StringBuilder();
-		for (MeasurementVariableDto measurementVariable : measurementVariables) {
+		for (final MeasurementVariableDto measurementVariable : measurementVariables) {
 			leftOuterJoinQuery.append(this.getVariableDetailsJoinQuery(measurementVariable));
 		}
 		return leftOuterJoinQuery.toString();
@@ -305,10 +303,10 @@ class ObservationQuery {
 
 	// use the id
 	private String getVariableDetailsJoinQuery(final MeasurementVariableDto measurementVariabl) {
-		return "        LEFT OUTER JOIN\n" + "    (SELECT \n" + "        nep.nd_experiment_id,\n" + "            pt.phenotype_id,\n"
-				+ "            IF(cvterm_id = cvterm_id, pt.value, NULL) AS PhenotypeValue\n" + FROM + "        phenotype pt\n"
+		return "        LEFT OUTER JOIN\n" + "    (SELECT pt.nd_experiment_id, pt.phenotype_id, "
+				+ "            IF(cvterm_id = cvterm_id, pt.value, NULL) AS PhenotypeValue " + FROM + " phenotype pt"
 				+ "    INNER JOIN cvterm svdo ON svdo.cvterm_id = pt.observable_id\n"
-				+ "    INNER JOIN nd_experiment_phenotype nep ON nep.phenotype_id = pt.phenotype_id\n" + WHERE
+				+ WHERE
 				+ "        svdo.name = ? ) " + measurementVariabl.getName() + " ON " + measurementVariabl.getName()
 				+ ".nd_experiment_id = nde.nd_experiment_id\n";
 	}
