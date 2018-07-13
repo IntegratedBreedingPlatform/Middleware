@@ -233,6 +233,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 		if (user == null) {
 			// FIXME fresh db doesn't have admin user in crop. BMS-886
 			final Person person = PersonTestDataInitializer.createPerson();
+			person.setFirstName(SampleDaoTest.ADMIN);
+			person.setLastName(SampleDaoTest.ADMIN);
 			this.personDAO.saveOrUpdate(person);
 
 			user = UserTestDataInitializer.createUser();
