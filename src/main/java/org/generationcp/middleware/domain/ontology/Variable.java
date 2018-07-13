@@ -1,11 +1,15 @@
 
 package org.generationcp.middleware.domain.ontology;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Extends {@link Term} The Variable with term, property, scale, method.
@@ -31,6 +35,8 @@ public class Variable extends Term {
 	private Method method;
 	private Property property;
 	private Scale scale;
+
+	private FormulaDto formula;
 
 	private Boolean isFavorite;
 
@@ -93,6 +99,14 @@ public class Variable extends Term {
 
 	public void setScale(Scale scale) {
 		this.scale = scale;
+	}
+
+	public FormulaDto getFormula() {
+		return formula;
+	}
+
+	public void setFormula(FormulaDto formula) {
+		this.formula = formula;
 	}
 
 	/**
@@ -205,5 +219,10 @@ public class Variable extends Term {
 		if (this.observations != null) {
 			Debug.println(indent + 3, "observations:" + this.observations);
 		}
+
+		if (this.formula != null) {
+			Debug.println(indent + 3, "formula:" + this.formula);
+		}
 	}
+
 }
