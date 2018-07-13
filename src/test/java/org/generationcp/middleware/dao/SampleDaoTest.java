@@ -1,6 +1,8 @@
 package org.generationcp.middleware.dao;
 
-import com.google.common.collect.Ordering;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -12,10 +14,8 @@ import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
@@ -28,20 +28,18 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.google.common.collect.Ordering;
 
 public class SampleDaoTest extends IntegrationTestBase {
 
-	public static final String ADMIN = "admin";
+	private static final String LIST_NAME = "TEST-LIST-FOR-SAMPLE-DAO-1";
+	private static final String PLOT_ID = "PLOT-ID1";
+	public static final String ADMIN = "Admin";
 	public static final Integer TEST_SAMPLE_RECORD_COUNT = 23;
 
 	private SampleListDao sampleListDao;
@@ -89,7 +87,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 
-		this.listId = this.createSampleListForFilter("TEST-LIST-FOR-SAMPLE-DAO-1");
+		this.listId = this.createSampleListForFilter(LIST_NAME, false, TEST_SAMPLE_RECORD_COUNT, "PLOT-ID");
 	}
 
 	@Test
@@ -98,6 +96,15 @@ public class SampleDaoTest extends IntegrationTestBase {
 		final Long countAllSample = this.sampleDao.countFilter(null, this.listId);
 
 		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT.intValue(), countAllSample.intValue());
+
+	}
+	
+	@Test
+	public void testCountFilterWithPlotId() {
+
+		final Long countAllSample = this.sampleDao.countFilter(PLOT_ID, this.listId);
+
+		Assert.assertEquals(1, countAllSample.intValue());
 
 	}
 
@@ -123,7 +130,56 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(3, result3.size());
 
 	}
-
+	
+	@Test
+	public void testFilterPaginationWithPlotId() {
+		final Pageable pageable = Mockito.mock(Pageable.class);
+		Mockito.when(pageable.getPageSize()).thenReturn(10);
+		Mockito.when(pageable.getPageNumber()).thenReturn(0);
+		final List<SampleDTO> result = this.sampleDao.filter(PLOT_ID, this.listId, pageable);
+		Assert.assertEquals(1, result.size());
+	}
+	
+	@Test
+	public void testFilter() {
+		final Pageable pageable = Mockito.mock(Pageable.class);
+		Mockito.when(pageable.getPageSize()).thenReturn(10);
+		Mockito.when(pageable.getPageNumber()).thenReturn(0);
+		final List<SampleDTO> result = this.sampleDao.filter(PLOT_ID, this.listId, pageable);
+		Assert.assertEquals(1, result.size());
+		final SampleDTO sample =  result.get(0);
+		Assert.assertNotNull(sample.getSampleId());
+		Assert.assertEquals("SAMPLE-" + LIST_NAME + 1, sample.getSampleName());
+		Assert.assertEquals("BUSINESS-KEY-" + LIST_NAME + 1, sample.getSampleBusinessKey());
+		Assert.assertEquals("Admin Admin", sample.getTakenBy());
+		Assert.assertEquals("TEST-LIST-FOR-SAMPLE-DAO-1", sample.getSampleList());
+		Assert.assertEquals("0", sample.getPlantNumber().toString());
+		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
+		Assert.assertNull(sample.getGid());
+		Assert.assertEquals("Germplasm 1", sample.getDesignation());
+	}
+	
+	@Test
+	public void testFilterWhereTakenByIsNull() {
+		//Create a new sample list
+		this.listId = this.createSampleListForFilter(LIST_NAME, true, TEST_SAMPLE_RECORD_COUNT, "PLOTID");
+		final Pageable pageable = Mockito.mock(Pageable.class);
+		Mockito.when(pageable.getPageSize()).thenReturn(10);
+		Mockito.when(pageable.getPageNumber()).thenReturn(0);
+		final List<SampleDTO> result = this.sampleDao.filter("PLOTID1", this.listId, pageable);
+		Assert.assertEquals(1, result.size());
+		final SampleDTO sample =  result.get(0);
+		Assert.assertNotNull(sample.getSampleId());
+		Assert.assertEquals("SAMPLE-" + LIST_NAME + 1, sample.getSampleName());
+		Assert.assertEquals("BUSINESS-KEY-" + LIST_NAME + 1, sample.getSampleBusinessKey());
+		Assert.assertNull(sample.getTakenBy());
+		Assert.assertEquals("TEST-LIST-FOR-SAMPLE-DAO-1", sample.getSampleList());
+		Assert.assertEquals("0", sample.getPlantNumber().toString());
+		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
+		Assert.assertNull(sample.getGid());
+		Assert.assertEquals("Germplasm 1", sample.getDesignation());
+	}
+	
 	@Test
 	public void testFilterSortAscending() {
 
@@ -166,7 +222,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 	}
 
-	private Integer createSampleListForFilter(final String listName) {
+	private Integer createSampleListForFilter(final String listName, final boolean takenByIsNull, final int sampleSize, final String plotIdString) {
 
 		final DmsProject project = new DmsProject();
 		project.setName("Test Project");
@@ -195,12 +251,12 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 
-		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
+		for (int i = 1; i < sampleSize + 1; i++) {
 
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setPlotId("PLOT-ID" + i);
+			experimentModel.setPlotId(plotIdString + i);
 			experimentModel.setProject(project);
 			experimentDao.saveOrUpdate(experimentModel);
 
@@ -221,10 +277,10 @@ public class SampleDaoTest extends IntegrationTestBase {
 			plant.setExperiment(experimentModel);
 
 			final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, user);
-			sample.setCreatedBy(user);
 			sample.setSampleName("SAMPLE-" + listName + i);
 			sample.setSampleBusinessKey("BUSINESS-KEY-" + listName + i);
 			sample.setEntryNumber(i);
+			if(takenByIsNull) sample.setTakenBy(null);
 			this.sampleDao.saveOrUpdate(sample);
 
 		}
