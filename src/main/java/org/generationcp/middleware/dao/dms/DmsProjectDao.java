@@ -187,14 +187,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";
 
-//	public List<Reference> getRootFolders(final String programUUID) {
-//		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID);
-//	}
-
-//	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID) {
-//		return this.getChildrenOfFolder(folderId, programUUID, null);
-//	}
-
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
 		for (final Object[] row : list) {
