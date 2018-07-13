@@ -115,10 +115,4 @@ public class StudyTypeDto implements Serializable, Comparable<StudyTypeDto> {
 		return new StudyTypeDto(1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME, 10000, true);
 	}
 	
-	public String getPluralFormOfLabel() {
-		if (this.label.endsWith("y")){
-			return this.label.substring(0, label.length()-1) + "ies";
-		}
-		return this.label + "s";
-	}
 }
