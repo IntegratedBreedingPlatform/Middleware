@@ -109,6 +109,7 @@
         <mapping class="org.generationcp.middleware.pojos.Plant"/>
         <mapping class="org.generationcp.middleware.pojos.SampleList"/>
         <mapping class="org.generationcp.middleware.pojos.dms.StudyType"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.BrapiCall"/>
         
     </session-factory>
 </hibernate-configuration>

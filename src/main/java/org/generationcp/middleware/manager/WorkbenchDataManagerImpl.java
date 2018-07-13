@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.generationcp.middleware.dao.BrapiCallDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
+import org.generationcp.middleware.pojos.workbench.BrapiCall;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -169,6 +171,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
 		standardPresetDAO.setSession(this.getCurrentSession());
 		return standardPresetDAO;
+	}
+
+	private BrapiCallDAO getBrapiCallDAO() {
+		final BrapiCallDAO brapiCallDAO = new BrapiCallDAO();
+		brapiCallDAO.setSession(this.getCurrentSession());
+		return brapiCallDAO;
 	}
 
 	@Override
@@ -1021,6 +1029,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Role> getAllRoles() {
 		return this.getRoleDao().getAll();
+	}
+
+	@Override
+	public List<BrapiCall> getBrapiCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
+		return this.getBrapiCallDAO().getByDataType(dataType, pageSize, pageNumber);
 	}
 
 }
