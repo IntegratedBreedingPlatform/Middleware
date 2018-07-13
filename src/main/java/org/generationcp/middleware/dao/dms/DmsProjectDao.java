@@ -11,7 +11,15 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import com.google.common.base.Preconditions;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -31,6 +39,7 @@ import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -45,14 +54,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Preconditions;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -90,6 +92,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND pr.object_project_id = :folderId "
 			+ "     AND NOT EXISTS (SELECT 1 FROM project p WHERE p.project_id = subject.project_id AND p.deleted = " + DELETED_STUDY + ")"
 			+ "     AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
+			+ "     AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
 			// the OR here for value = null is required for folders.
 			+ "	ORDER BY name";
 
@@ -184,34 +187,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";
 
-	public List<Reference> getRootFolders(final String programUUID) {
-		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID);
-	}
-
-	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID) {
-
-		final List<Reference> childrenNodes;
-
-		try {
-			final Query query =
-				this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name").addScalar("description")
-					.addScalar("is_study").addScalar("program_uuid").addScalar("studyType").addScalar("label").addScalar("name")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId");
-			query.setParameter("folderId", folderId);
-			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-
-			final List<Object[]> list = query.list();
-			childrenNodes = getChildrenNodesList(list);
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				"Error retrieving study folder tree, folderId=" + folderId + " programUUID=" + programUUID + ":" + e.getMessage(), e);
-		}
-
-		return childrenNodes;
-	}
-
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
 		for (final Object[] row : list) {
@@ -222,16 +197,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			// project.description
 			final String description = (String) row[2];
 			// non-zero if a study, else a folder
-			final Integer isStudy = ((Integer) row[3]);
+			final Integer isStudy = (Integer) row[3];
 			// project.program_uuid
 			final String projectUUID = (String) row[4];
 
-			if (isStudy == 1) {
+			if (isStudy.equals(1)) {
 				final Integer studyTypeId = (Integer) row[5];
 				final String label = (String) row[6];
 				final String studyTypeName = (String) row[7];
-				final boolean visible = ((Byte) row[9]) == 1;
-				final Integer cvtermId = (Integer) row[10];
+				final boolean visible = ((Byte) row[8]) == 1;
+				final Integer cvtermId = (Integer) row[9];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto));
 			} else {
@@ -530,12 +505,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyDetails> studyDetails = new ArrayList<>();
 
 		final StringBuilder sqlString = new StringBuilder().append(
-			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
-			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
+				"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
+				.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
 			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy ").append("FROM project p ")
-			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+				.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
-			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
+				.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
 			.append("                   AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
 			.append("       LEFT JOIN nd_experiment e ON p.project_id = e.project_id ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
@@ -644,8 +619,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final StringBuilder sqlString =
 					new StringBuilder()
-			.append("SELECT COUNT(1) ")
-			.append("FROM project p ")
+			.append("SELECT COUNT(1) ").append("FROM project p ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ")
 			.append(TermId.PI_NAME.getId())
@@ -681,12 +655,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final StringBuilder sqlString = new StringBuilder()
 				.append("SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
-				.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, st"
-						+ ".study_type_id AS "
-						+ "studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as cvtermId ")
+					.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, st"
+							+ ".study_type_id AS "
+							+ "studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as cvtermId ")
 				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy ").append("FROM project p ")
-				.append(" LEFT JOIN projectprop  ppPI ON p.project_id = ppPI.project_id ").append(" AND ppPI.variable_id =  ")
-				.append(TermId.PI_NAME.getId()).append(" ")
+					.append(" LEFT JOIN projectprop  ppPI ON p.project_id = ppPI.project_id ").append(" AND ppPI.variable_id =  ")
+					.append(TermId.PI_NAME.getId()).append(" ")
 				// 8100
 				.append(" LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
 				.append(" AND ppPIid.variable_id =  ").append(TermId.PI_ID.getId()).append(" ")
@@ -753,8 +727,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final StringBuilder sqlString =
 					new StringBuilder()
-			.append("SELECT COUNT(1) ")
-			.append("FROM project p ")
+			.append("SELECT COUNT(1) ").append("FROM project p ")
 			.append(" ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ")
@@ -1121,5 +1094,34 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException("Error with getProjectStartDateByProjectId() query from Project " + e.getMessage(), e);
 		}
 		return null;
+	}
+
+	public List<Reference> getRootFolders(final String programUUID, final Integer studyType) {
+		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyType);
+	}
+
+	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID, final Integer studyType) {
+
+		final List<Reference> childrenNodes;
+
+		try {
+			final Query query =
+					this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name")
+							.addScalar("description").addScalar("is_study", Hibernate.INTEGER).addScalar("program_uuid").addScalar("studyType").addScalar("label")
+							.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId");
+			query.setParameter("folderId", folderId);
+			query.setParameter("studyTypeId", studyType);
+			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
+
+			final List<Object[]> list = query.list();
+			childrenNodes = getChildrenNodesList(list);
+
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error retrieving study folder tree, folderId=" + folderId + " programUUID=" + programUUID + ":" + e.getMessage(), e);
+		}
+
+		return childrenNodes;
 	}
 }
