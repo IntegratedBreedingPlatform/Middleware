@@ -277,4 +277,8 @@ public class SampleDetailsDTO implements Serializable {
 	public void setSampleEntryNo(final Integer sampleEntryNo) {
 		this.sampleEntryNo = sampleEntryNo;
 	}
+
+	public SimpleDateFormat getDateFormat() {
+		return dateFormat;
+	}
 }

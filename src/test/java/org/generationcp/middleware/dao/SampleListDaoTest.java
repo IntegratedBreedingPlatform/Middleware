@@ -1,7 +1,6 @@
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,20 +8,29 @@ import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,11 +52,15 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	private SampleListDao sampleListDao;
 	private UserDAO userDao;
+	private PersonDAO personDAO;
 	private PlantDao plantDao;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
 	private GeolocationDao geolocationDao;
 	private DmsProjectDao dmsProjectDao;
+	private StockDao stockDao;
+	private ExperimentStockDao experimentStockDao;
+	private ExperimentPropertyDao experimentPropertyDao;
 
 	public static final String ROOT_FOLDER = "Samples";
 
@@ -60,6 +72,12 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.userDao = new UserDAO();
 		this.userDao.setSession(this.sessionProvder.getSession());
 
+		this.personDAO = new PersonDAO();
+		this.personDAO.setSession(this.sessionProvder.getSession());
+
+		this.stockDao = new StockDao();
+		this.stockDao.setSession(this.sessionProvder.getSession());
+
 		this.plantDao = new PlantDao();
 		this.plantDao.setSession(this.sessionProvder.getSession());
 
@@ -68,6 +86,12 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());
+
+		this.experimentPropertyDao = new ExperimentPropertyDao();
+		this.experimentPropertyDao.setSession(this.sessionProvder.getSession());
+
+		this.experimentStockDao = new ExperimentStockDao();
+		this.experimentStockDao.setSession(this.sessionProvder.getSession());
 
 		this.geolocationDao = new GeolocationDao();
 		this.geolocationDao.setSession(this.sessionProvder.getSession());
@@ -238,6 +262,30 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertTrue(Ordering.natural().reverse().isOrdered(result));
 	}
 
+	@Test
+	public void testGetSampleDetailsDTO() {
+
+		final List<SampleList> sampleLists = this.sampleListDao.searchSampleLists("TEST-LIST-1", true, PROGRAM_UUID, null);
+
+		final List<SampleDetailsDTO> result = this.sampleListDao.getSampleDetailsDTO(sampleLists.get(0).getId());
+
+		Assert.assertFalse(result.isEmpty());
+		final SampleDetailsDTO sampleDetailsDTO = result.get(0);
+
+		final User user = this.userDao.getUserByUserName(ADMIN);
+		final Person person = user.getPerson();
+
+		Assert.assertEquals("PABCD", sampleDetailsDTO.getPlantBusinessKey());
+		Assert.assertEquals("BUSINESS-KEY-TEST-LIST-1", sampleDetailsDTO.getSampleBusinessKey());
+		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), sampleDetailsDTO.getTakenBy());
+		Assert.assertEquals("SAMPLE-TEST-LIST-1", sampleDetailsDTO.getSampleName());
+		Assert.assertEquals("Germplasm 1", sampleDetailsDTO.getDesignation());
+		Assert.assertEquals(sampleDetailsDTO.getDateFormat().format(new Date()), sampleDetailsDTO.getDisplayDate());
+		Assert.assertEquals(1, sampleDetailsDTO.getEntryNumber().intValue());
+		Assert.assertEquals("1", sampleDetailsDTO.getPlotNumber());
+
+	}
+
 	private void createSampleListForSearch(final String listName) {
 
 		final DmsProject project = new DmsProject();
@@ -245,28 +293,24 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		project.setDescription("Test Project");
 		dmsProjectDao.save(project);
 
-		User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
-		if (user == null) {
-			// FIXME fresh db doesn't have admin user in crop. BMS-886
-			user = UserTestDataInitializer.createUser();
-			user.setName(ADMIN);
-			user.setUserid(null);
-			this.userDao.saveOrUpdate(user);
-		}
+		final User user = this.createTestUser();
+
+		final ExperimentModel experimentModel = this.createTestExperiment(project);
+		this.createTestStock(experimentModel);
+
+		this.createTestSampleList(listName, user, experimentModel);
+
+
+	}
+
+	private void createTestSampleList(final String listName, final User user, final ExperimentModel experimentModel) {
+
+		final Plant plant = PlantTestDataInitializer.createPlant();
+		plant.setExperiment(experimentModel);
+
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 		sampleList.setListName(listName);
 		sampleList.setDescription("DESCRIPTION-" + listName);
-
-		final ExperimentModel experimentModel = new ExperimentModel();
-		final Geolocation geolocation = new Geolocation();
-		geolocationDao.saveOrUpdate(geolocation);
-		experimentModel.setGeoLocation(geolocation);
-		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-		experimentModel.setProject(project);
-		experimentDao.saveOrUpdate(experimentModel);
-
-		final Plant plant = PlantTestDataInitializer.createPlant();
-		plant.getExperiment().setNdExperimentId(experimentModel.getNdExperimentId());
 
 		final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, user);
 		sample.setSampleName("SAMPLE-" + listName);
@@ -275,6 +319,73 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		this.sampleDao.saveOrUpdate(sample);
+
 	}
+
+	private User createTestUser() {
+		User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
+		if (user == null) {
+			// FIXME fresh db doesn't have admin user in crop. BMS-886
+			final Person person = PersonTestDataInitializer.createPerson();
+			person.setFirstName("John");
+			person.setLastName("Doe");
+			this.personDAO.saveOrUpdate(person);
+
+			user = UserTestDataInitializer.createUser();
+			user.setName(ADMIN);
+			user.setUserid(null);
+			user.setPersonid(person.getId());
+			this.userDao.saveOrUpdate(user);
+		}
+
+		return user;
+	}
+
+	private ExperimentModel createTestExperiment(final DmsProject project) {
+
+		final ExperimentModel experimentModel = new ExperimentModel();
+		final Geolocation geolocation = new Geolocation();
+		geolocationDao.saveOrUpdate(geolocation);
+
+		experimentModel.setGeoLocation(geolocation);
+		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+		experimentModel.setProject(project);
+		experimentDao.saveOrUpdate(experimentModel);
+
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(TermId.PLOT_NO.getId());
+		experimentProperty.setValue("1");
+		experimentProperty.setRank(1);
+		experimentPropertyDao.saveOrUpdate(experimentProperty);
+
+		return experimentModel;
+
+	}
+
+	private StockModel createTestStock(final ExperimentModel experimentModel) {
+
+		final StockModel stockModel = new StockModel();
+		stockModel.setUniqueName("1");
+		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
+		stockModel.setName("Germplasm 1");
+		stockModel.setIsObsolete(false);
+		stockModel.setDbxrefId(1);
+
+		this.stockDao.saveOrUpdate(stockModel);
+
+		final ExperimentStock experimentStock = new ExperimentStock();
+		experimentStock.setStock(stockModel);
+		experimentStock.setExperiment(experimentModel);
+		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
+
+		this.experimentStockDao.saveOrUpdate(experimentStock);
+
+		return stockModel;
+
+	}
+
+
+
 
 }
