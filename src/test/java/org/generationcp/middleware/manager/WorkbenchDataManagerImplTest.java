@@ -666,16 +666,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testGetProjectUserInfoByProjectIdAndUserId() {
-		final ProjectUserInfo result = this.workbenchDataManager.getProjectUserInfoDao()
-				.getByProjectIdAndUserId(this.commonTestProject.getProjectId(), this.testUser1.getUserid());
-
-		Assert.assertNotNull(result);
-		Assert.assertEquals(result.getProject(), this.commonTestProject);
-		Assert.assertEquals(result.getUserId(), this.testUser1.getUserid());
-	}
-	
-	@Test
 	public void testGetProjectUserInfoByProjectId() {
 		final List<ProjectUserInfo> results = this.workbenchDataManager.getProjectUserInfoDao()
 				.getByProjectId(this.commonTestProject.getProjectId());
@@ -822,4 +812,49 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue(this.workbenchDataManager.isSuperAdminUser(userId2));
 	}
 	
+	@Test
+	public void testGetProjectUserInfoByProjectIdAndUserIds() {
+		final Project project = this.workbenchTestDataUtil.createTestProjectData();
+		this.workbenchDataManager.addProject(project);
+		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
+		final Integer userId1 = this.workbenchDataManager.addUser(user1);
+		
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, userId1);
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		final List<ProjectUserInfo> result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserIds(project.getProjectId(), Arrays.asList(userId1));
+		Assert.assertEquals(1, result.size());
+		Assert.assertEquals(userId1, result.get(0).getUserId());
+		Assert.assertEquals(project.getProjectId(), result.get(0).getProject().getProjectId());
+	}
+	
+	@Test
+	public void testGetProjectUserInfoByProjectIdAndUserId() {
+		final Project project = this.workbenchTestDataUtil.createTestProjectData();
+		this.workbenchDataManager.addProject(project);
+		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
+		final Integer userId1 = this.workbenchDataManager.addUser(user1);
+		
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, userId1);
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		final ProjectUserInfo result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), userId1);
+		Assert.assertEquals(userId1, result.getUserId());
+		Assert.assertEquals(project.getProjectId(), result.getProject().getProjectId());
+	}
+	
+	@Test
+	public void testDeleteProjectUserInfo() {
+		final Project project = this.workbenchTestDataUtil.createTestProjectData();
+		this.workbenchDataManager.addProject(project);
+		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
+		final Integer userId1 = this.workbenchDataManager.addUser(user1);
+		
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, userId1);
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		ProjectUserInfo result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), userId1);
+		Assert.assertEquals(userId1, result.getUserId());
+		Assert.assertEquals(project.getProjectId(), result.getProject().getProjectId());
+		this.workbenchDataManager.deleteProjectUserInfos(Arrays.asList(result));
+		result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), userId1);
+		Assert.assertNull(result);
+	}
 }
