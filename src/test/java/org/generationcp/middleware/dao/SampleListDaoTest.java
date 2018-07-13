@@ -335,6 +335,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 			user.setName(ADMIN);
 			user.setUserid(null);
 			user.setPersonid(person.getId());
+			user.setPerson(person);
 			this.userDao.saveOrUpdate(user);
 		}
 
