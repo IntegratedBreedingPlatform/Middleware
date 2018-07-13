@@ -70,7 +70,7 @@ public class DmsProjectDaoTest {
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
 
-		final List<Reference> result = this.dao.getRootFolders(PROG_UUID);
+		final List<Reference> result = this.dao.getRootFolders(PROG_UUID, null);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(mockQueryResult.size(), result.size());
 

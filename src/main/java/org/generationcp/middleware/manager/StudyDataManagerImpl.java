@@ -138,12 +138,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Reference> getRootFolders(final String programUUID) {
-		return this.getDmsProjectDao().getRootFolders(programUUID);
+		return this.getDmsProjectDao().getRootFolders(programUUID, null);
 	}
 
 	@Override
 	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID) {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID);
+		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, null);
 	}
 
 	@Override
@@ -654,7 +654,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder is not existing");
 		}
 		// check if folder has no children
-		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID);
+		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, null);
 		if (children != null && !children.isEmpty()) {
 			throw new MiddlewareQueryException("Folder is not empty");
 		}
@@ -678,7 +678,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final DmsProjectDao dmsProjectDao = this.getDmsProjectDao();
 
 		// check if folder has no children
-		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID);
+		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, null);
 		return (children == null || children.isEmpty());
 	}
 
@@ -1220,7 +1220,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	 */
 	@Override
 	public List<Reference> getRootFoldersByStudyType(final String programUUID, final Integer studyTypeId) {
-		return this.getDmsProjectDao().getRootFoldersByStudyType(programUUID, studyTypeId);
+		return this.getDmsProjectDao().getRootFolders(programUUID, studyTypeId);
 	}
 
 	/**
@@ -1233,6 +1233,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	 */
 	@Override
 	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
-		return this.getDmsProjectDao().getChildrenOfFolderByStudyType(folderId, programUUID, studyTypeId);
+		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
 	}
 }

@@ -187,34 +187,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";
 
-	public List<Reference> getRootFolders(final String programUUID) {
-		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID);
-	}
+//	public List<Reference> getRootFolders(final String programUUID) {
+//		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID);
+//	}
 
-	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID) {
-
-		final List<Reference> childrenNodes;
-
-		try {
-			final Query query =
-				this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name")
-						.addScalar("description").addScalar("is_study", Hibernate.INTEGER).addScalar("program_uuid").addScalar("studyType").addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId");
-			query.setParameter("folderId", folderId);
-			query.setParameter("studyTypeId", null);
-			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-
-			final List<Object[]> list = query.list();
-			childrenNodes = getChildrenNodesList(list);
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				"Error retrieving study folder tree, folderId=" + folderId + " programUUID=" + programUUID + ":" + e.getMessage(), e);
-		}
-
-		return childrenNodes;
-	}
+//	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID) {
+//		return this.getChildrenOfFolder(folderId, programUUID, null);
+//	}
 
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
@@ -534,7 +513,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyDetails> studyDetails = new ArrayList<>();
 
 		final StringBuilder sqlString = new StringBuilder().append(
-			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
+				"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 				.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
 			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy ").append("FROM project p ")
 				.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
@@ -1125,11 +1104,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return null;
 	}
 
-	public List<Reference> getRootFoldersByStudyType(final String programUUID, final Integer studyType) {
-		return getChildrenOfFolderByStudyType(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyType);
+	public List<Reference> getRootFolders(final String programUUID, final Integer studyType) {
+		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyType);
 	}
 
-	public List<Reference> getChildrenOfFolderByStudyType(final Integer folderId, final String programUUID, final Integer studyType) {
+	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID, final Integer studyType) {
 
 		final List<Reference> childrenNodes;
 
