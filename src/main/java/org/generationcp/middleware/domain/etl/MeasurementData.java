@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementData {
@@ -41,6 +42,8 @@ public class MeasurementData {
 	// used to map this object to what is actually saved in the database after saving
 	private Variable variable;
 
+	private Phenotype.ValueStatus valueStatus;
+
 	public MeasurementData() {
 	}
 
@@ -52,6 +55,7 @@ public class MeasurementData {
 		this.phenotypeId = data.phenotypeId;
 		this.cValueId = data.cValueId;
 		this.measurementVariable = data.measurementVariable;
+		this.valueStatus = data.valueStatus;
 	}
 
 	public MeasurementData(final String label, final String value) {
@@ -120,21 +124,30 @@ public class MeasurementData {
 		this.phenotypeId = phenotypeId;
 	}
 
+	public Phenotype.ValueStatus getValueStatus() {
+		return this.valueStatus;
+	}
+
+	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
+		this.valueStatus = valueStatus;
+	}
+
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("MeasurementData [label=");
-		builder.append(this.label);
-		builder.append(", value=");
-		builder.append(this.value);
-		builder.append(", isEditable=");
-		builder.append(this.isEditable);
-		builder.append(", dataType=");
-		builder.append(this.dataType);
-		builder.append(", phenotypeId=");
-		builder.append(this.phenotypeId);
-		builder.append("]");
-		return builder.toString();
+		return "MeasurementData{" +
+			"isCustomCategoricalValue=" + isCustomCategoricalValue +
+			", label='" + label + '\'' +
+			", value='" + value + '\'' +
+			", cValueId='" + cValueId + '\'' +
+			", isEditable=" + isEditable +
+			", dataType='" + dataType + '\'' +
+			", phenotypeId=" + phenotypeId +
+			", measurementVariable=" + measurementVariable +
+			", isAccepted=" + isAccepted +
+			", oldValue='" + oldValue + '\'' +
+			", variable=" + variable +
+			", valueStatus=" + valueStatus +
+			'}';
 	}
 
 	public void print(final int indent) {
