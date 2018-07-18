@@ -458,7 +458,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 			if (this.getInventoryInfo().getDistinctScaleCountForGermplsm() > 1) {
 				return "MIXED";
 			} else if (!this.getInventoryInfo().getTotalAvailableBalance().equals(0D)) {
-				return Double.toString(this.getInventoryInfo().getTotalAvailableBalance()) + this.getInventoryInfo().getScaleForGermplsm();
+				return Double.toString(this.getInventoryInfo().getTotalAvailableBalance());
 			}
 		}
 		return "";

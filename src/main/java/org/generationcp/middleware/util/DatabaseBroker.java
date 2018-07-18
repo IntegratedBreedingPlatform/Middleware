@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -37,7 +38,6 @@ import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
@@ -79,13 +79,7 @@ import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.dao.oms.CVDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
-import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
-import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
-import org.generationcp.middleware.dao.oms.StandardVariableDao;
-import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.dao.oms.*;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
@@ -262,12 +256,6 @@ public class DatabaseBroker {
 		final PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
 		phenotypeOutlierDao.setSession(this.getActiveSession());
 		return phenotypeOutlierDao;
-	}
-
-	public ExperimentPhenotypeDao getExperimentPhenotypeDao() {
-		final ExperimentPhenotypeDao experimentPhenotypeDao = new ExperimentPhenotypeDao();
-		experimentPhenotypeDao.setSession(this.getActiveSession());
-		return experimentPhenotypeDao;
 	}
 
 	public CvTermPropertyDao getCvTermPropertyDao() {
@@ -597,6 +585,14 @@ public class DatabaseBroker {
 		final NamingConfigurationDAO namingConfigurationDAO = new NamingConfigurationDAO();
 		namingConfigurationDAO.setSession(this.getActiveSession());
 		return namingConfigurationDAO;
+	}
+
+	public FormulaDAO getFormulaDao() {
+
+		final FormulaDAO formulaDao = new FormulaDAO();
+		formulaDao.setSession(this.getActiveSession());
+		return formulaDao;
+
 	}
 
 

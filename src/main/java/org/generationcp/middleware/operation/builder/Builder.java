@@ -31,6 +31,8 @@ import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
+import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 /**
@@ -122,7 +124,7 @@ public abstract class Builder extends DatabaseBroker {
 	
 	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.sessionProvider);
+				this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
 	}
 	
 	protected final OntologyMethodDataManager getOntologyMethodDataManager() {
@@ -139,5 +141,9 @@ public abstract class Builder extends DatabaseBroker {
 	
 	protected final StandardVariableTransformer getStandardVariableTransformer() {
 		return new StandardVariableTransformer(this.sessionProvider);
+	}
+
+	protected final FormulaService getFormulaService() {
+		return new FormulaServiceImpl(this.sessionProvider);
 	}
 }
