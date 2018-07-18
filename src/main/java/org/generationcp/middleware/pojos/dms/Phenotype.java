@@ -14,6 +14,8 @@ package org.generationcp.middleware.pojos.dms;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,6 +40,26 @@ import java.util.Objects;
 public class Phenotype implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public enum ValueStatus {
+
+		OUT_OF_SYNC ("out-of-sync"),
+		MANUALLY_EDITED ("manually-edited");
+
+		ValueStatus(final String description) {
+			this.description = description;
+		}
+
+		private String description;
+
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(final String description) {
+			this.description = description;
+		}
+	}
 
 	@Id
 	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value", pkColumnValue = "phenotype", allocationSize = 500)
@@ -66,6 +88,10 @@ public class Phenotype implements Serializable {
 	// References cvterm
 	@Column(name = "cvalue_id")
 	private Integer cValueId;
+
+	@Column(name = "status")
+	@Enumerated(EnumType.ORDINAL)
+	private ValueStatus valueStatus;
 
 	// References cvterm
 	@Column(name = "assay_id")
@@ -162,6 +188,14 @@ public class Phenotype implements Serializable {
 		this.experiment = experiment;
 	}
 
+	public ValueStatus getValueStatus() {
+		return valueStatus;
+	}
+
+	public void setValueStatus(final ValueStatus valueStatus) {
+		this.valueStatus = valueStatus;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -170,23 +204,22 @@ public class Phenotype implements Serializable {
 			return false;
 		final Phenotype phenotype = (Phenotype) o;
 		return Objects.equals(getPhenotypeId(), phenotype.getPhenotypeId()) && Objects.equals(getUniqueName(), phenotype.getUniqueName())
-			&& Objects.equals(getName(), phenotype.getName()) && Objects.equals(getObservableId(), phenotype.getObservableId()) && Objects
-			.equals(getAttributeId(), phenotype.getAttributeId()) && Objects.equals(getValue(), phenotype.getValue()) && Objects
-			.equals(getcValueId(), phenotype.getcValueId()) && Objects.equals(getAssayId(), phenotype.getAssayId()) && Objects
-			.equals(getExperiment(), phenotype.getExperiment());
+				&& Objects.equals(getName(), phenotype.getName()) && Objects.equals(getObservableId(), phenotype.getObservableId())
+				&& Objects.equals(getAttributeId(), phenotype.getAttributeId()) && Objects.equals(getValue(), phenotype.getValue())
+				&& Objects.equals(getcValueId(), phenotype.getcValueId()) && Objects.equals(getAssayId(), phenotype.getAssayId()) && Objects
+				.equals(getExperiment(), phenotype.getExperiment()) && Objects.equals(getValueStatus(), phenotype.getValueStatus());
 	}
 
 	@Override
 	public int hashCode() {
-
 		return Objects.hash(getPhenotypeId(), getUniqueName(), getName(), getObservableId(), getAttributeId(), getValue(), getcValueId(),
-			getAssayId(), getExperiment());
+			getValueStatus(), getAssayId(), getExperiment(), getValueStatus());
 	}
 
 	@Override
 	public String toString() {
 		return "Phenotype{" + "phenotypeId=" + phenotypeId + ", uniqueName='" + uniqueName + '\'' + ", name='" + name + '\''
 			+ ", observableId=" + observableId + ", attributeId=" + attributeId + ", value='" + value + '\'' + ", cValueId=" + cValueId
-			+ ", assayId=" + assayId + ", experiment=" + experiment + '}';
+			+ ", assayId=" + assayId + ", experiment=" + experiment + ", valueStatus=" + valueStatus + "}";
 	}
 }
