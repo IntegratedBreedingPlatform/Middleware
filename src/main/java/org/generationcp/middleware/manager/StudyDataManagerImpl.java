@@ -1095,8 +1095,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void saveOrUpdatePhenotypeValue(final int experimentId, final int variableId, final String value,
-			final Phenotype existingPhenotype, final int dataTypeId) {
-		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId);
+			final Phenotype existingPhenotype, final int dataTypeId, final Phenotype.ValueStatus valueStatus) {
+		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId, valueStatus);
 	}
 
 	@Override

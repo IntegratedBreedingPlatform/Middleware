@@ -755,7 +755,7 @@ public interface StudyDataManager {
 
 	Phenotype getPhenotypeById(int phenotypeId);
 
-	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId);
+	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId, Phenotype.ValueStatus valueStatus);
 
 	StudyMetadata getStudyMetadata(Integer studyId);
 

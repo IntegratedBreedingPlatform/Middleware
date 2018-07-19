@@ -80,6 +80,14 @@ public class FormulaDto {
 		this.description = description;
 	}
 
+	public boolean isInputVariablePresent(final Integer inputCvTermId) {
+		for (final FormulaVariable formulaVariable: this.inputs) {
+			if (formulaVariable.getTargetTermId().equals(inputCvTermId))
+				return true;
+		}
+		return false;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {
