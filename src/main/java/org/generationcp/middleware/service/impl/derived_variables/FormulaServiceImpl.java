@@ -1,10 +1,6 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -15,7 +11,10 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Transactional
 @Service
@@ -63,6 +62,15 @@ public class FormulaServiceImpl implements FormulaService {
 		return formulaVariables;
 	}
 
+	@Override
+	public FormulaDto save(final FormulaDto formulaDto) {
+		Formula formula = this.convertToFormula(formulaDto);
+		formula = this.formulaDaoFactory.getFormulaDAO().save(formula);
+		final FormulaDto result = this.convertToFormulaDto(formula);
+
+		return result;
+	}
+
 	protected void fillFormulaVariables(final FormulaDto formulaDto, final Set<FormulaVariable> formulaVariables) {
 		for (final FormulaVariable formulaVariable : formulaDto.getInputs()) {
 			final Optional<FormulaDto> formulaOptional = this.getByTargetId(formulaVariable.getId());
@@ -102,6 +110,30 @@ public class FormulaServiceImpl implements FormulaService {
 		formulaVariable.setId(cvTerm.getCvTermId());
 		formulaVariable.setName(cvTerm.getName());
 		return formulaVariable;
+	}
+
+	Formula convertToFormula(FormulaDto formulaDto) {
+		final Formula formula = new Formula();
+
+		formula.setName(formulaDto.getName());
+		final CVTerm cvterm = new CVTerm();
+		cvterm.setCvTermId(formulaDto.getTargetTermId());
+		formula.setTargetCVTerm(cvterm);
+		formula.setFormulaId(formulaDto.getFormulaId());
+		formula.setDefinition(formulaDto.getDefinition());
+		formula.setDescription(formulaDto.getDescription());
+		formula.setActive(formulaDto.getActive());
+
+		final List<CVTerm> inputs = new ArrayList<>();
+		for (FormulaVariable formulaVariable : formulaDto.getInputs()) {
+			final CVTerm input = new CVTerm();
+			input.setCvTermId(formulaVariable.getId());
+			input.setName(formulaVariable.getName());
+			inputs.add(input);
+		}
+		formula.setInputs(inputs);
+
+		return formula;
 	}
 
 	public HibernateSessionProvider getSessionProvider() {

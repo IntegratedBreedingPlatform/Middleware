@@ -1,12 +1,9 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
@@ -26,10 +23,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 public class FormulaServiceImplTest {
 	
@@ -57,6 +59,9 @@ public class FormulaServiceImplTest {
 		final Formula testFormula = this.createTestFormula();
 		final FormulaDto formulaDto = this.formulaServiceImpl.convertToFormulaDto(testFormula);
 		this.verifyFormulaDto(testFormula, formulaDto);
+
+		final Formula formulaConvertedBack = this.formulaServiceImpl.convertToFormula(formulaDto);
+		this.verifyFormulaDto(formulaConvertedBack, formulaDto);
 	}
 
 	private void verifyFormulaDto(final Formula testFormula, final FormulaDto formulaDto) {
@@ -80,7 +85,7 @@ public class FormulaServiceImplTest {
 		Assert.assertEquals(expectedInput.getCvTermId().intValue(), actualInput.getId());
 		Assert.assertEquals(expectedInput.getName(), actualInput.getName());
 	}
-	
+
 	@Test
 	public void testGetByTargetId() {
 		final Formula formula1 = this.createTestFormula();
@@ -191,6 +196,20 @@ public class FormulaServiceImplTest {
 			verifyFormulaVariable(input, variablesMap.get(input.getCvTermId()));
 		}
 		
+	}
+
+	@Test
+	public void testSave() {
+		final Formula formula = this.createTestFormula();
+
+		when(this.formulaDao.save(any(Formula.class))).thenReturn(formula);
+
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setTargetTermId(2);
+		formulaDto.setDefinition("{{2}}");
+		final FormulaDto result = this.formulaServiceImpl.save(formulaDto);
+
+		this.verifyFormulaDto(formula, result);
 	}
 
 	private Formula createTestFormula() {

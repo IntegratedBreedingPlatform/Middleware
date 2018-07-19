@@ -24,4 +24,6 @@ public interface FormulaService {
 	 * @return
 	 */
 	public Set<FormulaVariable> getAllFormulaVariables(Set<Integer> variableIds);
+
+	public FormulaDto save(FormulaDto formulaDto);
 }
