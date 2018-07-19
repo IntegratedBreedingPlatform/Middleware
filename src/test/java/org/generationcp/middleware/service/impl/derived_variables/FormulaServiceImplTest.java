@@ -61,7 +61,7 @@ public class FormulaServiceImplTest {
 		final FormulaDto formulaDto = FormulaUtils.convertToFormulaDto(testFormula);
 		this.verifyFormulaDto(testFormula, formulaDto);
 
-		final Formula formulaConvertedBack = this.formulaServiceImpl.convertToFormula(formulaDto);
+		final Formula formulaConvertedBack = FormulaUtils.convertToFormula(formulaDto);
 		this.verifyFormulaDto(formulaConvertedBack, formulaDto);
 	}
 

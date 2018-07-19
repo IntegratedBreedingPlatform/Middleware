@@ -65,7 +65,7 @@ public class FormulaServiceImpl implements FormulaService {
 
 	@Override
 	public FormulaDto save(final FormulaDto formulaDto) {
-		Formula formula = this.convertToFormula(formulaDto);
+		Formula formula = FormulaUtils.convertToFormula(formulaDto);
 		formula = this.formulaDaoFactory.getFormulaDAO().save(formula);
 		final FormulaDto result = FormulaUtils.convertToFormulaDto(formula);
 
@@ -83,30 +83,6 @@ public class FormulaServiceImpl implements FormulaService {
 				}
 			}
 		}
-	}
-
-	Formula convertToFormula(FormulaDto formulaDto) {
-		final Formula formula = new Formula();
-
-		formula.setName(formulaDto.getName());
-		final CVTerm cvterm = new CVTerm();
-		cvterm.setCvTermId(formulaDto.getTargetTermId());
-		formula.setTargetCVTerm(cvterm);
-		formula.setFormulaId(formulaDto.getFormulaId());
-		formula.setDefinition(formulaDto.getDefinition());
-		formula.setDescription(formulaDto.getDescription());
-		formula.setActive(formulaDto.getActive());
-
-		final List<CVTerm> inputs = new ArrayList<>();
-		for (FormulaVariable formulaVariable : formulaDto.getInputs()) {
-			final CVTerm input = new CVTerm();
-			input.setCvTermId(formulaVariable.getId());
-			input.setName(formulaVariable.getName());
-			inputs.add(input);
-		}
-		formula.setInputs(inputs);
-
-		return formula;
 	}
 
 	public HibernateSessionProvider getSessionProvider() {
