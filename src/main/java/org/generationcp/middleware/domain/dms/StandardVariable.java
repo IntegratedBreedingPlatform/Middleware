@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.Debug;
 
@@ -52,6 +53,8 @@ public class StandardVariable implements Serializable {
 	private String cropOntologyId;
 
 	private Set<VariableType> variableTypes;
+
+	private FormulaDto formula;
 
 	public StandardVariable() {
 	}
@@ -369,4 +372,11 @@ public class StandardVariable implements Serializable {
 		return this.variableTypes;
 	}
 
+	public void setFormula(final FormulaDto formula) {
+		this.formula = formula;
+	}
+
+	public FormulaDto getFormula() {
+		return this.formula;
+	}
 }
