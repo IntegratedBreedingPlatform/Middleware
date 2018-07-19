@@ -138,12 +138,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Reference> getRootFolders(final String programUUID) {
-		return this.getDmsProjectDao().getRootFolders(programUUID);
+		return this.getDmsProjectDao().getRootFolders(programUUID, null);
 	}
 
 	@Override
 	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID) {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID);
+		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, null);
 	}
 
 	@Override
@@ -654,7 +654,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder is not existing");
 		}
 		// check if folder has no children
-		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID);
+		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, null);
 		if (children != null && !children.isEmpty()) {
 			throw new MiddlewareQueryException("Folder is not empty");
 		}
@@ -678,7 +678,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final DmsProjectDao dmsProjectDao = this.getDmsProjectDao();
 
 		// check if folder has no children
-		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID);
+		final List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, null);
 		return (children == null || children.isEmpty());
 	}
 
@@ -1209,5 +1209,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return null;
 
+	}
+
+	/**
+	 * Returns list of root or top-level folders and studies.
+	 *
+	 * @param programUUID program's unique id
+	 * @param studyTypeId
+	 * @return List of Folder POJOs or empty list if none found
+	 */
+	@Override
+	public List<Reference> getRootFoldersByStudyType(final String programUUID, final Integer studyTypeId) {
+		return this.getDmsProjectDao().getRootFolders(programUUID, studyTypeId);
+	}
+
+	/**
+	 * Returns list of children of a folder given its ID.
+	 *
+	 * @param folderId    The id of the folder to match
+	 * @param programUUID unique id of the program
+	 * @param studyTypeId
+	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
+	 */
+	@Override
+	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
+		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
 	}
 }

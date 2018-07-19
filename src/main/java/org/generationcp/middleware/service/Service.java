@@ -59,6 +59,8 @@ import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.SampleListService;
+import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
@@ -132,7 +134,7 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.sessionProvider);
+				this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
 	}
 
 	protected GermplasmDataManager getGermplasmDataManager() {
@@ -213,5 +215,9 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final SampleListService getSampleListService() {
 		return new SampleListServiceImpl(this.sessionProvider);
+	}
+
+	protected final FormulaService getFormulaService() {
+		return new FormulaServiceImpl(this.sessionProvider);
 	}
 }

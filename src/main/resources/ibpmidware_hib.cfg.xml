@@ -109,6 +109,9 @@
         <mapping class="org.generationcp.middleware.pojos.Plant"/>
         <mapping class="org.generationcp.middleware.pojos.SampleList"/>
         <mapping class="org.generationcp.middleware.pojos.dms.StudyType"/>
-        
+
+        <!-- Derived variables -->
+        <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>
+
     </session-factory>
 </hibernate-configuration>

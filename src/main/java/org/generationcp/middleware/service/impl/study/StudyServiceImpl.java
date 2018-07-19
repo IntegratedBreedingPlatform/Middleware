@@ -119,8 +119,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.designFactors = new DesignFactors(currentSession);
 		this.studyMeasurements = new StudyMeasurements(currentSession);
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(currentSession);
-		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider),
-				new OntologyPropertyDataManagerImpl(sessionProvider), new OntologyScaleDataManagerImpl(sessionProvider), sessionProvider);
+		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
+				this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
 

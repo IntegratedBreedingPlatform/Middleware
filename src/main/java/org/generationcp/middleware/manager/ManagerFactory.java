@@ -38,6 +38,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -55,11 +56,13 @@ import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
+import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
@@ -151,7 +154,7 @@ public class ManagerFactory implements Serializable {
 
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.sessionProvider);
+				this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
 	}
 
 	public PresetDataManager getPresetDataManager() {
@@ -295,6 +298,10 @@ public class ManagerFactory implements Serializable {
 
 	public PlantService getPlantService() {
 		return new PlantServiceImpl(this.sessionProvider);
+	}
+
+	public FormulaService getFormulaService() {
+		return new FormulaServiceImpl(this.sessionProvider);
 	}
 
 	public DatasetService getDatasetService() {

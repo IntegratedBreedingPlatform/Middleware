@@ -14,12 +14,15 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -34,6 +37,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -44,6 +48,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationTestBase {
 
@@ -63,7 +71,10 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
-
+	
+	private FormulaDAO formulaDAO;
+	private CVTermDao cvTermDAO;
+	
 	private Project testProject;
 	private Method testMethod;
 	private Property testProperty;
@@ -75,15 +86,92 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		// Variable caching relies on the context holder to determine current crop database in use
 		ContextHolder.setCurrentCrop("wheat");
 	}
+	
+	/**
+	 * All test depend on add variable, scale, property, method
+	 *
+	 * @throws Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		this.formulaDAO = new FormulaDAO();
+		this.formulaDAO.setSession(this.sessionProvder.getSession());
+		this.cvTermDAO = new CVTermDao();
+		this.cvTermDAO.setSession(this.sessionProvder.getSession());
+		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
+		this.testProject = instance.createTestProjectData();
+		ContextHolder.setCurrentProgram(this.testProject.getUniqueID());
+
+		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
+		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testMethod.setDefinition("Test Method");
+		this.methodManager.addMethod(this.testMethod);
+
+		this.testProperty = new Property();
+		this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testProperty.setDefinition("Test Property");
+		this.testProperty.setCropOntologyId(OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID);
+		this.testProperty.addClass("My New Class");
+		this.propertyManager.addProperty(this.testProperty);
+
+		this.testScale = new Scale();
+		this.testScale.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testScale.setDefinition("Test Scale");
+		this.testScale.setDataType(DataType.NUMERIC_VARIABLE);
+		this.testScale.setMinValue("0");
+		this.testScale.setMaxValue("100");
+		this.scaleManager.addScale(this.testScale);
+
+		this.testVariableInfo = this.buildVariable(this.testProperty);
+	}
 
 	@Test
-	public void testGetAllVariablesUsingFilter() throws MiddlewareException {
+	public void testGetAllVariablesUsingFilter() {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setFetchAll(true);
 
 		final List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
 		Assert.assertTrue(!variables.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "From Total Variables:  " + variables.size());
+	}
+	
+	@Test
+	public void testGetVariablesForCurrentProgramUsingFilter() {
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setFetchAll(false);
+		variableFilter.setProgramUuid(this.testProject.getUniqueID());
+		
+		final List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
+		final ImmutableMap<Integer, Variable> map = Maps.uniqueIndex(variables, new Function<Variable, Integer>() {
+			@Override
+			public Integer apply(Variable input) {
+				return input.getId();
+			}
+		});
+		Assert.assertNotNull(map.get(this.testVariableInfo.getId()));
+	}
+	
+	@Test
+	public void testGetVariablesWithFormulaUsingFilter() {
+		final Formula formula = this.saveFormulaForTestVariable();
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setFetchAll(false);
+		variableFilter.setProgramUuid(this.testProject.getUniqueID());
+		
+		final List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
+		final ImmutableMap<Integer, Variable> map = Maps.uniqueIndex(variables, new Function<Variable, Integer>() {
+			@Override
+			public Integer apply(Variable input) {
+				return input.getId();
+			}
+		});
+		final int id = this.testVariableInfo.getId();
+		Assert.assertNotNull(map.get(id));
+		// Verify formula details
+		final FormulaDto retrievedFormula = map.get(id).getFormula();
+		Assert.assertNotNull(retrievedFormula);
+		Assert.assertEquals(formula.getFormulaId(), retrievedFormula.getFormulaId());
+		Assert.assertEquals(formula.getInputs().get(0).getCvTermId().intValue(), retrievedFormula.getInputs().get(0).getId());
 	}
 
 	@Test
@@ -109,6 +197,20 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertEquals("Crop ontology id should be " + OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID,
 				OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID, variable.getProperty().getCropOntologyId());
 	}
+	
+	@Test
+	public void testGetVariableWithFormula() throws Exception {
+		final Formula formula = this.saveFormulaForTestVariable();
+		final Variable variable =
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, true);
+		Assert.assertNotNull(variable);
+		// Verify formula details
+		final FormulaDto retrievedFormula = variable.getFormula();
+		Assert.assertNotNull(retrievedFormula);
+		Assert.assertEquals(formula.getFormulaId(), retrievedFormula.getFormulaId());
+		Assert.assertEquals(formula.getInputs().get(0).getCvTermId().intValue(), retrievedFormula.getInputs().get(0).getId());
+		
+	}
 
 	@Test
 	public void testNotRetrievingVariableUsageStatistics() throws Exception {
@@ -121,25 +223,22 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testGetVariable_DontFilterObsolete() throws Exception {
-		final CVTermDao cvtermDao = new CVTermDao();
-		cvtermDao.setSession(this.sessionProvder.getSession());
-
 		// set property, scale, method and variable to obsolete
-		final CVTerm testPropertyCvTerm = cvtermDao.getById(this.testProperty.getId());
+		final CVTerm testPropertyCvTerm = this.cvTermDAO.getById(this.testProperty.getId());
 		testPropertyCvTerm.setIsObsolete(true);
-		cvtermDao.update(testPropertyCvTerm);
+		this.cvTermDAO.update(testPropertyCvTerm);
 
-		final CVTerm testScaleCvTerm = cvtermDao.getById(this.testScale.getId());
+		final CVTerm testScaleCvTerm = this.cvTermDAO.getById(this.testScale.getId());
 		testScaleCvTerm.setIsObsolete(true);
-		cvtermDao.update(testScaleCvTerm);
+		this.cvTermDAO.update(testScaleCvTerm);
 
-		final CVTerm testMethodCvTerm = cvtermDao.getById(this.testMethod.getId());
+		final CVTerm testMethodCvTerm = this.cvTermDAO.getById(this.testMethod.getId());
 		testMethodCvTerm.setIsObsolete(true);
-		cvtermDao.update(testMethodCvTerm);
+		this.cvTermDAO.update(testMethodCvTerm);
 
-		final CVTerm testVariableCvTerm = cvtermDao.getById(this.testVariableInfo.getId());
+		final CVTerm testVariableCvTerm = this.cvTermDAO.getById(this.testVariableInfo.getId());
 		testVariableCvTerm.setIsObsolete(true);
-		cvtermDao.update(testVariableCvTerm);
+		this.cvTermDAO.update(testVariableCvTerm);
 
 		final Variable variable =
 				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), false, false);
@@ -149,16 +248,16 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		// revert changes
 		testPropertyCvTerm.setIsObsolete(false);
-		cvtermDao.update(testPropertyCvTerm);
+		this.cvTermDAO.update(testPropertyCvTerm);
 
 		testScaleCvTerm.setIsObsolete(false);
-		cvtermDao.update(testScaleCvTerm);
+		this.cvTermDAO.update(testScaleCvTerm);
 
 		testMethodCvTerm.setIsObsolete(false);
-		cvtermDao.update(testMethodCvTerm);
+		this.cvTermDAO.update(testMethodCvTerm);
 
 		testVariableCvTerm.setIsObsolete(false);
-		cvtermDao.update(testVariableCvTerm);
+		this.cvTermDAO.update(testVariableCvTerm);
 
 	}
 
@@ -254,55 +353,24 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertFalse("Variable should have no usage", hasUsage);
 	}
 
-	/**
-	 * All test depend on add variable, scale, property, method
-	 *
-	 * @throws Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
-		this.testProject = instance.createTestProjectData();
-		ContextHolder.setCurrentProgram(this.testProject.getUniqueID());
+	
 
-		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
-		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testMethod.setDefinition("Test Method");
-		this.methodManager.addMethod(this.testMethod);
-
-		this.testProperty = new Property();
-		this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testProperty.setDefinition("Test Property");
-		this.testProperty.setCropOntologyId(OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID);
-		this.testProperty.addClass("My New Class");
-		this.propertyManager.addProperty(this.testProperty);
-
-		this.testScale = new Scale();
-		this.testScale.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testScale.setDefinition("Test Scale");
-		this.testScale.setDataType(DataType.NUMERIC_VARIABLE);
-		this.testScale.setMinValue("0");
-		this.testScale.setMaxValue("100");
-		this.scaleManager.addScale(this.testScale);
-
-		this.buildVariable();
-	}
-
-	private void buildVariable() {
-		this.testVariableInfo = new OntologyVariableInfo();
-		this.testVariableInfo.setProgramUuid(this.testProject.getUniqueID());
-		this.testVariableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testVariableInfo.setDescription("Test Variable");
-		this.testVariableInfo.setMethodId(this.testMethod.getId());
-		this.testVariableInfo.setPropertyId(this.testProperty.getId());
-		this.testVariableInfo.setScaleId(this.testScale.getId());
-		this.testVariableInfo.setAlias("My alias");
-		this.testVariableInfo.setExpectedMin("0");
-		this.testVariableInfo.setExpectedMax("100");
-		this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		this.testVariableInfo.setIsFavorite(true);
-		this.variableManager.addVariable(this.testVariableInfo);
-
+	private OntologyVariableInfo buildVariable(final Property property) {
+		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setProgramUuid(this.testProject.getUniqueID());
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.setDescription("Test Variable");
+		variableInfo.setMethodId(this.testMethod.getId());
+		variableInfo.setPropertyId(property.getId());
+		variableInfo.setScaleId(this.testScale.getId());
+		variableInfo.setAlias("My alias");
+		variableInfo.setExpectedMin("0");
+		variableInfo.setExpectedMax("100");
+		variableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		variableInfo.setIsFavorite(true);
+		this.variableManager.addVariable(variableInfo);
+		
+		return variableInfo;
 	}
 
 	protected void createTestVariableWithCategoricalValue() {
@@ -317,7 +385,30 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		this.scaleManager.addScale(this.testScale);
 
-		this.buildVariable();
+		this.testVariableInfo = this.buildVariable(this.testProperty);
+	}
+	
+	private Formula saveFormulaForTestVariable() {
+		final Formula formula = new Formula();
+		formula.setActive(true);
+		formula.setDefinition(RandomStringUtils.randomAlphanumeric(50));
+		formula.setDescription(RandomStringUtils.randomAlphanumeric(50));
+		formula.setName(RandomStringUtils.randomAlphanumeric(50));
+
+		final CVTerm targetCVTerm = this.cvTermDAO.getById(this.testVariableInfo.getId());
+		formula.setTargetCVTerm(targetCVTerm);
+		
+		final Property property = new Property();
+		property.setName(OntologyDataCreationUtil.getNewRandomName());
+		property.setDefinition("Test Property");
+		property.setCropOntologyId(OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID);
+		property.addClass("My New Class");
+		this.propertyManager.addProperty(property);
+		final OntologyVariableInfo inputVariable = this.buildVariable(property);
+		final CVTerm inputCVTerm = this.cvTermDAO.getById(inputVariable.getId());
+		formula.getInputs().add(inputCVTerm);
+		
+		return this.formulaDAO.save(formula);
 	}
 
 	@Test
