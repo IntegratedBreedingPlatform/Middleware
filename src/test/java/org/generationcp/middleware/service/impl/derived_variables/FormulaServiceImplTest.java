@@ -14,6 +14,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.derived_variables.FormulaDaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.util.FormulaUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +58,7 @@ public class FormulaServiceImplTest {
 	@Test
 	public void testConvertToFormulaDto() {
 		final Formula testFormula = this.createTestFormula();
-		final FormulaDto formulaDto = this.formulaServiceImpl.convertToFormulaDto(testFormula);
+		final FormulaDto formulaDto = FormulaUtils.convertToFormulaDto(testFormula);
 		this.verifyFormulaDto(testFormula, formulaDto);
 
 		final Formula formulaConvertedBack = this.formulaServiceImpl.convertToFormula(formulaDto);

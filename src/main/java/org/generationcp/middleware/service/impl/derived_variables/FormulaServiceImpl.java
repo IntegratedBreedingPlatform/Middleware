@@ -8,6 +8,7 @@ import org.generationcp.middleware.manager.derived_variables.FormulaDaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.util.FormulaUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,7 @@ public class FormulaServiceImpl implements FormulaService {
 	public Optional<FormulaDto> getByTargetId(final Integer targetId) {
 		final Formula formula = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableId(targetId);
 		if (formula != null) {
-			return Optional.of(this.convertToFormulaDto(formula));
+			return Optional.of(FormulaUtils.convertToFormulaDto(formula));
 		}
 		return Optional.absent();
 	}
@@ -47,7 +48,7 @@ public class FormulaServiceImpl implements FormulaService {
 		final List<FormulaDto> formulaDtos = new ArrayList<>();
 		final List<Formula> formulas = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableIds(variableIds);
 		for (final Formula formula : formulas) {
-			formulaDtos.add(this.convertToFormulaDto(formula));
+			formulaDtos.add(FormulaUtils.convertToFormulaDto(formula));
 		}
 		return formulaDtos;
 	}
@@ -66,7 +67,7 @@ public class FormulaServiceImpl implements FormulaService {
 	public FormulaDto save(final FormulaDto formulaDto) {
 		Formula formula = this.convertToFormula(formulaDto);
 		formula = this.formulaDaoFactory.getFormulaDAO().save(formula);
-		final FormulaDto result = this.convertToFormulaDto(formula);
+		final FormulaDto result = FormulaUtils.convertToFormulaDto(formula);
 
 		return result;
 	}
@@ -82,34 +83,6 @@ public class FormulaServiceImpl implements FormulaService {
 				}
 			}
 		}
-	}
-
-	protected FormulaDto convertToFormulaDto(final Formula formula) {
-		final FormulaDto formulaDto = new FormulaDto();
-
-		formulaDto.setName(formula.getName());
-		formulaDto.setTargetTermId(formula.getTargetCVTerm().getCvTermId());
-		formulaDto.setFormulaId(formula.getFormulaId());
-		formulaDto.setDefinition(formula.getDefinition());
-		formulaDto.setDescription(formula.getDescription());
-		formulaDto.setActive(formula.getActive());
-
-		final List<FormulaVariable> inputs = new ArrayList<>();
-		for (final CVTerm cvTerm : formula.getInputs()) {
-			final FormulaVariable formulaVariable = this.convertToFormulaVariable(cvTerm);
-			formulaVariable.setTargetTermId(formulaDto.getTargetTermId());
-			inputs.add(formulaVariable);
-		}
-		formulaDto.setInputs(inputs);
-
-		return formulaDto;
-	}
-
-	protected FormulaVariable convertToFormulaVariable(final CVTerm cvTerm) {
-		final FormulaVariable formulaVariable = new FormulaVariable();
-		formulaVariable.setId(cvTerm.getCvTermId());
-		formulaVariable.setName(cvTerm.getName());
-		return formulaVariable;
 	}
 
 	Formula convertToFormula(FormulaDto formulaDto) {
