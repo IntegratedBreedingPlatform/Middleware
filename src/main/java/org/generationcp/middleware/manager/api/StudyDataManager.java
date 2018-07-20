@@ -833,4 +833,18 @@ public interface StudyDataManager {
 	 */
 	List<Reference> getChildrenOfFolderByStudyType(int folderId, String programUUID, Integer studyTypeId);
 
+	/**
+	 *
+	 * @param experimentId
+	 * @param termId
+	 * @return
+	 */
+	Phenotype getPhenotype (Integer experimentId, Integer termId);
+
+	/**
+	 *
+	 * @param phenotype
+	 */
+	void updatePhenotype (Phenotype phenotype);
+
 }

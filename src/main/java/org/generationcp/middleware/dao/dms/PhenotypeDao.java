@@ -32,6 +32,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
@@ -876,6 +877,22 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					"Error in getByProjectAndType(" + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(), e);
 		}
 		return phenotypes;
+	}
+
+	public Phenotype getByExperimentAndTrait(final Integer experimentId, final Integer termId) {
+		try {
+			final ExperimentModel experiment = new ExperimentModel();
+			experiment.setNdExperimentId(experimentId);
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("observableId", termId));
+			criteria.add(Restrictions.eq("experiment", experiment));
+			return (Phenotype) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+					"Error in getByExperimentAndTrait(" + experimentId + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
+		}
+
 	}
 
 	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {

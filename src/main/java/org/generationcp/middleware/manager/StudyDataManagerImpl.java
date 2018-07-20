@@ -1235,4 +1235,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
 		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
 	}
+
+	/**
+	 * @param experimentId
+	 * @param termId
+	 * @return
+	 */
+	@Override
+	public Phenotype getPhenotype(final Integer experimentId, final Integer termId) {
+		return this.getPhenotypeDao().getByExperimentAndTrait(experimentId, termId);
+	}
+
+	/**
+	 * @param phenotype
+	 */
+	@Override
+	public void updatePhenotype(final Phenotype phenotype) {
+		this.getPhenotypeDao().saveOrUpdate(phenotype);
+	}
 }

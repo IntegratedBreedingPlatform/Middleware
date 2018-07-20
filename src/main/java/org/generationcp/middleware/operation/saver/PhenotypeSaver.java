@@ -123,7 +123,9 @@ public class PhenotypeSaver extends Saver {
 
 	private void saveOrUpdate(final int experimentId, final Phenotype phenotype) throws MiddlewareQueryException {
 		if (phenotype != null) {
-		  	phenotype.setExperiment(this.getExperimentDao().getById(experimentId));
+			final ExperimentModel experiment = new ExperimentModel();
+			experiment.setNdExperimentId(experimentId);
+		  	phenotype.setExperiment(experiment);
 			this.getPhenotypeDao().merge(phenotype);
 		}
 	}
