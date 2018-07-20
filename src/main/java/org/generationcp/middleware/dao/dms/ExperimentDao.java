@@ -31,8 +31,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link ExperimentModel}.
@@ -469,4 +471,91 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getExperimentIdsByStockIds(final Collection<Integer> stockIds) {
+		try {
+			if (stockIds != null && !stockIds.isEmpty()) {
+				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+				criteria.add(Restrictions.in("stock.stockId", stockIds));
+				criteria.setProjection(Projections.property("ndExperimentId"));
+
+				return criteria.list();
+			}
+		} catch (final HibernateException e) {
+			final String error = "Error in getExperimentIdsByStockIds=" + stockIds + " query in ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
+		}
+		return new ArrayList<>();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(final Set<Integer> gids, final String programUUID) {
+		final Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<>();
+
+		if (gids.isEmpty()) {
+			return germplasmEnvironments;
+		}
+
+		for (final Integer gid : gids) {
+			germplasmEnvironments.put(gid, new HashSet<Integer>());
+		}
+
+		final String sql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
+				+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) ";
+		final StringBuilder sb = new StringBuilder();
+		sb.append(sql);
+		if (programUUID != null) {
+			sb.append("INNER JOIN project p ON p.project_id = e.project_id and p.program_uuid = :programUUID ");
+		}
+		sb.append(" ORDER BY s.dbxref_id ");
+		try {
+			final Query query = this.getSession().createSQLQuery(sb.toString());
+			query.setParameterList("gids", gids);
+			if (programUUID != null) {
+				query.setParameter("programUUID", programUUID);
+			}
+			final List<Object[]> result = query.list();
+
+			for (final Object[] row : result) {
+				final Integer gId = (Integer) row[0];
+				final Integer environmentId = (Integer) row[1];
+
+				final Set<Integer> gidEnvironments = germplasmEnvironments.get(gId);
+				gidEnvironments.add(environmentId);
+				germplasmEnvironments.remove(gId);
+				germplasmEnvironments.put(gId, gidEnvironments);
+			}
+
+		} catch (final HibernateException e) {
+			final String error = "Error at getEnvironmentsOfGermplasms(programUUID=" + programUUID + " ,gids=" + gids
+					+ ") query on ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
+		}
+
+		return germplasmEnvironments;
+
+	}
+
+	public long countStocksByDatasetId(final int datasetId) {
+
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(DISTINCT e.stock_id) FROM nd_experiment e ")
+				.append(" WHERE e.project_id = :datasetId");
+
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("datasetId", datasetId);
+			final BigInteger count = (BigInteger) query.uniqueResult();
+			return count.longValue();
+
+		} catch (final HibernateException e) {
+			final String error = "Error at countStocksByDatasetId=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
+		}
+	}
+
 }

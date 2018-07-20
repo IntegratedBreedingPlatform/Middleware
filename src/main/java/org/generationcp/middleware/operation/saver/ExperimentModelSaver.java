@@ -10,6 +10,9 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -23,11 +26,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExperimentModelSaver extends Saver {
 
@@ -173,15 +172,6 @@ public class ExperimentModelSaver extends Saver {
 		experimentProperty.setRank(variable.getVariableType().getRank());
 
 		return experimentProperty;
-	}
-
-	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) {
-		ExperimentStock experimentStock = new ExperimentStock();
-		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
-		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
-		experimentStock.setExperiment(experiment);
-
-		return experimentStock;
 	}
 
 	public int moveStudyToNewGeolocation(int studyId) {
