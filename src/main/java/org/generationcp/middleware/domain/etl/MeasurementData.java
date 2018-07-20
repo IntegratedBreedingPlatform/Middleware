@@ -43,6 +43,7 @@ public class MeasurementData {
 	private Variable variable;
 
 	private Phenotype.ValueStatus valueStatus;
+	private boolean changed;
 
 	public MeasurementData() {
 	}
@@ -56,12 +57,14 @@ public class MeasurementData {
 		this.cValueId = data.cValueId;
 		this.measurementVariable = data.measurementVariable;
 		this.valueStatus = data.valueStatus;
+		this.changed = data.changed;
 	}
 
 	public MeasurementData(final String label, final String value) {
 		super();
 		this.label = label;
 		this.value = value;
+		this.changed = false;
 	}
 
 	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType) {
@@ -70,6 +73,7 @@ public class MeasurementData {
 		this.value = value;
 		this.isEditable = isEditable;
 		this.dataType = dataType;
+		this.changed = false;
 	}
 
 	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType, final Integer valueId) {
@@ -87,6 +91,7 @@ public class MeasurementData {
 		this.isEditable = isEditable;
 		this.dataType = dataType;
 		this.measurementVariable = mvar;
+		this.changed = false;
 	}
 
 	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType, final Integer valueId,
@@ -124,29 +129,21 @@ public class MeasurementData {
 		this.phenotypeId = phenotypeId;
 	}
 
-	public Phenotype.ValueStatus getValueStatus() {
-		return this.valueStatus;
-	}
-
-	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
-		this.valueStatus = valueStatus;
-	}
-
 	@Override
 	public String toString() {
 		return "MeasurementData{" +
-			"isCustomCategoricalValue=" + isCustomCategoricalValue +
-			", label='" + label + '\'' +
-			", value='" + value + '\'' +
-			", cValueId='" + cValueId + '\'' +
-			", isEditable=" + isEditable +
-			", dataType='" + dataType + '\'' +
-			", phenotypeId=" + phenotypeId +
-			", measurementVariable=" + measurementVariable +
-			", isAccepted=" + isAccepted +
-			", oldValue='" + oldValue + '\'' +
-			", variable=" + variable +
-			", valueStatus=" + valueStatus +
+			"isCustomCategoricalValue=" + this.isCustomCategoricalValue +
+			", label='" + this.label + '\'' +
+			", value='" + this.value + '\'' +
+			", cValueId='" + this.cValueId + '\'' +
+			", isEditable=" + this.isEditable +
+			", dataType='" + this.dataType + '\'' +
+			", phenotypeId=" + this.phenotypeId +
+			", measurementVariable=" + this.measurementVariable +
+			", isAccepted=" + this.isAccepted +
+			", oldValue='" + this.oldValue + '\'' +
+			", variable=" + this.variable +
+			", valueStatus=" + this.valueStatus +
 			'}';
 	}
 
@@ -239,7 +236,7 @@ public class MeasurementData {
 
 		final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
 
-		if ((this.cValueId == null ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(value)) {
+		if ((this.cValueId == null ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(this.value)) {
 			// If the categorical value id and value are empty, just return a CategoricalDisplayValue with empty
 			// id, name and description.
 			return new CategoricalDisplayValue("", "", "", false);
@@ -400,5 +397,23 @@ public class MeasurementData {
 		this.oldValue = value;
 	}
 
+	public void setChanged(final boolean b) {
+		this.changed = b;
+	}
 
+	public static String getEmptyString() {
+		return EMPTY_STRING;
+	}
+
+	public static String getMissingValue() {
+		return MISSING_VALUE;
+	}
+
+	public boolean isCustomCategoricalValue() {
+		return this.isCustomCategoricalValue;
+	}
+
+	public boolean isChanged() {
+		return this.changed;
+	}
 }

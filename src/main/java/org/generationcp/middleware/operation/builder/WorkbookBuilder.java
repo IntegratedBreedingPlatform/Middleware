@@ -459,6 +459,7 @@ public class WorkbookBuilder extends Builder {
 						final MeasurementData measurementData =
 							new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable, dataType,
 								condition);
+
 						measurementDataList.add(measurementData);
 						break;
 					}
