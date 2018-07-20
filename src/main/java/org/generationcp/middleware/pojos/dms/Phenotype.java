@@ -43,21 +43,21 @@ public class Phenotype implements Serializable {
 
 	public enum ValueStatus {
 
-		OUT_OF_SYNC ("out-of-sync"),
-		MANUALLY_EDITED ("manually-edited");
+		OUT_OF_SYNC ("OUT_OF_SYNC"),
+		MANUALLY_EDITED ("MANUALLY_EDITED");
 
-		ValueStatus(final String description) {
-			this.description = description;
+		ValueStatus(final String name) {
+			this.name = name;
 		}
 
-		private String description;
+		private String name;
 
-		public String getDescription() {
-			return description;
+		public String getName() {
+			return name;
 		}
 
-		public void setDescription(final String description) {
-			this.description = description;
+		public void setName(final String description) {
+			this.name = name;
 		}
 	}
 
@@ -89,8 +89,8 @@ public class Phenotype implements Serializable {
 	@Column(name = "cvalue_id")
 	private Integer cValueId;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
-	@Enumerated(EnumType.ORDINAL)
 	private ValueStatus valueStatus;
 
 	// References cvterm
