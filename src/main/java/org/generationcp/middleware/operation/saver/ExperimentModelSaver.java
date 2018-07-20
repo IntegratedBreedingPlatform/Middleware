@@ -114,8 +114,7 @@ public class ExperimentModelSaver extends Saver {
 			experimentModel.setGeoLocation(this.getGeolocationDao().getById(values.getLocationId()));
 		}
 		if (values.getGermplasmId() != null) {
-			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
-			experimentModel.getExperimentStocks().add(this.createExperimentStock(experimentModel, values.getGermplasmId()));
+			experimentModel.setStock(this.getStockModelBuilder().get(values.getGermplasmId()));
 		}
 
 		if (!(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.equals(expType) && TermId.STUDY_INFORMATION.equals(expType))) {

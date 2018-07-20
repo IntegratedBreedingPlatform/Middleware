@@ -137,7 +137,7 @@ public class SampleServiceImpl implements SampleService {
 		final String takenBy = (sample.getTakenBy() != null) ? sample.getTakenBy().getPerson().getDisplayName() : null;
 		final String plotId = experiment.getPlotId();
 		final String studyName = objectProject.getName();
-		final StockModel stock = experiment.getExperimentStocks().get(0).getStock();
+		final StockModel stock = experiment.getStock();
 		final String entryNo = stock.getUniqueName();
 		final Integer gid = stock.getDbxrefId();
 

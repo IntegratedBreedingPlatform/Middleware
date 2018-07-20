@@ -79,9 +79,8 @@ public class ExperimentBuilder extends Builder {
 	private Map<Integer, StockModel> getStockModelMap(List<ExperimentModel> experimentModels) throws MiddlewareQueryException {
 		final Map<Integer, StockModel> stockModelMap = new HashMap<>();
 		for (final ExperimentModel experimentModel : experimentModels) {
-			List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
-			if (experimentStocks != null && experimentStocks.size() == 1) {
-				StockModel stock = experimentStocks.get(0).getStock();
+			final StockModel stock = experimentModel.getStock();
+			if (stock != null) {
 				Integer stockId = stock.getStockId();
 				stockModelMap.put(stockId, stock);
 			}
@@ -304,21 +303,19 @@ public class ExperimentBuilder extends Builder {
 
 	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes,
 			Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
-		List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
-		if (experimentStocks != null && experimentStocks.size() == 1) {
-			StockModel stockModel = null;
-			if (stockModelMap != null && stockModelMap.get(experimentStocks.get(0).getStock().getStockId()) != null) {
-				stockModel = stockModelMap.get(experimentStocks.get(0).getStock().getStockId());
-			} else {
-				stockModel = this.getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
-			}
+		StockModel stockModel = experimentModel.getStock();
+		final Integer stockId = stockModel.getStockId();
+		if (stockModelMap != null && stockModelMap.get(stockId) != null) {
+			stockModel = stockModelMap.get(stockId);
+		} else {
+			stockModel = this.getStockBuilder().get(stockId);
+		}
 
-			for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
-				Variable var = this.createGermplasmFactor(stockModel, variableType);
-				if(var != null){
-					factors.add(var);
-				}				
-			}
+		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
+			Variable var = this.createGermplasmFactor(stockModel, variableType);
+			if(var != null){
+				factors.add(var);
+			}				
 		}
 	}
 
