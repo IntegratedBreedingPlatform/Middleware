@@ -408,4 +408,12 @@ public class MeasurementData {
 	public boolean isChanged() {
 		return this.changed;
 	}
+
+	public Phenotype.ValueStatus getValueStatus() {
+		return valueStatus;
+	}
+
+	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
+		this.valueStatus = valueStatus;
+	}
 }
