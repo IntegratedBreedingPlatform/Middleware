@@ -55,7 +55,7 @@ public class GeolocationSaver extends Saver {
 						this.getPhenotypeSaver()
 							.saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(), var.getValue(),
 								this.getPhenotypeDao().getById(var.getPhenotypeId()),
-								var.getVariableType().getStandardVariable().getDataType().getId());
+								var.getVariableType().getStandardVariable().getDataType().getId(), null);
 					}
 				}
 			}

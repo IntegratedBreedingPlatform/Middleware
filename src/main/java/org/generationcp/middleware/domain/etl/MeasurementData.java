@@ -345,6 +345,14 @@ public class MeasurementData {
 		this.variable = variable;
 	}
 
+	public Phenotype.ValueStatus getValueStatus() {
+		return this.valueStatus;
+	}
+
+	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
+		this.valueStatus = valueStatus;
+	}
+
 	/**
 	 * Checks whether the value of MeasurementData is valid or not based on its data type. Returns true if valid.
 	 * 
@@ -353,6 +361,7 @@ public class MeasurementData {
 	public boolean isCategoricalValueValid() {
 
 		// If the variable is categorical, check if the value has a match in possible values list.
+
 		if (this.getMeasurementVariable().getDataTypeId() != null
 				&& this.getMeasurementVariable().getDataTypeId().intValue() == DataType.CATEGORICAL_VARIABLE.getId()
 				&& this.getMeasurementVariable().getPossibleValues() != null && StringUtils.isNotBlank(this.value)) {
@@ -390,5 +399,6 @@ public class MeasurementData {
 	public void setOldValue(final String value) {
 		this.oldValue = value;
 	}
+
 
 }

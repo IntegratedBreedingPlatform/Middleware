@@ -16,6 +16,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.util.Debug;
@@ -62,11 +63,13 @@ public class MeasurementVariable {
 
 	private VariableType variableType;
 
+	private FormulaDto formula;
+
 	public MeasurementVariable() {
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label) {
+	public MeasurementVariable(final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label) {
 		this.name = name;
 		this.description = description;
 		this.scale = scale;
@@ -78,8 +81,8 @@ public class MeasurementVariable {
 		this.required = false;
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, PhenotypicType role) {
+	public MeasurementVariable(final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label, final PhenotypicType role) {
 		this.name = name;
 		this.description = description;
 		this.scale = scale;
@@ -92,41 +95,45 @@ public class MeasurementVariable {
 		this.role = role;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
-			String value, String label) {
+	public MeasurementVariable(
+		final int termId, final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label) {
 		this(name, description, scale, method, property, dataType, value, label);
 		this.termId = termId;
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange) {
+	public MeasurementVariable(final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label, final Double minRange, final Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label);
 		this.minRange = minRange;
 		this.maxRange = maxRange;
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+	public MeasurementVariable(final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label, final Double minRange, final Double maxRange, final PhenotypicType role) {
 		this(name, description, scale, method, property, dataType, value, label, role);
 		this.minRange = minRange;
 		this.maxRange = maxRange;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange) {
+	public MeasurementVariable(
+		final int termId, final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label, final Double minRange, final Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange);
 		this.termId = termId;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+	public MeasurementVariable(
+		final int termId, final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label, final Double minRange, final Double maxRange, final PhenotypicType role) {
 		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange, role);
 		this.termId = termId;
 
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, VariableType variableType) {
+	public MeasurementVariable(
+		final int termId, final String name, final String description, final String scale, final String method, final String property, final String dataType,
+			final String value, final String label, final VariableType variableType) {
 		this(termId, name, description, scale, method, property, dataType, value, label);
 		this.variableType = variableType;
 	}
@@ -135,7 +142,7 @@ public class MeasurementVariable {
 		return this.termId;
 	}
 
-	public void setTermId(int termId) {
+	public void setTermId(final int termId) {
 		this.termId = termId;
 	}
 
@@ -143,7 +150,7 @@ public class MeasurementVariable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -151,7 +158,7 @@ public class MeasurementVariable {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -159,7 +166,7 @@ public class MeasurementVariable {
 		return this.scale;
 	}
 
-	public void setScale(String scale) {
+	public void setScale(final String scale) {
 		this.scale = scale;
 	}
 
@@ -167,7 +174,7 @@ public class MeasurementVariable {
 		return this.method;
 	}
 
-	public void setMethod(String method) {
+	public void setMethod(final String method) {
 		this.method = method;
 	}
 
@@ -175,7 +182,7 @@ public class MeasurementVariable {
 		return this.property;
 	}
 
-	public void setProperty(String property) {
+	public void setProperty(final String property) {
 		this.property = property;
 	}
 
@@ -183,7 +190,7 @@ public class MeasurementVariable {
 		return this.dataType;
 	}
 
-	public void setDataType(String dataType) {
+	public void setDataType(final String dataType) {
 		this.dataType = dataType;
 	}
 
@@ -191,7 +198,7 @@ public class MeasurementVariable {
 		return this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -205,13 +212,13 @@ public class MeasurementVariable {
 		return this.label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("MeasurementVariable [termId=");
 		builder.append(this.termId);
 		builder.append(", name=");
@@ -256,7 +263,7 @@ public class MeasurementVariable {
 		return builder.toString();
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "MeasurementVariable: ");
 		Debug.println(indent + 3, "termId: " + this.termId);
 		Debug.println(indent + 3, "Name: " + this.name);
@@ -284,7 +291,7 @@ public class MeasurementVariable {
 		return this.isFactor;
 	}
 
-	public void setFactor(boolean isFactor) {
+	public void setFactor(final boolean isFactor) {
 		this.isFactor = isFactor;
 	}
 
@@ -298,7 +305,7 @@ public class MeasurementVariable {
 	/**
 	 * @param dataTypeId the dataTypeId to set
 	 */
-	public void setDataTypeId(Integer dataTypeId) {
+	public void setDataTypeId(final Integer dataTypeId) {
 		this.dataTypeId = dataTypeId;
 	}
 
@@ -312,14 +319,14 @@ public class MeasurementVariable {
 	/**
 	 * @param possibleValues the possibleValues to set
 	 */
-	public void setPossibleValues(List<ValueReference> possibleValues) {
+	public void setPossibleValues(final List<ValueReference> possibleValues) {
 
 		this.possibleValues = possibleValues;
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
 		if (possibleValues != null) {
-			for (ValueReference ref : possibleValues) {
+			for (final ValueReference ref : possibleValues) {
 				sb.append(ref.getDescription() + "|");
 			}
 		}
@@ -337,7 +344,7 @@ public class MeasurementVariable {
 	/**
 	 * @param minRange the minRange to set
 	 */
-	public void setMinRange(Double minRange) {
+	public void setMinRange(final Double minRange) {
 		this.minRange = minRange;
 	}
 
@@ -351,7 +358,7 @@ public class MeasurementVariable {
 	/**
 	 * @param maxRange the maxRange to set
 	 */
-	public void setMaxRange(Double maxRange) {
+	public void setMaxRange(final Double maxRange) {
 		this.maxRange = maxRange;
 	}
 
@@ -366,7 +373,7 @@ public class MeasurementVariable {
 	 */
 	public String getDataTypeCode() {
 
-		DataType dataTypeEnum = DataType.getById(this.dataTypeId);
+		final DataType dataTypeEnum = DataType.getById(this.dataTypeId);
 		if (dataTypeEnum != null) {
 			return dataTypeEnum.getDataTypeCode();
 		}
@@ -379,7 +386,7 @@ public class MeasurementVariable {
 		return this.required;
 	}
 
-	public void setRequired(boolean required) {
+	public void setRequired(final boolean required) {
 		this.required = required;
 	}
 
@@ -387,7 +394,7 @@ public class MeasurementVariable {
 		return this.treatmentLabel;
 	}
 
-	public void setTreatmentLabel(String treatmentLabel) {
+	public void setTreatmentLabel(final String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
 
@@ -395,15 +402,15 @@ public class MeasurementVariable {
 		return this.role;
 	}
 
-	public void setRole(PhenotypicType role) {
+	public void setRole(final PhenotypicType role) {
 		this.role = role;
 	}
 
 	public VariableType getVariableType() {
-		return variableType;
+		return this.variableType;
 	}
 
-	public void setVariableType(VariableType variableType) {
+	public void setVariableType(final VariableType variableType) {
 		this.variableType = variableType;
 	}
 
@@ -417,12 +424,12 @@ public class MeasurementVariable {
 	/**
 	 * @param operation the operation to set
 	 */
-	public void setOperation(Operation operation) {
+	public void setOperation(final Operation operation) {
 		this.operation = operation;
 	}
 
 	public MeasurementVariable copy() {
-		MeasurementVariable var = new MeasurementVariable();
+		final MeasurementVariable var = new MeasurementVariable();
 		var.setTermId(this.termId);
 		var.setName(this.name);
 		var.setDescription(this.description);
@@ -448,12 +455,12 @@ public class MeasurementVariable {
 		return this.possibleValuesString;
 	}
 
-	public void setPossibleValuesString(String possibleValuesString) {
+	public void setPossibleValuesString(final String possibleValuesString) {
 		this.possibleValuesString = possibleValuesString;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 
 		if (this == obj) {
 			return true;
@@ -464,7 +471,7 @@ public class MeasurementVariable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		MeasurementVariable other = (MeasurementVariable) obj;
+		final MeasurementVariable other = (MeasurementVariable) obj;
 		if (this.termId != 0 && other.termId != 0 && this.termId != other.termId) {
 			return false;
 		} else if (this.getPSMHashCode() != other.getPSMHashCode()) {
@@ -490,4 +497,11 @@ public class MeasurementVariable {
 		return java.util.Objects.hash(this.property, this.scale, this.method);
 	}
 
+	public void setFormula(final FormulaDto formula) {
+		this.formula = formula;
+	}
+
+	public FormulaDto getFormula() {
+		return this.formula;
+	}
 }
