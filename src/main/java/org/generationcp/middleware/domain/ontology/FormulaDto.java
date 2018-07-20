@@ -82,7 +82,7 @@ public class FormulaDto {
 
 	public boolean isInputVariablePresent(final Integer inputCvTermId) {
 		for (final FormulaVariable formulaVariable: this.inputs) {
-			if (formulaVariable.getTargetTermId().equals(inputCvTermId))
+			if (Integer.valueOf(formulaVariable.getId()).equals(inputCvTermId))
 				return true;
 		}
 		return false;
