@@ -200,8 +200,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			// Delete experiments
 			statement =
-				this.getSession().createSQLQuery("delete e, es, eprop " + "from nd_experiment e "
-					+ "left join nd_experiment_stock es on e.nd_experiment_id = es.nd_experiment_id "
+				this.getSession().createSQLQuery("delete e, eprop " + "from nd_experiment e "
 					+ "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id "
 					+ "where e.nd_experiment_id in (" + experimentIds + ") ");
 			statement.executeUpdate();
@@ -229,8 +228,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// Delete experiments
 			statement =
 				this.getSession()
-					.createSQLQuery("DELETE e, es, eprop " + "FROM nd_experiment e "
-						+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
+					.createSQLQuery("DELETE e, eprop " + "FROM nd_experiment e "
 						+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
 						+ "WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
 			statement.executeUpdate();
@@ -260,10 +258,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			statement =
 				this.getSession()
 					.createSQLQuery(
-						"DELETE g, gp, e, es, eprop " + "FROM nd_geolocation g "
+						"DELETE g, gp, e, eprop " + "FROM nd_geolocation g "
 							+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
 							+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
-							+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
 							+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
 							+ "WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
 
@@ -430,12 +427,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public int getExperimentIdByLocationIdStockId(final int projectId, final Integer locationId, final Integer stockId) throws MiddlewareQueryException {
 		try {
-			// update the value of phenotypes
 			final String sql =
 					"SELECT exp.nd_experiment_id " + "FROM nd_experiment exp "
-							+ "INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  "
-							+ "INNER JOIN stock ON expstock.stock_id = stock.stock_id " + " WHERE exp.project_id = " + projectId
-							+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND stock.stock_id = "
+							+ " WHERE exp.project_id = " + projectId
+							+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND exp.stock_id = "
 							+ stockId;
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);

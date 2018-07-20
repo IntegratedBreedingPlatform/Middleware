@@ -131,15 +131,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		try {
 
 			final String queryStr = "select ldp.* FROM nd_experiment e,"
-				+ " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
+				+ " nd_experimentprop nd_ep, stock,"
 				+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms, nd_geolocation geo"
 				+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
 				+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
 				+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"
 				+ " AND e.project_id = pr.subject_project_id"
 				+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
-				+ " AND nd_stock.nd_experiment_id = nd_ep.nd_experiment_id"
-				+ " AND stock.stock_id = nd_stock.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
+				+ " AND stock.stock_id = e.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
 				+ " AND nd_ep.value = :PLOT_NO"
 				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
 				+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"

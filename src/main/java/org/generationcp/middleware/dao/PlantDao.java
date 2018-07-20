@@ -23,8 +23,7 @@ public class PlantDao extends GenericDAO<Plant, Integer> {
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           0,"
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1))*1) AS max_sequence_no"
 		+ " FROM nd_experiment nde "
-		+ " INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id"
-		+ " INNER JOIN stock st ON st.stock_id = es.stock_id "
+		+ " INNER JOIN stock st ON st.stock_id = nde.stock_id "
 		+ " INNER JOIN plant pl ON pl.nd_experiment_id = nde.nd_experiment_id"
 		+ " INNER JOIN sample s ON s.plant_id = pl.plant_id WHERE st.dbxref_id IN (:gids)"
 		+ " GROUP BY st.dbxref_id;";

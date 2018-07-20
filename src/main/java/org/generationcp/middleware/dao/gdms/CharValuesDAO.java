@@ -96,8 +96,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					+ "  INNER JOIN sample sample ON (sample.sample_id = charvalues.sample_id) " //
 					+ "  INNER JOIN plant plant ON (sample.plant_id = plant.plant_id) " //
 					+ "  INNER JOIN nd_experiment experiment ON (plant.nd_experiment_id = experiment.nd_experiment_id) " //
-					+ "  INNER JOIN nd_experiment_stock exp_stock ON (exp_stock.nd_experiment_id = experiment.nd_experiment_id) " //
-					+ "  INNER JOIN stock stock ON (stock.stock_id = exp_stock.stock_id) " //
+					+ "  INNER JOIN stock stock ON (stock.stock_id = experiment.stock_id) " //
 					+ "  INNER JOIN gdms_marker marker ON (marker.marker_id = charvalues.marker_id) " //
 					+ "  WHERE charvalues.dataset_id = :datasetId "; //
 
