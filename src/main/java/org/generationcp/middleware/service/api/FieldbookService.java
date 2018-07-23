@@ -977,4 +977,6 @@ public interface FieldbookService {
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
 	Workbook getStudyDataSet(int studyID);
+
+	Workbook getStudyByNameAndProgramUUID(String studyName, String programUUID);
 }

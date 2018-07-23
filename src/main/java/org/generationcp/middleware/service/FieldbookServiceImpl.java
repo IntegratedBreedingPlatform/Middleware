@@ -207,6 +207,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
+	
+	@Override
+	public Workbook getStudyByNameAndProgramUUID(final String studyName, final String programUUID) {
+		final int id = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(studyName, programUUID);
+		return this.getStudyDataSet(id);
+	}
 
 	@Override
 	public boolean loadAllObservations(final Workbook workbook) {
