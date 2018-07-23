@@ -1,14 +1,13 @@
-package org.generationcp.middleware.manager.derived_variables;
+package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
-public class FormulaDaoFactory {
+public class DaoFactory {
 	
 	private HibernateSessionProvider sessionProvider;
 
-	public FormulaDaoFactory(HibernateSessionProvider sessionProvider) {
-		super();
+	public DaoFactory(HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
 	

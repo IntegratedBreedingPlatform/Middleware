@@ -4,9 +4,8 @@ import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.derived_variables.FormulaDaoFactory;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.util.FormulaUtils;
 import org.springframework.stereotype.Service;
@@ -23,19 +22,19 @@ public class FormulaServiceImpl implements FormulaService {
 
 
 	private HibernateSessionProvider sessionProvider;
-	private FormulaDaoFactory formulaDaoFactory;
+	private DaoFactory daoFactory;
 
 	public FormulaServiceImpl() {
 	}
 
 	public FormulaServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
-		this.formulaDaoFactory = new FormulaDaoFactory(this.sessionProvider);
+		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}
 
 	@Override
 	public Optional<FormulaDto> getByTargetId(final Integer targetId) {
-		final Formula formula = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableId(targetId);
+		final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(targetId);
 		if (formula != null) {
 			return Optional.of(FormulaUtils.convertToFormulaDto(formula));
 		}
@@ -46,7 +45,7 @@ public class FormulaServiceImpl implements FormulaService {
 	public List<FormulaDto> getByTargetIds(final Set<Integer> variableIds) {
 
 		final List<FormulaDto> formulaDtos = new ArrayList<>();
-		final List<Formula> formulas = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableIds(variableIds);
+		final List<Formula> formulas = this.daoFactory.getFormulaDAO().getByTargetVariableIds(variableIds);
 		for (final Formula formula : formulas) {
 			formulaDtos.add(FormulaUtils.convertToFormulaDto(formula));
 		}
@@ -66,7 +65,7 @@ public class FormulaServiceImpl implements FormulaService {
 	@Override
 	public FormulaDto save(final FormulaDto formulaDto) {
 		Formula formula = FormulaUtils.convertToFormula(formulaDto);
-		formula = this.formulaDaoFactory.getFormulaDAO().save(formula);
+		formula = this.daoFactory.getFormulaDAO().save(formula);
 		final FormulaDto result = FormulaUtils.convertToFormulaDto(formula);
 
 		return result;
@@ -94,8 +93,8 @@ public class FormulaServiceImpl implements FormulaService {
 	}
 
 	
-	protected void setFormulaDaoFactory(final FormulaDaoFactory formulaDaoFactory) {
-		this.formulaDaoFactory = formulaDaoFactory;
+	protected void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 
 }
