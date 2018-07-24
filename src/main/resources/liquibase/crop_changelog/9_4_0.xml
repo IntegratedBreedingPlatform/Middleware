@@ -10,38 +10,26 @@
 				<columnExists tableName="nd_experiment" columnName="stock_id"/>
 			</not>
 		</preConditions>
+		<comment>
+			Add stock_id to nd_experiment table. Migrate data. Drop nd_experiment_stock table.
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE nd_experiment
-			ADD COLUMN stock_id INT(11) AFTER project_id,
+			ADD COLUMN stock_id INT(11) NULL AFTER project_id,
 			ADD INDEX nd_experiment_fk4_idx (stock_id ASC);
-		</sql>
-	</changeSet>
-
-	<changeSet author="darla" id="v9.4.0-2">
-		<preConditions onFail="MARK_RAN">
-			<and>
-				<columnExists tableName="nd_experiment" columnName="stock_id"/>
-				<tableExists tableName="nd_experiment_stock"/>
-			</and>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-            UPDATE nd_experiment e
-            INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id
-            SET e.stock_id = es.stock_id;
-		</sql>
-	</changeSet>
-
-	<changeSet author="darla" id="v9.4.0-3">
-		<preConditions onFail="MARK_RAN">
-			<columnExists tableName="nd_experiment" columnName="stock_id"/>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
+			
 			ALTER TABLE nd_experiment
 			ADD CONSTRAINT nd_experiment_fk4
 				FOREIGN KEY (stock_id)
 				REFERENCES stock (stock_id)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION;
+				
+			UPDATE nd_experiment e
+            INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id
+            SET e.stock_id = es.stock_id;
+            
+            DROP TABLE nd_experiment_stock;
 		</sql>
 	</changeSet>
 
