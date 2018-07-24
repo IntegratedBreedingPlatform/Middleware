@@ -389,8 +389,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("select distinct exp from ExperimentModel as exp ");
 			queryString.append("left outer join exp.properties as plot with plot.typeId IN (8200,8380) ");
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
-			queryString.append("left outer join exp.experimentStocks as es ");
-			queryString.append("left outer join es.stock as st ");
+			queryString.append("left outer join exp.stock as st ");
 			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
 			if(firstInstance) {
 				queryString.append("and exp.geoLocation.description = 1 ");
