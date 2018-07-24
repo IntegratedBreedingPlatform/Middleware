@@ -22,6 +22,13 @@ public class PersonTestDataInitializer {
 		return person;
 	}
 
+	public static Person createPerson(final String firstName, final String lastName) {
+		final Person person = PersonTestDataInitializer.createPerson();
+		person.setFirstName(firstName);
+		person.setLastName(lastName);
+		return person;
+	}
+
 	public static Person createPerson(final int id) {
 		final Person person = new Person("First Name", "Middle Name", "Last Name");
 		person.setId(id);
