@@ -130,6 +130,8 @@ public class Measurements {
 			phenotype.setPhenotypeId(phenotypeId);
 		}
 
+		phenotype.setValueStatus(measurementData.getValueStatus());
+
 		return phenotype;
 
 	}
