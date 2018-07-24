@@ -303,18 +303,20 @@ public class ExperimentBuilder extends Builder {
 	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes,
 			Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
 		StockModel stockModel = experimentModel.getStock();
-		final Integer stockId = stockModel.getStockId();
-		if (stockModelMap != null && stockModelMap.get(stockId) != null) {
-			stockModel = stockModelMap.get(stockId);
-		} else {
-			stockModel = this.getStockBuilder().get(stockId);
-		}
-
-		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
-			Variable var = this.createGermplasmFactor(stockModel, variableType);
-			if(var != null){
-				factors.add(var);
-			}				
+		if (stockModel != null) {
+			final Integer stockId = stockModel.getStockId();
+			if (stockModelMap != null && stockModelMap.get(stockId) != null) {
+				stockModel = stockModelMap.get(stockId);
+			} else {
+				stockModel = this.getStockBuilder().get(stockId);
+			}
+			
+			for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
+				Variable var = this.createGermplasmFactor(stockModel, variableType);
+				if(var != null){
+					factors.add(var);
+				}				
+			}
 		}
 	}
 
