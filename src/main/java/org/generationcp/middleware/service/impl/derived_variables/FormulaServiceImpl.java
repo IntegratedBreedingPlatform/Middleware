@@ -33,6 +33,15 @@ public class FormulaServiceImpl implements FormulaService {
 	}
 
 	@Override
+	public Optional<FormulaDto> getById(final Integer formulaId) {
+		final Formula formula = this.daoFactory.getFormulaDAO().getById(formulaId);
+		if (formula != null) {
+			return Optional.of(FormulaUtils.convertToFormulaDto(formula));
+		}
+		return Optional.absent();
+	}
+
+	@Override
 	public Optional<FormulaDto> getByTargetId(final Integer targetId) {
 		final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(targetId);
 		if (formula != null) {
@@ -69,6 +78,13 @@ public class FormulaServiceImpl implements FormulaService {
 		final FormulaDto result = FormulaUtils.convertToFormulaDto(formula);
 
 		return result;
+	}
+
+	@Override
+	public void delete(final Integer formulaId) {
+		final Formula formula = this.daoFactory.getFormulaDAO().getById(formulaId);
+		formula.setActive(false);
+		this.daoFactory.getFormulaDAO().update(formula);
 	}
 
 	protected void fillFormulaVariables(final FormulaDto formulaDto, final Set<FormulaVariable> formulaVariables) {
