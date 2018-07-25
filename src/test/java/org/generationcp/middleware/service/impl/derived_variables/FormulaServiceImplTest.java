@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
@@ -31,7 +32,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.when;
 
 public class FormulaServiceImplTest {
@@ -90,7 +93,7 @@ public class FormulaServiceImplTest {
 	@Test
 	public void testGetByTargetId() {
 		final Formula formula1 = this.createTestFormula();
-		Mockito.doReturn(formula1).when(this.formulaDao).getByTargetVariableId(Matchers.anyInt());
+		Mockito.doReturn(formula1).when(this.formulaDao).getByTargetVariableId(anyInt());
 		final Optional<FormulaDto> formulaDto = this.formulaServiceImpl.getByTargetId(formula1.getTargetCVTerm().getCvTermId());
 		Assert.assertTrue(formulaDto.isPresent());
 		this.verifyFormulaDto(formula1, formulaDto.get());
@@ -211,6 +214,18 @@ public class FormulaServiceImplTest {
 		final FormulaDto result = this.formulaServiceImpl.save(formulaDto);
 
 		this.verifyFormulaDto(formula, result);
+	}
+
+	@Test
+	public void testDelete() {
+		final Formula formula = this.createTestFormula();
+
+		when(this.formulaDao.getById(anyInt())).thenReturn(formula);
+
+		this.formulaServiceImpl.delete(RandomUtils.nextInt());
+
+		Assert.assertThat(formula.getActive(), is(false));
+		Mockito.verify(this.formulaDao).update(formula);
 	}
 
 	private Formula createTestFormula() {
