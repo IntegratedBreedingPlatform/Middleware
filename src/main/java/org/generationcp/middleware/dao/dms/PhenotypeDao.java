@@ -45,6 +45,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -886,11 +887,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("observableId", termId));
 			criteria.add(Restrictions.eq("experiment", experiment));
-			return (Phenotype) criteria.uniqueResult();
+			criteria.addOrder(Order.desc("phenotypeId"));
+			final List list = criteria.list();
+			return (list.size() > 0 ? (Phenotype) list.get(0) : null);
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error in getByExperimentAndTrait(" + experimentId + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
+				"Error in getByExperimentAndTrait(" + experimentId + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
 		}
 
 	}
