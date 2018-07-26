@@ -65,7 +65,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 			"SELECT COUNT(DISTINCT CONCAT(dataset_name,'')) " + "FROM gdms_dataset gd " + "INNER JOIN "
 					+ "gdms_qtl gq ON gd.dataset_id = gq.dataset_id " + "WHERE gq.qtl_id = :qtlId ";
 
-	private static final String GET_GERMPLASM_NAMES_BY_MARKER_ID = "SELECT DISTINCT "
+	protected static final String GET_GERMPLASM_NAMES_BY_MARKER_ID = "SELECT DISTINCT "
 		+ " n.nid nid,"
 		+ " n.gid germplasmId,"
 		+ " n.ntype typeId,"
@@ -283,16 +283,16 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	public List<Name> getGermplasmNamesByMarkerId(final Integer markerId) {
 		try {
 			if (markerId != null) {
-				Query query = this.getSession().createSQLQuery(DatasetDAO.GET_GERMPLASM_NAMES_BY_MARKER_ID)
-					.addScalar("nid")
-					.addScalar("germplasmId")
-					.addScalar("typeId")
-					.addScalar("nstat")
-					.addScalar("userId")
-					.addScalar("nval")
-					.addScalar("locationId")
-					.addScalar("ndate")
-					.addScalar("referenceId");
+				SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_GERMPLASM_NAMES_BY_MARKER_ID);
+				query.addScalar("nid");
+				query.addScalar("germplasmId");
+				query.addScalar("typeId");
+				query.addScalar("nstat");
+				query.addScalar("userId");
+				query.addScalar("nval");
+				query.addScalar("locationId");
+				query.addScalar("ndate");
+				query.addScalar("referenceId");
 				query.setParameter("markerId", markerId);
 				query.setResultTransformer(Transformers.aliasToBean(Name.class));
 				return query.list();

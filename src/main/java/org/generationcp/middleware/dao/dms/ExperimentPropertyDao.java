@@ -135,8 +135,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id")
 							.append(" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ").append(order);
 
-			final Query query =
-					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName")
+			final SQLQuery query =
+					this.getSession().createSQLQuery(sql.toString());
+					query.addScalar("datasetId").addScalar("datasetName")
 							.addScalar("geolocationId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
@@ -212,8 +213,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			}
 			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
 
-			final Query query =
-					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
+			final SQLQuery query =
+					this.getSession().createSQLQuery(sql.toString());
+					query.addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
 							.addScalar("geolocationId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
 							"rep").addScalar("plotNo").addScalar("row")
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")

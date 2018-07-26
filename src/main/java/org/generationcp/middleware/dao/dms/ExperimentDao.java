@@ -224,7 +224,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				this.getSession()
 					.createSQLQuery("DELETE pheno FROM nd_experiment e"
 						+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
-						+ "  WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
+						+ "  WHERE e.project_id = :datasetId ");
+			statement.setParameter("datasetId", datasetId);
 			statement.executeUpdate();
 
 			// Delete experiments
@@ -232,7 +233,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				this.getSession()
 					.createSQLQuery("DELETE e, eprop " + "FROM nd_experiment e "
 						+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-						+ "WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
+						+ "WHERE e.project_id = :datasetId ");
+			statement.setParameter("datasetId", datasetId);
 			statement.executeUpdate();
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error in deleteExperimentsByStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
@@ -253,7 +255,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				this.getSession()
 					.createSQLQuery("DELETE pheno FROM nd_experiment e"
 						+ "  LEFT JOIN phenotype pheno ON pheno.nd_experiment_id = e.nd_experiment_id"
-						+ "  WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
+						+ "  WHERE e.project_id = :datasetId ");
+			statement.setParameter("datasetId", datasetId);
 			statement.executeUpdate();
 
 			// Delete experiments
@@ -264,7 +267,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 							+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
 							+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
 							+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-							+ "WHERE e.project_id = :datasetId ").setParameter("datasetId", datasetId);
+							+ "WHERE e.project_id = :datasetId ");
+			statement.setParameter("datasetId", datasetId);
 
 			statement.executeUpdate();
 		} catch (final HibernateException e) {
@@ -400,12 +404,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("(st.uniqueName * 1) ASC, ");
 			queryString.append("exp.ndExperimentId ASC");
 
-			final Query q =
-					this.getSession().createQuery(queryString.toString())//
-							.setParameter("p_id", projectId) //
-							.setParameterList("type_ids", lists) //
-							.setMaxResults(numOfRows) //
-							.setFirstResult(start);
+			final Query q = this.getSession().createQuery(queryString.toString());
+			q.setParameter("p_id", projectId);
+			q.setParameterList("type_ids", lists);
+			q.setMaxResults(numOfRows);
+			q.setFirstResult(start);
 
 			return q.list();
 		} catch (final HibernateException e) {

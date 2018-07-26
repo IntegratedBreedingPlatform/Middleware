@@ -116,7 +116,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			final String sql = "SELECT DISTINCT e.stock_id" + " FROM nd_experiment e "
 					+ " WHERE e.project_id = :projectId ORDER BY e.stock_id";
-			final Query query = this.getSession().createSQLQuery(sql).setParameter("projectId", datasetId);
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("projectId", datasetId);
 			final List<Integer> ids = query.list();
 			for (final Integer id : ids) {
 				stockModels.add(this.getById(id));

@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -256,7 +257,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setPlotId("PLOT-ID" + i);
+			experimentModel.setPlotId(plotIdString + i);
 			experimentModel.setProject(project);
 			experimentModel.setStock(stockModel);
 			experimentDao.saveOrUpdate(experimentModel);

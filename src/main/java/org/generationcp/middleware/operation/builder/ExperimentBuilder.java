@@ -300,7 +300,7 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes,
+	void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes,
 			Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
 		StockModel stockModel = experimentModel.getStock();
 		if (stockModel != null) {

@@ -822,7 +822,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public Boolean containsAtLeast2CommonEntriesWithValues(final int projectId, final int locationId, final int germplasmTermId) {
 
-		String groupByGermplasm = "nd_exp_stock.stock_id";
+		String groupByGermplasm = "stock.stock_id";
 		if (germplasmTermId == TermId.DESIG.getId()) {
 			groupByGermplasm = "stock.name";
 		} else if (germplasmTermId == TermId.GID.getId()) {
