@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.impl.study;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,6 @@ import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -35,12 +33,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
@@ -421,6 +419,11 @@ public class SampleListServiceImpl implements SampleListService {
 		return this.getSampleListDao().getSampleListMetadata(listIds);
 	}
 
+	@Override
+	public long countSamplesByUIDs(final Set<String> sampleUIDs, final Integer listId) {
+		return sampleService.countBySampleUIDs(sampleUIDs, listId);
+	}
+
 	protected boolean isDescendant(final SampleList list, final SampleList of) {
 		if (of.getHierarchy() == null) {
 			return false;
@@ -460,6 +463,16 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
 		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
+	}
+
+	@Override
+	public void updateSamplePlateInfo(final Integer sampleListId, final Map<String, SamplePlateInfo> plateInfoMap) {
+		final SampleList sampleList = this.sampleListDao.getById(sampleListId);
+		for (final Sample sample : sampleList.getSamples()) {
+			sample.getPlant().setPlateId(plateInfoMap.get(sample.getSampleBusinessKey()).getPlateId());
+			sample.getPlant().setWell(plateInfoMap.get(sample.getSampleBusinessKey()).getWell());
+		}
+		this.sampleListDao.saveOrUpdate(sampleList);
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {

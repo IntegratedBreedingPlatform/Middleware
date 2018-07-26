@@ -91,6 +91,19 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return (Long) criteria.uniqueResult();
 	}
 
+	public long countBySampleUIDs(final Set<String> sampleUIDs , final Integer listId) {
+		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+		if (!sampleUIDs.isEmpty()) {
+			criteria.add(Restrictions.in("sampleBusinessKey", sampleUIDs));
+		}
+		if (listId != null) {
+			criteria.add(Restrictions.eq("sampleList.id", listId));
+		}
+
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<SampleDTO> getSampleDTOS(final Criteria criteria) {
 	    if (criteria == null) {

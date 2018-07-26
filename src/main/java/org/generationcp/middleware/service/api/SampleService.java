@@ -35,4 +35,5 @@ public interface SampleService {
 
 	Boolean studyHasSamples(final Integer studyId);
 
+	long countBySampleUIDs(Set<String> sampleUIDs, Integer listId);
 }
