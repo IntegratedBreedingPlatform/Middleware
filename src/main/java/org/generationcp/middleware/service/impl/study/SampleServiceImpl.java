@@ -1,12 +1,14 @@
 package org.generationcp.middleware.service.impl.study;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.SampleDao;
-import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
@@ -16,7 +18,12 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +31,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 @Repository
 @Transactional
@@ -48,18 +56,6 @@ public class SampleServiceImpl implements SampleService {
 		final SampleDao sampleDao = new SampleDao();
 		sampleDao.setSession(sessionProvider.getSession());
 		return sampleDao;
-	}
-
-	private ExperimentDao getExperimentDao() {
-		final ExperimentDao experimentDao = new ExperimentDao();
-		experimentDao.setSession(sessionProvider.getSession());
-		return experimentDao;
-	}
-
-	private UserDAO getUserDAO() {
-		final UserDAO userDao = new UserDAO();
-		userDao.setSession(sessionProvider.getSession());
-		return userDao;
 	}
 
 	@Override

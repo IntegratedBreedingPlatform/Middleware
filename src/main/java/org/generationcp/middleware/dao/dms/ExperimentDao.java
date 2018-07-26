@@ -42,6 +42,8 @@ import java.util.Set;
  */
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
+	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
+
 	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
 			" experiment.nd_experiment_id, " + //
 			" plant.plant_id," + //
@@ -66,23 +68,24 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) throws MiddlewareQueryException {
+	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
 		try {
 			if (geolocationIds != null && !geolocationIds.isEmpty()) {
 				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 				criteria.add(Restrictions.in("geoLocation.locationId", geolocationIds));
-				criteria.setProjection(Projections.property("ndExperimentId"));
+				criteria.setProjection(Projections.property(ND_EXPERIMENT_ID));
 
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getExperimentIdsByGeolocationIds=" + geolocationIds + " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at getExperimentIdsByGeolocationIds=" + geolocationIds + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
-	public long countByTrialEnvironmentAndVariate(final int trialEnvironmentId, final int variateVariableId) throws MiddlewareQueryException {
+	public long countByTrialEnvironmentAndVariate(final int trialEnvironmentId, final int variateVariableId) {
 		try {
 			final SQLQuery query =
 					this.getSession().createSQLQuery(
@@ -94,43 +97,47 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countByTrialEnvironmentAndVariate=" + trialEnvironmentId + ", " + variateVariableId
-					+ " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at countByTrialEnvironmentAndVariate=" + trialEnvironmentId + ", " + variateVariableId
+					+ " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
 	}
 
-	public ExperimentModel getExperimentByProjectIdAndLocation(final Integer projectId, final Integer locationId) throws MiddlewareQueryException {
+	public ExperimentModel getExperimentByProjectIdAndLocation(final Integer projectId, final Integer locationId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("project.projectId", projectId));
 			criteria.add(Restrictions.eq("geoLocation.locationId", locationId));
 			final List<ExperimentModel> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
-				return (ExperimentModel) list.get(0);
+				return list.get(0);
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getExperimentByProjectIdAndLocation=" + projectId + "," + locationId
-					+ " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at getExperimentByProjectIdAndLocation=" + projectId + "," + locationId
+					+ " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentModel> getExperimentsByProjectIds(final List<Integer> projectIds) throws MiddlewareQueryException {
-		final List<ExperimentModel> list = new ArrayList<ExperimentModel>();
+	public List<ExperimentModel> getExperimentsByProjectIds(final List<Integer> projectIds) {
+		final List<ExperimentModel> list = new ArrayList<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("project.projectId", projectIds));
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getExperimentsByProjectIds query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at getExperimentsByProjectIds query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return list;
 	}
 
-	public boolean hasFieldmap(final int datasetId) throws MiddlewareQueryException {
+	public boolean hasFieldmap(final int datasetId) {
 		try {
 			final String sql =
 					"SELECT COUNT(eprop.value) " + " FROM nd_experiment ep "
@@ -142,13 +149,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return count != null && count.longValue() > 0;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countExperimentsByDatasetId=" + datasetId + " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at hasFieldmap=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return false;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getLocationIdsOfStudy(final int studyId) throws MiddlewareQueryException {
+	public List<Integer> getLocationIdsOfStudy(final int studyId) {
 		try {
 			final String sql =
 					"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
@@ -159,13 +167,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Integer>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getLocationIdsOfStudyWithFieldmap(final int studyId) throws MiddlewareQueryException {
+	public List<Integer> getLocationIdsOfStudyWithFieldmap(final int studyId) {
 		try {
 			final String sql =
 					"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
@@ -178,12 +187,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at getLocationIdsOfStudyWithFieldmap=" + studyId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Integer>();
 	}
 
-	public void deleteExperimentsByIds(final List<Integer> experimentIdList) throws MiddlewareQueryException {
+	public void deleteExperimentsByIds(final List<Integer> experimentIdList) {
 		final String experimentIds = StringUtils.join(experimentIdList, ",");
 
 		try {
@@ -207,11 +217,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "where e.nd_experiment_id in (" + experimentIds + ") ");
 			statement.executeUpdate();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in deleteExperimentsByLocation=" + experimentIds + " in DataSetDao: " + e.getMessage(), e);
+			final String message = "Error at deleteExperimentsByIds=" + experimentIds + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public void deleteExperimentsByStudy(final int datasetId) throws MiddlewareQueryException {
+	public void deleteExperimentsByStudy(final int datasetId) {
 
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -237,11 +249,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			statement.setParameter("datasetId", datasetId);
 			statement.executeUpdate();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in deleteExperimentsByStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
+			final String message = "Error at deleteExperimentsByStudy=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public void deleteTrialExperimentsOfStudy(final int datasetId) throws MiddlewareQueryException {
+	public void deleteTrialExperimentsOfStudy(final int datasetId) {
 
 		try {
 
@@ -272,7 +286,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			statement.executeUpdate();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in deleteTrialExperimentsOfStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
+			final String message = "Error at deleteTrialExperimentsOfStudy=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
@@ -296,11 +312,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return count != 0;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at checkIfLocationIDsExistInExperiments=" + locationIds + "," + dataSetId + ","
-					+ " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at checkIfLocationIDsExistInExperiments=" + locationIds + "," + dataSetId + ","
+					+ " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return false;
 
 	}
 
@@ -312,9 +328,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final List list = criteria.list();
 			return list != null && !list.isEmpty();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at checkIfPlotIdExists=" + plotId + " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at checkIfPlotIdExists=" + plotId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return true;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -325,9 +342,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final List list = criteria.list();
 			return list != null && !list.isEmpty();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at checkIfPlotIdExists=" + plotIds + " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at checkIfPlotIdExists=" + plotIds + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return true;
 	}
 
 	public Map<Integer, List<PlantDTO>> getSampledPlants (final Integer studyId) {
@@ -361,8 +379,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentModel> getExperiments(final int projectId, final int typeId, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
+	public List<ExperimentModel> getExperiments(final int projectId, final int typeId, final int start, final int numOfRows) {
 		try {
 			final DmsProject project = new DmsProject();
 			project.setProjectId(projectId);
@@ -380,11 +397,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentModel> getExperiments(final int projectId, final List<TermId> types, final int start, final int numOfRows, final boolean firstInstance)
-			throws MiddlewareQueryException {
+	public List<ExperimentModel> getExperiments(final int projectId, final List<TermId> types, final int start, final int numOfRows, final boolean firstInstance) {
 		try {
 
-			final List<Integer> lists = new ArrayList<Integer>();
+			final List<Integer> lists = new ArrayList<>();
 			for (final TermId termId : types) {
 				lists.add(termId.getId());
 			}
@@ -418,18 +434,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public long count(final int dataSetId) throws MiddlewareQueryException {
+	public long count(final int dataSetId) {
 		try {
 			return (Long) this.getSession().createQuery("select count(*) from ExperimentModel where project_id = " + dataSetId)
 					.uniqueResult();
 		} catch (final HibernateException e) {
-			final String message = "Error at getExperiments=" + dataSetId;
+			final String message = "Error at countExperiments=" + dataSetId;
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public int getExperimentIdByLocationIdStockId(final int projectId, final Integer locationId, final Integer stockId) throws MiddlewareQueryException {
+	public int getExperimentIdByLocationIdStockId(final int projectId, final Integer locationId, final Integer stockId) {
 		try {
 			final String sql =
 					"SELECT exp.nd_experiment_id " + "FROM nd_experiment exp "
@@ -454,13 +470,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Integer getExperimentIdByProjectId(final int projectId) throws MiddlewareQueryException {
+	public Integer getExperimentIdByProjectId(final int projectId) {
 		try {
 			final DmsProject project = new DmsProject();
 			project.setProjectId(projectId);
 			final Criteria criteria = this.getSession().createCriteria(ExperimentModel.class);
 			criteria.add(Restrictions.eq("project", project));
-			criteria.setProjection(Projections.property("ndExperimentId"));
+			criteria.setProjection(Projections.property(ND_EXPERIMENT_ID));
 			final List<Integer> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
@@ -480,7 +496,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (stockIds != null && !stockIds.isEmpty()) {
 				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 				criteria.add(Restrictions.in("stock.stockId", stockIds));
-				criteria.setProjection(Projections.property("ndExperimentId"));
+				criteria.setProjection(Projections.property(ND_EXPERIMENT_ID));
 
 				return criteria.list();
 			}

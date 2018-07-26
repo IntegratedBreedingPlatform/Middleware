@@ -31,7 +31,7 @@ import org.hibernate.criterion.Restrictions;
 public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getStockIdsByPropertyTypeAndValue(Integer typeId, String value) throws MiddlewareQueryException {
+	public List<Integer> getStockIdsByPropertyTypeAndValue(Integer typeId, String value) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -41,13 +41,12 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getStockIdsByPropertyTypeAndValue=" + typeId + ", " + value
+			throw new MiddlewareQueryException("Error at getStockIdsByPropertyTypeAndValue=" + typeId + ", " + value
 					+ " query on StockPropertyDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
 	}
 
-	public void deleteStockPropInProjectByTermId(Integer projectId, int termId) throws MiddlewareQueryException {
+	public void deleteStockPropInProjectByTermId(Integer projectId, int termId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -65,7 +64,7 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 			Debug.println("DELETE STOCKPROP ROWS FOR " + termId + " : " + query.executeUpdate());
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in deleteStockPropInProjectByTermId(" + projectId + ", " + termId + ") in StockPropertyDao: "
+			throw new MiddlewareQueryException("Error in deleteStockPropInProjectByTermId(" + projectId + ", " + termId + ") in StockPropertyDao: "
 					+ e.getMessage(), e);
 		}
 	}

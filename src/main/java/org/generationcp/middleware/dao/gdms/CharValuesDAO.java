@@ -103,7 +103,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(CharValuesDAO.class);
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getGIDsByMarkerId(final Integer markerId, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<Integer> getGIDsByMarkerId(final Integer markerId, final int start, final int numOfRows) {
 
 		try {
 			if (markerId != null) {
@@ -114,12 +114,12 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 				return query.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
-	public long countGIDsByMarkerId(final Integer markerId) throws MiddlewareQueryException {
+	public long countGIDsByMarkerId(final Integer markerId) {
 		try {
 			if (markerId != null) {
 				SQLQuery query = this.getSession().createSQLQuery(CharValuesDAO.COUNT_GIDS_BY_MARKER_ID);
@@ -130,13 +130,13 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(),
+			throw new MiddlewareQueryException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(),
 					e);
 		}
 		return 0;
 	}
 
-	public void deleteByDatasetId(final int datasetId) throws MiddlewareQueryException {
+	public void deleteByDatasetId(final int datasetId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -146,13 +146,13 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_char_values WHERE dataset_id = " + datasetId);
 			statement.executeUpdate();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in CharValuesDAO: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in deleteByDatasetId=" + datasetId + " in CharValuesDAO: " + e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MarkerSampleId> getMarkerSampleIdsByGids(final List<Integer> gIds) throws MiddlewareQueryException {
-		List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
+	public List<MarkerSampleId> getMarkerSampleIdsByGids(final List<Integer> gIds) {
+		List<MarkerSampleId> toReturn = new ArrayList<>();
 
 		try {
 			if (gIds != null && !gIds.isEmpty()) {
@@ -171,7 +171,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from CharValues: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from CharValues: " + e.getMessage(), e);
 		}
 		return toReturn;
 	}
@@ -195,7 +195,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 
 					}
 		} catch (HibernateException e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error with getUniqueAllelesByGidsAndMids(gids=" + gids + ") query from CharValuesDAO " + e.getMessage(), e);
 		}
 		return results;
@@ -203,8 +203,8 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<AllelicValueElement> getAlleleValuesByMarkerId(final List<Integer> markerIdList) throws MiddlewareQueryException {
-		List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
+	public List<AllelicValueElement> getAlleleValuesByMarkerId(final List<Integer> markerIdList) {
+		List<AllelicValueElement> returnVal = new ArrayList<>();
 
 		if (markerIdList == null || markerIdList.isEmpty()) {
 			return returnVal;
@@ -231,7 +231,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAlleleValuesByMarkerId() query from AlleleValues: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getAlleleValuesByMarkerId() query from AlleleValues: " + e.getMessage(), e);
 		}
 
 		return returnVal;
@@ -239,7 +239,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 
 
 	@SuppressWarnings("unchecked")
-	public List<CharValues> getCharValuesByMarkerIds(final List<Integer> markerIds) throws MiddlewareQueryException {
+	public List<CharValues> getCharValuesByMarkerIds(final List<Integer> markerIds) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("markerId", markerIds));
@@ -252,7 +252,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 		}
 	}
 
-	public List<CharValueElement> getCharValueElementsByDatasetId (final Integer datasetId) throws MiddlewareQueryException {
+	public List<CharValueElement> getCharValueElementsByDatasetId (final Integer datasetId) {
 		Preconditions.checkNotNull(datasetId);
 		try {
 			return this.getSession().createSQLQuery(GET_CHAR_VALUES_ELEMENTS_BY_DATASETID)

@@ -142,9 +142,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countStocks=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 
 	public long countObservations(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)
@@ -162,9 +161,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -202,10 +200,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return stocks;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getStocks(projectId=" + projectId + ") at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at getStocks(projectId=" + projectId + ") at StockDao: " + e.getMessage(), e);
 		}
 
-		return stocks;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -221,7 +218,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
 		}
 
 		return stockModels;
@@ -239,8 +236,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).intValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countStockObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countStockObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 }
