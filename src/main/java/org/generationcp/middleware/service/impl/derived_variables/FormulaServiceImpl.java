@@ -35,7 +35,7 @@ public class FormulaServiceImpl implements FormulaService {
 	@Override
 	public Optional<FormulaDto> getById(final Integer formulaId) {
 		final Formula formula = this.daoFactory.getFormulaDAO().getById(formulaId);
-		if (formula != null) {
+		if (formula != null && formula.getActive()) {
 			return Optional.of(FormulaUtils.convertToFormulaDto(formula));
 		}
 		return Optional.absent();
