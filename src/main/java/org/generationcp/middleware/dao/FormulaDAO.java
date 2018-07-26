@@ -23,6 +23,7 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("active", true));
 			criteria.add(Restrictions.eq("targetCVTerm.cvTermId", variableId));
 			criteria.setMaxResults(1); // Only one formula per target for now
 			criteria.setFetchMode("inputs", FetchMode.SELECT);
@@ -47,6 +48,7 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 
 			try {
 				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+				criteria.add(Restrictions.eq("active", true));
 				criteria.add(Restrictions.in("targetCVTerm.cvTermId", variableIds));
 				criteria.setFetchMode("inputs", FetchMode.JOIN);
 
