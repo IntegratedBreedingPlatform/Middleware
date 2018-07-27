@@ -485,7 +485,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			for (final CVTermProperty property : properties) {
 				if (property.getTypeId() == TermId.VARIABLE_TYPE.getId()) {
-					variable.addVariableType(VariableType.getByName(property.getValue()));
+					final VariableType variableType = VariableType.getByName(property.getValue());
+					variable.addVariableType(variableType);
+					if (variableType.equals(VariableType.TRAIT)) {
+						variable.setAllowsFormula(true);
+					}
 				} else if (property.getTypeId() == TermId.CREATION_DATE.getId()) {
 					variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
 				} else if (property.getTypeId() == TermId.LAST_UPDATE_DATE.getId()) {
