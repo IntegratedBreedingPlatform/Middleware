@@ -6,17 +6,12 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.PlantDao;
-import org.generationcp.middleware.dao.SampleDao;
-import org.generationcp.middleware.dao.SampleListDao;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.Sample;
@@ -44,45 +39,19 @@ import java.util.Set;
 @Transactional(propagation = Propagation.REQUIRED)
 public class SampleListServiceImpl implements SampleListService {
 
-	private SampleListDao sampleListDao;
-
-	private UserDAO userDao;
-
-	private SampleDao sampleDao;
-
 	private StudyMeasurements studyMeasurements;
 
-	private PlantDao plantDao;
+	private DaoFactory daoFactory;
 
 	@Autowired
 	private SampleService sampleService;
 
 	@Autowired
-	private StudyDataManager studyService;
-
-	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
 	public SampleListServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.sampleListDao = new SampleListDao();
-		this.sampleListDao.setSession(sessionProvider.getSession());
-		this.sampleDao = new SampleDao();
-		this.sampleDao.setSession(sessionProvider.getSession());
-		this.userDao = new UserDAO();
-		this.userDao.setSession(sessionProvider.getSession());
-		this.plantDao = new PlantDao();
-		this.plantDao.setSession(sessionProvider.getSession());
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
-		this.sampleService = new SampleServiceImpl(sessionProvider);
-		this.studyService = new StudyDataManagerImpl(sessionProvider);
-	}
-
-	public void setSampleListDao(final SampleListDao sampleListDao) {
-		this.sampleListDao = sampleListDao;
-	}
-
-	public void setUserDao(final UserDAO userDao) {
-		this.userDao = userDao;
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -106,7 +75,7 @@ public class SampleListServiceImpl implements SampleListService {
 			final SampleList sampleList = new SampleList();
 			User takenBy = null;
 			sampleList.setCreatedDate(sampleListDTO.getCreatedDate());
-			final User user = this.userDao.getUserByUserName(sampleListDTO.getCreatedBy());
+			final User user = this.daoFactory.getUserDao().getUserByUserName(sampleListDTO.getCreatedBy());
 			sampleList.setProgramUUID(sampleListDTO.getProgramUUID());
 			sampleList.setCreatedBy(user);
 			sampleList.setDescription(sampleListDTO.getDescription());
@@ -116,14 +85,14 @@ public class SampleListServiceImpl implements SampleListService {
 			final SampleList parent;
 
 			if (sampleListDTO.getParentId() == null || sampleListDTO.getParentId().equals(0)) {
-				parent = this.sampleListDao.getRootSampleList();
+				parent = this.daoFactory.getSampleListDao().getRootSampleList();
 			} else {
-				parent = this.sampleListDao.getParentSampleFolder(sampleListDTO.getParentId());
+				parent = this.daoFactory.getSampleListDao().getParentSampleFolder(sampleListDTO.getParentId());
 			}
 
 			Preconditions.checkArgument(parent.isFolder(), "The parent id must not be a list");
 
-			final SampleList uniqueSampleListName = this.sampleListDao
+			final SampleList uniqueSampleListName = this.daoFactory.getSampleListDao()
 					.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID());
 
 			Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
@@ -137,7 +106,7 @@ public class SampleListServiceImpl implements SampleListService {
 			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
 
 			if (!sampleListDTO.getTakenBy().isEmpty()) {
-				takenBy = this.userDao.getUserByUserName(sampleListDTO.getTakenBy());
+				takenBy = this.daoFactory.getUserDao().getUserByUserName(sampleListDTO.getTakenBy());
 			}
 
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
@@ -176,9 +145,9 @@ public class SampleListServiceImpl implements SampleListService {
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 
 					final Sample sample = this.sampleService
-						.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, entryNumber, sampleName,
-							sampleListDTO.getSamplingDate(),
-							observationDto.getMeasurementId(), sampleList, user, sampleListDTO.getCreatedDate(), takenBy);
+							.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, entryNumber, sampleName,
+									sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user,
+									sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
 				}
 
@@ -186,14 +155,14 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 
 			sampleList.setSamples(samples);
-			return this.sampleListDao.save(sampleList);
+			return this.daoFactory.getSampleListDao().save(sampleList);
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
 	}
 
 	private Map<Integer, Integer> getMaxPlantNumber(final Collection<Integer> experimentIds) {
-		return this.plantDao.getMaxPlantNumber(experimentIds);
+		return this.daoFactory.getPlantDao().getMaxPlantNumber(experimentIds);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -221,7 +190,7 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	private Map<Integer, Integer> getMaxSequenceNumberByGID(final Collection<Integer> gids) {
-		return this.plantDao.getMaxSequenceNumber(gids);
+		return this.daoFactory.getPlantDao().getMaxSequenceNumber(gids);
 	}
 
 	/**
@@ -235,7 +204,8 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String username, final String programUUID) {
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String username,
+			final String programUUID) {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
 		Preconditions.checkNotNull(username, "username can not be empty");
@@ -245,9 +215,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 		final SampleList parentList;
 		if (0 == parentId) {
-			parentList = this.sampleListDao.getRootSampleList();
+			parentList = this.daoFactory.getSampleListDao().getRootSampleList();
 		} else {
-			parentList = this.sampleListDao.getById(parentId);
+			parentList = this.daoFactory.getSampleListDao().getById(parentId);
 
 		}
 
@@ -255,12 +225,12 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(parentList.isFolder(), "Specified parentID is not a folder");
 
 		final SampleList uniqueSampleListName =
-				this.sampleListDao.getSampleListByParentAndName(folderName, parentList.getId(), programUUID);
+				this.daoFactory.getSampleListDao().getSampleListByParentAndName(folderName, parentList.getId(), programUUID);
 
 		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 		try {
-			User cropUser = this.userDao.getUserByUserName(username);
+			User cropUser = this.daoFactory.getUserDao().getUserByUserName(username);
 			final SampleList sampleFolder = new SampleList();
 			sampleFolder.setCreatedDate(new Date());
 			sampleFolder.setCreatedBy(cropUser);
@@ -270,7 +240,7 @@ public class SampleListServiceImpl implements SampleListService {
 			sampleFolder.setHierarchy(parentList);
 			sampleFolder.setType(SampleListType.FOLDER);
 			sampleFolder.setProgramUUID(programUUID);
-			return this.sampleListDao.save(sampleFolder).getId();
+			return this.daoFactory.getSampleListDao().save(sampleFolder).getId();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in createSampleListFolder in SampleListServiceImpl: " + e.getMessage(), e);
@@ -291,20 +261,20 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(newFolderName);
 		Preconditions.checkArgument(!newFolderName.isEmpty(), "newFolderName can not be empty");
 
-		final SampleList folder = this.sampleListDao.getById(folderId);
+		final SampleList folder = this.daoFactory.getSampleListDao().getById(folderId);
 
 		Preconditions.checkArgument(folder != null, "Folder does not exist");
 		Preconditions.checkArgument(SampleListType.FOLDER.equals(folder.getType()), "Specified folderID is not a folder");
 		Preconditions.checkArgument(folder.getHierarchy() != null, "Root folder name is not editable");
 
-		final SampleList uniqueSampleListName =
-				this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId(), folder.getProgramUUID());
+		final SampleList uniqueSampleListName = this.daoFactory.getSampleListDao()
+				.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId(), folder.getProgramUUID());
 
 		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 		folder.setListName(newFolderName);
 		try {
-			return this.sampleListDao.saveOrUpdate(folder);
+			return this.daoFactory.getSampleListDao().saveOrUpdate(folder);
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in updateSampleListFolderName in SampleListServiceImpl: " + e.getMessage(), e);
 		}
@@ -328,16 +298,16 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(newParentFolderId);
 		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), "Arguments can not have the same value");
 
-		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
+		final SampleList listToMove = this.daoFactory.getSampleListDao().getById(sampleListId);
 
 		Preconditions.checkArgument(listToMove != null, "sampleList does not exist");
 		Preconditions.checkArgument(listToMove.getHierarchy() != null, "Root folder can not me moved");
 
 		final SampleList newParentFolder;
 		if (0 == newParentFolderId) {
-			newParentFolder = this.sampleListDao.getRootSampleList();
+			newParentFolder = this.daoFactory.getSampleListDao().getRootSampleList();
 		} else {
-			newParentFolder = this.sampleListDao.getById(newParentFolderId);
+			newParentFolder = this.daoFactory.getSampleListDao().getById(newParentFolderId);
 		}
 
 		Preconditions.checkArgument(newParentFolder != null, "Specified newParentFolderId does not exist");
@@ -352,8 +322,8 @@ public class SampleListServiceImpl implements SampleListService {
 			listToMove.setProgramUUID(programUUID);
 		}
 
-		final SampleList uniqueSampleListName =
-				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId, listToMove.getProgramUUID());
+		final SampleList uniqueSampleListName = this.daoFactory.getSampleListDao()
+				.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId, listToMove.getProgramUUID());
 
 		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 		Preconditions.checkArgument(!this.isDescendant(listToMove, newParentFolder),
@@ -361,7 +331,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 		listToMove.setHierarchy(newParentFolder);
 		try {
-			return this.sampleListDao.saveOrUpdate(listToMove);
+			return this.daoFactory.getSampleListDao().saveOrUpdate(listToMove);
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in moveSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
@@ -376,7 +346,7 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public void deleteSampleListFolder(final Integer folderId) {
 		Preconditions.checkNotNull(folderId);
-		final SampleList folder = this.sampleListDao.getById(folderId);
+		final SampleList folder = this.daoFactory.getSampleListDao().getById(folderId);
 
 		Preconditions.checkArgument(folder != null, "Folder does not exist");
 		Preconditions.checkArgument(folder.isFolder(), "Specified folderID is not a folder");
@@ -385,7 +355,7 @@ public class SampleListServiceImpl implements SampleListService {
 				.checkArgument(folder.getChildren() == null || folder.getChildren().isEmpty(), "Folder has children and cannot be deleted");
 
 		try {
-			this.sampleListDao.makeTransient(folder);
+			this.daoFactory.getSampleListDao().makeTransient(folder);
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in moveSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
@@ -393,17 +363,17 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public List<SampleList> getAllTopLevelLists(final String programUUID) {
-		return this.getSampleListDao().getAllTopLevelLists(programUUID);
+		return this.daoFactory.getSampleListDao().getAllTopLevelLists(programUUID);
 	}
 
 	@Override
 	public SampleList getSampleListByListId(final Integer listId) {
-		return this.getSampleListDao().getById(listId);
+		return this.daoFactory.getSampleListDao().getById(listId);
 	}
 
 	@Override
 	public SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid) {
-		return this.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
+		return this.daoFactory.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
 	}
 
 	@Override
@@ -416,7 +386,7 @@ public class SampleListServiceImpl implements SampleListService {
 				return sampleList.getId();
 			}
 		});
-		return this.getSampleListDao().getSampleListMetadata(listIds);
+		return this.daoFactory.getSampleListDao().getSampleListMetadata(listIds);
 	}
 
 	@Override
@@ -437,96 +407,58 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public List<SampleListDTO> getSampleLists(final Integer trialId) {
-		return this.sampleListDao.getSampleLists(trialId);
+		return this.daoFactory.getSampleListDao().getSampleLists(trialId);
 	}
 
 	@Override
 	public SampleList getSampleList(final Integer sampleListId) {
-		return this.sampleListDao.getById(sampleListId);
+		return this.daoFactory.getSampleListDao().getById(sampleListId);
 	}
 
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
-		return this.sampleListDao.getSampleDetailsDTO(sampleListId);
+		return this.daoFactory.getSampleListDao().getSampleDetailsDTO(sampleListId);
 	}
 
 	@Override
 	public List<SampleList> getAllSampleTopLevelLists(final String programUUID) {
-		return this.sampleListDao.getAllTopLevelLists(programUUID);
+		return this.daoFactory.getSampleListDao().getAllTopLevelLists(programUUID);
 	}
 
 	@Override
-	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
-		return this.sampleListDao.searchSampleLists(searchString, exactMatch, programUUID, pageable);
+	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID,
+			final Pageable pageable) {
+		return this.daoFactory.getSampleListDao().searchSampleLists(searchString, exactMatch, programUUID, pageable);
 	}
 
 	@Override
 	public List<SampleList> getSampleListByParentFolderIdBatched(final Integer parentId, final String programUUID, final int batchSize) {
-		return this.getSampleListDao().getByParentFolderId(parentId, programUUID);
+		return this.daoFactory.getSampleListDao().getByParentFolderId(parentId, programUUID);
 	}
 
 	@Override
 	public void updateSamplePlateInfo(final Integer sampleListId, final Map<String, SamplePlateInfo> plateInfoMap) {
-		final SampleList sampleList = this.sampleListDao.getById(sampleListId);
+		final SampleList sampleList = this.daoFactory.getSampleListDao().getById(sampleListId);
 		for (final Sample sample : sampleList.getSamples()) {
 			sample.getPlant().setPlateId(plateInfoMap.get(sample.getSampleBusinessKey()).getPlateId());
 			sample.getPlant().setWell(plateInfoMap.get(sample.getSampleBusinessKey()).getWell());
 		}
-		this.sampleListDao.saveOrUpdate(sampleList);
+		this.daoFactory.getSampleListDao().saveOrUpdate(sampleList);
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
 		this.studyMeasurements = studyMeasurements;
 	}
 
-	public void setStudyService(final StudyDataManager studyService) {
-		this.studyService = studyService;
-	}
-
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
-	}
-	public void setPlantDao(final PlantDao plantDAO) {
-		this.plantDao = plantDAO;
 	}
 
 	public void setSampleService(final SampleService sampleService) {
 		this.sampleService = sampleService;
 	}
 
-	public void setSampleDao(final SampleDao sampleDao) {
-		this.sampleDao = sampleDao;
-	}
-
-	public SampleListDao getSampleListDao() {
-		return this.sampleListDao;
-	}
-
-	public UserDAO getUserDao() {
-		return this.userDao;
-	}
-
-	public SampleDao getSampleDao() {
-		return this.sampleDao;
-	}
-
-	public StudyMeasurements getStudyMeasurements() {
-		return this.studyMeasurements;
-	}
-
-	public PlantDao getPlantDao() {
-		return this.plantDao;
-	}
-
-	public SampleService getSampleService() {
-		return this.sampleService;
-	}
-
-	public StudyDataManager getStudyService() {
-		return this.studyService;
-	}
-
-	public WorkbenchDataManager getWorkbenchDataManager() {
-		return this.workbenchDataManager;
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 }
