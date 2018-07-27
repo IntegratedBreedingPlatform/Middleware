@@ -391,7 +391,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public long countSamplesByUIDs(final Set<String> sampleUIDs, final Integer listId) {
-		return sampleService.countBySampleUIDs(sampleUIDs, listId);
+		return this.daoFactory.getSampleDao().countBySampleUIDs(sampleUIDs, listId);
 	}
 
 	protected boolean isDescendant(final SampleList list, final SampleList of) {

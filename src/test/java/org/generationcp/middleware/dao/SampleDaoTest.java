@@ -36,13 +36,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class SampleDaoTest extends IntegrationTestBase {
 
 	public static final String ADMIN = "admin";
 	public static final Integer TEST_SAMPLE_RECORD_COUNT = 23;
+	public static final String LIST_NAME = "TEST-LIST-FOR-SAMPLE-DAO-1";
 
 	private SampleListDao sampleListDao;
 	private UserDAO userDao;
@@ -89,7 +92,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 
-		this.listId = this.createSampleListForFilter("TEST-LIST-FOR-SAMPLE-DAO-1");
+		this.listId = this.createSampleListForFilter(LIST_NAME);
 	}
 
 	@Test
@@ -165,6 +168,20 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertTrue(Ordering.natural().reverse().isOrdered(result));
 
 	}
+
+	@Test
+	public void testCountBySampleUIDs() {
+
+		final Set<String> sampleUIDs = new HashSet<>();
+		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
+			sampleUIDs.add("BUSINESS-KEY-" + LIST_NAME + i);
+		}
+
+		final Long count = this.sampleDao.countBySampleUIDs(sampleUIDs, this.listId);
+		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT.intValue(), count.intValue());
+
+	}
+
 
 	private Integer createSampleListForFilter(final String listName) {
 

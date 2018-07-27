@@ -6,6 +6,8 @@ import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
+import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -15,6 +17,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -23,6 +26,7 @@ import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
+import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.generationcp.middleware.service.impl.study.StudyMeasurements;
 import org.generationcp.middleware.util.Util;
 import org.hamcrest.MatcherAssert;
@@ -39,6 +43,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -691,6 +696,82 @@ public class SampleListServiceImplTest {
 		final List<SampleList> result = this.sampleListService.searchSampleLists(searchString, exactMatch, programUUID, pageable);
 
 		Assert.assertSame(expectedResult, result);
+
+	}
+
+	@Test
+	public void testCountSamplesByUIDs() {
+
+		final int sampleListId = 1;
+		when(sampleDao.countBySampleUIDs(Mockito.anySet(), Mockito.eq(sampleListId))).thenReturn(1l);
+
+		final long count = this.sampleListService.countSamplesByUIDs(new HashSet<String>(), sampleListId);
+		Mockito.verify(sampleDao).countBySampleUIDs(Mockito.anySet(), Mockito.eq(sampleListId));
+
+		Assert.assertEquals(1l, count);
+
+	}
+
+	@Test
+	public void testUpdateSamplePlateInfo() {
+
+		final int sampleListId = 1;
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = this.createSamplePlateInfoMap();
+		final SampleList sampleList = this.createSampleList();
+
+		when(sampleListDao.getById(sampleListId)).thenReturn(sampleList);
+
+		this.sampleListService.updateSamplePlateInfo(sampleListId, samplePlateInfoMap);
+
+		final Plant samplePlant1 = sampleList.getSamples().get(0).getPlant();
+		final Plant samplePlant2 = sampleList.getSamples().get(1).getPlant();
+
+		Assert.assertEquals("PlateId1", samplePlant1.getPlateId());
+		Assert.assertEquals("Well1", samplePlant1.getWell());
+		Assert.assertEquals("PlateId2", samplePlant2.getPlateId());
+		Assert.assertEquals("Well2", samplePlant2.getWell());
+
+		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
+
+	}
+
+	private SampleList createSampleList() {
+
+		final SampleList sampleList = new SampleList();
+		final List<Sample> samples = new ArrayList<>();
+		samples.add(createSample(sampleList, "BusinessKey1"));
+		samples.add(createSample(sampleList, "BusinessKey2"));
+		sampleList.setSamples(samples);
+		return sampleList;
+	}
+
+	private Sample createSample(final SampleList sampleList, final String businessKey) {
+		final User createdBy = new User();
+		final Plant plant = new Plant();
+		plant.setPlantBusinessKey(businessKey);
+		final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, createdBy);
+		sample.setSampleBusinessKey(businessKey);
+		return sample;
+	}
+
+
+	private Map<String,SamplePlateInfo> createSamplePlateInfoMap() {
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = new HashMap<>();
+
+		final String plantBusinessKey1 = "BusinessKey1";
+		final String plantBusinessKey2 = "BusinessKey2";
+
+		final SamplePlateInfo plateInfo1 = new SamplePlateInfo();
+		plateInfo1.setPlateId("PlateId1");
+		plateInfo1.setWell("Well1");
+		final SamplePlateInfo plateInfo2 = new SamplePlateInfo();
+		plateInfo2.setPlateId("PlateId2");
+		plateInfo2.setWell("Well2");
+
+		samplePlateInfoMap.put(plantBusinessKey1, plateInfo1);
+		samplePlateInfoMap.put(plantBusinessKey2, plateInfo2);
+
+		return samplePlateInfoMap;
 
 	}
 }
