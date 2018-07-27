@@ -75,6 +75,26 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
 
+	private static final String HAS_OUT_OF_SYNC = "SELECT "
+		+ "    COUNT(1)"
+		+ " FROM"
+		+ "    phenotype pheno"
+		+ "        INNER JOIN"
+		+ "    (SELECT "
+		+ "        MAX(p.phenotype_id) id,"
+		+ "            p.nd_experiment_id exp_id,"
+		+ "            p.observable_id obs_id"
+		+ "    FROM"
+		+ "        phenotype p"
+		+ "    GROUP BY p.nd_experiment_id , p.observable_id) ph ON (ph.id = pheno.phenotype_id"
+		+ "        AND ph.exp_id = pheno.nd_experiment_id"
+		+ "        AND ph.obs_id = pheno.observable_id)"
+		+ "        INNER JOIN"
+		+ "    nd_experiment n ON pheno.nd_experiment_id = n.nd_experiment_id"
+		+ " WHERE"
+		+ "    pheno.status = 'OUT_OF_SYNC'"
+		+ "        AND n.project_id = :projectId";
+
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
 		try {
@@ -1068,5 +1088,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	private void savePhenotype(final Phenotype phenotype) {
 		final Session currentSession = this.getSession();
 		currentSession.save(phenotype);
+	}
+
+	public Boolean hasOutOfSync(final Integer projectId) {
+		final SQLQuery query = this.getSession().createSQLQuery(HAS_OUT_OF_SYNC);
+		query.setParameter("projectId", projectId);
+		final BigInteger result = (BigInteger) query.uniqueResult();
+		return result.intValue() > 0;
 	}
 }

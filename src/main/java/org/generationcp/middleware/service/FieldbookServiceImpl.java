@@ -283,8 +283,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
 
 			this.saveMeasurements(saveVariates, variates, observations, measurements);
-			final List<MeasurementData> changedFormulaObservations = this.getChangedFormulaObservations(observations);
-			this.saveChangedPhenotypes(changedFormulaObservations);
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
@@ -296,7 +294,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
-	private void saveChangedPhenotypes (final List<MeasurementData> measurementDataList) {
+	@Override
+	public void saveChangedPhenotypes(final List<MeasurementRow> observations) {
+		final List<MeasurementData> measurementDataList = this.getChangedFormulaObservations(observations);
 		for (final MeasurementData measurementData: measurementDataList) {
 			final Phenotype phenotype = this.getPhenotypeDao().getById(measurementData.getPhenotypeId());
 			if (phenotype != null) {
@@ -304,6 +304,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				this.getPhenotypeDao().saveOrUpdate(phenotype);
 			}
 		}
+	}
+
+	@Override
+	public Boolean hasOutOfSyncObervations(final Integer projectId) {
+		return this.getPhenotypeDao().hasOutOfSync(projectId);
 	}
 
 	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {

@@ -977,4 +977,8 @@ public interface FieldbookService {
 	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
 	Workbook getStudyDataSet(int studyID);
+
+	void saveChangedPhenotypes(final List<MeasurementRow> observations);
+
+	Boolean hasOutOfSyncObervations(Integer id);
 }
