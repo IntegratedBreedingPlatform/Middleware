@@ -3,6 +3,9 @@ package org.generationcp.middleware.service.api.study;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+
+import java.util.Objects;
 
 /**
  * A measurementVariable and its associated measurement.
@@ -16,10 +19,14 @@ public class MeasurementDto {
 
 	private String variableValue;
 
-	public MeasurementDto(final MeasurementVariableDto measurementVariable, final Integer phenotypeId, final String variableValue) {
+	private Phenotype.ValueStatus valueStatus;
+
+	public MeasurementDto(final MeasurementVariableDto measurementVariable, final Integer phenotypeId, final String variableValue, final
+		Phenotype.ValueStatus valueStatus) {
 		this.phenotypeId = phenotypeId;
 		this.variableValue = variableValue;
 		this.measurementVariable = measurementVariable;
+		this.valueStatus = valueStatus;
 	}
 
 	public MeasurementDto(final String variableValue) {
@@ -36,7 +43,7 @@ public class MeasurementDto {
 	/**
 	 * @param measurementVariable the measurementVariable to set
 	 */
-	public void setMeasurementVariable(MeasurementVariableDto measurementVariable) {
+	public void setMeasurementVariable(final MeasurementVariableDto measurementVariable) {
 		this.measurementVariable = measurementVariable;
 	}
 
@@ -50,7 +57,7 @@ public class MeasurementDto {
 	/**
 	 * @param phenotypeId the phenotypeId to set
 	 */
-	public void setPhenotypeId(Integer phenotypeId) {
+	public void setPhenotypeId(final Integer phenotypeId) {
 		this.phenotypeId = phenotypeId;
 	}
 
@@ -64,26 +71,43 @@ public class MeasurementDto {
 	/**
 	 * @param variableValue the variableValue to set
 	 */
-	public void setVariableValue(String variableValue) {
+	public void setVariableValue(final String variableValue) {
 		this.variableValue = variableValue;
 	}
 
+	public Phenotype.ValueStatus getValueStatus() {
+		return this.valueStatus;
+	}
+
+	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
+		this.valueStatus = valueStatus;
+	}
+
 	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof MeasurementDto))
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (o == null || this.getClass() != o.getClass())
 			return false;
-		MeasurementDto castOther = (MeasurementDto) other;
-		return new EqualsBuilder().append(measurementVariable, castOther.measurementVariable).append(phenotypeId, castOther.phenotypeId)
-				.append(variableValue, castOther.variableValue).isEquals();
+		final MeasurementDto that = (MeasurementDto) o;
+		return Objects.equals(this.measurementVariable, that.measurementVariable) &&
+			Objects.equals(this.phenotypeId, that.phenotypeId) &&
+			Objects.equals(this.variableValue, that.variableValue) &&
+			this.valueStatus == that.valueStatus;
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(measurementVariable).append(phenotypeId).append(variableValue).toHashCode();
+		return Objects.hash(this.measurementVariable, this.phenotypeId, this.variableValue, this.valueStatus);
 	}
 
 	@Override
 	public String toString() {
-		return "MeasurementDto [measurementVariable=" + measurementVariable + ", phenotypeId=" + phenotypeId + ", variableValue=" + variableValue + "]";
+		return "MeasurementDto{" +
+			"measurementVariable=" + this.measurementVariable +
+			", phenotypeId=" + this.phenotypeId +
+			", variableValue='" + this.variableValue + '\'' +
+			", valueStatus=" + this.valueStatus +
+			'}';
 	}
 }

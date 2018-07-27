@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -102,6 +103,7 @@ public class StudyMeasurements {
 		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
 			createSQLQuery.addScalar(measurementVariable.getName());
 			createSQLQuery.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
+			createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
 		}
 	}
 
@@ -116,9 +118,13 @@ public class StudyMeasurements {
 				final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
 				int counterTwo = 0;
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
-					measurementVariableResults.add(new MeasurementDto(variable, (Integer) row[fixedColumns + counterTwo + 1],
-							(String) row[fixedColumns + counterTwo]));
-					counterTwo += 2;
+					final String status = (String) row[fixedColumns + counterTwo + 2];
+					measurementVariableResults.add(new MeasurementDto(
+						variable,
+						(Integer) row[fixedColumns + counterTwo + 1],
+						(String) row[fixedColumns + counterTwo],
+						(status != null ? Phenotype.ValueStatus.valueOf(status) : null)));
+					counterTwo += 3;
 				}
 				final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3],
 						(String) row[4], (String) row[5], (String) row[6], (String) row[7], (String) row[8], (String) row[9],
@@ -130,7 +136,7 @@ public class StudyMeasurements {
 				measurement.setFieldMapRange((String) row[14]);
 				measurement.setSamples((String) row[15]);
 
-				int additionalFactorsIndex = fixedColumns + selectionMethodsAndTraits.size() * 2;
+				int additionalFactorsIndex = fixedColumns + selectionMethodsAndTraits.size() * 3;
 				for (final String gpDesc : germplasmDescriptors) {
 					measurement.additionalGermplasmDescriptor(gpDesc, (String) row[additionalFactorsIndex++]);
 				}

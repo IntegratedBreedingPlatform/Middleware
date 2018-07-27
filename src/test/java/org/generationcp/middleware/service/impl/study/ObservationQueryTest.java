@@ -47,20 +47,20 @@ public class ObservationQueryTest {
 	public void testGetAllMeasurementsQueryGeneration() throws Exception {
 		final ObservationQuery fixture = new ObservationQuery();
 		final String result = fixture.getAllObservationsQuery(this.traitNames, this.germplasmDescriptors, this.designFactors, null, null);
-		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForAllMeasurements()),
-				formatString(result));
+		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForAllMeasurements()),
+			this.formatString(result));
 	}
 
 	@Test
 	public void testGetSingleMeasurementQueryGeneration() throws Exception {
 		final ObservationQuery fixture = new ObservationQuery();
 		final String result = fixture.getSingleObservationQuery(this.traitNames, this.germplasmDescriptors, this.designFactors);
-		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForSingleMeasurement()),
-				formatString(result));
+		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForSingleMeasurement()),
+			this.formatString(result));
 	}
 
 	private String formatString(final String format) {
-		return formattedSQL.format(format).replace(" ", "");
+		return this.formattedSQL.format(format).replace(" ", "");
 	}
 
 	private String expectedQueryForAllMeasurements() {
@@ -83,6 +83,7 @@ public class ObservationQueryTest {
 				+ "    nde.plot_id as PLOT_ID,"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.value, NULL)) AS '" + ObservationQueryTest.PH_CM + "', \n"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.phenotype_id, NULL)) AS '" + ObservationQueryTest.PH_CM + "_PhenotypeId', \n"
+				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.status, NULL)) AS '" + ObservationQueryTest.PH_CM + "_Status', \n"
 				+ "   (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '" + ObservationQueryTest.STOCK_ID + "') '" + ObservationQueryTest.STOCK_ID + "', \n"
 				+ "   (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '" + ObservationQueryTest.FACT1 + "') '" + ObservationQueryTest.FACT1 + "', \n"
 				+ " 1=1 FROM \n"
@@ -118,6 +119,7 @@ public class ObservationQueryTest {
 				+ "    nde.plot_id as PLOT_ID,"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.value, NULL)) AS '" + ObservationQueryTest.PH_CM + "', \n"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.phenotype_id, NULL)) AS '" + ObservationQueryTest.PH_CM + "_PhenotypeId', \n"
+				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.status, NULL)) AS '" + ObservationQueryTest.PH_CM + "_Status', \n"
 				+ "   (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '" + ObservationQueryTest.STOCK_ID + "') '" + ObservationQueryTest.STOCK_ID + "', \n"
 				+ "   (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '" + ObservationQueryTest.FACT1 + "') '" + ObservationQueryTest.FACT1 + "', \n"
 				+ " 1=1 FROM \n"
