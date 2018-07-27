@@ -8,6 +8,7 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -943,6 +944,16 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<VariableType> getVariableTypes(final Integer variableId) {
+		final List<VariableType> variableTypes = new ArrayList<>();
+		final List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermAndType(variableId, TermId.VARIABLE_TYPE.getId());
+		for (final CVTermProperty property : properties) {
+			variableTypes.add(VariableType.getByName(property.getValue()));
+		}
+		return variableTypes;
 	}
 
 	@Override

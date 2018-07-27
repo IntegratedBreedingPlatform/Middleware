@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager.ontology.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -92,6 +93,8 @@ public interface OntologyVariableDataManager {
 	boolean areVariablesUsedInStudy(List<Integer> variablesIds);
 	
 	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
+
+	public List<VariableType> getVariableTypes(Integer variableId);
 
 	void deleteVariablesFromCache(List<Integer> variablesIds);
 }
