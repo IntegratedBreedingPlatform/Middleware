@@ -103,8 +103,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
+			.createAlias("experiment.stock", "stock")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
@@ -182,8 +181,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
+			.createAlias("experiment.stock", "stock")
 			.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.property("sampleId")) //row[0]
 				.add(Projections.property("sampleName")) //row[1]
@@ -270,8 +268,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createCriteria(Sample.class, SAMPLE)
 			.createAlias(SAMPLE_PLANT, PLANT)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
+			.createAlias("experiment.stock", "stock")
 			.add(Restrictions.in(SAMPLE_ID, sampleIds))
 			.setProjection(Projections.projectionList()
 				.add(Projections.property("sample.sampleId"))
@@ -298,8 +295,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)//
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)//
 
-			.createAlias("experiment.experimentStocks", "experimentStocks")//
-			.createAlias("experimentStocks.stock", "stock")//
+			.createAlias("experiment.stock", "stock")//
 			.createAlias("experiment.project", "project")//
 			.createAlias("project.relatedTos", "relatedTos")//
 			.createAlias("relatedTos.objectProject", "objectProject")//
