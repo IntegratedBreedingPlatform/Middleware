@@ -124,6 +124,7 @@ class ObservationQuery {
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 			final List<String> designFactors, final String sortBy, final String sortOrder) {
+		//FIXME remove inner join with max phenotype_id when BMS-5055 is solved
 		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + this.getInstanceNumberClause() + this
 			.getGroupingClause()
 				+ this.getOrderingClause(sortBy, sortOrder);
