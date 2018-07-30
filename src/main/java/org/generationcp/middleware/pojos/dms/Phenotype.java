@@ -53,11 +53,11 @@ public class Phenotype implements Serializable {
 		private String name;
 
 		public String getName() {
-			return name;
+			return this.name;
 		}
 
 		public void setName(final String description) {
-			this.name = name;
+			this.name = this.name;
 		}
 	}
 
@@ -181,7 +181,7 @@ public class Phenotype implements Serializable {
 	}
 
 	public ExperimentModel getExperiment() {
-		return experiment;
+		return this.experiment;
 	}
 
 	public void setExperiment(final ExperimentModel experiment) {
@@ -189,7 +189,7 @@ public class Phenotype implements Serializable {
 	}
 
 	public ValueStatus getValueStatus() {
-		return valueStatus;
+		return this.valueStatus;
 	}
 
 	public void setValueStatus(final ValueStatus valueStatus) {
@@ -203,23 +203,25 @@ public class Phenotype implements Serializable {
 		if (!(o instanceof Phenotype))
 			return false;
 		final Phenotype phenotype = (Phenotype) o;
-		return Objects.equals(getPhenotypeId(), phenotype.getPhenotypeId()) && Objects.equals(getUniqueName(), phenotype.getUniqueName())
-				&& Objects.equals(getName(), phenotype.getName()) && Objects.equals(getObservableId(), phenotype.getObservableId())
-				&& Objects.equals(getAttributeId(), phenotype.getAttributeId()) && Objects.equals(getValue(), phenotype.getValue())
-				&& Objects.equals(getcValueId(), phenotype.getcValueId()) && Objects.equals(getAssayId(), phenotype.getAssayId()) && Objects
-				.equals(getExperiment(), phenotype.getExperiment()) && Objects.equals(getValueStatus(), phenotype.getValueStatus());
+		return Objects.equals(this.getPhenotypeId(), phenotype.getPhenotypeId()) && Objects.equals(this.getUniqueName(), phenotype.getUniqueName())
+			&& Objects.equals(this.getName(), phenotype.getName()) && Objects.equals(this.getObservableId(), phenotype.getObservableId()) && Objects
+			.equals(this.getAttributeId(), phenotype.getAttributeId()) && Objects.equals(this.getValue(), phenotype.getValue()) && Objects
+			.equals(this.getcValueId(), phenotype.getcValueId()) && Objects.equals(this.getAssayId(), phenotype.getAssayId()) && Objects
+			.equals(this.getExperiment(), phenotype.getExperiment());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getPhenotypeId(), getUniqueName(), getName(), getObservableId(), getAttributeId(), getValue(), getcValueId(),
-			getValueStatus(), getAssayId(), getExperiment(), getValueStatus());
+
+		return Objects.hash(
+			this.getPhenotypeId(), this.getUniqueName(), this.getName(), this.getObservableId(), this.getAttributeId(), this.getValue(), this.getcValueId(),
+			this.getValueStatus(), this.getAssayId(), this.getExperiment());
 	}
 
 	@Override
 	public String toString() {
-		return "Phenotype{" + "phenotypeId=" + phenotypeId + ", uniqueName='" + uniqueName + '\'' + ", name='" + name + '\''
-			+ ", observableId=" + observableId + ", attributeId=" + attributeId + ", value='" + value + '\'' + ", cValueId=" + cValueId
-			+ ", assayId=" + assayId + ", experiment=" + experiment + ", valueStatus=" + valueStatus + "}";
+		return "Phenotype{" + "phenotypeId=" + this.phenotypeId + ", uniqueName='" + this.uniqueName + '\'' + ", name='" + this.name + '\''
+			+ ", observableId=" + this.observableId + ", attributeId=" + this.attributeId + ", value='" + this.value + '\'' + ", cValueId=" + this.cValueId
+			+ ", assayId=" + this.assayId + ", experiment=" + this.experiment + '}';
 	}
 }
