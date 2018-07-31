@@ -104,6 +104,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.stock", "stock")
+			.createAlias("stock.germplasm", "germplasm")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
@@ -117,7 +118,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("plant.plantBusinessKey")) //row[7]
 				.add(Projections.property("dataset.datasetId")) //row[8]
 				.add(Projections.property("dataset.datasetName")) //row[9]
-				.add(Projections.property("stock.dbxrefId")) //row[10]
+				.add(Projections.property("germplasm.gid")) //row[10]
 				.add(Projections.property("stock.name")) //row[11] TODO preferred name
 				.add(Projections.property("samplingDate")) //row[12]
 				.add(Projections.property("entryNumber")) //row[13]
@@ -182,6 +183,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.stock", "stock")
+			.createAlias("stock.germplasm", "germplasm")
 			.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.property("sampleId")) //row[0]
 				.add(Projections.property("sampleName")) //row[1]
@@ -191,7 +193,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("sampleList.listName")) //row[5]
 				.add(Projections.property("plant.plantNumber")) //row[6]
 				.add(Projections.property("plant.plantBusinessKey")) //row[7]
-				.add(Projections.property("stock.dbxrefId")) //row[8]
+				.add(Projections.property("germplasm.gid")) //row[8]
 				.add(Projections.property("stock.name")) //row[9] TODO preferred name
 				.add(Projections.property("samplingDate")) //row[10]
 				.add(Projections.property("entryNumber")) //row[11]
@@ -269,10 +271,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(SAMPLE_PLANT, PLANT)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.stock", "stock")
+			.createAlias("stock.germplasm", "germplasm")
 			.add(Restrictions.in(SAMPLE_ID, sampleIds))
 			.setProjection(Projections.projectionList()
 				.add(Projections.property("sample.sampleId"))
-				.add(Projections.property("stock.dbxrefId")))
+				.add(Projections.property("germplasm.gid")))
 			.list();
 		for (final Object[] row : result) {
 			map.put((Integer) row[0], (Integer) row[1]);
@@ -296,11 +299,12 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)//
 
 			.createAlias("experiment.stock", "stock")//
+			.createAlias("stock.germplasm", "germplasm")
 			.createAlias("experiment.project", "project")//
 			.createAlias("project.relatedTos", "relatedTos")//
 			.createAlias("relatedTos.objectProject", "objectProject")//
 			.createAlias("objectProject.studyType", "studyType")//
-			.add(Restrictions.eq("stock.dbxrefId", gid))//
+			.add(Restrictions.eq("germplasm.gid", gid))//
 			.add(Restrictions.ne("project." + DmsProjectDao.DELETED, true))
 
 			.addOrder(Order.desc("sample.sampleBusinessKey"))//

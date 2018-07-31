@@ -10,6 +10,7 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
@@ -59,6 +60,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private DmsProjectDao dmsProjectDao;
 	private StockDao stockDao;
 	private ExperimentPropertyDao experimentPropertyDao;
+	private GermplasmDAO germplasmDao;
 
 	public static final String ROOT_FOLDER = "Samples";
 
@@ -93,6 +95,9 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		
+		this.germplasmDao = new GermplasmDAO();
+		this.germplasmDao.setSession(this.sessionProvder.getSession());
 
 		// Create three sample lists test data for search
 		this.createSampleListForSearch("TEST-LIST-1");
@@ -278,7 +283,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(sampleDetailsDTO.getDateFormat().format(new Date()), sampleDetailsDTO.getDisplayDate());
 		Assert.assertEquals(1, sampleDetailsDTO.getEntryNumber().intValue());
 		Assert.assertEquals("1", sampleDetailsDTO.getPlotNumber());
-
+		Assert.assertNotNull(sampleDetailsDTO.getGid());
 	}
 
 	private void createSampleListForSearch(final String listName) {
@@ -360,13 +365,16 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	}
 
 	private StockModel createTestStock(final ExperimentModel experimentModel) {
-
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+		germplasm.setGid(null);
+		this.germplasmDao.save(germplasm);
+		
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
 		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
-		stockModel.setGermplasm(new Germplasm(1));
+		stockModel.setGermplasm(germplasm);
 
 		this.stockDao.saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);

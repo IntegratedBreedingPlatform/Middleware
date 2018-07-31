@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
@@ -16,6 +18,7 @@ import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
@@ -50,6 +53,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private StockDao stockDao;
 	private PersonDAO personDAO;
 	private DmsProjectDao dmsProjectDao;
+	private GermplasmDAO germplasmDao;
 
 	private Integer listId;
 
@@ -81,6 +85,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		
+		this.germplasmDao = new GermplasmDAO();
+		this.germplasmDao.setSession(this.sessionProvder.getSession());
 
 		this.listId = this.createSampleListForFilter(LIST_NAME, false, TEST_SAMPLE_RECORD_COUNT, "PLOT-ID");
 	}
@@ -150,7 +157,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("TEST-LIST-FOR-SAMPLE-DAO-1", sample.getSampleList());
 		Assert.assertEquals("0", sample.getPlantNumber().toString());
 		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
-		Assert.assertNull(sample.getGid());
+		Assert.assertNotNull(sample.getGid());
 		Assert.assertEquals("Germplasm 1", sample.getDesignation());
 	}
 	
@@ -171,7 +178,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("TEST-LIST-FOR-SAMPLE-DAO-1", sample.getSampleList());
 		Assert.assertEquals("0", sample.getPlantNumber().toString());
 		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
-		Assert.assertNull(sample.getGid());
+		Assert.assertNotNull(sample.getGid());
 		Assert.assertEquals("Germplasm 1", sample.getDesignation());
 	}
 	
@@ -247,11 +254,16 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 
 		for (int i = 1; i < sampleSize + 1; i++) {
+			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+			germplasm.setGid(null);
+			this.germplasmDao.save(germplasm);
+			
 			final StockModel stockModel = new StockModel();
 			stockModel.setName("Germplasm " + i);
 			stockModel.setIsObsolete(false);
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(String.valueOf(i));
+			stockModel.setGermplasm(germplasm);
 			stockDao.saveOrUpdate(stockModel);
 			
 			final ExperimentModel experimentModel = new ExperimentModel();

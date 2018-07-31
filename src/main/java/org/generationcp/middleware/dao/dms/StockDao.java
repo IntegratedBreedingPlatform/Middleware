@@ -37,13 +37,15 @@ import java.util.Set;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	protected static final String DBXREF_ID = "dbxrefId";
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
 		final List<Integer> stockIds;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			if ("dbxrefId".equals(columnName)) {
-				criteria.add(Restrictions.eq(columnName, Integer.valueOf(value)));
+			if (DBXREF_ID.equals(columnName)) {
+				criteria.add(Restrictions.eq("germplasm.gid", Integer.valueOf(value)));
 			} else {
 				criteria.add(Restrictions.eq(columnName, value));
 			}
