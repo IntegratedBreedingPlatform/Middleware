@@ -84,30 +84,22 @@ public class MeasurementDto {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
-		if (this == o)
-			return true;
-		if (o == null || this.getClass() != o.getClass())
+	public boolean equals(final Object other) {
+		if (!(other instanceof MeasurementDto))
 			return false;
-		final MeasurementDto that = (MeasurementDto) o;
-		return Objects.equals(this.measurementVariable, that.measurementVariable) &&
-			Objects.equals(this.phenotypeId, that.phenotypeId) &&
-			Objects.equals(this.variableValue, that.variableValue) &&
-			this.valueStatus == that.valueStatus;
+		final MeasurementDto castOther = (MeasurementDto) other;
+		return new EqualsBuilder().append(this.measurementVariable, castOther.measurementVariable).append(this.phenotypeId, castOther.phenotypeId)
+				.append(this.variableValue, castOther.variableValue).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.measurementVariable, this.phenotypeId, this.variableValue, this.valueStatus);
+		return new HashCodeBuilder().append(this.measurementVariable).append(this.phenotypeId).append(this.variableValue).toHashCode();
 	}
 
 	@Override
 	public String toString() {
-		return "MeasurementDto{" +
-			"measurementVariable=" + this.measurementVariable +
-			", phenotypeId=" + this.phenotypeId +
-			", variableValue='" + this.variableValue + '\'' +
-			", valueStatus=" + this.valueStatus +
-			'}';
+		return "MeasurementDto [measurementVariable=" + this.measurementVariable + ", phenotypeId=" + this.phenotypeId + ", variableValue=" + this.variableValue
+			+ "]";
 	}
 }
