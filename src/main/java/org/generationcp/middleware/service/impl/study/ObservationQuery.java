@@ -261,7 +261,7 @@ class ObservationQuery {
 			.append("	INNER JOIN stock s ON s.stock_id = es.stock_id \n")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
-			.append(" INNER JOIN (SELECT\n"
+			.append("   LEFT JOIN (SELECT\n"
 				+ "                  max(p.phenotype_id) phenotype_id,\n"
 				+ "                  p.nd_experiment_id,\n"
 				+ "                  p.observable_id,\n"
