@@ -118,5 +118,26 @@
 			  ORDER BY e.project_id, e.nd_geolocation_id, e.type_id, td.trait_name, s.name;        
 		  </sql>
     </changeSet>
+    
+    <changeSet author="darla" id="v9.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+				WHERE TABLE_NAME = 'stock' AND CONSTRAINT_NAME='stock_dbxref_id_fk' 
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Add FK to dbxref_id column in Stock table to Germplasm GID
+		</comment>
+		<addForeignKeyConstraint 
+			constraintName="stock_dbxref_id_fk"  
+			baseTableName="stock"  
+			baseColumnNames="dbxref_id" 
+			referencedTableName="germplsm" 
+			referencedColumnNames="gid"
+			onDelete="NO ACTION"
+			onUpdate="NO ACTION"/>
+	</changeSet>
 
 </databaseChangeLog>

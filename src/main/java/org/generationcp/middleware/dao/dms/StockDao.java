@@ -193,7 +193,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					final Integer typeId = (Integer) row[7];
 					final Boolean isObsolete = (Boolean) row[8];
 
-					stocks.add(new StockModel(id, dbxrefId, organismId, name, uniqueName, value, description, typeId, isObsolete));
+					//FIXME - check if we need to retrieve germplasm in building StockModel here
+					stocks.add(new StockModel(id, organismId, name, uniqueName, value, description, typeId, isObsolete));
 				}
 			}
 

@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -131,7 +132,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final Variable variable = builder.createGermplasmFactor(stockModel, variableType);
 
 		Assert.assertNotNull(variable);
-		Assert.assertEquals(String.valueOf(stockModel.getDbxrefId()), variable.getValue());
+		Assert.assertEquals(String.valueOf(stockModel.getGermplasm().getGid()), variable.getValue());
 	}
 
 	@Test
@@ -202,7 +203,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals(5, variables.size());
 		final Iterator<Variable> iterator = variables.iterator();
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
-		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getDbxrefId()));
+		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getGermplasm().getGid()));
 		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getValue());
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), stockModel.getProperties().iterator().next().getValue());
@@ -244,7 +245,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 	private StockModel createStockModel() {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(20));
-		stockModel.setDbxrefId(new Random().nextInt(Integer.MAX_VALUE));
+		stockModel.setGermplasm(new Germplasm(new Random().nextInt(Integer.MAX_VALUE)));
 		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
 		stockModel.setValue(RandomStringUtils.randomAlphanumeric(20));
 
