@@ -69,7 +69,7 @@ public class StockBuilder extends Builder {
 		return stocks;
 	}
 
-	private String getValue(StockModel stockModel, DMSVariableType variableType) {
+	String getValue(StockModel stockModel, DMSVariableType variableType) {
 		String value = null;
 		int id = variableType.getStandardVariable().getId();
 		if (id == TermId.ENTRY_NO.getId()) {

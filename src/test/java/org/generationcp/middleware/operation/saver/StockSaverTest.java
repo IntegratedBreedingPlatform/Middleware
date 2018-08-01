@@ -60,12 +60,12 @@ public class StockSaverTest {
 	}
 
 	@Before
-	public void setUp() throws MiddlewareQueryException {
+	public void setUp() {
 		this.stockSaver = Mockito.spy(new StockSaver(Mockito.mock(HibernateSessionProvider.class)));
 	}
 
 	@Test
-	public void testCreateOrUpdate() throws MiddlewareQueryException {
+	public void testCreateOrUpdate() {
 		VariableList factors = this.createVariableList();
 		this.stockModel = this.stockSaver.createStock(factors, this.stockModel);
 		assertNotNull(this.stockModel);
