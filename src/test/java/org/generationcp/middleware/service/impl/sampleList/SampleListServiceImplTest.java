@@ -723,13 +723,13 @@ public class SampleListServiceImplTest {
 
 		this.sampleListService.updateSamplePlateInfo(sampleListId, samplePlateInfoMap);
 
-		final Plant samplePlant1 = sampleList.getSamples().get(0).getPlant();
-		final Plant samplePlant2 = sampleList.getSamples().get(1).getPlant();
+		final Sample sample1 = sampleList.getSamples().get(0);
+		final Sample sample2 = sampleList.getSamples().get(1);
 
-		Assert.assertEquals("PlateId1", samplePlant1.getPlateId());
-		Assert.assertEquals("Well1", samplePlant1.getWell());
-		Assert.assertEquals("PlateId2", samplePlant2.getPlateId());
-		Assert.assertEquals("Well2", samplePlant2.getWell());
+		Assert.assertEquals("PlateId1", sample1.getPlateId());
+		Assert.assertEquals("Well1", sample1.getWell());
+		Assert.assertEquals("PlateId2", sample2.getPlateId());
+		Assert.assertEquals("Well2", sample2.getWell());
 
 		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
 

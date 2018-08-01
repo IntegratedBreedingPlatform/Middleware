@@ -440,8 +440,8 @@ public class SampleListServiceImpl implements SampleListService {
 	public void updateSamplePlateInfo(final Integer sampleListId, final Map<String, SamplePlateInfo> plateInfoMap) {
 		final SampleList sampleList = this.daoFactory.getSampleListDao().getById(sampleListId);
 		for (final Sample sample : sampleList.getSamples()) {
-			sample.getPlant().setPlateId(plateInfoMap.get(sample.getSampleBusinessKey()).getPlateId());
-			sample.getPlant().setWell(plateInfoMap.get(sample.getSampleBusinessKey()).getWell());
+			sample.setPlateId(plateInfoMap.get(sample.getSampleBusinessKey()).getPlateId());
+			sample.setWell(plateInfoMap.get(sample.getSampleBusinessKey()).getWell());
 		}
 		this.daoFactory.getSampleListDao().saveOrUpdate(sampleList);
 	}

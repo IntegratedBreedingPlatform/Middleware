@@ -214,8 +214,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("stock.name")) //row[9] TODO preferred name
 				.add(Projections.property("samplingDate")) //row[10]
 				.add(Projections.property("entryNumber")) //row[11]
-				.add(Projections.property("plant.plateId")) //row[12]
-				.add(Projections.property("plant.well")) //row[13]
+				.add(Projections.property("sample.plateId")) //row[12]
+				.add(Projections.property("sample.well")) //row[13]
 
 			)).list();
 
@@ -348,8 +348,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("studyType.visible"))//
 				.add(Projections.property("studyType.cvTermId"))//
 				//.add(Projections.property("objectProject.studyType"))//
-				.add(Projections.property("plant.plateId"))//
-				.add(Projections.property("plant.well"))))//
+				.add(Projections.property("sample.plateId"))//
+				.add(Projections.property("sample.well"))))//
 			.list();//
 
 		final HashMap<String,SampleGermplasmDetailDTO> samplesMap = new HashMap<>();
