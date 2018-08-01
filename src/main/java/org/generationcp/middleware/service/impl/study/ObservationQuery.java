@@ -259,7 +259,6 @@ class ObservationQuery {
 			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n")
 			.append("	INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n")
 			.append("	INNER JOIN stock s ON s.stock_id = es.stock_id \n")
-			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
 			//FIXME remove this subquery when there are no duplicated rows for same nd_experiment and observable id
 			.append("       LEFT JOIN (select * from phenotype\n"
 				+ "                                  inner join (SELECT max(p.phenotype_id) phenotypeid,\n"
