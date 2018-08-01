@@ -213,9 +213,4 @@ public class SampleServiceImpl implements SampleService {
 		return this.getSampleDao().hasSamples(studyId);
 	}
 
-	@Override
-	public long countBySampleUIDs(final Set<String> sampleUIDs, final Integer listId) {
-		return this.getSampleDao().countBySampleUIDs(sampleUIDs, listId);
-	}
-
 }
