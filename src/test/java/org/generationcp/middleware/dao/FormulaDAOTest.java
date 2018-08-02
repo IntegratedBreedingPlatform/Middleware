@@ -17,6 +17,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.core.Is.is;
+
 public class FormulaDAOTest extends IntegrationTestBase {
 
 	private FormulaDAO formulaDAO;
@@ -69,6 +71,29 @@ public class FormulaDAOTest extends IntegrationTestBase {
 		Assert.assertThat("Should retrieve correct list of formula by target variable IDs", formulaList.size(), Matchers.equalTo(2));
 		Assert.assertTrue(formulaList.contains(formula1));
 		Assert.assertTrue(formulaList.contains(formula2));
+	}
+
+	@Test
+	public void testGetByInputId() {
+		final Formula formula1 = saveTestFormula();
+		final Formula formula2 = saveTestFormula();
+
+		this.sessionProvder.getSession().flush();
+
+		final List<Formula> fromFormula1Input1 = this.formulaDAO.getByInputId(formula1.getInputs().get(0).getCvTermId());
+
+		Assert.assertThat(fromFormula1Input1.size(), is(1));
+		Assert.assertThat(fromFormula1Input1.get(0).getFormulaId(), is(formula1.getFormulaId()));
+
+		final List<Formula> fromFormula1Input2 = this.formulaDAO.getByInputId(formula1.getInputs().get(1).getCvTermId());
+
+		Assert.assertThat(fromFormula1Input2.size(), is(1));
+		Assert.assertThat(fromFormula1Input2.get(0).getFormulaId(), is(formula1.getFormulaId()));
+
+		final List<Formula> fromFormula2 = this.formulaDAO.getByInputId(formula2.getInputs().get(0).getCvTermId());
+
+		Assert.assertThat(fromFormula2.size(), is(1));
+		Assert.assertThat(fromFormula2.get(0).getFormulaId(), is(formula2.getFormulaId()));
 	}
 
 	protected Formula saveTestFormula() {

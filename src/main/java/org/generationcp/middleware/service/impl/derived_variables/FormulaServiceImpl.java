@@ -8,6 +8,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.util.FormulaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +56,17 @@ public class FormulaServiceImpl implements FormulaService {
 
 		final List<FormulaDto> formulaDtos = new ArrayList<>();
 		final List<Formula> formulas = this.daoFactory.getFormulaDAO().getByTargetVariableIds(variableIds);
+		for (final Formula formula : formulas) {
+			formulaDtos.add(FormulaUtils.convertToFormulaDto(formula));
+		}
+		return formulaDtos;
+	}
+
+	@Override
+	public List<FormulaDto> getByInputId(final Integer inputId) {
+
+		final List<FormulaDto> formulaDtos = new ArrayList<>();
+		final List<Formula> formulas = this.daoFactory.getFormulaDAO().getByInputId(inputId);
 		for (final Formula formula : formulas) {
 			formulaDtos.add(FormulaUtils.convertToFormulaDto(formula));
 		}

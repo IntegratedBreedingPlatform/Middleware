@@ -18,6 +18,8 @@ public interface FormulaService {
 
 	public List<FormulaDto> getByTargetIds(Set<Integer> variableIds);
 
+	List<FormulaDto> getByInputId(Integer inputId);
+
 	/**
 	 * Gets all FormulaVariables from a given derived trait variableIds including the FormulaVariables of an argument variable if it is itself
 	 * a derived trait.
