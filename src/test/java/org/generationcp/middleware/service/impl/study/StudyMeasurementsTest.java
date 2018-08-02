@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -174,6 +176,45 @@ public class StudyMeasurementsTest {
 				Arrays.asList(new ImmutablePair<String, String>(StudyMeasurementsTest.STOCK_ID, StudyMeasurementsTest.STOCKID2)),
 				Arrays.asList(new ImmutablePair<String, String>(StudyMeasurementsTest.FACT1, StudyMeasurementsTest.FACT1_VALUE2),
 						new ImmutablePair<String, String>(StudyMeasurementsTest.FACT2, StudyMeasurementsTest.FACT2_VALUE2)));
+	}
+	
+	@Test
+	public void testGetAllStudyDetailsAsTable() {
+		final List<MeasurementVariableDto> traits = Arrays.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name()));
+		final List<Object[]> results = new ArrayList<>();
+		final Object[] result = {1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "PLOT_ID", "LOC_NAME", "LOC_ABBR", 1, 1, 1, 1, "Study Name", 1};
+		results.add(result);
+		final SQLQuery query = Mockito.mock(SQLQuery.class);
+		Mockito.when(this.session.createSQLQuery(
+				new ObservationQuery().getObservationQueryWithBlockRowCol(traits, 1)))
+				.thenReturn(query);
+		Mockito.when(query.list()).thenReturn(results);
+		final List<Object[]> returned = this.studyMeasurements.getAllStudyDetailsAsTable(2007, traits, 1);
+		for(int i = 0; i<returned.size(); i++) {
+			Assert.assertEquals(result[i], returned.get(0)[i]);
+		}
+		Mockito.verify(query).addScalar(StudyMeasurements.PROJECT_NAME);
+		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_DB_ID);
+		Mockito.verify(query).addScalar(StudyMeasurements.ND_GEOLOCATION_ID);
+		Mockito.verify(query).addScalar(StudyMeasurements.FIELD_MAP_ROW);
+		Mockito.verify(query).addScalar(StudyMeasurements.FIELD_MAP_COLUMN);
+		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_ABBREVIATION);
+		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_NAME);
+		Mockito.verify(query).addScalar(Matchers.eq(StudyMeasurements.PLOT_ID), Matchers.any(StringType.class));
+		Mockito.verify(query).addScalar(StudyMeasurements.COL);
+		Mockito.verify(query).addScalar(StudyMeasurements.ROW);
+		Mockito.verify(query).addScalar(StudyMeasurements.BLOCK_NO);
+		Mockito.verify(query).addScalar(StudyMeasurements.PLOT_NO);
+		Mockito.verify(query).addScalar(StudyMeasurements.REP_NO);
+		Mockito.verify(query).addScalar(StudyMeasurements.ENTRY_CODE);
+		Mockito.verify(query).addScalar(StudyMeasurements.ENTRY_NO);
+		Mockito.verify(query).addScalar(StudyMeasurements.DESIGNATION);
+		Mockito.verify(query).addScalar(StudyMeasurements.GID);
+		Mockito.verify(query).addScalar(StudyMeasurements.ENTRY_TYPE);
+		Mockito.verify(query).addScalar(StudyMeasurements.TRIAL_INSTANCE);
+		Mockito.verify(query).addScalar(StudyMeasurements.ND_EXPERIMENT_ID);
+		Mockito.verify(query).addScalar(TermId.ALTITUDE.name());
+		Mockito.verify(query).addScalar(Matchers.eq(TermId.ALTITUDE.name() + "_PhenotypeId"), Matchers.any(IntegerType.class));
 	}
 
 	/**

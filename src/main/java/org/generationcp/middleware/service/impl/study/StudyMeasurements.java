@@ -16,6 +16,27 @@ import java.util.List;
 
 public class StudyMeasurements {
 
+	public static final String PROJECT_NAME = "PROJECT_NAME";
+	public static final String LOCATION_DB_ID = "locationDbId";
+	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
+	public static final String FIELD_MAP_ROW = "FieldMapRow";
+	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
+	public static final String LOCATION_NAME = "LocationName";
+	public static final String PLOT_ID = "PLOT_ID";
+	public static final String COL = "COL";
+	public static final String ROW = "ROW";
+	public static final String BLOCK_NO = "BLOCK_NO";
+	public static final String PLOT_NO = "PLOT_NO";
+	public static final String REP_NO = "REP_NO";
+	public static final String ENTRY_CODE = "ENTRY_CODE";
+	public static final String ENTRY_NO = "ENTRY_NO";
+	public static final String DESIGNATION = "DESIGNATION";
+	public static final String GID = "GID";
+	public static final String ENTRY_TYPE = "ENTRY_TYPE";
+	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	public static final String ND_EXPERIMENT_ID = "nd_experiment_id";
+
 	public static final String STUDY_ID = "studyId";
 
 	private final Session session;
@@ -173,31 +194,31 @@ public class StudyMeasurements {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
-		createSQLQuery.addScalar("LocationName");
-		createSQLQuery.addScalar("LocationAbbreviation");
-		createSQLQuery.addScalar("FieldMapColumn");
-		createSQLQuery.addScalar("FieldMapRow");
-		createSQLQuery.addScalar("nd_geolocation_id");
-		createSQLQuery.addScalar("locationDbId");
+		createSQLQuery.addScalar(LOCATION_NAME);
+		createSQLQuery.addScalar(LOCATION_ABBREVIATION);
+		createSQLQuery.addScalar(FIELD_MAP_COLUMN);
+		createSQLQuery.addScalar(FIELD_MAP_ROW);
+		createSQLQuery.addScalar(ND_GEOLOCATION_ID);
+		createSQLQuery.addScalar(LOCATION_DB_ID);
 		createSQLQuery.addScalar(PROJECT_NAME);
 		this.addScalarForTraits(measurementVariables, createSQLQuery);
 		return createSQLQuery;
 	}
 
 	private void addScalar(final SQLQuery createSQLQuery) {
-		createSQLQuery.addScalar("nd_experiment_id");
-		createSQLQuery.addScalar("TRIAL_INSTANCE");
-		createSQLQuery.addScalar("ENTRY_TYPE");
-		createSQLQuery.addScalar("GID");
-		createSQLQuery.addScalar("DESIGNATION");
-		createSQLQuery.addScalar("ENTRY_NO");
-		createSQLQuery.addScalar("ENTRY_CODE");
-		createSQLQuery.addScalar("REP_NO");
-		createSQLQuery.addScalar("PLOT_NO");
-		createSQLQuery.addScalar("BLOCK_NO");
-		createSQLQuery.addScalar("ROW");
-		createSQLQuery.addScalar("COL");
-		createSQLQuery.addScalar("PLOT_ID", new StringType());
+		createSQLQuery.addScalar(ND_EXPERIMENT_ID);
+		createSQLQuery.addScalar(TRIAL_INSTANCE);
+		createSQLQuery.addScalar(ENTRY_TYPE);
+		createSQLQuery.addScalar(GID);
+		createSQLQuery.addScalar(DESIGNATION);
+		createSQLQuery.addScalar(ENTRY_NO);
+		createSQLQuery.addScalar(ENTRY_CODE);
+		createSQLQuery.addScalar(REP_NO);
+		createSQLQuery.addScalar(PLOT_NO);
+		createSQLQuery.addScalar(BLOCK_NO);
+		createSQLQuery.addScalar(ROW);
+		createSQLQuery.addScalar(COL);
+		createSQLQuery.addScalar(PLOT_ID, new StringType());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -205,7 +226,7 @@ public class StudyMeasurements {
 			final Integer selectionVariableId) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(this.measurementQuery.getSampleObservationQuery());
 
-		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
+		createSQLQuery.addScalar(ND_EXPERIMENT_ID, new IntegerType());
 		createSQLQuery.addScalar("preferred_name", new StringType());
 		createSQLQuery.addScalar("value", new StringType());
 		createSQLQuery.addScalar("gid", new IntegerType());

@@ -602,8 +602,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
 		this.germplasmDescriptors = germplasmDescriptors;
 	}
-
+	
 	public void setDesignFactors(final DesignFactors designFactors) {
 		this.designFactors = designFactors;
+	}
+	
+	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
+		this.measurementVariableService = measurementVariableService;
+	}
+	
+	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
+		this.studyMeasurements = studyMeasurements;
 	}
 }
