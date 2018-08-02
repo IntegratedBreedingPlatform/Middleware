@@ -432,7 +432,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		final List<FormulaDto> formulaDtoList = this.formulaService.getByTargetIds(map.keySet());
 		for (final FormulaDto formulaDto : formulaDtoList) {
-			map.get(formulaDto.getTargetTermId()).setFormula(formulaDto);
+			map.get(formulaDto.getTarget().getId()).setFormula(formulaDto);
 		}
 
 		final List<Variable> variables = new ArrayList<>(map.values());

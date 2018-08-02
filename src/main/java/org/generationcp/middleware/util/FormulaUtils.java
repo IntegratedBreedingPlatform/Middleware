@@ -16,7 +16,7 @@ public final class FormulaUtils {
 		final FormulaDto formulaDto = new FormulaDto();
 
 		formulaDto.setName(formula.getName());
-		formulaDto.setTargetTermId(formula.getTargetCVTerm().getCvTermId());
+		formulaDto.setTarget(convertToFormulaVariable(formula.getTargetCVTerm()));
 		formulaDto.setFormulaId(formula.getFormulaId());
 		formulaDto.setDefinition(formula.getDefinition());
 		formulaDto.setDescription(formula.getDescription());
@@ -25,7 +25,7 @@ public final class FormulaUtils {
 		final List<FormulaVariable> inputs = new ArrayList<>();
 		for (final CVTerm cvTerm : formula.getInputs()) {
 			final FormulaVariable formulaVariable = convertToFormulaVariable(cvTerm);
-			formulaVariable.setTargetTermId(formulaDto.getTargetTermId());
+			formulaVariable.setTargetTermId(formulaDto.getTarget().getId());
 			inputs.add(formulaVariable);
 		}
 		formulaDto.setInputs(inputs);
@@ -45,7 +45,7 @@ public final class FormulaUtils {
 
 		formula.setName(formulaDto.getName());
 		final CVTerm cvterm = new CVTerm();
-		cvterm.setCvTermId(formulaDto.getTargetTermId());
+		cvterm.setCvTermId(formulaDto.getTarget().getId());
 		formula.setTargetCVTerm(cvterm);
 		formula.setFormulaId(formulaDto.getFormulaId());
 		formula.setDefinition(formulaDto.getDefinition());

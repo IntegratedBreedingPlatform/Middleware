@@ -71,7 +71,7 @@ public class FormulaServiceImplTest {
 	private void verifyFormulaDto(final Formula testFormula, final FormulaDto formulaDto) {
 		Assert.assertEquals(testFormula.getFormulaId(), formulaDto.getFormulaId());
 		Assert.assertEquals(testFormula.getName(), formulaDto.getName());
-		Assert.assertEquals(testFormula.getTargetCVTerm().getCvTermId(), formulaDto.getTargetTermId());
+		Assert.assertEquals(testFormula.getTargetCVTerm().getCvTermId(), Integer.valueOf(formulaDto.getTarget().getId()));
 		Assert.assertEquals(testFormula.getDefinition(), formulaDto.getDefinition());
 		Assert.assertEquals(testFormula.getDescription(), formulaDto.getDescription());
 		Assert.assertEquals(testFormula.getActive(), formulaDto.getActive());
@@ -209,7 +209,7 @@ public class FormulaServiceImplTest {
 		when(this.formulaDao.save(any(Formula.class))).thenReturn(formula);
 
 		final FormulaDto formulaDto = new FormulaDto();
-		formulaDto.setTargetTermId(2);
+		formulaDto.setTarget(new FormulaVariable(2, "", null));
 		formulaDto.setDefinition("{{2}}");
 		final FormulaDto result = this.formulaServiceImpl.save(formulaDto);
 
