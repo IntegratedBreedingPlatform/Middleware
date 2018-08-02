@@ -23,6 +23,7 @@ class ObservationQuery {
 	public static final String SELECT_TEXT = " SELECT\n"
 		+ "   nde.nd_experiment_id,\n"
 		+ "   gl.description                                      AS                      TRIAL_INSTANCE,\n"
+		+ " (SELECT proj.name FROM Project proj where proj.project_id =  pr.object_project_id) AS PROJECT_NAME,\n"
 		+ "   gl.nd_geolocation_id,\n"
 		+ "   (SELECT iispcvt.definition\n"
 		+ FROM
