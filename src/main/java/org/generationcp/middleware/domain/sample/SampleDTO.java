@@ -11,8 +11,6 @@ import java.util.TimeZone;
 
 public class SampleDTO {
 
-	public static TimeZone TIMEZONE = TimeZone.getDefault();
-
 	private Integer sampleId;
 	private Integer entryNo;
 	private Integer gid;
@@ -23,6 +21,8 @@ public class SampleDTO {
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
+	private String plateId;
+	private String well;
 	private Set<Dataset> datasets = new HashSet<>();
 
 	// FIXME Jackson use UTC as default timezone
@@ -170,6 +170,22 @@ public class SampleDTO {
 
 	public void setDesignation(String designation) {
 		this.designation = designation;
+	}
+
+	public String getPlateId() {
+		return plateId;
+	}
+
+	public void setPlateId(String plateId) {
+		this.plateId = plateId;
+	}
+
+	public String getWell() {
+		return well;
+	}
+
+	public void setWell(String well) {
+		this.well = well;
 	}
 
 	public Set<Dataset> getDatasets() {

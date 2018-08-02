@@ -83,6 +83,14 @@ public class Sample implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<AccMetadataSet> accMetadataSets;
 
+	@Basic(optional = false)
+	@Column(name = "plate_Id")
+	private String plateId;
+
+	@Basic(optional = false)
+	@Column(name = "well")
+	private String well;
+
 	public Sample() {
 
 	}
@@ -165,6 +173,22 @@ public class Sample implements Serializable {
 
 	public void setPlant(final Plant plant) {
 		this.plant = plant;
+	}
+
+	public String getPlateId() {
+		return plateId;
+	}
+
+	public void setPlateId(String plateId) {
+		this.plateId = plateId;
+	}
+
+	public String getWell() {
+		return well;
+	}
+
+	public void setWell(String well) {
+		this.well = well;
 	}
 
 	@Override
