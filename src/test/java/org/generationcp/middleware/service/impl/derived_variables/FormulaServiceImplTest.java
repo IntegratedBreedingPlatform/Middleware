@@ -59,13 +59,26 @@ public class FormulaServiceImplTest {
 	}
 	
 	@Test
-	public void testConvertToFormulaDto() {
+	public void testConvert() {
 		final Formula testFormula = this.createTestFormula();
 		final FormulaDto formulaDto = FormulaUtils.convertToFormulaDto(testFormula);
 		this.verifyFormulaDto(testFormula, formulaDto);
 
 		final Formula formulaConvertedBack = FormulaUtils.convertToFormula(formulaDto);
 		this.verifyFormulaDto(formulaConvertedBack, formulaDto);
+	}
+
+	@Test
+	public void testConvert_DuplicatedInputs() {
+		final Formula testFormula = this.createTestFormula();
+		testFormula.getInputs().addAll(testFormula.getInputs());
+
+		final FormulaDto formulaDto = FormulaUtils.convertToFormulaDto(testFormula);
+		Assert.assertThat(testFormula.getInputs().size(), is(4));
+
+		final Formula formulaConvertedBack = FormulaUtils.convertToFormula(formulaDto);
+		Assert.assertThat("Should save only one copy of input", formulaConvertedBack.getInputs().size(), is(2));
+
 	}
 
 	private void verifyFormulaDto(final Formula testFormula, final FormulaDto formulaDto) {
