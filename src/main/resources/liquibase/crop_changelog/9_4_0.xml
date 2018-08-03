@@ -16,13 +16,6 @@
 			ADD INDEX phenotype_idx6 (status);
 		</sql>
 	</changeSet>
-
-				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
-		http://www.liquibase.org/xml/ns/dbchangelog-ext
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-
 	<changeSet author="cuenyad" id="v9.4.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
