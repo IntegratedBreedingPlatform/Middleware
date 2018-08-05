@@ -4,11 +4,12 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface SampleListService {
 
@@ -57,6 +58,8 @@ public interface SampleListService {
 	 * @param folderId
 	 */
 	void deleteSampleListFolder(final Integer folderId);
+
+	long countSamplesByUIDs(Set<String> sampleUIDs, Integer listId);
 
 	List<SampleListDTO> getSampleLists(final Integer trialId);
 
@@ -129,4 +132,6 @@ public interface SampleListService {
 	 * @return
 	 */
 	List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
+
+	void updateSamplePlateInfo(Integer sampleListId, Map<String, SamplePlateInfo> plateInfoMap);
 }

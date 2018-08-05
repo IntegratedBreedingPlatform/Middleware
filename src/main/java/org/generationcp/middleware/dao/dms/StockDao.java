@@ -157,7 +157,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final String sql = "select count(e.nd_experiment_id) "
 					+ "from nd_experiment e, phenotype p "
 					+ "where e.nd_experiment_id = p.nd_experiment_id  "
-					+ "  and nep.nd_experiment_id = e.nd_experiment_id " + "  and e.nd_geolocation_id = " + trialEnvironmentId
+					+ "  and e.nd_geolocation_id = " + trialEnvironmentId
 					+ "  and p.observable_id = " + variateStdVarId + "  and e.project_id = " + datasetId
 					+ "  and (trim(p.value) <> '' and p.value is not null)";
 			final Query query = this.getSession().createSQLQuery(sql);
