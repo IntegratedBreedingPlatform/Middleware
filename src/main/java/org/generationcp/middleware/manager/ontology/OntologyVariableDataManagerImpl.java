@@ -617,6 +617,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		VariableCache.removeFromCache(variableInfo.getId());
 
+		final List<FormulaDto> formulas = this.formulaService.getByInputId(Integer.valueOf(variableInfo.getId()));
+		for (final FormulaDto formula : formulas) {
+			VariableCache.removeFromCache(formula.getTarget().getId());
+		}
+
 		final VariableInfoDaoElements elements = new VariableInfoDaoElements();
 		elements.setVariableId(variableInfo.getId());
 		elements.setProgramUuid(variableInfo.getProgramUuid());
