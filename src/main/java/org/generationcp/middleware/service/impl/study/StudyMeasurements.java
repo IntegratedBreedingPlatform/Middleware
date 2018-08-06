@@ -86,7 +86,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("FIELDMAP RANGE");
 		createSQLQuery.addScalar("SUM_OF_SAMPLES");
 
-		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery);
+		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery, true);
 
 		for (final String gpDescriptor : germplasmDescriptors) {
 			createSQLQuery.addScalar(gpDescriptor, new StringType());
@@ -99,11 +99,13 @@ public class StudyMeasurements {
 		return createSQLQuery;
 	}
 
-	private void addScalarForTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits, final SQLQuery createSQLQuery) {
+	private void addScalarForTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits, final SQLQuery createSQLQuery, final Boolean addStatus) {
 		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
 			createSQLQuery.addScalar(measurementVariable.getName());
 			createSQLQuery.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
-			createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
+			if (addStatus) {
+				createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
+			}
 		}
 	}
 
@@ -185,7 +187,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("FieldMapRow");
 		createSQLQuery.addScalar("nd_geolocation_id");
 		createSQLQuery.addScalar("locationDbId");
-		this.addScalarForTraits(measurementVariables, createSQLQuery);
+		this.addScalarForTraits(measurementVariables, createSQLQuery, false);
 		return createSQLQuery;
 	}
 
