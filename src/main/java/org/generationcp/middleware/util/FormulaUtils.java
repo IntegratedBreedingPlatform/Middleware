@@ -43,7 +43,7 @@ public final class FormulaUtils {
 		return formulaVariable;
 	}
 
-	public static Formula convertToFormula(FormulaDto formulaDto) {
+	public static Formula convertToFormula(final FormulaDto formulaDto) {
 		final Formula formula = new Formula();
 
 		formula.setName(formulaDto.getName());
@@ -62,7 +62,7 @@ public final class FormulaUtils {
 			input.setName(formulaVariable.getName());
 			inputs.add(input);
 		}
-		formula.setInputs(new ArrayList<CVTerm>(inputs));
+		formula.setInputs(new ArrayList<>(inputs));
 
 		return formula;
 	}
