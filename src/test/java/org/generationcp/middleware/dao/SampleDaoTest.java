@@ -157,6 +157,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
 		Assert.assertNull(sample.getGid());
 		Assert.assertEquals("Germplasm 1", sample.getDesignation());
+		Assert.assertEquals("PLATEID-1", sample.getPlateId());
+		Assert.assertEquals("WELL-1", sample.getWell());
 	}
 
 	@Test
@@ -178,6 +180,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
 		Assert.assertNull(sample.getGid());
 		Assert.assertEquals("Germplasm 1", sample.getDesignation());
+		Assert.assertEquals("PLATEID-1", sample.getPlateId());
+		Assert.assertEquals("WELL-1", sample.getWell());
 	}
 
 	@Test
@@ -293,6 +297,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 			sample.setSampleName("SAMPLE-" + listName + i);
 			sample.setSampleBusinessKey("BUSINESS-KEY-" + listName + i);
 			sample.setEntryNumber(i);
+			sample.setPlateId("PLATEID-" + i);
+			sample.setWell("WELL-" + i);
 			if (takenByIsNull)
 				sample.setTakenBy(null);
 			this.sampleDao.saveOrUpdate(sample);

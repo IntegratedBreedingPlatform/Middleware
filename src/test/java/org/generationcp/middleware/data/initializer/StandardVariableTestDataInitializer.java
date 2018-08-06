@@ -57,6 +57,14 @@ public class StandardVariableTestDataInitializer {
 		stdVariable.setDescription(name + " Description");
 		return stdVariable;
 	}
+	
+	public static StandardVariable createStandardVariable(final TermId termId) {
+		final StandardVariable standardVariable = new StandardVariable();
+		Term term = new Term();
+		term.setId(termId.getId());
+		standardVariable.setDataType(term);
+		return standardVariable;
+	}
 
 	public static StandardVariable createStandardVariable(final Term property, final Term scale, final Term method,
 			final Term dataType, final Term storedIn, final Term isA, final PhenotypicType phenotypicType,
