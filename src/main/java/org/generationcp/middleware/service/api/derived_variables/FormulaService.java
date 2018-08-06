@@ -12,9 +12,13 @@ import java.util.Set;
  */
 public interface FormulaService {
 
+	public Optional<FormulaDto> getById(Integer formulaId);
+
 	public Optional<FormulaDto> getByTargetId(Integer targetId);
 
 	public List<FormulaDto> getByTargetIds(Set<Integer> variableIds);
+
+	List<FormulaDto> getByInputId(Integer inputId);
 
 	/**
 	 * Gets all FormulaVariables from a given derived trait variableIds including the FormulaVariables of an argument variable if it is itself
@@ -24,4 +28,8 @@ public interface FormulaService {
 	 * @return
 	 */
 	public Set<FormulaVariable> getAllFormulaVariables(Set<Integer> variableIds);
+
+	public FormulaDto save(FormulaDto formulaDto);
+
+	void delete(Integer formulaId);
 }
