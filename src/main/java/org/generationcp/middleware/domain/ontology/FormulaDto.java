@@ -11,17 +11,11 @@ public class FormulaDto {
 	private static final long serialVersionUID = 1L;
 
 	private Integer formulaId;
-
-	private Integer targetTermId;
-
+	private FormulaVariable target;
 	private List<FormulaVariable> inputs = new ArrayList<>();
-
 	private String definition;
-
 	private Boolean active;
-
 	private String name;
-
 	private String description;
 
 	public Integer getFormulaId() {
@@ -32,12 +26,12 @@ public class FormulaDto {
 		this.formulaId = formulaId;
 	}
 
-	public Integer getTargetTermId() {
-		return targetTermId;
+	public FormulaVariable getTarget() {
+		return target;
 	}
 
-	public void setTargetTermId(final Integer targetTermId) {
-		this.targetTermId = targetTermId;
+	public void setTarget(final FormulaVariable target) {
+		this.target = target;
 	}
 
 	public List<FormulaVariable> getInputs() {
@@ -100,14 +94,19 @@ public class FormulaDto {
 
 		final FormulaDto formula = (FormulaDto) o;
 
-		return new EqualsBuilder().append(formulaId, formula.formulaId).append(targetTermId, formula.targetTermId)
-				.append(definition, formula.definition).append(active, formula.active).append(name, formula.name)
-				.append(description, formula.description).isEquals();
+		return new EqualsBuilder() //
+			.append(formulaId, formula.formulaId) //
+			.append(target.getId(), formula.getTarget().getId()) //
+			.append(definition, formula.definition) //
+			.append(active, formula.active) //
+			.append(name, formula.name) //
+			.append(description, formula.description) //
+			.isEquals(); //
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(formulaId).append(targetTermId).append(definition).append(active).append(name)
+		return new HashCodeBuilder(17, 37).append(formulaId).append(target).append(definition).append(active).append(name)
 				.append(description).toHashCode();
 	}
 

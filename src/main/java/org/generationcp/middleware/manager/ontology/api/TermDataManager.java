@@ -37,6 +37,11 @@ public interface TermDataManager {
 	Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareException;
 
 	/**
+	 * Returns term by name
+	 */
+	Term getTermByName(String name) throws MiddlewareException;
+
+	/**
 	 * Returns term by cvId
 	 */
 	List<Term> getTermByCvId(int cvId) throws MiddlewareException;
