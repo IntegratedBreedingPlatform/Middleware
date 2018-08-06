@@ -393,18 +393,6 @@ public class MeasurementData {
 		this.changed = b;
 	}
 
-	public static String getEmptyString() {
-		return EMPTY_STRING;
-	}
-
-	public static String getMissingValue() {
-		return MISSING_VALUE;
-	}
-
-	public boolean isCustomCategoricalValue() {
-		return this.isCustomCategoricalValue;
-	}
-
 	public boolean isChanged() {
 		return this.changed;
 	}
