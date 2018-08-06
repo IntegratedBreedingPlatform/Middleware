@@ -33,7 +33,6 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.when;
 
@@ -217,14 +216,11 @@ public class FormulaServiceImplTest {
 
 	@Test
 	public void testSave() {
-		final Formula formula = this.createTestFormula();
-
-		when(this.formulaDao.save(any(Formula.class))).thenReturn(formula);
-
 		final FormulaDto formulaDto = new FormulaDto();
 		formulaDto.setTarget(new FormulaVariable(2, "", null));
 		formulaDto.setDefinition("{{2}}");
 		final FormulaDto result = this.formulaServiceImpl.save(formulaDto);
+		final Formula formula = FormulaUtils.convertToFormula(formulaDto);
 
 		this.verifyFormulaDto(formula, result);
 	}
