@@ -85,7 +85,7 @@ public class FormulaServiceImpl implements FormulaService {
 
 	@Override
 	public FormulaDto save(final FormulaDto formulaDto) {
-		Formula formula = FormulaUtils.convertToFormula(formulaDto);
+		final Formula formula = FormulaUtils.convertToFormula(formulaDto);
 		this.daoFactory.getFormulaDAO().save(formula);
 		final FormulaDto result = FormulaUtils.convertToFormulaDto(formula);
 
