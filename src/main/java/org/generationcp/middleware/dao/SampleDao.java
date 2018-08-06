@@ -135,8 +135,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("stock.name")) //row[11] TODO preferred name
 				.add(Projections.property("samplingDate")) //row[12]
 				.add(Projections.property("entryNumber")) //row[13]
-				.add(Projections.property("plant.plateId")) //row[14]
-				.add(Projections.property("plant.well")) //row[15]
+				.add(Projections.property("sample.plateId")) //row[14]
+				.add(Projections.property("sample.well")) //row[15]
 			)).list();
 		return mapSampleDTOS(result);
 	}
