@@ -160,9 +160,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			for (final Object[] row : list) {
 				final Integer id = (Integer) row[0];
-				final Long locationCount = ((BigInteger) row[1]).longValue();
-				final Long germplasmCount = ((BigInteger) row[2]).longValue();
-				final Long observationCount = ((BigInteger) row[3]).longValue();
+				final long locationCount = ((BigInteger) row[1]).longValue();
+				final long germplasmCount = ((BigInteger) row[2]).longValue();
+				final long observationCount = ((BigInteger) row[3]).longValue();
 
 				traitInfoList.add(new TraitInfo(id, null, null, locationCount, germplasmCount, observationCount));
 			}
@@ -192,9 +192,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			for (final Object[] row : list) {
 				final Integer id = (Integer) row[0];
-				final Long locationCount = ((BigInteger) row[1]).longValue();
-				final Long germplasmCount = ((BigInteger) row[2]).longValue();
-				final Long observationCount = ((BigInteger) row[3]).longValue();
+				final long locationCount = ((BigInteger) row[1]).longValue();
+				final long germplasmCount = ((BigInteger) row[2]).longValue();
+				final long observationCount = ((BigInteger) row[3]).longValue();
 
 				traitInfoList.add(new TraitInfo(id, null, null, locationCount, germplasmCount, observationCount));
 			}
@@ -997,7 +997,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			// Get observations (Traits)
 			final SQLQuery observationsQuery = this.getSession().createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS);
 			observationsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
-			observationsQuery.addScalar("expid").addScalar("nd_exp_phen_id").addScalar("cvterm_id")
+			observationsQuery.addScalar("expid").addScalar("phen_id").addScalar("cvterm_id")
 					.addScalar("cvterm_name", new StringType()).
 					addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType());
 			final List<Object[]> observationResults = observationsQuery.list();
