@@ -85,6 +85,10 @@ public class StudyMeasurementsTest {
 	private final List<MeasurementVariableDto> testTraits = Arrays.asList(
 			new MeasurementVariableDto(1, StudyMeasurementsTest.TRAIT1),
 			new MeasurementVariableDto(2, StudyMeasurementsTest.TRAIT2));
+	private static final String ROW1_TRAIT1_STATUS = "MANUALLY_EDITED";
+	private static final String ROW1_TRAIT2_STATUS = "OUT_OF_SYNC";
+	private static final String ROW2_TRAIT2_STATUS = null;
+	private static final String ROW2_TRAIT1_STATUS = null;
 
 	@Mock
 	private Session session;
@@ -106,28 +110,32 @@ public class StudyMeasurementsTest {
 		MockitoAnnotations.initMocks(this);
 		this.studyMeasurements = new StudyMeasurements(this.session);
 
-		this.testRow1 = new Object[] { StudyMeasurementsTest.PLOT_IDENTIFIER1, StudyMeasurementsTest.TRIAL_INSTANCE,
-				StudyMeasurementsTest.ENTRY_TYPE, StudyMeasurementsTest.GID1, StudyMeasurementsTest.DESIGNATION1,
-				StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.SEED_SOURCE1, StudyMeasurementsTest.REP_NO,
-				StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.BLOCK_NO, StudyMeasurementsTest.ROW,
-				StudyMeasurementsTest.COL, StudyMeasurementsTest.PLOT_ID1, StudyMeasurementsTest.FIELDMAP_COLUMN,
-				StudyMeasurementsTest.FIELDMAP_RANGE, StudyMeasurementsTest.SUM_OF_SAMPLES,
-				StudyMeasurementsTest.ROW1_TRAIT1_VALUE, StudyMeasurementsTest.ROW1_TRAIT1_PHENOTYPE_ID,
-				StudyMeasurementsTest.ROW1_TRAIT2_VALUE, StudyMeasurementsTest.ROW1_TRAIT2_PHENOTYPE_ID,
-				StudyMeasurementsTest.STOCKID1, StudyMeasurementsTest.FACT1_VALUE1,
-				StudyMeasurementsTest.FACT2_VALUE1 };
-		this.testRow2 = new Object[] { StudyMeasurementsTest.PLOT_IDENTIFIER2, StudyMeasurementsTest.TRIAL_INSTANCE,
-				StudyMeasurementsTest.ENTRY_TYPE, StudyMeasurementsTest.GID2, StudyMeasurementsTest.DESIGNATION2,
-				StudyMeasurementsTest.PLOT_NO2, StudyMeasurementsTest.SEED_SOURCE2, StudyMeasurementsTest.REP_NO,
-				StudyMeasurementsTest.PLOT_NO2, StudyMeasurementsTest.BLOCK_NO, StudyMeasurementsTest.ROW,
-				StudyMeasurementsTest.COL, StudyMeasurementsTest.PLOT_ID2, StudyMeasurementsTest.FIELDMAP_COLUMN,
-				StudyMeasurementsTest.FIELDMAP_RANGE, StudyMeasurementsTest.SUM_OF_SAMPLES,
-				StudyMeasurementsTest.ROW2_TRAIT1_VALUE, StudyMeasurementsTest.ROW2_TRAIT1_PHENOTYPE_ID,
-				StudyMeasurementsTest.ROW2_TRAIT2_VALUE, StudyMeasurementsTest.ROW2_TRAIT2_PHENOTYPE_ID,
-				StudyMeasurementsTest.STOCKID2, StudyMeasurementsTest.FACT1_VALUE2,
-				StudyMeasurementsTest.FACT2_VALUE2 };
-		this.singleMeasurement = Arrays.<Object[]> asList(this.testRow1);
-		this.allMeasurements = Arrays.<Object[]> asList(this.testRow1, this.testRow2);
+		this.testRow1 = new Object[] {
+			StudyMeasurementsTest.PLOT_IDENTIFIER1, StudyMeasurementsTest.TRIAL_INSTANCE,
+			StudyMeasurementsTest.ENTRY_TYPE, StudyMeasurementsTest.GID1, StudyMeasurementsTest.DESIGNATION1,
+			StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.SEED_SOURCE1, StudyMeasurementsTest.REP_NO,
+			StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.BLOCK_NO, StudyMeasurementsTest.ROW, StudyMeasurementsTest.COL,
+			StudyMeasurementsTest.PLOT_ID1, StudyMeasurementsTest.FIELDMAP_COLUMN, StudyMeasurementsTest.FIELDMAP_RANGE,
+			StudyMeasurementsTest.SUM_OF_SAMPLES, StudyMeasurementsTest.ROW1_TRAIT1_VALUE,
+			StudyMeasurementsTest.ROW1_TRAIT1_PHENOTYPE_ID, StudyMeasurementsTest.ROW1_TRAIT1_STATUS,
+			StudyMeasurementsTest.ROW1_TRAIT2_VALUE,
+			StudyMeasurementsTest.ROW1_TRAIT2_PHENOTYPE_ID, StudyMeasurementsTest.ROW1_TRAIT2_STATUS, StudyMeasurementsTest.STOCKID1,
+			StudyMeasurementsTest.FACT1_VALUE1,
+			StudyMeasurementsTest.FACT2_VALUE1};
+		this.testRow2 = new Object[] {
+			StudyMeasurementsTest.PLOT_IDENTIFIER2, StudyMeasurementsTest.TRIAL_INSTANCE,
+			StudyMeasurementsTest.ENTRY_TYPE, StudyMeasurementsTest.GID2, StudyMeasurementsTest.DESIGNATION2,
+			StudyMeasurementsTest.PLOT_NO2, StudyMeasurementsTest.SEED_SOURCE2, StudyMeasurementsTest.REP_NO,
+			StudyMeasurementsTest.PLOT_NO2, StudyMeasurementsTest.BLOCK_NO, StudyMeasurementsTest.ROW, StudyMeasurementsTest.COL,
+			StudyMeasurementsTest.PLOT_ID2, StudyMeasurementsTest.FIELDMAP_COLUMN, StudyMeasurementsTest.FIELDMAP_RANGE,
+			StudyMeasurementsTest.SUM_OF_SAMPLES, StudyMeasurementsTest.ROW2_TRAIT1_VALUE,
+			StudyMeasurementsTest.ROW2_TRAIT1_PHENOTYPE_ID, StudyMeasurementsTest.ROW2_TRAIT1_STATUS,
+			StudyMeasurementsTest.ROW2_TRAIT2_VALUE,
+			StudyMeasurementsTest.ROW2_TRAIT2_PHENOTYPE_ID, StudyMeasurementsTest.ROW2_TRAIT2_STATUS, StudyMeasurementsTest.STOCKID2,
+			StudyMeasurementsTest.FACT1_VALUE2,
+			StudyMeasurementsTest.FACT2_VALUE2};
+		this.singleMeasurement = Arrays.<Object[]>asList(this.testRow1);
+		this.allMeasurements = Arrays.<Object[]>asList(this.testRow1, this.testRow2);
 		Mockito.when(this.mockSqlQueryForAllMeasurements.list()).thenReturn(this.allMeasurements);
 		Mockito.when(this.mockSqlQueryForSingleMeasurement.list()).thenReturn(this.singleMeasurement);
 	}
@@ -328,7 +336,7 @@ public class StudyMeasurementsTest {
 
 	private void verifyScalarSetting(final SQLQuery query) {
 		// Fixed columns + Trait name - no type
-		Mockito.verify(query, Mockito.times(StudyMeasurementsTest.STRING_COLUMNS.size() + this.testTraits.size()))
+		Mockito.verify(query, Mockito.times(StudyMeasurementsTest.STRING_COLUMNS.size() + this.testTraits.size() + 2))
 				.addScalar(Matchers.anyString());
 		for (final String column : StudyMeasurementsTest.STRING_COLUMNS) {
 			Mockito.verify(query).addScalar(column);

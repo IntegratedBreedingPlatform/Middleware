@@ -152,7 +152,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(sample.getSampleId());
 		Assert.assertEquals("SAMPLE-" + LIST_NAME + 1, sample.getSampleName());
 		Assert.assertEquals("BUSINESS-KEY-" + LIST_NAME + 1, sample.getSampleBusinessKey());
-		Assert.assertEquals("Admin Admin", sample.getTakenBy());
 		Assert.assertEquals("TEST-LIST-FOR-SAMPLE-DAO-1", sample.getSampleList());
 		Assert.assertEquals("0", sample.getPlantNumber().toString());
 		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());

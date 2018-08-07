@@ -68,6 +68,7 @@ class ObservationQuery {
 	public static final String ND_GEOLOCATIONPROP_GP = "            nd_geolocationprop gp \n";
 	public static final String GP_TYPE_ID = "            gp.type_id = ";
 	public static final String PHENOTYPE_ID = "_PhenotypeId";
+	public static final String STATUS = "_Status";
 	public static final String INSTANCE_NUMBER_CLAUSE = " AND gl.nd_geolocation_id = :instanceId \n";
 	public static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
 
@@ -124,8 +125,10 @@ class ObservationQuery {
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 			final List<String> designFactors, final String sortBy, final String sortOrder) {
-		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + getInstanceNumberClause() + getGroupingClause()
-				+ getOrderingClause(sortBy, sortOrder);
+		//FIXME remove inner join with max phenotype_id when BMS-5055 is solved
+		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + this.getInstanceNumberClause() + this
+			.getGroupingClause()
+				+ this.getOrderingClause(sortBy, sortOrder);
 	}
 
 	/**
@@ -138,9 +141,9 @@ class ObservationQuery {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
 		final String orderByMeasurementVariableId = getOrderByMeasurementVariableId(measurementVariables);
 
-		final String fromText = getFromExpression(measurementVariables);
+		final String fromText = this.getFromExpression(measurementVariables);
 
-		final String orderByText = getOrderByExpression(measurementVariables, orderByMeasurementVariableId);
+		final String orderByText = this.getOrderByExpression(measurementVariables, orderByMeasurementVariableId);
 
 		String whereText = WHERE_TEXT;
 
@@ -149,9 +152,9 @@ class ObservationQuery {
 		}
 
 		return SELECT_TEXT + ", " + BLOCK_NO_TEXT + ", " + ROW_NUMBER_TEXT + "," + COLUMN_NUMBER_TEXT +
-				", " + locationDbIdSubQuery +
-				", " + locationNameSubQuery +
-				", " + locationAbbreviationSubQuery +
+				", " + this.locationDbIdSubQuery +
+				", " + this.locationNameSubQuery +
+				", " + this.locationAbbreviationSubQuery +
 				", " + FIELDMAP_COLUMN_TEXT +
 				", " + FIELDMAP_ROW_TEXT +
 				columnNamesFromTraitNames +
@@ -180,7 +183,7 @@ class ObservationQuery {
 
 	String getSingleObservationQuery(final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors, final List<String> designFactors) {
 		return this.getObservationsMainQuery(traits, germplasmDescriptors, designFactors) + " AND nde.nd_experiment_id = :experiment_id \n"
-				+ getGroupingClause();
+				+ this.getGroupingClause();
 	}
 
 	private String getColumnNamesFromTraitNames(final List<MeasurementVariableDto> measurementVariables) {
@@ -223,11 +226,16 @@ class ObservationQuery {
 			.append("    nde.plot_id as PLOT_ID, \n");
 
 		final String traitClauseFormat =
-			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
+			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', ";
 
 		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
-			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
-				measurementVariable.getName(), measurementVariable.getName() + PHENOTYPE_ID));
+			sqlBuilder.append(String.format(traitClauseFormat,
+				measurementVariable.getName(),
+				measurementVariable.getName(),
+				measurementVariable.getName(),
+				measurementVariable.getName() + PHENOTYPE_ID,
+				measurementVariable.getName(),
+				measurementVariable.getName() + STATUS));
 		}
 
 		if (!germplasmDescriptors.isEmpty()) {
@@ -253,8 +261,12 @@ class ObservationQuery {
 			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n")
 			.append("	INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n")
 			.append("	INNER JOIN stock s ON s.stock_id = es.stock_id \n")
-			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
-			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
+			//FIXME remove this subquery when there are no duplicated rows for same nd_experiment and observable id
+			.append("       LEFT JOIN (select * from phenotype\n"
+				+ "                                  inner join (SELECT max(p.phenotype_id) phenotypeid,\n"
+				+ "                                                     p.nd_experiment_id as ndid,\n"
+				+ "                                                     p.observable_id as obsid FROM phenotype p GROUP BY p.nd_experiment_id, p.observable_id) pheno on phenotype.phenotype_id = pheno.phenotypeid) ph ON (ph.nd_experiment_id = nde.nd_experiment_id)\n"
+				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id")
 			.append("		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");
 
 		return sqlBuilder.toString();

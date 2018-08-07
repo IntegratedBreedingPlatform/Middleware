@@ -68,8 +68,8 @@ public class PhenotypeSaver extends Saver {
 	}
 
 	public void saveOrUpdate(final int experimentId, final Integer variableId, final String value, final Phenotype oldPhenotype,
-			final Integer dataTypeId) throws MiddlewareQueryException {
-		final Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, dataTypeId);
+			final Integer dataTypeId, final Phenotype.ValueStatus valueStatus) throws MiddlewareQueryException {
+		final Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, dataTypeId, valueStatus);
 		this.saveOrUpdate(experimentId, phenotype);
 	}
 
@@ -123,13 +123,15 @@ public class PhenotypeSaver extends Saver {
 
 	private void saveOrUpdate(final int experimentId, final Phenotype phenotype) throws MiddlewareQueryException {
 		if (phenotype != null) {
-		  	phenotype.setExperiment(this.getExperimentDao().getById(experimentId));
+			final ExperimentModel experiment = new ExperimentModel();
+			experiment.setNdExperimentId(experimentId);
+		  	phenotype.setExperiment(experiment);
 			this.getPhenotypeDao().merge(phenotype);
 		}
 	}
 
 	private Phenotype createPhenotype(final Integer variableId, final String value, final Phenotype oldPhenotype,
-			final Integer dataTypeId) throws MiddlewareQueryException {
+			final Integer dataTypeId, Phenotype.ValueStatus valueStatus) throws MiddlewareQueryException {
 
 		if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null)) {
 			return null;
@@ -142,6 +144,7 @@ public class PhenotypeSaver extends Saver {
 		} else {
 			phenotype.setValue(value);
 		}
+		phenotype.setValueStatus(valueStatus);
 		phenotype.setObservableId(variableId);
 		phenotype.setName(String.valueOf(variableId));
 

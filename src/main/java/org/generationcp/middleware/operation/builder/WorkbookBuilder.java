@@ -43,6 +43,7 @@ import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.DatasetUtil;
@@ -459,6 +460,7 @@ public class WorkbookBuilder extends Builder {
 						final MeasurementData measurementData =
 							new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable, dataType,
 								condition);
+
 						measurementDataList.add(measurementData);
 						break;
 					}
@@ -588,6 +590,8 @@ public class WorkbookBuilder extends Builder {
 						// we check if its a number to be sure
 						measurementData.setcValueId(variable.getValue());
 					}
+					//FIXME get this information along with the variable to avoid going back to the database inside these loops
+					this.setValueStatusToMeasurementData(variable, measurementData);
 					measurementDataList.add(measurementData);
 					break;
 				}
@@ -597,6 +601,13 @@ public class WorkbookBuilder extends Builder {
 						this.getDataType(variate.getDataTypeId()), variate);
 				measurementDataList.add(measurementData);
 			}
+		}
+	}
+
+	private void setValueStatusToMeasurementData(final Variable variable, final MeasurementData measurementData) {
+		final Phenotype phenotype = this.getPhenotypeDao().getById(variable.getPhenotypeId());
+		if (phenotype != null) {
+			measurementData.setValueStatus(phenotype.getValueStatus());
 		}
 	}
 
@@ -887,6 +898,7 @@ public class WorkbookBuilder extends Builder {
 					if (experiments.size() == 1) {
 						measurementVariable.setValue(variable.getValue());
 					}
+					this.setValueStatusToMeasurementData(variable, measurementData);
 					dataList.add(measurementData);
 				}
 

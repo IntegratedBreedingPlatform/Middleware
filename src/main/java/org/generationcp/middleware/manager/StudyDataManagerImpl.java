@@ -1095,8 +1095,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void saveOrUpdatePhenotypeValue(final int experimentId, final int variableId, final String value,
-			final Phenotype existingPhenotype, final int dataTypeId) {
-		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId);
+			final Phenotype existingPhenotype, final int dataTypeId, final Phenotype.ValueStatus valueStatus) {
+		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId, valueStatus);
 	}
 
 	@Override
@@ -1234,5 +1234,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
 		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
+	}
+
+	/**
+	 * @param experimentId
+	 * @param termId
+	 * @return
+	 */
+	@Override
+	public Phenotype getPhenotype(final Integer experimentId, final Integer termId) {
+		return this.getPhenotypeDao().getByExperimentAndTrait(experimentId, termId);
+	}
+
+	/**
+	 * @param phenotype
+	 */
+	@Override
+	public void updatePhenotype(final Phenotype phenotype) {
+		this.getPhenotypeDao().saveOrUpdate(phenotype);
 	}
 }
