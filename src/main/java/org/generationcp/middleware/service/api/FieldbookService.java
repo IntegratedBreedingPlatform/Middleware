@@ -980,5 +980,5 @@ public interface FieldbookService {
 
 	void saveChangedPhenotypes(final List<MeasurementRow> observations);
 
-	Boolean hasOutOfSyncObervations(Integer id);
+	Boolean hasOutOfSyncObservations(Integer id);
 }

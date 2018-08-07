@@ -307,7 +307,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Boolean hasOutOfSyncObervations(final Integer projectId) {
+	public Boolean hasOutOfSyncObservations(final Integer projectId) {
 		return this.getPhenotypeDao().hasOutOfSync(projectId);
 	}
 
@@ -1170,7 +1170,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void saveStudyColumnOrdering(final Integer studyId, final String studyName, final List<Integer> orderedTermIds) {
-		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+		final int plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 
