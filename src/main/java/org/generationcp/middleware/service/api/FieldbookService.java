@@ -978,7 +978,7 @@ public interface FieldbookService {
 
 	Workbook getStudyDataSet(int studyID);
 
-	void saveChangedPhenotypes(final List<MeasurementRow> observations);
+	void updatePhenotypeStatus(final List<MeasurementRow> observations);
 
 	Boolean hasOutOfSyncObservations(Integer id);
 }

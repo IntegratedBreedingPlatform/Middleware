@@ -294,8 +294,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
+	//TODO find a better way to mark variable as OUT_OF_SYNC when inputs are deleted
 	@Override
-	public void saveChangedPhenotypes(final List<MeasurementRow> observations) {
+	public void updatePhenotypeStatus(final List<MeasurementRow> observations) {
 		final List<MeasurementData> measurementDataList = this.getChangedFormulaObservations(observations);
 		for (final MeasurementData measurementData: measurementDataList) {
 			final Phenotype phenotype = this.getPhenotypeDao().getById(measurementData.getPhenotypeId());

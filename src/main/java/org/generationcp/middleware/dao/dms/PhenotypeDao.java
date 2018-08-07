@@ -75,8 +75,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
 
-	public static final String OUT_OF_SYNC = "OUT_OF_SYNC";
-
 	//FIXME BMS-5055
 	private static final String HAS_OUT_OF_SYNC = "SELECT "
 		+ "    COUNT(1)"
@@ -95,7 +93,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		+ "        INNER JOIN"
 		+ "    nd_experiment n ON pheno.nd_experiment_id = n.nd_experiment_id"
 		+ " WHERE"
-		+ "    pheno.status = '" + OUT_OF_SYNC
+		+ "    pheno.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC
 		+ "'        AND n.project_id = :projectId";
 
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {

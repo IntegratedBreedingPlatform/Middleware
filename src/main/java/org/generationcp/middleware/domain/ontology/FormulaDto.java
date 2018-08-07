@@ -12,6 +12,7 @@ public class FormulaDto {
 
 	private Integer formulaId;
 	private FormulaVariable target;
+	//TODO Perhaps we can keep a an internal copy of inputs as a map (Improvement)
 	private List<FormulaVariable> inputs = new ArrayList<>();
 	private String definition;
 	private Boolean active;
@@ -19,7 +20,7 @@ public class FormulaDto {
 	private String description;
 
 	public Integer getFormulaId() {
-		return formulaId;
+		return this.formulaId;
 	}
 
 	public void setFormulaId(final Integer formulaId) {
@@ -27,7 +28,7 @@ public class FormulaDto {
 	}
 
 	public FormulaVariable getTarget() {
-		return target;
+		return this.target;
 	}
 
 	public void setTarget(final FormulaVariable target) {
@@ -43,7 +44,7 @@ public class FormulaDto {
 	}
 
 	public String getDefinition() {
-		return definition;
+		return this.definition;
 	}
 
 	public void setDefinition(final String definition) {
@@ -51,7 +52,7 @@ public class FormulaDto {
 	}
 
 	public Boolean getActive() {
-		return active;
+		return this.active;
 	}
 
 	public void setActive(final Boolean active) {
@@ -59,7 +60,7 @@ public class FormulaDto {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -67,7 +68,7 @@ public class FormulaDto {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
@@ -88,26 +89,27 @@ public class FormulaDto {
 			return true;
 		}
 
-		if (o == null || getClass() != o.getClass()) {
+		if (o == null || this.getClass() != o.getClass()) {
 			return false;
 		}
 
 		final FormulaDto formula = (FormulaDto) o;
 
 		return new EqualsBuilder() //
-			.append(formulaId, formula.formulaId) //
-			.append(target.getId(), formula.getTarget().getId()) //
-			.append(definition, formula.definition) //
-			.append(active, formula.active) //
-			.append(name, formula.name) //
-			.append(description, formula.description) //
+			.append(this.formulaId, formula.formulaId) //
+			.append(this.target.getId(), formula.getTarget().getId()) //
+			.append(this.definition, formula.definition) //
+			.append(this.active, formula.active) //
+			.append(this.name, formula.name) //
+			.append(this.description, formula.description) //
 			.isEquals(); //
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(formulaId).append(target).append(definition).append(active).append(name)
-				.append(description).toHashCode();
+		return new HashCodeBuilder(17, 37).append(this.formulaId).append(this.target).append(this.definition).append(this.active).append(
+			this.name)
+				.append(this.description).toHashCode();
 	}
 
 }

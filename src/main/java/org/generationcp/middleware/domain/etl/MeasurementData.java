@@ -43,7 +43,7 @@ public class MeasurementData {
 	private Variable variable;
 
 	private Phenotype.ValueStatus valueStatus;
-	private boolean changed;
+	private boolean changed = false;
 
 	public MeasurementData() {
 	}
@@ -64,7 +64,6 @@ public class MeasurementData {
 		super();
 		this.label = label;
 		this.value = value;
-		this.changed = false;
 	}
 
 	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType) {
@@ -73,7 +72,6 @@ public class MeasurementData {
 		this.value = value;
 		this.isEditable = isEditable;
 		this.dataType = dataType;
-		this.changed = false;
 	}
 
 	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType, final Integer valueId) {
@@ -91,7 +89,6 @@ public class MeasurementData {
 		this.isEditable = isEditable;
 		this.dataType = dataType;
 		this.measurementVariable = mvar;
-		this.changed = false;
 	}
 
 	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType, final Integer valueId,
@@ -398,7 +395,7 @@ public class MeasurementData {
 	}
 
 	public Phenotype.ValueStatus getValueStatus() {
-		return valueStatus;
+		return this.valueStatus;
 	}
 
 	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {

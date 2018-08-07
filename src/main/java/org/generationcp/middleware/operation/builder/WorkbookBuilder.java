@@ -590,6 +590,7 @@ public class WorkbookBuilder extends Builder {
 						// we check if its a number to be sure
 						measurementData.setcValueId(variable.getValue());
 					}
+					//FIXME get this information along with the variable to avoid going back to the database inside these loops
 					this.setValueStatusToMeasurementData(variable, measurementData);
 					measurementDataList.add(measurementData);
 					break;
