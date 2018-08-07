@@ -23,6 +23,7 @@ class ObservationQuery {
 	public static final String SELECT_TEXT = " SELECT\n"
 		+ "   nde.nd_experiment_id,\n"
 		+ "   gl.description                                      AS                      TRIAL_INSTANCE,\n"
+		+ "   proj.name									  AS 					  PROJECT_NAME,\n"
 		+ "   gl.nd_geolocation_id,\n"
 		+ "   (SELECT iispcvt.definition\n"
 		+ FROM
@@ -167,6 +168,7 @@ class ObservationQuery {
 	private String getFromExpression(final List<MeasurementVariableDto> variables) {
 		return " FROM\n" + "    Project p\n" + INNER_JOIN
 				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + INNER_JOIN
+				+ "    project proj ON proj.project_id =  pr.object_project_id\n" + INNER_JOIN
 				+ "    nd_experiment nde ON nde.project_id = pr.subject_project_id\n" + INNER_JOIN
 				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + INNER_JOIN
 				+ "    nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id\n" + INNER_JOIN

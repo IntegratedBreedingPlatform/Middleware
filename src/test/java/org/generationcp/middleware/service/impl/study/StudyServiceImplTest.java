@@ -21,6 +21,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -77,13 +78,18 @@ public class StudyServiceImplTest {
 	@Mock
 	private UserDataManager userDataManager;
 	
+	@Mock
+	private StudyMeasurements studyMeasurements;
+	
+	@Mock
+	private MeasurementVariableService measurementVariableService;
+	
 	private StudyServiceImpl studyServiceImpl;
 	
 	final List<String> additionalGermplasmDescriptors = Lists.newArrayList(STOCK_ID);
 	
 	final List<String> additionalDesignFactors = Lists.newArrayList(FACT1);
 	
-
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -93,6 +99,8 @@ public class StudyServiceImplTest {
 		
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
 		this.studyServiceImpl.setUserDataManager(this.userDataManager);
+		this.studyServiceImpl.setMeasurementVariableService(this.measurementVariableService);
+		this.studyServiceImpl.setStudyMeasurements(this.studyMeasurements);
 		
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockSqlQuery);
@@ -350,5 +358,41 @@ public class StudyServiceImplTest {
 		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(Matchers.anyInt())).thenReturn(null);
 		final String year = this.studyServiceImpl.getYearFromStudy(1);
 		Assert.assertNull(year);
+	}
+	
+	@Test
+	public void testGetTrialObservationTable() {
+		final List<Object[]> results = new ArrayList<>();
+		final Object[] result = {1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "PLOT_ID", "LOC_NAME", "LOC_ABBR", 1, 1, 1, 1, "Study Name", 1};
+		results.add(result);
+		Mockito.when(this.studyMeasurements.getAllStudyDetailsAsTable(Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt())).thenReturn(results);
+		Mockito.when(this.measurementVariableService.getVariables(1, VariableType.TRAIT.getId())).thenReturn(Arrays.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name())));
+		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(1)).thenReturn("20180821");
+		
+		final TrialObservationTable dto = this.studyServiceImpl.getTrialObservationTable(1, 1);
+		Mockito.verify(this.studyMeasurements).getAllStudyDetailsAsTable(Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt());
+		Mockito.verify(this.measurementVariableService).getVariables(1, VariableType.TRAIT.getId());
+		Assert.assertNotNull(dto.getHeaderRow());
+		Assert.assertEquals("1", dto.getStudyDbId().toString());
+		Assert.assertEquals(String.valueOf(TermId.ALTITUDE.getId()), dto.getObservationVariableDbIds().get(0).toString());
+		Assert.assertEquals(TermId.ALTITUDE.name(), dto.getObservationVariableNames().get(0));
+		final List<String> tableResults = dto.getData().get(0);
+		Assert.assertEquals("2018", tableResults.get(0));
+		Assert.assertEquals("1", tableResults.get(1));
+		Assert.assertEquals("Study Name Environment Number 1", tableResults.get(2));
+		Assert.assertEquals("1", tableResults.get(3));
+		Assert.assertEquals("LOC_ABBR", tableResults.get(4));
+		Assert.assertEquals("1", tableResults.get(5));
+		Assert.assertEquals("desig", tableResults.get(6));
+		Assert.assertEquals("1", tableResults.get(7));
+		Assert.assertEquals("PLOT_NO", tableResults.get(8));
+		Assert.assertEquals("1", tableResults.get(9));
+		Assert.assertEquals("1", tableResults.get(10));
+		Assert.assertEquals("UnknownTimestamp", tableResults.get(11));
+		Assert.assertEquals("Test", tableResults.get(12));
+		Assert.assertEquals("1", tableResults.get(13));
+		Assert.assertEquals("1", tableResults.get(14));
+		Assert.assertEquals("PLOT_ID", tableResults.get(15));
+		Assert.assertEquals("1", tableResults.get(16));
 	}
 }
