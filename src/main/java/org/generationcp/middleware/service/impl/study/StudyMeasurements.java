@@ -143,15 +143,15 @@ public class StudyMeasurements {
 			for (final Object[] row : results) {
 
 				final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
-				int counterTwo = 0;
+				int counterThree = 0;
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
-					final String status = (String) row[fixedColumns + counterTwo + 2];
+					final String status = (String) row[fixedColumns + counterThree + 2];
 					measurementVariableResults.add(new MeasurementDto(
 						variable,
-						(Integer) row[fixedColumns + counterTwo + 1],
-						(String) row[fixedColumns + counterTwo],
+						(Integer) row[fixedColumns + counterThree + 1],
+						(String) row[fixedColumns + counterThree],
 						(status != null ? Phenotype.ValueStatus.valueOf(status) : null)));
-					counterTwo += 3;
+					counterThree += 3;
 				}
 				final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1],
 						(String) row[2], (Integer) row[3], (String) row[4], (String) row[5], (String) row[6],
