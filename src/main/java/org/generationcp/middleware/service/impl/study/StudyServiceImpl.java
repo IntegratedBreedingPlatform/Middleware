@@ -426,7 +426,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 				entry.add(year);
 
-				final int lastFixedColumn = 18;
+				final int lastFixedColumn = 19;
 
 				// studyDbId = nd_geolocation_id
 				entry.add(String.valueOf(row[17]));
@@ -435,11 +435,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final String locationAbbreviation = (String) row[14];
 
 				// studyName
-				final String studyName = "Study-" + row[1];
+				final String studyName =  row[lastFixedColumn] + " Environment Number " + row[1];
 				entry.add(studyName);
 
 				// locationDbId
-				entry.add(String.valueOf(row[lastFixedColumn]));
+				entry.add(String.valueOf(row[18]));
 
 				// locationName
 				if (StringUtils.isNotBlank(locationAbbreviation)) {
@@ -602,8 +602,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
 		this.germplasmDescriptors = germplasmDescriptors;
 	}
-
+	
 	public void setDesignFactors(final DesignFactors designFactors) {
 		this.designFactors = designFactors;
+	}
+	
+	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
+		this.measurementVariableService = measurementVariableService;
+	}
+	
+	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
+		this.studyMeasurements = studyMeasurements;
 	}
 }

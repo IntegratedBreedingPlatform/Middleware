@@ -35,21 +35,14 @@ public class Variable extends Term {
 	private Method method;
 	private Property property;
 	private Scale scale;
-
 	private FormulaDto formula;
-
+	private boolean allowsFormula;
 	private Boolean isFavorite;
-
 	private String minValue;
-
 	private String maxValue;
-
 	private Integer observations;
-
 	private Integer studies;
-
 	private Boolean hasPair;
-
   	private Boolean hasUsage;
 
 	public Variable() {
@@ -107,6 +100,14 @@ public class Variable extends Term {
 
 	public void setFormula(FormulaDto formula) {
 		this.formula = formula;
+	}
+
+	public boolean isAllowsFormula() {
+		return allowsFormula;
+	}
+
+	public void setAllowsFormula(final boolean allowsFormula) {
+		this.allowsFormula = allowsFormula;
 	}
 
 	/**

@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.service;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -60,6 +61,7 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -231,13 +233,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final long startTime = System.currentTimeMillis();
 
 		try {
-
 			final List<MeasurementVariable> variates = workbook.getVariates();
 			final List<MeasurementVariable> factors = workbook.getFactors();
 			final List<MeasurementRow> observations = workbook.getObservations();
 
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+
+
 
 			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 
@@ -273,7 +276,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 							for (final MeasurementData field : row.getDataList()) {
 								if (factor.getName().equals(field.getLabel()) && factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
 
-									saveOrUpdateTrialDesignData(this.getExperimentPropertySaver(),
+									this.saveOrUpdateTrialDesignData(this.getExperimentPropertySaver(),
 											this.getExperimentDao().getById(row.getExperimentId()), field, factor.getTermId());
 
 								}
@@ -284,6 +287,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 			final Measurements measurements =
 					new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
+
 			this.saveMeasurements(saveVariates, variates, observations, measurements);
 
 		} catch (final Exception e) {
@@ -294,6 +298,41 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		FieldbookServiceImpl.LOG.debug("========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
+	}
+
+	//TODO find a better way to mark variable as OUT_OF_SYNC when inputs are deleted
+	@Override
+	public void updatePhenotypeStatus(final List<MeasurementRow> observations) {
+		final List<MeasurementData> measurementDataList = this.getChangedFormulaObservations(observations);
+		for (final MeasurementData measurementData: measurementDataList) {
+			final Phenotype phenotype = this.getPhenotypeDao().getById(measurementData.getPhenotypeId());
+			if (phenotype != null) {
+				phenotype.setValueStatus(measurementData.getValueStatus());
+				this.getPhenotypeDao().saveOrUpdate(phenotype);
+			}
+		}
+	}
+
+	@Override
+	public Boolean hasOutOfSyncObservations(final Integer projectId) {
+		return this.getPhenotypeDao().hasOutOfSync(projectId);
+	}
+
+	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
+		final List<MeasurementData> result = new ArrayList();
+		for (final MeasurementRow measurementRow : observations) {
+			final List<MeasurementData> dataList = measurementRow.getDataList();
+			if (dataList == null || dataList.isEmpty()) {
+				continue;
+			}
+			for (final MeasurementData measurementData : dataList) {
+				if (Phenotype.ValueStatus.OUT_OF_SYNC.equals(measurementData.getValueStatus()) && measurementData.isChanged()) {
+					result.add(measurementData);
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 	protected void saveOrUpdateTrialDesignData(final ExperimentPropertySaver experimentPropertySaver, final ExperimentModel experimentModel,
@@ -525,7 +564,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public GermplasmList getGermplasmListByName(final String name, final String programUUID) {
-		final List<GermplasmList> germplasmLists = germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
+		final List<GermplasmList> germplasmLists = this.germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
 		if (!germplasmLists.isEmpty()) {
 			return germplasmLists.get(0);
 		}
@@ -864,7 +903,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public GermplasmList getGermplasmListById(final Integer listId) {
-		return germplasmListManager.getGermplasmListById(listId);
+		return this.germplasmListManager.getGermplasmListById(listId);
 	}
 
 	@Override
@@ -1138,7 +1177,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void saveStudyColumnOrdering(final Integer studyId, final String studyName, final List<Integer> orderedTermIds) {
-		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+		final int plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 

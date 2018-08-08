@@ -63,7 +63,7 @@ public class Measurements {
 	 * 
 	 * @param observations
 	 */
-	void saveOutliers(List<MeasurementRow> observations) {
+	void saveOutliers(final List<MeasurementRow> observations) {
 
 		for (final MeasurementRow measurementRow : observations) {
 			final List<MeasurementData> dataList = measurementRow.getDataList();
@@ -72,7 +72,7 @@ public class Measurements {
 				continue;
 			}
 
-			List<PhenotypeOutlier> outlierList = new ArrayList<PhenotypeOutlier>();
+			final List<PhenotypeOutlier> outlierList = new ArrayList<PhenotypeOutlier>();
 			for (final MeasurementData measurementData : dataList) {
 
 				// When a measurement is marked as missing, we should log its old value in the phenotype_outlier table.
@@ -98,7 +98,7 @@ public class Measurements {
 
 	PhenotypeOutlier createPhenotypeOutlierFromMeasurement(final MeasurementData measurementData) {
 
-		PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
+		final PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
 		phenotypeOutlier.setPhenotypeId(measurementData.getPhenotypeId());
 		phenotypeOutlier.setValue(measurementData.getOldValue());
 		return phenotypeOutlier;
@@ -130,6 +130,8 @@ public class Measurements {
 			phenotype.setPhenotypeId(phenotypeId);
 		}
 
+		phenotype.setValueStatus(measurementData.getValueStatus());
+
 		return phenotype;
 
 	}
@@ -160,7 +162,7 @@ public class Measurements {
 
 				this.phenotypeSaver.saveOrUpdate(measurementRow.getExperimentId(), measurementVariable.getTermId(),
 						measurementData.getcValueId() != null && !"".equals(measurementData.getcValueId()) ? measurementData.getcValueId()
-								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId());
+								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId(), measurementData.getValueStatus());
 				// This is not great but essential because the workbook
 				// object must be updated so that it has new phenotype id. This
 				// id is then piped back to the UI and is used in subsequent calls to

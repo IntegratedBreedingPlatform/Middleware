@@ -53,7 +53,7 @@ public class User implements Serializable, BeanFormState {
 			+ "  person.fname    AS fName, \n"
 			+ "  person.lname    AS lName, \n"
 			+ "  person.pemail   AS email, \n"
-			+ "  role.id    AS roleId \n"
+			+ "  role.id    AS roleId, \n"
 			+ "  role.description       AS roleName \n"
 			+ "FROM cvterm scale INNER JOIN cvterm_relationship r ON (r.object_id = scale.cvterm_id) \n"
 			+ "  INNER JOIN cvterm variable ON (r.subject_id = variable.cvterm_id) \n"
@@ -114,13 +114,13 @@ public class User implements Serializable, BeanFormState {
 	public User() {
 	}
 
-	public User(Integer userid) {
+	public User(final Integer userid) {
 		super();
 		this.userid = userid;
 	}
 
-	public User(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password,
-			Integer personid, Integer adate, Integer cdate) {
+	public User(final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type, final String name, final String password,
+			final Integer personid, final Integer adate, final Integer cdate) {
 		super();
 		this.userid = userid;
 		this.instalid = instalid;
@@ -141,7 +141,7 @@ public class User implements Serializable, BeanFormState {
 	 * @return the copy of the User object
 	 */
 	public User copy() {
-		User user = new User();
+		final User user = new User();
 		user.setInstalid(this.instalid);
 		user.setStatus(this.status);
 		user.setAccess(this.access);
@@ -161,7 +161,7 @@ public class User implements Serializable, BeanFormState {
 		return this.userid;
 	}
 
-	public void setUserid(Integer userid) {
+	public void setUserid(final Integer userid) {
 		this.userid = userid;
 	}
 
@@ -169,7 +169,7 @@ public class User implements Serializable, BeanFormState {
 		return this.instalid;
 	}
 
-	public void setInstalid(Integer instalid) {
+	public void setInstalid(final Integer instalid) {
 		this.instalid = instalid;
 	}
 
@@ -177,7 +177,7 @@ public class User implements Serializable, BeanFormState {
 		return this.status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 
@@ -185,7 +185,7 @@ public class User implements Serializable, BeanFormState {
 		return this.access;
 	}
 
-	public void setAccess(Integer access) {
+	public void setAccess(final Integer access) {
 		this.access = access;
 	}
 
@@ -193,7 +193,7 @@ public class User implements Serializable, BeanFormState {
 		return this.type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(final Integer type) {
 		this.type = type;
 	}
 
@@ -201,7 +201,7 @@ public class User implements Serializable, BeanFormState {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -209,7 +209,7 @@ public class User implements Serializable, BeanFormState {
 		return this.password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.password = password;
 	}
 
@@ -217,7 +217,7 @@ public class User implements Serializable, BeanFormState {
 		return this.personid;
 	}
 
-	public void setPersonid(Integer personid) {
+	public void setPersonid(final Integer personid) {
 		this.personid = personid;
 	}
 
@@ -225,7 +225,7 @@ public class User implements Serializable, BeanFormState {
 		return this.adate;
 	}
 
-	public void setAssignDate(Integer adate) {
+	public void setAssignDate(final Integer adate) {
 		this.adate = adate;
 	}
 
@@ -233,7 +233,7 @@ public class User implements Serializable, BeanFormState {
 		return this.cdate;
 	}
 
-	public void setCloseDate(Integer cdate) {
+	public void setCloseDate(final Integer cdate) {
 		this.cdate = cdate;
 	}
 
@@ -241,7 +241,7 @@ public class User implements Serializable, BeanFormState {
 		return this.person;
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(final Person person) {
 		this.person = person;
 	}
 
@@ -249,7 +249,7 @@ public class User implements Serializable, BeanFormState {
 		return this.isnew;
 	}
 
-	public void setIsNew(Boolean val) {
+	public void setIsNew(final Boolean val) {
 		this.isnew = val;
 	}
 
@@ -259,25 +259,25 @@ public class User implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (obj == this) {
 			return true;
 		}
-		if (!User.class.isInstance(obj)) {
+		if (!(obj instanceof User)) {
 			return false;
 		}
 
-		User otherObj = (User) obj;
+		final User otherObj = (User) obj;
 
 		return new EqualsBuilder().append(this.userid, otherObj.userid).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("User [userid=");
 		builder.append(this.userid);
 		builder.append(", instalid=");
@@ -317,7 +317,7 @@ public class User implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public void setActive(Boolean val) {
+	public void setActive(final Boolean val) {
 		this.active = val;
 	}
 
@@ -327,7 +327,7 @@ public class User implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public void setEnabled(Boolean val) {
+	public void setEnabled(final Boolean val) {
 		this.enabled = val;
 
 	}
