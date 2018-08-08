@@ -484,5 +484,18 @@
 			8413);
 		</sql>
 	</changeSet>
+	<changeSet author="clarissa" id="v9.3.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_fingermillet_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on fingermillet scales 20600 and 20601 from categorical to numeric data type.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm_relationship SET object_id = 1110 WHERE subject_id = 20600 AND object_id = 1130;
+
+			UPDATE cvterm_relationship SET object_id = 1110 WHERE subject_id = 20601 AND object_id = 1130;
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
