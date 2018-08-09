@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v9.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+					1
+				FROM
+					workbench_sidebar_category_link W
+				WHERE
+					W.TOOL_NAME = 'sample_manager'
+						AND W.SIDEBAR_CATEGORY_LINK_ID > (SELECT
+							WC.sidebar_category_id
+						FROM
+							workbench_sidebar_category_link WC
+						WHERE
+							WC.TOOL_NAME = 'study_manager_fieldbook_web');
+			</sqlCheck>
+		</preConditions>
+		<comment>Reordering Menu for Manage Samples and Studies</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link_role
+				WHERE sidebar_category_link_id in (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE TOOL_NAME='sample_manager');
+
+			DELETE FROM workbench_sidebar_category_link WHERE TOOL_NAME='sample_manager';
+
+			INSERT INTO workbench_sidebar_category_link (tool_name, sidebar_category_id, sidebar_link_name, sidebar_link_title)
+				VALUES ('sample_manager', '1', 'manage_samples', 'Manage Samples');
+
+			INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+				SELECT `sidebar_category_link_id`, role.id FROM `workbench_sidebar_category_link` link
+			 		INNER JOIN role WHERE link.tool_name NOT IN ('backup_restore')
+			 		AND role.description = 'ADMIN'
+             		AND link.TOOL_NAME='sample_manager';
+
+			INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+				SELECT `sidebar_category_link_id`, role.id FROM `workbench_sidebar_category_link` link
+			 		INNER JOIN role WHERE link.tool_name NOT IN ('backup_restore', 'manage_program', 'germplasm_import', 'ontology_manager')
+			 		AND role.description = 'BREEDER'
+			 		AND link.TOOL_NAME='sample_manager';
+
+			 INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+				SELECT `sidebar_category_link_id`, role.id FROM `workbench_sidebar_category_link` link
+			 		INNER JOIN role WHERE link.tool_name NOT IN ('backup_restore', 'manage_program', 'germplasm_import', 'ontology_manager')
+			 		AND role.description = 'TECHNICIAN'
+			 		AND link.TOOL_NAME='sample_manager';
+
+			 INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+				SELECT `sidebar_category_link_id`, role.id FROM `workbench_sidebar_category_link` link
+			 		INNER JOIN role WHERE link.tool_name IN ('bm_list_manager_main', 'study_browser', 'germplasm_mainheadtohead',
+			 						  'trait_donor_query', 'breeding_view_wb', 'breeding_gxe', 'about_bms')
+			 			AND role.description   = 'READONLY'
+						AND link.TOOL_NAME='sample_manager';
+
+			INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+				SELECT `sidebar_category_link_id`, role.id FROM `workbench_sidebar_category_link` link
+			 		INNER JOIN role WHERE link.tool_name NOT IN ('backup_restore')
+			   			AND role.description = 'SUPERADMIN'
+						AND link.TOOL_NAME='sample_manager';
+
+		</sql>
+	</changeSet>
+</databaseChangeLog>
