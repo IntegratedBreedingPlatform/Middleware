@@ -1,12 +1,10 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
@@ -14,9 +12,10 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.derived_variables.FormulaDaoFactory;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.util.FormulaUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,10 +25,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.when;
 
 public class FormulaServiceImplTest {
 	
@@ -40,7 +45,7 @@ public class FormulaServiceImplTest {
 	private FormulaDAO formulaDao;
 	
 	@Mock
-	private FormulaDaoFactory factory;
+	private DaoFactory factory;
 	
 	@InjectMocks
 	private FormulaServiceImpl formulaServiceImpl;
@@ -48,21 +53,37 @@ public class FormulaServiceImplTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		this.formulaServiceImpl.setFormulaDaoFactory(this.factory);
+		this.formulaServiceImpl.setDaoFactory(this.factory);
 		Mockito.doReturn(this.formulaDao).when(this.factory).getFormulaDAO();
 	}
 	
 	@Test
-	public void testConvertToFormulaDto() {
+	public void testConvert() {
 		final Formula testFormula = this.createTestFormula();
-		final FormulaDto formulaDto = this.formulaServiceImpl.convertToFormulaDto(testFormula);
+		final FormulaDto formulaDto = FormulaUtils.convertToFormulaDto(testFormula);
 		this.verifyFormulaDto(testFormula, formulaDto);
+
+		final Formula formulaConvertedBack = FormulaUtils.convertToFormula(formulaDto);
+		this.verifyFormulaDto(formulaConvertedBack, formulaDto);
+	}
+
+	@Test
+	public void testConvert_DuplicatedInputs() {
+		final Formula testFormula = this.createTestFormula();
+		testFormula.getInputs().addAll(testFormula.getInputs());
+
+		final FormulaDto formulaDto = FormulaUtils.convertToFormulaDto(testFormula);
+		Assert.assertThat(testFormula.getInputs().size(), is(4));
+
+		final Formula formulaConvertedBack = FormulaUtils.convertToFormula(formulaDto);
+		Assert.assertThat("Should save only one copy of input", formulaConvertedBack.getInputs().size(), is(2));
+
 	}
 
 	private void verifyFormulaDto(final Formula testFormula, final FormulaDto formulaDto) {
 		Assert.assertEquals(testFormula.getFormulaId(), formulaDto.getFormulaId());
 		Assert.assertEquals(testFormula.getName(), formulaDto.getName());
-		Assert.assertEquals(testFormula.getTargetCVTerm().getCvTermId(), formulaDto.getTargetTermId());
+		Assert.assertEquals(testFormula.getTargetCVTerm().getCvTermId(), Integer.valueOf(formulaDto.getTarget().getId()));
 		Assert.assertEquals(testFormula.getDefinition(), formulaDto.getDefinition());
 		Assert.assertEquals(testFormula.getDescription(), formulaDto.getDescription());
 		Assert.assertEquals(testFormula.getActive(), formulaDto.getActive());
@@ -80,11 +101,11 @@ public class FormulaServiceImplTest {
 		Assert.assertEquals(expectedInput.getCvTermId().intValue(), actualInput.getId());
 		Assert.assertEquals(expectedInput.getName(), actualInput.getName());
 	}
-	
+
 	@Test
 	public void testGetByTargetId() {
 		final Formula formula1 = this.createTestFormula();
-		Mockito.doReturn(formula1).when(this.formulaDao).getByTargetVariableId(Matchers.anyInt());
+		Mockito.doReturn(formula1).when(this.formulaDao).getByTargetVariableId(anyInt());
 		final Optional<FormulaDto> formulaDto = this.formulaServiceImpl.getByTargetId(formula1.getTargetCVTerm().getCvTermId());
 		Assert.assertTrue(formulaDto.isPresent());
 		this.verifyFormulaDto(formula1, formulaDto.get());
@@ -191,6 +212,29 @@ public class FormulaServiceImplTest {
 			verifyFormulaVariable(input, variablesMap.get(input.getCvTermId()));
 		}
 		
+	}
+
+	@Test
+	public void testSave() {
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setTarget(new FormulaVariable(2, "", null));
+		formulaDto.setDefinition("{{2}}");
+		final FormulaDto result = this.formulaServiceImpl.save(formulaDto);
+		final Formula formula = FormulaUtils.convertToFormula(formulaDto);
+
+		this.verifyFormulaDto(formula, result);
+	}
+
+	@Test
+	public void testDelete() {
+		final Formula formula = this.createTestFormula();
+
+		when(this.formulaDao.getById(anyInt())).thenReturn(formula);
+
+		this.formulaServiceImpl.delete(RandomUtils.nextInt());
+
+		Assert.assertThat(formula.getActive(), is(false));
+		Mockito.verify(this.formulaDao).update(formula);
 	}
 
 	private Formula createTestFormula() {

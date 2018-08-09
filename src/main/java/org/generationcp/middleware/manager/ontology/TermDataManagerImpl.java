@@ -38,6 +38,11 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 	}
 
 	@Override
+	public Term getTermByName(final String name) throws MiddlewareException {
+		return Term.fromCVTerm(this.getCvTermDao().getByName(name));
+	}
+
+	@Override
 	public List<Term> getTermByCvId(final int cvId) throws MiddlewareException {
 		return this.getCvTermDao().getTermByCvId(cvId);
 	}

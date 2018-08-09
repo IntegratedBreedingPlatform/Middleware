@@ -34,5 +34,4 @@ public interface SampleService {
 	List<SampleGermplasmDetailDTO> getByGid(final Integer gid);
 
 	Boolean studyHasSamples(final Integer studyId);
-
 }

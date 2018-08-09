@@ -8,6 +8,7 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -431,7 +432,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		final List<FormulaDto> formulaDtoList = this.formulaService.getByTargetIds(map.keySet());
 		for (final FormulaDto formulaDto : formulaDtoList) {
-			map.get(formulaDto.getTargetTermId()).setFormula(formulaDto);
+			map.get(formulaDto.getTarget().getId()).setFormula(formulaDto);
 		}
 
 		final List<Variable> variables = new ArrayList<>(map.values());
@@ -484,7 +485,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			for (final CVTermProperty property : properties) {
 				if (property.getTypeId() == TermId.VARIABLE_TYPE.getId()) {
-					variable.addVariableType(VariableType.getByName(property.getValue()));
+					final VariableType variableType = VariableType.getByName(property.getValue());
+					variable.addVariableType(variableType);
+					if (variableType.equals(VariableType.TRAIT)) {
+						variable.setAllowsFormula(true);
+					}
 				} else if (property.getTypeId() == TermId.CREATION_DATE.getId()) {
 					variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
 				} else if (property.getTypeId() == TermId.LAST_UPDATE_DATE.getId()) {
@@ -611,6 +616,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	public void updateVariable(final OntologyVariableInfo variableInfo) {
 
 		VariableCache.removeFromCache(variableInfo.getId());
+
+		final List<FormulaDto> formulas = this.formulaService.getByInputId(Integer.valueOf(variableInfo.getId()));
+		for (final FormulaDto formula : formulas) {
+			VariableCache.removeFromCache(formula.getTarget().getId());
+		}
 
 		final VariableInfoDaoElements elements = new VariableInfoDaoElements();
 		elements.setVariableId(variableInfo.getId());
@@ -943,6 +953,16 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<VariableType> getVariableTypes(final Integer variableId) {
+		final List<VariableType> variableTypes = new ArrayList<>();
+		final List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermAndType(variableId, TermId.VARIABLE_TYPE.getId());
+		for (final CVTermProperty property : properties) {
+			variableTypes.add(VariableType.getByName(property.getValue()));
+		}
+		return variableTypes;
 	}
 
 	@Override
