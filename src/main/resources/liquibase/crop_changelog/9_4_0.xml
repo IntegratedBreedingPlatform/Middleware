@@ -84,4 +84,9 @@
 			constraintName="fk_target_variable_id"
 			onDelete="CASCADE"></addForeignKeyConstraint>
 	</changeSet>
+
+	<changeSet author="cuenyad" id="v9.4.0-5">
+    	<modifyDataType columnName="well" newDataType="varchar(255)" tableName="sample"/>
+   		<modifyDataType columnName="plate_id" newDataType="varchar(255)" tableName="sample"/>
+	</changeSet>
 </databaseChangeLog>
