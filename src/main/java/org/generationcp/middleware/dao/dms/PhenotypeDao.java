@@ -864,7 +864,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.append(" FROM nd_experiment nd_exp ")
 				.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
 				.append(" INNER JOIN stock ON nd_exp_stock.stock_id = stock.stock_id ")
-				.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ").append(" where a.project_id = ")
+				.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ").append(" where nd_exp.project_id = ")
 				.append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
 				.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
 				.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ").append(" group by nd_exp.nd_geolocation_id, ")
