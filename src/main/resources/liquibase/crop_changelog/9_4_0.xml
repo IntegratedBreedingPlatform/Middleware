@@ -85,8 +85,64 @@
 			onDelete="CASCADE"></addForeignKeyConstraint>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v9.4.0-5">
-    	<modifyDataType columnName="well" newDataType="varchar(255)" tableName="sample"/>
-   		<modifyDataType columnName="plate_id" newDataType="varchar(255)" tableName="sample"/>
+	<changeSet author="clarissa" id="v9.4.0-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM listnms WHERE listtype='FOLDER' AND liststatus=1;
+			</sqlCheck>
+        </preConditions>
+		<comment>
+			Ensure that folders does not have liststatus=1 (for lists).
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE listnms SET liststatus=0 WHERE listtype='FOLDER' AND liststatus=1;
+		</sql>
 	</changeSet>
+
+	<changeSet author="clarissa" id="v9.4.0-6">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM cvtermprop WHERE cvterm_id=8131 AND type_id=1800 AND VALUE='Environment Detail';
+			</sqlCheck>
+        </preConditions>
+		<comment>
+			Categorizing the cvterms as Experimental Design where it used to be grouped as Environment Detail and Study Detail.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM cvtermprop WHERE type_id=1800 AND VALUE='Environment Detail' AND cvterm_id IN
+			(8131,
+			8132,
+			8133,
+			8134,
+			8136,
+			8137,
+			8138,
+			8139,
+			8142,
+			8146,
+			8411,
+			8412,
+			8413);
+
+			UPDATE cvtermprop SET VALUE='Experimental Design' WHERE type_id=1800 AND VALUE='Study Detail' AND cvterm_id IN
+			(8131,
+			8132,
+			8133,
+			8134,
+			8136,
+			8137,
+			8138,
+			8139,
+			8142,
+			8146,
+			8411,
+			8412,
+			8413);
+		</sql>
+	</changeSet>
+
+    <changeSet author="cuenyad" id="v9.4.0-7">
+        <modifyDataType columnName="well" newDataType="varchar(255)" tableName="sample"/>
+        <modifyDataType columnName="plate_id" newDataType="varchar(255)" tableName="sample"/>
+    </changeSet>
 </databaseChangeLog>
