@@ -261,19 +261,23 @@ public class MeasurementData {
 		return new CategoricalDisplayValue(this.value, this.value, this.value, false);
 	}
 
+	// FIXME consolidate logic in the copy constructor
 	public MeasurementData copy() {
 		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
 		data.setCustomCategoricalValue(this.isCustomCategoricalValue);
 		data.setAccepted(this.isAccepted);
+		data.setValueStatus(this.valueStatus);
 		return data;
 	}
 
+	// FIXME consolidate logic in a copy constructor
 	public MeasurementData copy(final MeasurementVariable oldVar) {
 		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, oldVar);
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
+		data.setValueStatus(this.valueStatus);
 		return data;
 	}
 
