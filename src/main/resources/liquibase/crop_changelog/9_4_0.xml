@@ -141,4 +141,17 @@
 		</sql>
 	</changeSet>
 
+    <changeSet author="cuenyad" id="v9.4.0-7">
+		<preConditions onFail="HALT">
+				<columnExists tableName="sample" columnName="plate_id"/>
+		</preConditions>
+        <modifyDataType columnName="plate_id" newDataType="varchar(255)" tableName="sample"/>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v9.4.0-8">
+		<preConditions onFail="HALT">
+			<columnExists tableName="sample" columnName="well"/>
+		</preConditions>
+		<modifyDataType columnName="well" newDataType="varchar(255)" tableName="sample"/>
+	</changeSet>
 </databaseChangeLog>
