@@ -137,8 +137,23 @@
 			8146,
 			8411,
 			8412,
-			8413);
-		</sql>
+			8413)
+;		</sql>
 	</changeSet>
 
+	<changeSet author="marie" id="v9.2.0-16">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM cvterm
+				WHERE cvterm_id = 1540
+				AND cv_id = 1011;
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm 
+			SET name = 'Seed acquisition methods', definition = 'Methods used to acquire samples of germplasm'
+			WHERE cvterm_id = 1540 AND cv_id = 1011;
+		</sql>
+	</changeSet>
+	
 </databaseChangeLog>
