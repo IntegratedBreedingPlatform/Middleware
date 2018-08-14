@@ -188,9 +188,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 
 		final int pageSize = pageable.getPageSize();
-		int start = pageSize * pageable.getPageNumber();
+		final int start = pageSize * pageable.getPageNumber();
 
-		// TODO add datasets
+		// TODO add datasets using FetchMode.SELECT to not break pagination
 		final List<Object[]> result = criteria
 			.setFirstResult(start)
 			.setMaxResults(pageSize)
