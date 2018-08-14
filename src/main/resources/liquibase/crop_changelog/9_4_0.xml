@@ -137,8 +137,8 @@
 			8146,
 			8411,
 			8412,
-			8413)
-;		</sql>
+			8413);
+		</sql>
 	</changeSet>
 
 	<changeSet author="marie" id="v9.2.0-16">
