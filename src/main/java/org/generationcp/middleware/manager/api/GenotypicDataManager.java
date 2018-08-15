@@ -1807,6 +1807,4 @@ public interface GenotypicDataManager {
 	
 	List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId);
 
-	java.util.Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleUIDs);
-
 }
