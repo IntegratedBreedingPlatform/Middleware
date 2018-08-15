@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -28,8 +29,11 @@ public class TransactionBuilder extends Builder {
 
 	private static final int COMMITMENT_DATE_INDEFINITE = 0;
 
+	private DaoFactory daoFactory;
+
 	public TransactionBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public List<Transaction> buildForSave(List<Lot> lots, Double amount, Integer userId, String comment, Integer sourceId,
@@ -92,7 +96,7 @@ public class TransactionBuilder extends Builder {
 	}
 
 	private Integer getPersonId(Integer userId) throws MiddlewareQueryException {
-		User user = this.getUserDao().getById(userId);
+		User user = this.daoFactory.getUserDao().getById(userId);
 		return user.getPersonid();
 	}
 }

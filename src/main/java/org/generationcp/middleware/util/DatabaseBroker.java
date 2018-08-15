@@ -30,7 +30,6 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.StudyTypeDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -163,12 +162,6 @@ public class DatabaseBroker {
 		final CountryDAO countryDao = new CountryDAO();
 		countryDao.setSession(this.getActiveSession());
 		return countryDao;
-	}
-
-	public UserDAO getUserDao() {
-		final UserDAO userDao = new UserDAO();
-		userDao.setSession(this.getActiveSession());
-		return userDao;
 	}
 
 	public CVDao getCvDao() {

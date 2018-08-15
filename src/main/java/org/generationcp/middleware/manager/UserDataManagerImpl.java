@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.generationcp.middleware.dao.PersonDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -67,6 +66,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<Person>> functionBasedLocalPersonGuavaCacheLoader;
 
+	private DaoFactory daoFactory;
+
 	public UserDataManagerImpl() {
 		super();
 		this.bindCacheLoaderFunctionsToLocalUserCache();
@@ -75,6 +76,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	public UserDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		this.bindCacheLoaderFunctionsToLocalUserCache();
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	private void bindCacheLoaderFunctionsToLocalUserCache() {
@@ -83,7 +85,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 					@Override
 					public List<User> apply(final String key) {
-						return UserDataManagerImpl.this.getUserDao().getAll();
+						return UserDataManagerImpl.this.daoFactory.getUserDao().getAll();
 					}
 				});
 
@@ -111,7 +113,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public long countAllUsers() throws MiddlewareQueryException {
-		return this.countAll(this.getUserDao());
+		return this.countAll(this.daoFactory.getUserDao());
 	}
 
 	@Override
@@ -120,9 +122,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			UserDataManagerImpl.localUserCache.invalidateAll();
 			UserDataManagerImpl.localPersonCache.invalidateAll();
-			final UserDAO dao = this.getUserDao();
 
-			final User recordSaved = dao.saveOrUpdate(user);
+			final User recordSaved = this.daoFactory.getUserDao().saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user="
@@ -137,7 +138,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			UserDataManagerImpl.localUserCache.invalidateAll();
 			UserDataManagerImpl.localPersonCache.invalidateAll();
-			this.getUserDao().saveOrUpdate(user);
+			this.daoFactory.getUserDao().saveOrUpdate(user);
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user="
@@ -148,7 +149,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public User getUserById(final int id) throws MiddlewareQueryException {
-		return this.getUserDao().getById(id, false);
+		return this.daoFactory.getUserDao().getById(id, false);
 	}
 
 	@Override
@@ -156,7 +157,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			UserDataManagerImpl.localUserCache.invalidateAll();
 			UserDataManagerImpl.localPersonCache.invalidateAll();
-			this.getUserDao().makeTransient(user);
+			this.daoFactory.getUserDao().makeTransient(user);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user="
 					+ user + "): " + e.getMessage(), e);
@@ -237,7 +238,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public boolean isUsernameExists(final String userName) throws MiddlewareQueryException {
-		if (this.getUserDao().isUsernameExists(userName)) {
+		if (this.daoFactory.getUserDao().isUsernameExists(userName)) {
 			return true;
 		}
 		return false;
@@ -245,7 +246,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public User getUserByUserName(final String userName) throws MiddlewareQueryException {
-		return this.getUserDao().getUserByUserName(userName);
+		return this.daoFactory.getUserDao().getUserByUserName(userName);
 	}
 
 	@Override
@@ -256,7 +257,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public User getUserByFullname(final String fullname) throws MiddlewareQueryException {
-		return this.getUserDao().getUserByFullname(fullname);
+		return this.daoFactory.getUserDao().getUserByFullname(fullname);
 	}
 
 
@@ -267,12 +268,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
-		return this.getUserDao().getUsersAssociatedToStudy(studyId);
+		return this.daoFactory.getUserDao().getUsersAssociatedToStudy(studyId);
 	}
 
 	@Override
 	public List<UserDto> getUsersForEnvironment(final Integer instanceId) throws MiddlewareQueryException {
-		return this.getUserDao().getUsersForEnvironment(instanceId);
+		return this.daoFactory.getUserDao().getUsersForEnvironment(instanceId);
 	}
 
 }

@@ -49,7 +49,7 @@
     </bean>
 
     <bean id="userDataManager" class="org.generationcp.middleware.manager.UserDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="germplasmDataManager" class="org.generationcp.middleware.manager.GermplasmDataManagerImpl">
