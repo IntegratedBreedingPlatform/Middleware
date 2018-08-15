@@ -81,6 +81,8 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	private Scale testScale;
 	private OntologyVariableInfo testVariableInfo;
 
+	private DaoFactory daoFactory;
+
 	@BeforeClass
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
@@ -94,8 +96,8 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.formulaDAO = new FormulaDAO();
-		this.formulaDAO.setSession(this.sessionProvder.getSession());
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.formulaDAO = daoFactory.getFormulaDAO();
 		this.cvTermDAO = new CVTermDao();
 		this.cvTermDAO.setSession(this.sessionProvder.getSession());
 		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
