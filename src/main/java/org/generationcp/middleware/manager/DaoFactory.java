@@ -1,10 +1,17 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.dao.ims.StockTransactionDAO;
+import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
@@ -68,5 +75,47 @@ public class DaoFactory {
 		final CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
 		cvTermRelationshipDao.setSession(sessionProvider.getSession());
 		return cvTermRelationshipDao;
+	}
+
+	public LotDAO getLotDao() {
+		LotDAO lotDao = new LotDAO();
+		lotDao.setSession(this.sessionProvider.getSession());
+		return lotDao;
+	}
+
+	public TransactionDAO getTransactionDAO() {
+		TransactionDAO transactionDao = new TransactionDAO();
+		transactionDao.setSession(this.sessionProvider.getSession());
+		return transactionDao;
+	}
+
+	public StockTransactionDAO getStockTransactionDAO() {
+		StockTransactionDAO stockTransactionDao = new StockTransactionDAO();
+		stockTransactionDao.setSession(this.sessionProvider.getSession());
+		return stockTransactionDao;
+	}
+
+	public GermplasmListDAO getGermplasmListDAO() {
+		GermplasmListDAO germplasmListDao = new GermplasmListDAO();
+		germplasmListDao.setSession(this.sessionProvider.getSession());
+		return germplasmListDao;
+	}
+
+	public GermplasmListDataDAO getGermplasmListDataDAO() {
+		GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
+		germplasmListDataDao.setSession(this.sessionProvider.getSession());
+		return germplasmListDataDao;
+	}
+
+	public LocationDAO getLocationDAO() {
+		LocationDAO locationDao = new LocationDAO();
+		locationDao.setSession(this.sessionProvider.getSession());
+		return locationDao;
+	}
+
+	public PersonDAO getPersonDAO() {
+		PersonDAO personDao = new PersonDAO();
+		personDao.setSession(this.sessionProvider.getSession());
+		return personDao;
 	}
 }
