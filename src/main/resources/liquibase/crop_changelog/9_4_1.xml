@@ -5,8 +5,13 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="vanina" id="v9.4.1-1">
-		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="plant_samples"/>
+		<preConditions onFail="CONTINUE">
+			<and>
+				<tableExists tableName="plant_samples"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM plant_samples;
+				</sqlCheck>
+			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			DROP TABLE plant_samples;
