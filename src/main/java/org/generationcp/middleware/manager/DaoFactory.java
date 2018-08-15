@@ -5,11 +5,18 @@ import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
+import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class DaoFactory {
 
 	private HibernateSessionProvider sessionProvider;
+
+	public DaoFactory(){
+		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+	}
 
 	public DaoFactory(HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
@@ -45,4 +52,21 @@ public class DaoFactory {
 		return userDAO;
 	}
 
+	public CVTermDao getCvTermDao() {
+		final CVTermDao cvTermDao = new CVTermDao();
+		cvTermDao.setSession(this.sessionProvider.getSession());
+		return cvTermDao;
+	}
+
+	public CvTermPropertyDao getCvTermPropertyDao() {
+		final CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
+		cvTermPropertyDao.setSession(this.sessionProvider.getSession());
+		return cvTermPropertyDao;
+	}
+
+	public CVTermRelationshipDao getCvTermRelationshipDao() {
+		final CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
+		cvTermRelationshipDao.setSession(sessionProvider.getSession());
+		return cvTermRelationshipDao;
+	}
 }
