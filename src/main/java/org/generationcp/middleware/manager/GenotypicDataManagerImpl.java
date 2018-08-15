@@ -92,11 +92,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private static final String TYPE_CISR = GdmsType.TYPE_CISR.getValue();
 	private static final String TYPE_UA = GdmsType.TYPE_UA.getValue(); // Unassigned
 
+	private DaoFactory daoFactory;
+
 	public GenotypicDataManagerImpl() {
 	}
 
-	public GenotypicDataManagerImpl(HibernateSessionProvider sessionProvider) {
+	public GenotypicDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -1775,7 +1778,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public java.util.Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
-		return getSampleDao().getGIDsBySampleIds(sampleIds);
+		return daoFactory.getSampleDao().getGIDsBySampleIds(sampleIds);
 	}
 
 }

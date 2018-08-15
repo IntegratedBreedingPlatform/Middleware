@@ -89,6 +89,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
+	private DaoFactory daoFactory;
 
 	public StudyDataManagerImpl() {
 	}
@@ -101,6 +102,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private void init(final HibernateSessionProvider sessionProvider) {
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
@@ -1116,7 +1118,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
-		return this.getSampleDao().getExperimentSampleMap(studyDbId);
+		return this.daoFactory.getSampleDao().getExperimentSampleMap(studyDbId);
 	}
 
 	@Override
