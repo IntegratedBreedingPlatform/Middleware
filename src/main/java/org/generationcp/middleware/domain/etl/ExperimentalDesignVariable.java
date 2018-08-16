@@ -34,7 +34,7 @@ public class ExperimentalDesignVariable {
 	public String getExperimentalDesignDisplay() {
 		final MeasurementVariable variable = this.getExperimentalDesign();
 		final MeasurementVariable exptDesignSource = this.getExperimentalDesignSource();
-		if (Integer.valueOf(variable.getValue()) == TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() && exptDesignSource != null) {
+		if (NumberUtils.toInt(variable.getValue()) == TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() && exptDesignSource != null) {
 			return DesignTypeItem.ALPHA_LATTICE;
 		} else if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
