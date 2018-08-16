@@ -32,7 +32,7 @@ import org.springframework.data.domain.Pageable;
 public class SampleDao extends GenericDAO<Sample, Integer> {
 	protected static final String SQL_SAMPLES_AND_EXPERIMENTS =
 		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM plant pl INNER JOIN\n"
-			+ "            						sample AS sp ON pl.plant_id = sp.sample_id\n" + "        WHERE\n"
+			+ "            						sample AS sp ON pl.plant_id = sp.plant_id\n" + "        WHERE\n"
 			+ "            						nde.nd_experiment_id = pl.nd_experiment_id) 'SAMPLES'"
 			+ "		FROM project p INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
 			+ "		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
@@ -43,7 +43,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample FROM project p INNER JOIN\n"
 			+ "    nd_experiment nde ON nde.project_id = p.project_id INNER JOIN\n"
 			+ "    plant AS pl ON nde.nd_experiment_id = pl.nd_experiment_id INNER JOIN\n"
-			+ "    sample AS sp ON pl.plant_id = sp.sample_id WHERE p.project_id = (SELECT \n"
+			+ "    sample AS sp ON pl.plant_id = sp.plant_id WHERE p.project_id = (SELECT \n"
 			+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
 			+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
 			+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n" + "GROUP BY pl.nd_experiment_id";
