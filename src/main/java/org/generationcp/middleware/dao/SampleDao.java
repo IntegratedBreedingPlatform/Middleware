@@ -18,7 +18,13 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
+import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -65,10 +71,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
 		}
-		if (pageable != null) {
-			return getSampleDTOS(criteria, pageable);
-		}
-		return getSampleDTOS(criteria);
+		return getSampleDTOS(criteria, pageable);
 	}
 
 	public Sample getBySampleId(final Integer sampleId) {
@@ -132,7 +135,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("dataset.datasetId")) //row[8]
 				.add(Projections.property("dataset.datasetName")) //row[9]
 				.add(Projections.property("stock.dbxrefId")) //row[10]
-				.add(Projections.property("stock.name")) //row[11] TODO preferred name
+				.add(Projections.property("stock.name")) //row[11] TODO preferred name - see BMS-5033
 				.add(Projections.property("samplingDate")) //row[12]
 				.add(Projections.property("entryNumber")) //row[13]
 				.add(Projections.property("sample.plateId")) //row[14]
@@ -186,12 +189,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		if (criteria == null) {
 			return Collections.<SampleDTO>emptyList();
 		}
-
 		final int pageSize = pageable.getPageSize();
-		int start = pageSize * pageable.getPageNumber();
+		final int start = pageSize * pageable.getPageNumber();
 
-		// TODO add datasets
-		final List<Object[]> result = criteria
+		final List<Sample> samples = criteria
 			.setFirstResult(start)
 			.setMaxResults(pageSize)
 			.createAlias(SAMPLE_PLANT, PLANT)
@@ -201,53 +202,55 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.experimentStocks", "experimentStocks")
 			.createAlias("experimentStocks.stock", "stock")
-			.setProjection(Projections.distinct(Projections.projectionList()
-				.add(Projections.property("sampleId")) //row[0]
-				.add(Projections.property("sampleName")) //row[1]
-				.add(Projections.property(SAMPLE_BUSINESS_KEY)) //row[2]
-				.add(Projections.property("person.firstName")) //row[3]
-				.add(Projections.property("person.lastName")) //row[4]
-				.add(Projections.property("sampleList.listName")) //row[5]
-				.add(Projections.property("plant.plantNumber")) //row[6]
-				.add(Projections.property("plant.plantBusinessKey")) //row[7]
-				.add(Projections.property("stock.dbxrefId")) //row[8]
-				.add(Projections.property("stock.name")) //row[9] TODO preferred name
-				.add(Projections.property("samplingDate")) //row[10]
-				.add(Projections.property("entryNumber")) //row[11]
-				.add(Projections.property("sample.plateId")) //row[12]
-				.add(Projections.property("sample.well")) //row[13]
+			.list();
 
-			)).list();
+		final List<SampleDTO> sampleDTOs = new ArrayList<>();
 
-		final Map<Integer, SampleDTO> sampleDTOMap = new LinkedHashMap<>();
-		for (final Object[] row : result) {
+		for (final Sample sample : samples) {
 
-			final Integer sampleId = (Integer) row[0];
-			SampleDTO dto = sampleDTOMap.get(sampleId);
-			if (dto == null) {
-				dto = new SampleDTO();
-				dto.setEntryNo((Integer) row[11]);
-				dto.setSampleId(sampleId);
-				dto.setSampleName((String) row[1]);
-				dto.setSampleBusinessKey((String) row[2]);
-				if(row[3] != null && row[4] != null) dto.setTakenBy(row[3] + " " + row[4]);
-				dto.setSampleList((String) row[5]);
-				dto.setPlantNumber((Integer) row[6]);
-				dto.setPlantBusinessKey((String) row[7]);
-				dto.setGid((Integer) row[8]);
-				dto.setDesignation((String) row[9]);
-				if (row[10] != null) {
-					dto.setSamplingDate((Date) row[10]);
-				}
-				dto.setPlateId((String) row[12]);
-				dto.setWell((String) row[13]);
-				// TODO add datasets
+			final Integer sampleId = sample.getSampleId();
+			SampleDTO sampleDTO = new SampleDTO();
+			sampleDTO.setEntryNo(sample.getEntryNumber());
+			sampleDTO.setSampleId(sampleId);
+			sampleDTO.setSampleName(sample.getSampleName());
+			sampleDTO.setSampleBusinessKey(sample.getSampleBusinessKey());
+			final User takenBy = sample.getTakenBy();
+			if (takenBy != null && takenBy.getPerson() != null) {
+				final Person person = takenBy.getPerson();
+				sampleDTO.setTakenBy(person.getFirstName() + " " + person.getLastName());
 			}
+			sampleDTO.setSampleList(sample.getSampleList().getListName());
+			final Plant plant = sample.getPlant();
+			sampleDTO.setPlantNumber(plant.getPlantNumber());
+			sampleDTO.setPlantBusinessKey(plant.getPlantBusinessKey());
+			if (plant.getExperiment() != null && plant.getExperiment().getExperimentStocks() != null
+				&& plant.getExperiment().getExperimentStocks().get(0) != null
+				&& plant.getExperiment().getExperimentStocks().get(0).getStock() != null) {
+				final StockModel stock = plant.getExperiment().getExperimentStocks().get(0).getStock();
+				sampleDTO.setGid(stock.getDbxrefId());
+				sampleDTO.setDesignation(stock.getName()); // TODO preferred name - see BMS-5033
+			}
+			if (sample.getSamplingDate() != null) {
+				sampleDTO.setSamplingDate(sample.getSamplingDate());
+			}
+			sampleDTO.setPlateId(sample.getPlateId());
+			sampleDTO.setWell(sample.getWell());
 
-			sampleDTOMap.put(sampleId, dto);
+			if (sample.getAccMetadataSets() != null) {
+				sampleDTO.setDatasets(new HashSet<SampleDTO.Dataset>());
+
+				for (AccMetadataSet accMetadataSet : sample.getAccMetadataSets()) {
+					final SampleDTO.Dataset datasetDto = new SampleDTO().new Dataset();
+					final Dataset dataset = accMetadataSet.getDataset();
+					datasetDto.setDatasetId(dataset.getDatasetId());
+					datasetDto.setName(dataset.getDatasetName());
+					sampleDTO.getDatasets().add(datasetDto);
+				}
+			}
+			sampleDTOs.add(sampleDTO);
 		}
 
-		return new ArrayList<>(sampleDTOMap.values());
+		return sampleDTOs;
 	}
 
 	@SuppressWarnings("rawtypes")
