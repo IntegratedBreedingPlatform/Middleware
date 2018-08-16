@@ -39,6 +39,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -76,8 +77,11 @@ public class WorkbookBuilder extends Builder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilder.class);
 
+	private DaoFactory daoFactory;
+
 	public WorkbookBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	/**
@@ -236,7 +240,7 @@ public class WorkbookBuilder extends Builder {
 		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.populateBreedingMethodPossibleValues");
 
 		try {
-			final CVTerm breedingMethodProperty = this.getCvTermDao().getById(TermId.BREEDING_METHOD_PROP.getId());
+			final CVTerm breedingMethodProperty = daoFactory.getCvTermDao().getById(TermId.BREEDING_METHOD_PROP.getId());
 			List<ValueReference> possibleBreedingMethodValues = null;
 			for (final MeasurementVariable variable : variates) {
 				if (variable.getProperty().equals(breedingMethodProperty.getName())) {

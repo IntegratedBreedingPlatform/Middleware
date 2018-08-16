@@ -38,7 +38,7 @@ import com.google.common.cache.CacheBuilder;
  */
 @Transactional
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
-
+	
 	/**
 	 * Caching all the users in the system. Max is ten because we do not expect
 	 * to have more than 10 war filed. Each war file will create on cache.
@@ -66,7 +66,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<Person>> functionBasedLocalPersonGuavaCacheLoader;
 
-	private DaoFactory daoFactory;
+	private static DaoFactory daoFactory;
 
 	public UserDataManagerImpl() {
 		super();
@@ -94,7 +94,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 					@Override
 					public List<Person> apply(final String key) {
-						return UserDataManagerImpl.this.getPersonDao().getAll();
+						return UserDataManagerImpl.daoFactory.getPersonDAO().getAll();
 					}
 				});
 	}
@@ -179,7 +179,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
 		final List<Person> toReturn = new ArrayList<Person>();
-		final PersonDAO dao = this.getPersonDao();
+		final PersonDAO dao = daoFactory.getPersonDAO();
 		final List<Person> persons = dao.getAll();
 		Collections.sort(persons);
 		toReturn.addAll(persons);
@@ -188,7 +188,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public long countAllPersons() throws MiddlewareQueryException {
-		return this.countAll(this.getPersonDao());
+		return this.countAll(daoFactory.getPersonDAO());
 	}
 
 	@Override
@@ -197,7 +197,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			UserDataManagerImpl.localUserCache.invalidateAll();
 			UserDataManagerImpl.localPersonCache.invalidateAll();
-			final PersonDAO dao = this.getPersonDao();
+			final PersonDAO dao = daoFactory.getPersonDAO();
 			final Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
 		} catch (final Exception e) {
@@ -211,7 +211,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public Person getPersonById(final int id) throws MiddlewareQueryException {
-		return this.getPersonDao().getById(id, false);
+		return daoFactory.getPersonDAO().getById(id, false);
 	}
 
 	@Override
@@ -219,7 +219,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			UserDataManagerImpl.localUserCache.invalidateAll();
 			UserDataManagerImpl.localPersonCache.invalidateAll();
-			this.getPersonDao().makeTransient(person);
+			daoFactory.getPersonDAO().makeTransient(person);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): "
@@ -230,7 +230,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public boolean isPersonExists(final String firstName, final String lastName) throws MiddlewareQueryException {
-		if (this.getPersonDao().isPersonExists(firstName, lastName)) {
+		if (daoFactory.getPersonDAO().isPersonExists(firstName, lastName)) {
 			return true;
 		}
 		return false;
@@ -252,7 +252,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public Person getPersonByName(final String firstName, final String middleName, final String lastName)
 			throws MiddlewareQueryException {
-		return this.getPersonDao().getPersonByName(firstName, middleName, lastName);
+		return daoFactory.getPersonDAO().getPersonByName(firstName, middleName, lastName);
 	}
 
 	@Override
@@ -263,7 +263,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public Person getPersonByEmail(final String email) throws MiddlewareQueryException {
-		return this.getPersonDao().getPersonByEmail(email);
+		return daoFactory.getPersonDAO().getPersonByEmail(email);
 	}
 
 	@Override

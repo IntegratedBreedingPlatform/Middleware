@@ -22,12 +22,16 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Database;
 
 public class TraitGroupBuilder extends Builder {
 
+	private DaoFactory daoFactory;
+
 	public TraitGroupBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	/**
@@ -66,7 +70,7 @@ public class TraitGroupBuilder extends Builder {
 	 */
 	private List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
 		List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
-		traitClasses.addAll(this.getCvTermDao().getAllTraitClasses());
+		traitClasses.addAll(daoFactory.getCvTermDao().getAllTraitClasses());
 		Collections.sort(traitClasses);
 		return traitClasses;
 	}
@@ -103,7 +107,7 @@ public class TraitGroupBuilder extends Builder {
 		}
 		Collections.sort(traitClassIds);
 
-		Map<Integer, List<PropertyReference>> retrievedProperties = this.getCvTermDao().getPropertiesOfTraitClasses(traitClassIds);
+		Map<Integer, List<PropertyReference>> retrievedProperties = daoFactory.getCvTermDao().getPropertiesOfTraitClasses(traitClassIds);
 
 		if (!retrievedProperties.isEmpty()) {
 			for (TraitClassReference traitClass : traitClasses) {
@@ -127,7 +131,7 @@ public class TraitGroupBuilder extends Builder {
 		Collections.sort(propertyIds);
 
 		Map<Integer, List<StandardVariableReference>> retrievedVariables =
-				this.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
+				daoFactory.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
 
 		if (!retrievedVariables.isEmpty()) {
 			for (PropertyReference property : traitClassProperties) {

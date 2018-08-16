@@ -98,8 +98,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	public void setUp() throws Exception {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.formulaDAO = daoFactory.getFormulaDAO();
-		this.cvTermDAO = new CVTermDao();
-		this.cvTermDAO.setSession(this.sessionProvder.getSession());
+		this.cvTermDAO = daoFactory.getCvTermDao();
 		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
 		this.testProject = instance.createTestProjectData();
 		ContextHolder.setCurrentProgram(this.testProject.getUniqueID());

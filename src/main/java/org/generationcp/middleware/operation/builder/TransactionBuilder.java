@@ -71,7 +71,7 @@ public class TransactionBuilder extends Builder {
 			gids.add(lot.getEntityId());
 		}
 
-		List<Transaction> existingTransactions = this.getTransactionDao().getByLotIds(lotIds);
+		List<Transaction> existingTransactions = daoFactory.getTransactionDAO().getByLotIds(lotIds);
 
 		if (gids != null && !gids.isEmpty()) {
 			for (Transaction transaction : existingTransactions) {

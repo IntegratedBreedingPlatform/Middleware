@@ -34,9 +34,7 @@ public class FormulaDAOTest extends IntegrationTestBase {
 	public void setup() {
 		daoFactory = new DaoFactory(this.sessionProvder);
 		this.formulaDAO = daoFactory.getFormulaDAO();
-
-		this.cvtermDAO = new CVTermDao();
-		this.cvtermDAO.setSession(this.sessionProvder.getSession());
+		this.cvtermDAO = daoFactory.getCvTermDao();
 	}
 
 	@Test

@@ -17,17 +17,21 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class CvTermSaver extends Saver {
 
+	private DaoFactory daoFactory;
+
 	public CvTermSaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public Term save(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException {
 		this.validateInputFields(name, definition);
-		CVTermDao dao = this.getCvTermDao();
+		CVTermDao dao = daoFactory.getCvTermDao();
 		CVTerm cvTerm = this.create(name, definition, cvId.getId(), false, false);
 		dao.save(cvTerm);
 
@@ -36,7 +40,7 @@ public class CvTermSaver extends Saver {
 
 	public Term update(Term term) throws MiddlewareException, MiddlewareQueryException {
 		this.validateInputFields(term.getName(), term.getDefinition());
-		CVTermDao dao = this.getCvTermDao();
+		CVTermDao dao = daoFactory.getCvTermDao();
 
 		CVTerm cvTerm = dao.getById(term.getId());
 
@@ -74,7 +78,7 @@ public class CvTermSaver extends Saver {
 	}
 
 	public void delete(CVTerm cvTerm, CvId cvId) throws MiddlewareQueryException {
-		CVTermDao dao = this.getCvTermDao();
+		CVTermDao dao = daoFactory.getCvTermDao();
 		try {
 			dao.makeTransient(cvTerm);
 		} catch (MiddlewareQueryException e) {

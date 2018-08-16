@@ -42,6 +42,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.Location;
@@ -75,8 +76,11 @@ public class WorkbookSaver extends Saver {
 	private static final String VARIABLETYPEMAP = "variableTypeMap";
 	private static final String MEASUREMENTVARIABLEMAP = "measurementVariableMap";
 
+	private DaoFactory daoFactory;
+
 	public WorkbookSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	/**
@@ -403,7 +407,7 @@ public class WorkbookSaver extends Saver {
 
 		watch.restart("save geolocation");
 
-		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, this.getLocationDAO());
+		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
 
 		final Geolocation g = this.getGeolocationSaver()
 				.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
@@ -467,7 +471,7 @@ public class WorkbookSaver extends Saver {
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
 
-							this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, this.getLocationDAO());
+							this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
 
 							final Geolocation g = this.getGeolocationSaver()
 									.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
