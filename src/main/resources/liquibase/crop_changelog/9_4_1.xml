@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="vanina" id="v9.4.1-1">
+	<changeSet author="vanina" id="v9.4.1-8">
 		<preConditions onFail="CONTINUE">
 			<and>
 				<tableExists tableName="plant_samples"/>
