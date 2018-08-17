@@ -60,4 +60,17 @@
 			DROP TABLE projectprop_objective_bkp;
  		</sql>
  	</changeSet>
+	<changeSet author="vanina" id="v9.4.1-8">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<tableExists tableName="plant_samples"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM plant_samples;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE plant_samples;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
