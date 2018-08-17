@@ -31,6 +31,7 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -288,7 +289,11 @@ public class SampleDaoTest extends IntegrationTestBase {
 			experimentStock.setExperiment(experimentModel);
 			experimentStock.setStock(stockModel);
 			experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
-			experimentStockDao.saveOrUpdate(experimentStock);
+
+			final List<ExperimentStock> experimentStocks = new ArrayList<>();
+			experimentStocks.add(experimentStock);
+			experimentModel.setExperimentStocks(experimentStocks);
+			experimentDao.saveOrUpdate(experimentModel);
 
 			final Plant plant = PlantTestDataInitializer.createPlant();
 			plant.setExperiment(experimentModel);
