@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="vanina" id="v9.4.1-1">
+ 		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="projectprop_old"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE projectprop_old;
+		</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.4.1-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="projectprop_study_title_bkp"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE projectprop_study_title_bkp;
+		</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.4.1-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="projectprop_study_type_bkp"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE projectprop_study_type_bkp;
+		</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.4.1-4">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="projectprop_created_by_bkp"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE projectprop_created_by_bkp;
+		</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.4.1-5">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="projectprop_dates_bkp"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE projectprop_dates_bkp;
+		</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.4.1-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="projectprop_name_bkp"/>
+ 		</preConditions>
+ 		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE projectprop_name_bkp;
+		</sql>
+	</changeSet>
+	<changeSet author="vanina" id="v9.4.1-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="projectprop_objective_bkp"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE projectprop_objective_bkp;
+ 		</sql>
+ 	</changeSet>
+</databaseChangeLog>
