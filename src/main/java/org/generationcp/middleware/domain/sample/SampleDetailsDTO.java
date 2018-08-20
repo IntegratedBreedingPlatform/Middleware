@@ -41,6 +41,8 @@ public class SampleDetailsDTO implements Serializable {
 	private Integer entryNumber;
 	private String plotNumber;
 	private Integer sampleEntryNo;
+	private String plateId;
+	private String well;
 
 	public SampleDetailsDTO() {
 
@@ -280,5 +282,21 @@ public class SampleDetailsDTO implements Serializable {
 
 	public SimpleDateFormat getDateFormat() {
 		return dateFormat;
+	}
+
+	public String getPlateId() {
+		return plateId;
+	}
+
+	public void setPlateId(String plateId) {
+		this.plateId = plateId;
+	}
+
+	public String getWell() {
+		return well;
+	}
+
+	public void setWell(String well) {
+		this.well = well;
 	}
 }
