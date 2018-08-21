@@ -718,6 +718,11 @@ public class SampleListServiceImplTest {
 		final Map<String, SamplePlateInfo> samplePlateInfoMap = this.createSamplePlateInfoMap();
 		final SampleList sampleList = this.createSampleList();
 
+		for(Sample sample: sampleList.getSamples()){
+			Assert.assertEquals(null, sample.getPlateId());
+			Assert.assertEquals(null, sample.getWell());
+		}
+		
 		when(sampleListDao.getById(sampleListId)).thenReturn(sampleList);
 
 		this.sampleListService.updateSamplePlateInfo(sampleListId, samplePlateInfoMap);
@@ -733,6 +738,39 @@ public class SampleListServiceImplTest {
 		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
 
 	}
+	
+	@Test
+	public void testUpdateASamplePlateInfoFromSampleList() {
+
+		final int sampleListId = 1;
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = new HashMap<>();
+		final String plantBusinessKey2 = "BusinessKey2";
+		final SamplePlateInfo plateInfo2 = new SamplePlateInfo();
+		plateInfo2.setPlateId("PlateId2");
+		plateInfo2.setWell("Well2");
+
+		samplePlateInfoMap.put(plantBusinessKey2, plateInfo2);
+
+		final SampleList sampleList = this.createSampleList();
+
+		for(Sample sample: sampleList.getSamples()){
+			Assert.assertEquals(null, sample.getPlateId());
+			Assert.assertEquals(null, sample.getWell());
+		}
+
+		when(sampleListDao.getById(sampleListId)).thenReturn(sampleList);
+
+		this.sampleListService.updateSamplePlateInfo(sampleListId, samplePlateInfoMap);
+
+		final Sample sample = sampleList.getSamples().get(1);
+
+		Assert.assertEquals("PlateId2", sample.getPlateId());
+		Assert.assertEquals("Well2", sample.getWell());
+
+		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
+
+	}
+	
 
 	private SampleList createSampleList() {
 
