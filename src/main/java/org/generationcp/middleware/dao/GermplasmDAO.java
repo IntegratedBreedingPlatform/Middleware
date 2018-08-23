@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -35,6 +36,8 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -636,6 +639,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final String message = "Error executing GermplasmDAO.getGroupMembersByGroupId(mgid={}) : {}";
 			GermplasmDAO.LOG.error(message, mgid, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
+		try {
+			return (PedigreeDTO) this.getSession().createSQLQuery(Germplasm.GET_PEDIGREE) //
+				.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("crossingPlan")
+				.addScalar("crossingYear", new IntegerType()).addScalar("parent1DbId").addScalar("parent1Name").addScalar("parent1Type")
+				.addScalar("parent2DbId").addScalar("parent2Name").addScalar("parent2Type")
+				.setParameter("gid", germplasmDbId) //
+				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.class)) //
+				.uniqueResult();
+		} catch (final HibernateException e) {
+			GermplasmDAO.LOG.error(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
 

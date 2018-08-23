@@ -15,6 +15,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -23,6 +24,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,10 +33,14 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
@@ -250,6 +256,35 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		groupMembers = this.dao.getManagementGroupMembers(0);
 		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = 0.", groupMembers.isEmpty());
+	}
+
+	@Test
+	public void testGetPedigree() throws ParseException {
+		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		this.dao.save(femaleParent);
+		this.dao.save(maleParent);
+
+		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		cross.setGpid1(femaleParent.getGid());
+		cross.setGpid2(maleParent.getGid());
+		cross.setGnpgs(2);
+		this.dao.save(cross);
+
+		final Germplasm advance = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		advance.setGpid1(cross.getGid());
+		advance.setGpid2(cross.getGid());
+		advance.setGnpgs(-1);
+		this.dao.save(advance);
+
+		final PedigreeDTO pedigree = this.dao.getPedigree(advance.getGid(), null);
+
+		Assert.assertThat(pedigree.getGermplasmDbId(), is(advance.getGid()));
+		Assert.assertThat(pedigree.getParent1DbId(), is(femaleParent.getGid()));
+		Assert.assertThat(pedigree.getParent2DbId(), is(maleParent.getGid()));
+		final Date gdate = Util.parseDate(String.valueOf(advance.getGdate()), Util.DATE_AS_NUMBER_FORMAT);
+		final Integer year = Integer.valueOf(Util.getSimpleDateFormat("yyyy").format(gdate));
+		Assert.assertThat(pedigree.getCrossingYear(), is(year));
 	}
 
 	@Test
