@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.hibernate.HibernateException;
@@ -19,37 +20,40 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TermDataManagerImpl extends DataManager implements TermDataManager {
 
+	private DaoFactory daoFactory;
+
 	public TermDataManagerImpl() {
 
 	}
 
 	public TermDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
 	public Term getTermById(final Integer termId) throws MiddlewareException {
-		return Term.fromCVTerm(this.getCvTermDao().getById(termId));
+		return Term.fromCVTerm(daoFactory.getCvTermDao().getById(termId));
 	}
 
 	@Override
 	public Term getTermByNameAndCvId(final String name, final int cvId) throws MiddlewareException {
-		return Term.fromCVTerm(this.getCvTermDao().getByNameAndCvId(name, cvId));
+		return Term.fromCVTerm(daoFactory.getCvTermDao().getByNameAndCvId(name, cvId));
 	}
 
 	@Override
 	public Term getTermByName(final String name) throws MiddlewareException {
-		return Term.fromCVTerm(this.getCvTermDao().getByName(name));
+		return Term.fromCVTerm(daoFactory.getCvTermDao().getByName(name));
 	}
 
 	@Override
 	public List<Term> getTermByCvId(final int cvId) throws MiddlewareException {
-		return this.getCvTermDao().getTermByCvId(cvId);
+		return daoFactory.getCvTermDao().getTermByCvId(cvId);
 	}
 
 	@Override
 	public boolean isTermReferred(final int termId) {
-		return this.getCvTermRelationshipDao().isTermReferred(termId);
+		return daoFactory.getCvTermRelationshipDao().isTermReferred(termId);
 	}
 
 	@Override
@@ -103,6 +107,6 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 
 	@Override
 	public List<String> getCategoriesReferredInPhenotype(final int scaleId) {
-		return this.getCvTermRelationshipDao().getCategoriesReferredInPhenotype(scaleId);
+		return daoFactory.getCvTermRelationshipDao().getCategoriesReferredInPhenotype(scaleId);
 	}
 }

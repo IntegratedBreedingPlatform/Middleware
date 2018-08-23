@@ -21,6 +21,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -45,6 +46,8 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	public static final String SITE_SOIL_PH_TERMID = "9999";
 	private static ProjectPropertyDao projectPropDao;
 	private static CVTermDao cvTermDao;
+
+	private DaoFactory daoFactory;
 	
 	@Autowired
 	private GermplasmDataManager germplasmManager;
@@ -63,11 +66,11 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
+		daoFactory = new DaoFactory(this.sessionProvder);
+		cvTermDao = daoFactory.getCvTermDao();
 
 		projectPropDao = new ProjectPropertyDao();
 		projectPropDao.setSession(this.sessionProvder.getSession());
-		cvTermDao = new CVTermDao();
-		cvTermDao.setSession(this.sessionProvder.getSession());
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
 		}

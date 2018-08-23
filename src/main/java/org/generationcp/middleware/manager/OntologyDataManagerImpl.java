@@ -58,11 +58,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	public static final String DELETE_TERM_ERROR_MESSAGE = "The term you selected cannot be deleted";
 
+	private DaoFactory daoFactory;
+
 	public OntologyDataManagerImpl() {
 	}
 
 	public OntologyDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -230,7 +233,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) {
 		Set<StandardVariable> standardVariables = new HashSet<>();
-		List<Integer> stdVarIds = this.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
+		List<Integer> stdVarIds = daoFactory.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
 		for (Integer stdVarId : stdVarIds) {
 			standardVariables.add(this.getStandardVariable(stdVarId, programUUID));
 		}
@@ -278,14 +281,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public long countTermsByCvId(CvId cvId) {
-		return this.getCvTermDao().countTermsByCvId(cvId);
+		return daoFactory.getCvTermDao().countTermsByCvId(cvId);
 	}
 
 	@Override
 	public List<Term> getMethodsForTrait(Integer traitId) {
 		List<Term> methodTerms = new ArrayList<>();
 		Set<Integer> methodIds = new HashSet<>();
-		List<Integer> localMethodIds = this.getCvTermDao().findMethodTermIdsByTrait(traitId);
+		List<Integer> localMethodIds = daoFactory.getCvTermDao().findMethodTermIdsByTrait(traitId);
 		if (localMethodIds != null) {
 			methodIds.addAll(localMethodIds);
 		}
@@ -299,7 +302,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public List<Term> getScalesForTrait(Integer traitId) {
 		List<Term> scaleTerms = new ArrayList<>();
 		Set<Integer> scaleIds = new HashSet<>();
-		List<Integer> localMethodIds = this.getCvTermDao().findScaleTermIdsByTrait(traitId);
+		List<Integer> localMethodIds = daoFactory.getCvTermDao().findScaleTermIdsByTrait(traitId);
 		if (localMethodIds != null) {
 			scaleIds.addAll(localMethodIds);
 		}
@@ -380,7 +383,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		TreeMap<String, StandardVariable> standardVariables = new TreeMap<>();
 		List<Integer> localStdVariableIds = new ArrayList<>();
 
-		localStdVariableIds = this.getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
+		localStdVariableIds = daoFactory.getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
 
 		for (Integer stdVarId : localStdVariableIds) {
 			StandardVariable sd = this.getStandardVariableBuilder().create(stdVarId, programUUID);
@@ -415,9 +418,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		List<CVTerm> cvTerms = new ArrayList<>();
 		List<Integer> termIds = new ArrayList<>();
 
-		termIds = this.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
+		termIds = daoFactory.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
 		for (Integer id : termIds) {
-			cvTerms.add(this.getCvTermDao().getById(id));
+			cvTerms.add(daoFactory.getCvTermDao().getById(id));
 		}
 		for (CVTerm cvTerm : cvTerms) {
 			terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
@@ -537,7 +540,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) {
 		Term typeTerm = this.getTermById(typeId);
 		if (typeTerm != null) {
-			CVTermRelationship cvRelationship = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
+			CVTermRelationship cvRelationship = daoFactory.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
 			// add the relationship
 			if (cvRelationship == null) {
 				this.getTermRelationshipSaver().save(subjectId, typeId, objectId);
@@ -579,7 +582,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public long countIsAOfProperties() {
 		long count = 0;
-		count += this.getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
+		count += daoFactory.getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
 		return count;
 	}
 
@@ -638,7 +641,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		// For property, scale, method
-		List<Integer> standardVariableIds = this.getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
+		List<Integer> standardVariableIds = daoFactory.getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
 		for (Integer id : standardVariableIds) {
 			standardVariables.add(this.getStandardVariable(id, programUUID));
 		}
@@ -648,14 +651,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	private List<StandardVariable> getStandardVariablesOfTraitClass(Integer traitClassId, String programUUID) {
 		List<StandardVariable> standardVariables = new ArrayList<>();
-		List<PropertyReference> properties = this.getCvTermDao().getPropertiesOfTraitClass(traitClassId);
+		List<PropertyReference> properties = daoFactory.getCvTermDao().getPropertiesOfTraitClass(traitClassId);
 
 		List<Integer> propertyIds = new ArrayList<>();
 		for (PropertyReference property : properties) {
 			propertyIds.add(property.getId());
 		}
 
-		Map<Integer, List<StandardVariableReference>> propertyVars = this.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
+		Map<Integer, List<StandardVariableReference>> propertyVars = daoFactory.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
 
 		for (Integer propId : propertyIds) {
 			List<StandardVariableReference> stdVarRefs = propertyVars.get(propId);
@@ -815,7 +818,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
 
-				this.getTermSaver().delete(this.getCvTermDao().getById(cvTermId), cvId);
+				this.getTermSaver().delete(daoFactory.getCvTermDao().getById(cvTermId), cvId);
 
 			} else {
 				throw new MiddlewareQueryException("variables cannot be used in this method");
@@ -831,21 +834,21 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             return null;
         }
 
-        return getCvTermRelationshipDao().retrieveAnalysisDerivedVariableID(originalVariableTermID, analysisMethodID);
+        return daoFactory.getCvTermRelationshipDao().retrieveAnalysisDerivedVariableID(originalVariableTermID, analysisMethodID);
 	}
 
 	@Override
 	public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) {
 
 		try {
-			if (this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
+			if (daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
 				this.validateTermRelationshipsForDeletion(cvTermId);
 			}
 
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
 
 				this.deleteCvTermRelationship(cvTermId, typeId);
-				this.getTermSaver().delete(this.getCvTermDao().getById(cvTermId), cvId);
+				this.getTermSaver().delete(daoFactory.getCvTermDao().getById(cvTermId), cvId);
 
 			} else {
 				throw new MiddlewareQueryException("variables cannot be used in this method");
@@ -861,8 +864,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	private void validateTermRelationshipsForDeletion(int cvTermId) {
 
-		if (this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
-			if (this.getCvTermDao().getById(this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv()
+		if (daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
+			if (daoFactory.getCvTermDao().getById(daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv()
 					.equals(CvId.PROPERTIES.getId())) {
 				throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(),
 						OntologyDataManagerImpl.DELETE_TERM_ERROR_MESSAGE);
@@ -880,7 +883,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	private void deleteCvTermRelationship(int subjectId, int typeId) {
 		Term typeTerm = this.getTermById(typeId);
 		if (typeTerm != null) {
-			CVTermRelationship cvRelationship = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
+			CVTermRelationship cvRelationship = daoFactory.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
 			if (cvRelationship != null) {
 				this.getTermRelationshipSaver().deleteRelationship(cvRelationship);
 			}
@@ -889,7 +892,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public List<Property> getAllPropertiesWithTraitClass() {
-		List<Property> properties = this.getCvTermDao().getAllPropertiesWithTraitClass();
+		List<Property> properties = daoFactory.getCvTermDao().getAllPropertiesWithTraitClass();
 		Collections.sort(properties, new Comparator<Property>() {
 
 			@Override

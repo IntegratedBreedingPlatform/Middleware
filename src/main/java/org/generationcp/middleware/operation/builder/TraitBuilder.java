@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class TraitBuilder extends Builder {
@@ -33,8 +34,11 @@ public class TraitBuilder extends Builder {
 	private static final List<Integer> NUMERIC_VARIABLE_TYPE = Arrays.asList(TermId.NUMERIC_VARIABLE.getId(),
 			TermId.DATE_VARIABLE.getId());
 
+	private DaoFactory daoFactory;
+
 	public TraitBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds) {
@@ -45,7 +49,7 @@ public class TraitBuilder extends Builder {
 		// Get locationCount, germplasmCount, observationCount, minValue,
 		// maxValue
 		// Retrieve traits environments
-		variableTerms.addAll(this.getCvTermDao().getVariablesByType(TraitBuilder.NUMERIC_VARIABLE_TYPE));
+		variableTerms.addAll(daoFactory.getCvTermDao().getVariablesByType(TraitBuilder.NUMERIC_VARIABLE_TYPE));
 		variableIds.addAll(this.getVariableIds(variableTerms));
 		numericTraitInfoList.addAll(this.getPhenotypeDao().getNumericTraitInfoList(environmentIds, variableIds));
 
@@ -77,7 +81,7 @@ public class TraitBuilder extends Builder {
 		final List<CVTerm> variableTerms = new ArrayList<>();
 
 		// Get character variable terms
-		variableTerms.addAll(this.getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId())));
+		variableTerms.addAll(daoFactory.getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId())));
 
 		// Get location, germplasm and observation counts
 		final List<TraitInfo> traitInfoList = this.getTraitCounts(this.getVariableIds(variableTerms), environmentIds);
@@ -138,7 +142,7 @@ public class TraitBuilder extends Builder {
 		// Set name, description and get categorical domain values and count per
 		// value
 		if (!localCategTraitList.isEmpty()) {
-			finalTraitInfoList.addAll(this.getCvTermDao().setCategoricalVariables(localCategTraitList));
+			finalTraitInfoList.addAll(daoFactory.getCvTermDao().setCategoricalVariables(localCategTraitList));
 			this.getPhenotypeDao().setCategoricalTraitInfoValues(finalTraitInfoList, environmentIds);
 		}
 

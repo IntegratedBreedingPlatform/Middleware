@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.gms.ListDataColumn;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -15,12 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ListDataPropertySaver extends Saver {
 
+	private DaoFactory daoFactory;
+
 	public ListDataPropertySaver() {
 		super();
 	}
 	
 	public ListDataPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public List<ListDataInfo> saveProperties(List<ListDataInfo> listDataCollection) throws MiddlewareQueryException {
@@ -30,7 +34,7 @@ public class ListDataPropertySaver extends Saver {
 			for (ListDataInfo listDataObj : listDataCollection) {
 				Integer listDataId = listDataObj.getListDataId();
 				if (listDataId != null) {
-					GermplasmListData listData = this.getGermplasmListDataDAO().getById(listDataId);
+					GermplasmListData listData = daoFactory.getGermplasmListDataDAO().getById(listDataId);
 
 					if (listData != null) {
 						for (ListDataColumn column : listDataObj.getColumns()) {

@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -42,12 +43,15 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private OntologyMethodDataManager manager;
 
-	private final CVTermDao dao = new CVTermDao();
+	private DaoFactory daoFactory;
+
+	private CVTermDao cvTermDao;
 	private final CvTermPropertyDao propertyDao = new CvTermPropertyDao();
 
 	@Before
 	public void setUp() throws Exception {
-		this.dao.setSession(this.sessionProvder.getSession());
+		daoFactory = new DaoFactory(this.sessionProvder);
+		cvTermDao = daoFactory.getCvTermDao();
 		this.propertyDao.setSession(this.sessionProvder.getSession());
 	}
 
@@ -62,9 +66,9 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 		TestDataHelper.fillTestMethodsCvTerms(methodTerms, 3);
 
 		Map<Integer, CVTerm> termMap = new HashMap<>();
-		// save 3 methods using dao
+		// save 3 methods using cvTermDao
 		for (CVTerm term : methodTerms) {
-			this.dao.save(term);
+			this.cvTermDao.save(term);
 			termMap.put(term.getCvTermId(), term);
 		}
 
@@ -127,9 +131,9 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	 * */
 	@Test
 	public void testGetMethodByIdShouldGetFullMethodWithIdSupplied() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using cvTermDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		this.dao.save(methodTerm);
+		this.cvTermDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
 		Calendar cal = Calendar.getInstance();
@@ -175,7 +179,7 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 
 		this.manager.addMethod(method);
 
-		CVTerm cvterm = this.dao.getById(method.getId());
+		CVTerm cvterm = this.cvTermDao.getById(method.getId());
 
 		// Make sure each method data inserted properly, assert them and display proper message if not inserted properly
 		String message = "The %s for method '" + method.getId() + "' was not added correctly.";
@@ -196,9 +200,9 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	 */
 	@Test
 	public void testUpdateMethodShouldUpdateExistingMethod() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using cvTermDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		this.dao.save(methodTerm);
+		this.cvTermDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
 		Calendar cal = Calendar.getInstance();
@@ -217,7 +221,7 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 		method.setDefinition("New Method Definition");
 		this.manager.updateMethod(method);
 
-		CVTerm cvterm = this.dao.getById(method.getId());
+		CVTerm cvterm = this.cvTermDao.getById(method.getId());
 
 		// Make sure the inserted data should come as they are inserted and Display proper message if the data doesn't come as expected
 		String message = "The %s for method '" + method.getId() + "' was not updated correctly.";
@@ -255,9 +259,9 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	 */
 	@Test
 	public void testDeleteMethodShouldDeleteExistingMethod() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using cvTermDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		this.dao.save(methodTerm);
+		this.cvTermDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
 		Calendar cal = Calendar.getInstance();
@@ -283,7 +287,7 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 		// Delete the method
 		this.manager.deleteMethod(methodTerm.getCvTermId());
 
-		CVTerm cvterm = this.dao.getById(methodTerm.getCvTermId());
+		CVTerm cvterm = this.cvTermDao.getById(methodTerm.getCvTermId());
 
 		// Make sure the method must be deleted and it asserts null
 		String message = "The %s for method '" + methodTerm.getCvTermId() + "' was not deleted correctly.";
