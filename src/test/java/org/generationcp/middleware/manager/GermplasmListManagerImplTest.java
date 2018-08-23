@@ -134,7 +134,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.dataSetupTest.setDataImportService(this.dataImportService);
 		this.dataSetupTest.setGermplasmListManager(this.manager);
 		this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
-		this.testGermplasm = this.germplasmTDI.createGermplasmWithPreferredName();
+		this.testGermplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		this.dataManager.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName());
 
 		final GermplasmList germplasmListOther = this.germplasmListTDI
