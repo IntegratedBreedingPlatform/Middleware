@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -1002,6 +1003,8 @@ public interface GermplasmDataManager {
 	 * @return The parents for each germplasm in a study.
 	 */
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
+
+	PedigreeDTO getPedigree(Integer germplasmDbId, String notation);
 
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
