@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 import org.junit.Assert;
@@ -38,11 +39,12 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	private static final int METHOD_ENUMERATED = 4040;
 
 	private static CVTermDao dao;
+	private DaoFactory daoFactory;
 
 	@Before
 	public void setUp() throws Exception {
-		CvTermDaoTest.dao = new CVTermDao();
-		CvTermDaoTest.dao.setSession(this.sessionProvder.getSession());
+		daoFactory = new DaoFactory(this.sessionProvder);
+		CvTermDaoTest.dao = daoFactory.getCvTermDao();
 	}
 
 	@Test

@@ -14,6 +14,7 @@ import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
@@ -46,7 +47,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 	private SampleListDao sampleListDao;
 	private UserDAO userDao;
-	private PlantDao plantDao;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
 	private GeolocationDao geolocationDao;
@@ -57,19 +57,15 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 	private Integer listId;
 
+	private DaoFactory daoFactory;
+
 	@Before
 	public void setUp() throws Exception {
-		this.sampleListDao = new SampleListDao();
-		this.sampleListDao.setSession(this.sessionProvder.getSession());
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 
-		this.userDao = new UserDAO();
-		this.userDao.setSession(this.sessionProvder.getSession());
-
-		this.plantDao = new PlantDao();
-		this.plantDao.setSession(this.sessionProvder.getSession());
-
-		this.sampleDao = new SampleDao();
-		this.sampleDao.setSession(this.sessionProvder.getSession());
+		this.sampleListDao = daoFactory.getSampleListDao();
+		this.userDao = daoFactory.getUserDao();
+		this.sampleDao = daoFactory.getSampleDao();
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());

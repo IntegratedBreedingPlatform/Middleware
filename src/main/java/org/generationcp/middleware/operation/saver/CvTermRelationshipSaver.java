@@ -15,17 +15,21 @@ import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 
 public class CvTermRelationshipSaver extends Saver {
 
+	private DaoFactory daoFactory;
+
 	public CvTermRelationshipSaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	// Returns the id
 	public Integer save(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareException, MiddlewareQueryException {
-		CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
+		CVTermRelationshipDao dao = daoFactory.getCvTermRelationshipDao();
 		CVTermRelationship cvTermRelationship = this.create(subjectId, typeId, objectId);
 		dao.save(cvTermRelationship);
 
@@ -42,7 +46,7 @@ public class CvTermRelationshipSaver extends Saver {
 
 	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException,
 			MiddlewareQueryException {
-		CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
+		CVTermRelationshipDao dao = daoFactory.getCvTermRelationshipDao();
 		CVTermRelationship relationship = null;
 		try {
 			relationship = dao.saveOrUpdateRelationship(cvTermRelationship);
@@ -53,7 +57,7 @@ public class CvTermRelationshipSaver extends Saver {
 	}
 
 	public void deleteRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException {
-		CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
+		CVTermRelationshipDao dao = daoFactory.getCvTermRelationshipDao();
 		try {
 			dao.makeTransient(cvTermRelationship);
 		} catch (MiddlewareQueryException e) {

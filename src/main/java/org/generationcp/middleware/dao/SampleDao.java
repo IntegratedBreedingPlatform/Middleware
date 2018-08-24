@@ -288,26 +288,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return sample;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
-		final Map<Integer, Integer> map = new HashMap<>();
-		final List<Object[]> result = getSession()
-			.createCriteria(Sample.class, SAMPLE)
-			.createAlias(SAMPLE_PLANT, PLANT)
-			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
-			.add(Restrictions.in(SAMPLE_ID, sampleIds))
-			.setProjection(Projections.projectionList()
-				.add(Projections.property("sample.sampleId"))
-				.add(Projections.property("stock.dbxrefId")))
-			.list();
-		for (final Object[] row : result) {
-			map.put((Integer) row[0], (Integer) row[1]);
-		}
-		return map;
-	}
-
 	public List<SampleDTO> getBySampleBks(final Set<String> sampleUIDs) {
 		return getSampleDTOS(getSession().createCriteria(Sample.class, SAMPLE) //
 				.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs)));

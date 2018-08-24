@@ -12,7 +12,9 @@ import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInit
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
+import org.generationcp.middleware.manager.GermplasmListManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -30,6 +32,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	private static final int GROUP_ID = 0;
 	private static final int NO_OF_ENTRIES = 5;
 	private static ListInventoryBuilder listInventoryBuilder;
+	private static GermplasmListManager germplasmListManager;
 	private static List<Integer> gids;
 
 	@Autowired
@@ -46,10 +49,11 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	public void setUp() {
 		inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
+		germplasmListManager = new GermplasmListManagerImpl(this.sessionProvder);
 		gids = this.createListOfGermplasmIds(NO_OF_ENTRIES);
 		this.initializeGermplasms(gids);
 		germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES, gids);
-		this.listInventoryBuilder.getGermplasmListDAO().save(germplasmList);
+		germplasmListManager.addGermplasmList(germplasmList);
 	}
 
 	@Test

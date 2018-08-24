@@ -350,9 +350,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public void assignLocationIdVariableToEnvironmentDetailSection(final Workbook workbook) {
 
 		final Optional<MeasurementVariable> locationIdVariableInFactors =
-				findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbook.getFactors());
+			this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbook.getFactors());
 		final Optional<MeasurementVariable> locationIdVariableInConditions =
-				findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbook.getConditions());
+			this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), workbook.getConditions());
 		if (locationIdVariableInFactors.isPresent()) {
 			this.asssignMeasurementVariableToEnvironmentDetail(locationIdVariableInFactors.get());
 
@@ -376,7 +376,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// Creates a LOCATION_ID Variable with default value of "Unspecified Location".
 		// This variable will be added to an imported study with no LOCATION_ID Variable specified in the file.
 		final String unspecifiedLocationId = this.retrieveLocIdOfUnspecifiedLocation();
-		final MeasurementVariable variable = createMeasurementVariable(TermId.LOCATION_ID.getId(), unspecifiedLocationId, Operation.ADD,
+		final MeasurementVariable variable = this.createMeasurementVariable(TermId.LOCATION_ID.getId(), unspecifiedLocationId, Operation.ADD,
 				PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
 		variable.setName(Workbook.DEFAULT_LOCATION_ID_VARIABLE_ALIAS);
 		variable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -404,7 +404,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	protected String retrieveLocIdOfUnspecifiedLocation() {
 
 		String unspecifiedLocationId = "";
-		final List<Location> locations = locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+		final List<Location> locations = this.locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}
@@ -978,8 +978,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
-		if (workbook.getStudyDetails().getStudyType().getId() != NURSERY_STUDY_TYPE_ID && !trialVariablesTermIds
-				.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
+		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
 			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_STUDY_CONDITION));
 		}
