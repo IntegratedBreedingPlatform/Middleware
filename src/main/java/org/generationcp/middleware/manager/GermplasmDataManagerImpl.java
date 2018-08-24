@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
@@ -1571,4 +1572,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public NamingConfiguration getNamingConfigurationByName(final String name) {
 		return this.getNamingConfigurationDAO().getByName(name);
 	}
+
+	@Override
+	public GermplasmDTO getGermplasmDTOByGID (final Integer gid) {
+		// needed since a given germplasm could have been replaced by another germplasm
+		final Germplasm originalGermplasm = this.getGermplasmByGID(gid);
+
+		return null;
+	}
+
 }

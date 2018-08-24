@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
@@ -1166,4 +1167,6 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	NamingConfiguration getNamingConfigurationByName(String name);
+
+	GermplasmDTO getGermplasmDTOByGID (final Integer gid);
 }
