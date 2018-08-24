@@ -28,17 +28,21 @@ import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class TermBuilder extends Builder {
 
+	private DaoFactory daoFactory;
+
 	public TermBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public Term get(int termId) throws MiddlewareQueryException {
 		Term term = null;
-		term = TermBuilder.mapCVTermToTerm(this.getCvTermDao().getById(termId));
+		term = TermBuilder.mapCVTermToTerm(daoFactory.getCvTermDao().getById(termId));
 		return term;
 	}
 
@@ -56,7 +60,7 @@ public class TermBuilder extends Builder {
 
 	public List<Term> getTermsByCvId(CvId cvId) throws MiddlewareQueryException {
 		List<Term> terms = new ArrayList<Term>();
-		List<CVTerm> cvTerms = this.getCvTermDao().getTermsByCvId(cvId, 0, 0);
+		List<CVTerm> cvTerms = daoFactory.getCvTermDao().getTermsByCvId(cvId, 0, 0);
 		for (CVTerm cvTerm : cvTerms) {
 			terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
 		}
@@ -65,7 +69,7 @@ public class TermBuilder extends Builder {
 
 	public List<Term> getTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException {
 		List<Term> terms = new ArrayList<Term>();
-		List<CVTerm> cvTerms = this.getCvTermDao().getTermsByCvId(cvId, start, numOfRows);
+		List<CVTerm> cvTerms = daoFactory.getCvTermDao().getTermsByCvId(cvId, start, numOfRows);
 		for (CVTerm cvTerm : cvTerms) {
 			terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
 		}
@@ -77,7 +81,7 @@ public class TermBuilder extends Builder {
 	}
 
 	public Term findTermByName(String name, int cvId) throws MiddlewareQueryException {
-		return this.mapToTerm(this.getCvTermDao().getByNameAndCvId(name, cvId));
+		return this.mapToTerm(daoFactory.getCvTermDao().getByNameAndCvId(name, cvId));
 	}
 
 	private Term mapToTerm(CVTerm cvTerm) {
@@ -93,7 +97,7 @@ public class TermBuilder extends Builder {
 	public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException {
 		List<Term> terms = null;
 
-		List<CVTerm> cvTerms = this.getCvTermDao().getByIds(ids);
+		List<CVTerm> cvTerms = daoFactory.getCvTermDao().getByIds(ids);
 		if (cvTerms != null) {
 			terms = new ArrayList<Term>();
 			for (CVTerm cvTerm : cvTerms) {
@@ -110,7 +114,7 @@ public class TermBuilder extends Builder {
 		if (term == null) {
 			term = this.getTermSaver().save(name, name, cv);
 			// assign unclassified trait class
-			CVTerm cvTerm = this.getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
+			CVTerm cvTerm = daoFactory.getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
 			Integer typeClass = null;
 			if (cvTerm != null) {
 				typeClass = TermId.GENERAL_TRAIT_CLASS.getId();
@@ -124,17 +128,17 @@ public class TermBuilder extends Builder {
 
 	public Term getTermOfProperty(int termId, int cvId) throws MiddlewareQueryException {
 		Term term = null;
-		term = TermBuilder.mapCVTermToTerm(this.getCvTermDao().getTermOfProperty(termId, cvId));
+		term = TermBuilder.mapCVTermToTerm(daoFactory.getCvTermDao().getTermOfProperty(termId, cvId));
 		return term;
 	}
 
 	public Term getTermOfClassOfProperty(int termId, int cvId, int isATermId) throws MiddlewareQueryException {
 		Term term = null;
-		List<Integer> list = this.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(isATermId, termId);
+		List<Integer> list = daoFactory.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(isATermId, termId);
 		// since we're getting the isA relationship, we're only expecting only one object (only hasValue has many result)
 		if (list != null && !list.isEmpty()) {
 			Integer objectId = list.get(0);
-			term = TermBuilder.mapCVTermToTerm(this.getCvTermDao().getById(objectId));
+			term = TermBuilder.mapCVTermToTerm(daoFactory.getCvTermDao().getById(objectId));
 		}
 		return term;
 	}
@@ -142,12 +146,12 @@ public class TermBuilder extends Builder {
 	public List<org.generationcp.middleware.domain.oms.Scale> getAllInventoryScales() throws MiddlewareQueryException {
 		List<org.generationcp.middleware.domain.oms.Scale> list = 
 				new ArrayList<org.generationcp.middleware.domain.oms.Scale>();
-		list.addAll(this.getCvTermDao().getAllInventoryScales());
+		list.addAll(daoFactory.getCvTermDao().getAllInventoryScales());
 		return list;
 	}
 	
 	public org.generationcp.middleware.domain.oms.Scale getInventoryScaleByName(final String name) throws MiddlewareQueryException {
-		return this.getCvTermDao().getInventoryScaleByName(name);
+		return daoFactory.getCvTermDao().getInventoryScaleByName(name);
 	}
 	
 	public Term findOrSaveProperty(String name, String definition, String cropOntologyId, Set<String> traitClasses)
@@ -169,11 +173,11 @@ public class TermBuilder extends Builder {
 	
 	public Set<String> getDefaultTraitClasses() throws MiddlewareQueryException {
 		Set<String> traitClasses = new LinkedHashSet<String>();
-		CVTerm cvTerm = this.getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
+		CVTerm cvTerm = daoFactory.getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
 		if (cvTerm != null) {
 			traitClasses.add(cvTerm.getName());
 		} else {
-			cvTerm = this.getCvTermDao().getById(TermId.ONTOLOGY_TRAIT_CLASS.getId());
+			cvTerm = daoFactory.getCvTermDao().getById(TermId.ONTOLOGY_TRAIT_CLASS.getId());
 			if (cvTerm != null) {
 				traitClasses.add(cvTerm.getName());
 			}

@@ -21,7 +21,7 @@ public class GermplasmTestDataGenerator {
 	}
 
 	public Germplasm createGermplasmWithPreferredAndNonpreferredNames() {
-		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName();
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Name preferredName = germplasm.getPreferredName();
 		preferredName.setGermplasmId(germplasm.getGid());
 		this.germplasmDataManager.addGermplasm(germplasm, preferredName);

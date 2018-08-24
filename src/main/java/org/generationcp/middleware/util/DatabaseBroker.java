@@ -15,25 +15,17 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.ListDataPropertyDAO;
-import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
-import org.generationcp.middleware.dao.SampleDao;
-import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -76,9 +68,6 @@ import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.dao.gdms.TrackDataDAO;
 import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
-import org.generationcp.middleware.dao.ims.LotDAO;
-import org.generationcp.middleware.dao.ims.StockTransactionDAO;
-import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.*;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
@@ -136,12 +125,6 @@ public class DatabaseBroker {
 		return dmsProjectDao;
 	}
 
-	public CVTermDao getCvTermDao() {
-		final CVTermDao cvTermDao = new CVTermDao();
-		cvTermDao.setSession(this.getActiveSession());
-		return cvTermDao;
-	}
-
 	public StudyTypeDAO getStudyTypeDao() {
 		final StudyTypeDAO studyTypeDAO = new StudyTypeDAO();
 		studyTypeDAO.setSession(this.getActiveSession());
@@ -156,22 +139,10 @@ public class DatabaseBroker {
 		return new BreedersQueryDao(this.getActiveSession());
 	}
 
-	public CVTermRelationshipDao getCvTermRelationshipDao() {
-		final CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
-		cvTermRelationshipDao.setSession(this.getActiveSession());
-		return cvTermRelationshipDao;
-	}
-
 	public CountryDAO getCountryDao() {
 		final CountryDAO countryDao = new CountryDAO();
 		countryDao.setSession(this.getActiveSession());
 		return countryDao;
-	}
-
-	public UserDAO getUserDao() {
-		final UserDAO userDao = new UserDAO();
-		userDao.setSession(this.getActiveSession());
-		return userDao;
 	}
 
 	public CVDao getCvDao() {
@@ -256,12 +227,6 @@ public class DatabaseBroker {
 		final PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
 		phenotypeOutlierDao.setSession(this.getActiveSession());
 		return phenotypeOutlierDao;
-	}
-
-	public CvTermPropertyDao getCvTermPropertyDao() {
-		final CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
-		cvTermPropertyDao.setSession(this.getActiveSession());
-		return cvTermPropertyDao;
 	}
 
 	public VariableOverridesDao getVariableProgramOverridesDao() {
@@ -456,12 +421,6 @@ public class DatabaseBroker {
 		return germplasmSearchDao;
 	}
 
-	public LocationDAO getLocationDao() {
-		final LocationDAO locationDao = new LocationDAO();
-		locationDao.setSession(this.getActiveSession());
-		return locationDao;
-	}
-
 	public LocdesDAO getLocDesDao() {
 		final LocdesDAO locdesDao = new LocdesDAO();
 		locdesDao.setSession(this.getActiveSession());
@@ -486,12 +445,6 @@ public class DatabaseBroker {
 		return userDefinedFieldDao;
 	}
 
-	public LocationDAO getLocationDAO() {
-		final LocationDAO locationDao = new LocationDAO();
-		locationDao.setSession(this.getActiveSession());
-		return locationDao;
-	}
-
 	public LocdesDAO getLocdesDao() {
 		final LocdesDAO locdesDao = new LocdesDAO();
 		locdesDao.setSession(this.getActiveSession());
@@ -502,24 +455,6 @@ public class DatabaseBroker {
 		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
 		programFavoriteDao.setSession(this.getActiveSession());
 		return programFavoriteDao;
-	}
-
-	public GermplasmListDAO getGermplasmListDAO() {
-		final GermplasmListDAO germplasmListDao = new GermplasmListDAO();
-		germplasmListDao.setSession(this.getActiveSession());
-		return germplasmListDao;
-	}
-
-	public SampleListDao getSampleListDAO() {
-		final SampleListDao sampleListDao = new SampleListDao();
-		sampleListDao.setSession(this.getActiveSession());
-		return sampleListDao;
-	}
-
-	public GermplasmListDataDAO getGermplasmListDataDAO() {
-		final GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
-		germplasmListDataDao.setSession(this.getActiveSession());
-		return germplasmListDataDao;
 	}
 
 	public ListDataPropertyDAO getListDataPropertyDAO() {
@@ -534,38 +469,8 @@ public class DatabaseBroker {
 		return listDataProjectDao;
 	}
 
-	public LotDAO getLotDao() {
-		final LotDAO lotDao = new LotDAO();
-		lotDao.setSession(this.getActiveSession());
-		return lotDao;
-	}
-
-	public PersonDAO getPersonDao() {
-		final PersonDAO personDao = new PersonDAO();
-		personDao.setSession(this.getActiveSession());
-		return personDao;
-	}
-
-	public TransactionDAO getTransactionDao() {
-		final TransactionDAO transactionDao = new TransactionDAO();
-		transactionDao.setSession(this.getActiveSession());
-		return transactionDao;
-	}
-
-	public StockTransactionDAO getStockTransactionDAO() {
-		final StockTransactionDAO stockTransactionDAO = new StockTransactionDAO();
-		stockTransactionDAO.setSession(this.getActiveSession());
-		return stockTransactionDAO;
-	}
-
 	public TermPropertyBuilder getTermPropertyBuilder() {
 		return new TermPropertyBuilder(this.sessionProvider);
-	}
-
-	public SampleDao getSampleDao() {
-		final SampleDao sampleDao = new SampleDao();
-		sampleDao.setSession(this.getActiveSession());
-		return sampleDao;
 	}
 
 	// ================================ InventoryDataManager DAO Methods =============================
@@ -586,15 +491,6 @@ public class DatabaseBroker {
 		namingConfigurationDAO.setSession(this.getActiveSession());
 		return namingConfigurationDAO;
 	}
-
-	public FormulaDAO getFormulaDao() {
-
-		final FormulaDAO formulaDao = new FormulaDAO();
-		formulaDao.setSession(this.getActiveSession());
-		return formulaDao;
-
-	}
-
 
 	/**
 	 * Parse hibernate query result value to boolean with null check

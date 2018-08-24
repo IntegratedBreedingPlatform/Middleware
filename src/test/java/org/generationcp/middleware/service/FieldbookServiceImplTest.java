@@ -123,7 +123,6 @@ public class FieldbookServiceImplTest {
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
-		when(this.dbBroker.getLocationDAO()).thenReturn(this.locationDAO);
 		when(this.locationDataManager.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID))
 				.thenReturn(new ArrayList<Location>());
 	}

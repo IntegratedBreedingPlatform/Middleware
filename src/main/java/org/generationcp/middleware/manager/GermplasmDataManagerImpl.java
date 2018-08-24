@@ -65,6 +65,8 @@ import java.util.Set;
 @Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
 
+	private DaoFactory daoFactory;
+
 	private static final String GID_SEPARATOR_FOR_STORED_PROCEDURE_CALL = ",";
 
 	public GermplasmDataManagerImpl() {
@@ -72,10 +74,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	public GermplasmDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public GermplasmDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
+		daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -604,7 +608,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	@Deprecated
 	public Location getLocationByID(final Integer id) {
-		return this.getLocationDao().getById(id, false);
+		return daoFactory.getLocationDAO().getById(id, false);
 	}
 
 	/**
@@ -613,7 +617,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByIDs(final List<Integer> ids) {
-		return this.getLocationDao().getLocationByIds(ids);
+		return daoFactory.getLocationDAO().getLocationByIds(ids);
 	}
 
 	@Override
@@ -821,7 +825,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			if (!gids.isEmpty()) {
-				this.getTransactionDao().cancelUnconfirmedTransactionsForGermplasms(gids);
+				daoFactory.getTransactionDAO().cancelUnconfirmedTransactionsForGermplasms(gids);
 			}
 		}
 		return this.addOrUpdateGermplasms(germplasms, Operation.UPDATE);
@@ -992,7 +996,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	@Deprecated
 	public List<Location> getAllBreedingLocations() {
-		return this.getLocationDAO().getAllBreedingLocations();
+		return daoFactory.getLocationDAO().getAllBreedingLocations();
 	}
 
 	@Override
@@ -1079,7 +1083,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Map<Integer, String> getLocationNamesByGids(final List<Integer> gids) {
-		return this.getLocationDao().getLocationNamesMapByGIDs(gids);
+		return daoFactory.getLocationDAO().getLocationNamesMapByGIDs(gids);
 	}
 
 	@Override

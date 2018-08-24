@@ -238,6 +238,27 @@ public class Germplasm implements Serializable {
 					+ "   AND g.grplce = 0 \n" + "   AND ( l.liststatus != " + GermplasmListDAO.STATUS_DELETED
 					+ " OR l.liststatus IS NULL)";
 
+	public static final String GET_PEDIGREE = "SELECT groupSource.gid," //
+		+ "   g.gid as germplasmDbId," //
+		+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
+		+ "   m.mname AS crossingPlan," //
+		+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
+		+ "   femaleParent.gid as parent1DbId," //
+		+ "   femaleParentName.nval as parent1Name," //
+		+ "   if(femaleParent.gid is not null, 'FEMALE', null) as parent1Type," //
+		+ "   maleParent.gid as parent2DbId," //
+		+ "   maleParentName.nval as parent2Name," //
+		+ "   if(maleParent.gid is not null, 'MALE', null) as parent2Type" //
+		+ " FROM germplsm g" //
+		+ "   LEFT JOIN methods m ON m.mid = g.methn" //
+		//  considering groupSource itself in the generative case to simplify join with the parents"
+		+ "   LEFT JOIN germplsm groupSource ON (g.gpid1 = groupSource.gid AND g.gnpgs = -1) OR (groupSource.gid = g.gid AND g.gnpgs <> -1)" //
+		+ "   LEFT JOIN germplsm femaleParent ON groupSource.gpid1 = femaleParent.gid" //
+		+ "   LEFT JOIN names femaleParentName ON femaleParent.gid = femaleParentName.gid AND femaleParentName.nstat = 1" //
+		+ "   LEFT JOIN germplsm maleParent ON groupSource.gpid2 = maleParent.gid" //
+		+ "   LEFT JOIN names maleParentName ON maleParent.gid = maleParentName.gid AND maleParentName.nstat = 1" //
+		+ " WHERE g.gid = :gid AND g.deleted = 0 AND g.grplce = 0";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)

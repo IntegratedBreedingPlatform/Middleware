@@ -10,6 +10,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hamcrest.Matchers;
@@ -27,13 +28,13 @@ public class FormulaDAOTest extends IntegrationTestBase {
 	private CVTerm input1;
 	private CVTerm input2;
 
+	private DaoFactory daoFactory;
+
 	@Before
 	public void setup() {
-		this.formulaDAO = new FormulaDAO();
-		this.formulaDAO.setSession(this.sessionProvder.getSession());
-
-		this.cvtermDAO = new CVTermDao();
-		this.cvtermDAO.setSession(this.sessionProvder.getSession());
+		daoFactory = new DaoFactory(this.sessionProvder);
+		this.formulaDAO = daoFactory.getFormulaDAO();
+		this.cvtermDAO = daoFactory.getCvTermDao();
 	}
 
 	@Test
