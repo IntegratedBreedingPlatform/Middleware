@@ -85,7 +85,7 @@ public abstract class DataManager extends DatabaseBroker {
 
 	/**
 	 * Gets the parameter types of given parameters. <br/>
-	 * 
+	 *
 	 * @param parameters
 	 * @return Class[] of parameter types
 	 */
