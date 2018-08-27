@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -36,6 +37,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
@@ -1135,4 +1137,50 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 
 	}
+
+	public GermplasmDTO getGermplasmDTObyID(final Integer id) {
+
+		try {
+			final String sql = "SELECT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
+					+ "  (SELECT n.nval FROM names n " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.ftype = 'ACCNO' AND u.fldno = n.ntype)" //
+					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS accessionNumber, " //
+					+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
+					+ "  (SELECT a.aval FROM atributs a " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'ORI_COUN' AND u.fldno = a.atype)" //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS countryOfOriginCode, " //
+					+ "   (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) AS germplasmName," //
+					+ "  (SELECT n.nval FROM names n " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.ftype = 'GENUS' AND u.fldno = n.ntype)" //
+					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS genus," //
+					+ "   (SELECT ld.source FROM listdata ld" //
+					+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
+					+ "   (SELECT a.aval FROM atributs a " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SPNAM' AND u.fldno = a.atype)" //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
+					+ "   (SELECT a.aval FROM atributs a " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SPAUTH' AND u.fldno = a.atype)" //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS speciesAuthority, " //
+					+ "   (SELECT a.aval FROM atributs a " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SUBTAX' AND u.fldno = a.atype)" //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
+					+ "   (SELECT a.aval FROM atributs a " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'STAUTH' AND u.fldno = a.atype)" //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority " //
+					+ "  FROM germplsm g " //
+					+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.gid = :gid AND g.deleted = 0 AND g.grplce = 0"; //
+			final Object object =
+					this.getSession().createSQLQuery(sql).addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber")
+							.addScalar("acquisitionDate").addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus")
+							.addScalar("germplasmSeedSource").addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa")
+							.addScalar("subtaxaAuthority").setParameter("gid", id)
+							.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class)).uniqueResult();
+			return (object != null) ? (GermplasmDTO) object : null;
+		} catch (final HibernateException e) {
+			final String message = "Error with getGermplasmDTObyID(gid=" + id.toString() + ") " + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }

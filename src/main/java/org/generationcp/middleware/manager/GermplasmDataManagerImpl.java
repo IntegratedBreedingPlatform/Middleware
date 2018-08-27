@@ -1575,10 +1575,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public GermplasmDTO getGermplasmDTOByGID (final Integer gid) {
-		// needed since a given germplasm could have been replaced by another germplasm
-		final Germplasm originalGermplasm = this.getGermplasmByGID(gid);
-
-		return null;
+		return this.daoFactory.getGermplasmDao().getGermplasmDTObyID(gid);
 	}
 
 }
