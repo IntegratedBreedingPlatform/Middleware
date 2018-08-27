@@ -1,9 +1,11 @@
-package org.generationcp.middleware.domain.gms;
+package org.generationcp.middleware.domain.germplasm;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 
+@AutoProperty
 public class GermplasmDTO {
 
 	private String germplasmDbId;
