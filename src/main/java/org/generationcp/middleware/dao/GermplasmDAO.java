@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
+import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
@@ -655,10 +656,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
 				+ "   femaleParent.gid as parent1DbId," //
 				+ "   femaleParentName.nval as parent1Name," //
-				+ "   if(femaleParent.gid is not null, 'FEMALE', null) as parent1Type," //
+				+ "   if(femaleParent.gid is not null, '" + ParentType.FEMALE.name() + "', null) as parent1Type," //
 				+ "   maleParent.gid as parent2DbId," //
 				+ "   maleParentName.nval as parent2Name," //
-				+ "   if(maleParent.gid is not null, 'MALE', null) as parent2Type" //
+				+ "   if(maleParent.gid is not null, '" + ParentType.MALE.name() + "', null) as parent2Type" //
 				+ " FROM germplsm g" //
 				+ "   LEFT JOIN methods m ON m.mid = g.methn" //
 				//  considering groupSource itself in the generative case to simplify join with the parents"
@@ -694,15 +695,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   name.nval as defaultDisplayName," //
 				+ "   CASE" //
 				+ "   WHEN progeny.gnpgs = -1" //
-				+ "     THEN 'SELF'" //
+				+ "     THEN '" + ParentType.SELF.name() + "'" //
 				+ "   WHEN progeny.gnpgs >= 2" //
 				+ "     THEN" //
 				+ "       CASE" //
 				+ "         WHEN progeny.gpid1 = progeny.gpid2" //
-				+ "           THEN 'SELF'" //
+				+ "           THEN '" + ParentType.SELF.name() + "'" //
 				+ "         WHEN progeny.gpid1 = parent.gid" //
-				+ "           THEN 'FEMALE'" //
-				+ "         ELSE 'MALE'" //
+				+ "           THEN '" + ParentType.FEMALE.name() + "'" //
+				+ "         ELSE '" + ParentType.MALE.name() + "'" //
 				+ "       END" //
 				+ "   ELSE ''" //
 				+ "   END as parentType" //

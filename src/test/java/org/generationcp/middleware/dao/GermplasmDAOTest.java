@@ -15,6 +15,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -320,14 +321,14 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(progeny.getGermplasmDbId(), is(maleParent.getGid()));
 		Assert.assertThat(progeny.getDefaultDisplayName(), is(maleParentPreferredName.getNval()));
 		Assert.assertThat(progeny.getProgeny(), hasSize(1));
-		Assert.assertThat(progeny.getProgeny().get(0).getParentType(), is("MALE"));
+		Assert.assertThat(progeny.getProgeny().get(0).getParentType(), is(ParentType.MALE.name()));
 		Assert.assertThat(progeny.getProgeny().get(0).getDefaultDisplayName(), is(crossPreferredName.getNval()));
 
 		final ProgenyDTO crossProgeny = this.dao.getProgeny(cross.getGid());
 
 		Assert.assertThat(crossProgeny.getGermplasmDbId(), is(cross.getGid()));
 		Assert.assertThat(crossProgeny.getProgeny(), hasSize(1));
-		Assert.assertThat(crossProgeny.getProgeny().get(0).getParentType(), is("SELF"));
+		Assert.assertThat(crossProgeny.getProgeny().get(0).getParentType(), is(ParentType.SELF.name()));
 		Assert.assertThat(crossProgeny.getProgeny().get(0).getGermplasmDbId(), is(advance.getGid()));
 	}
 
