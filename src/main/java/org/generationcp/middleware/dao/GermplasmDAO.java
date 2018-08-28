@@ -1219,7 +1219,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.deleted = 0 AND g.grplce = 0" //
 					+ "  AND (g.gid = :gid OR reference.btable = :pui  " //
 					+ "  OR  (:name is not null and (SELECT n.nval FROM names n" //
-					+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition ))"; //
+					+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition )"
+					+ "  OR (:gid IS NULL AND :pui IS NULL AND :name IS NULL))"; //
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString);
 
@@ -1254,7 +1255,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.deleted = 0 AND g.grplce = 0" //
 				+ "  AND (g.gid = :gid OR reference.btable = :pui  " //
 				+ "  OR  (:name is not null and (SELECT n.nval FROM names n" //
-				+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition ))");
+				+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition ) "
+				+ "  OR (:gid IS NULL AND :pui IS NULL AND :name IS NULL))");
 
 		query.setParameter("gid", germplasmSearchRequestDTO.getGid()).
 				setParameter("pui", germplasmSearchRequestDTO.getPui()).setParameter("name", germplasmSearchRequestDTO.getPreferredName())
