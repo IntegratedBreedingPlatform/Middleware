@@ -687,7 +687,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final Germplasm germplasm = this.getByGIDWithPrefName(germplasmDbId);
 			if (germplasm == null) {
-				throw new MiddlewareQueryException("No germplasm with id " + germplasmDbId);
+				return null;
 			}
 
 			final String query = "SELECT" //
