@@ -42,6 +42,7 @@ public class ProgenyDTO {
 
 	private int germplasmDbId;
 	private String defaultDisplayName;
+	// defined as singular in BrAPI. See also https://github.com/plantbreeding/API/issues/275
 	private List<Progeny> progeny;
 
 	public int getGermplasmDbId() {
