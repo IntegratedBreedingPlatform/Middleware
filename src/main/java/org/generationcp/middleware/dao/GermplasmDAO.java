@@ -682,6 +682,58 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
+		try {
+			final Germplasm germplasm = this.getByGIDWithPrefName(germplasmDbId);
+			if (germplasm == null) {
+				throw new MiddlewareQueryException("No germplasm with id " + germplasmDbId);
+			}
+
+			final String query = "SELECT" //
+				+ "   progeny.gid as germplasmDbId," //
+				+ "   name.nval as defaultDisplayName," //
+				+ "   CASE" //
+				+ "   WHEN progeny.gnpgs = -1" //
+				+ "     THEN 'SELF'" //
+				+ "   WHEN progeny.gnpgs >= 2" //
+				+ "     THEN" //
+				+ "       CASE" //
+				+ "         WHEN progeny.gpid1 = progeny.gpid2" //
+				+ "           THEN 'SELF'" //
+				+ "         WHEN progeny.gpid1 = parent.gid" //
+				+ "           THEN 'FEMALE'" //
+				+ "         ELSE 'MALE'" //
+				+ "       END" //
+				+ "   ELSE ''" //
+				+ "   END as parentType" //
+				+ " FROM germplsm parent" //
+				+ "   LEFT JOIN germplsm progeny ON (progeny.gnpgs = -1 AND progeny.gpid2 = parent.gid)" //
+				+ "                                 OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = parent.gid OR progeny.gpid2 = parent.gid))" //
+				+ "   LEFT JOIN names name ON progeny.gid = name.gid AND name.nstat = 1" //
+				+ " WHERE parent.gid = :gid" //
+				+ "       AND parent.deleted = 0 AND parent.grplce = 0" //
+				+ "       AND progeny.deleted = 0 AND progeny.grplce = 0";
+
+			final List<ProgenyDTO.Progeny> progeny = this.getSession().createSQLQuery(query) //
+				.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("parentType")
+				.setParameter("gid", germplasmDbId) //
+				.setResultTransformer(Transformers.aliasToBean(ProgenyDTO.Progeny.class)) //
+				.list();
+
+			final ProgenyDTO progenyDTO = new ProgenyDTO();
+			progenyDTO.setGermplasmDbId(germplasm.getGid());
+			progenyDTO.setDefaultDisplayName(germplasm.getPreferredName().getNval());
+
+			progenyDTO.setProgeny(progeny);
+
+			return progenyDTO;
+
+		} catch (final HibernateException e) {
+			GermplasmDAO.LOG.error(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
 	/**
 	 * <strong>Algorithm for checking parent groups for crosses</strong>
 	 * <p>

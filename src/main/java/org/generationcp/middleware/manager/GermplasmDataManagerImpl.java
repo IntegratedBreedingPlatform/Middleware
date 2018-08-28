@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -1366,6 +1367,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
 		return this.daoFactory.getGermplasmDao().getPedigree(germplasmDbId, notation);
+	}
+
+	@Override
+	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
+		return this.daoFactory.getGermplasmDao().getProgeny(germplasmDbId);
 	}
 
 	/**

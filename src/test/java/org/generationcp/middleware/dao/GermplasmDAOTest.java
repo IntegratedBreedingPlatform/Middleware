@@ -16,6 +16,7 @@ import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -40,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
@@ -52,16 +54,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private boolean testDataSetup = false;
 
 	private GermplasmDAO dao;
-
 	private LotDAO lotDAO;
-
 	private TransactionDAO transactionDAO;
-
 	private ListDataProjectDAO listDataProjectDAO;
-
 	private GermplasmListDAO germplasmListDAO;
-
 	private MethodDAO methodDAO;
+	private NameDAO nameDAO;
 
 	@Autowired
 	private InventoryDataManager inventoryDM;
@@ -89,6 +87,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 			this.methodDAO = new MethodDAO();
 			this.methodDAO.setSession(this.sessionProvder.getSession());
+
+			this.nameDAO = new NameDAO();
+			this.nameDAO.setSession(this.sessionProvder.getSession());
 
 		}
 
@@ -285,6 +286,49 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Date gdate = Util.parseDate(String.valueOf(advance.getGdate()), Util.DATE_AS_NUMBER_FORMAT);
 		final Integer year = Integer.valueOf(Util.getSimpleDateFormat("yyyy").format(gdate));
 		Assert.assertThat(pedigree.getCrossingYear(), is(year));
+	}
+
+	@Test
+	public void testGetProgeny() throws ParseException {
+		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		this.dao.save(femaleParent);
+		this.dao.save(maleParent);
+
+		final Name maleParentPreferredName = maleParent.getPreferredName();
+		maleParentPreferredName.setGermplasmId(maleParent.getGid());
+		this.nameDAO.save(maleParentPreferredName);
+
+		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		cross.setGpid1(femaleParent.getGid());
+		cross.setGpid2(maleParent.getGid());
+		cross.setGnpgs(2);
+		this.dao.save(cross);
+
+		final Name crossPreferredName = cross.getPreferredName();
+		crossPreferredName.setGermplasmId(cross.getGid());
+		this.nameDAO.save(crossPreferredName);
+
+		final Germplasm advance = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		advance.setGpid1(cross.getGid());
+		advance.setGpid2(cross.getGid());
+		advance.setGnpgs(-1);
+		this.dao.save(advance);
+
+		final ProgenyDTO progeny = this.dao.getProgeny(maleParent.getGid());
+
+		Assert.assertThat(progeny.getGermplasmDbId(), is(maleParent.getGid()));
+		Assert.assertThat(progeny.getDefaultDisplayName(), is(maleParentPreferredName.getNval()));
+		Assert.assertThat(progeny.getProgeny(), hasSize(1));
+		Assert.assertThat(progeny.getProgeny().get(0).getParentType(), is("MALE"));
+		Assert.assertThat(progeny.getProgeny().get(0).getDefaultDisplayName(), is(crossPreferredName.getNval()));
+
+		final ProgenyDTO crossProgeny = this.dao.getProgeny(cross.getGid());
+
+		Assert.assertThat(crossProgeny.getGermplasmDbId(), is(cross.getGid()));
+		Assert.assertThat(crossProgeny.getProgeny(), hasSize(1));
+		Assert.assertThat(crossProgeny.getProgeny().get(0).getParentType(), is("SELF"));
+		Assert.assertThat(crossProgeny.getProgeny().get(0).getGermplasmDbId(), is(advance.getGid()));
 	}
 
 	@Test

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -1007,6 +1008,8 @@ public interface GermplasmDataManager {
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
 	PedigreeDTO getPedigree(Integer germplasmDbId, String notation);
+
+	ProgenyDTO getProgeny(Integer germplasmDbId);
 
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
