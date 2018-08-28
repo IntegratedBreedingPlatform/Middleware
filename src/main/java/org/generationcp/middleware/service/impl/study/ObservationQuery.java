@@ -262,11 +262,8 @@ class ObservationQuery {
 			.append("	INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n")
 			.append("	INNER JOIN stock s ON s.stock_id = es.stock_id \n")
 			//FIXME remove this subquery when there are no duplicated rows for same nd_experiment and observable id
-			.append("       LEFT JOIN (select * from phenotype\n"
-				+ "                                  inner join (SELECT max(p.phenotype_id) phenotypeid,\n"
-				+ "                                                     p.nd_experiment_id as ndid,\n"
-				+ "                                                     p.observable_id as obsid FROM phenotype p GROUP BY p.nd_experiment_id, p.observable_id) pheno on phenotype.phenotype_id = pheno.phenotypeid) ph ON (ph.nd_experiment_id = nde.nd_experiment_id)\n"
-				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id")
+			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
+			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
 			.append("		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");
 
 		return sqlBuilder.toString();
