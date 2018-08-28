@@ -23,6 +23,7 @@ import java.util.Set;
 import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -647,7 +648,28 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
 		try {
-			return (PedigreeDTO) this.getSession().createSQLQuery(Germplasm.GET_PEDIGREE) //
+			final String query = "SELECT groupSource.gid," //
+				+ "   g.gid as germplasmDbId," //
+				+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
+				+ "   m.mname AS crossingPlan," //
+				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
+				+ "   femaleParent.gid as parent1DbId," //
+				+ "   femaleParentName.nval as parent1Name," //
+				+ "   if(femaleParent.gid is not null, 'FEMALE', null) as parent1Type," //
+				+ "   maleParent.gid as parent2DbId," //
+				+ "   maleParentName.nval as parent2Name," //
+				+ "   if(maleParent.gid is not null, 'MALE', null) as parent2Type" //
+				+ " FROM germplsm g" //
+				+ "   LEFT JOIN methods m ON m.mid = g.methn" //
+				//  considering groupSource itself in the generative case to simplify join with the parents"
+				+ "   LEFT JOIN germplsm groupSource ON (g.gpid1 = groupSource.gid AND g.gnpgs = -1) OR (groupSource.gid = g.gid AND g.gnpgs >= 2)" //
+				+ "   LEFT JOIN germplsm femaleParent ON groupSource.gpid1 = femaleParent.gid" //
+				+ "   LEFT JOIN names femaleParentName ON femaleParent.gid = femaleParentName.gid AND femaleParentName.nstat = 1" //
+				+ "   LEFT JOIN germplsm maleParent ON groupSource.gpid2 = maleParent.gid" //
+				+ "   LEFT JOIN names maleParentName ON maleParent.gid = maleParentName.gid AND maleParentName.nstat = 1" //
+				+ " WHERE g.gid = :gid AND g.deleted = 0 AND g.grplce = 0";
+
+			return (PedigreeDTO) this.getSession().createSQLQuery(query) //
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("crossingPlan")
 				.addScalar("crossingYear", new IntegerType()).addScalar("parent1DbId").addScalar("parent1Name").addScalar("parent1Type")
 				.addScalar("parent2DbId").addScalar("parent2Name").addScalar("parent2Type")
