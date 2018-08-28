@@ -1575,13 +1575,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public GermplasmDTO getGermplasmDTOByGID (final Integer gid) {
+	public GermplasmDTO getGermplasmDTOByGID(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().getGermplasmDTO(gid);
 	}
 
 	@Override
-	public List<GermplasmDTO> searchGermplasmDTO (final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
 		return this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO);
+	}
+
+	@Override
+	public long countGermplasmDTOs(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+		return this.daoFactory.getGermplasmDao().countGermplasmDTOs(germplasmSearchRequestDTO);
 	}
 
 }

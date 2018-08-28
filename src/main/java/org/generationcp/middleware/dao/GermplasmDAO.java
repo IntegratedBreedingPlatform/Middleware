@@ -1188,7 +1188,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public List<GermplasmDTO> getGermplasmDTOList (final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
 
 		try {
-			final String sql = "SELECT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
+
+			final String queryString = "SELECT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
 					+ "  (SELECT n.nval FROM names n " //
 					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.ftype = 'ACCNO' AND u.fldno = n.ntype)" //
 					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS accessionNumber, " //
@@ -1220,16 +1221,25 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "  OR  (:name is not null and (SELECT n.nval FROM names n" //
 					+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition ))"; //
 
-			final List<GermplasmDTO> objects =
-					this.getSession().createSQLQuery(sql).addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber")
-							.addScalar("acquisitionDate").addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus")
-							.addScalar("germplasmSeedSource").addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa")
-							.addScalar("subtaxaAuthority").setParameter("gid", germplasmSearchRequestDTO.getGid())
-							.setParameter("pui", germplasmSearchRequestDTO.getPui())
-							.setParameter("name", germplasmSearchRequestDTO.getPreferredName())
-							.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() +"%")
-							.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class)).list();
-			return objects;
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString);
+
+			sqlQuery.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
+					.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
+					.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
+					.setParameter("gid", germplasmSearchRequestDTO.getGid()).setParameter("pui", germplasmSearchRequestDTO.getPui())
+					.setParameter("name", germplasmSearchRequestDTO.getPreferredName())
+					.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%")
+					.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
+
+			if (germplasmSearchRequestDTO.getPage() != null && germplasmSearchRequestDTO.getPageSize() != null) {
+				sqlQuery.setFirstResult(germplasmSearchRequestDTO.getPageSize() * (germplasmSearchRequestDTO.getPage() - 1));
+				sqlQuery.setMaxResults(germplasmSearchRequestDTO.getPageSize());
+			}
+
+			final List<GermplasmDTO> germplasmDTOList = sqlQuery.list();
+
+			return germplasmDTOList;
+
 		} catch (final HibernateException e) {
 			final String message = "Error with getGermplasmDTOList" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
@@ -1238,7 +1248,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public long countGermplasmDTOs(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
-		return 0;
+
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) "
+		        + "  FROM germplsm g " //
+				+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.deleted = 0 AND g.grplce = 0" //
+				+ "  AND (g.gid = :gid OR reference.btable = :pui  " //
+				+ "  OR  (:name is not null and (SELECT n.nval FROM names n" //
+				+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition ))");
+
+		query.setParameter("gid", germplasmSearchRequestDTO.getGid()).
+				setParameter("pui", germplasmSearchRequestDTO.getPui()).setParameter("name", germplasmSearchRequestDTO.getPreferredName())
+				.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%");
+
+		return ((BigInteger) query.uniqueResult()).longValue();
+
 	}
 
 }
