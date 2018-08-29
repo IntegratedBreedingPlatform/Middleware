@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 
@@ -279,6 +280,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		advance.setGnpgs(-1);
 		this.dao.save(advance);
 
+		final Germplasm advance2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		advance2.setGpid1(cross.getGid());
+		advance2.setGpid2(cross.getGid());
+		advance2.setGnpgs(-1);
+		this.dao.save(advance2);
+
 		final PedigreeDTO pedigree = this.dao.getPedigree(advance.getGid(), null);
 
 		Assert.assertThat(pedigree.getGermplasmDbId(), is(advance.getGid()));
@@ -287,6 +294,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Date gdate = Util.parseDate(String.valueOf(advance.getGdate()), Util.DATE_AS_NUMBER_FORMAT);
 		final Integer year = Integer.valueOf(Util.getSimpleDateFormat("yyyy").format(gdate));
 		Assert.assertThat(pedigree.getCrossingYear(), is(year));
+
+		Assert.assertThat(pedigree.getSiblings(), hasSize(1));
+		Assert.assertThat(pedigree.getSiblings().get(0).getGermplasmDbId(), is(advance2.getGid()));
 	}
 
 	@Test

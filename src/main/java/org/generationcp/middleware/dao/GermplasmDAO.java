@@ -662,7 +662,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   if(maleParent.gid is not null, '" + ParentType.MALE.name() + "', null) as parent2Type" //
 				+ " FROM germplsm g" //
 				+ "   LEFT JOIN methods m ON m.mid = g.methn" //
-				//  considering groupSource itself in the generative case to simplify join with the parents"
+				//  considering groupSource itself in the generative case"
 				+ "   LEFT JOIN germplsm groupSource ON (g.gpid1 = groupSource.gid AND g.gnpgs = -1) OR (groupSource.gid = g.gid AND g.gnpgs >= 2)" //
 				+ "   LEFT JOIN germplsm femaleParent ON groupSource.gpid1 = femaleParent.gid" //
 				+ "   LEFT JOIN names femaleParentName ON femaleParent.gid = femaleParentName.gid AND femaleParentName.nstat = 1" //
@@ -670,13 +670,36 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   LEFT JOIN names maleParentName ON maleParent.gid = maleParentName.gid AND maleParentName.nstat = 1" //
 				+ " WHERE g.gid = :gid AND g.deleted = 0 AND g.grplce = 0";
 
-			return (PedigreeDTO) this.getSession().createSQLQuery(query) //
+			final PedigreeDTO pedigreeDTO = (PedigreeDTO) this.getSession().createSQLQuery(query) //
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("crossingPlan")
 				.addScalar("crossingYear", new IntegerType()).addScalar("parent1DbId").addScalar("parent1Name").addScalar("parent1Type")
 				.addScalar("parent2DbId").addScalar("parent2Name").addScalar("parent2Type")
 				.setParameter("gid", germplasmDbId) //
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.class)) //
 				.uniqueResult();
+
+			final String siblingsQuery = "SELECT" //
+				+ "   sibling.gid AS germplasmDbId," //
+				+ "   n.nval AS defaultDisplayName" //
+				+ " FROM germplsm g" //
+				// considering groupSource itself in the generative case"
+				+ "   INNER JOIN germplsm groupSource ON (g.gpid1 = groupSource.gid AND g.gnpgs = -1) OR (groupSource.gid = g.gid AND g.gnpgs >= 2)" //
+				+ "   INNER JOIN germplsm sibling ON sibling.gpid1 = groupSource.gid" //
+				+ "                                 AND sibling.gnpgs = -1" //
+				+ "                                 AND sibling.gid != g.gid" //
+				+ "                                 AND groupSource.gid != g.gid" //
+				+ "   LEFT JOIN names n ON sibling.gid = n.gid AND n.nstat = 1" //
+				+ " WHERE g.gid = :gid";
+
+			final List<PedigreeDTO.Sibling> siblings = this.getSession().createSQLQuery(siblingsQuery) //
+				.addScalar("germplasmDbId").addScalar("defaultDisplayName")
+				.setParameter("gid", germplasmDbId)
+				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.Sibling.class)) //
+				.list();
+
+			pedigreeDTO.setSiblings(siblings);
+
+			return pedigreeDTO;
 		} catch (final HibernateException e) {
 			GermplasmDAO.LOG.error(e.getMessage());
 			throw new MiddlewareQueryException(e.getMessage(), e);

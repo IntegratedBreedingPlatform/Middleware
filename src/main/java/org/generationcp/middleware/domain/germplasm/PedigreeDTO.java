@@ -8,7 +8,29 @@ import java.util.List;
 @AutoProperty
 public class PedigreeDTO {
 
-	private int germplasmDbId;
+	public static class Sibling {
+		private Integer germplasmDbId;
+		private String defaultDisplayName;
+
+		public Integer getGermplasmDbId() {
+			return germplasmDbId;
+		}
+
+		public void setGermplasmDbId(final Integer germplasmDbId) {
+			this.germplasmDbId = germplasmDbId;
+		}
+
+		public String getDefaultDisplayName() {
+			return defaultDisplayName;
+		}
+
+		public void setDefaultDisplayName(final String defaultDisplayName) {
+			this.defaultDisplayName = defaultDisplayName;
+		}
+
+	}
+
+	private Integer germplasmDbId;
 	private String defaultDisplayName;
 	private String pedigree;
 	private String crossingPlan;
@@ -20,13 +42,13 @@ public class PedigreeDTO {
 	private Integer parent2DbId;
 	private String parent2Name;
 	private String parent2Type;
-	private List<PedigreeDTO> siblings;
+	private List<Sibling> siblings;
 
 	public int getGermplasmDbId() {
 		return germplasmDbId;
 	}
 
-	public void setGermplasmDbId(final int germplasmDbId) {
+	public void setGermplasmDbId(final Integer germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 
@@ -118,11 +140,11 @@ public class PedigreeDTO {
 		this.parent2Type = parent2Type;
 	}
 
-	public List<PedigreeDTO> getSiblings() {
+	public List<Sibling> getSiblings() {
 		return siblings;
 	}
 
-	public void setSiblings(final List<PedigreeDTO> siblings) {
+	public void setSiblings(final List<Sibling> siblings) {
 		this.siblings = siblings;
 	}
 
