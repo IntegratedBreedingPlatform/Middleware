@@ -1283,7 +1283,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<GermplasmDTO> getGermplasmDTOList (final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+	public List<GermplasmDTO> getGermplasmDTOList(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
 
 		try {
 
@@ -1331,7 +1331,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
 			if (germplasmSearchRequestDTO.getPage() != null && germplasmSearchRequestDTO.getPageSize() != null) {
-				sqlQuery.setFirstResult(germplasmSearchRequestDTO.getPageSize() * (germplasmSearchRequestDTO.getPage() - 1));
+				sqlQuery.setFirstResult(germplasmSearchRequestDTO.getPageSize() * germplasmSearchRequestDTO.getPage());
 				sqlQuery.setMaxResults(germplasmSearchRequestDTO.getPageSize());
 			}
 
