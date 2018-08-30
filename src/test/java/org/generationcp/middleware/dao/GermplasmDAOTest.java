@@ -286,7 +286,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		advance2.setGnpgs(-1);
 		this.dao.save(advance2);
 
-		final PedigreeDTO pedigree = this.dao.getPedigree(advance.getGid(), null);
+		final PedigreeDTO pedigree = this.dao.getPedigree(advance.getGid(), null, true);
 
 		Assert.assertThat(pedigree.getGermplasmDbId(), is(advance.getGid()));
 		Assert.assertThat(pedigree.getParent1DbId(), is(femaleParent.getGid()));

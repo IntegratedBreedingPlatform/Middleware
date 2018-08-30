@@ -1365,8 +1365,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
-		return this.daoFactory.getGermplasmDao().getPedigree(germplasmDbId, notation);
+	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
+		return this.daoFactory.getGermplasmDao().getPedigree(germplasmDbId, notation, includeSiblings);
 	}
 
 	@Override

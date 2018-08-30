@@ -647,7 +647,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
+	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		try {
 			final String query = "SELECT groupSource.gid," //
 				+ "   g.gid as germplasmDbId," //
@@ -677,6 +677,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.setParameter("gid", germplasmDbId) //
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.class)) //
 				.uniqueResult();
+
+			if (includeSiblings != null && !includeSiblings) {
+				return pedigreeDTO;
+			}
 
 			final String siblingsQuery = "SELECT" //
 				+ "   sibling.gid AS germplasmDbId," //
