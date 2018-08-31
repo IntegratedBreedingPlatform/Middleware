@@ -9,39 +9,22 @@ import java.util.Date;
 public class GermplasmDTO {
 
 	private String germplasmDbId;
-
 	private String defaultDisplayName;
-
 	private String accessionNumber;
-
 	private String germplasmName;
-
 	private String germplasmPUI;
-
 	private String pedigree;
-
 	private String germplasmSeedSource;
-
 	private String commonCropName;
-
 	private String instituteCode;
-
 	private String instituteName;
-
 	private Integer biologicalStatusOfAccessionCode;
-
 	private String countryOfOriginCode;
-
 	private String genus;
-
 	private String species;
-
 	private String speciesAuthority;
-
 	private String subtaxa;
-
 	private String subtaxaAuthority;
-
 	private Date acquisitionDate;
 
 	public String getGermplasmDbId() {
