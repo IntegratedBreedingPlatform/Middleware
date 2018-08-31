@@ -1271,14 +1271,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority " //
 					+ "  FROM germplsm g " //
-					+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.gid = :gid and g.deleted = 0 AND g.grplce = 0"; //
+					+ "     LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
+					+ "  WHERE g.gid = :gid and g.deleted = 0 AND g.grplce = 0";
 
-			final Object object =
-					this.getSession().createSQLQuery(sql).addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber")
-							.addScalar("acquisitionDate").addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus")
-							.addScalar("germplasmSeedSource").addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa")
-							.addScalar("subtaxaAuthority").setParameter("gid", id)
-							.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class)).uniqueResult();
+			final Object object = this.getSession().createSQLQuery(sql) //
+				.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
+				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
+				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
+				.setParameter("gid", id) //
+				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class)) //
+				.uniqueResult();
 			return (object != null) ? (GermplasmDTO) object : null;
 		} catch (final HibernateException e) {
 			final String message = "Error with getGermplasmDTO(gid=" + id.toString() + ") " + e.getMessage();
@@ -1318,21 +1320,30 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority " //
 					+ "  FROM germplsm g " //
-					+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.deleted = 0 AND g.grplce = 0" //
-					+ "  AND (g.gid = :gid OR reference.btable = :pui  " //
-					+ "  OR  (:name is not null and (SELECT n.nval FROM names n" //
-					+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition )"
-					+ "  OR (:gid IS NULL AND :pui IS NULL AND :name IS NULL))"; //
+					+ "  	LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
+					+ "	 WHERE g.deleted = 0" //
+					+ "      AND g.grplce = 0" //
+					+ "      AND (g.gid = :gid" //
+					+ "           OR reference.btable = :pui" //
+					+ "           OR (:name is not null" //
+					+ "               and (SELECT n.nval" //
+					+ "                    FROM names n" //
+					+ "                    WHERE n.nstat = 1 AND n.gid = g.gid" //
+					+ "                    LIMIT 1) like :likeCondition)" //
+					+ "           OR (:gid IS NULL" //
+					+ "               AND :pui IS NULL" //
+					+ "               AND :name IS NULL))";
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString);
 
 			sqlQuery.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
-					.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
-					.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
-					.setParameter("gid", germplasmSearchRequestDTO.getGid()).setParameter("pui", germplasmSearchRequestDTO.getPui())
-					.setParameter("name", germplasmSearchRequestDTO.getPreferredName())
-					.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%")
-					.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
+				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
+				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority") //
+				.setParameter("gid", germplasmSearchRequestDTO.getGid()) //
+				.setParameter("pui", germplasmSearchRequestDTO.getPui()) //
+				.setParameter("name", germplasmSearchRequestDTO.getPreferredName()) //
+				.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%") //
+				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
 			if (germplasmSearchRequestDTO.getPage() != null && germplasmSearchRequestDTO.getPageSize() != null) {
 				sqlQuery.setFirstResult(germplasmSearchRequestDTO.getPageSize() * germplasmSearchRequestDTO.getPage());
