@@ -1246,29 +1246,29 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final String sql = "SELECT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
 					+ "  (SELECT n.nval FROM names n " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.ftype = 'ACCNO' AND u.fldno = n.ntype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
 					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS accessionNumber, " //
 					+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
 					+ "  (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'ORI_COUN' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'ORI_COUN' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS countryOfOriginCode, " //
 					+ "   (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) AS germplasmName," //
 					+ "  (SELECT n.nval FROM names n " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.ftype = 'GENUS' AND u.fldno = n.ntype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'GENUS' AND u.fldno = n.ntype)" //
 					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS genus," //
 					+ "   (SELECT ld.source FROM listdata ld" //
 					+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SPNAM' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SPAUTH' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPAUTH' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS speciesAuthority, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SUBTAX' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SUBTAX' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'STAUTH' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority " //
 					+ "  FROM germplsm g " //
 					+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.gid = :gid and g.deleted = 0 AND g.grplce = 0"; //
@@ -1293,29 +1293,29 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			final String queryString = "SELECT convert(g.gid, char) AS germplasmDbId, reference.btable AS germplasmPUI, " //
 					+ "  (SELECT n.nval FROM names n " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.ftype = 'ACCNO' AND u.fldno = n.ntype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
 					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS accessionNumber, " //
 					+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
 					+ "  (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'ORI_COUN' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'ORI_COUN' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS countryOfOriginCode, " //
 					+ "   (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) AS germplasmName," //
 					+ "  (SELECT n.nval FROM names n " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.ftype = 'GENUS' AND u.fldno = n.ntype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'GENUS' AND u.fldno = n.ntype)" //
 					+ "   WHERE (n.gid = g.gid) LIMIT 1) AS genus," //
 					+ "   (SELECT ld.source FROM listdata ld" //
 					+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SPNAM' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SPAUTH' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPAUTH' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS speciesAuthority, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'SUBTAX' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SUBTAX' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.ftype = 'STAUTH' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority " //
 					+ "  FROM germplsm g " //
 					+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.deleted = 0 AND g.grplce = 0" //
