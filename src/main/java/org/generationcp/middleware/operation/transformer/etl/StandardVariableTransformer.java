@@ -31,11 +31,12 @@ public class StandardVariableTransformer extends Transformer {
 		standardVariable.setScale(variable.getScale());
 		standardVariable.setMethod(variable.getMethod());
 		standardVariable.setObsolete(variable.isObsolete());
+		standardVariable.setFormula(variable.getFormula());
 		final DataType dataType = variable.getScale().getDataType();
 		if (dataType != null) {
 			standardVariable.setDataType(new Term(dataType.getId(), dataType.getName(), dataType.getName()));
 		}
-		VariableConstraints variableConstraints = new VariableConstraints();
+		final VariableConstraints variableConstraints = new VariableConstraints();
 		variableConstraints.setMinValueId(0);
 		variableConstraints.setMaxValueId(0);
 		//setting min value

@@ -14,14 +14,18 @@ package org.generationcp.middleware.operation.builder;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class MethodBuilder extends Builder {
 
 	private static final int METHOD_CV_ID = 1020;
 
+	private DaoFactory daoFactory;
+
 	public MethodBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public Term findMethodById(int id) throws MiddlewareQueryException {
@@ -35,7 +39,7 @@ public class MethodBuilder extends Builder {
 	}
 
 	public Term findMethodByName(String name) throws MiddlewareQueryException {
-		return this.mapToTerm(this.getCvTermDao().getByNameAndCvId(name, MethodBuilder.METHOD_CV_ID));
+		return this.mapToTerm(daoFactory.getCvTermDao().getByNameAndCvId(name, MethodBuilder.METHOD_CV_ID));
 	}
 
 	private Term mapToTerm(CVTerm cvTerm) {

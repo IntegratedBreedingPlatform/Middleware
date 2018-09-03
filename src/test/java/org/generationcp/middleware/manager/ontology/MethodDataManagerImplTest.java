@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
@@ -51,7 +52,7 @@ public class MethodDataManagerImplTest {
 	private CVTermRelationshipDao cvTermRelationshipDao;
 
 	@Mock
-	private OntologyDaoFactory daoFactory;
+	private DaoFactory daoFactory;
 
 	private OntologyMethodDataManagerImpl methodDataManager;
 

@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
@@ -35,8 +36,11 @@ import org.springframework.util.CollectionUtils;
 
 public class ListInventoryBuilder extends Builder {
 
+	private DaoFactory daoFactory;
+
 	public ListInventoryBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class ListInventoryBuilder extends Builder {
 	public List<GermplasmListData> retrieveLotCountsForListEntries(final Integer listId, final List<Integer> entryIds)
 			throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = null;
-		listEntries = this.getGermplasmListDataDAO().getByIds(entryIds);
+		listEntries = daoFactory.getGermplasmListDataDAO().getByIds(entryIds);
 		final List<Integer> gids = new ArrayList<Integer>();
 		final List<Integer> lrecIds = new ArrayList<Integer>();
 		for (final GermplasmListData entry : listEntries) {
@@ -145,7 +149,7 @@ public class ListInventoryBuilder extends Builder {
 		if (!listScaleIds.isEmpty()) {
 			Map<Integer, Integer> scaleIdWiseTermId = new HashMap<>();
 			final List<CVTermRelationship> relationshipsOfScales =
-					this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(listScaleIds, TermId.HAS_SCALE.getId());
+					daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(listScaleIds, TermId.HAS_SCALE.getId());
 			List<Integer> listObjectIds = new ArrayList<>();
 			if (relationshipsOfScales != null) {
 				for (CVTermRelationship relationship : relationshipsOfScales) {
@@ -153,7 +157,7 @@ public class ListInventoryBuilder extends Builder {
 					listObjectIds.add(relationship.getObjectId());
 				}
 
-				List<CVTerm> listScaleCvTerm = this.getCvTermDao().getByIds(listObjectIds);
+				List<CVTerm> listScaleCvTerm = daoFactory.getCvTermDao().getByIds(listObjectIds);
 
 				for (final CVTerm cvTerm : listScaleCvTerm) {
 					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
@@ -193,7 +197,7 @@ public class ListInventoryBuilder extends Builder {
 				gids.add(germplasm.getGid());
 			}
 
-			List<Object[]> lotScalesForGermplsms = this.getLotDao().retrieveLotScalesForGermplasms(gids);
+			List<Object[]> lotScalesForGermplsms = daoFactory.getLotDao().retrieveLotScalesForGermplasms(gids);
 
 			if(!CollectionUtils.isEmpty(lotScalesForGermplsms)) {
 				Map<Integer, Set<String>> germplsmWiseScales = new HashMap<>();
@@ -241,7 +245,7 @@ public class ListInventoryBuilder extends Builder {
 		if (!listScaleIds.isEmpty()) {
 			Map<Integer, Integer> scaleIdWiseTermId = new HashMap<>();
 			final List<CVTermRelationship> relationshipsOfScales =
-					this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(listScaleIds, TermId.HAS_SCALE.getId());
+					daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(listScaleIds, TermId.HAS_SCALE.getId());
 			List<Integer> listObjectIds = new ArrayList<>();
 			if (relationshipsOfScales != null) {
 				for (CVTermRelationship relationship : relationshipsOfScales) {
@@ -249,7 +253,7 @@ public class ListInventoryBuilder extends Builder {
 					listObjectIds.add(relationship.getObjectId());
 				}
 
-				List<CVTerm> listScaleCvTerm = this.getCvTermDao().getByIds(listObjectIds);
+				List<CVTerm> listScaleCvTerm = daoFactory.getCvTermDao().getByIds(listObjectIds);
 
 				for (final CVTerm cvTerm : listScaleCvTerm) {
 					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
@@ -283,7 +287,7 @@ public class ListInventoryBuilder extends Builder {
 	}
 
 	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> gIds) {
-		final Map<Integer, String> stockIDs = this.getTransactionDao().retrieveStockIds(gIds);
+		final Map<Integer, String> stockIDs = daoFactory.getTransactionDAO().retrieveStockIds(gIds);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
@@ -296,7 +300,7 @@ public class ListInventoryBuilder extends Builder {
 
 	public Integer countLotsWithAvailableBalanceForGermplasm(final Integer gid) throws MiddlewareQueryException {
 		Integer lotCount = null;
-		final Map<Integer, BigInteger> lotCounts = this.getLotDao().countLotsWithAvailableBalance(Collections.singletonList(gid));
+		final Map<Integer, BigInteger> lotCounts = daoFactory.getLotDao().countLotsWithAvailableBalance(Collections.singletonList(gid));
 		final BigInteger lotCountBigInt = lotCounts.get(gid);
 		if (lotCounts != null && lotCountBigInt != null) {
 			lotCount = lotCountBigInt.intValue();
@@ -306,8 +310,8 @@ public class ListInventoryBuilder extends Builder {
 
 	public List<LotDetails> retrieveInventoryLotsForGermplasm(final Integer gid) throws MiddlewareQueryException {
 		List<LotDetails> lotDetails = null;
-		final List<Lot> lots = this.getLotDao().getLotAggregateDataForGermplasm(gid);
-		final Map<Integer, Object[]> lotStatusDataForGermplasm = this.getLotDao().getLotStatusDataForGermplasm(gid);
+		final List<Lot> lots = daoFactory.getLotDao().getLotAggregateDataForGermplasm(gid);
+		final Map<Integer, Object[]> lotStatusDataForGermplasm = daoFactory.getLotDao().getLotStatusDataForGermplasm(gid);
 		this.setLotStatusForGermplasm(lots, lotStatusDataForGermplasm);
 		lotDetails = LotTransformer.extraLotDetails(lots);
 		this.setLocationsAndScales(lotDetails);
@@ -339,7 +343,7 @@ public class ListInventoryBuilder extends Builder {
 
 			// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
 			// where listdata.gid may not be the final germplasm displayed
-			final List<Lot> lots = this.getLotDao().getLotAggregateDataForList(listId, gids);
+			final List<Lot> lots = daoFactory.getLotDao().getLotAggregateDataForList(listId, gids);
 
 			// add to each list entry related lot information
 			final List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
@@ -369,7 +373,7 @@ public class ListInventoryBuilder extends Builder {
 
 		if (listEntries != null && !listEntries.isEmpty()) {
 
-			final List<Lot> lots = this.getLotDao().getReservedLotAggregateDataForList(listId, gids);
+			final List<Lot> lots = daoFactory.getLotDao().getReservedLotAggregateDataForList(listId, gids);
 
 			final List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
 			this.setLocationsAndScales(lotRows);
@@ -381,7 +385,7 @@ public class ListInventoryBuilder extends Builder {
 			throws MiddlewareQueryException {
 		List<ListEntryLotDetails> lotRows = new ArrayList<ListEntryLotDetails>();
 
-		final List<Lot> lots = this.getLotDao().getLotAggregateDataForListEntry(listId, gid);
+		final List<Lot> lots = daoFactory.getLotDao().getLotAggregateDataForListEntry(listId, gid);
 		lotRows = LotTransformer.extractLotDetailsForListEntry(lots, recordId);
 		this.setLocationsAndScales(lotRows);
 
@@ -393,7 +397,7 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	private void retrieveAvailableBalLotCounts(final List<GermplasmListData> listEntries, final List<Integer> gids)
 			throws MiddlewareQueryException {
-		final Map<Integer, Object[]> lotCounts = this.getLotDao().getAvailableBalanceCountAndTotalLotsCount(gids);
+		final Map<Integer, Object[]> lotCounts = daoFactory.getLotDao().getAvailableBalanceCountAndTotalLotsCount(gids);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
@@ -434,7 +438,7 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	private void retrieveReservedLotCounts(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
 			throws MiddlewareQueryException {
-		final Map<Integer, BigInteger> reservedLotCounts = this.getTransactionDao().countLotsWithReservationForListEntries(listEntryIds);
+		final Map<Integer, BigInteger> reservedLotCounts = daoFactory.getTransactionDAO().countLotsWithReservationForListEntries(listEntryIds);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
@@ -453,7 +457,7 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	protected void retrieveWithdrawalBalance(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
 			throws MiddlewareQueryException {
-		final Map<Integer, Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalBalanceWithDistinctScale(listEntryIds);
+		final Map<Integer, Object[]> withdrawalData = daoFactory.getTransactionDAO().retrieveWithdrawalBalanceWithDistinctScale(listEntryIds);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
@@ -481,7 +485,7 @@ public class ListInventoryBuilder extends Builder {
 	protected void retrieveWithdrawalStatus(final List<GermplasmListData> listEntries, final List<Integer> gIds)
 			throws MiddlewareQueryException {
 		Integer sourceId = listEntries.get(0).getList().getId();
-		final List<Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalStatus(sourceId, gIds);
+		final List<Object[]> withdrawalData = daoFactory.getTransactionDAO().retrieveWithdrawalStatus(sourceId, gIds);
 
 		final Map<Integer, HashSet<Integer>> germplasmWiseLotsMap = new HashMap<>();
 		final Map<Integer, HashSet<Integer>> lotWiseStatus = new HashMap<>();
@@ -608,9 +612,9 @@ public class ListInventoryBuilder extends Builder {
 
 		this.createScaleAndLocationMaps(lots, locationIds, scaleIds, scaleLotMap, locationLotMap);
 
-		final List<Location> allLocations = this.getLocationDao().getByIds(locationIds);
+		final List<Location> allLocations = daoFactory.getLocationDAO().getByIds(locationIds);
 		final List<Term> allScales = new ArrayList<Term>();
-		final List<CVTerm> cvTerms = this.getCvTermDao().getByIds(scaleIds);
+		final List<CVTerm> cvTerms = daoFactory.getCvTermDao().getByIds(scaleIds);
 		for (final CVTerm cvTerm : cvTerms) {
 			allScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
 		}
@@ -622,7 +626,7 @@ public class ListInventoryBuilder extends Builder {
 		if (!scaleIds.isEmpty()) {
 
 			final List<CVTermRelationship> relationshipsOfScales =
-					this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(scaleIds, TermId.HAS_SCALE.getId());
+					daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(scaleIds, TermId.HAS_SCALE.getId());
 
 			List<Integer> listObjectIds = new ArrayList<>();
 			if (relationshipsOfScales != null) {
@@ -631,7 +635,7 @@ public class ListInventoryBuilder extends Builder {
 					listObjectIds.add(relationship.getObjectId());
 				}
 
-				List<CVTerm> listScaleCvTerm = this.getCvTermDao().getByIds(listObjectIds);
+				List<CVTerm> listScaleCvTerm = daoFactory.getCvTermDao().getByIds(listObjectIds);
 
 				for (final CVTerm cvTerm : listScaleCvTerm) {
 					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
@@ -641,7 +645,7 @@ public class ListInventoryBuilder extends Builder {
 			}
 
 			final List<CVTermRelationship> scaleMethodRelationship =
-					this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(scaleIds, TermId.HAS_METHOD.getId());
+					daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(scaleIds, TermId.HAS_METHOD.getId());
 
 			List<Integer> listMethodObjectIds = new ArrayList<>();
 			if (scaleMethodRelationship != null) {
@@ -650,7 +654,7 @@ public class ListInventoryBuilder extends Builder {
 					listMethodObjectIds.add(relationship.getObjectId());
 				}
 
-				List<CVTerm> listScaleMethodCvTerm = this.getCvTermDao().getByIds(listMethodObjectIds);
+				List<CVTerm> listScaleMethodCvTerm = daoFactory.getCvTermDao().getByIds(listMethodObjectIds);
 
 				for (final CVTerm cvTerm : listScaleMethodCvTerm) {
 					Term term = TermBuilder.mapCVTermToTerm(cvTerm);

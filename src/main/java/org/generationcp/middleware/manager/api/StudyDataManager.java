@@ -755,7 +755,7 @@ public interface StudyDataManager {
 
 	Phenotype getPhenotypeById(int phenotypeId);
 
-	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId);
+	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId, Phenotype.ValueStatus valueStatus);
 
 	StudyMetadata getStudyMetadata(Integer studyId);
 
@@ -832,5 +832,19 @@ public interface StudyDataManager {
 	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
 	 */
 	List<Reference> getChildrenOfFolderByStudyType(int folderId, String programUUID, Integer studyTypeId);
+
+	/**
+	 *
+	 * @param experimentId
+	 * @param termId
+	 * @return
+	 */
+	Phenotype getPhenotype (Integer experimentId, Integer termId);
+
+	/**
+	 *
+	 * @param phenotype
+	 */
+	void updatePhenotype (Phenotype phenotype);
 
 }

@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementData {
@@ -41,6 +42,9 @@ public class MeasurementData {
 	// used to map this object to what is actually saved in the database after saving
 	private Variable variable;
 
+	private Phenotype.ValueStatus valueStatus;
+	private boolean changed = false;
+
 	public MeasurementData() {
 	}
 
@@ -52,6 +56,8 @@ public class MeasurementData {
 		this.phenotypeId = data.phenotypeId;
 		this.cValueId = data.cValueId;
 		this.measurementVariable = data.measurementVariable;
+		this.valueStatus = data.valueStatus;
+		this.changed = data.changed;
 	}
 
 	public MeasurementData(final String label, final String value) {
@@ -122,19 +128,20 @@ public class MeasurementData {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("MeasurementData [label=");
-		builder.append(this.label);
-		builder.append(", value=");
-		builder.append(this.value);
-		builder.append(", isEditable=");
-		builder.append(this.isEditable);
-		builder.append(", dataType=");
-		builder.append(this.dataType);
-		builder.append(", phenotypeId=");
-		builder.append(this.phenotypeId);
-		builder.append("]");
-		return builder.toString();
+		return "MeasurementData{" +
+			"isCustomCategoricalValue=" + this.isCustomCategoricalValue +
+			", label='" + this.label + '\'' +
+			", value='" + this.value + '\'' +
+			", cValueId='" + this.cValueId + '\'' +
+			", isEditable=" + this.isEditable +
+			", dataType='" + this.dataType + '\'' +
+			", phenotypeId=" + this.phenotypeId +
+			", measurementVariable=" + this.measurementVariable +
+			", isAccepted=" + this.isAccepted +
+			", oldValue='" + this.oldValue + '\'' +
+			", variable=" + this.variable +
+			", valueStatus=" + this.valueStatus +
+			'}';
 	}
 
 	public void print(final int indent) {
@@ -226,7 +233,7 @@ public class MeasurementData {
 
 		final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
 
-		if ((this.cValueId == null ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(value)) {
+		if ((this.cValueId == null ||  StringUtils.isEmpty(this.cValueId)) && StringUtils.isEmpty(this.value)) {
 			// If the categorical value id and value are empty, just return a CategoricalDisplayValue with empty
 			// id, name and description.
 			return new CategoricalDisplayValue("", "", "", false);
@@ -254,19 +261,23 @@ public class MeasurementData {
 		return new CategoricalDisplayValue(this.value, this.value, this.value, false);
 	}
 
+	// FIXME consolidate logic in the copy constructor
 	public MeasurementData copy() {
 		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
 		data.setCustomCategoricalValue(this.isCustomCategoricalValue);
 		data.setAccepted(this.isAccepted);
+		data.setValueStatus(this.valueStatus);
 		return data;
 	}
 
+	// FIXME consolidate logic in a copy constructor
 	public MeasurementData copy(final MeasurementVariable oldVar) {
 		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, oldVar);
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
+		data.setValueStatus(this.valueStatus);
 		return data;
 	}
 
@@ -340,6 +351,7 @@ public class MeasurementData {
 	public boolean isCategoricalValueValid() {
 
 		// If the variable is categorical, check if the value has a match in possible values list.
+
 		if (this.getMeasurementVariable().getDataTypeId() != null
 				&& this.getMeasurementVariable().getDataTypeId().intValue() == DataType.CATEGORICAL_VARIABLE.getId()
 				&& this.getMeasurementVariable().getPossibleValues() != null && StringUtils.isNotBlank(this.value)) {
@@ -378,4 +390,19 @@ public class MeasurementData {
 		this.oldValue = value;
 	}
 
+	public void setChanged(final boolean b) {
+		this.changed = b;
+	}
+
+	public boolean isChanged() {
+		return this.changed;
+	}
+
+	public Phenotype.ValueStatus getValueStatus() {
+		return this.valueStatus;
+	}
+
+	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
+		this.valueStatus = valueStatus;
+	}
 }

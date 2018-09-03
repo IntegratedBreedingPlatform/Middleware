@@ -150,9 +150,13 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("experiment.plotId"), "plotId");
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
 		projectionList.add(Projections.property("stock.dbxrefId"), "gid");
+		projectionList.add(Projections.property("sample.plateId"), "plateId");
+		projectionList.add(Projections.property("sample.well"), "well");
+
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample").createAlias("samples.plant", "plant")
-				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN).createAlias("user.person", "person")
+				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
+				.createAlias("user.person", "person", CriteriaSpecification.LEFT_JOIN)
 				.createAlias("plant.experiment", "experiment")
 				.createAlias("experiment.stock", "stock")
 				.createAlias("experiment.properties", "properties").add(Restrictions.eq("id", sampleListId))

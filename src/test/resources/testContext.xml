@@ -23,7 +23,7 @@
 	</bean>
 
 	<bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.J2eeUserTransaction">
-		<property name="transactionTimeout" value="300" />
+		<property name="transactionTimeout" value="${test.atomikos.transaction.timeout}" />
 	</bean>
 
 	<bean id="transactionManager"
@@ -49,15 +49,15 @@
     </bean>
 
     <bean id="userDataManager" class="org.generationcp.middleware.manager.UserDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="germplasmDataManager" class="org.generationcp.middleware.manager.GermplasmDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="germplasmListManager" class="org.generationcp.middleware.manager.GermplasmListManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
 	<bean id="germplasmGroupingService" class="org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl">
@@ -87,7 +87,7 @@
     </bean>
 
     <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="crossStudyDataManager" class="org.generationcp.middleware.manager.CrossStudyDataManagerImpl">
@@ -99,7 +99,7 @@
     </bean>
 
     <bean id="inventoryDataManager" class="org.generationcp.middleware.manager.InventoryDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="inventoryService" class="org.generationcp.middleware.service.InventoryServiceImpl">
@@ -144,19 +144,19 @@
     </bean>
 
     <bean id="ontologyPropertyDataManager" class="org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="ontologyVariableDataManager" class="org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="ontologyScaleDataManager" class="org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="termDataManager" class="org.generationcp.middleware.manager.ontology.TermDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="ontologyService" class="org.generationcp.middleware.service.OntologyServiceImpl">

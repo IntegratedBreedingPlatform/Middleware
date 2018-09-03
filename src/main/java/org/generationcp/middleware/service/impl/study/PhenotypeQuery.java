@@ -45,7 +45,7 @@ public class PhenotypeQuery {
 	public static final String PHENOTYPE_SEARCH_OBSERVATION_FILTER = " AND exists(SELECT 1 " //
 		+ " FROM phenotype ph " //
 		+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
-		+ "   INNER JOIN nd_experiment ndep ON ndeph.nd_experiment_id = ndep.nd_experiment_id " //
+		+ "   INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
 		+ "   INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
 		+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
 		+ "                             AND pp.variable_id = ph.observable_id " //

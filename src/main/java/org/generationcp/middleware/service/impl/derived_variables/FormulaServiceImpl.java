@@ -1,21 +1,21 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
+import com.google.common.base.Optional;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.util.FormulaUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.generationcp.middleware.domain.ontology.FormulaDto;
-import org.generationcp.middleware.domain.ontology.FormulaVariable;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.derived_variables.FormulaDaoFactory;
-import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.service.api.derived_variables.FormulaService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Optional;
 
 @Transactional
 @Service
@@ -23,21 +23,30 @@ public class FormulaServiceImpl implements FormulaService {
 
 
 	private HibernateSessionProvider sessionProvider;
-	private FormulaDaoFactory formulaDaoFactory;
+	private DaoFactory daoFactory;
 
 	public FormulaServiceImpl() {
 	}
 
 	public FormulaServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
-		this.formulaDaoFactory = new FormulaDaoFactory(this.sessionProvider);
+		this.daoFactory = new DaoFactory(this.sessionProvider);
+	}
+
+	@Override
+	public Optional<FormulaDto> getById(final Integer formulaId) {
+		final Formula formula = this.daoFactory.getFormulaDAO().getById(formulaId);
+		if (formula != null && formula.getActive()) {
+			return Optional.of(FormulaUtils.convertToFormulaDto(formula));
+		}
+		return Optional.absent();
 	}
 
 	@Override
 	public Optional<FormulaDto> getByTargetId(final Integer targetId) {
-		final Formula formula = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableId(targetId);
+		final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(targetId);
 		if (formula != null) {
-			return Optional.of(this.convertToFormulaDto(formula));
+			return Optional.of(FormulaUtils.convertToFormulaDto(formula));
 		}
 		return Optional.absent();
 	}
@@ -46,9 +55,20 @@ public class FormulaServiceImpl implements FormulaService {
 	public List<FormulaDto> getByTargetIds(final Set<Integer> variableIds) {
 
 		final List<FormulaDto> formulaDtos = new ArrayList<>();
-		final List<Formula> formulas = this.formulaDaoFactory.getFormulaDAO().getByTargetVariableIds(variableIds);
+		final List<Formula> formulas = this.daoFactory.getFormulaDAO().getByTargetVariableIds(variableIds);
 		for (final Formula formula : formulas) {
-			formulaDtos.add(this.convertToFormulaDto(formula));
+			formulaDtos.add(FormulaUtils.convertToFormulaDto(formula));
+		}
+		return formulaDtos;
+	}
+
+	@Override
+	public List<FormulaDto> getByInputId(final Integer inputId) {
+
+		final List<FormulaDto> formulaDtos = new ArrayList<>();
+		final List<Formula> formulas = this.daoFactory.getFormulaDAO().getByInputId(inputId);
+		for (final Formula formula : formulas) {
+			formulaDtos.add(FormulaUtils.convertToFormulaDto(formula));
 		}
 		return formulaDtos;
 	}
@@ -61,6 +81,22 @@ public class FormulaServiceImpl implements FormulaService {
 			this.fillFormulaVariables(formulaDto, formulaVariables);
 		}
 		return formulaVariables;
+	}
+
+	@Override
+	public FormulaDto save(final FormulaDto formulaDto) {
+		final Formula formula = FormulaUtils.convertToFormula(formulaDto);
+		this.daoFactory.getFormulaDAO().save(formula);
+		final FormulaDto result = FormulaUtils.convertToFormulaDto(formula);
+
+		return result;
+	}
+
+	@Override
+	public void delete(final Integer formulaId) {
+		final Formula formula = this.daoFactory.getFormulaDAO().getById(formulaId);
+		formula.setActive(false);
+		this.daoFactory.getFormulaDAO().update(formula);
 	}
 
 	protected void fillFormulaVariables(final FormulaDto formulaDto, final Set<FormulaVariable> formulaVariables) {
@@ -76,34 +112,6 @@ public class FormulaServiceImpl implements FormulaService {
 		}
 	}
 
-	protected FormulaDto convertToFormulaDto(final Formula formula) {
-		final FormulaDto formulaDto = new FormulaDto();
-
-		formulaDto.setName(formula.getName());
-		formulaDto.setTargetTermId(formula.getTargetCVTerm().getCvTermId());
-		formulaDto.setFormulaId(formula.getFormulaId());
-		formulaDto.setDefinition(formula.getDefinition());
-		formulaDto.setDescription(formula.getDescription());
-		formulaDto.setActive(formula.getActive());
-
-		final List<FormulaVariable> inputs = new ArrayList<>();
-		for (final CVTerm cvTerm : formula.getInputs()) {
-			final FormulaVariable formulaVariable = this.convertToFormulaVariable(cvTerm);
-			formulaVariable.setTargetTermId(formulaDto.getTargetTermId());
-			inputs.add(formulaVariable);
-		}
-		formulaDto.setInputs(inputs);
-
-		return formulaDto;
-	}
-
-	protected FormulaVariable convertToFormulaVariable(final CVTerm cvTerm) {
-		final FormulaVariable formulaVariable = new FormulaVariable();
-		formulaVariable.setId(cvTerm.getCvTermId());
-		formulaVariable.setName(cvTerm.getName());
-		return formulaVariable;
-	}
-
 	public HibernateSessionProvider getSessionProvider() {
 		return this.sessionProvider;
 	}
@@ -113,8 +121,8 @@ public class FormulaServiceImpl implements FormulaService {
 	}
 
 	
-	protected void setFormulaDaoFactory(final FormulaDaoFactory formulaDaoFactory) {
-		this.formulaDaoFactory = formulaDaoFactory;
+	protected void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 
 }

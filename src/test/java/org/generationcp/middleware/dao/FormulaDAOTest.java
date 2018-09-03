@@ -10,12 +10,15 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.core.Is.is;
 
 public class FormulaDAOTest extends IntegrationTestBase {
 
@@ -25,13 +28,13 @@ public class FormulaDAOTest extends IntegrationTestBase {
 	private CVTerm input1;
 	private CVTerm input2;
 
+	private DaoFactory daoFactory;
+
 	@Before
 	public void setup() {
-		this.formulaDAO = new FormulaDAO();
-		this.formulaDAO.setSession(this.sessionProvder.getSession());
-
-		this.cvtermDAO = new CVTermDao();
-		this.cvtermDAO.setSession(this.sessionProvder.getSession());
+		daoFactory = new DaoFactory(this.sessionProvder);
+		this.formulaDAO = daoFactory.getFormulaDAO();
+		this.cvtermDAO = daoFactory.getCvTermDao();
 	}
 
 	@Test
@@ -69,6 +72,29 @@ public class FormulaDAOTest extends IntegrationTestBase {
 		Assert.assertThat("Should retrieve correct list of formula by target variable IDs", formulaList.size(), Matchers.equalTo(2));
 		Assert.assertTrue(formulaList.contains(formula1));
 		Assert.assertTrue(formulaList.contains(formula2));
+	}
+
+	@Test
+	public void testGetByInputId() {
+		final Formula formula1 = saveTestFormula();
+		final Formula formula2 = saveTestFormula();
+
+		this.sessionProvder.getSession().flush();
+
+		final List<Formula> fromFormula1Input1 = this.formulaDAO.getByInputId(formula1.getInputs().get(0).getCvTermId());
+
+		Assert.assertThat(fromFormula1Input1.size(), is(1));
+		Assert.assertThat(fromFormula1Input1.get(0).getFormulaId(), is(formula1.getFormulaId()));
+
+		final List<Formula> fromFormula1Input2 = this.formulaDAO.getByInputId(formula1.getInputs().get(1).getCvTermId());
+
+		Assert.assertThat(fromFormula1Input2.size(), is(1));
+		Assert.assertThat(fromFormula1Input2.get(0).getFormulaId(), is(formula1.getFormulaId()));
+
+		final List<Formula> fromFormula2 = this.formulaDAO.getByInputId(formula2.getInputs().get(0).getCvTermId());
+
+		Assert.assertThat(fromFormula2.size(), is(1));
+		Assert.assertThat(fromFormula2.get(0).getFormulaId(), is(formula2.getFormulaId()));
 	}
 
 	protected Formula saveTestFormula() {

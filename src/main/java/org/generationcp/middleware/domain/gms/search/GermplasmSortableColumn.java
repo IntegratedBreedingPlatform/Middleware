@@ -30,7 +30,11 @@ public enum GermplasmSortableColumn {
 	GID("GID", GermplasmSearchDAO.GID),
 	GERMPLASM_DATE("GERMPLASM DATE", GermplasmSearchDAO.GERMPLASM_DATE),
 	GROUP_ID("GROUP ID", GermplasmSearchDAO.GROUP_ID),
-	NAMES("NAMES", GermplasmSearchDAO.NAMES);
+	NAMES("NAMES", GermplasmSearchDAO.NAMES),
+	GROUP_SOURCE_GID("GROUP SOURCE GID", GermplasmSearchDAO.GROUP_SOURCE_GID),
+	GROUP_SOURCE_PREFERRED_NAME("GROUP SOURCE", GermplasmSearchDAO.GROUP_SOURCE_PREFERRED_NAME),
+	IMMEDIATE_SOURCE_GID("IMMEDIATE SOURCE GID", GermplasmSearchDAO.IMMEDIATE_SOURCE_GID),
+	IMMEDIATE_SOURCE_PREFERRED_NAME("IMMEDIATE SOURCE", GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME);
 
 	// The corresponding column name in the germplasm search table
 	String tableColumnName;

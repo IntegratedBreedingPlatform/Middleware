@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
@@ -58,12 +59,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	private static final String SCALE_MAX_VALUE_NOT_VALID = "Max value is not valid";
 	private static final String SCALE_IS_REFERRED_TO_VARIABLE = "Scale is referred to variable.";
 
+	private DaoFactory daoFactory;
+
 	public OntologyScaleDataManagerImpl() {
 		super();
 	}
 
 	public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -112,8 +116,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 		try {
 
-			List<CVTerm> terms = fetchAll ? this.getCvTermDao().getAllByCvId(CvId.SCALES, filterObsolete)
-					: this.getCvTermDao().getAllByCvId(termIds, CvId.SCALES, filterObsolete);
+			List<CVTerm> terms = fetchAll ? daoFactory.getCvTermDao().getAllByCvId(CvId.SCALES, filterObsolete)
+					: daoFactory.getCvTermDao().getAllByCvId(termIds, CvId.SCALES, filterObsolete);
 			for (CVTerm s : terms) {
 				if (fetchAll) {
 					termIds.add(s.getCvTermId());
@@ -200,7 +204,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	@Override
 	public void addScale(Scale scale) {
 
-		CVTerm term = this.getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
+		CVTerm term = daoFactory.getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
 
 		if (term != null) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_EXIST_WITH_SAME_NAME);
@@ -220,20 +224,20 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		try {
 
 			// Saving term to database.
-			CVTerm savedTerm = this.getCvTermDao().save(scale.getName(), scale.getDefinition(), CvId.SCALES);
+			CVTerm savedTerm = daoFactory.getCvTermDao().save(scale.getName(), scale.getDefinition(), CvId.SCALES);
 			scale.setId(savedTerm.getCvTermId());
 
 			// Setting dataType to Scale and saving relationship
-			this.getCvTermRelationshipDao().save(scale.getId(), TermRelationshipId.HAS_TYPE.getId(), scale.getDataType().getId());
+			daoFactory.getCvTermRelationshipDao().save(scale.getId(), TermRelationshipId.HAS_TYPE.getId(), scale.getDataType().getId());
 
 			// Saving values if present
 			if (!Strings.isNullOrEmpty(scale.getMinValue())) {
-				this.getCvTermPropertyDao().save(scale.getId(), TermId.MIN_VALUE.getId(), String.valueOf(scale.getMinValue()), 0);
+				daoFactory.getCvTermPropertyDao().save(scale.getId(), TermId.MIN_VALUE.getId(), String.valueOf(scale.getMinValue()), 0);
 			}
 
 			// Saving values if present
 			if (!Strings.isNullOrEmpty(scale.getMaxValue())) {
-				this.getCvTermPropertyDao().save(scale.getId(), TermId.MAX_VALUE.getId(), String.valueOf(scale.getMaxValue()), 0);
+				daoFactory.getCvTermPropertyDao().save(scale.getId(), TermId.MAX_VALUE.getId(), String.valueOf(scale.getMaxValue()), 0);
 			}
 
 			// Saving categorical values if dataType is CATEGORICAL_VARIABLE
@@ -251,13 +255,13 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					String value = c.getDefinition().trim();
 
 					CVTerm category = new CVTerm(null, cv.getCvId(), label, value, null, 0, 0);
-					this.getCvTermDao().save(category);
-					this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
+					daoFactory.getCvTermDao().save(category);
+					daoFactory.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 				}
 			}
 
 			// Save creation time
-			this.getCvTermPropertyDao().save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+			daoFactory.getCvTermPropertyDao().save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
 
 		} catch (Exception e) {
@@ -294,7 +298,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		}
 
 		// Fetch full scale from db
-		CVTerm term = this.getCvTermDao().getById(scale.getId());
+		CVTerm term = daoFactory.getCvTermDao().getById(scale.getId());
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DOES_NOT_EXIST);
@@ -305,7 +309,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		}
 
 		// Fetch entire Scale variable from DB
-		List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(scale.getId());
+		List<CVTermRelationship> relationships = daoFactory.getCvTermRelationshipDao().getBySubject(scale.getId());
 
 		Optional<CVTermRelationship> optionalDataRelation = Iterables.tryFind(relationships, new Predicate<CVTermRelationship>() {
 
@@ -319,7 +323,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		DataType oldDataType = dataRelation != null ? DataType.getById(dataRelation.getObjectId()) : null;
 
 		// Check data type change when object is referred to variable
-		if (this.getCvTermRelationshipDao().isTermReferred(scale.getId()) && !Objects.equals(oldDataType, scale.getDataType())) {
+		if (daoFactory.getCvTermRelationshipDao().isTermReferred(scale.getId()) && !Objects.equals(oldDataType, scale.getDataType())) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_IS_REFERRED_TO_VARIABLE);
 		}
 
@@ -334,7 +338,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			}
 		}
 
-		List<CVTerm> categoricalValues = this.getCvTermDao().getByIds(valueIds);
+		List<CVTerm> categoricalValues = daoFactory.getCvTermDao().getByIds(valueIds);
 
 		Map<Integer, CVTerm> removableCategoryTerms = Util.mapAll(categoricalValues, new Function<CVTerm, Integer>() {
 
@@ -362,19 +366,19 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			term.setName(scale.getName());
 			term.setDefinition(scale.getDefinition());
 
-			this.getCvTermDao().merge(term);
+			daoFactory.getCvTermDao().merge(term);
 
 			// Update data type if changed
 			if (!Objects.equals(oldDataType, scale.getDataType())) {
 				if (dataRelation != null) {
 					dataRelation.setObjectId(scale.getDataType().getId());
-					this.getCvTermRelationshipDao().merge(dataRelation);
+					daoFactory.getCvTermRelationshipDao().merge(dataRelation);
 				} else {
-					this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_TYPE.getId(), scale.getDataType().getId());
+					daoFactory.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_TYPE.getId(), scale.getDataType().getId());
 				}
 			}
 
-			CvTermPropertyDao cvTermPropertyDao = this.getCvTermPropertyDao();
+			CvTermPropertyDao cvTermPropertyDao = daoFactory.getCvTermPropertyDao();
 			int maxTermId = TermId.MAX_VALUE.getId();
 			int minTermId = TermId.MIN_VALUE.getId();
 			String minScale = scale.getMinValue();
@@ -419,7 +423,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 						// update description of existing category and continue
 						ct.setDefinition(value);
-						this.getCvTermDao().merge(ct);
+						daoFactory.getCvTermDao().merge(ct);
 						category = ct;
 
 						break;
@@ -427,15 +431,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 					if (category == null) {
 						category = new CVTerm(null, cvId, label, value, null, 0, 0);
-						this.getCvTermDao().save(category);
-						this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
+						daoFactory.getCvTermDao().save(category);
+						daoFactory.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 					}
 				}
 			}
 
 			for (Integer k : removableCategoryRelations.keySet()) {
-				this.getCvTermRelationshipDao().makeTransient(removableCategoryRelations.get(k));
-				this.getCvTermDao().makeTransient(removableCategoryTerms.get(k));
+				daoFactory.getCvTermRelationshipDao().makeTransient(removableCategoryRelations.get(k));
+				daoFactory.getCvTermDao().makeTransient(removableCategoryTerms.get(k));
 			}
 
 			if (!scale.getDataType().equals(DataType.CATEGORICAL_VARIABLE) && cvId != null) {
@@ -443,7 +447,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			}
 
 			// Save last modified Time
-			this.getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+			daoFactory.getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 			this.deleteScalesRelatedVariablesFromCache(Integer.valueOf(scale.getId()));
 
 		} catch (Exception e) {
@@ -478,7 +482,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	@Override
 	public void deleteScale(int scaleId) {
 
-		CVTerm term = this.getCvTermDao().getById(scaleId);
+		CVTerm term = daoFactory.getCvTermDao().getById(scaleId);
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DOES_NOT_EXIST);
@@ -488,7 +492,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DOES_NOT_EXIST);
 		}
 
-		if (this.getCvTermRelationshipDao().isTermReferred(scaleId)) {
+		if (daoFactory.getCvTermRelationshipDao().isTermReferred(scaleId)) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_IS_REFERRED_TO_VARIABLE);
 		}
 
@@ -496,19 +500,19 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 			// Deleting existing relationships for property
 			List<Integer> categoricalTermIds = new ArrayList<>();
-			List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(scaleId);
+			List<CVTermRelationship> relationships = daoFactory.getCvTermRelationshipDao().getBySubject(scaleId);
 
 			for (CVTermRelationship r : relationships) {
 				if (r.getTypeId().equals(TermId.HAS_VALUE.getId())) {
 					categoricalTermIds.add(r.getObjectId());
 				}
-				this.getCvTermRelationshipDao().makeTransient(r);
+				daoFactory.getCvTermRelationshipDao().makeTransient(r);
 			}
 
-			List<CVTerm> terms = this.getCvTermDao().getByIds(categoricalTermIds);
+			List<CVTerm> terms = daoFactory.getCvTermDao().getByIds(categoricalTermIds);
 
 			for (CVTerm c : terms) {
-				this.getCvTermDao().makeTransient(c);
+				daoFactory.getCvTermDao().makeTransient(c);
 			}
 
 			if (!terms.isEmpty()) {
@@ -516,12 +520,12 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			}
 
 			// Deleting existing values for property
-			List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermId(scaleId);
+			List<CVTermProperty> properties = daoFactory.getCvTermPropertyDao().getByCvTermId(scaleId);
 			for (CVTermProperty p : properties) {
-				this.getCvTermPropertyDao().makeTransient(p);
+				daoFactory.getCvTermPropertyDao().makeTransient(p);
 			}
 
-			this.getCvTermDao().makeTransient(term);
+			daoFactory.getCvTermDao().makeTransient(term);
 
 
 		} catch (Exception e) {

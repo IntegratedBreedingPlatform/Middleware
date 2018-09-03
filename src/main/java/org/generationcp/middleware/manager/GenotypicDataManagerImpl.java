@@ -95,7 +95,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public GenotypicDataManagerImpl() {
 	}
 
-	public GenotypicDataManagerImpl(HibernateSessionProvider sessionProvider) {
+	public GenotypicDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
@@ -1771,11 +1771,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId) {
 		return this.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
-	}
-
-	@Override
-	public java.util.Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
-		return getSampleDao().getGIDsBySampleIds(sampleIds);
 	}
 
 }

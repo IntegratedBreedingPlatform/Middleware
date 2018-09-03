@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -33,8 +34,11 @@ public class PhenotypeSaver extends Saver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeSaver.class);
 
+	private DaoFactory daoFactory;
+
 	public PhenotypeSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public void savePhenotypes(final ExperimentModel experimentModel, final VariableList variates) throws MiddlewareQueryException {
@@ -68,8 +72,8 @@ public class PhenotypeSaver extends Saver {
 	}
 
 	public void saveOrUpdate(final int experimentId, final Integer variableId, final String value, final Phenotype oldPhenotype,
-			final Integer dataTypeId) throws MiddlewareQueryException {
-		final Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, dataTypeId);
+			final Integer dataTypeId, final Phenotype.ValueStatus valueStatus) throws MiddlewareQueryException {
+		final Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, dataTypeId, valueStatus);
 		this.saveOrUpdate(experimentId, phenotype);
 	}
 
@@ -123,13 +127,15 @@ public class PhenotypeSaver extends Saver {
 
 	private void saveOrUpdate(final int experimentId, final Phenotype phenotype) throws MiddlewareQueryException {
 		if (phenotype != null) {
-		  	phenotype.setExperiment(this.getExperimentDao().getById(experimentId));
+			final ExperimentModel experiment = new ExperimentModel();
+			experiment.setNdExperimentId(experimentId);
+		  	phenotype.setExperiment(experiment);
 			this.getPhenotypeDao().merge(phenotype);
 		}
 	}
 
 	private Phenotype createPhenotype(final Integer variableId, final String value, final Phenotype oldPhenotype,
-			final Integer dataTypeId) throws MiddlewareQueryException {
+			final Integer dataTypeId, Phenotype.ValueStatus valueStatus) throws MiddlewareQueryException {
 
 		if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null)) {
 			return null;
@@ -142,6 +148,7 @@ public class PhenotypeSaver extends Saver {
 		} else {
 			phenotype.setValue(value);
 		}
+		phenotype.setValueStatus(valueStatus);
 		phenotype.setObservableId(variableId);
 		phenotype.setName(String.valueOf(variableId));
 
@@ -172,14 +179,14 @@ public class PhenotypeSaver extends Saver {
 	protected Map<Integer, String> getPossibleValuesMap(final int variableId) throws MiddlewareQueryException {
 		final Map<Integer, String> possibleValuesMap = new HashMap<Integer, String>();
 		final CVTermRelationship scaleRelationship =
-				this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(variableId, TermId.HAS_SCALE.getId());
+				daoFactory.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(variableId, TermId.HAS_SCALE.getId());
 		if (scaleRelationship != null) {
 			final List<CVTermRelationship> possibleValues =
-					this.getCvTermRelationshipDao().getBySubjectIdAndTypeId(scaleRelationship.getObjectId(), TermId.HAS_VALUE.getId());
+					daoFactory.getCvTermRelationshipDao().getBySubjectIdAndTypeId(scaleRelationship.getObjectId(), TermId.HAS_VALUE.getId());
 			if (possibleValues != null) {
 				for (final CVTermRelationship cvTermRelationship : possibleValues) {
 					possibleValuesMap.put(cvTermRelationship.getObjectId(),
-							this.getCvTermDao().getById(cvTermRelationship.getObjectId()).getName());
+							daoFactory.getCvTermDao().getById(cvTermRelationship.getObjectId()).getName());
 				}
 			}
 		}

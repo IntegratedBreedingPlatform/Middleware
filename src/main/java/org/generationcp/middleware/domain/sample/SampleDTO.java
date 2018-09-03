@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class SampleDTO {
 
@@ -20,8 +21,11 @@ public class SampleDTO {
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
+	private String plateId;
+	private String well;
 	private Set<Dataset> datasets = new HashSet<>();
 
+	// FIXME Jackson use UTC as default timezone
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
 	private Date samplingDate;
 
@@ -166,6 +170,22 @@ public class SampleDTO {
 
 	public void setDesignation(String designation) {
 		this.designation = designation;
+	}
+
+	public String getPlateId() {
+		return plateId;
+	}
+
+	public void setPlateId(String plateId) {
+		this.plateId = plateId;
+	}
+
+	public String getWell() {
+		return well;
+	}
+
+	public void setWell(String well) {
+		this.well = well;
 	}
 
 	public Set<Dataset> getDatasets() {

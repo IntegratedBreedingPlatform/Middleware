@@ -20,11 +20,15 @@ import java.util.Set;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 
 public class ExperimentSearcher extends Searcher {
 
+	private DaoFactory daoFactory;
+
 	public ExperimentSearcher(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	// TODO: Not all factors were considered in this method. to be added as needed
@@ -57,7 +61,7 @@ public class ExperimentSearcher extends Searcher {
 	}
 
 	private Integer getStoredInId(Integer factorId) throws MiddlewareQueryException {
-		List<Integer> termIds = this.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
+		List<Integer> termIds = daoFactory.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
 		return termIds != null && !termIds.isEmpty() ? termIds.get(0) : null;
 	}
 

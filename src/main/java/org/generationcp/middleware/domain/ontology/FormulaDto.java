@@ -11,33 +11,28 @@ public class FormulaDto {
 	private static final long serialVersionUID = 1L;
 
 	private Integer formulaId;
-
-	private Integer targetTermId;
-
+	private FormulaVariable target;
+	//TODO Perhaps we can keep a an internal copy of inputs as a map (Improvement)
 	private List<FormulaVariable> inputs = new ArrayList<>();
-
 	private String definition;
-
 	private Boolean active;
-
 	private String name;
-
 	private String description;
 
 	public Integer getFormulaId() {
-		return formulaId;
+		return this.formulaId;
 	}
 
 	public void setFormulaId(final Integer formulaId) {
 		this.formulaId = formulaId;
 	}
 
-	public Integer getTargetTermId() {
-		return targetTermId;
+	public FormulaVariable getTarget() {
+		return this.target;
 	}
 
-	public void setTargetTermId(final Integer targetTermId) {
-		this.targetTermId = targetTermId;
+	public void setTarget(final FormulaVariable target) {
+		this.target = target;
 	}
 
 	public List<FormulaVariable> getInputs() {
@@ -49,7 +44,7 @@ public class FormulaDto {
 	}
 
 	public String getDefinition() {
-		return definition;
+		return this.definition;
 	}
 
 	public void setDefinition(final String definition) {
@@ -57,7 +52,7 @@ public class FormulaDto {
 	}
 
 	public Boolean getActive() {
-		return active;
+		return this.active;
 	}
 
 	public void setActive(final Boolean active) {
@@ -65,7 +60,7 @@ public class FormulaDto {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -73,11 +68,19 @@ public class FormulaDto {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
 		this.description = description;
+	}
+
+	public boolean isInputVariablePresent(final Integer inputCvTermId) {
+		for (final FormulaVariable formulaVariable: this.inputs) {
+			if (Integer.valueOf(formulaVariable.getId()).equals(inputCvTermId))
+				return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -86,21 +89,27 @@ public class FormulaDto {
 			return true;
 		}
 
-		if (o == null || getClass() != o.getClass()) {
+		if (o == null || this.getClass() != o.getClass()) {
 			return false;
 		}
 
 		final FormulaDto formula = (FormulaDto) o;
 
-		return new EqualsBuilder().append(formulaId, formula.formulaId).append(targetTermId, formula.targetTermId)
-				.append(definition, formula.definition).append(active, formula.active).append(name, formula.name)
-				.append(description, formula.description).isEquals();
+		return new EqualsBuilder() //
+			.append(this.formulaId, formula.formulaId) //
+			.append(this.target.getId(), formula.getTarget().getId()) //
+			.append(this.definition, formula.definition) //
+			.append(this.active, formula.active) //
+			.append(this.name, formula.name) //
+			.append(this.description, formula.description) //
+			.isEquals(); //
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(formulaId).append(targetTermId).append(definition).append(active).append(name)
-				.append(description).toHashCode();
+		return new HashCodeBuilder(17, 37).append(this.formulaId).append(this.target).append(this.definition).append(this.active).append(
+			this.name)
+				.append(this.description).toHashCode();
 	}
 
 }

@@ -35,6 +35,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -53,8 +54,11 @@ public class StandardVariableBuilder extends Builder {
 	private static final String DATA_TYPE_NUMERIC = "N";
 	private static final String DATA_TYPE_CHARACTER = "C";
 
+	private DaoFactory daoFactory;
+
 	public StandardVariableBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public StandardVariable create(final int standardVariableId, final String programUUID) {
@@ -122,7 +126,7 @@ public class StandardVariableBuilder extends Builder {
 			// Now this relationship is linked to the "Property" of the standard variable. (facepalm).
 			if (summary.getProperty() != null) {
 				final List<CVTermRelationship> propertyCvTermRelationships =
-						this.getCvTermRelationshipDao().getBySubject(summary.getProperty().getId());
+						daoFactory.getCvTermRelationshipDao().getBySubject(summary.getProperty().getId());
 				final Term isAOfProperty = this.createTerm(propertyCvTermRelationships, TermId.IS_A);
 				if (isAOfProperty != null) {
 					summary.setIsA(new TermSummary(isAOfProperty.getId(), isAOfProperty.getName(), isAOfProperty.getDefinition()));
@@ -145,7 +149,7 @@ public class StandardVariableBuilder extends Builder {
 		}
 		if (term != null) {
 			final CVTermProperty property =
-					this.getCvTermPropertyDao().getOneByCvTermAndType(term.getId(), TermId.CROP_ONTOLOGY_ID.getId());
+					daoFactory.getCvTermPropertyDao().getOneByCvTermAndType(term.getId(), TermId.CROP_ONTOLOGY_ID.getId());
 			if (property != null) {
 				cropOntologyId = property.getValue();
 			}
@@ -187,7 +191,7 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private CVTerm getCvTerm(final int id) {
-		return this.getCvTermDao().getById(id);
+		return daoFactory.getCvTermDao().getById(id);
 	}
 
 	public StandardVariable findOrSave(final String name, final String description, final String propertyName, final String scaleName, final String methodName,
@@ -280,7 +284,7 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public StandardVariable getByName(final String name, final String programUUID) {
-		final CVTerm cvTerm = this.getCvTermDao().getByName(name);
+		final CVTerm cvTerm = daoFactory.getCvTermDao().getByName(name);
 		if (cvTerm != null && cvTerm.getCvTermId() != null) {
 			return this.getStandardVariableBuilder().create(cvTerm.getCvTermId(), programUUID);
 		}
@@ -311,7 +315,7 @@ public class StandardVariableBuilder extends Builder {
 
 	public Integer getIdByPropertyScaleMethod(final Integer propertyId, final Integer scaleId, final Integer methodId) {
 		Integer stdVariableId = null;
-		stdVariableId = this.getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "DESC");
+		stdVariableId = daoFactory.getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "DESC");
 		return stdVariableId;
 	}
 
@@ -400,34 +404,34 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {
-		return this.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
+		return daoFactory.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
 
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(final List<String> traitNames) {
-		return this.getCvTermDao().getStandardVariableIdsWithTypeByProperties(traitNames);
+		return daoFactory.getCvTermDao().getStandardVariableIdsWithTypeByProperties(traitNames);
 	}
 
 	public Integer getIdByTermId(final int cvTermId, final TermId termId) {
 		Integer stdVariableId = null;
-		stdVariableId = this.getCvTermDao().getStandardVariableIdByTermId(cvTermId, termId);
+		stdVariableId = daoFactory.getCvTermDao().getStandardVariableIdByTermId(cvTermId, termId);
 		return stdVariableId;
 	}
 
 	public CVTerm getCvTerm(final String name, final int cvId) {
-		return this.getCvTermDao().getByNameAndCvId(name, cvId);
+		return daoFactory.getCvTermDao().getByNameAndCvId(name, cvId);
 	}
 
 	public Integer getIdByPropertyScaleMethodRole(final Integer propertyId, final Integer scaleId, final Integer methodId,
 			final PhenotypicType role) {
 		Integer stdVariableId = null;
-		stdVariableId = this.getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+		stdVariableId = daoFactory.getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
 		return stdVariableId;
 	}
 
 	public boolean validateEnumerationUsage(final int standardVariableId, final int enumerationId) {
 		final Integer storedInId =
-				this.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), standardVariableId).get(0);
+				daoFactory.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), standardVariableId).get(0);
 		final String value = String.valueOf(enumerationId);
 		if (storedInId == TermId.STUDY_INFO_STORAGE.getId() || storedInId == TermId.DATASET_INFO_STORAGE.getId()) {
 			return !this.isExistsPropertyByTypeAndValue(standardVariableId, value);
@@ -476,7 +480,7 @@ public class StandardVariableBuilder extends Builder {
 
 	public List<StandardVariableReference> findAllByProperty(final int propertyId) {
 		final List<StandardVariableReference> list = new ArrayList<>();
-		list.addAll(this.getCvTermDao().getStandardVariablesOfProperty(propertyId));
+		list.addAll(daoFactory.getCvTermDao().getStandardVariablesOfProperty(propertyId));
 		return list;
 	}
 }

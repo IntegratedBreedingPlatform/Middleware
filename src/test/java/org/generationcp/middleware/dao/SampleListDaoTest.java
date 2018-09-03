@@ -17,6 +17,7 @@ import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
@@ -51,7 +52,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private SampleListDao sampleListDao;
 	private UserDAO userDao;
 	private PersonDAO personDAO;
-	private PlantDao plantDao;
 	private SampleDao sampleDao;
 	private ExperimentDao experimentDao;
 	private GeolocationDao geolocationDao;
@@ -59,27 +59,23 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private StockDao stockDao;
 	private ExperimentPropertyDao experimentPropertyDao;
 
+	private DaoFactory daoFactory;
+
 	public static final String ROOT_FOLDER = "Samples";
 
 	@Before
 	public void setUp() throws Exception {
-		this.sampleListDao = new SampleListDao();
-		this.sampleListDao.setSession(this.sessionProvder.getSession());
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 
-		this.userDao = new UserDAO();
-		this.userDao.setSession(this.sessionProvder.getSession());
+		this.sampleListDao = this.daoFactory.getSampleListDao();
+		this.userDao = this.daoFactory.getUserDao();
+		this.sampleDao = this.daoFactory.getSampleDao();
 
 		this.personDAO = new PersonDAO();
 		this.personDAO.setSession(this.sessionProvder.getSession());
 
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
-
-		this.plantDao = new PlantDao();
-		this.plantDao.setSession(this.sessionProvder.getSession());
-
-		this.sampleDao = new SampleDao();
-		this.sampleDao.setSession(this.sessionProvder.getSession());
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());
