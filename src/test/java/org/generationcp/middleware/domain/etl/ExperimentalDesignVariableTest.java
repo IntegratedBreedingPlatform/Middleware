@@ -105,4 +105,13 @@ public class ExperimentalDesignVariableTest {
 		final ExperimentalDesignVariable experimentalDesignVariable = new ExperimentalDesignVariable(variables);
 		Assert.assertEquals("Experimental design must be empty ", "", experimentalDesignVariable.getExperimentalDesignDisplay());
 	}
+
+	@Test
+	public void testGetExperimentalDesignDisplayWithNullVariableValue() {
+		final List<MeasurementVariable> variables = new ArrayList<>();
+		variables.add(this.createMeasurementVariableTestData(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), null,
+				this.createPossibleValuesOfExptDesign()));
+		final ExperimentalDesignVariable experimentalDesignVariable = new ExperimentalDesignVariable(variables);
+		Assert.assertEquals("Experimental design must be empty ", "", experimentalDesignVariable.getExperimentalDesignDisplay());
+	}
 }

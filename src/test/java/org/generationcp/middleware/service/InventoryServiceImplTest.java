@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -70,7 +71,7 @@ public class InventoryServiceImplTest {
 	private HibernateSessionProvider sessionProvider;
 
 	@Mock
-	private InventoryDaoFactory inventoryDaoFactory;
+	private DaoFactory daoFactory;
 
 	@Mock
 	private LotDAO lotDAO;
@@ -108,14 +109,14 @@ public class InventoryServiceImplTest {
 	@Before
 	public void setup() {
 
-		Mockito.when(this.inventoryDaoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
-		Mockito.when(this.inventoryDaoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
-		Mockito.when(this.inventoryDaoFactory.getPersonDAO()).thenReturn(this.personDAO);
-		Mockito.when(this.inventoryDaoFactory.getLotDao()).thenReturn(this.lotDAO);
-		Mockito.when(this.inventoryDaoFactory.getLocationDAO()).thenReturn(this.locationDAO);
-		Mockito.when(this.inventoryDaoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
-		Mockito.when(this.inventoryDaoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
-		Mockito.when(this.inventoryDaoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
+		Mockito.when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
+		Mockito.when(this.daoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
+		Mockito.when(this.daoFactory.getPersonDAO()).thenReturn(this.personDAO);
+		Mockito.when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
+		Mockito.when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
+		Mockito.when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
+		Mockito.when(this.daoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
+		Mockito.when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
 	}
 
 	@Test

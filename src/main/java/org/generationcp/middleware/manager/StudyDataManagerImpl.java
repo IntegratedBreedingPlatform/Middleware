@@ -89,6 +89,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
+	private DaoFactory daoFactory;
 
 	public StudyDataManagerImpl() {
 	}
@@ -101,6 +102,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private void init(final HibernateSessionProvider sessionProvider) {
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
@@ -821,13 +823,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private void populateSiteAnPersonIfNecessary(final StudyDetails detail) {
 		if (detail != null) {
 			if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
-				final Location loc = this.getLocationDao().getById(detail.getSiteId());
+				final Location loc = daoFactory.getLocationDAO().getById(detail.getSiteId());
 				if (loc != null) {
 					detail.setSiteName(loc.getLname());
 				}
 			}
 			if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
-				final Person person = this.getPersonDao().getById(detail.getPiId());
+				final Person person = daoFactory.getPersonDAO().getById(detail.getPiId());
 				if (person != null) {
 					detail.setPiName(person.getDisplayName());
 				}
@@ -864,10 +866,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}
 		}
 		if (!siteIds.isEmpty()) {
-			siteMap.putAll(this.getLocationDao().getLocationNamesByLocationIDs(siteIds));
+			siteMap.putAll(daoFactory.getLocationDAO().getLocationNamesByLocationIDs(siteIds));
 		}
 		if (!personIds.isEmpty()) {
-			personMap.putAll(this.getPersonDao().getPersonNamesByPersonIds(personIds));
+			personMap.putAll(daoFactory.getPersonDAO().getPersonNamesByPersonIds(personIds));
 		}
 	}
 
@@ -916,7 +918,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			if (name != null) {
 				return name;
 			}
-			final Location location = this.getLocationDAO().getById(id);
+			final Location location = daoFactory.getLocationDAO().getById(id);
 			if (location != null) {
 				locationMap.put(id, location.getLname());
 				return location.getLname();
@@ -1095,8 +1097,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void saveOrUpdatePhenotypeValue(final int experimentId, final int variableId, final String value,
-			final Phenotype existingPhenotype, final int dataTypeId) {
-		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId);
+			final Phenotype existingPhenotype, final int dataTypeId, final Phenotype.ValueStatus valueStatus) {
+		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId, valueStatus);
 	}
 
 	@Override
@@ -1116,7 +1118,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
-		return this.getSampleDao().getExperimentSampleMap(studyDbId);
+		return this.daoFactory.getSampleDao().getExperimentSampleMap(studyDbId);
 	}
 
 	@Override
@@ -1234,5 +1236,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
 		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
+	}
+
+	/**
+	 * @param experimentId
+	 * @param termId
+	 * @return
+	 */
+	@Override
+	public Phenotype getPhenotype(final Integer experimentId, final Integer termId) {
+		return this.getPhenotypeDao().getByExperimentAndTrait(experimentId, termId);
+	}
+
+	/**
+	 * @param phenotype
+	 */
+	@Override
+	public void updatePhenotype(final Phenotype phenotype) {
+		this.getPhenotypeDao().saveOrUpdate(phenotype);
 	}
 }

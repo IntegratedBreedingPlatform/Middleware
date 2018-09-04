@@ -7,7 +7,7 @@ public class FormulaVariable extends Term {
 	public FormulaVariable() {
 	}
 
-	public FormulaVariable(final Integer id, final String name, final int targetTermId) {
+	public FormulaVariable(final Integer id, final String name, final Integer targetTermId) {
 		this.setId(id);
 		this.targetTermId = targetTermId;
 		this.setName(name);

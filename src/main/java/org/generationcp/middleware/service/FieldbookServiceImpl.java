@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.service;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -38,6 +39,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -60,6 +62,7 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -97,6 +100,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
 
+	private DaoFactory daoFactory;
+
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
 	public FieldbookServiceImpl() {
@@ -105,6 +110,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public FieldbookServiceImpl(final HibernateSessionProvider sessionProvider, final String localDatabaseName) {
 		super(sessionProvider, localDatabaseName);
+		daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -207,6 +213,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
+	
+	@Override
+	public Workbook getStudyByNameAndProgramUUID(final String studyName, final String programUUID) {
+		final int id = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(studyName, programUUID);
+		return this.getStudyDataSet(id);
+	}
 
 	@Override
 	public boolean loadAllObservations(final Workbook workbook) {
@@ -225,13 +237,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final long startTime = System.currentTimeMillis();
 
 		try {
-
 			final List<MeasurementVariable> variates = workbook.getVariates();
 			final List<MeasurementVariable> factors = workbook.getFactors();
 			final List<MeasurementRow> observations = workbook.getObservations();
 
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+
+
 
 			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 
@@ -267,7 +280,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 							for (final MeasurementData field : row.getDataList()) {
 								if (factor.getName().equals(field.getLabel()) && factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
 
-									saveOrUpdateTrialDesignData(this.getExperimentPropertySaver(),
+									this.saveOrUpdateTrialDesignData(this.getExperimentPropertySaver(),
 											this.getExperimentDao().getById(row.getExperimentId()), field, factor.getTermId());
 
 								}
@@ -278,6 +291,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 			final Measurements measurements =
 					new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
+
 			this.saveMeasurements(saveVariates, variates, observations, measurements);
 
 		} catch (final Exception e) {
@@ -288,6 +302,41 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		FieldbookServiceImpl.LOG.debug("========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
+	}
+
+	//TODO find a better way to mark variable as OUT_OF_SYNC when inputs are deleted
+	@Override
+	public void updatePhenotypeStatus(final List<MeasurementRow> observations) {
+		final List<MeasurementData> measurementDataList = this.getChangedFormulaObservations(observations);
+		for (final MeasurementData measurementData: measurementDataList) {
+			final Phenotype phenotype = this.getPhenotypeDao().getById(measurementData.getPhenotypeId());
+			if (phenotype != null) {
+				phenotype.setValueStatus(measurementData.getValueStatus());
+				this.getPhenotypeDao().saveOrUpdate(phenotype);
+			}
+		}
+	}
+
+	@Override
+	public Boolean hasOutOfSyncObservations(final Integer projectId) {
+		return this.getPhenotypeDao().hasOutOfSync(projectId);
+	}
+
+	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
+		final List<MeasurementData> result = new ArrayList();
+		for (final MeasurementRow measurementRow : observations) {
+			final List<MeasurementData> dataList = measurementRow.getDataList();
+			if (dataList == null || dataList.isEmpty()) {
+				continue;
+			}
+			for (final MeasurementData measurementData : dataList) {
+				if (Phenotype.ValueStatus.OUT_OF_SYNC.equals(measurementData.getValueStatus()) && measurementData.isChanged()) {
+					result.add(measurementData);
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 	protected void saveOrUpdateTrialDesignData(final ExperimentPropertySaver experimentPropertySaver, final ExperimentModel experimentModel,
@@ -358,7 +407,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
-		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
+		final GermplasmListDAO germplasmListDao = daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
 
@@ -434,7 +483,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				// Save germplasmListData
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
-				this.getGermplasmListDataDAO().save(germplasmListData);
+				daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 				counter++;
 			}
 
@@ -465,7 +514,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Integer saveGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
 			final boolean isApplyNewGroupToPreviousCrosses) {
 
-		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
+		final GermplasmListDAO germplasmListDao = daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
 
@@ -483,7 +532,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
-				this.getGermplasmListDataDAO().save(germplasmListData);
+				daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 			}
 
 			// For Management Group Settings Processing
@@ -519,7 +568,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public GermplasmList getGermplasmListByName(final String name, final String programUUID) {
-		final List<GermplasmList> germplasmLists = germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
+		final List<GermplasmList> germplasmLists = this.germplasmListManager.getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
 		if (!germplasmLists.isEmpty()) {
 			return germplasmLists.get(0);
 		}
@@ -612,7 +661,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		final List<Integer> variableIdList = new ArrayList<>(variableIds);
-		variables.addAll(this.getCvTermDao()
+		variables.addAll(daoFactory.getCvTermDao()
 				.getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(), TermId.CATEGORICAL_VARIABLE.getId()));
 		for (final CVTerm variable : variables) {
 			list.add(new StandardVariableReference(variable.getCvTermId(), variable.getName(), variable.getDefinition()));
@@ -648,14 +697,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	private void addAllVariableIdsInMode(final Set<Integer> variableIds, final List<Integer> storedInIds) {
 		for (final Integer storedInId : storedInIds) {
-			variableIds.addAll(this.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
+			variableIds.addAll(daoFactory.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
 		}
 	}
 
 	private void createPropertyList(final Set<Integer> propertyVariableList, final List<Integer> propertyIds) {
 		for (final Integer propertyId : propertyIds) {
 			propertyVariableList
-					.addAll(this.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
+					.addAll(daoFactory.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
 		}
 	}
 
@@ -754,7 +803,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StandardVariable> getPossibleTreatmentPairs(final int cvTermId, final int propertyId, final List<Integer> hiddenFields) {
 		final List<StandardVariable> treatmentPairs = new ArrayList<>();
-		treatmentPairs.addAll(this.getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
+		treatmentPairs.addAll(daoFactory.getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 
 		final List<Integer> termIds = new ArrayList<>();
 		final Map<Integer, CVTerm> termMap = new HashMap<>();
@@ -766,7 +815,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		final List<CVTerm> terms = new ArrayList<>();
-		terms.addAll(this.getCvTermDao().getByIds(termIds));
+		terms.addAll(daoFactory.getCvTermDao().getByIds(termIds));
 
 		for (final CVTerm term : terms) {
 			termMap.put(term.getCvTermId(), term);
@@ -800,7 +849,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Integer updateGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList) {
-		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
+		final GermplasmListDAO germplasmListDao = daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
 
@@ -816,7 +865,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
-				this.getGermplasmListDataDAO().update(germplasmListData);
+				daoFactory.getGermplasmListDataDAO().update(germplasmListData);
 			}
 
 		} catch (final MiddlewareQueryException e) {
@@ -858,7 +907,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public GermplasmList getGermplasmListById(final Integer listId) {
-		return germplasmListManager.getGermplasmListById(listId);
+		return this.germplasmListManager.getGermplasmListById(listId);
 	}
 
 	@Override
@@ -1071,7 +1120,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<GermplasmList> getGermplasmListsByProjectId(final int projectId, final GermplasmListType type) {
-		return this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		return daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 	}
 
 	@Override
@@ -1099,7 +1148,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public void deleteListDataProjects(final int projectId, final GermplasmListType type) {
 		// when used in advanced, it will delete all the advance lists (list
 		// data projects)
-		final List<GermplasmList> lists = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		final List<GermplasmList> lists = daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (lists != null && !lists.isEmpty()) {
 			for (final GermplasmList list : lists) {
 				this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
@@ -1132,7 +1181,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void saveStudyColumnOrdering(final Integer studyId, final String studyName, final List<Integer> orderedTermIds) {
-		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+		final int plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 

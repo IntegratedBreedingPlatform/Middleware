@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
@@ -25,8 +26,11 @@ public class LotBuilder extends Builder {
 
 	private static final int LOT_NOT_DERIVED_FROM_ANOTHER = 0;
 
+	private DaoFactory daoFactory;
+
 	public LotBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public List<Lot> build(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId, Double amount,
@@ -57,7 +61,7 @@ public class LotBuilder extends Builder {
 		List<Integer> newGids = new ArrayList<Integer>();
 
 		List<Lot> existingLots =
-				this.getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(EntityType.GERMPLSM.name(), gids, locationId, scaleId);
+				daoFactory.getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(EntityType.GERMPLSM.name(), gids, locationId, scaleId);
 		List<Integer> gidsWithExistingCombi = new ArrayList<Integer>();
 		if (existingLots != null && !existingLots.isEmpty()) {
 			for (Lot lot : existingLots) {
@@ -96,7 +100,7 @@ public class LotBuilder extends Builder {
 
 	private List<Lot> createLotsForUpdate(List<Integer> gids, Integer locationId, Integer scaleId, String comment)
 			throws MiddlewareQueryException {
-		List<Lot> existingLots = this.getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
+		List<Lot> existingLots = daoFactory.getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
 
 		if (gids != null && !gids.isEmpty()) {
 
@@ -113,7 +117,7 @@ public class LotBuilder extends Builder {
 	public LotsResult getGidsForUpdateAndAdd(List<Integer> gids) throws MiddlewareQueryException {
 
 		List<Integer> newGids = new ArrayList<Integer>();
-		List<Lot> existingLots = this.getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
+		List<Lot> existingLots = daoFactory.getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
 		List<Integer> gidsWithExistingCombi = new ArrayList<Integer>();
 		if (existingLots != null && !existingLots.isEmpty()) {
 			for (Lot lot : existingLots) {

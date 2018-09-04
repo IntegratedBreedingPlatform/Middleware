@@ -23,6 +23,7 @@ class ObservationQuery {
 	public static final String SELECT_TEXT = " SELECT\n"
 		+ "   nde.nd_experiment_id,\n"
 		+ "   gl.description                                      AS                      TRIAL_INSTANCE,\n"
+		+ "   proj.name									  AS 					  PROJECT_NAME,\n"
 		+ "   gl.nd_geolocation_id,\n"
 		+ "   (SELECT iispcvt.definition\n"
 		+ FROM
@@ -67,6 +68,7 @@ class ObservationQuery {
 	public static final String ND_GEOLOCATIONPROP_GP = "            nd_geolocationprop gp \n";
 	public static final String GP_TYPE_ID = "            gp.type_id = ";
 	public static final String PHENOTYPE_ID = "_PhenotypeId";
+	public static final String STATUS = "_Status";
 	public static final String INSTANCE_NUMBER_CLAUSE = " AND gl.nd_geolocation_id = :instanceId \n";
 	public static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
 
@@ -122,8 +124,10 @@ class ObservationQuery {
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 			final List<String> designFactors, final String sortBy, final String sortOrder) {
-		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + getInstanceNumberClause() + getGroupingClause()
-				+ getOrderingClause(sortBy, sortOrder);
+		//FIXME remove inner join with max phenotype_id when BMS-5055 is solved
+		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + this.getInstanceNumberClause() + this
+			.getGroupingClause()
+				+ this.getOrderingClause(sortBy, sortOrder);
 	}
 
 	/**
@@ -136,9 +140,9 @@ class ObservationQuery {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
 		final String orderByMeasurementVariableId = getOrderByMeasurementVariableId(measurementVariables);
 
-		final String fromText = getFromExpression(measurementVariables);
+		final String fromText = this.getFromExpression(measurementVariables);
 
-		final String orderByText = getOrderByExpression(measurementVariables, orderByMeasurementVariableId);
+		final String orderByText = this.getOrderByExpression(measurementVariables, orderByMeasurementVariableId);
 
 		String whereText = WHERE_TEXT;
 
@@ -147,9 +151,9 @@ class ObservationQuery {
 		}
 
 		return SELECT_TEXT + ", " + BLOCK_NO_TEXT + ", " + ROW_NUMBER_TEXT + "," + COLUMN_NUMBER_TEXT +
-				", " + locationDbIdSubQuery +
-				", " + locationNameSubQuery +
-				", " + locationAbbreviationSubQuery +
+				", " + this.locationDbIdSubQuery +
+				", " + this.locationNameSubQuery +
+				", " + this.locationAbbreviationSubQuery +
 				", " + FIELDMAP_COLUMN_TEXT +
 				", " + FIELDMAP_ROW_TEXT +
 				columnNamesFromTraitNames +
@@ -163,6 +167,7 @@ class ObservationQuery {
 	private String getFromExpression(final List<MeasurementVariableDto> variables) {
 		return " FROM\n" + "    Project p\n" + INNER_JOIN
 				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + INNER_JOIN
+				+ "    project proj ON proj.project_id =  pr.object_project_id\n" + INNER_JOIN
 				+ "    nd_experiment nde ON nde.project_id = pr.subject_project_id\n" + INNER_JOIN
 				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + INNER_JOIN
 				+ "    Stock s ON s.stock_id = nde.stock_id\n" + this.getVariableDetailsJoin(variables)
@@ -176,7 +181,7 @@ class ObservationQuery {
 
 	String getSingleObservationQuery(final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors, final List<String> designFactors) {
 		return this.getObservationsMainQuery(traits, germplasmDescriptors, designFactors) + " AND nde.nd_experiment_id = :experiment_id \n"
-				+ getGroupingClause();
+				+ this.getGroupingClause();
 	}
 
 	private String getColumnNamesFromTraitNames(final List<MeasurementVariableDto> measurementVariables) {
@@ -215,15 +220,20 @@ class ObservationQuery {
 			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'COL') COL, \n")
 			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n")
 			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n")
-			.append("    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n")
+			.append("    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.plant_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n")
 			.append("    nde.plot_id as PLOT_ID, \n");
 
 		final String traitClauseFormat =
-			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
+			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', ";
 
 		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
-			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
-				measurementVariable.getName(), measurementVariable.getName() + PHENOTYPE_ID));
+			sqlBuilder.append(String.format(traitClauseFormat,
+				measurementVariable.getName(),
+				measurementVariable.getName(),
+				measurementVariable.getName(),
+				measurementVariable.getName() + PHENOTYPE_ID,
+				measurementVariable.getName(),
+				measurementVariable.getName() + STATUS));
 		}
 
 		if (!germplasmDescriptors.isEmpty()) {

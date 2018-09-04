@@ -32,6 +32,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
@@ -44,6 +45,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -72,6 +74,27 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "AND p.observable_id IN (:traitIds) ";
 
 	private static final String ORDER_BY_OBS = "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
+
+	//FIXME BMS-5055
+	private static final String HAS_OUT_OF_SYNC = "SELECT "
+		+ "    COUNT(1)"
+		+ " FROM"
+		+ "    phenotype pheno"
+		+ "        INNER JOIN"
+		+ "    (SELECT "
+		+ "        MAX(p.phenotype_id) id,"
+		+ "            p.nd_experiment_id exp_id,"
+		+ "            p.observable_id obs_id"
+		+ "    FROM"
+		+ "        phenotype p"
+		+ "    GROUP BY p.nd_experiment_id , p.observable_id) ph ON (ph.id = pheno.phenotype_id"
+		+ "        AND ph.exp_id = pheno.nd_experiment_id"
+		+ "        AND ph.obs_id = pheno.observable_id)"
+		+ "        INNER JOIN"
+		+ "    nd_experiment n ON pheno.nd_experiment_id = n.nd_experiment_id"
+		+ " WHERE"
+		+ "    pheno.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC
+		+ "'        AND n.project_id = :projectId";
 
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
@@ -136,9 +159,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			for (final Object[] row : list) {
 				final Integer id = (Integer) row[0];
-				final Long locationCount = ((BigInteger) row[1]).longValue();
-				final Long germplasmCount = ((BigInteger) row[2]).longValue();
-				final Long observationCount = ((BigInteger) row[3]).longValue();
+				final long locationCount = ((BigInteger) row[1]).longValue();
+				final long germplasmCount = ((BigInteger) row[2]).longValue();
+				final long observationCount = ((BigInteger) row[3]).longValue();
 
 				traitInfoList.add(new TraitInfo(id, null, null, locationCount, germplasmCount, observationCount));
 			}
@@ -167,9 +190,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			for (final Object[] row : list) {
 				final Integer id = (Integer) row[0];
-				final Long locationCount = ((BigInteger) row[1]).longValue();
-				final Long germplasmCount = ((BigInteger) row[2]).longValue();
-				final Long observationCount = ((BigInteger) row[3]).longValue();
+				final long locationCount = ((BigInteger) row[1]).longValue();
+				final long germplasmCount = ((BigInteger) row[2]).longValue();
+				final long observationCount = ((BigInteger) row[3]).longValue();
 
 				traitInfoList.add(new TraitInfo(id, null, null, locationCount, germplasmCount, observationCount));
 			}
@@ -834,7 +857,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final StringBuilder sql = new StringBuilder().append(" SELECT phenotype.observable_id,count(phenotype.observable_id) ")
 				.append(" FROM nd_experiment nd_exp ")
 				.append(" INNER JOIN stock ON nd_exp.stock_id = stock.stock_id ")
-				.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ").append(" where a.project_id = ")
+				.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ").append(" where nd_exp.project_id = ")
 				.append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
 				.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
 				.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ").append(" group by nd_exp.nd_geolocation_id, ")
@@ -869,6 +892,24 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					"Error in getByProjectAndType(" + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(), e);
 		}
 		return phenotypes;
+	}
+
+	public Phenotype getByExperimentAndTrait(final Integer experimentId, final Integer termId) {
+		try {
+			final ExperimentModel experiment = new ExperimentModel();
+			experiment.setNdExperimentId(experimentId);
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("observableId", termId));
+			criteria.add(Restrictions.eq("experiment", experiment));
+			criteria.addOrder(Order.desc("phenotypeId"));
+			final List list = criteria.list();
+			return (list.size() > 0 ? (Phenotype) list.get(0) : null);
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error in getByExperimentAndTrait(" + experimentId + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
+		}
+
 	}
 
 	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
@@ -950,7 +991,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			// Get observations (Traits)
 			final SQLQuery observationsQuery = this.getSession().createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS);
 			observationsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
-			observationsQuery.addScalar("expid").addScalar("nd_exp_phen_id").addScalar("cvterm_id")
+			observationsQuery.addScalar("expid").addScalar("phen_id").addScalar("cvterm_id")
 					.addScalar("cvterm_name", new StringType()).
 					addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType());
 			final List<Object[]> observationResults = observationsQuery.list();
@@ -1041,5 +1082,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	private void savePhenotype(final Phenotype phenotype) {
 		final Session currentSession = this.getSession();
 		currentSession.save(phenotype);
+	}
+
+	public Boolean hasOutOfSync(final Integer projectId) {
+		final SQLQuery query = this.getSession().createSQLQuery(HAS_OUT_OF_SYNC);
+		query.setParameter("projectId", projectId);
+		final BigInteger result = (BigInteger) query.uniqueResult();
+		return result.intValue() > 0;
 	}
 }

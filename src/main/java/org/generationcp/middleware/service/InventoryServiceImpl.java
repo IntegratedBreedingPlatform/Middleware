@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -53,7 +54,7 @@ public class InventoryServiceImpl implements InventoryService {
 
 	private LotBuilder lotBuilder;
 	private TransactionBuilder transactionBuilder;
-	private InventoryDaoFactory inventoryDaoFactory;
+	private DaoFactory daoFactory;
 
 	public InventoryServiceImpl() {
 
@@ -61,7 +62,7 @@ public class InventoryServiceImpl implements InventoryService {
 
 	public InventoryServiceImpl(final HibernateSessionProvider sessionProvider) {
 
-		this.inventoryDaoFactory = new InventoryDaoFactory(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 		this.lotBuilder = new LotBuilder(sessionProvider);
 		this.transactionBuilder = new TransactionBuilder(sessionProvider);
 
@@ -75,7 +76,7 @@ public class InventoryServiceImpl implements InventoryService {
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId, final String germplasmListType)
 			throws MiddlewareQueryException {
-		final GermplasmList germplasmList = this.inventoryDaoFactory.getGermplasmListDAO().getById(listId);
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
 		final List<GermplasmListData> listData = this.getGermplasmListData(germplasmList, germplasmListType);
 		return this.getInventoryDetailsList(germplasmList, listData);
 	}
@@ -89,7 +90,7 @@ public class InventoryServiceImpl implements InventoryService {
 			}
 		}
 		final List<InventoryDetails> inventoryDetails =
-				this.inventoryDaoFactory.getTransactionDAO().getInventoryDetailsByTransactionRecordId(recordIds);
+				this.daoFactory.getTransactionDAO().getInventoryDetailsByTransactionRecordId(recordIds);
 		this.fillInventoryDetailList(inventoryDetails, germplasmList, listData);
 		this.fillLocationDetails(inventoryDetails);
 		this.fillScaleDetails(inventoryDetails);
@@ -111,7 +112,7 @@ public class InventoryServiceImpl implements InventoryService {
 
 		final Map<Integer, String> usersMap = new HashMap<Integer, String>();
 		if (!userIds.isEmpty()) {
-			usersMap.putAll(this.inventoryDaoFactory.getPersonDAO().getPersonNamesByUserIds(new ArrayList<>(userIds)));
+			usersMap.putAll(this.daoFactory.getPersonDAO().getPersonNamesByUserIds(new ArrayList<>(userIds)));
 		}
 
 		// set scale details of the inventory
@@ -134,7 +135,7 @@ public class InventoryServiceImpl implements InventoryService {
 		// get the scale details from database
 		final Map<Integer, CVTerm> scalesMap = new HashMap<>();
 		if (!scaleIds.isEmpty()) {
-			final List<CVTerm> cvtermList = this.inventoryDaoFactory.getCvTermDao().getByIds(new ArrayList<>(scaleIds));
+			final List<CVTerm> cvtermList = this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(scaleIds));
 			for (final CVTerm cvTerm : cvtermList) {
 				scalesMap.put(cvTerm.getCvTermId(), cvTerm);
 			}
@@ -160,7 +161,7 @@ public class InventoryServiceImpl implements InventoryService {
 		// get the location details from database
 		final Map<Integer, Location> locationsMap = new HashMap<>();
 		if (!locationIds.isEmpty()) {
-			final List<Location> locations = this.inventoryDaoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds));
+			final List<Location> locations = this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds));
 			for (final Location location : locations) {
 				locationsMap.put(location.getLocid(), location);
 			}
@@ -216,9 +217,9 @@ public class InventoryServiceImpl implements InventoryService {
 		Integer germplasmListId = germplasmList.getId();
 		if (germplasmList.getType() != null && germplasmList.getType().equalsIgnoreCase(germplasmListType)
 				&& !GermplasmListType.LST.toString().equals(germplasmListType)) {
-			germplasmListId = this.inventoryDaoFactory.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(germplasmListId);
+			germplasmListId = this.daoFactory.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(germplasmListId);
 		}
-		return this.inventoryDaoFactory.getGermplasmListDataDAO().getByListId(germplasmListId);
+		return this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmListId);
 	}
 
 	/**
@@ -229,7 +230,7 @@ public class InventoryServiceImpl implements InventoryService {
 	@Override
 	public Integer getCurrentNotationNumberForBreederIdentifier(final String breederIdentifier) throws MiddlewareQueryException {
 		final List<String> inventoryIDs =
-				this.inventoryDaoFactory.getTransactionDAO().getInventoryIDsWithBreederIdentifier(breederIdentifier);
+				this.daoFactory.getTransactionDAO().getInventoryIDsWithBreederIdentifier(breederIdentifier);
 
 		if (inventoryIDs == null || inventoryIDs.isEmpty()) {
 			return 0;
@@ -282,24 +283,24 @@ public class InventoryServiceImpl implements InventoryService {
 				this.lotBuilder.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(),
 						details.getUserId());
 
-		this.inventoryDaoFactory.getLotDao().saveOrUpdate(lot);
+		this.daoFactory.getLotDao().saveOrUpdate(lot);
 
 		final Transaction transaction =
 				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), details.getUserId(),
 						details.getComment(), details.getSourceId(), details.getInventoryID(), details.getBulkWith(),
 						details.getBulkCompl());
-		this.inventoryDaoFactory.getTransactionDAO().saveOrUpdate(transaction);
+		this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);
 
 		final StockTransaction stockTransaction = new StockTransaction(null, listDataProject, transaction);
 		stockTransaction.setSourceRecordId(transaction.getSourceRecordId());
-		this.inventoryDaoFactory.getStockTransactionDAO().saveOrUpdate(stockTransaction);
+		this.daoFactory.getStockTransactionDAO().saveOrUpdate(stockTransaction);
 	}
 
 	@Override
 	public Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(final String entityType, final Integer entityId,
 			final Integer locationId, final Integer scaleId) {
 		final List<Lot> lots =
-				this.inventoryDaoFactory.getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(entityType,
+				this.daoFactory.getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(entityType,
 						Arrays.asList(new Integer[] {entityId}), locationId, scaleId);
 		if (lots != null && !lots.isEmpty()) {
 			return lots.get(0);
@@ -310,19 +311,19 @@ public class InventoryServiceImpl implements InventoryService {
 	@Override
 	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId)
 			throws MiddlewareQueryException {
-		return this.inventoryDaoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId);
+		return this.daoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId);
 	}
 
 	@Override
 	public List<InventoryDetails> getSummedInventoryListByListDataProjectListId(final Integer listDataProjectListId,
 			final GermplasmListType type) throws MiddlewareQueryException {
-		return this.inventoryDaoFactory.getStockTransactionDAO().retrieveSummedInventoryDetailsForListDataProjectListId(
+		return this.daoFactory.getStockTransactionDAO().retrieveSummedInventoryDetailsForListDataProjectListId(
 				listDataProjectListId, type);
 	}
 
 	@Override
 	public boolean stockHasCompletedBulking(final Integer listId) throws MiddlewareQueryException {
-		return this.inventoryDaoFactory.getStockTransactionDAO().stockHasCompletedBulking(listId);
+		return this.daoFactory.getStockTransactionDAO().stockHasCompletedBulking(listId);
 	}
 
 	public void setLotBuilder(final LotBuilder lotBuilder) {

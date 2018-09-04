@@ -19,11 +19,11 @@ public class DMSVariableTypeTestDataInitializer {
 		return variable;
 	}
 
-	public static DMSVariableType createDMSVariableTypeWithStandardVariable() {
+	public static DMSVariableType createDMSVariableTypeWithStandardVariable(final TermId termId) {
 		final DMSVariableType variable = new DMSVariableType();
-		variable.setLocalName("CROSS");
+		variable.setLocalName(termId.name());
 		variable.setStandardVariable(
-				StandardVariableTestDataInitializer.createStandardVariable(TermId.CROSS.getId(), TermId.CROSS.name()));
+				StandardVariableTestDataInitializer.createStandardVariable(termId.getId(), termId.name()));
 		return variable;
 	}
 

@@ -532,7 +532,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			final StringBuilder sql =
 					new StringBuilder().append("DELETE FROM nd_experimentprop ").append(" WHERE nd_experiment_id IN ( ")
 							.append(" SELECT e.nd_experiment_id ").append(" FROM nd_experiment e ")
-							.append(" AND e.project_id = ").append(projectId);
+							.append(" WHERE e.project_id = ").append(projectId);
 			sql.append(") ").append(" AND type_id =").append(termId);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());

@@ -217,6 +217,7 @@ public class MeasurementRow {
 		}
 	}
 
+	// FIXME consolidate logic in the copy constructor
 	public MeasurementRow copy() {
 		List<MeasurementData> newDataList = null;
 		if (this.dataList != null && !this.dataList.isEmpty()) {
@@ -230,6 +231,7 @@ public class MeasurementRow {
 		return row;
 	}
 
+	// FIXME consolidate logic in a copy constructor
 	public MeasurementRow copy(List<MeasurementVariable> variableList) {
 		List<MeasurementData> newDataList = null;
 		if (this.dataList != null && !this.dataList.isEmpty()) {

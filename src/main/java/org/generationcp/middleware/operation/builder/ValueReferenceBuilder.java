@@ -21,27 +21,31 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 
 public class ValueReferenceBuilder extends Builder {
 
+	private DaoFactory daoFactory;
+
 	public ValueReferenceBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
-		List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(stdVarId);
+		List<CVTermRelationship> relationships = daoFactory.getCvTermRelationshipDao().getBySubject(stdVarId);
 		Integer scaleId = this.getRelationshipValue(relationships, TermId.HAS_SCALE.getId());
 		
 		//get data type and valid values from scale
-		List<CVTermRelationship> scaleRelationships = this.getCvTermRelationshipDao().getBySubject(scaleId);
+		List<CVTermRelationship> scaleRelationships = daoFactory.getCvTermRelationshipDao().getBySubject(scaleId);
 		Integer dataType = this.getRelationshipValue(scaleRelationships, TermId.HAS_TYPE.getId());
 		
 		if (dataType != null && dataType == TermId.CATEGORICAL_VARIABLE.getId()) {
 			Set<ValueReference> set = this.getRelationshipValues(scaleRelationships, TermId.HAS_VALUE.getId());
 			for (ValueReference ref : set) {
-				CVTerm term = this.getCvTermDao().getById(ref.getId());
+				CVTerm term = daoFactory.getCvTermDao().getById(ref.getId());
 				if (term != null) {
 					ref.setKey(ref.getId().toString());
 					ref.setName(term.getName());
