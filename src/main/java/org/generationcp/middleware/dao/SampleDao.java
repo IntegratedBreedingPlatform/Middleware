@@ -98,7 +98,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	public long countBySampleUIDs(final Set<String> sampleUIDs , final Integer listId) {
 		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
 		if (!sampleUIDs.isEmpty()) {
-			criteria.add(Restrictions.in("sampleBusinessKey", sampleUIDs));
+			criteria.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs));
 		}
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
@@ -200,20 +200,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.stock", "stock")
-			.setProjection(Projections.distinct(Projections.projectionList()
-				.add(Projections.property("sampleId")) //row[0]
-				.add(Projections.property("sampleName")) //row[1]
-				.add(Projections.property(SAMPLE_BUSINESS_KEY)) //row[2]
-				.add(Projections.property("person.firstName")) //row[3]
-				.add(Projections.property("person.lastName")) //row[4]
-				.add(Projections.property("sampleList.listName")) //row[5]
-				.add(Projections.property("plant.plantNumber")) //row[6]
-				.add(Projections.property("plant.plantBusinessKey")) //row[7]
-				.add(Projections.property("stock.dbxrefId")) //row[8]
-				.add(Projections.property("stock.name")) //row[9] TODO preferred name
-				.add(Projections.property("samplingDate")) //row[10]
-				.add(Projections.property("entryNumber")) //row[11]
-			)).list();
+			.list();
 
 		final List<SampleDTO> sampleDTOs = new ArrayList<>();
 

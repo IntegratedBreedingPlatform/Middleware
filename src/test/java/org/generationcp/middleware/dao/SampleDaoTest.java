@@ -229,6 +229,17 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT.intValue(), count.intValue());
 
 	}
+	
+	@Test
+	public void testGetBySampleBks(){
+		final Set<String> sampleUIDs = new HashSet<>();
+		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
+			sampleUIDs.add("BUSINESS-KEY-" + LIST_NAME + i);
+		}
+		final List<SampleDTO> sampleDtos = this.sampleDao.getBySampleBks(sampleUIDs);
+		Assert.assertNotNull(sampleDtos);
+		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT.intValue(), sampleDtos.size());
+	}
 
 	private Integer createSampleListForFilter(final String listName, final boolean takenByIsNull, final int sampleSize,
 			final String plotIdString) {

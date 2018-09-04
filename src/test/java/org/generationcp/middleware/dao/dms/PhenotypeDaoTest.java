@@ -84,7 +84,7 @@ public class PhenotypeDaoTest {
 				+ " AND exists(SELECT 1 " //
 				+ " FROM phenotype ph " //
 				+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
-				+ "   INNER JOIN nd_experiment ndep ON ndeph.nd_experiment_id = ndep.nd_experiment_id " //
+				+ "   INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
 				+ "   INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
 				+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
 				+ "                             AND pp.variable_id = ph.observable_id " //
@@ -152,7 +152,7 @@ public class PhenotypeDaoTest {
 		final String sql = "SELECT COUNT(1) FROM (" + getPhenotypeSearchMainQuery() + " AND exists(SELECT 1 " //
 				+ " FROM phenotype ph " //
 				+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
-				+ "   INNER JOIN nd_experiment ndep ON ndeph.nd_experiment_id = ndep.nd_experiment_id " //
+				+ "   INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
 				+ "   INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
 				+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
 				+ "                             AND pp.variable_id = ph.observable_id " //
@@ -392,7 +392,7 @@ public class PhenotypeDaoTest {
 		return " SELECT phenotype.observable_id,count(phenotype.observable_id) "
 		+ " FROM nd_experiment nd_exp "
 		+ " INNER JOIN stock ON nd_exp.stock_id = stock.stock_id "
-		+ " LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id  where a.project_id = "
+		+ " LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id  where nd_exp.project_id = "
 		+ projectId + " and nd_exp.nd_geolocation_id = " + locationId
 		+ " and ((phenotype.value <> '' and phenotype.value is not null) or "
 		+ " (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null))  group by nd_exp.nd_geolocation_id, "
