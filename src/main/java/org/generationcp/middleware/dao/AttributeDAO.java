@@ -45,8 +45,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList)
-			throws MiddlewareQueryException {
+	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList) {
 		List<Attribute> returnList = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {
 			try {

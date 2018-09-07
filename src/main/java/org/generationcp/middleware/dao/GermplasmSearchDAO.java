@@ -359,7 +359,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 	private Set<Integer> retrieveGIDGroupMemberResults(final Set<Integer> gidSearchResults) {
 		try {
-			final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
+			final Set<Integer> gidGroupMembersSearchResults = new HashSet<>();
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT members.gid FROM germplsm members WHERE members.deleted = 0 AND members.grplce = 0 "
 					+ "AND members.mgid IN (select g.mgid from germplsm g where g.gid IN (:gids) and g.mgid != 0)");
@@ -461,12 +461,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		for (final Map.Entry<String, Boolean> sortCondition : sortState.entrySet()) {
 			final String order = sortCondition.getValue().equals(true) ? "ASC" : "DESC";
 
-			if (attributeTypesMap.containsKey(sortCondition.getKey())) {
+			if (attributeTypesMap.containsKey(sortCondition.getKey()) || nameTypesMap .containsKey(sortCondition.getKey())) {
 				sortingQuery.append(String.format(" `%s`", sortCondition.getKey()));
 			
-			} else if (nameTypesMap .containsKey(sortCondition.getKey())) {
-				sortingQuery.append(String.format(" `%s`", sortCondition.getKey()));
-				
 			} else {
 				sortingQuery.append(String.format(" `%s`", GermplasmSortableColumn.get(sortCondition.getKey()).getDbColumnName()));
 			}

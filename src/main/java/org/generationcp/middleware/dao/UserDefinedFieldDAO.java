@@ -37,7 +37,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(UserDefinedFieldDAO.class);
 
 	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByFieldTableNameAndType(String tableName, String fieldType) throws MiddlewareQueryException {
+	public List<UserDefinedField> getByFieldTableNameAndType(String tableName, String fieldType) {
 		try {
 			if (tableName != null && fieldType != null) {
 				Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
@@ -47,14 +47,14 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByFieldTableNameAndType(name=" + tableName + " type= " + fieldType
+			throw new MiddlewareQueryException("Error with getByFieldTableNameAndType(name=" + tableName + " type= " + fieldType
 					+ " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
-		return new ArrayList<UserDefinedField>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getByTableNameAndNameLike(String tableName, String nameLike) throws MiddlewareQueryException {
+	public List<UserDefinedField> getByTableNameAndNameLike(String tableName, String nameLike) {
 		try {
 			if (tableName != null && nameLike != null) {
 				Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
@@ -64,14 +64,14 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByTableNameAndNameLike(name=" + tableName + " nameLike= " + nameLike
+			throw new MiddlewareQueryException("Error with getByTableNameAndNameLike(name=" + tableName + " nameLike= " + nameLike
 					+ " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
-		return new ArrayList<UserDefinedField>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Integer> getByCodesInMap(String table, String type, List<String> codes) throws MiddlewareQueryException {
+	public Map<String, Integer> getByCodesInMap(String table, String type, List<String> codes) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.eq("ftable", table));
@@ -79,7 +79,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			criteria.add(Restrictions.in("fcode", codes));
 			List<UserDefinedField> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
-				Map<String, Integer> map = new HashMap<String, Integer>();
+				Map<String, Integer> map = new HashMap<>();
 				for (UserDefinedField field : list) {
 					map.put(field.getFcode(), field.getFldno());
 				}
@@ -87,10 +87,10 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByCodesInMap(name=" + table + " type= " + type + " ) query from UserDefinedField: "
+			throw new MiddlewareQueryException("Error with getByCodesInMap(name=" + table + " type= " + type + " ) query from UserDefinedField: "
 					+ e.getMessage(), e);
 		}
-		return new HashMap<String, Integer>();
+		return new HashMap<>();
 	}
 
 	public UserDefinedField getByLocalFieldNo(Integer lfldno) {
@@ -99,7 +99,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return (UserDefinedField) criteria.uniqueResult();
 	}
 
-	public UserDefinedField getByTableTypeAndCode(String table, String type, String code) throws MiddlewareQueryException {
+	public UserDefinedField getByTableTypeAndCode(String table, String type, String code) {
 		try {
 			if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(type) && StringUtils.isNotBlank(code)) {
 				Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);

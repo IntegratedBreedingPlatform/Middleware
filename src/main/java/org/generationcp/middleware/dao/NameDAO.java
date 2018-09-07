@@ -271,7 +271,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getPreferredNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -527,7 +527,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			map = createGidAndPreferredNameMap(query.list());
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getSourcePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -550,7 +550,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			map = createGidAndPreferredNameMap(query.list());
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getImmediatePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
