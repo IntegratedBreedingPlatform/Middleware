@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.NonUniqueResultException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -119,5 +120,43 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
+		List<UserDefinedField> returnList = new ArrayList<>();
+		if (gidList != null && !gidList.isEmpty()) {
+			try {
+				final String sql = "SELECT DISTINCT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
+						+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("u", UserDefinedField.class);
+				query.setParameterList("gidList", gidList);
+				returnList = query.list();
+
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getAttributesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
+			}
+		}
+		return returnList;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<UserDefinedField> getNameTypesByGIDList(final List<Integer> gidList) {
+		List<UserDefinedField> returnList = new ArrayList<>();
+		if (gidList != null && !gidList.isEmpty()) {
+			try {
+				final String sql = "SELECT DISTINCT {u.*}" + " FROM names n" + " INNER JOIN udflds u" + " WHERE n.ntype=u.fldno"
+						+ " AND n.gid in (:gidList)" + " ORDER BY u.fname";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("u", UserDefinedField.class);
+				query.setParameterList("gidList", gidList);
+				returnList = query.list();
+
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getNameTypesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
+			}
+		}
+		return returnList;
 	}
 }

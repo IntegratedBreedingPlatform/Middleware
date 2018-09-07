@@ -367,7 +367,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
-		return this.getAttributeDao().getAttributeTypesByGIDList(gidList);
+		return this.getUserDefinedFieldDao().getAttributeTypesByGIDList(gidList);
 	}
 
 	@Override
@@ -382,6 +382,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<Attribute> attributeList = this.getAttributeDao().getAttributeValuesByTypeAndGIDList(attributeType, gidList);
 		for (final Attribute attribute : attributeList) {
 			returnMap.put(attribute.getGermplasmId(), attribute.getAval());
+		}
+
+		return returnMap;
+	}
+	
+	@Override
+	public List<UserDefinedField> getNameTypesByGIDList(final List<Integer> gidList) {
+		return this.getUserDefinedFieldDao().getNameTypesByGIDList(gidList);
+	}
+	
+	@Override
+	public Map<Integer, String> getNamesByTypeAndGIDList(final Integer nameType, final List<Integer> gidList) {
+		final Map<Integer, String> returnMap = new HashMap<>();
+		// initialize map with GIDs
+		for (final Integer gid : gidList) {
+			returnMap.put(gid, "-");
+		}
+
+		final List<Name> nameList = this.getNameDao().getNamesByTypeAndGIDList(nameType, gidList);
+		for (final Name name : nameList) {
+			returnMap.put(name.getGermplasmId(), name.getNval());
 		}
 
 		return returnMap;

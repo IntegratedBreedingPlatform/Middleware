@@ -45,25 +45,6 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
-		List<UserDefinedField> returnList = new ArrayList<>();
-		if (gidList != null && !gidList.isEmpty()) {
-			try {
-				final String sql = "SELECT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
-						+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("u", UserDefinedField.class);
-				query.setParameterList("gidList", gidList);
-				returnList = query.list();
-
-			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getAttributesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
-			}
-		}
-		return returnList;
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList)
 			throws MiddlewareQueryException {
 		List<Attribute> returnList = new ArrayList<>();
