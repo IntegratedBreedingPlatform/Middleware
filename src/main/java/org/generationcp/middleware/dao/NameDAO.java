@@ -564,7 +564,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			try {
 				final String sql = "SELECT {n.*}" + " FROM names n" + " WHERE n.ntype = :nameType" + " AND n.gid in (:gidList)";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("a", Name.class);
+				query.addEntity("n", Name.class);
 				query.setParameter("nameType", nameType);
 				query.setParameterList("gidList", gidList);
 				returnList = query.list();
