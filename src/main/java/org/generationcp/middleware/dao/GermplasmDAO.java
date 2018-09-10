@@ -1318,7 +1318,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
 					+ "   (SELECT a.aval FROM atributs a " //
 					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority " //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority, " //
+					+ "   (SELECT a.aval FROM atributs a " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'PROGM' AND u.fldno = a.atype)" //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS instituteCode " //
 					+ "  FROM germplsm g " //
 					+ "  	LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
 					+ "	 WHERE g.deleted = 0" //
@@ -1338,11 +1341,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			sqlQuery.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
 				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
-				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority") //
-				.setParameter("gid", germplasmSearchRequestDTO.getGid()) //
-				.setParameter("pui", germplasmSearchRequestDTO.getPui()) //
-				.setParameter("name", germplasmSearchRequestDTO.getPreferredName()) //
-				.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%") //
+					.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority").addScalar(
+					"instituteCode") //
+					.setParameter("gid", germplasmSearchRequestDTO.getGid()) //
+					.setParameter("pui", germplasmSearchRequestDTO.getPui()) //
+					.setParameter("name", germplasmSearchRequestDTO.getPreferredName()) //
+					.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%") //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
 			if (germplasmSearchRequestDTO.getPage() != null && germplasmSearchRequestDTO.getPageSize() != null) {

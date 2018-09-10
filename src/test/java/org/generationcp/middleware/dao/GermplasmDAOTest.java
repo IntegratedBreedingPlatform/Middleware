@@ -714,6 +714,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		fields.put("SPAUTH", "");
 		fields.put("SUBTAX", "");
 		fields.put("STAUTH", "");
+		fields.put("PROGM", "");
 
 		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
 
@@ -774,8 +775,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		// Assert.assertThat(germplasmDTO.getPedigree(), is());
 		// Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is());
 		Assert.assertThat(germplasmDTO.getCommonCropName(), isEmptyOrNullString());
-		// Assert.assertThat(germplasmDTO.getInstituteCode(), is());
-		// Assert.assertThat(germplasmDTO.getInstituteName(), is());
+		 Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("PROGM")));
+		 Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("PROGM")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
 		Assert.assertThat(germplasmDTO.getCountryOfOriginCode(), is(fields.get("ORI_COUN")));
 		Assert.assertThat(germplasmDTO.getGenus(), is(names.get("GENUS")));
