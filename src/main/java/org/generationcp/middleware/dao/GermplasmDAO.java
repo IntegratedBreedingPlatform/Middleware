@@ -1269,7 +1269,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxa, " //
 					+ "   (SELECT a.aval FROM atributs a " //
 					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'STAUTH' AND u.fldno = a.atype)" //
-					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority " //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority, " //
+					+ "   (SELECT a.aval FROM atributs a " //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'PROGM' AND u.fldno = a.atype)" //
+					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS instituteCode " //
 					+ "  FROM germplsm g " //
 					+ "     LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
 					+ "  WHERE g.gid = :gid and g.deleted = 0 AND g.grplce = 0";
@@ -1277,7 +1280,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final Object object = this.getSession().createSQLQuery(sql) //
 				.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
 				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
-				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
+				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority").addScalar(
+					"instituteCode") //
 				.setParameter("gid", id) //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class)) //
 				.uniqueResult();
