@@ -678,7 +678,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.class)) //
 				.uniqueResult();
 
-			if (includeSiblings != null && !includeSiblings) {
+			if (includeSiblings == null || !includeSiblings) {
 				return pedigreeDTO;
 			}
 
