@@ -686,12 +686,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   sibling.gid AS germplasmDbId," //
 				+ "   n.nval AS defaultDisplayName" //
 				+ " FROM germplsm g" //
-				// considering groupSource itself in the generative case"
-				+ "   INNER JOIN germplsm groupSource ON (g.gpid1 = groupSource.gid AND g.gnpgs = -1) OR (groupSource.gid = g.gid AND g.gnpgs >= 2)" //
-				+ "   INNER JOIN germplsm sibling ON sibling.gpid1 = groupSource.gid" //
-				+ "                                 AND sibling.gnpgs = -1" //
-				+ "                                 AND sibling.gid != g.gid" //
-				+ "                                 AND groupSource.gid != g.gid" //
+				+ "   INNER JOIN germplsm sibling ON sibling.gpid1 = g.gpid1"//
+				+ "                                  AND sibling.gnpgs = -1"//
+				+ "                                  AND g.gpid1 != 0"//
+				+ "                                  AND sibling.gid != g.gid"//
 				+ "   LEFT JOIN names n ON sibling.gid = n.gid AND n.nstat = 1" //
 				+ " WHERE g.gid = :gid";
 
