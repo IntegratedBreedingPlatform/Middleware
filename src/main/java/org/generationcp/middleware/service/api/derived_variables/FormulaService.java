@@ -12,13 +12,13 @@ import java.util.Set;
  */
 public interface FormulaService {
 
-	public Optional<FormulaDto> getById(Integer formulaId);
+	Optional<FormulaDto> getById(final Integer formulaId);
 
-	public Optional<FormulaDto> getByTargetId(Integer targetId);
+	Optional<FormulaDto> getByTargetId(final Integer targetId);
 
-	public List<FormulaDto> getByTargetIds(Set<Integer> variableIds);
+	List<FormulaDto> getByTargetIds(final Set<Integer> variableIds);
 
-	List<FormulaDto> getByInputId(Integer inputId);
+	List<FormulaDto> getByInputId(final Integer inputId);
 
 	/**
 	 * Gets all FormulaVariables from a given derived trait variableIds including the FormulaVariables of an argument variable if it is itself
