@@ -27,9 +27,12 @@ public interface FormulaService {
 	 * @param variableIds
 	 * @return
 	 */
-	public Set<FormulaVariable> getAllFormulaVariables(Set<Integer> variableIds);
+	Set<FormulaVariable> getAllFormulaVariables(final Set<Integer> variableIds);
 
-	public FormulaDto save(FormulaDto formulaDto);
+	FormulaDto save(final FormulaDto formulaDto);
 
-	void delete(Integer formulaId);
+	void delete(final Integer formulaId);
+
+	FormulaDto update(final FormulaDto formulaDto);
+
 }
