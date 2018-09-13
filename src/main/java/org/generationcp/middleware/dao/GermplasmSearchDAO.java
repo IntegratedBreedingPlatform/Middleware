@@ -30,6 +30,8 @@ import java.util.Set;
  */
 public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
+	private static final String ATRIBUTS = "ATRIBUTS";
+
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmSearchDAO.class);
 
 	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
@@ -593,7 +595,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			}
 		}
 
-		return getTypesFromUserDefinedFieldTable(addedColumnsPropertyIds, nonStandardColumns, "ATRIBUTS");
+		return getTypesFromUserDefinedFieldTable(addedColumnsPropertyIds, nonStandardColumns, ATRIBUTS);
 	}
 	
 	protected Map<String, Integer> getNameTypesMap(final List<String> addedColumnsPropertyIds) {
@@ -611,15 +613,16 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	private Map<String, Integer> getTypesFromUserDefinedFieldTable(final List<String> addedColumnsPropertyIds,
 			final List<String> nonStandardColumns, final String ftable) {
 		final Map<String, Integer> typesMap = new HashMap<>();
+		final String field = ATRIBUTS.equals(ftable)? "fcode" : "fname";
 		if (!nonStandardColumns.isEmpty()) {
 			final SQLQuery query =
-					this.getSession().createSQLQuery("SELECT fcode, fldno from udflds where ftable = :ftable and fcode IN (:fcodeList)");
+					this.getSession().createSQLQuery("SELECT " + field + ", fldno from udflds where ftable = :ftable and " + field + " IN (:fieldList)");
 			query.setParameter("ftable", ftable);
-			query.setParameterList("fcodeList", addedColumnsPropertyIds);
+			query.setParameterList("fieldList", addedColumnsPropertyIds);
 			final List<Object[]> results = query.list();
 
 			for (final Object[] row : results) {
-				typesMap.put(String.valueOf(row[0]), (Integer) row[1]);
+				typesMap.put(String.valueOf(row[0]).toUpperCase(), (Integer) row[1]);
 			}
 
 		}
