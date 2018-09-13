@@ -80,6 +80,9 @@ public class SampleList implements Serializable {
 	@Column(name = "program_uuid")
 	private String programUUID;
 
+	@Column(name = "gobii_project_id")
+	private Integer gobiiProjectId;
+
 	public SampleListType getType() {
 		return type;
 	}
@@ -158,6 +161,14 @@ public class SampleList implements Serializable {
 
 	public void setChildren(final List<SampleList> children) {
 		this.children = children;
+	}
+
+	public Integer getGobiiProjectId() {
+		return gobiiProjectId;
+	}
+
+	public void setGobiiProjectId(final Integer gobiiProjectId) {
+		this.gobiiProjectId = gobiiProjectId;
 	}
 
 	@Override
