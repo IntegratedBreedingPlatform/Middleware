@@ -97,12 +97,6 @@ public interface SampleListService {
 	 */
 	Map<Integer, ListMetadata> getListMetadata(final List<SampleList> sampleLists);
 
-	/**
-	 * @param listId - the list Id
-	 * @return - List of SampleList POJOs
-	 */
-	SampleList getSampleListByListId(final Integer listId);
-
 	SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid);
 
 	/**

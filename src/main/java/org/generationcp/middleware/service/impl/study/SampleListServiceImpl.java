@@ -367,11 +367,6 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public SampleList getSampleListByListId(final Integer listId) {
-		return this.daoFactory.getSampleListDao().getById(listId);
-	}
-
-	@Override
 	public SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid) {
 		return this.daoFactory.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
 	}

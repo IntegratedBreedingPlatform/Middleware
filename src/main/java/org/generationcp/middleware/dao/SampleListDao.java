@@ -296,6 +296,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		return SampleListDao.RESTRICTED_LIST;
 	}
 
+	// TODO Could be reused, move to GenericDAO
 	String addOrder(final String queryString, final Pageable pageable) {
 
 		final StringBuilder stringBuilder = new StringBuilder(queryString);
