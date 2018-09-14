@@ -448,6 +448,16 @@ public class SampleListServiceImpl implements SampleListService {
 		this.daoFactory.getSampleListDao().saveOrUpdate(sampleList);
 	}
 
+	@Override
+	public SampleList getSampleListById(final Integer sampleListId) {
+		return this.daoFactory.getSampleListDao().getById(sampleListId);
+	}
+
+	@Override
+	public SampleList saveOrUpdate(final SampleList sampleList) {
+		return this.daoFactory.getSampleListDao().saveOrUpdate(sampleList);
+	}
+
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
 		this.studyMeasurements = studyMeasurements;
 	}

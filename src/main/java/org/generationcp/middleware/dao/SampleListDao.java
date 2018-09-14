@@ -118,7 +118,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
 
-		final SQLQuery query = this.getSession().createSQLQuery(addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
+		final SQLQuery query = this.getSession().createSQLQuery(
+				addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
 
 		query.setParameter("searchString", searchString + (exactMatch ? "" : "%"));
 		query.setParameter("listType", SampleListType.SAMPLE_LIST.toString());
