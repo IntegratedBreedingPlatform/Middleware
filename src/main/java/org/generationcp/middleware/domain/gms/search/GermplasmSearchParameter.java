@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.domain.gms.search;
 
 import java.util.Collections;

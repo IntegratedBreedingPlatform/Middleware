@@ -297,7 +297,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getPreferredNameIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getPreferredNameIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(),
+					e);
 		}
 
 		return toreturn;
@@ -524,7 +525,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_GROUP_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
 			query.setParameterList("gids", gids);
 
-			map = createGidAndPreferredNameMap(query.list());
+			map = this.createGidAndPreferredNameMap(query.list());
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getSourcePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
@@ -547,7 +548,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_IMMEDIATE_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
 			query.setParameterList("gids", gids);
 
-			map = createGidAndPreferredNameMap(query.list());
+			map = this.createGidAndPreferredNameMap(query.list());
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getImmediatePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
@@ -556,7 +557,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		}
 		return map;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Name> getNamesByTypeAndGIDList(final Integer nameType, final List<Integer> gidList) {
 		List<Name> returnList = new ArrayList<>();
@@ -569,8 +570,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				query.setParameterList("gidList", gidList);
 				returnList = query.list();
 			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getNamesByTypeAndGIDList(nameType=" + nameType
-						+ ", gidList=" + gidList + "): " + e.getMessage(), e);
+				throw new MiddlewareQueryException(
+						"Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage(), e);
 			}
 		}
 		return returnList;

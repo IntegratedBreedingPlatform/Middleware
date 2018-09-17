@@ -69,23 +69,23 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return criteria.list();
 	}
 
-	public Attribute getAttribute (final Integer gid, final String attributeName) {
+	public Attribute getAttribute(final Integer gid, final String attributeName) {
 		Attribute attribute = null;
-			try {
-				final String sql = "SELECT {a.*} FROM atributs a INNER JOIN udflds u ON (a.atype=u.fldno)"
-						+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("a", Attribute.class);
-				query.setParameter("gid", gid);
-				query.setParameter("name", attributeName);
-				final List<Attribute> attributes = query.list();
-				if (!attributes.isEmpty()) {
-					attribute = attributes.get(0);
-				}
-
-			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getAttribute(gidList=" + gid + ", " + attributeName + "): " + e.getMessage(), e);
+		try {
+			final String sql = "SELECT {a.*} FROM atributs a INNER JOIN udflds u ON (a.atype=u.fldno)"
+					+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("a", Attribute.class);
+			query.setParameter("gid", gid);
+			query.setParameter("name", attributeName);
+			final List<Attribute> attributes = query.list();
+			if (!attributes.isEmpty()) {
+				attribute = attributes.get(0);
 			}
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getAttribute(gidList=" + gid + ", " + attributeName + "): " + e.getMessage(), e);
+		}
 		return attribute;
 	}
 }
