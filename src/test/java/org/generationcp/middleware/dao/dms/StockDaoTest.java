@@ -119,7 +119,6 @@ public class StockDaoTest extends IntegrationTestBase {
 		rel.setSubjectProject(subject);
 		rel.setTypeId(TermId.BELONGS_TO_STUDY.getId());
 		projectRelationshipDao.save(rel);
-		System.out.println(rel);
 	}
 	
 	@Test
@@ -266,46 +265,6 @@ public class StockDaoTest extends IntegrationTestBase {
 		return variateTerm;
 	}
 
-
-
-//	@Test
-//	public void testGetStudiesByGid() {
-//		final int gid = 123;
-//		final int start = 10;
-//		final int numOfRows = 500;
-//		this.dao.getStudiesByGid(gid, start, numOfRows);
-//		final String expectedSql =  "select distinct p.project_id, p.name, p.description, "
-//				+ "st.study_type_id, st.label, st.name, st.visible, st.cvterm_id, p.program_uuid "
-//				+ "FROM stock s "
-//				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-//				+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = e.project_id "
-//				+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
-//				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
-//				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0";
-//		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-//		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
-//		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-//		Mockito.verify(query).setFirstResult(start);
-//		Mockito.verify(query).setMaxResults(numOfRows);
-//	}
-//	
-//	@Test
-//	public void testCountStudiesByGid() {
-//		Mockito.doReturn(new BigInteger("100")).when(this.query).uniqueResult();
-//		final int gid = 123;
-//		final long count = this.dao.countStudiesByGid(gid);
-//		
-//		final String expectedSql = "select count(distinct p.project_id) " + "FROM stock s "
-//				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-//				+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = e.project_id "
-//				+ "LEFT JOIN project p ON pr.object_project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
-//				+ " AND p.deleted = 0";
-//		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-//		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
-//		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-//		Assert.assertEquals(100L, count);
-//	}
-//	
 	private void createSampleStocks(final Integer count, final DmsProject study) {
 		// Save the experiments in the same instance
 		environment = new Geolocation();
@@ -344,6 +303,5 @@ public class StockDaoTest extends IntegrationTestBase {
 		experimentModel.setStock(stockModel);
 		experimentDao.saveOrUpdate(experimentModel);
 		this.experiments.add(experimentModel);
-		System.out.println(experimentModel);
 	}
 }
