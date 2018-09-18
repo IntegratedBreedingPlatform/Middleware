@@ -131,17 +131,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return daoFactory.getGermplasmListDAO().countByName(name, operation);
 	}
 
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
 	@Override
-	public long countGermplasmListByName(final String name, final Operation operation, final Database instance) {
-		return daoFactory.getGermplasmListDAO().countByName(name, operation);
-	}
-
-	@Override
-	public long countGermplasmListByStatus(final Integer status, final Database instance) {
+	public long countGermplasmListByStatus(final Integer status) {
 		return daoFactory.getGermplasmListDAO().countByStatus(status);
 	}
 

@@ -10,6 +10,21 @@
 
 package org.generationcp.middleware.manager;
 
+import static org.hamcrest.CoreMatchers.both;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsNot.not;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.TransformerUtils;
 import org.generationcp.middleware.DataSetupTest;
@@ -49,18 +64,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.hamcrest.core.IsNot.not;
 
 /*
  * The add/update/delete tests are highly dependent on the tests before it Therefore the order of execution is important. In the future, we
@@ -254,7 +257,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	public void testCountGermplasmListByName() throws Exception {
 		final String name = "2002%";
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByName(" + name + "): " + this.manager
-				.countGermplasmListByName(name, Operation.LIKE, Database.CENTRAL));
+				.countGermplasmListByName(name, Operation.LIKE));
 		// Verify using: select count(*) from listnms where liststatus <> 9 and listname like '2002%';
 	}
 
@@ -262,7 +265,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	public void testCountGermplasmListByStatus() throws Exception {
 		final Integer status = Integer.valueOf(1);
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByStatus(status=" + status + "): " + this.manager
-				.countGermplasmListByStatus(status, Database.CENTRAL));
+				.countGermplasmListByStatus(status));
 		// Verify using: select count(*) from listnms where liststatus <> 9 and liststatus = 1;
 	}
 

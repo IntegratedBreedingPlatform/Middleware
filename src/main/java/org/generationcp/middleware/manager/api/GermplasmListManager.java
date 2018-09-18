@@ -17,7 +17,6 @@ import java.util.Map;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -82,25 +81,12 @@ public interface GermplasmListManager {
 	long countGermplasmListByName(String name, Operation operation);
 
 	/**
-	 * Returns the number of Germplasm List records with names matching the given parameter.
-	 *
-	 * @param name
-	 * @param operation can be Operation.EQUAL or Operation.LIKE
-	 * @param database - can either be Database.CENTRAL or Database.LOCAL
-	 * @return The count of Germplasm lists based on the given name and operation
-	 * @deprecated
-	 */
-	@Deprecated
-	long countGermplasmListByName(String name, Operation operation, Database database);
-
-	/**
 	 * Returns the number of Germplasm List records that have the given status.
 	 *
 	 * @param status
-	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return The count of Germplasm lists based on the given status.
 	 */
-	long countGermplasmListByStatus(Integer status, Database instance);
+	long countGermplasmListByStatus(Integer status);
 
 	/**
 	 * Returns the germplasm lists that are associated with the specified GID.
