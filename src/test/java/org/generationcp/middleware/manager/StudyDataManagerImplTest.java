@@ -207,7 +207,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchStudiesByGid() throws Exception {
-		final GidStudyQueryFilter filter = new GidStudyQueryFilter(this.studyTDI.getGid());
+		// Flushing to force Hibernate to synchronize with the underlying database before the search
+		//  Without this the inserted experiment is not retrieved properly
+		this.manager.getActiveSession().flush();
+		
+		final Integer gid = this.studyTDI.getGid();
+		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
 		final StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
 		// We are sure that the result set will contain the test study we added in the set up
 		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);

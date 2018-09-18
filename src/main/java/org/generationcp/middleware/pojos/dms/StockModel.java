@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import org.generationcp.middleware.pojos.Germplasm;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Basic;
@@ -21,6 +22,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -49,12 +52,10 @@ public class StockModel implements Serializable {
 	@Column(name = "stock_id")
 	private Integer stockId;
 
-	/**
-	 * The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table:
-	 * stock_dbxref.
-	 */
-	@Column(name = "dbxref_id")
-	private Integer dbxrefId;
+	
+	@ManyToOne(targetEntity = Germplasm.class)
+	@JoinColumn(name = "dbxref_id", nullable = true)
+	private Germplasm germplasm;
 
 	/**
 	 * The organism_id is the organism to which the stock belongs. This column is mandatory.
@@ -99,11 +100,10 @@ public class StockModel implements Serializable {
 	public StockModel() {
 	}
 
-	public StockModel(Integer stockId, Integer dbxrefId, Integer organismId, String name, String uniqueName, String value,
+	public StockModel(Integer stockId, Integer organismId, String name, String uniqueName, String value,
 			String description, Integer typeId, Boolean isObsolete) {
 		super();
 		this.stockId = stockId;
-		this.dbxrefId = dbxrefId;
 		this.organismId = organismId;
 		this.name = name;
 		this.uniqueName = uniqueName;
@@ -121,12 +121,14 @@ public class StockModel implements Serializable {
 		this.stockId = stockId;
 	}
 
-	public Integer getDbxrefId() {
-		return this.dbxrefId;
+	
+	public Germplasm getGermplasm() {
+		return germplasm;
 	}
 
-	public void setDbxrefId(Integer dbxrefId) {
-		this.dbxrefId = dbxrefId;
+	
+	public void setGermplasm(Germplasm germplasm) {
+		this.germplasm = germplasm;
 	}
 
 	public Integer getOrganismId() {
@@ -197,7 +199,7 @@ public class StockModel implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.dbxrefId == null ? 0 : this.dbxrefId.hashCode());
+		result = prime * result + (this.germplasm == null ? 0 : this.germplasm.hashCode());
 		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
 		result = prime * result + (this.isObsolete == null ? 0 : this.isObsolete.hashCode());
 		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
@@ -221,11 +223,11 @@ public class StockModel implements Serializable {
 			return false;
 		}
 		StockModel other = (StockModel) obj;
-		if (this.dbxrefId == null) {
-			if (other.dbxrefId != null) {
+		if (this.germplasm == null) {
+			if (other.germplasm != null) {
 				return false;
 			}
-		} else if (!this.dbxrefId.equals(other.dbxrefId)) {
+		} else if (!this.germplasm.equals(other.germplasm)) {
 			return false;
 		}
 		if (this.description == null) {
@@ -292,8 +294,8 @@ public class StockModel implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Stock [stockId=");
 		builder.append(this.stockId);
-		builder.append(", dbxrefId=");
-		builder.append(this.dbxrefId);
+		builder.append(", germplasm=");
+		builder.append(this.germplasm);
 		builder.append(", organismId=");
 		builder.append(this.organismId);
 		builder.append(", name=");
