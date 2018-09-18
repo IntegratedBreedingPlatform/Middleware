@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.Database;
 
 public class TraitGroupBuilder extends Builder {
 
@@ -47,11 +46,11 @@ public class TraitGroupBuilder extends Builder {
 
 		if (includePropertiesAndVariables) {
 			// Step 2: Get all Trait Class Properties
-			this.setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
+			this.setPropertiesOfTraitClasses(traitClasses);
 
 			// Step 3: Get all StandardVariables of Properties
 			for (TraitClassReference traitClass : traitClasses) {
-				this.setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
+				this.setStandardVariablesOfProperties(traitClass.getProperties());
 			}
 		}
 
@@ -99,7 +98,7 @@ public class TraitGroupBuilder extends Builder {
 		}
 	}
 
-	private void setPropertiesOfTraitClasses(Database instance, List<TraitClassReference> traitClasses) throws MiddlewareQueryException {
+	private void setPropertiesOfTraitClasses(List<TraitClassReference> traitClasses) throws MiddlewareQueryException {
 
 		List<Integer> traitClassIds = new ArrayList<Integer>();
 		for (TraitClassReference traitClass : traitClasses) {
@@ -122,7 +121,7 @@ public class TraitGroupBuilder extends Builder {
 
 	}
 
-	private void setStandardVariablesOfProperties(Database instance, List<PropertyReference> traitClassProperties)
+	private void setStandardVariablesOfProperties(List<PropertyReference> traitClassProperties)
 			throws MiddlewareQueryException {
 		List<Integer> propertyIds = new ArrayList<Integer>();
 		for (PropertyReference property : traitClassProperties) {
