@@ -10,6 +10,15 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -27,15 +36,6 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation of the LocationDataManager interface. To instantiate this
@@ -349,7 +349,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getAllBreedingLocations() {
 
 		final List<Location> allLocations =
-				this.getFromInstanceByMethod(daoFactory.getLocationDAO(), Database.LOCAL, "getAllBreedingLocations", new Object[] {},
+				this.getFromInstanceByMethod(daoFactory.getLocationDAO(), "getAllBreedingLocations", new Object[] {},
 						new Class[] {});
 
 		return allLocations;

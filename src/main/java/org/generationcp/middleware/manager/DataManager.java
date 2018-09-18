@@ -267,46 +267,6 @@ public abstract class DataManager extends DatabaseBroker {
 	}
 
 	/**
-	 * A generic implementation of the getXXXByXXXX(Database instance) method that calls a specific get method from a DAO. <br/>
-	 * Calls the corresponding method that returns list type as specified in the parameter methodName. <br/>
-	 * <br/>
-	 * Sample usage: <br/>
-	 *
-	 * <pre>
-	 * <code>
-	 *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) {
-	 *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows},
-	 *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
-	 *    }
-	 * </code>
-	 * </pre>
-	 *
-	 * @param dao The DAO to call the method from
-	 * @param methodName The method to call
-	 * @param parameters The parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may
-	 *        add them to this
-	 * @param parameterTypes The types of the parameters passed to the methods
-	 * @return the List result
-	 * @throws MiddlewareQueryException
-	 * @deprecated
-	 */
-	@Deprecated
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public List getFromInstanceByMethod(final GenericDAO dao, final Database instance, final String methodName, final Object[] parameters, final Class[] parameterTypes)
-			throws MiddlewareQueryException {
-		final List toReturn = new ArrayList();
-		try {
-			final java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
-			dao.setSession(this.getActiveSession());
-			toReturn.addAll((List) method.invoke(dao, parameters));
-		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-			// NoSuchMethodException
-			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
-		}
-		return toReturn;
-	}
-
-	/**
 	 * A generic implementation of the getXXXByXXXX(Integer id, ...) method that calls a specific get method from a DAO. <br/>
 	 * Calls the corresponding method that returns list type as specified in the parameter methodName. <br/>
 	 * <br/>

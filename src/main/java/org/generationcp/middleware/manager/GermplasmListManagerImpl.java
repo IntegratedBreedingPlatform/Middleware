@@ -35,12 +35,12 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
@@ -114,16 +114,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				new Class[] {Integer.TYPE, Integer.TYPE});
 	}
 
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	@Override
-	public List<GermplasmList> getAllGermplasmLists(final int start, final int numOfRows, final Database instance) {
-		return this.getFromInstanceByMethod(daoFactory.getGermplasmListDAO(), instance, "getAllExceptDeleted", new Object[] {start, numOfRows},
-				new Class[] {Integer.TYPE, Integer.TYPE});
-	}
-
 	@Override
 	public long countAllGermplasmLists() {
 
@@ -134,18 +124,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public List<GermplasmList> getGermplasmListByName(final String name, final String programUUID, final int start, final int numOfRows,
 			final Operation operation) {
 		return daoFactory.getGermplasmListDAO().getByName(name, programUUID, operation, start, numOfRows);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Override
-	@Deprecated
-	public List<GermplasmList> getGermplasmListByName(final String name, final int start, final int numOfRows, final Operation operation,
-			final Database instance) {
-
-		return this.getFromInstanceByMethod(daoFactory.getGermplasmListDAO(), instance, "getByName",
-				new Object[] {name, operation, start, numOfRows}, new Class[] {String.class, Operation.class, Integer.TYPE, Integer.TYPE});
 	}
 
 	@Override
@@ -231,13 +209,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public long countGermplasmListDataByGID(final Integer gid) {
 
 		return this.countAllByMethod(daoFactory.getGermplasmListDataDAO(), "countByGID", new Object[] {gid}, new Class[] {Integer.class});
-	}
-
-	@Override
-	public List<GermplasmList> getAllTopLevelLists(final int start, final int numOfRows, final Database instance) {
-
-		return this.getFromInstanceByMethod(daoFactory.getGermplasmListDAO(), instance, "getAllTopLevelLists", new Object[] {start, numOfRows},
-				new Class[] {Integer.TYPE, Integer.TYPE});
 	}
 
 	@Override
@@ -534,7 +505,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		
 		final List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
 
-		final List results = this.getFromInstanceByMethod(daoFactory.getGermplasmListDAO(), Database.LOCAL, "getGermplasmNameTypes",
+		final List results = this.getFromInstanceByMethod(daoFactory.getGermplasmListDAO(), "getGermplasmNameTypes",
 				new Object[] {}, new Class[] {});
 
 		for (final Object o : results) {
