@@ -11,6 +11,13 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
@@ -23,6 +30,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -56,17 +64,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
@@ -165,47 +162,38 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue("The size should be greater than 0.", resultSet.size() > 0);
 	}
 
-	@Ignore
 	@Test
 	public void testSearchStudiesForName() throws Exception {
+		// Study search query expect datasets for studies to be returned
+		this.studyTDI.addTestDataset(this.studyReference.getId());
+		
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+		filter.setStudySearchMatchingOption(StudySearchMatchingOption.EXACT_MATCHES);
+		filter.setProgramUUID(this.studyReference.getProgramUUID());
 
-		filter.setName("FooFoo");
+		filter.setName(RandomStringUtils.randomAlphanumeric(100));
 		StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		Assert.assertEquals("The size should be zero since the name is invalid", 0, resultSet.size());
+		Assert.assertEquals("The size should be zero since the study is not existing", 0, resultSet.size());
 
-		filter.setName(StudyDataManagerImplTest.BASIC_NURSERY_TEMPLATE);
+		filter.setName(this.studyReference.getName());
 		resultSet = this.manager.searchStudies(filter, 10);
 
-		// We are sure that the result set will contain at least one study
-		Assert.assertTrue("The size should be greater than zero", resultSet.size() > 0);
+		Assert.assertTrue("The study search by name results should contain test study", resultSet.size() > 0);
 	}
 
-	@Ignore
 	@Test
 	public void testSearchStudiesForStartDate() throws Exception {
+		// Study search query expect datasets for studies to be returned
+		this.studyTDI.addTestDataset(this.studyReference.getId());
+		
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		// start date of basic nursery template
-		filter.setStartDate(StudyDataManagerImplTest.START_DATE);
+		filter.setStartDate(new Integer(StudyTestDataInitializer.START_DATE));
+		filter.setProgramUUID(this.studyReference.getProgramUUID());
 
 		final StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		// We are sure that the result set will contain the test study we added in the set up
-		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
+		Assert.assertTrue("The study search by start date results should contain test study", resultSet.size() > 0);
 	}
 
-	@Ignore
-	@Test
-	public void testSearchStudiesForAll() throws Exception {
-		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-		filter.setStartDate(StudyDataManagerImplTest.START_DATE);
-		filter.setName(StudyDataManagerImplTest.BASIC_NURSERY_TEMPLATE);
-
-		final StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		// We are sure that the result set will contain the test study we added in the set up
-		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
-	}
-
-	@Test
 	public void testSearchStudiesByGid() throws Exception {
 		final GidStudyQueryFilter filter = new GidStudyQueryFilter(this.studyTDI.getGid());
 		final StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
