@@ -12,102 +12,155 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;  
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
-	private PhenotypeDao dao;
+	private static final int NO_OF_GERMPLASM = 5;
 
-	@Autowired
-	private DataImportService dataImportService;
-
-	@Autowired
-	private StudyDataManager studyDataManager;
-
-	private static final String FIELDBOOK_FILE_IBD_VALID = "Study457-3-1_Valid_IBD.xls";
-	private static final String FIELDBOOK_FILE_CATVARIATES_ONLY = "FieldbookFile_CategoricalVariatesOnly.xls";
-	private static final Integer CREATED_BY = 1;
-	private final Map<Integer, Map<String, Object>> studies = new HashMap<Integer, Map<String, Object>>();
-	private boolean testDataLoaded = false;
-
-	private static final String DATASETS = "datasets";
-	private static final String WORKBOOK = "workbook";
-	private final String cropPrefix = "ABCD";
+	private PhenotypeDao phenotypeDao;
 	
+	private GeolocationDao geolocationDao;
+	
+	private ExperimentDao experimentDao;
+	
+	private StockDao stockDao;
+	
+	private GermplasmDAO germplasmDao;
+	
+	private DmsProjectDao dmsProjectDao;
+	
+	private CVTermDao cvTermDao;
+	
+	private DmsProject study;
+	private CVTerm trait;
+
 	@Before
 	public void setUp() throws Exception {
 
-		if (this.dao == null) {
-			this.dao = new PhenotypeDao();
-			this.dao.setSession(this.sessionProvder.getSession());
+		if (this.phenotypeDao == null) {
+			this.phenotypeDao = new PhenotypeDao();
+			this.phenotypeDao.setSession(this.sessionProvder.getSession());
+		}
+		
+		if (this.geolocationDao == null) {
+			this.geolocationDao = new GeolocationDao();
+			this.geolocationDao.setSession(this.sessionProvder.getSession());
+		}
+		
+		if (this.germplasmDao == null) {
+			this.germplasmDao = new GermplasmDAO();
+			this.germplasmDao.setSession(this.sessionProvder.getSession());
+		}
+		
+		if (this.experimentDao == null) {
+			this.experimentDao = new ExperimentDao();
+			this.experimentDao.setSession(this.sessionProvder.getSession());
+		}
+		
+		if (this.stockDao == null) {
+			this.stockDao = new StockDao();
+			this.stockDao.setSession(this.sessionProvder.getSession());
+		}
+		
+		if (this.dmsProjectDao == null) {
+			this.dmsProjectDao = new DmsProjectDao();
+			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		}
+		
+		if (this.cvTermDao == null) {
+			this.cvTermDao = new CVTermDao();
+			this.cvTermDao.setSession(this.sessionProvder.getSession());
+		}
+		
+		if (this.study == null) {
+			this.study = new DmsProject();
+			this.study.setName("Test Project");
+			this.study.setDescription("Test Project");
+			dmsProjectDao.save(this.study);
+		}
+		
+		if (this.trait == null) {
+			this.trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+			this.cvTermDao.save(this.trait);
 		}
 
 		
-		this.importFieldbookFile(PhenotypeDaoIntegrationTest.FIELDBOOK_FILE_IBD_VALID, cropPrefix);
-		this.importFieldbookFile(PhenotypeDaoIntegrationTest.FIELDBOOK_FILE_CATVARIATES_ONLY, cropPrefix);
 	}
 
-	private void importFieldbookFile(final String fieldbookFileIbdValid, final String cropPrefix) throws Exception {
 
-		if (!this.testDataLoaded) {
-			final String fileLocation = PhenotypeDaoIntegrationTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
-			final File file = new File(fileLocation);
-			final Workbook workbook = this.dataImportService.parseWorkbook(file, PhenotypeDaoIntegrationTest.CREATED_BY);
-			workbook.print(IntegrationTestBase.INDENT);
-
-			final int studyId = this.dataImportService.saveDataset(workbook, null, cropPrefix);
-
-			final List<DatasetReference> datasetRefences = this.studyDataManager.getDatasetReferences(studyId);
-
-			final Map<String, Object> studyDetails = new HashMap<String, Object>();
-			studyDetails.put(PhenotypeDaoIntegrationTest.DATASETS, datasetRefences);
-			studyDetails.put(PhenotypeDaoIntegrationTest.WORKBOOK, workbook);
-			this.studies.put(studyId, studyDetails);
-			this.testDataLoaded = true;
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testContainsAtLeast2CommonEntriesWithValues() throws Exception {
-		int locationId = 0;
-		int plotId = 0;
+		final Integer studyId = this.study.getProjectId();
+		// Create environment with 2 reps but no phenotype data
+		Integer locationId = this.createEnvironmentData(2, false);
+		Assert.assertFalse(this.phenotypeDao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.GID.getId()));
+		
+		// Create environment with 1 rep and phenotype data
+		locationId = this.createEnvironmentData(1, true);
+		Assert.assertFalse(this.phenotypeDao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.GID.getId()));
 
-		for (Integer studyId : this.studies.keySet()) {
+		// Create environment with 2 reps and phenotype data
+		locationId = this.createEnvironmentData(2, true);
+		Assert.assertTrue(this.phenotypeDao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.GID.getId()));
+	}
+	
+	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
+		
+		final Geolocation geolocation = new Geolocation();
+		geolocationDao.saveOrUpdate(geolocation);
 
-			final Map<String, Object> studyDetails = this.studies.get(studyId);
-			final Workbook workbook = (Workbook) studyDetails.get(PhenotypeDaoIntegrationTest.WORKBOOK);
-			final List<DatasetReference> datasetRefences = (List<DatasetReference>) studyDetails.get(PhenotypeDaoIntegrationTest.DATASETS);
-
-			locationId = (int) workbook.getObservations().get(0).getLocationId();
-
-			for (final DatasetReference datasetReference : datasetRefences) {
-				if (datasetReference.getName().endsWith("PLOTDATA")) {
-					plotId = datasetReference.getId();
-				} else if (datasetReference.getName().endsWith("ENVIRONMENT")) {
-					studyId = datasetReference.getId();
+		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {
+			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+			germplasm.setGid(null);
+			this.germplasmDao.save(germplasm);
+			
+			final StockModel stockModel = new StockModel();
+			stockModel.setName("Germplasm " + i);
+			stockModel.setIsObsolete(false);
+			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
+			stockModel.setUniqueName(String.valueOf(i));
+			stockModel.setGermplasm(germplasm);
+			stockDao.saveOrUpdate(stockModel);
+			
+			// Create two experiments for the same stock
+			for (int j=0; j < numberOfReps; j++) {
+				final ExperimentModel experimentModel = new ExperimentModel();
+				experimentModel.setGeoLocation(geolocation);
+				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+				experimentModel.setPlotId(RandomStringUtils.randomAlphabetic(13));
+				experimentModel.setProject(this.study);
+				experimentModel.setStock(stockModel);
+				experimentDao.saveOrUpdate(experimentModel);
+				
+				if (withPhenotype) {
+					final Phenotype phenotype = new Phenotype();
+					phenotype.setObservableId(this.trait.getCvTermId());
+					phenotype.setExperiment(experimentModel);
+					phenotype.setValue(i + "." + j);
+					phenotypeDao.save(phenotype);
 				}
 			}
-			Assert.assertTrue("The plot dataset should have at least 2 common entries for analysis",
-					this.dao.containsAtLeast2CommonEntriesWithValues(plotId, locationId, TermId.ENTRY_NO.getId()));
-			Assert.assertFalse("The trial dataset does not contain entries for analysis",
-					this.dao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.ENTRY_NO.getId()));
+
 		}
+		
+		return geolocation.getLocationId();
 	}
 }
