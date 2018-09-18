@@ -384,12 +384,11 @@ public abstract class DataManager extends DatabaseBroker {
 	 * </pre>
 	 *
 	 * @param dao The DAO to call the method from
-	 * @param instance The database instance to query from
 	 * @return The number of entities
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
-	public long countFromInstance(final GenericDAO dao, final Database instance) {
+	public long countFromInstance(final GenericDAO dao) {
 		long count = 0;
 		dao.setSession(this.getActiveSession());
 		count = count + dao.countAll();

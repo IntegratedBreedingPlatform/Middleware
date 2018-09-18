@@ -119,21 +119,21 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetFirstFiveMaps() throws Exception {
-		final List<Map> maps = this.genotypicDataManager.getAllMaps(0, 5, Database.CENTRAL);
+		final List<Map> maps = this.genotypicDataManager.getAllMaps(0, 5);
 		Debug.println("RESULTS (testGetFirstFiveMaps): " + maps);
 	}
 
 	@Test
 	public void testGetMapInfoByMapName() throws Exception {
 		final String mapName = "RIL-8 (Yueyou13 x J 11)"; // CENTRAL test data
-		final List<MapInfo> results = this.genotypicDataManager.getMapInfoByMapName(mapName, Database.CENTRAL);
+		final List<MapInfo> results = this.genotypicDataManager.getMapInfoByMapName(mapName);
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 
 	@Test
 	public void testGetMapInfoByMapNameBothDB() throws Exception {
 		final String mapName = "GCP-833TestMap"; // LOCAL test data
-		final List<MapInfo> results = this.genotypicDataManager.getMapInfoByMapName(mapName, Database.LOCAL);
+		final List<MapInfo> results = this.genotypicDataManager.getMapInfoByMapName(mapName);
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 
@@ -203,13 +203,13 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountDatasetNames() throws Exception {
-		final long results = this.genotypicDataManager.countDatasetNames(Database.LOCAL);
+		final long results = this.genotypicDataManager.countDatasetNames();
 		Debug.println("testCountDatasetNames(Database.LOCAL) RESULTS: " + results);
 	}
 
 	@Test
 	public void testGetDatasetNames() throws Exception {
-		final List<String> result = this.genotypicDataManager.getDatasetNames(0, Integer.MAX_VALUE, Database.LOCAL);
+		final List<String> result = this.genotypicDataManager.getDatasetNames(0, Integer.MAX_VALUE);
 		Debug.printObjects(0, result);
 	}
 
@@ -294,7 +294,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	public void testGetGermplasmNamesByMarkerNames() throws Exception {
 		final List<String> markerNames = Arrays.asList("1_0001", "1_0007", "1_0013");
 
-		final List<GermplasmMarkerElement> results = this.genotypicDataManager.getGermplasmNamesByMarkerNames(markerNames, Database.LOCAL);
+		final List<GermplasmMarkerElement> results = this.genotypicDataManager.getGermplasmNamesByMarkerNames(markerNames);
 		Debug.println("testGetGermplasmNamesByMarkerNames(" + markerNames + ")  RESULTS: " + results);
 	}
 
@@ -379,13 +379,13 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountAllMarkerTypesLocal() throws Exception {
-		final long result = this.genotypicDataManager.countAllMarkerTypes(Database.LOCAL);
+		final long result = this.genotypicDataManager.countAllMarkerTypes();
 		Debug.println("testCountAllMarkerTypes(Database.LOCAL) RESULTS: " + result);
 	}
 
 	@Test
 	public void testCountAllMarkerTypesCentral() throws Exception {
-		final long result = this.genotypicDataManager.countAllMarkerTypes(Database.CENTRAL);
+		final long result = this.genotypicDataManager.countAllMarkerTypes();
 		Debug.println("testCountAllMarkerTypes(Database.CENTRAL) RESULTS: " + result);
 	}
 
@@ -1731,17 +1731,17 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountAllMaps() throws Exception {
-		final long count = this.genotypicDataManager.countAllMaps(Database.LOCAL);
+		final long count = this.genotypicDataManager.countAllMaps();
 		Assert.assertNotNull(count);
-		Debug.println("testCountAllMaps(" + Database.LOCAL + ") Results: " + count);
+		Debug.println("testCountAllMaps Results: " + count);
 	}
 
 	@Test
 	public void testGetAllMaps() throws Exception {
-		final List<Map> results = this.genotypicDataManager.getAllMaps(0, 100, Database.LOCAL);
+		final List<Map> results = this.genotypicDataManager.getAllMaps(0, 100);
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
-		Debug.println("testGetAllMaps(" + Database.LOCAL + ") Results:");
+		Debug.println("testGetAllMaps Results:");
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 

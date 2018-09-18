@@ -11,10 +11,17 @@
 
 package org.generationcp.middleware.dao.gdms;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
@@ -24,14 +31,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * DAO class for {@link Marker}.
@@ -192,7 +191,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 	 * @return Map of markerId-markerName pairs
 	 * @throws MiddlewareQueryException
 	 */
-	public Map<Integer, String> getFirstMarkerIdByMarkerName(final List<String> names, final Database instance) throws MiddlewareQueryException {
+	public Map<Integer, String> getFirstMarkerIdByMarkerName(final List<String> names) throws MiddlewareQueryException {
 		Map<Integer, String> toReturn = new HashMap<Integer, String>();
 		if (names == null || names.isEmpty()) {
 			return toReturn;
@@ -200,9 +199,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MarkerDAO.GET_ID_AND_NAME_BY_NAMES);
-			if (instance == Database.LOCAL) {
-				query = this.getSession().createSQLQuery(MarkerDAO.GET_ID_AND_NAME_BY_NAMES + "DESC");
-			}
 			query.setParameterList("markerNameList", names);
 			List<Object> results = query.list();
 

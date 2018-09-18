@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GdmsType;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
@@ -100,32 +99,20 @@ public interface GenotypicDataManager {
 	/**
 	 * Counts all Map records.
 	 *
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
 	 * @return the number of Map records found in the given instance
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countAllMaps(Database instance) throws MiddlewareQueryException;
+	long countAllMaps() throws MiddlewareQueryException;
 
 	/**
 	 * Gets all the Map records in the given range from the given database instance.
 	 *
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
 	 * @return List of all the maps on the given range from the given database instance
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Map> getAllMaps(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
-
-	/**
-	 * Gets map information (marker_name, linkage_group, start_position) from mapping_data view by the given map name.
-	 *
-	 * @param mapName - the name of the map to retrieve
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
-	 * @return the map info corresponding to the given map name
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException;
+	List<Map> getAllMaps(int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
 	 * Gets map information (marker_name, linkage_group, start_position) from mapping_data view by the given map name.
@@ -214,22 +201,20 @@ public interface GenotypicDataManager {
 	/**
 	 * Counts all the dataset names.
 	 *
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
 	 * @return the number of dataset names found in the given instance
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countDatasetNames(Database instance) throws MiddlewareQueryException;
+	long countDatasetNames() throws MiddlewareQueryException;
 
 	/**
 	 * Gets the dataset names from the dataset table. Data is filtered by ignoring dataset type = 'qtl'.
 	 *
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
 	 * @return List of the dataset names based on the given range from the given database instance
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
+	List<String> getDatasetNames(int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the dataset names from the dataset table based on the given qtl id. Retrieves from both local and central database instances.
@@ -317,11 +302,10 @@ public interface GenotypicDataManager {
 	 * germplasm names matching the marker names.
 	 *
 	 * @param markerNames - the marker names to match
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
 	 * @return the GermplasmMarkerElement list that contains the germplasm name and the corresponding marker names
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance)
+	List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames)
 			throws MiddlewareQueryException;
 
 	/**
@@ -417,11 +401,10 @@ public interface GenotypicDataManager {
 	/**
 	 * Gets the number of marker types.
 	 *
-	 * @param instance - specifies whether the data should be retrieved from either the Central or the Local IBDB instance
 	 * @return the number of all marker types on the specified database instance
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countAllMarkerTypes(Database instance) throws MiddlewareQueryException;
+	long countAllMarkerTypes() throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves the names of the the markers which have the specified marker type.

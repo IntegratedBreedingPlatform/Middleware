@@ -131,19 +131,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public long countAllMaps(Database instance) throws MiddlewareQueryException {
-		return super.countFromInstance(this.getMapDao(), instance);
+	public long countAllMaps() throws MiddlewareQueryException {
+		return super.countFromInstance(this.getMapDao());
 	}
 
 	@Override
-	public List<Map> getAllMaps(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+	public List<Map> getAllMaps(int start, int numOfRows) throws MiddlewareQueryException {
 
 		return this.getMapDao().getAll();
 
 	}
 
 	@Override
-	public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException {
+	public List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException {
 		List<MapInfo> mapInfoList = new ArrayList<>();
 
 		// Step 1: Get map id by map name
@@ -170,13 +170,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Collections.sort(mapInfoList);
 		return mapInfoList;
 
-	}
-
-	@Override
-	public List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException {
-		List<MapInfo> mapInfoList = this.getMapInfoByMapName(mapName, Database.LOCAL);
-		Collections.sort(mapInfoList);
-		return mapInfoList;
 	}
 
 	@Override
@@ -228,12 +221,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public long countDatasetNames(Database instance) throws MiddlewareQueryException {
+	public long countDatasetNames() throws MiddlewareQueryException {
 		return this.getDatasetDao().countByName();
 	}
 
 	@Override
-	public List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+	public List<String> getDatasetNames(int start, int numOfRows) throws MiddlewareQueryException {
 		return this.getDatasetDao().getDatasetNames(start, numOfRows);
 	}
 
@@ -312,7 +305,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance)
+	public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames)
 			throws MiddlewareQueryException {
 		return this.getMarkerDao().getGermplasmNamesByMarkerNames(markerNames);
 	}
@@ -353,7 +346,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		List<AllelicValueElement> allelicValues = new ArrayList<>();
 
 		// Get marker_ids by marker_names
-		java.util.Map<Integer, String> markerIdName = this.getMarkerDao().getFirstMarkerIdByMarkerName(markerNames, Database.LOCAL);
+		java.util.Map<Integer, String> markerIdName = this.getMarkerDao().getFirstMarkerIdByMarkerName(markerNames);
 		List<Integer> markerIds = new ArrayList<>(markerIdName.keySet());
 
 		allelicValues.addAll(this.getMarkerDao().getAllelicValuesByGidsAndMarkerIds(gids, markerIds));
@@ -486,7 +479,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public long countAllMarkerTypes(Database instance) throws MiddlewareQueryException {
+	public long countAllMarkerTypes() throws MiddlewareQueryException {
 		return this.getMarkerDao().countAllMarkerTypes();
 	}
 
