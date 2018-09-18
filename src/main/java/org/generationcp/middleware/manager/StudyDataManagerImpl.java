@@ -329,13 +329,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countExperimentsByTrialEnvironmentAndVariate(final int trialEnvironmentId, final int variateVariableId) {
-		final long count;
-		count = this.getExperimentDao().countByTrialEnvironmentAndVariate(trialEnvironmentId, variateVariableId);
-		return count;
-	}
-
-	@Override
 	public void addDataSetVariableType(final int datasetId, final DMSVariableType variableType) {
 
 		try {
@@ -1000,15 +993,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
-		final Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
-		if (geolocation != null) {
-			return geolocation.getDescription();
-		}
-		return null;
 	}
 
 	@Override

@@ -272,16 +272,6 @@ public interface StudyDataManager {
 	List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType);
 
 	/**
-	 * Returns the number of experiments matching the given trial environment and variate. Counts from central if the given ID is positive,
-	 * otherwise counts from local.
-	 *
-	 * @param trialEnvironmentId the trial environment id
-	 * @param variateVariableId  the variate variable id
-	 * @return The count
-	 */
-	long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId);
-
-	/**
 	 * Retrieves the trial environments belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise
 	 * retrieves from local.
 	 *
@@ -699,14 +689,6 @@ public interface StudyDataManager {
 	 * @param variableIds - list of variable IDs in the order that they will be saved
 	 */
 	void updateVariableOrdering(int datasetId, List<Integer> variableIds);
-
-	/**
-	 * Retrieves the trial instance number by geolocation id
-	 *
-	 * @param geolocationId
-	 * @return trial instance number
-	 */
-	public String getTrialInstanceNumberByGeolocationId(int geolocationId);
 
 	/**
 	 * Save the geolocation property given the geolocation id, type id and value

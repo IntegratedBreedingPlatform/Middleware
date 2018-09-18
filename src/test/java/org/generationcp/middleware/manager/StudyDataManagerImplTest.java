@@ -60,14 +60,11 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
-
-	private static final int PRESUMABLY_NON_EXISTENT_STUDY_ID = -1000000;
 
 	private static final String LOCATION_NAME = "LOCATION NAME";
 
@@ -75,9 +72,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private static final String BLOCK_NAME = "BLOCK NAME";
 
-	private static final int START_DATE = 20140627;
-
-	private static final String BASIC_NURSERY_TEMPLATE = "Basic nursery template";
 	private static final int PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID = -10000;
 
 	private StudyDataManagerImpl manager;
@@ -314,7 +308,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetFieldMapInfoOfStudy() throws MiddlewareQueryException {
+	public void testGetFieldMapInfoOfStudy() {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
@@ -499,21 +493,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Study should have the id " + this.studyReference.getId(), studyDetails.getId(), studyDetails.getId());
 	}
 
-	@Ignore
 	@Test
-	public void testGetTrialInstanceNumberByGeolocationId() {
-		try {
-			final String trialInstanceNumberExpected = "1";
-			final String trialInstanceNumberActual = this.manager.getTrialInstanceNumberByGeolocationId(1);
-			Assert.assertNotNull(trialInstanceNumberActual);
-			Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Unexpected exception: " + e.getMessage());
-		}
-	}
-
-	@Test
-	public void testGetAllSharedProjectNames() throws MiddlewareQueryException {
+	public void testGetAllSharedProjectNames() {
 		final List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
 		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
 	}

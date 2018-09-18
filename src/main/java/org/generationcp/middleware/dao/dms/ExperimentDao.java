@@ -79,25 +79,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 		return new ArrayList<Integer>();
 	}
-
-	public long countByTrialEnvironmentAndVariate(final int trialEnvironmentId, final int variateVariableId) throws MiddlewareQueryException {
-		try {
-			final SQLQuery query =
-					this.getSession().createSQLQuery(
-							"select count(distinct e.nd_experiment_id) " + "from nd_experiment e, phenotype p "
-									+ "where e.nd_experiment_id = p.nd_experiment_id "
-									+ "   and e.nd_geolocation_id = " + trialEnvironmentId + "   and p.observable_id = "
-									+ variateVariableId);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countByTrialEnvironmentAndVariate=" + trialEnvironmentId + ", " + variateVariableId
-					+ " query at ExperimentDao: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
+	
 	public ExperimentModel getExperimentByProjectIdAndLocation(final Integer projectId, final Integer locationId) throws MiddlewareQueryException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
