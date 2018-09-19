@@ -320,24 +320,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListDataByListIdAndEntryId(" + listId + ", " + entryId + "): " + data);
 	}
 
-	@Ignore
-	@Test
-	public void testGetGermplasmListDataByGID() throws Exception {
-		final Integer gid = Integer.valueOf(91959);
-		final List<GermplasmListData> results = this.manager.getGermplasmListDataByGID(gid, 0, 5);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListDataByGID(" + gid + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Ignore
-	@Test
-	public void testCountGermplasmListDataByGID() throws Exception {
-		final Integer gid = Integer.valueOf(91959);
-		Debug.println(IntegrationTestBase.INDENT,
-				"testCountGermplasmListDataByGID(" + gid + "): " + this.manager.countGermplasmListDataByGID(gid));
-	}
-
 	@Test
 	public void testAddGermplasmList() throws Exception {
 		final GermplasmList germplasmList =
@@ -585,10 +567,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		Debug.println(IntegrationTestBase.INDENT, "Test Case #3: test deleteGermplasmList(list of data) - with cascade delete");
 		final List<GermplasmList> toBeDeleted = new ArrayList<GermplasmList>();
-		/*
-		 * germplasmList = manager.getGermplasmListByName("Test List #2", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-		 * toBeDeleted.add(germplasmList); listDataList.addAll(germplasmList.getListData());
-		 */
 		germplasmList =
 				this.manager.getGermplasmListByName(TEST_LIST_3, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).get(0);
 		toBeDeleted.add(germplasmList);

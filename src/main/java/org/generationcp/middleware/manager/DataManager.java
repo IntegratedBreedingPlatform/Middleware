@@ -11,6 +11,9 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -57,10 +60,6 @@ import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 /**
  * The Class DataManager. Superclass of DataManager implementations. Contains generic implementation of retrieval methods. Contains getters
  * of Builder, Saver, Searcher objects.
@@ -99,21 +98,21 @@ public abstract class DataManager extends DatabaseBroker {
 			final Class parameterClass = parameters[i].getClass();
 			if (parameterClass.isPrimitive()) {
 				final String parameterClassName = parameterClass.getName();
-				if (parameterClassName.equals("boolean")) {
+				if ("boolean".equals(parameterClassName)) {
 					parameterTypes[i] = Boolean.TYPE;
-				} else if (parameterClassName.equals("byte")) {
+				} else if ("byte".equals(parameterClassName)) {
 					parameterTypes[i] = Byte.TYPE;
-				} else if (parameterClassName.equals("char")) {
+				} else if ("char".equals(parameterClassName)) {
 					parameterTypes[i] = Character.TYPE;
-				} else if (parameterClassName.equals("double")) {
+				} else if ("double".equals(parameterClassName)) {
 					parameterTypes[i] = Double.TYPE;
-				} else if (parameterClassName.equals("float")) {
+				} else if ("float".equals(parameterClassName)) {
 					parameterTypes[i] = Float.TYPE;
-				} else if (parameterClassName.equals("int")) {
+				} else if ("int".equals(parameterClassName)) {
 					parameterTypes[i] = Integer.TYPE;
-				} else if (parameterClassName.equals("long")) {
+				} else if ("long".equals(parameterClassName)) {
 					parameterTypes[i] = Long.TYPE;
-				} else if (parameterClassName.equals("short")) {
+				} else if ("short".equals(parameterClassName)) {
 					parameterTypes[i] = Short.TYPE;
 				}
 				// void?

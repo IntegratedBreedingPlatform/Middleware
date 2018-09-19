@@ -39,7 +39,7 @@ public class TraitGroupBuilder extends Builder {
 	 * @return list of all trait class references in a hierarchy
 	 * @throws MiddlewareQueryException
 	 */
-	public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException {
+	public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) {
 
 		// Step 1: Get all Trait Classes
 		List<TraitClassReference> traitClasses = this.getAllTraitClasses();
@@ -67,15 +67,15 @@ public class TraitGroupBuilder extends Builder {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	private List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
-		List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+	private List<TraitClassReference> getAllTraitClasses() {
+		List<TraitClassReference> traitClasses = new ArrayList<>();
 		traitClasses.addAll(daoFactory.getCvTermDao().getAllTraitClasses());
 		Collections.sort(traitClasses);
 		return traitClasses;
 	}
 
 	private List<TraitClassReference> buildTree(List<TraitClassReference> traitClasses, int parentTraitClassId) {
-		List<TraitClassReference> childrenTraitClasses = new ArrayList<TraitClassReference>();
+		List<TraitClassReference> childrenTraitClasses = new ArrayList<>();
 		for (TraitClassReference traitClass : traitClasses) {
 			if (traitClass.getParentTraitClassId() == parentTraitClassId) {
 				traitClass.setTraitClassChildren(this.buildTree(traitClasses, traitClass.getId()));
@@ -98,9 +98,9 @@ public class TraitGroupBuilder extends Builder {
 		}
 	}
 
-	private void setPropertiesOfTraitClasses(List<TraitClassReference> traitClasses) throws MiddlewareQueryException {
+	private void setPropertiesOfTraitClasses(List<TraitClassReference> traitClasses) {
 
-		List<Integer> traitClassIds = new ArrayList<Integer>();
+		List<Integer> traitClassIds = new ArrayList<>();
 		for (TraitClassReference traitClass : traitClasses) {
 			traitClassIds.add(traitClass.getId());
 		}
@@ -121,9 +121,8 @@ public class TraitGroupBuilder extends Builder {
 
 	}
 
-	private void setStandardVariablesOfProperties(List<PropertyReference> traitClassProperties)
-			throws MiddlewareQueryException {
-		List<Integer> propertyIds = new ArrayList<Integer>();
+	private void setStandardVariablesOfProperties(List<PropertyReference> traitClassProperties) {
+		List<Integer> propertyIds = new ArrayList<>();
 		for (PropertyReference property : traitClassProperties) {
 			propertyIds.add(property.getId());
 		}

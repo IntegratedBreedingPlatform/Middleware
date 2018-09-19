@@ -204,7 +204,7 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountDatasetNames() throws Exception {
 		final long results = this.genotypicDataManager.countDatasetNames();
-		Debug.println("testCountDatasetNames(Database.LOCAL) RESULTS: " + results);
+		Debug.println("testCountDatasetNames RESULTS: " + results);
 	}
 
 	@Test
@@ -380,13 +380,13 @@ public class GenotypicDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountAllMarkerTypesLocal() throws Exception {
 		final long result = this.genotypicDataManager.countAllMarkerTypes();
-		Debug.println("testCountAllMarkerTypes(Database.LOCAL) RESULTS: " + result);
+		Debug.println("testCountAllMarkerTypes RESULTS: " + result);
 	}
 
 	@Test
 	public void testCountAllMarkerTypesCentral() throws Exception {
 		final long result = this.genotypicDataManager.countAllMarkerTypes();
-		Debug.println("testCountAllMarkerTypes(Database.CENTRAL) RESULTS: " + result);
+		Debug.println("testCountAllMarkerTypes RESULTS: " + result);
 	}
 
 	@Test

@@ -11,7 +11,6 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,7 +119,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByName(final String name, final int start, final int numOfRows, final Operation op) {
-		final List<String> methods = Arrays.asList("countByName", "getByName");
 		return this.daoFactory.getLocationDAO().getByName(name, op, start, numOfRows);
 	}
 
@@ -217,7 +215,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return daoFactory.getLocationDAO().getById(id, false);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public List<Location> getLocationsByIDs(final List<Integer> ids) {
 		return daoFactory.getLocationDAO().getLocationByIds(ids);
@@ -518,8 +515,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber, final int pageSize,
 			final Map<LocationFilters, Object> filters) {
-		final List<LocationDetailsDto> locationsDetailsDto = daoFactory.getLocationDAO().getLocationsByFilter(pageNumber, pageSize, filters);
-		return locationsDetailsDto;
+		return this.daoFactory.getLocationDAO().getLocationsByFilter(pageNumber, pageSize, filters);
 	}
 
 	@Override
