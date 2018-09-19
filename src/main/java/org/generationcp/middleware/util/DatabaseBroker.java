@@ -463,11 +463,6 @@ public class DatabaseBroker {
 		return listDataPropertyDao;
 	}
 
-	public ListDataProjectDAO getListDataProjectDAO() {
-		final ListDataProjectDAO listDataProjectDao = new ListDataProjectDAO();
-		listDataProjectDao.setSession(this.getActiveSession());
-		return listDataProjectDao;
-	}
 
 	public TermPropertyBuilder getTermPropertyBuilder() {
 		return new TermPropertyBuilder(this.sessionProvider);

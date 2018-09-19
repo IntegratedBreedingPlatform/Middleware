@@ -81,7 +81,7 @@ public class ListDataProjectSaverTest {
 
 		Mockito.when(this.saver.getStudyDataManager()).thenReturn(studyDataManager);
 		Mockito.when(this.daoFactory.getGermplasmListDAO()).thenReturn(germplasmListDAO);
-		Mockito.when(this.saver.getListDataProjectDAO()).thenReturn(listDataProjectDAO);
+		Mockito.when(this.daoFactory.getListDataProjectDAO()).thenReturn(listDataProjectDAO);
 		Mockito.when(this.studyDataManager.getProject(PROJECT_ID)).thenReturn(project);
 		Mockito.when(this.germplasmListDAO.getById(ORIGINAL_GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 
@@ -129,8 +129,6 @@ public class ListDataProjectSaverTest {
 		Mockito.when(listDataProjectDAO.getByListIdAndGid(listId, 1)).thenReturn(listDataProject1);
 
 		Mockito.when(listDataProjectDAO.getByListId(listId)).thenReturn(listDataProjects);
-
-		Mockito.when(saver.getListDataProjectDAO()).thenReturn(listDataProjectDAO);
 
 		Mockito.when(listDataProjectDAO.saveOrUpdate(listDataProject2)).thenReturn(listDataProject2);
 

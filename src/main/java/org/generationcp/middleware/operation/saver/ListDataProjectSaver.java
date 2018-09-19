@@ -50,13 +50,13 @@ public class ListDataProjectSaver {
 
 		if (!isCreate && !isAdvanced) {
 			// delete old list data projects
-			this.saver.getListDataProjectDAO().deleteByListId(snapList.getId());
+			this.daoFactory.getListDataProjectDAO().deleteByListId(snapList.getId());
 		}
 
 		if (listDatas != null) {
 			for (final ListDataProject listDataProject : listDatas) {
 				this.prepareListDataProjectForSaving(listDataProject, snapList);
-				this.saver.getListDataProjectDAO().save(listDataProject);
+				this.daoFactory.getListDataProjectDAO().save(listDataProject);
 			}
 		}
 
@@ -151,7 +151,7 @@ public class ListDataProjectSaver {
 	}
 
 	public void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
-		final ListDataProjectDAO listDataProjectDAO = this.saver.getListDataProjectDAO();
+		final ListDataProjectDAO listDataProjectDAO = this.daoFactory.getListDataProjectDAO();
 		for (final Integer gid : germplasms) {
 			final ListDataProject listDataProject = listDataProjectDAO.getByListIdAndGid(listId, gid);
 			this.deleteListDataProject(listDataProject);
@@ -170,7 +170,7 @@ public class ListDataProjectSaver {
 	private void deleteListDataProject(final ListDataProject listDataProject) {
 		try {
 			if (listDataProject != null) {
-				this.saver.getListDataProjectDAO().makeTransient(listDataProject);
+				this.daoFactory.getListDataProjectDAO().makeTransient(listDataProject);
 			}
 
 		} catch (final Exception e) {
@@ -188,7 +188,7 @@ public class ListDataProjectSaver {
 
 			for (final ListDataProject germplasmListData : listDataProjects) {
 
-				final ListDataProject recordSaved = this.saver.getListDataProjectDAO().saveOrUpdate(germplasmListData);
+				final ListDataProject recordSaved = this.daoFactory.getListDataProjectDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getListDataProjectId());
 
 			}

@@ -166,16 +166,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public long countListDataProjectGermplasmListDataByListId(final Integer id) {
-
-		return this.countFromInstanceByIdAndMethod(this.getListDataProjectDAO(), id, "countByListId", new Object[] {id},
-				new Class[] {Integer.class});
+		return this.daoFactory.getListDataProjectDAO().countByListId(id);
 	}
 
 	@Override
 	public List<GermplasmListData> getGermplasmListDataByListIdAndGID(final Integer listId, final Integer gid) {
-
-		return this.getFromInstanceByIdAndMethod(daoFactory.getGermplasmListDataDAO(), listId, "getByListIdAndGID", new Object[] {listId, gid},
-				new Class[] {Integer.class, Integer.class});
+		return Arrays.asList(daoFactory.getGermplasmListDataDAO().getByListIdAndGid(listId, gid));
 	}
 
 	@Override
@@ -596,12 +592,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public List<ListDataProject> retrieveSnapshotListData(final Integer listID) {
-		return this.getListDataProjectDAO().getByListId(listID);
+		return this.daoFactory.getListDataProjectDAO().getByListId(listID);
 	}
 
 	@Override
 	public List<ListDataProject> retrieveSnapshotListDataWithParents(final Integer listID) {
-		return this.getListDataProjectDAO().getListDataProjectWithParents(listID);
+		return this.daoFactory.getListDataProjectDAO().getListDataProjectWithParents(listID);
 	}
 
 	@Override
@@ -779,7 +775,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	private Set<Integer> getGermplasmUsedInEntryList(final List<Integer> gids) {
 		try {
-			final ListDataProjectDAO dao = this.getListDataProjectDAO();
+			final ListDataProjectDAO dao = this.daoFactory.getListDataProjectDAO();
 			return dao.getGermplasmUsedInEntryList(gids).keySet();
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(

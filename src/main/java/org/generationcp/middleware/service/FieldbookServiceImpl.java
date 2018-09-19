@@ -10,7 +10,16 @@
 
 package org.generationcp.middleware.service;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -75,15 +84,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -1125,23 +1125,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<ListDataProject> getListDataProject(final int listId) {
-		return this.getListDataProjectDAO().getByListId(listId);
+		return this.daoFactory.getListDataProjectDAO().getByListId(listId);
 	}
 
 	@Override
 	public long countListDataProjectByListIdAndEntryType(final int listId, final SystemDefinedEntryType systemDefinedEntryType) {
-		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryType);
+		return this.daoFactory.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryType);
 	}
 
 	@Override
 	public ListDataProject getListDataProjectByStudy(final int projectId, final GermplasmListType type, final int plotId,
 			final String instanceNumber) {
-		return this.getListDataProjectDAO().getByStudy(projectId, type, plotId, instanceNumber);
+		return this.daoFactory.getListDataProjectDAO().getByStudy(projectId, type, plotId, instanceNumber);
 	}
 
 	@Override
 	public ListDataProject getListDataProjectByListIdAndEntryNo(final int listId, final int entryNo) {
-		return this.getListDataProjectDAO().getByListIdAndEntryNo(listId, entryNo);
+		return this.daoFactory.getListDataProjectDAO().getByListIdAndEntryNo(listId, entryNo);
 	}
 
 	@Override
@@ -1151,7 +1151,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final List<GermplasmList> lists = daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (lists != null && !lists.isEmpty()) {
 			for (final GermplasmList list : lists) {
-				this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
+				this.daoFactory.getListDataProjectDAO().deleteByListIdWithList(list.getId());
 			}
 		}
 	}
@@ -1219,7 +1219,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 			for (final ListDataProject listDataProject : listDataProjectList) {
 				listDataProject.setList(this.getGermplasmListById(listDataProject.getList().getId()));
-				this.getListDataProjectDAO().save(listDataProject);
+				this.daoFactory.getListDataProjectDAO().save(listDataProject);
 			}
 		} catch (final Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);

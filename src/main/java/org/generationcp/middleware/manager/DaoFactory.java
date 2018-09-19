@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.PlantDao;
@@ -117,5 +118,11 @@ public class DaoFactory {
 		PersonDAO personDao = new PersonDAO();
 		personDao.setSession(this.sessionProvider.getSession());
 		return personDao;
+	}
+	
+	public ListDataProjectDAO getListDataProjectDAO() {
+		final ListDataProjectDAO listDataProjectDao = new ListDataProjectDAO();
+		listDataProjectDao.setSession(this.sessionProvider.getSession());
+		return listDataProjectDao;
 	}
 }

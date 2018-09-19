@@ -265,46 +265,7 @@ public abstract class DataManager extends DatabaseBroker {
 		}
 		return toReturn;
 	}
-
-	/**
-	 * A generic implementation of the getXXXByXXXX(Integer id, ...) method that calls a specific get method from a DAO. <br/>
-	 * Calls the corresponding method that returns list type as specified in the parameter methodName. <br/>
-	 * <br/>
-	 * Sample usage: <br/>
-	 *
-	 * <pre>
-	 * <code>
-	 *     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) {
-	 *        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId",
-	 *                new Object[]{datasetId}, new Class[]{Integer.class});
-	 *
-	 *    }
-	 * <code>
-	 * </pre>
-	 *
-	 * @param dao The DAO to call the method from
-	 * @param id The id used to get the instance to connect to
-	 * @param methodName The method to call
-	 * @param parameters The parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may
-	 *        add them to this
-	 * @param parameterTypes The types of the parameters passed to the methods
-	 * @return the List result
-	 * @throws MiddlewareQueryException
-	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public List getFromInstanceByIdAndMethod(final GenericDAO dao, final Integer id, final String methodName, final Object[] parameters, final Class[] parameterTypes)
-			throws MiddlewareQueryException {
-		final List toReturn = new ArrayList();
-		try {
-			final java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
-			dao.setSession(this.getActiveSession());
-			toReturn.addAll((List) method.invoke(dao, parameters));
-		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-			// NoSuchMethodException
-			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
-		}
-		return toReturn;
-	}
+	
 
 	/**
 	 * A generic implementation of the countAllXXX() method that calls countAll() from Generic DAO. <br/>
@@ -392,45 +353,6 @@ public abstract class DataManager extends DatabaseBroker {
 		long count = 0;
 		dao.setSession(this.getActiveSession());
 		count = count + dao.countAll();
-		return count;
-	}
-
-	/**
-	 * A generic implementation of the countByXXXX(Integer id, ...) method that calls a specific count method from a DAO. <br/>
-	 * Calls the corresponding count method as specified in the parameter methodName. <br/>
-	 * <br/>
-	 * Sample usage: <br/>
-	 *
-	 * <pre>
-	 * <code>
-	 *      public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
-	 *            {
-	 *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition",
-	 *                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
-	 *    }
-	 * </code>
-	 * </pre>
-	 *
-	 * @param dao The DAO to call the method from
-	 * @param id The entity id
-	 * @param methodName The method to call
-	 * @param parameters The parameters to be passed to the method
-	 * @param parameterTypes The types of the parameters to be passed to the method
-	 * @return The count
-	 * @throws MiddlewareQueryException
-	 */
-	@SuppressWarnings("rawtypes")
-	public long countFromInstanceByIdAndMethod(final GenericDAO dao, final Integer id, final String methodName, final Object[] parameters, final Class[] parameterTypes)
-			throws MiddlewareQueryException {
-		long count = 0;
-		try {
-			final java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
-			dao.setSession(this.getActiveSession());
-			count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-			// NoSuchMethodException
-			this.logAndThrowException("Error in counting: " + e.getMessage(), e);
-		}
 		return count;
 	}
 
