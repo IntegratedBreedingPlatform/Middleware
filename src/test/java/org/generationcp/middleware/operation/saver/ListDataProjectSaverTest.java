@@ -14,13 +14,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -108,34 +111,22 @@ public class ListDataProjectSaverTest {
 
 	@Test
 	public void testPerformListDataProjectEntriesDeletion() {
-		final ListDataProjectSaver listDataProjectSaver = new ListDataProjectSaver();
-		listDataProjectSaver.setDaoFactory(daoFactory);
-		listDataProjectSaver.setSaver(saver);
-		final ListDataProjectSaver dataSaver = Mockito.spy(listDataProjectSaver);
-
-		final ListDataProjectDAO listDataProjectDAO = Mockito.mock(ListDataProjectDAO.class);
-		final List<Integer> germplasmList = new ArrayList<>();
-		germplasmList.add(1);
 		final Integer listId = 5;
-
 		final ListDataProject listDataProject1 = new ListDataProject();
 		listDataProject1.setEntryId(1);
-		final ListDataProject listDataProject2 = new ListDataProject();
-		listDataProject2.setEntryId(2);
+		Mockito.when(this.listDataProjectDAO.getByListIdAndGid(listId, 1)).thenReturn(listDataProject1);
 
-		final List<ListDataProject> listDataProjects = new ArrayList<>();
-		listDataProjects.add(listDataProject2);
-
-		Mockito.when(listDataProjectDAO.getByListIdAndGid(listId, 1)).thenReturn(listDataProject1);
-
-		Mockito.when(listDataProjectDAO.getByListId(listId)).thenReturn(listDataProjects);
-
-		Mockito.when(listDataProjectDAO.saveOrUpdate(listDataProject2)).thenReturn(listDataProject2);
-
-		dataSaver.performListDataProjectEntriesDeletion(germplasmList, listId);
-
-		Assert.assertEquals("The new entry for list listDataProject2 should be 1", (Integer) 1, listDataProject2.getEntryId());
-
+		final ListDataProject listDataProject2 = Mockito.mock(ListDataProject.class);
+		final ListDataProject listDataProject3 = Mockito.mock(ListDataProject.class);
+		Mockito.when(this.listDataProjectDAO.getByListId(listId)).thenReturn( Arrays.asList(listDataProject2, listDataProject3));
+		Mockito.doReturn(new ListDataProject()).when(this.listDataProjectDAO).saveOrUpdate(Matchers.any(ListDataProject.class));
+		
+		this.listDataProjectSaver.performListDataProjectEntriesDeletion(Arrays.asList(1), listId);
+		Mockito.verify(this.listDataProjectDAO).makeTransient(listDataProject1);
+		Mockito.verify(listDataProject2).setEntryId(1);
+		Mockito.verify(listDataProject3).setEntryId(2);
+		Mockito.verify(this.listDataProjectDAO).saveOrUpdate(listDataProject2);
+		Mockito.verify(this.listDataProjectDAO).saveOrUpdate(listDataProject3);
 	}
 
 	@Test
