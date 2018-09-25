@@ -132,7 +132,7 @@ public class SampleServiceImpl implements SampleService {
 		final String studyName = objectProject.getName();
 		final StockModel stock = experiment.getStock();
 		final String entryNo = stock.getUniqueName();
-		final Integer gid = stock.getDbxrefId();
+		final Integer gid = (stock.getGermplasm() != null) ? stock.getGermplasm().getGid() : null;
 
 		samplesDetailsDto = new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
 		samplesDetailsDto.setTakenBy(takenBy);

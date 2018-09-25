@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -327,7 +326,7 @@ public class ExperimentBuilder extends Builder {
 			return new Variable(variableType, stockModel.getUniqueName());
 		}
 		if (standardVariable.getId() == TermId.GID.getId()) {
-			return new Variable(variableType, stockModel.getDbxrefId());
+			return new Variable(variableType, stockModel.getGermplasm().getGid());
 		}
 		if (standardVariable.getId() == TermId.DESIG.getId()) {
 			return new Variable(variableType, stockModel.getName());

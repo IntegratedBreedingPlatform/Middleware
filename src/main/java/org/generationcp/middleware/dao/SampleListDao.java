@@ -1,8 +1,13 @@
 package org.generationcp.middleware.dao;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -29,12 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
@@ -149,16 +151,16 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("plant.plantBusinessKey"), "plantBusinessKey");
 		projectionList.add(Projections.property("experiment.plotId"), "plotId");
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
-		projectionList.add(Projections.property("stock.dbxrefId"), "gid");
+		projectionList.add(Projections.property("germplasm.gid"), "gid");
 		projectionList.add(Projections.property("sample.plateId"), "plateId");
 		projectionList.add(Projections.property("sample.well"), "well");
-
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample").createAlias("samples.plant", "plant")
 				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
 				.createAlias("user.person", "person", CriteriaSpecification.LEFT_JOIN)
 				.createAlias("plant.experiment", "experiment")
 				.createAlias("experiment.stock", "stock")
+				.createAlias("stock.germplasm", "germplasm")
 				.createAlias("experiment.properties", "properties").add(Restrictions.eq("id", sampleListId))
 				.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId())).setProjection(projectionList)
 				.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class)).addOrder(Order.asc("sample.sampleId"));

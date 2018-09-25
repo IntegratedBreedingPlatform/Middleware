@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 
@@ -68,7 +69,7 @@ public class StockSaver extends Saver {
 							dbxref = Integer.valueOf(value);
 						}
 					}
-					stockModel.setDbxrefId(dbxref);
+					stockModel.setGermplasm(new Germplasm(dbxref));
 
 				} else if (TermId.DESIG.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);

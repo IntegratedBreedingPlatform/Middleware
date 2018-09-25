@@ -69,13 +69,13 @@ public class StockBuilder extends Builder {
 		return stocks;
 	}
 
-	private String getValue(StockModel stockModel, DMSVariableType variableType) {
+	String getValue(StockModel stockModel, DMSVariableType variableType) {
 		String value = null;
 		int id = variableType.getStandardVariable().getId();
 		if (id == TermId.ENTRY_NO.getId()) {
 			value = stockModel.getUniqueName();
 		} else if (id == TermId.GID.getId()) {
-			value = stockModel.getDbxrefId() == null ? null : Integer.toString(stockModel.getDbxrefId());
+			value = stockModel.getGermplasm() == null ? null : Integer.toString(stockModel.getGermplasm().getGid());
 		} else if (id == TermId.DESIG.getId()) {
 			value = stockModel.getName();
 		} else if (id == TermId.ENTRY_CODE.getId()) {

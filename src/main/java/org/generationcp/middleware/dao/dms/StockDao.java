@@ -37,13 +37,15 @@ import java.util.Set;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	protected static final String DBXREF_ID = "dbxrefId";
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
 		final List<Integer> stockIds;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			if ("dbxrefId".equals(columnName)) {
-				criteria.add(Restrictions.eq(columnName, Integer.valueOf(value)));
+			if (DBXREF_ID.equals(columnName)) {
+				criteria.add(Restrictions.eq("germplasm.gid", Integer.valueOf(value)));
 			} else {
 				criteria.add(Restrictions.eq(columnName, value));
 			}
@@ -163,46 +165,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at countObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<StockModel> getStocks(final int projectId)  {
-		final List<StockModel> stocks = new ArrayList<>();
-
-		try {
-
-			final StringBuilder sql = new StringBuilder().append("SELECT DISTINCT s.* ")
-				.append("FROM nd_experiment e  ")
-				.append("   INNER JOIN stock s ON e.stock_id = s.stock_id ")
-				.append("   WHERE e.project_id = :projectId ");
-
-			final Query query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("projectId", projectId);
-
-			final List<Object[]> list = query.list();
-
-			if (list != null && !list.isEmpty()) {
-				for (final Object[] row : list) {
-					final Integer id = (Integer) row[0];
-					final Integer dbxrefId = (Integer) row[1];
-					final Integer organismId = (Integer) row[2];
-					final String name = (String) row[3];
-					final String uniqueName = (String) row[4];
-					final String value = (String) row[5];
-					final String description = (String) row[6];
-					final Integer typeId = (Integer) row[7];
-					final Boolean isObsolete = (Boolean) row[8];
-
-					stocks.add(new StockModel(id, dbxrefId, organismId, name, uniqueName, value, description, typeId, isObsolete));
-				}
-			}
-
-			return stocks;
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getStocks(projectId=" + projectId + ") at StockDao: " + e.getMessage(), e);
-		}
-
 	}
 
 	@SuppressWarnings("unchecked")
