@@ -454,6 +454,13 @@ public class Germplasm implements Serializable {
 	 */
 	@Transient
 	private Map<String, String> attributeTypesValueMap = new HashMap<>();
+	
+	/**
+	 *
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private Map<String, String> nameTypesValueMap = new HashMap<>();
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
@@ -899,6 +906,17 @@ public class Germplasm implements Serializable {
 			throw new NullArgumentException("attributeTypesValueMap must not be null");
 		}
 		this.attributeTypesValueMap = attributeTypesValueMap;
+	}
+	
+	public Map<String, String> getNameTypesValueMap() {
+		return ImmutableMap.copyOf(this.nameTypesValueMap);
+	}
+
+	public void setNameTypesValueMap(final Map<String, String> nameTypesValueMap) {
+		if (attributeTypesValueMap == null) {
+			throw new NullArgumentException("nameTypesValueMap must not be null");
+		}
+		this.nameTypesValueMap = nameTypesValueMap;
 	}
 
 	public String getGroupSourcePreferredName() {

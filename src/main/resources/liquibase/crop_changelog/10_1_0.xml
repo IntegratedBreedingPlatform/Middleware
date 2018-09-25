@@ -1,12 +1,146 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
-		http://www.liquibase.org/xml/ns/dbchangelog-ext
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="darla" id="v10.1-4">
+	<changeSet author="darla" id="v10.1-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="nd_experiment" columnName="stock_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add stock_id to nd_experiment table. Migrate data. Drop nd_experiment_stock table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			ADD COLUMN stock_id INT(11) NULL AFTER project_id,
+			ADD INDEX nd_experiment_fk4_idx (stock_id ASC);
+			
+			ALTER TABLE nd_experiment
+			ADD CONSTRAINT nd_experiment_fk4
+				FOREIGN KEY (stock_id)
+				REFERENCES stock (stock_id)
+				ON DELETE NO ACTION
+				ON UPDATE NO ACTION;
+				
+			UPDATE nd_experiment e
+            INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id
+            SET e.stock_id = es.stock_id;
+            
+            DROP TABLE nd_experiment_stock;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v10.1-2">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="germplasm_trial_details"/>
+        </preConditions>
+        <comment>
+			Removing nd_experiment_stock table from the germplasm_trial_details view.
+		</comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER VIEW germplasm_trial_details AS
+			  select
+			    pr.object_project_id AS study_id,
+			    e.project_id         AS project_id,
+			    e.type_id            AS type_id,
+			    e.nd_geolocation_id  AS envt_id,
+			    e.type_id            AS observation_type,
+			    e.nd_experiment_id   AS experiment_id,
+			    p.phenotype_id       AS phenotype_id,
+			    td.trait_name        AS trait_name,
+			    svd.cvterm_id        AS stdvar_id,
+			    svd.stdvar_name      AS stdvar_name,
+			    p.value              AS observed_value,
+			    s.stock_id           AS stock_id,
+			    s.name               AS entry_designation,
+			    g.gid                AS gid
+			  from
+			    ((((((((stock s
+			      join nd_experiment e ON e.stock_id = s.stock_id))
+			      join phenotype p ON p.nd_experiment_id = e.nd_experiment_id)
+			      join standard_variable_details svd ON svd.cvterm_id = p.observable_id)
+			      join trait_details td ON td.trait_id = svd.property_id)
+			      join project_relationship pr ON pr.subject_project_id = e.project_id)
+			      join germplsm g ON s.dbxref_id = g.gid))
+			  where
+			    ((e.type_id = 1170)
+			     or ((e.type_id = 1155)
+			         and (1 = (select count(0)
+			                   from
+			                     project_relationship
+			                   where
+			                     ((project_relationship.object_project_id = pr.object_project_id)
+			                      and (project_relationship.type_id = 1150))))))
+			  order by e.project_id, e.nd_geolocation_id, e.type_id, td.trait_name, s.name;
+        </sql>
+    </changeSet>
+    
+    <changeSet author="darla" id="v10.1-3">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="h2h_details"/>
+        </preConditions>
+        <comment>
+			Removing nd_experiment_stock table from the h2h_details view.
+		</comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER VIEW h2h_details AS
+			  SELECT
+			    pr.object_project_id AS study_id,
+			    e.project_id         AS project_id,
+			    e.type_id            AS type_id,
+			    e.nd_geolocation_id  AS location_id,
+			    e.type_id            AS observation_type,
+			    e.nd_experiment_id   AS experiment_id,
+			    p.phenotype_id       AS phenotype_id,
+			    td.trait_name        AS trait_name,
+			    p.value              AS observed_value,
+			    s.stock_id           AS stock_id,
+			    s.name               AS entry_designation
+			  FROM
+			    ((((((stock s
+			      JOIN nd_experiment e ON e.stock_id = s.stock_id)
+			      JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id)
+			      JOIN standard_variable_details svd ON svd.cvterm_id = p.observable_id)
+			      JOIN trait_details td ON td.trait_id = svd.property_id)
+			      JOIN project_relationship pr ON pr.subject_project_id = e.project_id))
+			  WHERE
+			    ((e.type_id = 1170)
+			     OR ((e.type_id = 1155)
+			         AND (1 = (SELECT COUNT(0)
+			                   FROM
+			                     project_relationship
+			                   WHERE
+			                     ((project_relationship.object_project_id = pr.object_project_id)
+			                      AND (project_relationship.type_id = 1150))))))
+			  ORDER BY e.project_id, e.nd_geolocation_id, e.type_id, td.trait_name, s.name;        
+		  </sql>
+    </changeSet>
+    
+     <changeSet author="darla" id="v10.1-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+				WHERE TABLE_NAME = 'stock' AND CONSTRAINT_NAME='stock_dbxref_id_fk' 
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Add FK to dbxref_id column in Stock table to Germplasm GID
+		</comment>
+		<addForeignKeyConstraint 
+			constraintName="stock_dbxref_id_fk"  
+			baseTableName="stock"  
+			baseColumnNames="dbxref_id" 
+			referencedTableName="germplsm" 
+			referencedColumnNames="gid"
+			onDelete="NO ACTION"
+			onUpdate="NO ACTION"/>
+	</changeSet>
+	
+    <changeSet author="darla" id="v10.1-5">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                SELECT count(*) FROM `sequence` WHERE sequence_name = 'nd_experiment_phenotype';
@@ -16,5 +150,6 @@
             DELETE FROM `sequence` WHERE sequence_name = 'nd_experiment_phenotype';
         </sql>
     </changeSet>
+
 
 </databaseChangeLog>
