@@ -100,6 +100,6 @@ public class StockBuilder extends Builder {
 	}
 
 	public long countStocks(int datasetId) throws MiddlewareQueryException {
-		return this.getExperimentStockDao().countStocksByDatasetId(datasetId);
+		return this.getExperimentDao().countStocksByDatasetId(datasetId);
 	}
 }

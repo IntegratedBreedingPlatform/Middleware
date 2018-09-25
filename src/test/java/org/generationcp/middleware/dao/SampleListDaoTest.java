@@ -4,12 +4,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
@@ -28,7 +26,6 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
@@ -37,6 +34,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import com.google.common.collect.Ordering;
 
 public class SampleListDaoTest extends IntegrationTestBase {
 
@@ -58,7 +57,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private GeolocationDao geolocationDao;
 	private DmsProjectDao dmsProjectDao;
 	private StockDao stockDao;
-	private ExperimentStockDao experimentStockDao;
 	private ExperimentPropertyDao experimentPropertyDao;
 
 	private DaoFactory daoFactory;
@@ -84,9 +82,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.experimentPropertyDao = new ExperimentPropertyDao();
 		this.experimentPropertyDao.setSession(this.sessionProvder.getSession());
-
-		this.experimentStockDao = new ExperimentStockDao();
-		this.experimentStockDao.setSession(this.sessionProvder.getSession());
 
 		this.geolocationDao = new GeolocationDao();
 		this.geolocationDao.setSession(this.sessionProvder.getSession());
@@ -369,13 +364,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		stockModel.setDbxrefId(1);
 
 		this.stockDao.saveOrUpdate(stockModel);
-
-		final ExperimentStock experimentStock = new ExperimentStock();
-		experimentStock.setStock(stockModel);
-		experimentStock.setExperiment(experimentModel);
-		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
-
-		this.experimentStockDao.saveOrUpdate(experimentStock);
+		experimentModel.setStock(stockModel);
 
 		return stockModel;
 

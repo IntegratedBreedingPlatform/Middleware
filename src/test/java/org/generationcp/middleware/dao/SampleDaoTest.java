@@ -1,10 +1,13 @@
 package org.generationcp.middleware.dao;
 
-import com.google.common.collect.Ordering;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
@@ -22,7 +25,6 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
@@ -32,11 +34,7 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Ordering;
 
 public class SampleDaoTest extends IntegrationTestBase {
 
@@ -51,7 +49,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private ExperimentDao experimentDao;
 	private GeolocationDao geolocationDao;
 	private StockDao stockDao;
-	private ExperimentStockDao experimentStockDao;
 	private PersonDAO personDAO;
 	private DmsProjectDao dmsProjectDao;
 
@@ -72,9 +69,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.geolocationDao = new GeolocationDao();
 		this.geolocationDao.setSession(this.sessionProvder.getSession());
-
-		this.experimentStockDao = new ExperimentStockDao();
-		this.experimentStockDao.setSession(this.sessionProvder.getSession());
 
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
@@ -235,6 +229,17 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT.intValue(), count.intValue());
 
 	}
+	
+	@Test
+	public void testGetBySampleBks(){
+		final Set<String> sampleUIDs = new HashSet<>();
+		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
+			sampleUIDs.add("BUSINESS-KEY-" + LIST_NAME + i);
+		}
+		final List<SampleDTO> sampleDtos = this.sampleDao.getBySampleBks(sampleUIDs);
+		Assert.assertNotNull(sampleDtos);
+		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT.intValue(), sampleDtos.size());
+	}
 
 	private Integer createSampleListForFilter(final String listName, final boolean takenByIsNull, final int sampleSize,
 			final String plotIdString) {
@@ -265,30 +270,21 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 
+
 		for (int i = 1; i < sampleSize + 1; i++) {
-
-			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setGeoLocation(geolocation);
-			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setPlotId(plotIdString + i);
-			experimentModel.setProject(project);
-			experimentDao.saveOrUpdate(experimentModel);
-
 			final StockModel stockModel = new StockModel();
 			stockModel.setName("Germplasm " + i);
 			stockModel.setIsObsolete(false);
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(String.valueOf(i));
 			stockDao.saveOrUpdate(stockModel);
-
-			final ExperimentStock experimentStock = new ExperimentStock();
-			experimentStock.setExperiment(experimentModel);
-			experimentStock.setStock(stockModel);
-			experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
-
-			final List<ExperimentStock> experimentStocks = new ArrayList<>();
-			experimentStocks.add(experimentStock);
-			experimentModel.setExperimentStocks(experimentStocks);
+			
+			final ExperimentModel experimentModel = new ExperimentModel();
+			experimentModel.setGeoLocation(geolocation);
+			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+			experimentModel.setPlotId(plotIdString + i);
+			experimentModel.setProject(project);
+			experimentModel.setStock(stockModel);
 			experimentDao.saveOrUpdate(experimentModel);
 
 			final Plant plant = PlantTestDataInitializer.createPlant();

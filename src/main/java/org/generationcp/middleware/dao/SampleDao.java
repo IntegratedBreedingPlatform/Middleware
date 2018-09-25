@@ -98,7 +98,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	public long countBySampleUIDs(final Set<String> sampleUIDs , final Integer listId) {
 		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
 		if (!sampleUIDs.isEmpty()) {
-			criteria.add(Restrictions.in("sampleBusinessKey", sampleUIDs));
+			criteria.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs));
 		}
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
@@ -119,8 +119,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
+			.createAlias("experiment.stock", "stock")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
@@ -200,8 +199,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
+			.createAlias("experiment.stock", "stock")
 			.list();
 
 		final List<SampleDTO> sampleDTOs = new ArrayList<>();
@@ -223,10 +221,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			final Plant plant = sample.getPlant();
 			sampleDTO.setPlantNumber(plant.getPlantNumber());
 			sampleDTO.setPlantBusinessKey(plant.getPlantBusinessKey());
-			if (plant.getExperiment() != null && plant.getExperiment().getExperimentStocks() != null
-				&& plant.getExperiment().getExperimentStocks().get(0) != null
-				&& plant.getExperiment().getExperimentStocks().get(0).getStock() != null) {
-				final StockModel stock = plant.getExperiment().getExperimentStocks().get(0).getStock();
+			if (plant.getExperiment() != null && plant.getExperiment().getStock() != null) {
+				final StockModel stock = plant.getExperiment().getStock();
 				sampleDTO.setGid(stock.getDbxrefId());
 				sampleDTO.setDesignation(stock.getName()); // TODO preferred name - see BMS-5033
 			}
@@ -288,6 +284,25 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return sample;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
+		final Map<Integer, Integer> map = new HashMap<>();
+		final List<Object[]> result = getSession()
+			.createCriteria(Sample.class, SAMPLE)
+			.createAlias(SAMPLE_PLANT, PLANT)
+			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
+			.createAlias("experiment.stock", "stock")
+			.add(Restrictions.in(SAMPLE_ID, sampleIds))
+			.setProjection(Projections.projectionList()
+				.add(Projections.property("sample.sampleId"))
+				.add(Projections.property("stock.dbxrefId")))
+			.list();
+		for (final Object[] row : result) {
+			map.put((Integer) row[0], (Integer) row[1]);
+		}
+		return map;
+	}
+
 	public List<SampleDTO> getBySampleBks(final Set<String> sampleUIDs) {
 		return getSampleDTOS(getSession().createCriteria(Sample.class, SAMPLE) //
 				.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs)));
@@ -303,8 +318,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)//
 			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)//
 
-			.createAlias("experiment.experimentStocks", "experimentStocks")//
-			.createAlias("experimentStocks.stock", "stock")//
+			.createAlias("experiment.stock", "stock")//
 			.createAlias("experiment.project", "project")//
 			.createAlias("project.relatedTos", "relatedTos")//
 			.createAlias("relatedTos.objectProject", "objectProject")//
@@ -330,7 +344,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("studyType.name"))//
 				.add(Projections.property("studyType.visible"))//
 				.add(Projections.property("studyType.cvTermId"))//
-				//.add(Projections.property("objectProject.studyType"))//
 				.add(Projections.property("sample.plateId"))//
 				.add(Projections.property("sample.well"))))//
 			.list();//
