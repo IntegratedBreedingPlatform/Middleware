@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 
@@ -29,7 +30,7 @@ public class StockSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public Integer saveStock(VariableList variableList) throws MiddlewareQueryException {
+	public Integer saveStock(VariableList variableList) {
 		StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
 			this.getStockDao().save(stockModel);
@@ -39,7 +40,7 @@ public class StockSaver extends Saver {
 		return null;
 	}
 
-	public void saveOrUpdateStock(VariableList variableList, int stockId) throws MiddlewareQueryException {
+	public void saveOrUpdateStock(VariableList variableList, int stockId) {
 		StockModel stockModel = this.getStockModelBuilder().get(stockId);
 		this.createStock(variableList, stockModel);
 		if (stockModel != null) {
@@ -47,7 +48,7 @@ public class StockSaver extends Saver {
 		}
 	}
 
-	protected StockModel createStock(VariableList variableList, StockModel stockModel) throws MiddlewareQueryException {
+	protected StockModel createStock(VariableList variableList, StockModel stockModel) {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
 				int variableId = variable.getVariableType().getStandardVariable().getId();
@@ -68,7 +69,7 @@ public class StockSaver extends Saver {
 							dbxref = Integer.valueOf(value);
 						}
 					}
-					stockModel.setDbxrefId(dbxref);
+					stockModel.setGermplasm(new Germplasm(dbxref));
 
 				} else if (TermId.DESIG.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
@@ -109,7 +110,7 @@ public class StockSaver extends Saver {
 		return null;
 	}
 
-	private StockModel getStockObject(StockModel stockModel) throws MiddlewareQueryException {
+	private StockModel getStockObject(StockModel stockModel) {
 		if (stockModel == null) {
 			stockModel = new StockModel();
 			stockModel.setIsObsolete(false);
@@ -126,7 +127,7 @@ public class StockSaver extends Saver {
 		stockModel.getProperties().add(property);
 	}
 
-	private StockProperty createProperty(Variable variable) throws MiddlewareQueryException {
+	private StockProperty createProperty(Variable variable) {
 		StockProperty property = new StockProperty();
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());

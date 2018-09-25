@@ -37,13 +37,15 @@ import java.util.Set;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	protected static final String DBXREF_ID = "dbxrefId";
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
 		final List<Integer> stockIds;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			if ("dbxrefId".equals(columnName)) {
-				criteria.add(Restrictions.eq(columnName, Integer.valueOf(value)));
+			if (DBXREF_ID.equals(columnName)) {
+				criteria.add(Restrictions.eq("germplasm.gid", Integer.valueOf(value)));
 			} else {
 				criteria.add(Restrictions.eq(columnName, value));
 			}
@@ -62,8 +64,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 					.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
-							+ "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
-							+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
+							+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
 							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = e.project_id "
 							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
 							+ " AND p.deleted = 0");
@@ -78,12 +79,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
-			final SQLQuery query = this.getSession()//
+			final SQLQuery query = this.getSession()
 				.createSQLQuery("select distinct p.project_id, p.name, p.description, "
 				+ "st.study_type_id, st.label, st.name, st.visible, st.cvterm_id, p.program_uuid "
 				+ "FROM stock s "
-				+ "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
-				+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
+				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
 				+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = e.project_id "
 				+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
 				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
@@ -116,10 +116,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		final Set<StockModel> stockModels = new LinkedHashSet<>();
 		try {
 
-			final String sql = "SELECT DISTINCT es.stock_id" + " FROM nd_experiment_stock es"
-					+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = es.nd_experiment_id"
-					+ " WHERE e.project_id = :projectId ORDER BY es.stock_id";
-			final Query query = this.getSession().createSQLQuery(sql).setParameter("projectId", datasetId);
+			final String sql = "SELECT DISTINCT e.stock_id" + " FROM nd_experiment e "
+					+ " WHERE e.project_id = :projectId ORDER BY e.stock_id";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("projectId", datasetId);
 			final List<Integer> ids = query.list();
 			for (final Integer id : ids) {
 				stockModels.add(this.getById(id));
@@ -134,10 +134,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public long countStocks(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)  {
 		try {
 
-			final String sql = "select count(distinct nes.stock_id) "
-					+ "from nd_experiment e, phenotype p, nd_experiment_stock nes "
+			final String sql = "select count(distinct e.stock_id) "
+					+ "from nd_experiment e, phenotype p "
 					+ "where e.nd_experiment_id = p.nd_experiment_id  "
-					+ "  and nes.nd_experiment_id = e.nd_experiment_id "
 					+ "  and e.nd_geolocation_id = " + trialEnvironmentId + "  and p.observable_id = " + variateStdVarId
 					+ "  and e.project_id = " + datasetId;
 			final Query query = this.getSession().createSQLQuery(sql);
@@ -145,9 +144,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countStocks=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 
 	public long countObservations(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)
@@ -165,51 +163,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<StockModel> getStocks(final int projectId)  {
-		final List<StockModel> stocks = new ArrayList<>();
-
-		try {
-
-			final StringBuilder sql = new StringBuilder().append("SELECT DISTINCT s.* ")
-				.append("FROM nd_experiment e  ")
-					.append("   INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id ")
-					.append("   AND e.project_id = :projectId ")
-					.append("   INNER JOIN stock s ON es.stock_id = s.stock_id ");
-
-			final Query query = this.getSession().createSQLQuery(sql.toString());
-			query.setParameter("projectId", projectId);
-
-			final List<Object[]> list = query.list();
-
-			if (list != null && !list.isEmpty()) {
-				for (final Object[] row : list) {
-					final Integer id = (Integer) row[0];
-					final Integer dbxrefId = (Integer) row[1];
-					final Integer organismId = (Integer) row[2];
-					final String name = (String) row[3];
-					final String uniqueName = (String) row[4];
-					final String value = (String) row[5];
-					final String description = (String) row[6];
-					final Integer typeId = (Integer) row[7];
-					final Boolean isObsolete = (Boolean) row[8];
-
-					stocks.add(new StockModel(id, dbxrefId, organismId, name, uniqueName, value, description, typeId, isObsolete));
-				}
-			}
-
-			return stocks;
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getStocks(projectId=" + projectId + ") at StockDao: " + e.getMessage(), e);
-		}
-
-		return stocks;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -225,7 +180,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
 		}
 
 		return stockModels;
@@ -234,17 +189,16 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public int countStockObservations(final int datasetId, final String nonEditableFactors)  {
 		try {
 
-			final StringBuilder sql = new StringBuilder().append("SELECT COUNT(sp.stockprop_id) ").append("FROM nd_experiment_stock es ")
-					.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = es.nd_experiment_id ")
-					.append("INNER JOIN stockProp sp ON sp.stock_id = es.stock_id ").append("WHERE e.project_id = ").append(datasetId)
+			final StringBuilder sql = new StringBuilder().append("SELECT COUNT(sp.stockprop_id) ")
+					.append("FROM nd_experiment e ")
+					.append("INNER JOIN stockProp sp ON sp.stock_id = e.stock_id ").append("WHERE e.project_id = ").append(datasetId)
 					.append(" AND sp.type_id NOT IN (").append(nonEditableFactors).append(")");
 			final Query query = this.getSession().createSQLQuery(sql.toString());
 
 			return ((BigInteger) query.uniqueResult()).intValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countStockObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countStockObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 }

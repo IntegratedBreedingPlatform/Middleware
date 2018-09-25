@@ -87,7 +87,7 @@ public class ExperimentSearcher extends Searcher {
 	}
 
 	private List<Integer> getExperimentIdsByStockIds(Collection<Integer> stockIds) throws MiddlewareQueryException {
-		return this.getExperimentStockDao().getExperimentIdsByStockIds(stockIds);
+		return this.getExperimentDao().getExperimentIdsByStockIds(stockIds);
 	}
 
 	private List<Integer> findExperimentsByStock(String columnName, String value) throws MiddlewareQueryException {

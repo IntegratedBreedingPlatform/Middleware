@@ -66,7 +66,6 @@ public class ExperimentModel implements Serializable {
 	// Geolocation
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "nd_geolocation_id")
-
 	private Geolocation geoLocation;
 
 	// References cvterm
@@ -86,11 +85,9 @@ public class ExperimentModel implements Serializable {
 	@JoinColumn(name = "project_id")
 	private DmsProject project;
 
-	//FIXME Should this not be a OneToOne? Can one experiment have multiple stock (germplasm) rows?
-	//Collection always contains one item currently.
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
-	@BatchSize(size = 5000)
-	private List<ExperimentStock> experimentStocks;
+	@ManyToOne(targetEntity = StockModel.class)
+	@JoinColumn(name = "stock_id", nullable = true)
+	private StockModel stock;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 5000)
@@ -151,12 +148,14 @@ public class ExperimentModel implements Serializable {
 		this.project = project;
 	}
 
-	public List<ExperimentStock> getExperimentStocks() {
-		return this.experimentStocks;
+	
+	public StockModel getStock() {
+		return stock;
 	}
 
-	public void setExperimentStocks(final List<ExperimentStock> experimentStocks) {
-		this.experimentStocks = experimentStocks;
+	
+	public void setStock(StockModel stock) {
+		this.stock = stock;
 	}
 
 	public List<Phenotype> getPhenotypes() {
