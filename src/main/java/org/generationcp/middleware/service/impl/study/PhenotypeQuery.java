@@ -31,8 +31,7 @@ public class PhenotypeQuery {
 		+ "  project plotdata_project " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = plotdata_project.project_id " //
 		+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
-		+ "  INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id " //
-		+ "  INNER JOIN stock s ON s.stock_id = es.stock_id " //
+		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 		+ "  INNER JOIN project_relationship pr ON plotdata_project.project_id = pr.subject_project_id " //
 		+ "  INNER JOIN project p ON pr.object_project_id = p.project_id " //
 		+ "  INNER JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //

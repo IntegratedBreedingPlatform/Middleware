@@ -1,15 +1,14 @@
+
 package org.generationcp.middleware.domain.gms.search;
 
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang.NullArgumentException;
-import org.generationcp.middleware.manager.Operation;
-
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.NullArgumentException;
+import org.generationcp.middleware.manager.Operation;
 
 /*
  * this class stores the parameters used in germplasm search
@@ -32,8 +31,6 @@ public class GermplasmSearchParameter {
 
 	private final Map<String, Boolean> sortState;
 
-	private Map<String, Integer> attributeTypesMap;
-
 	private List<String> addedColumnsPropertyIds = new LinkedList<>();
 
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation) {
@@ -42,7 +39,6 @@ public class GermplasmSearchParameter {
 		this.sortState = new LinkedHashMap<>();
 		this.startingRow = 0;
 		this.numberOfEntries = Integer.MAX_VALUE;
-		this.attributeTypesMap = new HashMap<>();
 	}
 
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation, final boolean includeParents,

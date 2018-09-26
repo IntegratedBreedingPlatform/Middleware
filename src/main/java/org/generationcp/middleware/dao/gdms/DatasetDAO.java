@@ -65,7 +65,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 			"SELECT COUNT(DISTINCT CONCAT(dataset_name,'')) " + "FROM gdms_dataset gd " + "INNER JOIN "
 					+ "gdms_qtl gq ON gd.dataset_id = gq.dataset_id " + "WHERE gq.qtl_id = :qtlId ";
 
-	private static final String GET_GERMPLASM_NAMES_BY_MARKER_ID = "SELECT DISTINCT "
+	protected static final String GET_GERMPLASM_NAMES_BY_MARKER_ID = "SELECT DISTINCT "
 		+ " n.nid nid,"
 		+ " n.gid germplasmId,"
 		+ " n.ntype typeId,"
@@ -79,8 +79,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		+ "   INNER JOIN sample s ON gcv.sample_id = s.sample_id "
 		+ "   INNER JOIN plant p ON s.plant_id = p.plant_id "
 		+ "   INNER JOIN nd_experiment nde ON p.nd_experiment_id = nde.nd_experiment_id "
-		+ "   INNER JOIN nd_experiment_stock ndes ON nde.nd_experiment_id = ndes.nd_experiment_id "
-		+ "   INNER JOIN stock st ON ndes.stock_id = st.stock_id "
+		+ "   INNER JOIN stock st ON nde.stock_id = st.stock_id "
 		+ "   INNER JOIN germplsm g ON g.gid = st.dbxref_id "
 		+ "   INNER JOIN names n ON n.gid = g.gid AND n.nstat = 1 "
 		+ " WHERE gcv.marker_id = :markerId "
@@ -97,7 +96,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		return 0;
 	}
 
-	public List<String> getDatasetNames(final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<String> getDatasetNames(final int start, final int numOfRows) {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DATASET_NAMES_NOT_QTL_AND_MTA);
 			query.setFirstResult(start);
@@ -111,7 +110,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<DatasetElement> getDetailsByName(final String name) throws MiddlewareQueryException {
+	public List<DatasetElement> getDetailsByName(final String name) {
 		List<DatasetElement> dataValues = new ArrayList<>();
 		try {
 			if (name != null) {
@@ -137,7 +136,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
-	public List<Integer> getDatasetIdsForFingerPrinting(final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<Integer> getDatasetIdsForFingerPrinting(final int start, final int numOfRows) {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
 			query.setFirstResult(start);
@@ -150,7 +149,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
-	public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException {
+	public long countDatasetIdsForFingerPrinting() {
 		Query query = this.getSession().createSQLQuery(DatasetDAO.COUNT_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
 		BigInteger result = (BigInteger) query.uniqueResult();
 		if (result != null) {
@@ -159,7 +158,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		return 0;
 	}
 
-	public List<Integer> getDatasetIdsForMapping(final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<Integer> getDatasetIdsForMapping(final int start, final int numOfRows) {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
 			query.setFirstResult(start);
@@ -173,7 +172,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
-	public long countDatasetIdsForMapping() throws MiddlewareQueryException {
+	public long countDatasetIdsForMapping() {
 		Query query = this.getSession().createSQLQuery(DatasetDAO.COUNT_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
 		BigInteger result = (BigInteger) query.uniqueResult();
 		if (result != null) {
@@ -182,7 +181,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		return 0;
 	}
 
-	public List<String> getDatasetNamesByQtlId(final Integer qtlId, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<String> getDatasetNamesByQtlId(final Integer qtlId, final int start, final int numOfRows) {
 		try {
 			if (qtlId != null) {
 				SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_DATASET_NAMES_BY_QTL_ID);
@@ -200,7 +199,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
-	public long countDatasetNamesByQtlId(final Integer qtlId) throws MiddlewareQueryException {
+	public long countDatasetNamesByQtlId(final Integer qtlId) {
 		try {
 			if (qtlId != null) {
 				Query query = this.getSession().createSQLQuery(DatasetDAO.COUNT_DATASET_NAMES_BY_QTL_ID);
@@ -218,7 +217,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
-	public void deleteByDatasetId(final Integer datasetId) throws MiddlewareQueryException {
+	public void deleteByDatasetId(final Integer datasetId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -235,7 +234,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<Dataset> getDatasetsByIds(final List<Integer> datasetIds) throws MiddlewareQueryException {
+	public List<Dataset> getDatasetsByIds(final List<Integer> datasetIds) {
 		try {
 			if (datasetIds != null) {
 				return this.getSession().createCriteria(Dataset.class, "dataset").add(Restrictions.in("datasetId", datasetIds)).list();
@@ -248,7 +247,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
-	public List<Dataset> getDatasetsByType(final String type) throws MiddlewareQueryException {
+	public List<Dataset> getDatasetsByType(final String type) {
 		try {
 			if (type != null) {
 				Criteria crit = this.getSession().createCriteria(Dataset.class);
@@ -263,7 +262,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		}
 	}
 
-	public Dataset getByName(final String datasetName) throws MiddlewareQueryException {
+	public Dataset getByName(final String datasetName) {
 		try {
 			if (datasetName != null) {
 				Criteria crit = this.getSession().createCriteria(Dataset.class);
@@ -284,16 +283,16 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 	public List<Name> getGermplasmNamesByMarkerId(final Integer markerId) {
 		try {
 			if (markerId != null) {
-				Query query = this.getSession().createSQLQuery(DatasetDAO.GET_GERMPLASM_NAMES_BY_MARKER_ID)
-					.addScalar("nid")
-					.addScalar("germplasmId")
-					.addScalar("typeId")
-					.addScalar("nstat")
-					.addScalar("userId")
-					.addScalar("nval")
-					.addScalar("locationId")
-					.addScalar("ndate")
-					.addScalar("referenceId");
+				SQLQuery query = this.getSession().createSQLQuery(DatasetDAO.GET_GERMPLASM_NAMES_BY_MARKER_ID);
+				query.addScalar("nid");
+				query.addScalar("germplasmId");
+				query.addScalar("typeId");
+				query.addScalar("nstat");
+				query.addScalar("userId");
+				query.addScalar("nval");
+				query.addScalar("locationId");
+				query.addScalar("ndate");
+				query.addScalar("referenceId");
 				query.setParameter("markerId", markerId);
 				query.setResultTransformer(Transformers.aliasToBean(Name.class));
 				return query.list();
