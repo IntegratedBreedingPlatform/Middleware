@@ -125,12 +125,15 @@ public class PhenotypeSaver extends Saver {
 		return phenotype;
 	}
 
-	private void saveOrUpdate(final int experimentId, final Phenotype phenotype) throws MiddlewareQueryException {
+	public void saveOrUpdate(final int experimentId, final Phenotype phenotype) throws MiddlewareQueryException {
 		if (phenotype != null) {
 			final ExperimentModel experiment = new ExperimentModel();
 			experiment.setNdExperimentId(experimentId);
-		  	phenotype.setExperiment(experiment);
-			this.getPhenotypeDao().merge(phenotype);
+			phenotype.setExperiment(experiment);
+			final int val = this.getPhenotypeDao().updatePhenotypesByExperimentIdAndObervableId(experimentId, phenotype.getObservableId(), phenotype.getValue());
+			if(val == 0) {
+				this.getPhenotypeDao().save(phenotype);
+			}
 		}
 	}
 

@@ -327,7 +327,7 @@ public class PhenotypeDaoTest {
 		final int stockId = 3;
 		final int cvTermId = 5157;
 		final String value = "1.5678";
-		this.dao.updatePhenotypesByProjectIdAndLocationId(projectId, locationId, stockId, cvTermId, value);
+		this.dao.updatePhenotypesByExperimentIdAndObervableId(projectId, cvTermId, value);
 		
 		Mockito.verify(this.session).flush();
 		final String updateSql = "UPDATE nd_experiment exp "

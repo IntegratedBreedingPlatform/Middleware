@@ -17,9 +17,17 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;  
+import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -30,6 +38,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
@@ -51,6 +60,11 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	
 	private DmsProject study;
 	private CVTerm trait;
+
+	private ExperimentModelSaver experimentModelSaver;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@Before
 	public void setUp() throws Exception {
@@ -102,12 +116,15 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.cvTermDao.save(this.trait);
 		}
 
+		if(this.experimentModelSaver == null) {
+			this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
+		}
 		
 	}
 
 
 	@Test
-	public void testContainsAtLeast2CommonEntriesWithValues() throws Exception {
+	public void testContainsAtLeast2CommonEntriesWithValues() {
 		final Integer studyId = this.study.getProjectId();
 		// Create environment with 2 reps but no phenotype data
 		Integer locationId = this.createEnvironmentData(2, false);
@@ -120,6 +137,41 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Create environment with 2 reps and phenotype data
 		locationId = this.createEnvironmentData(2, true);
 		Assert.assertTrue(this.phenotypeDao.containsAtLeast2CommonEntriesWithValues(studyId, locationId, TermId.GID.getId()));
+	}
+
+	@Test
+	public void testGetPhenotypeByExperimentIdAndObservableId() {
+		final VariableList factors = new VariableList();
+		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
+		ExperimentValues values = new ExperimentValues();
+		values.setVariableList(factors);
+		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
+		values.setGermplasmId(1);
+		//Save the experiment
+		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "jf10");
+		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		Assert.assertEquals("999", phenotype.getValue());
+	}
+
+	@Test
+	public void testUpdatePhenotypesByExperimentIdAndObervableId() {
+		final VariableList factors = new VariableList();
+		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
+		ExperimentValues values = new ExperimentValues();
+		values.setVariableList(factors);
+		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
+		values.setGermplasmId(1);
+
+		//Save the experiment
+		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "jf10");
+		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		Assert.assertEquals("999", phenotype.getValue());
+
+		this.phenotypeDao.updatePhenotypesByExperimentIdAndObervableId(experiment.getNdExperimentId(), phenotype.getObservableId(), "1000");
+		phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		Assert.assertEquals("1000", phenotype.getValue());
 	}
 	
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
