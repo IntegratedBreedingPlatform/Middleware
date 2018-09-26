@@ -58,6 +58,25 @@ public class ObservationQueryTest {
 		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForSingleMeasurement()),
 			this.formatString(result));
 	}
+	
+	@Test
+	public void testGetSampleObservationQuery() {
+		final ObservationQuery fixture = new ObservationQuery();
+		final String sql = "SELECT \n" + "    nde.nd_experiment_id as nd_experiment_id,\n"
+				+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value"
+				+ " as value, s.dbxref_id as gid"
+				+ " FROM \n" + "    project p \n" + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
+				+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
+				+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+				+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
+				+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
+				+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + " WHERE \n"
+				+ "\tp.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId \n"
+				+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
+				+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
+		assertEquals("The generated query must match the expected query.", formatString(sql),
+				formatString(fixture.getSampleObservationQuery()));
+	}
 
 	private String formatString(final String format) {
 		return this.formattedSQL.format(format).replace(" ", "");
@@ -91,8 +110,7 @@ public class ObservationQueryTest {
 				+ "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 				+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
 				+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-				+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
-				+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+				+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 				+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
 					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
@@ -127,8 +145,7 @@ public class ObservationQueryTest {
 				+ "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 				+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
 				+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-				+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
-				+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+				+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 				+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id"
 				+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"

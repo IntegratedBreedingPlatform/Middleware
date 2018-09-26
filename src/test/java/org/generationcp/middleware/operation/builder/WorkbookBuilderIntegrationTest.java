@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -16,6 +18,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,6 +64,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private static final String GRAIN_YIELD = "Grain Yield";
 	private static final String DRY_AND_WEIGH = "Dry and weigh";
 
+	private GermplasmDAO germplasmDao;
 	private List<MeasurementVariable> constants;
 	private List<MeasurementVariable> variates;
 	private String programUUID;
@@ -72,6 +76,8 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		if (this.workbookBuilder == null) {
 			this.workbookBuilder = new WorkbookBuilder(super.sessionProvder);
 		}
+		this.germplasmDao = new GermplasmDAO();
+		this.germplasmDao.setSession(this.sessionProvder.getSession());
 	}
 
 	private void setUpNursery() {
@@ -170,7 +176,11 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 			designationData.setMeasurementVariable(designationFactor);
 			dataList.add(designationData);
 
-			final MeasurementData gidData = new MeasurementData(gidFactor.getLabel(), String.valueOf(i));
+			// Need to use existing GID because of FK on stock
+			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+			germplasm.setGid(null);
+			this.germplasmDao.save(germplasm);
+			final MeasurementData gidData = new MeasurementData(gidFactor.getLabel(), germplasm.getGid().toString());
 			gidData.setMeasurementVariable(gidFactor);
 			dataList.add(gidData);
 
@@ -189,7 +199,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testWorkbookBuilderLoadsNoObservationsByDefaultNursery() throws MiddlewareException {
+	public void testWorkbookBuilderLoadsNoObservationsByDefaultNursery() {
 		setUpNursery();
 
 		// Save the workbook
@@ -216,7 +226,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testWorkbookBuilderLoadsNoObservationsByDefaultStudy() throws MiddlewareException {
+	public void testWorkbookBuilderLoadsNoObservationsByDefaultStudy() {
 		setUpStudy();
 
 		// Save the workbook

@@ -10,8 +10,10 @@
 
 package org.generationcp.middleware.dao.oms;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -34,17 +36,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	private static final Integer GROUP_ID = 10;
-	public static final String NOTE_ATTRIBUTE = "NOTE";
+	private static final String NOTE_ATTRIBUTE = "NOTE";
+	private static final String DERIVATIVE_NAME_CODE = "DRVNM";
+	private static final String DERIVATIVE_NAME = "DERIVATIVE NAME";
 
+	
 	private GermplasmSearchDAO dao;
 
 	private UserDefinedFieldDAO userDefinedFieldDao;
@@ -59,7 +61,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private Name femaleParentPreferredName;
 	private final int germplasmDate = 20150101;
 	private String attributeValue;
-	private final Map<String, Integer> attributeTypeMap = new HashMap<>();
+	private String code1NameTypeValue;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
@@ -226,8 +228,9 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		propertyIds.add(GermplasmSearchDAO.MALE_PARENT_ID);
 		propertyIds.add(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME);
 
-		// Add Attributes column (NOTE attribute)
+		// Add Attributes column (NOTE attribute) and "DERIVATIVE NAME" name type
 		propertyIds.add(NOTE_ATTRIBUTE);
+		propertyIds.add(DERIVATIVE_NAME);
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
@@ -338,7 +341,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchForGermplasmsWithAttributeColumnOnly() throws Exception {
+	public void testSearchForGermplasmsWithAttributeTypeAddedColumnOnly() throws Exception {
 
 		final GermplasmSearchParameter searchParameter =
 				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
@@ -346,6 +349,26 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final List<String> propertyIds = new LinkedList<>();
 
 		propertyIds.add(NOTE_ATTRIBUTE);
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
+
+		this.assertPossibleGermplasmFields(results);
+		this.assertAddedGermplasmFields(results.get(0), propertyIds);
+
+	}
+	
+	@Test
+	public void testSearchForGermplasmsWithGermplasmNameTypeAddedColumnOnly() throws Exception {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
+
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(DERIVATIVE_NAME);
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
 		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
@@ -978,6 +1001,55 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
 
 	}
+	
+	@Test
+	public void testSearchForGermplasmsNameTypeSortAscending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(DERIVATIVE_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {DERIVATIVE_NAME}, new boolean[] {true});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getNameTypesValueMap().get(DERIVATIVE_NAME));
+		}
+
+		// Check if the list is in ascending order
+		Assert.assertTrue(Ordering.natural().isOrdered(list));
+
+	}
+
+	@Test
+	public void testSearchForGermplasmsNameTypeSortDescending() {
+
+		final GermplasmSearchParameter searchParameter =
+				this.createSearchParam("GermplasmForSorting%", Operation.LIKE, false, false, false);
+		final List<String> propertyIds = new LinkedList<>();
+
+		propertyIds.add(DERIVATIVE_NAME);
+
+		searchParameter.setAddedColumnsPropertyIds(propertyIds);
+		searchParameter.setSortState(new Object[] {DERIVATIVE_NAME}, new boolean[] {false});
+
+		final List<Germplasm> results = this.dao.searchForGermplasms(searchParameter);
+
+		final List<String> list = new ArrayList<>();
+		for (final Germplasm g : results) {
+			list.add(g.getNameTypesValueMap().get(DERIVATIVE_NAME));
+		}
+
+		// Check if the list is in descending order
+		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
+
+	}
+
 
 	@Test
 	public void testSearchForGermplasmsNamesSortAscending() {
@@ -1011,6 +1083,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final List<String> list = new ArrayList<>();
 		for (final Germplasm g : results) {
+			System.out.println(">> Germplasm " + g.getGid() + " with name: " + g.getGermplasmNamesString());
 			list.add(g.getGermplasmNamesString());
 		}
 
@@ -1203,10 +1276,18 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, "Preferred Id of " + germplasmGID);
 		preferredId.setNstat(8);
 		this.germplasmDataDM.addGermplasmName(preferredId);
+		
+		// Add name of CODE1 type
+		this.code1NameTypeValue = "Code1 Name of " + germplasmGID;
+		UserDefinedField nameType = userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
+		final Name code1Name =
+				GermplasmTestDataInitializer.createGermplasmName(germplasmGID, this.code1NameTypeValue);
+		code1Name.setTypeId(nameType.getFldno());
+		code1Name.setNstat(0);
+		this.germplasmDataDM.addGermplasmName(code1Name);
 
 		// Add NOTE attribute
 		final UserDefinedField attributeField = userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
-		attributeTypeMap.put(attributeField.getFcode(), attributeField.getFldno());
 
 		this.attributeValue = "Attribute of " + germplasmGID;
 		final Attribute attribute = new Attribute();
@@ -1268,10 +1349,17 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 					GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Preferred Id of " + tempGermplasmGid);
 			tempPreferredId.setNstat(8);
 			this.germplasmDataDM.addGermplasmName(tempPreferredId);
+			
+			// Add name of CODE1 type
+			UserDefinedField nameType = userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
+			final Name code1Name =
+					GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Code1 Name of " + tempGermplasmGid);
+			code1Name.setTypeId(nameType.getFldno());
+			code1Name.setNstat(0);
+			this.germplasmDataDM.addGermplasmName(code1Name);
 
 			// Add NOTE attribute
 			final UserDefinedField attributeField = userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
-			attributeTypeMap.put(attributeField.getFcode(), attributeField.getFldno());
 
 			final Attribute attribute = new Attribute();
 			attribute.setGermplasmId(tempGermplasmGid);
@@ -1411,6 +1499,14 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		} else {
 			Assert.assertFalse("Result germplasm should not contain Note attribute",
 					germplasm.getAttributeTypesValueMap().containsKey(NOTE_ATTRIBUTE));
+		}
+		
+		if (propertyIds.contains(DERIVATIVE_NAME)) {
+			Assert.assertEquals("Result germplasm should contain CODE1 Name", this.code1NameTypeValue,
+					germplasm.getNameTypesValueMap().get(DERIVATIVE_NAME));
+		} else {
+			Assert.assertFalse("Result germplasm should not contain CODE1 Name",
+					germplasm.getNameTypesValueMap().containsKey(DERIVATIVE_NAME));
 		}
 
 	}

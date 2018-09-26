@@ -31,7 +31,6 @@ import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.ExperimentStockDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
@@ -68,7 +67,10 @@ import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.dao.gdms.TrackDataDAO;
 import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
-import org.generationcp.middleware.dao.oms.*;
+import org.generationcp.middleware.dao.oms.CVDao;
+import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
+import org.generationcp.middleware.dao.oms.StandardVariableDao;
+import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
@@ -191,12 +193,6 @@ public class DatabaseBroker {
 		final StockPropertyDao stockPropertyDao = new StockPropertyDao();
 		stockPropertyDao.setSession(this.getActiveSession());
 		return stockPropertyDao;
-	}
-
-	public ExperimentStockDao getExperimentStockDao() {
-		final ExperimentStockDao experimentStockDao = new ExperimentStockDao();
-		experimentStockDao.setSession(this.getActiveSession());
-		return experimentStockDao;
 	}
 
 	public ProjectPropertyDao getProjectPropertyDao() {

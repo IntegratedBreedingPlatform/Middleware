@@ -318,6 +318,25 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList);
 
+	
+	/**
+	 * Returns all the list of name types available for the given list of gids.
+	 *
+	 * @param gidList - list of GIDs
+	 * @return List of UserDefinedField POJOs that contains the name types for the given GIDs.
+	 */
+	List<UserDefinedField> getNameTypesByGIDList(List<Integer> gidList);
+	
+	/**
+	 * Returns a Map of GIDs to the name values given name type and a list of GIDs.
+	 *
+	 * @param nameType - name type ID of the values to retrieve
+	 * @param gidList - list of GIDs
+	 * @return Map<Integer, String> - map of gids to their corresponding name values for the specified name type
+	 */
+	Map<Integer, String> getNamesByTypeAndGIDList(Integer nameType, List<Integer> gidList);
+	
+	
 	/**
 	 * Returns the Method record identified by the id.
 	 *
