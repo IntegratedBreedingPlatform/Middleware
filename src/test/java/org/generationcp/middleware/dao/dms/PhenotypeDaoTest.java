@@ -323,8 +323,6 @@ public class PhenotypeDaoTest {
 	@Test
 	public void testUpdatePhenotypesByProjectIdAndLocationId() {
 		final int projectId = 1;
-		final int locationId = 2;
-		final int stockId = 3;
 		final int cvTermId = 5157;
 		final String value = "1.5678";
 		this.dao.updatePhenotypesByExperimentIdAndObervableId(projectId, cvTermId, value);
