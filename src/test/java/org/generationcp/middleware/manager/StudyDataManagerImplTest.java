@@ -753,7 +753,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testUpdateExperimentValues() {
 		final VariableList factors = new VariableList();
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
-		ExperimentValues values = new ExperimentValues();
+		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
 		values.setLocationId(manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment

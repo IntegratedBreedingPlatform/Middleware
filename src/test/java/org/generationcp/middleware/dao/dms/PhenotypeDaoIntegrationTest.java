@@ -143,14 +143,14 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	public void testGetPhenotypeByExperimentIdAndObservableId() {
 		final VariableList factors = new VariableList();
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
-		ExperimentValues values = new ExperimentValues();
+		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
 		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "jf10");
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
-		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 	}
 
@@ -158,7 +158,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	public void testUpdatePhenotypesByExperimentIdAndObervableId() {
 		final VariableList factors = new VariableList();
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
-		ExperimentValues values = new ExperimentValues();
+		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);

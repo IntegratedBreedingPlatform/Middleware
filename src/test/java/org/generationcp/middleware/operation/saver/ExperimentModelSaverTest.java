@@ -107,14 +107,14 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 	public void testAddOrUpdateExperiment() {
 		final VariableList factors = new VariableList();
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
-		ExperimentValues values = new ExperimentValues();
+		final ExperimentValues values = new ExperimentValues();
 		values.setVariableList(factors);
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
 		this.experimentModelSaver.addOrUpdateExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "dfg1");
 		final ExperimentModel experiment = this.experimentModelSaver.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
-		Phenotype phenotype = this.experimentModelSaver.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		final Phenotype phenotype = this.experimentModelSaver.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 	}
 }

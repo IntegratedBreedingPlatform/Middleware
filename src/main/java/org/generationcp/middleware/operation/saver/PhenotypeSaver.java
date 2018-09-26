@@ -138,7 +138,7 @@ public class PhenotypeSaver extends Saver {
 	}
 
 	private Phenotype createPhenotype(final Integer variableId, final String value, final Phenotype oldPhenotype,
-			final Integer dataTypeId, Phenotype.ValueStatus valueStatus) throws MiddlewareQueryException {
+			final Integer dataTypeId, final Phenotype.ValueStatus valueStatus) throws MiddlewareQueryException {
 
 		if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null)) {
 			return null;

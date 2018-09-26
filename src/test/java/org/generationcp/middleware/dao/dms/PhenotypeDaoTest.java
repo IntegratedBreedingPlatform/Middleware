@@ -60,14 +60,14 @@ public class PhenotypeDaoTest {
 		final PhenotypeSearchRequestDTO request = new PhenotypeSearchRequestDTO();
 		request.setPage(0);
 		request.setPageSize(10);
-		String studyDbId = "1";
+		final String studyDbId = "1";
 		final List<String> studyIds = Arrays.asList(studyDbId);
 		request.setStudyDbIds(studyIds);
 		final List<String> termIds = Arrays.asList("111", "222");
 		request.setCvTermIds(termIds);
 
 		// Headers (Observation units)
-		List<Object[]> searchPhenotypeMockResults = getSearchPhenotypeMockResults();
+		final List<Object[]> searchPhenotypeMockResults = getSearchPhenotypeMockResults();
 		Mockito.when(query.list()).thenReturn(searchPhenotypeMockResults);
 	
 		// Observations
@@ -75,10 +75,10 @@ public class PhenotypeDaoTest {
 		Mockito.when(this.session.createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS)).thenReturn(objsQuery);
 		Mockito.when(objsQuery.addScalar(Matchers.anyString())).thenReturn(objsQuery);
 		Mockito.when(objsQuery.addScalar(Matchers.anyString(), Matchers.any(PrimitiveType.class))).thenReturn(objsQuery);
-		List<Object[]> searchPhenotypeObservationMockResults = getSearchPhenotypeObservationMockResults();
+		final List<Object[]> searchPhenotypeObservationMockResults = getSearchPhenotypeObservationMockResults();
 		Mockito.when(objsQuery.list()).thenReturn(searchPhenotypeObservationMockResults);
 
-		List<PhenotypeSearchDTO> phenotypeSearchDTOS = this.dao.searchPhenotypes(0, Integer.MAX_VALUE, request);
+		final List<PhenotypeSearchDTO> phenotypeSearchDTOS = this.dao.searchPhenotypes(0, Integer.MAX_VALUE, request);
 
 		final String sql = getPhenotypeSearchMainQuery() + " AND gl.nd_geolocation_id in (:studyDbIds) " 
 				+ " AND exists(SELECT 1 " //
@@ -142,7 +142,7 @@ public class PhenotypeDaoTest {
 		final PhenotypeSearchRequestDTO request = new PhenotypeSearchRequestDTO();
 		request.setPage(0);
 		request.setPageSize(10);
-		String studyDbId = "1";
+		final String studyDbId = "1";
 		final List<String> studyIds = Arrays.asList(studyDbId);
 		request.setStudyDbIds(studyIds);
 		final List<String> termIds = Arrays.asList("111", "222");
