@@ -330,10 +330,10 @@ public class PhenotypeDaoTest {
 		this.dao.updatePhenotypesByExperimentIdAndObervableId(projectId, cvTermId, value);
 		
 		Mockito.verify(this.session).flush();
-		final String updateSql = "UPDATE nd_experiment exp "
-				+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id " + "SET pheno.value = '" + value + "'"
-				+ " WHERE exp.project_id = " + projectId + " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 "
-				+ " AND exp.stock_id = " + stockId + " AND pheno.observable_id = " + cvTermId;
+		final String updateSql = "UPDATE phenotype pheno "
+				+ "SET pheno.value = '" + value + "'"
+				+ " WHERE pheno.nd_experiment_id = " + projectId
+				+ " AND pheno.observable_id = " + cvTermId;
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(updateSql, sqlCaptor.getValue());
