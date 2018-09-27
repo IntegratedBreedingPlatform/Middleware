@@ -38,6 +38,5 @@
 	<include file="crop_changelog/9_4_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/9_4_1.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/10_1_0.xml" relativeToChangelogFile="true"/>
-	<include file="crop_changelog/10_2_0.xml" relativeToChangelogFile="true"/>
-
+	
  </databaseChangeLog>
