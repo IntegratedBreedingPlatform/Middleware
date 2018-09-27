@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.PoiUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -831,6 +832,28 @@ public class WorkbookParserTest {
 		// ALEU_COL_1_5's value in Excel is "6" but since it is invalid data and the user chose to discard the invalid values,
 		// it should be set to empty
 		Assert.assertEquals("", row.getMeasurementData(ALEU_COL_1_5).getValue());
+	}
+
+	@Test
+	public void testDetermineStudyTypeWithNoSpecifiedType() {
+		final Workbook wb = Mockito.mock(Workbook.class);
+		final StudyTypeDto studyTypeDto = this.workbookParser.determineStudyType(wb, 1);
+		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, studyTypeDto.getName());
+	}
+
+	@Test
+	public void testDetermineStudyType() {
+		final Workbook wb = Mockito.mock(Workbook.class);
+		final Sheet sheet = Mockito.mock(Sheet.class);
+		Mockito.when(wb.getSheetAt(Matchers.anyInt())).thenReturn(sheet);
+		final Row row = Mockito.mock(Row.class);
+		Mockito.when(sheet.getRow(Matchers.anyInt())).thenReturn(row);
+		final Cell cell = Mockito.mock(Cell.class);
+		Mockito.when(row.getCell(Matchers.anyInt())).thenReturn(cell);
+		Mockito.when(cell.getStringCellValue()).thenReturn(StudyTypeDto.TRIAL_NAME);
+		Mockito.when(cell.getCellType()).thenReturn(Cell.CELL_TYPE_STRING);
+		final StudyTypeDto studyTypeDto = this.workbookParser.determineStudyType(wb, 1);
+		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, studyTypeDto.getName());
 	}
 
 	@Test
