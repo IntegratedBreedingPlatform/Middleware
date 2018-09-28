@@ -100,11 +100,9 @@ public class FormulaServiceImpl implements FormulaService {
 
 	@Override
 	public FormulaDto update(final FormulaDto formulaDto) {
-		final Formula formula = this.daoFactory.getFormulaDAO().getById(formulaDto.getFormulaId());
-		formula.setInputs(FormulaUtils.convertFormulaVariableListToCVTermList(formulaDto.getInputs()));
-		formula.setDefinition(formulaDto.getDefinition());
-		this.daoFactory.getFormulaDAO().update(formula);
-		return FormulaUtils.convertToFormulaDto(formula);
+		final Formula formula = FormulaUtils.convertToFormula(formulaDto);
+		this.daoFactory.getFormulaDAO().merge(formula);
+		return formulaDto;
 	}
 
 	protected void fillFormulaVariables(final FormulaDto formulaDto, final Set<FormulaVariable> formulaVariables) {
