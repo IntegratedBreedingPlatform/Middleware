@@ -1,6 +1,7 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
@@ -93,6 +94,12 @@ public class DaoFactory {
 		StockTransactionDAO stockTransactionDao = new StockTransactionDAO();
 		stockTransactionDao.setSession(this.sessionProvider.getSession());
 		return stockTransactionDao;
+	}
+
+	public GermplasmDAO getGermplasmDao() {
+		final GermplasmDAO germplasmDao = new GermplasmDAO();
+		germplasmDao.setSession(this.sessionProvider.getSession());
+		return germplasmDao;
 	}
 
 	public GermplasmListDAO getGermplasmListDAO() {
