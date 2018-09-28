@@ -80,21 +80,25 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * Which folder the study is in, is defined in the project_relationship table.
 	 */
 	public static final String GET_CHILDREN_OF_FOLDER =
-		"SELECT subject.project_id AS project_id, subject.name AS name,  subject.description AS description, " + "	(CASE WHEN (pr"
-			+ ".type_id = " + TermId.IS_STUDY
-			.getId()
-			+ ") THEN 1 ELSE 0 END) AS is_study, " + "    subject.program_uuid AS program_uuid, "
-			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as "
-			+ "cvtermId "
-			+ " FROM project subject " + "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "
-			+ " LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
-			+ "    WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
-			+ "		AND pr.object_project_id = :folderId "
-			+ "     AND NOT EXISTS (SELECT 1 FROM project p WHERE p.project_id = subject.project_id AND p.deleted = " + DELETED_STUDY + ")"
-			+ "     AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
-			+ "     AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
-			// the OR here for value = null is required for folders.
-			+ "	ORDER BY name";
+		"SELECT subject.project_id AS project_id, "
+				+ "subject.name AS name,  subject.description AS description, " 
+				+ "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId()+ ") THEN 1 ELSE 0 END) AS is_study, " 
+				+ "    subject.program_uuid AS program_uuid, "
+				+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
+				+ "st.visible as visible, st.cvterm_id as cvtermId, subject.locked as isLocked, "
+				+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
+				+ "  FROM project subject " 
+				+ "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "
+				+ "  LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
+				+ "  LEFT JOIN users u ON u.userid = subject.created_by "
+				+ "  LEFT JOIN persons p ON p.personid = u.personid "
+				+ " WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
+				+ "   AND pr.object_project_id = :folderId "
+				+ "   AND NOT EXISTS (SELECT 1 FROM project p WHERE p.project_id = subject.project_id AND p.deleted = " + DELETED_STUDY + ")"
+				+ "   AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
+				+ "   AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
+				// the OR here for value = null is required for folders.
+				+ "	ORDER BY name";
 
 	private static final String GET_STUDIES_OF_FOLDER =
 			"SELECT  DISTINCT pr.subject_project_id " + "FROM    project_relationship pr, project p " + "WHERE   pr.type_id = "
@@ -208,8 +212,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final String studyTypeName = (String) row[7];
 				final boolean visible = ((Byte) row[8]) == 1;
 				final Integer cvtermId = (Integer) row[9];
+				final Boolean isLocked = (Boolean) row[10];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto));
+				final Integer ownerId = (Integer) row[11];
+				final String ownerName = (String) row[12];
+				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId, ownerName));
 			} else {
 				childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 			}
@@ -1112,7 +1119,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 					this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name")
 							.addScalar("description").addScalar("is_study", Hibernate.INTEGER).addScalar("program_uuid").addScalar("studyType").addScalar("label")
-							.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("ownerId");
+							.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("ownerId").addScalar("ownerName");
 			query.setParameter("folderId", folderId);
 			query.setParameter("studyTypeId", studyType);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
