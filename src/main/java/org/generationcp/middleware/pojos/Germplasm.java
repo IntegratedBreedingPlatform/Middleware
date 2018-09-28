@@ -238,6 +238,7 @@ public class Germplasm implements Serializable {
 					+ "   AND g.grplce = 0 \n" + "   AND ( l.liststatus != " + GermplasmListDAO.STATUS_DELETED
 					+ " OR l.liststatus IS NULL)";
 
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
