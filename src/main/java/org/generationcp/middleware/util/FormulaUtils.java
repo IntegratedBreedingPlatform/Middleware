@@ -58,7 +58,7 @@ public final class FormulaUtils {
 		return formula;
 	}
 
-	public static ArrayList convertFormulaVariableListToCVTermList(final List<FormulaVariable> formulaVariables) {
+	private static ArrayList convertFormulaVariableListToCVTermList(final List<FormulaVariable> formulaVariables) {
 		final Set<CVTerm> inputs = new LinkedHashSet<>();
 		for (final FormulaVariable formulaVariable : formulaVariables) {
 			final CVTerm input = new CVTerm();
