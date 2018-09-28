@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="mderamos" id="v10.2-1">
+        <preConditions onFail="CONTINUE">
+            <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM phenotype phenotype_duplicate INNER JOIN phenotype phenotype
+                    WHERE phenotype.phenotype_id > phenotype_duplicate.phenotype_id AND phenotype_duplicate.observable_id = phenotype.observable_id AND phenotype_duplicate.nd_experiment_id = phenotype.nd_experiment_id;
+            </sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE phenotype ADD UNIQUE INDEX phenotype_UNIQUE (observable_id ASC, nd_experiment_id ASC);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
