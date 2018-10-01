@@ -73,8 +73,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 					+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
-					+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+					+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 					+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
@@ -350,7 +349,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
 					+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
-					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+					"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
 					"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
 					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 					+ "    inner join project proj on proj.project_id = nde.project_id \n"

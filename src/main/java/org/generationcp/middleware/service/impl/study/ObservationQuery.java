@@ -115,8 +115,7 @@ class ObservationQuery {
 		+ " FROM \n" + "    project p \n" + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 		+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
 		+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-		+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
-		+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+		+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 		+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
 		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + " WHERE \n"
 		+ "\tp.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId \n"
@@ -171,8 +170,7 @@ class ObservationQuery {
 				+ "    project proj ON proj.project_id =  pr.object_project_id\n" + INNER_JOIN
 				+ "    nd_experiment nde ON nde.project_id = pr.subject_project_id\n" + INNER_JOIN
 				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + INNER_JOIN
-				+ "    nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id\n" + INNER_JOIN
-				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getVariableDetailsJoin(variables)
+				+ "    Stock s ON s.stock_id = nde.stock_id\n" + this.getVariableDetailsJoin(variables)
 
 				+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.RANGE_NO.getId() + "\n"
 				+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.COLUMN_NO.getId() + "\n"
@@ -259,8 +257,7 @@ class ObservationQuery {
 			.append("	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n")
 			.append("	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n")
 			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n")
-			.append("	INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n")
-			.append("	INNER JOIN stock s ON s.stock_id = es.stock_id \n")
+			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id \n")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
 			.append("		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");

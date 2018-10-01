@@ -5,8 +5,10 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
@@ -15,9 +17,14 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
@@ -207,6 +214,51 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	public void testGetByListIdAndGidNull() {
 		final Integer listId = this.testListDataProject.getList().getId();
 		Assert.assertNull(this.listDataProjectDAO.getByListIdAndGid(listId, this.parentGermplasm.getGid()));
+	}
+	
+	@Test
+	public void testGetByStudy() {
+		final Session mockSession = Mockito.mock(Session.class);
+		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
+		this.listDataProjectDAO = new ListDataProjectDAO();
+		this.listDataProjectDAO.setSession(mockSession);
+		Mockito.when(mockSession.createSQLQuery(Matchers.anyString())).thenReturn(mockQuery);
+		
+		final int plotNo = 10;
+		final String instanceNumber = "3";
+		final GermplasmListType listType = GermplasmListType.STUDY;
+		final int studyID = 5678;
+		this.listDataProjectDAO.getByStudy(studyID, listType, plotNo, instanceNumber);
+		
+		final String expectedSql = "select ldp.* FROM nd_experiment e,"
+				+ " nd_experimentprop nd_ep, stock,"
+				+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms, nd_geolocation geo"
+				+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
+				+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
+				+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"
+				+ " AND e.project_id = pr.subject_project_id"
+				+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
+				+ " AND stock.stock_id = e.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
+				+ " AND nd_ep.value = :PLOT_NO"
+				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
+				+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"
+				+ " AND geo.description = :INSTANCE_NUMBER"
+				+ " AND ( EXISTS (" + " SELECT 1" + " FROM listnms cl"
+				+ " WHERE cl.listid = ldp.list_id" + " AND cl.listtype = 'CHECK'" + " AND NOT EXISTS ("
+				+ " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id" + " AND nl.listtype = :LIST_TYPE"
+				+ " )) OR EXISTS (" + " SELECT 1 FROM listnms nl" + " WHERE nl.listid = ldp.list_id"
+				+ " AND nl.listtype = :LIST_TYPE" + " ))";
+		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+		Mockito.verify(mockSession).createSQLQuery(sqlCaptor.capture());
+		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
+		Mockito.verify(mockQuery).addEntity("ldp", ListDataProject.class);
+		Mockito.verify(mockQuery).setParameter("LIST_TYPE", listType.name());
+		Mockito.verify(mockQuery).setParameter("STUDY_ID", studyID);
+		Mockito.verify(mockQuery).setParameter("PLOT_NO", plotNo);
+		Mockito.verify(mockQuery).setParameter("INSTANCE_NUMBER", instanceNumber);
+		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DataSetType.PLOT_DATA.getId());
+		Mockito.verify(mockQuery).setParameterList("PLOT_NO_TERM_IDS",
+				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
 	}
 
 	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final long noOfTestEntries,

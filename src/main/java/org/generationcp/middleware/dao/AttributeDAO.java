@@ -45,27 +45,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
-		List<UserDefinedField> returnList = new ArrayList<>();
-		if (gidList != null && !gidList.isEmpty()) {
-			try {
-				final String sql = "SELECT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
-						+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("u", UserDefinedField.class);
-				query.setParameterList("gidList", gidList);
-				returnList = query.list();
-
-			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getAttributesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
-			}
-		}
-		return returnList;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList)
-			throws MiddlewareQueryException {
+	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList) {
 		List<Attribute> returnList = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
@@ -89,23 +69,23 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return criteria.list();
 	}
 
-	public Attribute getAttribute (final Integer gid, final String attributeName) {
+	public Attribute getAttribute(final Integer gid, final String attributeName) {
 		Attribute attribute = null;
-			try {
-				final String sql = "SELECT {a.*} FROM atributs a INNER JOIN udflds u ON (a.atype=u.fldno)"
-						+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("a", Attribute.class);
-				query.setParameter("gid", gid);
-				query.setParameter("name", attributeName);
-				final List<Attribute> attributes = query.list();
-				if (!attributes.isEmpty()) {
-					attribute = attributes.get(0);
-				}
-
-			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getAttribute(gidList=" + gid + ", " + attributeName + "): " + e.getMessage(), e);
+		try {
+			final String sql = "SELECT {a.*} FROM atributs a INNER JOIN udflds u ON (a.atype=u.fldno)"
+					+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("a", Attribute.class);
+			query.setParameter("gid", gid);
+			query.setParameter("name", attributeName);
+			final List<Attribute> attributes = query.list();
+			if (!attributes.isEmpty()) {
+				attribute = attributes.get(0);
 			}
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getAttribute(gidList=" + gid + ", " + attributeName + "): " + e.getMessage(), e);
+		}
 		return attribute;
 	}
 }

@@ -60,17 +60,17 @@ public class StockSaverTest {
 	}
 
 	@Before
-	public void setUp() throws MiddlewareQueryException {
+	public void setUp() {
 		this.stockSaver = Mockito.spy(new StockSaver(Mockito.mock(HibernateSessionProvider.class)));
 	}
 
 	@Test
-	public void testCreateOrUpdate() throws MiddlewareQueryException {
+	public void testCreateOrUpdate() {
 		VariableList factors = this.createVariableList();
 		this.stockModel = this.stockSaver.createStock(factors, this.stockModel);
 		assertNotNull(this.stockModel);
 		assertEquals(StockVariable.ENTRY_NO.getValue(), this.stockModel.getUniqueName());
-		assertEquals(StockVariable.GID.getValue(), this.stockModel.getDbxrefId().toString());
+		assertEquals(StockVariable.GID.getValue(), this.stockModel.getGermplasm().getGid().toString());
 		assertEquals(StockVariable.DESIG.getValue(), this.stockModel.getName().toString());
 		assertEquals(StockVariable.ENTRY_CODE.getValue(), this.stockModel.getValue());
 		assertNotNull(this.stockModel.getProperties());

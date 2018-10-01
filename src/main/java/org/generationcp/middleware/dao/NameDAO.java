@@ -11,8 +11,13 @@
 
 package org.generationcp.middleware.dao;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -27,12 +32,8 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 /**
  * DAO class for {@link Name}.
@@ -270,7 +271,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getPreferredNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -296,7 +297,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getPreferredNameIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getPreferredNameIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(),
+					e);
 		}
 
 		return toreturn;
@@ -523,10 +525,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_GROUP_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
 			query.setParameterList("gids", gids);
 
-			map = createGidAndPreferredNameMap(query.list());
+			map = this.createGidAndPreferredNameMap(query.list());
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getSourcePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -546,14 +548,33 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_IMMEDIATE_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
 			query.setParameterList("gids", gids);
 
-			map = createGidAndPreferredNameMap(query.list());
+			map = this.createGidAndPreferredNameMap(query.list());
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getImmediatePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return map;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Name> getNamesByTypeAndGIDList(final Integer nameType, final List<Integer> gidList) {
+		List<Name> returnList = new ArrayList<>();
+		if (gidList != null && !gidList.isEmpty()) {
+			try {
+				final String sql = "SELECT {n.*}" + " FROM names n" + " WHERE n.ntype = :nameType" + " AND n.gid in (:gidList)";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("n", Name.class);
+				query.setParameter("nameType", nameType);
+				query.setParameterList("gidList", gidList);
+				returnList = query.list();
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException(
+						"Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage(), e);
+			}
+		}
+		return returnList;
 	}
 
 	private Map<Integer, String> createGidAndPreferredNameMap(final List<Object> list) {
