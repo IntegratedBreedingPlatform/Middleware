@@ -85,7 +85,7 @@ public class WorkbookTestDataInitializer {
 	public static final String TRIAL = "TRIAL";
 	public static final String ENTRY = "ENTRY";
 	public static final String PLOT = "PLOT";
-	public static final String PLOT_ID = "PLOT_ID";
+	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	// DATA TYPES
 	public static final String CHAR = "C";
 	public static final String NUMERIC = "N";
@@ -398,7 +398,7 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
 				WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
 
-		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.PLOT_ID.getId(), WorkbookTestDataInitializer.PLOT_ID,
+		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.OBS_UNIT_ID.getId(), WorkbookTestDataInitializer.OBS_UNIT_ID,
 			"Field plot id - enumerated (number) ", WorkbookTestDataInitializer.TEXT, WorkbookTestDataInitializer.ASSIGNED,
 			WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
 			WorkbookTestDataInitializer.PLOT, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
@@ -500,8 +500,8 @@ public class WorkbookTestDataInitializer {
 					TermId.SEED_SOURCE.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT, String.valueOf(i),
 					TermId.PLOT_NO.getId(), workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT_ID, "PLOT010203P"+String.valueOf(i),
-				TermId.PLOT_ID.getId(), workbook.getFactors()));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+String.valueOf(i),
+				TermId.OBS_UNIT_ID.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.BLOCK, "", TermId.BLOCK_NO.getId(),
 					workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.REP, "", TermId.REP_NO.getId(),

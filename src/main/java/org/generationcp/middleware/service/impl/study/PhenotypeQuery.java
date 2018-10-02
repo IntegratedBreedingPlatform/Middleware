@@ -7,7 +7,7 @@ public class PhenotypeQuery {
 
 	public static final String PHENOTYPE_SEARCH = " SELECT " //
 		+ "  nde.nd_experiment_id AS nd_experiment_id, " //
-		+ "  nde.plot_id AS observationUnitDbId, " //
+		+ "  nde.OBS_UNIT_ID AS observationUnitDbId, " //
 		+ "  '' AS observationUnitName, " //
 		+ "  'plot' AS observationLevel, " //
 		+ "  NULL AS plantNumber, " // Until we have plant level observation

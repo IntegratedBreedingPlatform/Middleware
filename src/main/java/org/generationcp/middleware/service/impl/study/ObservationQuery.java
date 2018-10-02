@@ -63,7 +63,7 @@ class ObservationQuery {
 		+ WHERE
 		+ "      ndep.nd_experiment_id = nde.nd_experiment_id\n"
 		+ "      AND ispcvt.name = 'PLOT_NO')                                             PLOT_NO,\n"
-		+ "   nde.plot_id                                         AS                      PLOT_ID\n";
+		+ "   nde.OBS_UNIT_ID                                         AS                      OBS_UNIT_ID\n";
 	public static final String SELECT = "(SELECT ";
 	public static final String ND_GEOLOCATIONPROP_GP = "            nd_geolocationprop gp \n";
 	public static final String GP_TYPE_ID = "            gp.type_id = ";
@@ -221,7 +221,7 @@ class ObservationQuery {
 			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n")
 			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n")
 			.append("    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.plant_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n")
-			.append("    nde.plot_id as PLOT_ID, \n");
+			.append("    nde.OBS_UNIT_ID as OBS_UNIT_ID, \n");
 
 		final String traitClauseFormat =
 			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', ";

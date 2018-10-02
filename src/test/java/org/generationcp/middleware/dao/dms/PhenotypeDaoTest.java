@@ -50,9 +50,9 @@ public class PhenotypeDaoTest {
 		this.dao = new PhenotypeDao();
 		this.dao.setSession(this.session);
 		
-		Mockito.when(query.addScalar(Matchers.anyString())).thenReturn(query);
-		Mockito.when(query.addScalar(Matchers.anyString(), Matchers.any(PrimitiveType.class))).thenReturn(query);
-		Mockito.when(this.session.createSQLQuery(Matchers.anyString())).thenReturn(query);
+		Mockito.when(this.query.addScalar(Matchers.anyString())).thenReturn(this.query);
+		Mockito.when(this.query.addScalar(Matchers.anyString(), Matchers.any(PrimitiveType.class))).thenReturn(this.query);
+		Mockito.when(this.session.createSQLQuery(Matchers.anyString())).thenReturn(this.query);
 	}
 
 	@Test
@@ -60,27 +60,27 @@ public class PhenotypeDaoTest {
 		final PhenotypeSearchRequestDTO request = new PhenotypeSearchRequestDTO();
 		request.setPage(0);
 		request.setPageSize(10);
-		String studyDbId = "1";
+		final String studyDbId = "1";
 		final List<String> studyIds = Arrays.asList(studyDbId);
 		request.setStudyDbIds(studyIds);
 		final List<String> termIds = Arrays.asList("111", "222");
 		request.setCvTermIds(termIds);
 
 		// Headers (Observation units)
-		List<Object[]> searchPhenotypeMockResults = getSearchPhenotypeMockResults();
-		Mockito.when(query.list()).thenReturn(searchPhenotypeMockResults);
+		final List<Object[]> searchPhenotypeMockResults = this.getSearchPhenotypeMockResults();
+		Mockito.when(this.query.list()).thenReturn(searchPhenotypeMockResults);
 	
 		// Observations
 		final SQLQuery objsQuery = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.session.createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS)).thenReturn(objsQuery);
 		Mockito.when(objsQuery.addScalar(Matchers.anyString())).thenReturn(objsQuery);
 		Mockito.when(objsQuery.addScalar(Matchers.anyString(), Matchers.any(PrimitiveType.class))).thenReturn(objsQuery);
-		List<Object[]> searchPhenotypeObservationMockResults = getSearchPhenotypeObservationMockResults();
+		final List<Object[]> searchPhenotypeObservationMockResults = this.getSearchPhenotypeObservationMockResults();
 		Mockito.when(objsQuery.list()).thenReturn(searchPhenotypeObservationMockResults);
 
-		List<PhenotypeSearchDTO> phenotypeSearchDTOS = this.dao.searchPhenotypes(0, Integer.MAX_VALUE, request);
+		final List<PhenotypeSearchDTO> phenotypeSearchDTOS = this.dao.searchPhenotypes(0, Integer.MAX_VALUE, request);
 
-		final String sql = getPhenotypeSearchMainQuery() + " AND gl.nd_geolocation_id in (:studyDbIds) " 
+		final String sql = this.getPhenotypeSearchMainQuery() + " AND gl.nd_geolocation_id in (:studyDbIds) "
 				+ " AND exists(SELECT 1 " //
 				+ " FROM phenotype ph " //
 				+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
@@ -93,8 +93,8 @@ public class PhenotypeDaoTest {
 				;
 
 		Mockito.verify(this.session).createSQLQuery(Matchers.eq(sql));
-		Mockito.verify(query).setParameterList("cvTermIds", termIds);
-		Mockito.verify(query).setParameterList("studyDbIds", studyIds);
+		Mockito.verify(this.query).setParameterList("cvTermIds", termIds);
+		Mockito.verify(this.query).setParameterList("studyDbIds", studyIds);
 		Assert.assertThat(phenotypeSearchDTOS, is(not(empty())));
 		
 		Assert.assertThat(phenotypeSearchDTOS.get(0).getObservationUnitDbId(), is(searchPhenotypeMockResults.get(0)[1]));
@@ -142,14 +142,14 @@ public class PhenotypeDaoTest {
 		final PhenotypeSearchRequestDTO request = new PhenotypeSearchRequestDTO();
 		request.setPage(0);
 		request.setPageSize(10);
-		String studyDbId = "1";
+		final String studyDbId = "1";
 		final List<String> studyIds = Arrays.asList(studyDbId);
 		request.setStudyDbIds(studyIds);
 		final List<String> termIds = Arrays.asList("111", "222");
 		request.setCvTermIds(termIds);
 		final long count = this.dao.countPhenotypes(request);
 		
-		final String sql = "SELECT COUNT(1) FROM (" + getPhenotypeSearchMainQuery() + " AND exists(SELECT 1 " //
+		final String sql = "SELECT COUNT(1) FROM (" + this.getPhenotypeSearchMainQuery() + " AND exists(SELECT 1 " //
 				+ " FROM phenotype ph " //
 				+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
 				+ "   INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
@@ -161,17 +161,17 @@ public class PhenotypeDaoTest {
 				+ " AND gl.nd_geolocation_id in (:studyDbIds) " 
 				+ ") T";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(sql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
-		Mockito.verify(query).setParameterList("cvTermIds", termIds);
-		Mockito.verify(query).setParameterList("studyDbIds", studyIds);
+		Mockito.verify(this.query).setParameterList("cvTermIds", termIds);
+		Mockito.verify(this.query).setParameterList("studyDbIds", studyIds);
 		Assert.assertEquals(100L, count);
 	}
 	
 	private String getPhenotypeSearchMainQuery() {
 		return " SELECT " //
 				+ "  nde.nd_experiment_id AS nd_experiment_id, " //
-				+ "  nde.plot_id AS observationUnitDbId, " //
+				+ "  nde.OBS_UNIT_ID AS observationUnitDbId, " //
 				+ "  '' AS observationUnitName, " //
 				+ "  'plot' AS observationLevel, " //
 				+ "  NULL AS plantNumber, " // Until we have plant level observation
@@ -214,14 +214,14 @@ public class PhenotypeDaoTest {
 		final List<Integer> environmentIds = Arrays.asList(1, 2, 3);
 		this.dao.getObservationForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
 		
-		final String expectedSql = getObservationsForTraitMainQuery() + " AND s.dbxref_id IN (:germplasmIds) "
+		final String expectedSql = this.getObservationsForTraitMainQuery() + " AND s.dbxref_id IN (:germplasmIds) "
 				+ "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(query).setParameterList("traitIds", traitIds);
-		Mockito.verify(query).setParameterList("germplasmIds", germplasmIds);
-		Mockito.verify(query).setParameterList("environmentIds", environmentIds);
+		Mockito.verify(this.query).setParameterList("traitIds", traitIds);
+		Mockito.verify(this.query).setParameterList("germplasmIds", germplasmIds);
+		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
 	}
 	
 	@Test
@@ -232,15 +232,15 @@ public class PhenotypeDaoTest {
 		final int numOfRows = 500;
 		this.dao.getObservationForTraits(traitIds, environmentIds, start, numOfRows);
 		
-		final String expectedSql = getObservationsForTraitMainQuery()
+		final String expectedSql = this.getObservationsForTraitMainQuery()
 				+ "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(query).setParameterList("traitIds", traitIds);
-		Mockito.verify(query).setParameterList("environmentIds", environmentIds);
-		Mockito.verify(query).setFirstResult(start);
-		Mockito.verify(query).setMaxResults(numOfRows);
+		Mockito.verify(this.query).setParameterList("traitIds", traitIds);
+		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
+		Mockito.verify(this.query).setFirstResult(start);
+		Mockito.verify(this.query).setMaxResults(numOfRows);
 	}
 	
 	@Test
@@ -256,10 +256,10 @@ public class PhenotypeDaoTest {
 				+ "WHERE e.nd_geolocation_id IN (:environmentIds) "
 				+ "AND p.observable_id IN (:traitIds) ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(query).setParameterList("traitIds", traitIds);
-		Mockito.verify(query).setParameterList("environmentIds", environmentIds);
+		Mockito.verify(this.query).setParameterList("traitIds", traitIds);
+		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
 		Assert.assertEquals(100L, count);
 	}
 	
@@ -278,10 +278,10 @@ public class PhenotypeDaoTest {
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 				+ "    AND p.observable_id IN (:numericVariableIds) " + "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(query).setParameterList("numericVariableIds", traitIds);
-		Mockito.verify(query).setParameterList("environmentIds", environmentIds);
+		Mockito.verify(this.query).setParameterList("numericVariableIds", traitIds);
+		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
 	}
 	
 	@Test
@@ -297,10 +297,10 @@ public class PhenotypeDaoTest {
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 				+ "    AND p.observable_id IN (:variableIds) " + "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(query).setParameterList("variableIds", traitIds);
-		Mockito.verify(query).setParameterList("environmentIds", environmentIds);
+		Mockito.verify(this.query).setParameterList("variableIds", traitIds);
+		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
 	}
 	
 	@Test
@@ -315,9 +315,9 @@ public class PhenotypeDaoTest {
 				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 				+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
-		Mockito.verify(query).setParameterList("environmentIds", environmentIds);
+		Mockito.verify(this.query).setParameterList("environmentIds", environmentIds);
 	}
 	
 	@Test
@@ -346,9 +346,9 @@ public class PhenotypeDaoTest {
 		final int locationId = 2;
 		this.dao.containsAtLeast2CommonEntriesWithValues(projectId, locationId, TermId.DESIG.getId());
 		
-		final String expectedSql = getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.name");
+		final String expectedSql = this.getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.name");
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
 	}
 	
@@ -358,9 +358,9 @@ public class PhenotypeDaoTest {
 		final int locationId = 2;
 		this.dao.containsAtLeast2CommonEntriesWithValues(projectId, locationId, TermId.GID.getId());
 		
-		final String expectedSql = getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.dbxref_id");
+		final String expectedSql = this.getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.dbxref_id");
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
 	}
 	
@@ -370,9 +370,9 @@ public class PhenotypeDaoTest {
 		final int locationId = 2;
 		this.dao.containsAtLeast2CommonEntriesWithValues(projectId, locationId, TermId.ENTRY_NO.getId());
 		
-		final String expectedSql = getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.uniquename");
+		final String expectedSql = this.getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.uniquename");
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
 	}
 	
@@ -382,9 +382,9 @@ public class PhenotypeDaoTest {
 		final int locationId = 2;
 		this.dao.containsAtLeast2CommonEntriesWithValues(projectId, locationId, TermId.CROSS.getId());
 		
-		final String expectedSql = getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.stock_id");
+		final String expectedSql = this.getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.stock_id");
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(session).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
 	}
 

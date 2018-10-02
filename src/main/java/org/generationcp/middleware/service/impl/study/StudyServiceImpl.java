@@ -275,7 +275,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
 		 */
 		final List<String> fixedGermplasmDescriptors =
-				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "PLOT_ID");
+				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID");
 		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
 
 		for (final String gpDescriptor : allGermplasmDescriptors) {
@@ -493,7 +493,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// Y = row
 				entry.add(String.valueOf(y));
 
-				// plotId
+				// obsUnitId
 				entry.add(String.valueOf(row[12]));
 
 				// phenotypic values
@@ -519,7 +519,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
 				"germplasmName", "observationUnitDbId", "plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X",
-				"Y", "plotId"));
+				"Y", "obsUnitId"));
 
 		return dto;
 	}
