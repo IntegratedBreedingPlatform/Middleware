@@ -94,7 +94,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "  LEFT JOIN persons p ON p.personid = u.personid "
 				+ " WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
 				+ "   AND pr.object_project_id = :folderId "
-				+ "   AND NOT EXISTS (SELECT 1 FROM project p WHERE p.project_id = subject.project_id AND p.deleted = " + DELETED_STUDY + ")"
+				+ "   AND subject.deleted != " + DELETED_STUDY
 				+ "   AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
 				+ "   AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
 				// the OR here for value = null is required for folders.
