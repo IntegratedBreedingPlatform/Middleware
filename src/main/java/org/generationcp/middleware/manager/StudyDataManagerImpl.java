@@ -1255,4 +1255,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public void updatePhenotype(final Phenotype phenotype) {
 		this.getPhenotypeDao().saveOrUpdate(phenotype);
 	}
+	
+	@Override
+	public void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked) {
+		this.getDmsProjectDao().lockUnlockStudy(studyId, isLocked);
+		
+	}
+	
 }

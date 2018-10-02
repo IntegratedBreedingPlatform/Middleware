@@ -11,6 +11,12 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
@@ -56,17 +62,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
@@ -763,6 +758,20 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
+	}
+	
+	@Test
+	public void testUpdateStudyLockedStatus() {
+		final Integer studyId = this.studyReference.getId();
+		Assert.assertFalse(this.manager.getStudyDetails(studyId).getIsLocked());
+		this.manager.updateStudyLockedStatus(studyId, true);
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.manager.getActiveSession().flush();
+		Assert.assertTrue(this.manager.getStudyDetails(studyId).getIsLocked());
+		
+		this.manager.updateStudyLockedStatus(studyId, false);
+		this.manager.getActiveSession().flush();
+		Assert.assertFalse(this.manager.getStudyDetails(studyId).getIsLocked());
 	}
 
 }

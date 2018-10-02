@@ -846,5 +846,7 @@ public interface StudyDataManager {
 	 * @param phenotype
 	 */
 	void updatePhenotype (Phenotype phenotype);
+	
+	void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked);
 
 }

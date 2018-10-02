@@ -1135,4 +1135,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		return childrenNodes;
 	}
+	
+	public void lockUnlockStudy(final Integer studyId, final Boolean isLocked) {
+		Preconditions.checkNotNull(studyId);
+		
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq(PROJECT_ID, studyId));
+		final DmsProject study = (DmsProject) criteria.uniqueResult();
+		if (study != null){
+			study.setLocked(isLocked);
+			save(study);
+		}
+	}
 }
