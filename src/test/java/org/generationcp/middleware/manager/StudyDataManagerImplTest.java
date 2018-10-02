@@ -48,7 +48,10 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -91,6 +94,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private LocationDataManager locationManager;
+	
+	@Autowired
+	private UserDataManager userDataManager;
 
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -758,6 +764,23 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
+	}
+	
+	@Test
+	public void testGetStudyReference() throws Exception {
+		final Integer studyId = this.studyReference.getId();
+		final StudyReference studyFromDB = this.manager.getStudyReference(studyId);
+		Assert.assertEquals(this.studyReference.getId(), studyFromDB.getId());
+		Assert.assertEquals(this.studyReference.getName(), studyFromDB.getName());
+		Assert.assertEquals(this.studyReference.getDescription(), studyFromDB.getDescription());
+		Assert.assertEquals(this.studyReference.getProgramUUID(), studyFromDB.getProgramUUID());
+		Assert.assertEquals(this.studyReference.getStudyType(), studyFromDB.getStudyType());
+		Assert.assertFalse(studyFromDB.getIsLocked());
+		final Integer createdBy = Integer.valueOf(StudyTestDataInitializer.CREATED_BY);
+		Assert.assertEquals(createdBy, studyFromDB.getOwnerId());
+		final User user = this.userDataManager.getUserById(createdBy);
+		final Person person = this.userDataManager.getPersonById(user.getPersonid());
+		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), studyFromDB.getOwnerName());
 	}
 	
 	@Test

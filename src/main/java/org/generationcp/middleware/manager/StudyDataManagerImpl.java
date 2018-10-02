@@ -1261,5 +1261,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		this.getDmsProjectDao().lockUnlockStudy(studyId, isLocked);
 		
 	}
+
+	@Override
+	public StudyReference getStudyReference(final Integer studyId) {
+		return this.getDmsProjectDao().getStudyReference(studyId);
+	}
 	
 }

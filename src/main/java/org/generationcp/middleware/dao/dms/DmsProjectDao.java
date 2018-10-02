@@ -99,6 +99,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
 				// the OR here for value = null is required for folders.
 				+ "	ORDER BY name";
+	
+	public static final String STUDY_REFERENCE_SQL =
+			"SELECT pr.project_id AS project_id, "
+					+ "pr.name AS name,  pr.description AS description, pr.program_uuid AS program_uuid, " 
+					+ "st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
+					+ "st.visible as visible, st.cvterm_id as cvtermId, pr.locked as isLocked, "
+					+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
+					+ "  FROM project pr " 
+					+ "  LEFT JOIN study_type st ON pr.study_type_id = st.study_type_id "
+					+ "  LEFT JOIN users u ON u.userid = pr.created_by "
+					+ "  LEFT JOIN persons p ON p.personid = u.personid "
+					+ " WHERE pr.project_id = :studyId and pr.deleted != " + DELETED_STUDY;
 
 	private static final String GET_STUDIES_OF_FOLDER =
 			"SELECT  DISTINCT pr.subject_project_id " + "FROM    project_relationship pr, project p " + "WHERE   pr.type_id = "
@@ -1134,6 +1146,45 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 
 		return childrenNodes;
+	}
+	
+	public StudyReference getStudyReference(final Integer studyId) {
+		StudyReference studyReference = null;
+
+		try {
+			final Query query =
+					this.getSession().createSQLQuery(DmsProjectDao.STUDY_REFERENCE_SQL).addScalar("project_id").addScalar("name")
+							.addScalar("description").addScalar("program_uuid").addScalar("studyType").addScalar("label")
+							.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("ownerId").addScalar("ownerName");
+			query.setParameter("studyId", studyId);
+
+			final List<Object[]> list = query.list();
+			if (list != null && !list.isEmpty()) {
+				for (final Object[] row : list) {
+					final Integer id = (Integer) row[0];
+					final String name = (String) row[1];
+					final String description = (String) row[2];
+					final String projectUUID = (String) row[3];	
+					final Integer studyTypeId = (Integer) row[4];
+					final String label = (String) row[5];
+					final String studyTypeName = (String) row[6];
+					final boolean visible = ((Byte) row[7]) == 1;
+					final Integer cvtermId = (Integer) row[8];
+					final Boolean isLocked = (Boolean) row[9];
+					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
+					final Integer ownerId = (Integer) row[10];
+					final String ownerName = (String) row[11];
+					studyReference = new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId, ownerName);
+				}
+			}
+
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error getting StudyReference for studyId=" + studyId + ":" + e.getMessage(), e);
+		}
+
+		return studyReference;
 	}
 	
 	public void lockUnlockStudy(final Integer studyId, final Boolean isLocked) {

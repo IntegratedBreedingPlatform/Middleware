@@ -45,7 +45,7 @@ public class StudyTestDataInitializer {
 	public static final String START_DATE = "20160606";
 	public static final String END_DATE = "20160606";
 	private static final String OBJECTIVE = "OBJ1";
-	private static final String CREATED_BY = "1";
+	public static final String CREATED_BY = "1";
 	public static int datasetId = 255;
 
 	private final StudyDataManagerImpl studyDataManager;
@@ -68,13 +68,13 @@ public class StudyTestDataInitializer {
 		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyTypeDto.getTrialDto(),
 			cropPrefix,
 			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
-				.END_DATE, StudyTestDataInitializer.STUDY_UPDATE, StudyTestDataInitializer.OBJECTIVE);
+				.END_DATE, StudyTestDataInitializer.OBJECTIVE, StudyTestDataInitializer.CREATED_BY);
 	}
 	
 	public StudyReference addTestStudy(final String uniqueId, final String cropPrefix) throws Exception {
 		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyTypeDto.getTrialDto(), cropPrefix,
 			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
-			.END_DATE, StudyTestDataInitializer.STUDY_UPDATE, StudyTestDataInitializer.OBJECTIVE);
+			.END_DATE,StudyTestDataInitializer.OBJECTIVE, StudyTestDataInitializer.CREATED_BY);
 	}
 	
 	public StudyReference addTestStudy(final StudyTypeDto studyType, final String studyName, final String cropPrefix) throws Exception {
