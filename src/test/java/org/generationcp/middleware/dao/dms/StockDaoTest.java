@@ -21,15 +21,21 @@ import java.util.Set;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.StudyTypeDAO;
+import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -58,11 +64,15 @@ public class StockDaoTest extends IntegrationTestBase {
 	private CVTermDao cvtermDao;
 	private PhenotypeDao phenotypeDao;
 	private StudyTypeDAO studyTypeDAO;
+	private UserDAO userDao;
+	private PersonDAO personDao;
 	
 	private DmsProject project;
 	private List<StockModel> testStocks;
 	private List<ExperimentModel> experiments;
 	private Geolocation environment;
+	private User testUser;
+	private Person testPerson;
 	
 
 	@Before
@@ -97,6 +107,19 @@ public class StockDaoTest extends IntegrationTestBase {
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(this.sessionProvder.getSession());
 		
+		this.userDao = new UserDAO();
+		this.userDao.setSession(this.sessionProvder.getSession());
+		
+		this.personDao = new PersonDAO();
+		this.personDao.setSession(this.sessionProvder.getSession());
+		
+		if (this.testPerson == null) {
+			this.testPerson = this.personDao.save(PersonTestDataInitializer.createPerson());
+			User user = UserTestDataInitializer.createActiveUser();
+			user.setPersonid(this.testPerson.getId());
+			this.testUser = this.userDao.save(user);
+		}
+
 		this.project = this.createProject();
 		this.testStocks = new ArrayList<>();
 		this.experiments = new ArrayList<>();
@@ -109,6 +132,8 @@ public class StockDaoTest extends IntegrationTestBase {
 		project.setName("Test Project Name " + RandomStringUtils.randomAlphanumeric(5));
 		project.setDescription("Test Project " + RandomStringUtils.randomAlphanumeric(5));
 		project.setStudyType(this.studyTypeDAO.getStudyTypeByName(StudyTypeDto.TRIAL_NAME));
+		project.setProgramUUID(RandomStringUtils.randomAlphanumeric(20));
+		project.setCreatedBy(this.testUser.getUserid().toString());
 		dmsProjectDao.save(project);
 		return project;
 	}
@@ -241,6 +266,10 @@ public class StockDaoTest extends IntegrationTestBase {
 			Assert.assertEquals(id, studyReference.getId());
 			Assert.assertEquals(study.getName(), studyReference.getName());
 			Assert.assertEquals(study.getDescription(), studyReference.getDescription());
+			Assert.assertEquals(study.getProgramUUID(), studyReference.getProgramUUID());
+			Assert.assertEquals(study.getStudyType().getName(), studyReference.getStudyType().getName());
+			Assert.assertEquals(this.testUser.getUserid(), studyReference.getOwnerId());
+			Assert.assertEquals(this.testPerson.getFirstName() + " " + this.testPerson.getLastName(), studyReference.getOwnerName());
 		}
 	}
 	
