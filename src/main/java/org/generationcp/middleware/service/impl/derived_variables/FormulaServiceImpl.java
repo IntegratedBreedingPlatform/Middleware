@@ -8,7 +8,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.util.FormulaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,6 +96,13 @@ public class FormulaServiceImpl implements FormulaService {
 		final Formula formula = this.daoFactory.getFormulaDAO().getById(formulaId);
 		formula.setActive(false);
 		this.daoFactory.getFormulaDAO().update(formula);
+	}
+
+	@Override
+	public FormulaDto update(final FormulaDto formulaDto) {
+		final Formula formula = FormulaUtils.convertToFormula(formulaDto);
+		this.daoFactory.getFormulaDAO().merge(formula);
+		return formulaDto;
 	}
 
 	protected void fillFormulaVariables(final FormulaDto formulaDto, final Set<FormulaVariable> formulaVariables) {
