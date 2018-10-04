@@ -303,7 +303,7 @@ public class StudyMeasurementsTest {
 				measurement.getBlockNumber());
 		Assert.assertEquals("Make sure the Row # is correct", StudyMeasurementsTest.ROW, measurement.getRowNumber());
 		Assert.assertEquals("Make sure the Col # is correct", StudyMeasurementsTest.COL, measurement.getColumnNumber());
-		Assert.assertEquals("Make sure the Plot Id is correct", obsUnitId, measurement.getObsUnitId());
+		Assert.assertEquals("Make sure the Observation Unit Id is correct", obsUnitId, measurement.getObsUnitId());
 		Assert.assertEquals("Make sure the Fieldmap Column is correct", StudyMeasurementsTest.FIELDMAP_COLUMN,
 				measurement.getFieldMapColumn());
 		Assert.assertEquals("Make sure the Fielmap Range is correct", StudyMeasurementsTest.FIELDMAP_RANGE,

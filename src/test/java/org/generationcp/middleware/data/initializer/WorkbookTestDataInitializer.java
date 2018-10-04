@@ -399,7 +399,7 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
 
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.OBS_UNIT_ID.getId(), WorkbookTestDataInitializer.OBS_UNIT_ID,
-			"Field plot id - enumerated (number) ", WorkbookTestDataInitializer.TEXT, WorkbookTestDataInitializer.ASSIGNED,
+			"Field Observation Unit id - enumerated (number) ", WorkbookTestDataInitializer.TEXT, WorkbookTestDataInitializer.ASSIGNED,
 			WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
 			WorkbookTestDataInitializer.PLOT, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
 		// Plot Factors

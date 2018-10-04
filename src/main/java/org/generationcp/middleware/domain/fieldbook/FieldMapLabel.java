@@ -32,7 +32,7 @@ public class FieldMapLabel implements Serializable {
 	/** The experiment id. */
 	private Integer experimentId;
 
-	/** The plot id. */
+	/** The Observation Unit id. */
 	private String obsUnitId;
 
 	/** The entry number. */
