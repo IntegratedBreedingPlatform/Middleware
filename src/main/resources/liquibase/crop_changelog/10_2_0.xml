@@ -5,6 +5,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="vanina" id="v10.2.0-1">
+		<comment> Change column name plot_id as obs_unit_id in nd_experiment table </comment>
  		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="nd_experiment"/>
@@ -21,11 +22,12 @@
 	</changeSet>
 
 	<changeSet author="vanina" id="v10.2.0-2">
+		<comment> Change name and definition of cvterm 8201, previous PLOT_ID, in cvterm table </comment>
  		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				select count(*)
 				from cvterm
-				where cvterm_id = 8201 and name = 'PLOT_ID';
+				where cvterm_id = 8201;
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
@@ -36,19 +38,20 @@
 	</changeSet>
 
 	<changeSet author="vanina" id="v10.2.0-3">
+		<comment> Change alias of variable_id 8201, previous PLOT_ID, in projectprop table </comment>
  		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
 					select count(*)
 					from projectprop
-					where alias = 'PLOT_ID';
+					where variable_id = 8201;
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			update projectprop
 			set alias = 'OBS_UNIT_ID'
-			where alias = 'PLOT_ID';
+			where variable_id = 8201;
 		</sql>
 	</changeSet>
 
