@@ -5,8 +5,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="vanina" id="v10.2.0-1">
-		<comment> Change column name plot_id as obs_unit_id in nd_experiment table </comment>
- 		<preConditions onFail="MARK_RAN">
+		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="nd_experiment"/>
 				<columnExists tableName="nd_experiment" columnName="plot_id"/>
@@ -15,6 +14,7 @@
 				</not>
 			</and>
 		</preConditions>
+		<comment> Change column name plot_id as obs_unit_id in nd_experiment table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE nd_experiment
 			CHANGE COLUMN plot_id obs_unit_id CHAR(13) CHARACTER SET 'utf8' NULL DEFAULT NULL ;
@@ -22,14 +22,14 @@
 	</changeSet>
 
 	<changeSet author="vanina" id="v10.2.0-2">
-		<comment> Change name and definition of cvterm 8201, previous PLOT_ID, in cvterm table </comment>
- 		<preConditions onFail="MARK_RAN">
+		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				select count(*)
 				from cvterm
 				where cvterm_id = 8201;
 			</sqlCheck>
 		</preConditions>
+		<comment> Change name and definition of cvterm 8201, previous PLOT_ID, in cvterm table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			update cvterm
 			set name = 'OBS_UNIT_ID', definition = 'Field observation unit id - assigned (text)'
@@ -38,8 +38,7 @@
 	</changeSet>
 
 	<changeSet author="vanina" id="v10.2.0-3">
-		<comment> Change alias of variable_id 8201, previous PLOT_ID, in projectprop table </comment>
- 		<preConditions onFail="MARK_RAN">
+		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
 					select count(*)
@@ -48,6 +47,7 @@
 				</sqlCheck>
 			</not>
 		</preConditions>
+		<comment> Change alias of variable_id 8201, previous PLOT_ID, in projectprop table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			update projectprop
 			set alias = 'OBS_UNIT_ID'
