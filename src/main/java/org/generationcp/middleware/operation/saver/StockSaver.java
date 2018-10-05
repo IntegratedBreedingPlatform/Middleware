@@ -26,12 +26,12 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 
 public class StockSaver extends Saver {
 
-	public StockSaver(HibernateSessionProvider sessionProviderForLocal) {
+	public StockSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public Integer saveStock(VariableList variableList) {
-		StockModel stockModel = this.createStock(variableList, null);
+	public Integer saveStock(final VariableList variableList) {
+		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
 			this.getStockDao().save(stockModel);
 			return stockModel.getStockId();
@@ -40,20 +40,20 @@ public class StockSaver extends Saver {
 		return null;
 	}
 
-	public void saveOrUpdateStock(VariableList variableList, int stockId) {
-		StockModel stockModel = this.getStockModelBuilder().get(stockId);
+	public void saveOrUpdateStock(final VariableList variableList, final int stockId) {
+		final StockModel stockModel = this.getStockModelBuilder().get(stockId);
 		this.createStock(variableList, stockModel);
 		if (stockModel != null) {
 			this.getStockDao().merge(stockModel);
 		}
 	}
 
-	protected StockModel createStock(VariableList variableList, StockModel stockModel) {
+	protected StockModel createStock(final VariableList variableList, StockModel stockModel) {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
-			for (Variable variable : variableList.getVariables()) {
-				int variableId = variable.getVariableType().getStandardVariable().getId();
-				String value = variable.getValue();
-				PhenotypicType role = variable.getVariableType().getRole();
+			for (final Variable variable : variableList.getVariables()) {
+				final int variableId = variable.getVariableType().getStandardVariable().getId();
+				final String value = variable.getValue();
+				final PhenotypicType role = variable.getVariableType().getRole();
 
 				if (TermId.ENTRY_NO.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
@@ -79,12 +79,12 @@ public class StockSaver extends Saver {
 					stockModel = this.getStockObject(stockModel);
 					stockModel.setValue(value);
 
-				} else if (TermId.PLOT_ID.getId() == variableId) {
+				} else if (TermId.OBS_UNIT_ID.getId() == variableId) {
 					continue;
 
 				} else if (PhenotypicType.GERMPLASM == role) {
 					stockModel = this.getStockObject(stockModel);
-					StockProperty stockProperty = this.getStockProperty(stockModel, variable);
+					final StockProperty stockProperty = this.getStockProperty(stockModel, variable);
 					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {
 						this.addProperty(stockModel, this.createProperty(variable));
 					}
@@ -98,9 +98,9 @@ public class StockSaver extends Saver {
 		return stockModel;
 	}
 
-	private StockProperty getStockProperty(StockModel stockModel, Variable variable) {
+	private StockProperty getStockProperty(final StockModel stockModel, final Variable variable) {
 		if (stockModel != null && stockModel.getProperties() != null && !stockModel.getProperties().isEmpty()) {
-			for (StockProperty property : stockModel.getProperties()) {
+			for (final StockProperty property : stockModel.getProperties()) {
 				if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
 					property.setValue(variable.getValue());
 					return property;
@@ -119,7 +119,7 @@ public class StockSaver extends Saver {
 		return stockModel;
 	}
 
-	private void addProperty(StockModel stockModel, StockProperty property) {
+	private void addProperty(final StockModel stockModel, final StockProperty property) {
 		if (stockModel.getProperties() == null) {
 			stockModel.setProperties(new HashSet<StockProperty>());
 		}
@@ -127,8 +127,8 @@ public class StockSaver extends Saver {
 		stockModel.getProperties().add(property);
 	}
 
-	private StockProperty createProperty(Variable variable) {
-		StockProperty property = new StockProperty();
+	private StockProperty createProperty(final Variable variable) {
+		final StockProperty property = new StockProperty();
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
 		property.setRank(variable.getVariableType().getRank());

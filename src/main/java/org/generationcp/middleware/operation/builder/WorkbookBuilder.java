@@ -77,11 +77,11 @@ public class WorkbookBuilder extends Builder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilder.class);
 
-	private DaoFactory daoFactory;
+	private final DaoFactory daoFactory;
 
 	public WorkbookBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
-		daoFactory = new DaoFactory(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	/**
@@ -240,7 +240,7 @@ public class WorkbookBuilder extends Builder {
 		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.populateBreedingMethodPossibleValues");
 
 		try {
-			final CVTerm breedingMethodProperty = daoFactory.getCvTermDao().getById(TermId.BREEDING_METHOD_PROP.getId());
+			final CVTerm breedingMethodProperty = this.daoFactory.getCvTermDao().getById(TermId.BREEDING_METHOD_PROP.getId());
 			List<ValueReference> possibleBreedingMethodValues = null;
 			for (final MeasurementVariable variable : variates) {
 				if (variable.getProperty().equals(breedingMethodProperty.getName())) {
@@ -525,9 +525,9 @@ public class WorkbookBuilder extends Builder {
 				final String dataType = this.getDataType(factor.getDataTypeId());
 				final MeasurementData measurementData;
 
-				if (factor.getTermId() == TermId.PLOT_ID.getId()) {
-					final String plotId = experiment.getPlotId();
-					measurementData = new MeasurementData(factor.getName(), plotId, isEditable, dataType, factor);
+				if (factor.getTermId() == TermId.OBS_UNIT_ID.getId()) {
+					final String obsUnitId = experiment.getObsUnitId();
+					measurementData = new MeasurementData(factor.getName(), obsUnitId, isEditable, dataType, factor);
 				} else {
 					measurementData = new MeasurementData(factor.getName(), null, isEditable, dataType, factor);
 				}
@@ -1018,8 +1018,8 @@ public class WorkbookBuilder extends Builder {
 			if (measurementData == null) {
 				final boolean isEditable = NonEditableFactors.isEditable(factor.getTermId());
 				String value = null;
-				if (factor.getTermId() == TermId.PLOT_ID.getId()) {
-					value = experiment.getPlotId();
+				if (factor.getTermId() == TermId.OBS_UNIT_ID.getId()) {
+					value = experiment.getObsUnitId();
 				}
 				measurementData = new MeasurementData(factor.getName(), value, isEditable,
 						this.getDataType(factor.getDataTypeId()), factor.getTermId(), factor);

@@ -46,10 +46,10 @@ public class StudyMeasurementsTest {
 	private static final String TRAIT1 = "Trait1";
 	private static final String STOCK_ID = "STOCK_ID";
 	private static final int PROJECT_IDENTIFIER = 2019;
-	private static final int PLOT_IDENTIFIER1 = 9999;
-	private static final int PLOT_IDENTIFIER2 = 8888;
-	private static final String PLOT_ID1 = "ABC" + StudyMeasurementsTest.PLOT_IDENTIFIER1;
-	private static final String PLOT_ID2 = "ABC" + StudyMeasurementsTest.PLOT_IDENTIFIER2;
+	private static final int OBS_UNIT_IDENTIFIER1 = 9999;
+	private static final int OBS_UNIT_IDENTIFIER2 = 8888;
+	private static final String OBS_UNIT_ID1 = "ABC" + StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1;
+	private static final String OBS_UNIT_ID2 = "ABC" + StudyMeasurementsTest.OBS_UNIT_IDENTIFIER2;
 	private static final String PLOT_NO1 = "1";
 	private static final String PLOT_NO2 = "2";
 	private static final String TRIAL_INSTANCE = "1";
@@ -111,11 +111,11 @@ public class StudyMeasurementsTest {
 		this.studyMeasurements = new StudyMeasurements(this.session);
 
 		this.testRow1 = new Object[] {
-			StudyMeasurementsTest.PLOT_IDENTIFIER1, StudyMeasurementsTest.TRIAL_INSTANCE,
+			StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1, StudyMeasurementsTest.TRIAL_INSTANCE,
 			StudyMeasurementsTest.ENTRY_TYPE, StudyMeasurementsTest.GID1, StudyMeasurementsTest.DESIGNATION1,
 			StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.SEED_SOURCE1, StudyMeasurementsTest.REP_NO,
 			StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.BLOCK_NO, StudyMeasurementsTest.ROW, StudyMeasurementsTest.COL,
-			StudyMeasurementsTest.PLOT_ID1, StudyMeasurementsTest.FIELDMAP_COLUMN, StudyMeasurementsTest.FIELDMAP_RANGE,
+			StudyMeasurementsTest.OBS_UNIT_ID1, StudyMeasurementsTest.FIELDMAP_COLUMN, StudyMeasurementsTest.FIELDMAP_RANGE,
 			StudyMeasurementsTest.SUM_OF_SAMPLES, StudyMeasurementsTest.ROW1_TRAIT1_VALUE,
 			StudyMeasurementsTest.ROW1_TRAIT1_PHENOTYPE_ID, StudyMeasurementsTest.ROW1_TRAIT1_STATUS,
 			StudyMeasurementsTest.ROW1_TRAIT2_VALUE,
@@ -123,11 +123,11 @@ public class StudyMeasurementsTest {
 			StudyMeasurementsTest.FACT1_VALUE1,
 			StudyMeasurementsTest.FACT2_VALUE1};
 		this.testRow2 = new Object[] {
-			StudyMeasurementsTest.PLOT_IDENTIFIER2, StudyMeasurementsTest.TRIAL_INSTANCE,
+			StudyMeasurementsTest.OBS_UNIT_IDENTIFIER2, StudyMeasurementsTest.TRIAL_INSTANCE,
 			StudyMeasurementsTest.ENTRY_TYPE, StudyMeasurementsTest.GID2, StudyMeasurementsTest.DESIGNATION2,
 			StudyMeasurementsTest.PLOT_NO2, StudyMeasurementsTest.SEED_SOURCE2, StudyMeasurementsTest.REP_NO,
 			StudyMeasurementsTest.PLOT_NO2, StudyMeasurementsTest.BLOCK_NO, StudyMeasurementsTest.ROW, StudyMeasurementsTest.COL,
-			StudyMeasurementsTest.PLOT_ID2, StudyMeasurementsTest.FIELDMAP_COLUMN, StudyMeasurementsTest.FIELDMAP_RANGE,
+			StudyMeasurementsTest.OBS_UNIT_ID2, StudyMeasurementsTest.FIELDMAP_COLUMN, StudyMeasurementsTest.FIELDMAP_RANGE,
 			StudyMeasurementsTest.SUM_OF_SAMPLES, StudyMeasurementsTest.ROW2_TRAIT1_VALUE,
 			StudyMeasurementsTest.ROW2_TRAIT1_PHENOTYPE_ID, StudyMeasurementsTest.ROW2_TRAIT1_STATUS,
 			StudyMeasurementsTest.ROW2_TRAIT2_VALUE,
@@ -168,9 +168,9 @@ public class StudyMeasurementsTest {
 		Assert.assertEquals("Make sure that we have all measurements returned", this.allMeasurements.size(),
 				returnedMeasurements.size());
 		final ObservationDto measurement1 = returnedMeasurements.get(0);
-		this.verifyObservationValues(measurement1, StudyMeasurementsTest.PLOT_IDENTIFIER1, StudyMeasurementsTest.GID1,
+		this.verifyObservationValues(measurement1, StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1, StudyMeasurementsTest.GID1,
 				StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.SEED_SOURCE1, StudyMeasurementsTest.PLOT_NO1,
-				StudyMeasurementsTest.PLOT_ID1,
+				StudyMeasurementsTest.OBS_UNIT_ID1,
 				Arrays.asList(
 						new ImmutablePair<Integer, String>(StudyMeasurementsTest.ROW1_TRAIT1_PHENOTYPE_ID,
 								StudyMeasurementsTest.ROW1_TRAIT1_VALUE),
@@ -185,9 +185,9 @@ public class StudyMeasurementsTest {
 								StudyMeasurementsTest.FACT2_VALUE1)));
 
 		final ObservationDto measurement2 = returnedMeasurements.get(1);
-		this.verifyObservationValues(measurement2, StudyMeasurementsTest.PLOT_IDENTIFIER2, StudyMeasurementsTest.GID2,
+		this.verifyObservationValues(measurement2, StudyMeasurementsTest.OBS_UNIT_IDENTIFIER2, StudyMeasurementsTest.GID2,
 				StudyMeasurementsTest.PLOT_NO2, StudyMeasurementsTest.SEED_SOURCE2, StudyMeasurementsTest.PLOT_NO2,
-				StudyMeasurementsTest.PLOT_ID2,
+				StudyMeasurementsTest.OBS_UNIT_ID2,
 				Arrays.asList(
 						new ImmutablePair<Integer, String>(StudyMeasurementsTest.ROW2_TRAIT1_PHENOTYPE_ID,
 								StudyMeasurementsTest.ROW2_TRAIT1_VALUE),
@@ -207,7 +207,7 @@ public class StudyMeasurementsTest {
 		final List<MeasurementVariableDto> traits = Arrays
 				.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name()));
 		final List<Object[]> results = new ArrayList<>();
-		final Object[] result = { 1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "PLOT_ID",
+		final Object[] result = { 1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "OBS_UNIT_ID",
 				"LOC_NAME", "LOC_ABBR", 1, 1, 1, 1, "Study Name", 1 };
 		results.add(result);
 		final SQLQuery query = Mockito.mock(SQLQuery.class);
@@ -225,7 +225,7 @@ public class StudyMeasurementsTest {
 		Mockito.verify(query).addScalar(StudyMeasurements.FIELD_MAP_COLUMN);
 		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_ABBREVIATION);
 		Mockito.verify(query).addScalar(StudyMeasurements.LOCATION_NAME);
-		Mockito.verify(query).addScalar(Matchers.eq(StudyMeasurements.PLOT_ID), Matchers.any(StringType.class));
+		Mockito.verify(query).addScalar(Matchers.eq(StudyMeasurements.OBS_UNIT_ID), Matchers.any(StringType.class));
 		Mockito.verify(query).addScalar(StudyMeasurements.COL);
 		Mockito.verify(query).addScalar(StudyMeasurements.ROW);
 		Mockito.verify(query).addScalar(StudyMeasurements.BLOCK_NO);
@@ -255,18 +255,18 @@ public class StudyMeasurementsTest {
 
 		final List<ObservationDto> returnedMeasurements = this.studyMeasurements.getMeasurement(
 				StudyMeasurementsTest.PROJECT_IDENTIFIER, this.testTraits, this.germplasmDescriptors,
-				this.designFactors, StudyMeasurementsTest.PLOT_IDENTIFIER1);
+				this.designFactors, StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1);
 
 		this.verifyScalarSetting(this.mockSqlQueryForSingleMeasurement);
 		Mockito.verify(this.mockSqlQueryForSingleMeasurement).setParameter(Matchers.eq("studyId"),
 				Matchers.eq(StudyMeasurementsTest.PROJECT_IDENTIFIER));
 		Mockito.verify(this.mockSqlQueryForSingleMeasurement).setParameter(Matchers.eq("experiment_id"),
-				Matchers.eq(StudyMeasurementsTest.PLOT_IDENTIFIER1));
+				Matchers.eq(StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1));
 
 		final ObservationDto measurement1 = returnedMeasurements.get(0);
-		this.verifyObservationValues(measurement1, StudyMeasurementsTest.PLOT_IDENTIFIER1, StudyMeasurementsTest.GID1,
+		this.verifyObservationValues(measurement1, StudyMeasurementsTest.OBS_UNIT_IDENTIFIER1, StudyMeasurementsTest.GID1,
 				StudyMeasurementsTest.PLOT_NO1, StudyMeasurementsTest.SEED_SOURCE1, StudyMeasurementsTest.PLOT_NO1,
-				StudyMeasurementsTest.PLOT_ID1,
+				StudyMeasurementsTest.OBS_UNIT_ID1,
 				Arrays.asList(
 						new ImmutablePair<Integer, String>(StudyMeasurementsTest.ROW1_TRAIT1_PHENOTYPE_ID,
 								StudyMeasurementsTest.ROW1_TRAIT1_VALUE),
@@ -282,12 +282,12 @@ public class StudyMeasurementsTest {
 
 	}
 
-	private void verifyObservationValues(final ObservationDto measurement, final int plotIdentifier, final int gid,
-			final String entryNo, final String seedSource, final String plotNo, final String plotId,
+	private void verifyObservationValues(final ObservationDto measurement, final int obsUnitIdentifier, final int gid,
+			final String entryNo, final String seedSource, final String plotNo, final String obsUnitId,
 			final List<ImmutablePair<Integer, String>> traits,
 			final List<ImmutablePair<String, String>> germplasmDescriptors,
 			final List<ImmutablePair<String, String>> designFactors) {
-		Assert.assertEquals("Make sure the Experiment ID is correct", new Integer(plotIdentifier),
+		Assert.assertEquals("Make sure the Experiment ID is correct", new Integer(obsUnitIdentifier),
 				measurement.getMeasurementId());
 		Assert.assertEquals("Make sure the Trial Instance is correct", StudyMeasurementsTest.TRIAL_INSTANCE,
 				measurement.getTrialInstance());
@@ -303,7 +303,7 @@ public class StudyMeasurementsTest {
 				measurement.getBlockNumber());
 		Assert.assertEquals("Make sure the Row # is correct", StudyMeasurementsTest.ROW, measurement.getRowNumber());
 		Assert.assertEquals("Make sure the Col # is correct", StudyMeasurementsTest.COL, measurement.getColumnNumber());
-		Assert.assertEquals("Make sure the Plot Id is correct", plotId, measurement.getPlotId());
+		Assert.assertEquals("Make sure the Observation Unit Id is correct", obsUnitId, measurement.getObsUnitId());
 		Assert.assertEquals("Make sure the Fieldmap Column is correct", StudyMeasurementsTest.FIELDMAP_COLUMN,
 				measurement.getFieldMapColumn());
 		Assert.assertEquals("Make sure the Fielmap Range is correct", StudyMeasurementsTest.FIELDMAP_RANGE,
@@ -344,8 +344,8 @@ public class StudyMeasurementsTest {
 		for (final MeasurementVariableDto variable : this.testTraits) {
 			Mockito.verify(query).addScalar(variable.getName());
 		}
-		// PLOT_ID with StringType
-		Mockito.verify(query).addScalar(Matchers.eq("PLOT_ID"), Matchers.any(StringType.class));
+		// OBS_UNIT_ID with StringType
+		Mockito.verify(query).addScalar(Matchers.eq("OBS_UNIT_ID"), Matchers.any(StringType.class));
 
 		// Once for each non-fixed germplasm factor as StringType
 		for (final String gpDesc : this.germplasmDescriptors) {
