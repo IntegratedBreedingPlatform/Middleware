@@ -102,7 +102,7 @@ public class ExperimentPropertyDaoTest {
 		+ " , geo.description AS trialInstance , s.dbxref_id AS gid "
 		+ " , st.start_date as startDate , gpSeason.value as season "
 		+ " , epropBlock.value AS blockNo "
-		+ " , e.OBS_UNIT_ID as obsUnitId "
+		+ " , e.obs_unit_id as obsUnitId "
 		+ " FROM nd_geolocationprop blk "
 		+ "  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id "
 		+ "  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id "
@@ -155,7 +155,7 @@ public class ExperimentPropertyDaoTest {
 				" , siteId.value AS siteId" +
 				" , epropBlock.value AS blockNo " +
 				" , ldp.group_name AS pedigree " +
-				" , geo.OBS_UNIT_ID as obsUnitId " +
+				" , geo.obs_unit_id as obsUnitId " +
 				" FROM " +
 				" nd_experiment nde " +
 				" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = " +

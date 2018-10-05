@@ -171,7 +171,7 @@ public class PhenotypeDaoTest {
 	private String getPhenotypeSearchMainQuery() {
 		return " SELECT " //
 				+ "  nde.nd_experiment_id AS nd_experiment_id, " //
-				+ "  nde.OBS_UNIT_ID AS observationUnitDbId, " //
+				+ "  nde.obs_unit_id AS observationUnitDbId, " //
 				+ "  '' AS observationUnitName, " //
 				+ "  'plot' AS observationLevel, " //
 				+ "  NULL AS plantNumber, " // Until we have plant level observation
