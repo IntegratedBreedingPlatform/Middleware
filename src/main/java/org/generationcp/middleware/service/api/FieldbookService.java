@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -39,6 +40,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+
+import com.google.common.base.Optional;
 
 import java.util.List;
 import java.util.Map;
@@ -979,6 +982,8 @@ public interface FieldbookService {
 	Workbook getStudyDataSet(int studyID);
 	
 	Workbook getStudyByNameAndProgramUUID(String studyName, String programUUID);
+	
+	Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(String studyName, String programUUID);
 
 	void updatePhenotypeStatus(final List<MeasurementRow> observations);
 

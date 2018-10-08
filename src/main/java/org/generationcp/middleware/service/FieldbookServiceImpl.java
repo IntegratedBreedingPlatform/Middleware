@@ -10,7 +10,16 @@
 
 package org.generationcp.middleware.service;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -21,6 +30,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -76,14 +86,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Optional;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -1298,6 +1301,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public void setListDataProjectSaver(final ListDataProjectSaver listDataProjectSaver) {
 		this.listDataProjectSaver = listDataProjectSaver;
+	}
+
+	@Override
+	public Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(final String name, final String programUUID) {
+		final Integer studyId = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(name, programUUID);
+		if (studyId != null) {
+			return Optional.of(this.getStudyDataManager().getStudyReference(studyId));
+		}
+		return Optional.absent();
 	}
 
 }
