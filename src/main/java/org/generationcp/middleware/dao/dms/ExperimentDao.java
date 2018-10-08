@@ -303,7 +303,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			query.setParameterList("locationIds", locationIds);
 			query.setParameter("dataSetId", dataSetId);
 
-			Long count = 0L;
+			long count = 0L;
 			final Object obj = query.uniqueResult();
 			if (obj != null) {
 				count = ((Number) obj).longValue();
@@ -321,28 +321,28 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public boolean checkIfPlotIdExists(final String plotId) {
+	public boolean checkIfObsUnitIdExists(final String obsUnitId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("plotId", plotId));
+			criteria.add(Restrictions.eq("obsUnitId", obsUnitId));
 			final List list = criteria.list();
 			return list != null && !list.isEmpty();
 		} catch (final HibernateException e) {
-			final String message = "Error at checkIfPlotIdExists=" + plotId + " query at ExperimentDao: " + e.getMessage();
+			final String message = "Error at checkIfObsUnitIdExists=" + obsUnitId + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	public boolean checkIfPlotIdsExist(final List<String> plotIds) {
+	public boolean checkIfObsUnitIdsExist(final List<String> obsUnitIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.in("plotId", plotIds));
+			criteria.add(Restrictions.in("obsUnitId", obsUnitIds));
 			final List list = criteria.list();
 			return list != null && !list.isEmpty();
 		} catch (final HibernateException e) {
-			final String message = "Error at checkIfPlotIdExists=" + plotIds + " query at ExperimentDao: " + e.getMessage();
+			final String message = "Error at checkIfObsUnitIdExists=" + obsUnitIds + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

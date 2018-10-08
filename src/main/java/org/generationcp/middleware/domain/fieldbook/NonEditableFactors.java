@@ -56,8 +56,8 @@ public enum NonEditableFactors {
 
 	STOCKID(TermId.STOCKID.getId()),
 
-	/** The plot id. */
-	PLOT_ID(TermId.PLOT_ID.getId());
+	/** The observation unit id. */
+	OBS_UNIT_ID(TermId.OBS_UNIT_ID.getId());
 
 
 
@@ -69,7 +69,7 @@ public enum NonEditableFactors {
 	 *
 	 * @param id the id
 	 */
-	private NonEditableFactors(int id) {
+	private NonEditableFactors(final int id) {
 		this.setId(id);
 	}
 
@@ -87,7 +87,7 @@ public enum NonEditableFactors {
 	 *
 	 * @param id the new id
 	 */
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -97,8 +97,8 @@ public enum NonEditableFactors {
 	 * @param id the id
 	 * @return the non editable factors
 	 */
-	public static NonEditableFactors find(Integer id) {
-		for (NonEditableFactors factor : NonEditableFactors.values()) {
+	public static NonEditableFactors find(final Integer id) {
+		for (final NonEditableFactors factor : NonEditableFactors.values()) {
 			if (factor.getId() == id) {
 				return factor;
 			}
@@ -112,8 +112,8 @@ public enum NonEditableFactors {
 	 * @param id the id
 	 * @return true if is editable.
 	 */
-	public static boolean isEditable(Integer id) {
-		for (NonEditableFactors factor : NonEditableFactors.values()) {
+	public static boolean isEditable(final Integer id) {
+		for (final NonEditableFactors factor : NonEditableFactors.values()) {
 			if (factor.getId() == id) {
 				return false;
 			}
