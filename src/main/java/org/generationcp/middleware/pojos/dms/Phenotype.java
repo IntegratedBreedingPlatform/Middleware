@@ -24,6 +24,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -100,6 +101,12 @@ public class Phenotype implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
+
+	@Column(name = "created_date")
+	private Date createdDate;
+
+	@Column(name = "updated_date")
+	private Date updatedDate;
 
 	public Phenotype() {
 	}
@@ -196,6 +203,22 @@ public class Phenotype implements Serializable {
 		this.valueStatus = valueStatus;
 	}
 
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
+	public void setCreatedDate(final Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public Date getUpdatedDate() {
+		return this.updatedDate;
+	}
+
+	public void setUpdatedDate(final Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -220,8 +243,19 @@ public class Phenotype implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Phenotype{" + "phenotypeId=" + this.phenotypeId + ", uniqueName='" + this.uniqueName + '\'' + ", name='" + this.name + '\''
-			+ ", observableId=" + this.observableId + ", attributeId=" + this.attributeId + ", value='" + this.value + '\'' + ", cValueId=" + this.cValueId
-			+ ", assayId=" + this.assayId + ", experiment=" + this.experiment + '}';
+		return "Phenotype{" +
+			"phenotypeId=" + phenotypeId +
+			", uniqueName='" + uniqueName + '\'' +
+			", name='" + name + '\'' +
+			", observableId=" + observableId +
+			", attributeId=" + attributeId +
+			", value='" + value + '\'' +
+			", cValueId=" + cValueId +
+			", valueStatus=" + valueStatus +
+			", assayId=" + assayId +
+			", experiment=" + experiment +
+			", createdDate=" + createdDate +
+			", updatedDate=" + updatedDate +
+			'}';
 	}
 }

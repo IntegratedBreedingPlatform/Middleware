@@ -54,5 +54,35 @@
 			where variable_id = 8201;
 		</sql>
 	</changeSet>
+	
+	<changeSet author="vanina" id="v10.2.0-4">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="phenotype"/>
+				<not>
+					<columnExists tableName="phenotype" columnName="created_date"/>
+				</not>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE phenotype
+			ADD COLUMN created_date DATETIME NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v10.2.0-5">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="phenotype"/>
+				<not>
+					<columnExists tableName="phenotype" columnName="updated_date"/>
+				</not>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE phenotype
+			ADD COLUMN updated_date DATETIME NULL;
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
