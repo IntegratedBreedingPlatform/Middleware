@@ -24,7 +24,7 @@ public class StudyMeasurements {
 	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
 	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
 	public static final String LOCATION_NAME = "LocationName";
-	public static final String PLOT_ID = "PLOT_ID";
+	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	public static final String COL = "COL";
 	public static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
@@ -158,7 +158,7 @@ public class StudyMeasurements {
 						(String) row[7], (String) row[8], (String) row[9], measurementVariableResults);
 				measurement.setRowNumber((String) row[10]);
 				measurement.setColumnNumber((String) row[11]);
-				measurement.setPlotId((String) row[12]);
+				measurement.setObsUnitId((String) row[12]);
 				measurement.setFieldMapColumn((String) row[13]);
 				measurement.setFieldMapRange((String) row[14]);
 				measurement.setSamples((String) row[15]);
@@ -232,7 +232,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar(StudyMeasurements.BLOCK_NO);
 		createSQLQuery.addScalar(StudyMeasurements.ROW);
 		createSQLQuery.addScalar(StudyMeasurements.COL);
-		createSQLQuery.addScalar(StudyMeasurements.PLOT_ID, new StringType());
+		createSQLQuery.addScalar(StudyMeasurements.OBS_UNIT_ID, new StringType());
 	}
 
 	@SuppressWarnings("unchecked")

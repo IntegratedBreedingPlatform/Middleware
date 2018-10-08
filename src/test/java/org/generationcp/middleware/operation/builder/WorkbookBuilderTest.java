@@ -282,19 +282,19 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddMeasurementDataForFactorsNotFoundPlotId() {
+	public void testAddMeasurementDataForFactorsNotFoundObsUnitId() {
 		final List<MeasurementVariable> factorList = new ArrayList<>(
-				Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.PLOT_ID.getId(),
-						TermId.PLOT_ID.name(), "PLOT")));
+				Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.OBS_UNIT_ID.getId(),
+						TermId.OBS_UNIT_ID.name(), "PLOT")));
 		final Experiment experiment = new Experiment();
-		experiment.setPlotId("plot id 1");
+		experiment.setObsUnitId("obs unit id 1");
 		final VariableList factors = new VariableList();
 		final List<MeasurementData> measurementDataList = new ArrayList<>();
 		this.workbookBuilder.addMeasurementDataForFactors(factorList, experiment, factors, measurementDataList);
 		Assert.assertEquals("List should not be empty.", measurementDataList.size(), 1);
 		final MeasurementData measurementData = measurementDataList.get(0);
-		Assert.assertEquals(TermId.PLOT_ID.name(), measurementData.getLabel());
-		Assert.assertEquals(experiment.getPlotId(), measurementData.getValue());
+		Assert.assertEquals(TermId.OBS_UNIT_ID.name(), measurementData.getLabel());
+		Assert.assertEquals(experiment.getObsUnitId(), measurementData.getValue());
 		Assert.assertNull(measurementData.getcValueId());
 	}
 
@@ -352,7 +352,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		measurementVariableList.add(this.getMeasurementVariable(TermId.ENTRY_CODE.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.ENTRY_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.GID.getId(), true));
-		measurementVariableList.add(this.getMeasurementVariable(TermId.PLOT_ID.getId(), true));
+		measurementVariableList.add(this.getMeasurementVariable(TermId.OBS_UNIT_ID.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.REP_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.PLOT_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.SITE_SOIL_PH, false));

@@ -275,7 +275,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
 		 */
 		final List<String> fixedGermplasmDescriptors =
-				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "PLOT_ID");
+				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID");
 		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
 
 		for (final String gpDescriptor : allGermplasmDescriptors) {
@@ -349,7 +349,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
 					+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
-					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+					"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
 					"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
 					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 					+ "    inner join project proj on proj.project_id = nde.project_id \n"
@@ -493,7 +493,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// Y = row
 				entry.add(String.valueOf(y));
 
-				// plotId
+				// obsUnitId
 				entry.add(String.valueOf(row[12]));
 
 				// phenotypic values
@@ -519,7 +519,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
 				"germplasmName", "observationUnitDbId", "plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X",
-				"Y", "plotId"));
+				"Y", "obsUnitId"));
 
 		return dto;
 	}

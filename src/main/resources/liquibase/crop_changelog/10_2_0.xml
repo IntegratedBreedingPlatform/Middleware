@@ -1,10 +1,61 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="darla" id="v10.2.0-1" >
+	<changeSet author="vanina" id="v10.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="nd_experiment"/>
+				<columnExists tableName="nd_experiment" columnName="plot_id"/>
+				<not>
+					<columnExists tableName="nd_experiment" columnName="obs_unit_id"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment> Change column name plot_id as obs_unit_id in nd_experiment table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			CHANGE COLUMN plot_id obs_unit_id CHAR(13) CHARACTER SET 'utf8' NULL DEFAULT NULL ;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v10.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(*)
+				from cvterm
+				where cvterm_id = 8201;
+			</sqlCheck>
+		</preConditions>
+		<comment> Change name and definition of cvterm 8201, previous PLOT_ID, in cvterm table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			update cvterm
+			set name = 'OBS_UNIT_ID', definition = 'Field observation unit id - assigned (text)'
+			where cvterm_id = 8201;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v10.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(*)
+					from projectprop
+					where variable_id = 8201;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment> Change alias of variable_id 8201, previous PLOT_ID, in projectprop table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			update projectprop
+			set alias = 'OBS_UNIT_ID'
+			where variable_id = 8201;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v10.2.0-4" >
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="project" columnName="locked" />

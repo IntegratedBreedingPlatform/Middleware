@@ -882,7 +882,7 @@ public interface FieldbookService {
 	 */
 	long countListDataProjectByListIdAndEntryType(int listId, SystemDefinedEntryType systemDefinedEntryType);
 
-	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId, final String instanceNumber);
+	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int obsUnitId, final String instanceNumber);
 
 
 	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);

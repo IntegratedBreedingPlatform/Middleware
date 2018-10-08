@@ -29,6 +29,10 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -1390,6 +1394,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return treeNode;
 	}
 
+	@Override
+	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
+		return this.daoFactory.getGermplasmDao().getPedigree(germplasmDbId, notation, includeSiblings);
+	}
+
+	@Override
+	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
+		return this.daoFactory.getGermplasmDao().getProgeny(germplasmDbId);
+	}
+
 	/**
 	 * Local method for getting a particular germplasm's Name.
 	 *
@@ -1595,4 +1609,20 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public NamingConfiguration getNamingConfigurationByName(final String name) {
 		return this.getNamingConfigurationDAO().getByName(name);
 	}
+
+	@Override
+	public GermplasmDTO getGermplasmDTOByGID(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getGermplasmDTO(gid);
+	}
+
+	@Override
+	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+		return this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO);
+	}
+
+	@Override
+	public long countGermplasmDTOs(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+		return this.daoFactory.getGermplasmDao().countGermplasmDTOs(germplasmSearchRequestDTO);
+	}
+
 }
