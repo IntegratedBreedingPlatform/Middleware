@@ -29,7 +29,7 @@ public class ObservationDto {
 
 	private final String plotNumber;
 
-	private String plotId;
+	private String obsUnitId;
 
 	private final String blockNumber;
 
@@ -67,7 +67,7 @@ public class ObservationDto {
 		this.variableMeasurements = variableMeasurements;
 	}
 
-	public ObservationDto(Integer measurementId, String designation, List<MeasurementDto> variableResults, Integer gid) {
+	public ObservationDto(final Integer measurementId, final String designation, final List<MeasurementDto> variableResults, final Integer gid) {
 		this.measurementId = measurementId;
 		this.designation = designation;
 		this.variableMeasurements = variableResults;
@@ -117,12 +117,12 @@ public class ObservationDto {
 		return this.plotNumber;
 	}
 
-	public String getPlotId() {
-		return this.plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
 	}
 
-	public void setPlotId(String plotId) {
-		this.plotId = plotId;
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 	}
 
 	public String getBlockNumber() {
@@ -133,7 +133,7 @@ public class ObservationDto {
 		return this.columnNumber;
 	}
 
-	public void setColumnNumber(String columnNumber) {
+	public void setColumnNumber(final String columnNumber) {
 		this.columnNumber = columnNumber;
 	}
 
@@ -141,7 +141,7 @@ public class ObservationDto {
 		return this.rowNumber;
 	}
 
-	public void setRowNumber(String rowNumber) {
+	public void setRowNumber(final String rowNumber) {
 		this.rowNumber = rowNumber;
 	}
 
@@ -170,36 +170,36 @@ public class ObservationDto {
 		if (!(other instanceof ObservationDto)) {
 			return false;
 		}
-		ObservationDto castOther = (ObservationDto) other;
-		return new EqualsBuilder().append(measurementId, castOther.measurementId).isEquals();
+		final ObservationDto castOther = (ObservationDto) other;
+		return new EqualsBuilder().append(this.measurementId, castOther.measurementId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		if (hashCode == 0) {
-			hashCode = new HashCodeBuilder().append(measurementId).toHashCode();
+		if (this.hashCode == 0) {
+			this.hashCode = new HashCodeBuilder().append(this.measurementId).toHashCode();
 		}
-		return hashCode;
+		return this.hashCode;
 	}
 
 	public String getFieldMapColumn() {
-		return fieldMapColumn;
+		return this.fieldMapColumn;
 	}
 
-	public void setFieldMapColumn(String fieldMapColumn) {
+	public void setFieldMapColumn(final String fieldMapColumn) {
 		this.fieldMapColumn = fieldMapColumn;
 	}
 
 	public String getFieldMapRange() {
-		return fieldMapRange;
+		return this.fieldMapRange;
 	}
 
-	public void setFieldMapRange(String fieldMapRange) {
+	public void setFieldMapRange(final String fieldMapRange) {
 		this.fieldMapRange = fieldMapRange;
 	}
 
 	public String getSamples() {
-		return samples;
+		return this.samples;
 	}
 
 	public void setSamples(final String samples) {

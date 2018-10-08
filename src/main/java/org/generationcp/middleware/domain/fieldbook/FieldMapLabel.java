@@ -32,8 +32,8 @@ public class FieldMapLabel implements Serializable {
 	/** The experiment id. */
 	private Integer experimentId;
 
-	/** The plot id. */
-	private String plotId;
+	/** The Observation Unit id. */
+	private String obsUnitId;
 
 	/** The entry number. */
 	private Integer entryNumber;
@@ -509,12 +509,12 @@ public class FieldMapLabel implements Serializable {
 		this.scaleName = scaleName;
 	}
 
-	public String getPlotId() {
-		return plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
 	}
 
-	public FieldMapLabel setPlotId(final String plotId) {
-		this.plotId = plotId;
+	public FieldMapLabel setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 		return this;
 	}
 }

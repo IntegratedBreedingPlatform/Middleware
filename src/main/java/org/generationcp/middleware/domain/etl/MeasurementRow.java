@@ -31,21 +31,21 @@ public class MeasurementRow {
 	public MeasurementRow() {
 	}
 
-	public MeasurementRow(MeasurementRow row) {
+	public MeasurementRow(final MeasurementRow row) {
 		this.stockId = row.stockId;
 		this.locationId = row.locationId;
 		this.experimentId = row.experimentId;
 		this.dataList = new ArrayList<MeasurementData>();
-		for (MeasurementData data : row.dataList) {
+		for (final MeasurementData data : row.dataList) {
 			this.dataList.add(new MeasurementData(data));
 		}
 	}
 
-	public MeasurementRow(List<MeasurementData> dataList) {
+	public MeasurementRow(final List<MeasurementData> dataList) {
 		this.dataList = dataList;
 	}
 
-	public MeasurementRow(long stockId, long locationId, List<MeasurementData> dataList) {
+	public MeasurementRow(final long stockId, final long locationId, final List<MeasurementData> dataList) {
 		this.stockId = stockId;
 		this.locationId = locationId;
 		this.dataList = dataList;
@@ -55,7 +55,7 @@ public class MeasurementRow {
 		return this.stockId;
 	}
 
-	public void setStockId(long stockId) {
+	public void setStockId(final long stockId) {
 		this.stockId = stockId;
 	}
 
@@ -63,7 +63,7 @@ public class MeasurementRow {
 		return this.locationId;
 	}
 
-	public void setLocationId(long locationId) {
+	public void setLocationId(final long locationId) {
 		this.locationId = locationId;
 	}
 
@@ -71,15 +71,15 @@ public class MeasurementRow {
 		return this.experimentId;
 	}
 
-	public void setExperimentId(int experimentId) {
+	public void setExperimentId(final int experimentId) {
 		this.experimentId = experimentId;
 	}
 
-	public List<MeasurementData> getTrialDataList(List<String> trialHeaders) {
-		List<MeasurementData> list = new ArrayList<MeasurementData>();
+	public List<MeasurementData> getTrialDataList(final List<String> trialHeaders) {
+		final List<MeasurementData> list = new ArrayList<MeasurementData>();
 
 		if (this.dataList != null && !this.dataList.isEmpty()) {
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				if (trialHeaders != null && trialHeaders.contains(data.getLabel())) {
 					list.add(data);
 				}
@@ -89,12 +89,12 @@ public class MeasurementRow {
 		return list;
 	}
 
-	public List<MeasurementData> getNonTrialDataList(List<String> trialHeaders) {
+	public List<MeasurementData> getNonTrialDataList(final List<String> trialHeaders) {
 		final List<MeasurementData> list = new ArrayList<>();
 		if (this.dataList != null && !this.dataList.isEmpty()) {
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				//Remove SAMPLES with TermId = -2 because is nonexistent term Id
-				boolean isSampleVariable = data.getMeasurementVariable().getTermId() == TermId.SAMPLES.getId();
+				final boolean isSampleVariable = data.getMeasurementVariable().getTermId() == TermId.SAMPLES.getId();
 				if ( (trialHeaders == null || !trialHeaders.contains(data.getLabel()) ) && !isSampleVariable) {
 					list.add(data);
 				}
@@ -104,9 +104,9 @@ public class MeasurementRow {
 		return list;
 	}
 
-	public String getMeasurementDataValue(String label) {
+	public String getMeasurementDataValue(final String label) {
 		if (label != null && this.dataList != null && !this.dataList.isEmpty()) {
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				if (label != null && data.getLabel() != null && label.equals(data.getLabel())) {
 					if (data.getcValueId() != null) {
 						return data.getcValueId().toString();
@@ -119,9 +119,9 @@ public class MeasurementRow {
 		return null;
 	}
 
-	public MeasurementData getMeasurementData(String label) {
+	public MeasurementData getMeasurementData(final String label) {
 		if (label != null && this.dataList != null && !this.dataList.isEmpty()) {
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				if (label != null && data.getLabel() != null && label.equals(data.getLabel())) {
 					return data;
 				}
@@ -130,9 +130,9 @@ public class MeasurementRow {
 		return null;
 	}
 
-	public MeasurementData getMeasurementData(Integer termId) {
+	public MeasurementData getMeasurementData(final Integer termId) {
 		if (termId != null && this.dataList != null && !this.dataList.isEmpty()) {
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				if (data.getMeasurementVariable() != null && data.getMeasurementVariable().getTermId() == termId) {
 					return data;
 				}
@@ -145,14 +145,14 @@ public class MeasurementRow {
 		return this.dataList;
 	}
 
-	public void setDataList(List<MeasurementData> dataList) {
+	public void setDataList(final List<MeasurementData> dataList) {
 		this.dataList = dataList;
 	}
 
 	public List<MeasurementVariable> getMeasurementVariables() {
-		List<MeasurementVariable> variables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variables = new ArrayList<MeasurementVariable>();
 		if (this.dataList != null) {
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				if (data.getMeasurementVariable() != null) {
 					variables.add(data.getMeasurementVariable());
 				}
@@ -161,9 +161,9 @@ public class MeasurementRow {
 		return variables;
 	}
 
-	public String getMeasurementDataValue(Integer id) {
+	public String getMeasurementDataValue(final Integer id) {
 		if (this.dataList != null && !this.dataList.isEmpty()) {
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				if (data.getMeasurementVariable().getTermId() == id.intValue()) {
 					if (data.getcValueId() != null) {
 						return data.getcValueId().toString();
@@ -178,22 +178,22 @@ public class MeasurementRow {
 	}
 
 	public Integer getRange() {
-		String strRange = this.getMeasurementDataValue(TermId.RANGE_NO.getId());
+		final String strRange = this.getMeasurementDataValue(TermId.RANGE_NO.getId());
 		return strRange != null && NumberUtils.isNumber(strRange) ? Double.valueOf(strRange).intValue() : null;
 	}
 
 	public Integer getColumn() {
-		String strRange = this.getMeasurementDataValue(TermId.COLUMN_NO.getId());
+		final String strRange = this.getMeasurementDataValue(TermId.COLUMN_NO.getId());
 		return strRange != null && NumberUtils.isNumber(strRange) ? Double.valueOf(strRange).intValue() : null;
 	}
 
 	public String getKeyIdentifier() {
-		return this.getMeasurementDataValue(TermId.PLOT_ID.getId());
+		return this.getMeasurementDataValue(TermId.OBS_UNIT_ID.getId());
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("MeasurementRow [stockId=");
 		builder.append(this.stockId);
 		builder.append(", locationId=");
@@ -206,13 +206,13 @@ public class MeasurementRow {
 		return builder.toString();
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "MeasurementRow: ");
 		Debug.println(indent + 3, "Stock Id: " + this.stockId);
 		Debug.println(indent + 3, "Location Id: " + this.locationId);
 		Debug.println(indent + 3, "Experiment Id: " + this.experimentId);
 		Debug.println(indent + 3, "DataList: ");
-		for (MeasurementData data : this.dataList) {
+		for (final MeasurementData data : this.dataList) {
 			data.print(indent + 6);
 		}
 	}
@@ -222,33 +222,33 @@ public class MeasurementRow {
 		List<MeasurementData> newDataList = null;
 		if (this.dataList != null && !this.dataList.isEmpty()) {
 			newDataList = new ArrayList<MeasurementData>();
-			for (MeasurementData data : this.dataList) {
+			for (final MeasurementData data : this.dataList) {
 				newDataList.add(data.copy());
 			}
 		}
-		MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
+		final MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
 		row.setExperimentId(this.experimentId);
 		return row;
 	}
 
 	// FIXME consolidate logic in a copy constructor
-	public MeasurementRow copy(List<MeasurementVariable> variableList) {
+	public MeasurementRow copy(final List<MeasurementVariable> variableList) {
 		List<MeasurementData> newDataList = null;
 		if (this.dataList != null && !this.dataList.isEmpty()) {
 			newDataList = new ArrayList<MeasurementData>();
-			for (MeasurementData data : this.dataList) {
-				MeasurementVariable var = this.getMatchingMeasurementVariable(variableList, data.getMeasurementVariable());
+			for (final MeasurementData data : this.dataList) {
+				final MeasurementVariable var = this.getMatchingMeasurementVariable(variableList, data.getMeasurementVariable());
 				newDataList.add(data.copy(var));
 			}
 		}
-		MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
+		final MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
 		row.setExperimentId(this.experimentId);
 		return row;
 	}
 
-	private MeasurementVariable getMatchingMeasurementVariable(List<MeasurementVariable> variableList, MeasurementVariable originalVariable) {
+	private MeasurementVariable getMatchingMeasurementVariable(final List<MeasurementVariable> variableList, final MeasurementVariable originalVariable) {
 		if (variableList != null && originalVariable != null) {
-			for (MeasurementVariable var : variableList) {
+			for (final MeasurementVariable var : variableList) {
 				if (var.getTermId() == originalVariable.getTermId()) {
 					return var;
 				}

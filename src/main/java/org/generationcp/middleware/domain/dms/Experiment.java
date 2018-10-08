@@ -34,13 +34,13 @@ public class Experiment implements Serializable{
 
 	private Map<String, Variable> variatesMap;
 
-	private String plotId;
+	private String obsUnitId;
 
 	public int getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -48,7 +48,7 @@ public class Experiment implements Serializable{
 		return this.factors.sort();
 	}
 
-	public void setFactors(VariableList factors) {
+	public void setFactors(final VariableList factors) {
 		this.factors = factors;
 	}
 
@@ -66,17 +66,17 @@ public class Experiment implements Serializable{
 	/**
 	 * @param locationId the locationId to set
 	 */
-	public void setLocationId(Integer locationId) {
+	public void setLocationId(final Integer locationId) {
 		this.locationId = locationId;
 	}
 
-	public void setVariates(VariableList variates) {
+	public void setVariates(final VariableList variates) {
 		this.variates = variates;
 		if (this.variatesMap == null) {
 			this.variatesMap = new HashMap<>();
 			if (variates != null) {
 
-				for (Variable var : variates.getVariables()) {
+				for (final Variable var : variates.getVariables()) {
 					if (var != null && var.getVariableType() != null) {
 						this.variatesMap.put(Integer.toString(var.getVariableType().getId()), var);
 					}
@@ -89,25 +89,25 @@ public class Experiment implements Serializable{
 		return this.variatesMap;
 	}
 
-	public String getPlotId() {
-		return this.plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
 	}
 
-	public void setPlotId(String plotId) {
-		this.plotId = plotId;
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "Experiment: " + this.id);
 		Debug.println(indent + 3, "Factors:");
 		if (this.factors != null) {
-			for (Variable variable : this.factors.getVariables()) {
+			for (final Variable variable : this.factors.getVariables()) {
 				variable.print(indent + 6);
 			}
 		}
 		Debug.println(indent + 3, "Variates:");
 		if (this.factors != null) {
-			for (Variable variate : this.variates.getVariables()) {
+			for (final Variable variate : this.variates.getVariables()) {
 				variate.print(indent + 6);
 			}
 		}
@@ -115,7 +115,7 @@ public class Experiment implements Serializable{
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Experiment [id=");
 		builder.append(this.id);
 		builder.append(", factors=");

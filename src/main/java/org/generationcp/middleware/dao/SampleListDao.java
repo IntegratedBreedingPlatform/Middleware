@@ -120,7 +120,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
 
-		final SQLQuery query = this.getSession().createSQLQuery(addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
+		final SQLQuery query = this.getSession().createSQLQuery(this.addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
 
 		query.setParameter("searchString", searchString + (exactMatch ? "" : "%"));
 		query.setParameter("listType", SampleListType.SAMPLE_LIST.toString());
@@ -149,7 +149,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(CustomProjections.concatProperties(" ","person.firstName", "person.lastName"), "takenBy");
 		projectionList.add(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey");
 		projectionList.add(Projections.property("plant.plantBusinessKey"), "plantBusinessKey");
-		projectionList.add(Projections.property("experiment.plotId"), "plotId");
+		projectionList.add(Projections.property("experiment.obsUnitId"), "obsUnitId");
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
 		projectionList.add(Projections.property("germplasm.gid"), "gid");
 		projectionList.add(Projections.property("sample.plateId"), "plateId");

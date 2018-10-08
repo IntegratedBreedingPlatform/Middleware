@@ -74,8 +74,8 @@ public class ObservationQueryTest {
 				+ "\tp.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId \n"
 				+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
 				+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
-		assertEquals("The generated query must match the expected query.", formatString(sql),
-				formatString(fixture.getSampleObservationQuery()));
+		assertEquals("The generated query must match the expected query.", this.formatString(sql),
+			this.formatString(fixture.getSampleObservationQuery()));
 	}
 
 	private String formatString(final String format) {
@@ -99,7 +99,7 @@ public class ObservationQueryTest {
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n"
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
 				+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.plant_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n"
-				+ "    nde.plot_id as PLOT_ID,"
+				+ "    nde.obs_unit_id as OBS_UNIT_ID,"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.value, NULL)) AS '" + ObservationQueryTest.PH_CM + "', \n"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.phenotype_id, NULL)) AS '" + ObservationQueryTest.PH_CM + "_PhenotypeId', \n"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.status, NULL)) AS '" + ObservationQueryTest.PH_CM + "_Status', \n"
@@ -134,7 +134,7 @@ public class ObservationQueryTest {
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n"
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
 				+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.plant_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n"
-				+ "    nde.plot_id as PLOT_ID,"
+				+ "    nde.obs_unit_id as OBS_UNIT_ID,"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.value, NULL)) AS '" + ObservationQueryTest.PH_CM + "', \n"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.phenotype_id, NULL)) AS '" + ObservationQueryTest.PH_CM + "_PhenotypeId', \n"
 				+ " MAX(IF(cvterm_variable.name = '" + ObservationQueryTest.PH_CM + "', ph.status, NULL)) AS '" + ObservationQueryTest.PH_CM + "_Status', \n"

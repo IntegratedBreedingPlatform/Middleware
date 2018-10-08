@@ -107,7 +107,7 @@ public class StudyServiceImplTest {
 		Mockito.when(this.mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(this.mockSqlQuery);
 		Mockito.when(this.germplasmDescriptors.find(StudyServiceImplTest.STUDY_ID))
 				.thenReturn(Lists.newArrayList(TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
-						TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.PLOT_ID.name(), StudyServiceImplTest.STOCK_ID));
+						TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), StudyServiceImplTest.STOCK_ID));
 		Mockito.when(this.designFactors.find(StudyServiceImplTest.STUDY_ID))
 				.thenReturn(Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), StudyServiceImplTest.FACT1));
 	}
@@ -364,7 +364,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetTrialObservationTable() {
 		final List<Object[]> results = new ArrayList<>();
-		final Object[] result = {1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "PLOT_ID", "LOC_NAME", "LOC_ABBR", 1, 1, 1, 1, "Study Name", 1};
+		final Object[] result = {1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "OBS_UNIT_ID", "LOC_NAME", "LOC_ABBR", 1, 1, 1, 1, "Study Name", 1};
 		results.add(result);
 		Mockito.when(this.studyMeasurements.getAllStudyDetailsAsTable(Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt())).thenReturn(results);
 		Mockito.when(this.measurementVariableService.getVariables(1, VariableType.TRAIT.getId())).thenReturn(Arrays.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name())));
@@ -393,7 +393,7 @@ public class StudyServiceImplTest {
 		Assert.assertEquals("Test", tableResults.get(12));
 		Assert.assertEquals("1", tableResults.get(13));
 		Assert.assertEquals("1", tableResults.get(14));
-		Assert.assertEquals("PLOT_ID", tableResults.get(15));
+		Assert.assertEquals("OBS_UNIT_ID", tableResults.get(15));
 		Assert.assertEquals("1", tableResults.get(16));
 	}
 }
