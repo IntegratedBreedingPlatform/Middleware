@@ -30,6 +30,19 @@ public class UserDefinedFieldTestDataInitializer {
 		udField.setFname(fname);
 		return udField;
 	}
+
+	public static UserDefinedField createUserDefinedField(final String tableName, final String ftype, final String fname) {
+		final UserDefinedField udField = UserDefinedFieldTestDataInitializer.createUserDefinedField("FCODE12345", fname);
+		udField.setFtable(tableName);
+		udField.setFtype(ftype);
+		udField.setFdate(20060123);
+		udField.setFdesc(fname);
+		udField.setFfmt("-");
+		udField.setFuid(0);
+		udField.setLfldno(0);
+		udField.setScaleid(0);
+		return udField;
+	}
 	
 	private void populateValidListType() {
 		this.validListType = new ArrayList<UserDefinedField>();
