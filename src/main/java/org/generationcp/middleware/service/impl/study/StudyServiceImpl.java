@@ -350,6 +350,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
 					+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
 					"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" + // 8189 = cvterm for CUSTOM_LOCATION_ABBR
 					"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
 					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 					+ "    inner join project proj on proj.project_id = nde.project_id \n"
@@ -365,13 +366,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 			query.addScalar("INSTANCE_DBID", new IntegerType());
 			query.addScalar("LOCATION_NAME", new StringType());
 			query.addScalar("LOCATION_ABBR", new StringType());
+			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
 			query.addScalar("INSTANCE_NUMBER", new IntegerType());
 
 			final List queryResults = query.list();
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
-				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3]));
+				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[4],(String) row[3]));
 			}
 			return instances;
 		} catch (final HibernateException he) {
