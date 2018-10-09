@@ -228,7 +228,7 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetStudyInstances() throws Exception {
 
-		final Object[] testDBRow = {12345, "Gujarat, India", "GUJ", 1};
+		final Object[] testDBRow = {12345, "Gujarat, India", "GUJ", "", 1};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
 
@@ -238,7 +238,8 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(testDBRow[0], studyInstances.get(0).getInstanceDbId());
 		Assert.assertEquals(testDBRow[1], studyInstances.get(0).getLocationName());
 		Assert.assertEquals(testDBRow[2], studyInstances.get(0).getLocationAbbreviation());
-		Assert.assertEquals(testDBRow[3], studyInstances.get(0).getInstanceNumber());
+		Assert.assertEquals(testDBRow[3], studyInstances.get(0).getCustomLocationAbbreviation());
+		Assert.assertEquals(testDBRow[4], studyInstances.get(0).getInstanceNumber());
 	}
 
 	@Test
