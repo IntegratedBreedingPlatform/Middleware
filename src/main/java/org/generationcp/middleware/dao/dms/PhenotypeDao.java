@@ -13,7 +13,6 @@ package org.generationcp.middleware.dao.dms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1047,8 +1046,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	@Override
 	public Phenotype save(final Phenotype phenotype) {
 		try {
-			final Date date = new Date();
-			this.savePhenotype(phenotype, date);
+			this.savePhenotype(phenotype);
 			return phenotype;
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in save(" + phenotype + "): " + e.getMessage(), e);
@@ -1058,12 +1056,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	@Override
 	public Phenotype saveOrUpdate(final Phenotype entity) {
 		try {
-			final Date date = new Date();
 			if (entity.getPhenotypeId() == null) {
-				this.savePhenotype(entity, date);
-			}
-			else {
-				entity.setUpdatedDate(date);
+				this.savePhenotype(entity);
 			}
 			this.getSession().saveOrUpdate(entity);
 			return entity;
@@ -1075,12 +1069,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	@Override
 	public Phenotype merge(final Phenotype entity) {
 		try {
-			final Date date = new Date();
 			if (entity.getPhenotypeId() == null) {
-				this.savePhenotype(entity, date);
-			}
-			else {
-				entity.setUpdatedDate(date);
+				this.savePhenotype(entity);
 			}
 			this.getSession().merge(entity);
 			return entity;
@@ -1089,10 +1079,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 
-	private void savePhenotype(final Phenotype phenotype,final Date date) {
+	private void savePhenotype(final Phenotype phenotype) {
 		final Session currentSession = this.getSession();
-		phenotype.setCreatedDate(date);
-		phenotype.setUpdatedDate(date);
 		currentSession.save(phenotype);
 	}
 

@@ -102,10 +102,10 @@ public class Phenotype implements Serializable {
 	@JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
 
-	@Column(name = "created_date")
+	@Column(name = "created_date", updatable = false)
 	private Date createdDate;
 
-	@Column(name = "updated_date")
+	@Column(name = "updated_date", updatable = false)
 	private Date updatedDate;
 
 	public Phenotype() {
@@ -244,18 +244,18 @@ public class Phenotype implements Serializable {
 	@Override
 	public String toString() {
 		return "Phenotype{" +
-			"phenotypeId=" + phenotypeId +
-			", uniqueName='" + uniqueName + '\'' +
-			", name='" + name + '\'' +
-			", observableId=" + observableId +
-			", attributeId=" + attributeId +
-			", value='" + value + '\'' +
-			", cValueId=" + cValueId +
-			", valueStatus=" + valueStatus +
-			", assayId=" + assayId +
-			", experiment=" + experiment +
-			", createdDate=" + createdDate +
-			", updatedDate=" + updatedDate +
+			"phenotypeId=" + this.phenotypeId +
+			", uniqueName='" + this.uniqueName + '\'' +
+			", name='" + this.name + '\'' +
+			", observableId=" + this.observableId +
+			", attributeId=" + this.attributeId +
+			", value='" + this.value + '\'' +
+			", cValueId=" + this.cValueId +
+			", valueStatus=" + this.valueStatus +
+			", assayId=" + this.assayId +
+			", experiment=" + this.experiment +
+			", createdDate=" + this.createdDate +
+			", updatedDate=" + this.updatedDate +
 			'}';
 	}
 }

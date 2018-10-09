@@ -65,8 +65,11 @@
 			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE phenotype
-			ADD COLUMN created_date DATETIME NULL;
+			alter table phenotype
+			  add COLUMN created_date TIMESTAMP DEFAULT 0;
+
+			alter table phenotype
+			  modify COLUMN created_date TIMESTAMP default CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
@@ -80,8 +83,14 @@
 			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE phenotype
-			ADD COLUMN updated_date DATETIME NULL;
+			alter table phenotype
+			  add COLUMN
+			  updated_date TIMESTAMP DEFAULT 0;
+
+			alter table phenotype
+			  modify COLUMN
+			  updated_date TIMESTAMP default CURRENT_TIMESTAMP
+			  ON UPDATE CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
