@@ -1014,6 +1014,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType, final String fieldName) {
+		return this.getUserDefinedFieldDao().getByFieldTableNameAndFTypeAndFName(tableName, fieldType, fieldName);
+	}
+
+	@Override
 	public List<Method> getMethodsByGroupIncludesGgroup(final String group) {
 		return this.getMethodDao().getByGroupIncludesGgroup(group);
 	}

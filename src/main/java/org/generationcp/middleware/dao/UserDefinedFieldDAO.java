@@ -53,6 +53,23 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return new ArrayList<>();
 	}
 
+	public List<UserDefinedField> getByFieldTableNameAndFTypeAndFName(final String tableName, final String fieldType, final  String fieldName) {
+		try {
+			if (tableName != null && fieldType != null) {
+				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+				criteria.add(Restrictions.eq("ftable", tableName));
+				criteria.add(Restrictions.eq("ftype", fieldType));
+				criteria.add(Restrictions.eq("fname", fieldName));
+				criteria.addOrder(Order.asc("fname"));
+				return criteria.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getByFieldTableNameAndFTypeAndFName(tableName=" + tableName + " fieldType= " + fieldType
+					+ " fieldName= " + fieldName + " ) query from UserDefinedField: " + e.getMessage(), e);
+		}
+		return new ArrayList<>();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<UserDefinedField> getByTableNameAndNameLike(final String tableName, final String nameLike) {
 		try {
