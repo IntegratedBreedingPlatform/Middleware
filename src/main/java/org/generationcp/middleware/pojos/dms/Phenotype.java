@@ -102,10 +102,10 @@ public class Phenotype implements Serializable {
 	@JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
 
-	@Column(name = "created_date", updatable = false)
+	@Column(name = "created_date", updatable = false, insertable = false)
 	private Date createdDate;
 
-	@Column(name = "updated_date", updatable = false)
+	@Column(name = "updated_date", updatable = false, insertable = false)
 	private Date updatedDate;
 
 	public Phenotype() {

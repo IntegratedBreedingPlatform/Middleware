@@ -66,10 +66,10 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			alter table phenotype
-			  add COLUMN created_date TIMESTAMP DEFAULT 0;
+			  add COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
 
 			alter table phenotype
-			  modify COLUMN created_date TIMESTAMP default CURRENT_TIMESTAMP;
+			  modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
@@ -85,11 +85,11 @@
 		<sql dbms="mysql" splitStatements="true">
 			alter table phenotype
 			  add COLUMN
-			  updated_date TIMESTAMP DEFAULT 0;
+			  updated_date TIMESTAMP NULL DEFAULT NULL;
 
 			alter table phenotype
 			  modify COLUMN
-			  updated_date TIMESTAMP default CURRENT_TIMESTAMP
+			  updated_date TIMESTAMP NULL default CURRENT_TIMESTAMP
 			  ON UPDATE CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
