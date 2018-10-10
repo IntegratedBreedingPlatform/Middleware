@@ -134,6 +134,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		project.setStudyType(this.studyTypeDAO.getStudyTypeByName(StudyTypeDto.TRIAL_NAME));
 		project.setProgramUUID(RandomStringUtils.randomAlphanumeric(20));
 		project.setCreatedBy(this.testUser.getUserid().toString());
+		project.setLocked(true);
 		dmsProjectDao.save(project);
 		return project;
 	}
@@ -270,6 +271,7 @@ public class StockDaoTest extends IntegrationTestBase {
 			Assert.assertEquals(study.getStudyType().getName(), studyReference.getStudyType().getName());
 			Assert.assertEquals(this.testUser.getUserid(), studyReference.getOwnerId());
 			Assert.assertEquals(this.testPerson.getFirstName() + " " + this.testPerson.getLastName(), studyReference.getOwnerName());
+			Assert.assertTrue(studyReference.getIsLocked());
 		}
 	}
 	

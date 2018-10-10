@@ -26,7 +26,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.workbench.DatasetType;
 import org.generationcp.middleware.pojos.workbench.Project;
 
 /*
@@ -41,10 +40,9 @@ public class StudyTestDataInitializer {
 	private static final String TEST_FOLDER_NAME = "TEST_FOLDER_NAME";
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 	public static final String DATASET_NAME = "DATA SET NAME";
-	private static final String STUDY_UPDATE = "20160608";
 	public static final String START_DATE = "20160606";
 	public static final String END_DATE = "20160606";
-	private static final String OBJECTIVE = "OBJ1";
+	public static final String OBJECTIVE = "OBJ1";
 	public static final String CREATED_BY = "1";
 	public static int datasetId = 255;
 

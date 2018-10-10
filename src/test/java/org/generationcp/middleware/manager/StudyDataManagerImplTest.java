@@ -43,7 +43,6 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -67,8 +66,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
-
-	private static final int PRESUMABLY_NON_EXISTENT_STUDY_ID = -1000000;
 
 	private static final String LOCATION_NAME = "LOCATION NAME";
 
@@ -94,7 +91,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private LocationDataManager locationManager;
-	
+
 	@Autowired
 	private UserDataManager userDataManager;
 
@@ -209,9 +206,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testSearchStudiesByGid() throws Exception {
 		// Flushing to force Hibernate to synchronize with the underlying database before the search
-		//  Without this the inserted experiment is not retrieved properly
+		// Without this the inserted experiment is not retrieved properly
 		this.manager.getActiveSession().flush();
-		
+
 		final Integer gid = this.studyTDI.getGid();
 		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
 		final StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
@@ -231,13 +228,36 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final String uniqueId = this.commonTestProject.getUniqueID();
 		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
-		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
+		final String subFolderName = "Sub folder Name";
+		final String subFolderDescription = "Sub Folder Description";
+		final int subFolderID =
+				this.manager.addSubFolder(mainFolder.getProjectId(), subFolderName, subFolderDescription, uniqueId, "objective");
+		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId(), true);
 
-		final List<Reference> childrenNodes =
-				this.manager.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID());
+		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), uniqueId);
 		Assert.assertNotNull(childrenNodes);
-		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
-		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
+		Assert.assertEquals("The size should be one.", 2, childrenNodes.size());
+		for (final Reference reference : childrenNodes) {
+			if (reference.isFolder()) {
+				Assert.assertEquals(subFolderID, reference.getId().intValue());
+				Assert.assertEquals(subFolderName, reference.getName());
+				Assert.assertEquals(subFolderDescription, reference.getDescription());
+				Assert.assertEquals(uniqueId, reference.getProgramUUID());
+			} else {
+				final StudyReference study = (StudyReference) reference;
+				Assert.assertEquals(this.studyReference.getId(), study.getId());
+				Assert.assertEquals(this.studyReference.getName(), study.getName());
+				Assert.assertEquals(this.studyReference.getDescription(), study.getDescription());
+				Assert.assertEquals(uniqueId, study.getProgramUUID());
+				Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
+				Assert.assertFalse(study.getIsLocked());
+				final Integer createdBy = Integer.valueOf(StudyTestDataInitializer.CREATED_BY);
+				Assert.assertEquals(createdBy, study.getOwnerId());
+				final User user = this.userDataManager.getUserById(createdBy);
+				final Person person = this.userDataManager.getPersonById(user.getPersonid());
+				Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), study.getOwnerName());
+			}
+		}
 	}
 
 	@Test
@@ -332,7 +352,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetFieldMapInfoOfStudy() throws MiddlewareQueryException {
+	public void testGetFieldMapInfoOfStudy() {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
@@ -342,7 +362,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetParentFolder() throws MiddlewareQueryException {
+	public void testGetParentFolder() {
 		final String uniqueId = "001";
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
 		final int id = this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
@@ -351,13 +371,13 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetFolderTree() throws MiddlewareQueryException {
+	public void testGetFolderTree() {
 		List<FolderReference> tree = this.manager.getFolderTree();
 		final int sizeBefore = tree.size();
 		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		tree = this.manager.getFolderTree();
 		final int newSize = tree.size();
-		//Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
+		// Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
 		Assert.assertEquals("The new size should be equal the  size before + the newly added folder", newSize, (sizeBefore + 1));
 	}
 
@@ -365,10 +385,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		final FieldmapBlockInfo fieldMapBlockInfo =
-				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
-						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
-						false, null, FieldMapDataUtil.FIELD_ID);
+		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
+				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
+				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 
@@ -398,9 +417,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals(
 					"Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + resultTrialInstance.getPlantingOrder() + " instead.",
 					FieldMapDataUtil.PLANTING_ORDER, resultTrialInstance.getPlantingOrder().intValue());
-			Assert.assertEquals(
-					"Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + resultTrialInstance.getMachineRowCapacity()
-							+ " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY, resultTrialInstance.getMachineRowCapacity().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got "
+					+ resultTrialInstance.getMachineRowCapacity() + " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+					resultTrialInstance.getMachineRowCapacity().intValue());
 			Assert.assertEquals(
 					"Expected " + StudyDataManagerImplTest.BLOCK_NAME + " but got " + resultTrialInstance.getBlockName() + " instead.",
 					StudyDataManagerImplTest.BLOCK_NAME, resultTrialInstance.getBlockName());
@@ -421,10 +440,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		final FieldmapBlockInfo fieldMapBlockInfo =
-				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
-						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
-						false, null, FieldMapDataUtil.FIELD_ID);
+		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
+				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
+				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
@@ -484,37 +502,76 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyDetails() throws Exception {
+	public void testGetStudyDetailsByStudyType() throws Exception {
 		final List<StudyDetails> trialStudyDetails =
 				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY", cropPrefix);
+		final StudyReference newStudy = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY", cropPrefix);
 		final List<StudyDetails> updatedStudyDetails =
 				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewStudy = updatedStudyDetails.size();
 		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
 				sizeAfterAddingNewStudy, sizeBeforeAddingNewTrial + 1);
+		for (final StudyDetails details : updatedStudyDetails) {
+			if (this.studyReference.getId().equals(details.getId())) {
+				Assert.assertEquals(this.studyReference.getName(), details.getStudyName());
+				Assert.assertEquals(this.studyReference.getStudyType(), details.getStudyType());
+			} else if (newStudy.getId().equals(details.getId())) {
+				Assert.assertEquals(newStudy.getName(), details.getStudyName());
+				Assert.assertEquals(newStudy.getStudyType(), details.getStudyType());
+			}
+			// Do not verify unseeded data like study templates which are also retrieved
+			if (details.getProgramUUID() != null) {
+				this.verifyCommonStudyDetails(details);
+			}
+		}
+	}
+
+	private void verifyCommonStudyDetails(final StudyDetails details) {
+		Assert.assertEquals(StudyTestDataInitializer.STUDY_DESCRIPTION, details.getDescription());
+		Assert.assertEquals(StudyTestDataInitializer.START_DATE, details.getStartDate());
+		Assert.assertEquals(StudyTestDataInitializer.END_DATE, details.getEndDate());
+		Assert.assertEquals(StudyTestDataInitializer.OBJECTIVE, details.getObjective());
+		Assert.assertEquals(this.commonTestProject.getUniqueID(), details.getProgramUUID());
+		Assert.assertEquals(StudyTestDataInitializer.CREATED_BY, details.getCreatedBy());
+		Assert.assertFalse(details.getIsLocked());
 	}
 
 	@Test
-	public void testGetStudyStudyDetails() throws Exception {
+	public void testGetNurseryAndTrialStudyDetails() throws Exception {
 		final List<StudyDetails> studyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
-		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
-		this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL", cropPrefix);
+		final StudyReference nursery = this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
+		final StudyReference trial = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL", cropPrefix);
 		final List<StudyDetails> newStudyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
 		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy,
 				sizeBeforeAddingNewStudy + 2);
+		for (final StudyDetails details : newStudyDetailsList) {
+			if (nursery.getId().equals(details.getId())) {
+				Assert.assertEquals(nursery.getName(), details.getStudyName());
+				Assert.assertEquals(nursery.getStudyType(), details.getStudyType());
+			} else if (trial.getId().equals(details.getId())) {
+				Assert.assertEquals(trial.getName(), details.getStudyName());
+				Assert.assertEquals(trial.getStudyType(), details.getStudyType());
+			}
+			// Do not verify unseeded data like study templates which are also retrieved
+			if (details.getProgramUUID() != null) {
+				this.verifyCommonStudyDetails(details);
+			}
+		}
 	}
 
 	@Test
-	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareException {
+	public void testGetStudyDetails() {
 		final StudyDetails studyDetails = this.manager.getStudyDetails(this.studyReference.getId());
 		Assert.assertNotNull("Study should not be null", studyDetails);
-		Assert.assertEquals("Study should have the id " + this.studyReference.getId(), studyDetails.getId(), studyDetails.getId());
+		Assert.assertEquals(this.studyReference.getId(), studyDetails.getId());
+		Assert.assertEquals(this.studyReference.getName(), studyDetails.getStudyName());
+		Assert.assertEquals(this.studyReference.getStudyType(), studyDetails.getStudyType());
+		this.verifyCommonStudyDetails(studyDetails);
 	}
 
 	@Ignore
@@ -531,7 +588,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllSharedProjectNames() throws MiddlewareQueryException {
+	public void testGetAllSharedProjectNames() {
 		final List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
 		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
 	}
@@ -576,11 +633,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertTrue(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						programUUID));
+		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
+				locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
+				locationNameIdValue, programUUID));
 
 	}
 
@@ -607,11 +663,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Create projectproperty record
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
-		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(this.manager
-				.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue,
-						programUUID));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
+				locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
+				locationNameIdValue, programUUID));
 
 	}
 
@@ -649,8 +704,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setProject(project);
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
-		Assert.assertFalse(
-				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
+				locationNameIdValue, programUUID));
 
 	}
 
@@ -689,9 +744,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setProject(project);
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
-		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, ""));
-		Assert.assertFalse(
-				this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()), locationNameIdValue, programUUID));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
+				locationNameIdValue, ""));
+		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
+				locationNameIdValue, programUUID));
 
 	}
 
@@ -765,7 +821,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
 	}
-	
+
 	@Test
 	public void testGetStudyReference() throws Exception {
 		final Integer studyId = this.studyReference.getId();
@@ -782,7 +838,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Person person = this.userDataManager.getPersonById(user.getPersonid());
 		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), studyFromDB.getOwnerName());
 	}
-	
+
 	@Test
 	public void testUpdateStudyLockedStatus() {
 		final Integer studyId = this.studyReference.getId();
@@ -791,7 +847,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
 		Assert.assertTrue(this.manager.getStudyDetails(studyId).getIsLocked());
-		
+
 		this.manager.updateStudyLockedStatus(studyId, false);
 		this.manager.getActiveSession().flush();
 		Assert.assertFalse(this.manager.getStudyDetails(studyId).getIsLocked());
