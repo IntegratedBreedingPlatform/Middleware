@@ -23,7 +23,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -100,6 +104,9 @@ public class Phenotype implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
+
+	@Column(name = "sequence_no")
+	private Integer sequenceNo;
 
 	public Phenotype() {
 	}
@@ -196,6 +203,14 @@ public class Phenotype implements Serializable {
 		this.valueStatus = valueStatus;
 	}
 
+	public Integer getSequenceNo() {
+		return this.sequenceNo;
+	}
+
+	public void setSequenceNo(final Integer sequenceNo) {
+		this.sequenceNo = sequenceNo;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -220,8 +235,18 @@ public class Phenotype implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Phenotype{" + "phenotypeId=" + this.phenotypeId + ", uniqueName='" + this.uniqueName + '\'' + ", name='" + this.name + '\''
-			+ ", observableId=" + this.observableId + ", attributeId=" + this.attributeId + ", value='" + this.value + '\'' + ", cValueId=" + this.cValueId
-			+ ", assayId=" + this.assayId + ", experiment=" + this.experiment + '}';
+		return "Phenotype{" +
+			"phenotypeId=" + this.phenotypeId +
+			", uniqueName='" + this.uniqueName + '\'' +
+			", name='" + this.name + '\'' +
+			", observableId=" + this.observableId +
+			", attributeId=" + this.attributeId +
+			", value='" + this.value + '\'' +
+			", cValueId=" + this.cValueId +
+			", valueStatus=" + this.valueStatus +
+			", assayId=" + this.assayId +
+			", experiment=" + this.experiment +
+			", sequenceNo=" + this.sequenceNo +
+			'}';
 	}
 }
