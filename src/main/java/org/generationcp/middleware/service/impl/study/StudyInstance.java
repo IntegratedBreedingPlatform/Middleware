@@ -11,17 +11,19 @@ public class StudyInstance {
 	private int instanceDbId;
 	private String locationName;
 	private String locationAbbreviation;
+	private String customLocationAbbreviation;
 	private int instanceNumber;
 
 	public StudyInstance() {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final String locationName, final String locationAbbreviation, final int instanceNumber) {
+	public StudyInstance(final int instanceDbId, final String locationName, final String locationAbbreviation, final int instanceNumber, final String customLocationAbbreviation) {
 		this.instanceDbId = instanceDbId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
+		this.customLocationAbbreviation = customLocationAbbreviation;
 	}
 
 	public int getInstanceDbId() {
@@ -54,6 +56,15 @@ public class StudyInstance {
 
 	public void setInstanceNumber(final int instanceNumber) {
 		this.instanceNumber = instanceNumber;
+	}
+
+
+	public String getCustomLocationAbbreviation() {
+		return customLocationAbbreviation;
+	}
+
+	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
+		this.customLocationAbbreviation = customLocationAbbreviation;
 	}
 
 	@Override

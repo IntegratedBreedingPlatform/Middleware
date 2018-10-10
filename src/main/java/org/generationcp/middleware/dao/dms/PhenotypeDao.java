@@ -958,7 +958,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final PhenotypeSearchDTO observationUnit = new PhenotypeSearchDTO();
 
 				final Integer ndExperimentId = (Integer) row[0];
-				observationUnit.setObservationUnitDbId((String) row[1]); // plot_id
+				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
 				observationUnit.setObservationUnitName((String) row[2]);
 				observationUnit.setObservationLevel((String) row[3]);
 				observationUnit.setObservationLevels("1");

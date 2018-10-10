@@ -48,7 +48,7 @@ public class SampleServiceImpl implements SampleService {
 	@Autowired
 	private PlantService plantService;
 
-	private DaoFactory daoFactory;
+	private final DaoFactory daoFactory;
 
 	public SampleServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
@@ -92,13 +92,13 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public List<SampleDTO> filter(final String plotId, final Integer listId, Pageable pageable) {
-		return this.daoFactory.getSampleDao().filter(plotId, listId, pageable);
+	public List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable) {
+		return this.daoFactory.getSampleDao().filter(obsUnitId, listId, pageable);
 	}
 
 	@Override
-	public long countFilter(final String plotId, final Integer listId) {
-		return this.daoFactory.getSampleDao().countFilter(plotId, listId);
+	public long countFilter(final String obsUnitId, final Integer listId) {
+		return this.daoFactory.getSampleDao().countFilter(obsUnitId, listId);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
@@ -128,13 +128,13 @@ public class SampleServiceImpl implements SampleService {
 		final DmsProject objectProject = experiment.getProject().getRelatedTos().get(0).getObjectProject();
 		final Integer studyId = objectProject.getProjectId();
 		final String takenBy = (sample.getTakenBy() != null) ? sample.getTakenBy().getPerson().getDisplayName() : null;
-		final String plotId = experiment.getPlotId();
+		final String obsUnitId = experiment.getObsUnitId();
 		final String studyName = objectProject.getName();
 		final StockModel stock = experiment.getStock();
 		final String entryNo = stock.getUniqueName();
 		final Integer gid = (stock.getGermplasm() != null) ? stock.getGermplasm().getGid() : null;
 
-		samplesDetailsDto = new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
+		samplesDetailsDto = new SampleDetailsDTO(studyId, obsUnitId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
 		samplesDetailsDto.setTakenBy(takenBy);
 		samplesDetailsDto.setSampleDate(sample.getSamplingDate());
 		samplesDetailsDto.setStudyName(studyName);

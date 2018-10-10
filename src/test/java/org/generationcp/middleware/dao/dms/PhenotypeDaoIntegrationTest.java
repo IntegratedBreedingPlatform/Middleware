@@ -108,7 +108,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.study = new DmsProject();
 			this.study.setName("Test Project");
 			this.study.setDescription("Test Project");
-			dmsProjectDao.save(this.study);
+			this.dmsProjectDao.save(this.study);
 		}
 		
 		if (this.trait == null) {
@@ -177,7 +177,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
 		
 		final Geolocation geolocation = new Geolocation();
-		geolocationDao.saveOrUpdate(geolocation);
+		this.geolocationDao.saveOrUpdate(geolocation);
 
 		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
@@ -190,24 +190,24 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);
-			stockDao.saveOrUpdate(stockModel);
+			this.stockDao.saveOrUpdate(stockModel);
 			
 			// Create two experiments for the same stock
 			for (int j=0; j < numberOfReps; j++) {
 				final ExperimentModel experimentModel = new ExperimentModel();
 				experimentModel.setGeoLocation(geolocation);
 				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-				experimentModel.setPlotId(RandomStringUtils.randomAlphabetic(13));
+				experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
 				experimentModel.setProject(this.study);
 				experimentModel.setStock(stockModel);
-				experimentDao.saveOrUpdate(experimentModel);
+				this.experimentDao.saveOrUpdate(experimentModel);
 				
 				if (withPhenotype) {
 					final Phenotype phenotype = new Phenotype();
 					phenotype.setObservableId(this.trait.getCvTermId());
 					phenotype.setExperiment(experimentModel);
 					phenotype.setValue(i + "." + j);
-					phenotypeDao.save(phenotype);
+					this.phenotypeDao.save(phenotype);
 				}
 			}
 

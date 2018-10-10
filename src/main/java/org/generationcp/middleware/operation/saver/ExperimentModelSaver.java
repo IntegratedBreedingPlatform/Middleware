@@ -109,9 +109,8 @@ public class ExperimentModelSaver extends Saver {
 		}
 
 		if (!(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.equals(expType) && TermId.STUDY_INFORMATION.equals(expType))) {
-			final String plotUniqueId = getPlotUniqueId(cropPrefix);
-
-			experimentModel.setPlotId(plotUniqueId);
+			final String plotUniqueId = this.getPlotUniqueId(cropPrefix);
+			experimentModel.setObsUnitId(plotUniqueId);
 		}
 
 		return experimentModel;
@@ -140,7 +139,7 @@ public class ExperimentModelSaver extends Saver {
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
 			for (final Variable variable : factors.getVariables()) {
 				if (PhenotypicType.TRIAL_DESIGN == variable.getVariableType().getRole()) {
-					experimentProperties.add(createTrialDesignProperty(experimentModel, variable));
+					experimentProperties.add(this.createTrialDesignProperty(experimentModel, variable));
 				}
 			}
 		}

@@ -20,12 +20,12 @@ public interface SampleService {
 		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
 		Date createdDate, User takenBy);
 
-	List<SampleDTO> filter(final String plotId, Integer listId, Pageable pageable);
+	List<SampleDTO> filter(final String obsUnitId, Integer listId, Pageable pageable);
 
 	/**
 	 * count results from {@link #filter}
 	 */
-	long countFilter(final String plotId, final Integer listId);
+	long countFilter(final String obsUnitId, final Integer listId);
 
 	SampleDetailsDTO getSampleObservation(final String sampleId);
 

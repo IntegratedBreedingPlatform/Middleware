@@ -51,7 +51,7 @@ public class ExperimentPropertyDaoTest {
 		
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
-		Assert.assertEquals(getFieldmapLabelsQuery(), sqlCaptor.getValue());
+		Assert.assertEquals(this.getFieldmapLabelsQuery(), sqlCaptor.getValue());
 		Mockito.verify(this.mockQuery).setParameter("projectId", projectId);
 	}
 	
@@ -62,7 +62,7 @@ public class ExperimentPropertyDaoTest {
 		final int blockId = 33;
 		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, blockId);
 		
-		final String expectedSql = getFieldmapsInBlockMainQuery() + " AND blk.value = :blockId  ORDER BY e.nd_experiment_id ASC";
+		final String expectedSql = this.getFieldmapsInBlockMainQuery() + " AND blk.value = :blockId  ORDER BY e.nd_experiment_id ASC";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.mockSession).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql.replace(" ", ""), sqlCaptor.getValue().replace(" ", ""));
@@ -77,7 +77,7 @@ public class ExperimentPropertyDaoTest {
 		final int geolocationId = 22;
 		this.dao.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 		
-		final String expectedSql = getFieldmapsInBlockMainQuery() + 
+		final String expectedSql = this.getFieldmapsInBlockMainQuery() +
 				" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval " +
 				" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id " +
 				" AND bexp.nd_geolocation_id = :geolocationId " +
@@ -102,7 +102,7 @@ public class ExperimentPropertyDaoTest {
 		+ " , geo.description AS trialInstance , s.dbxref_id AS gid "
 		+ " , st.start_date as startDate , gpSeason.value as season "
 		+ " , epropBlock.value AS blockNo "
-		+ " , e.plot_id as plotId "
+		+ " , e.obs_unit_id as obsUnitId "
 		+ " FROM nd_geolocationprop blk "
 		+ "  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id "
 		+ "  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id "
@@ -155,7 +155,7 @@ public class ExperimentPropertyDaoTest {
 				" , siteId.value AS siteId" +
 				" , epropBlock.value AS blockNo " +
 				" , ldp.group_name AS pedigree " +
-				" , geo.plot_id as plotId " +
+				" , geo.obs_unit_id as obsUnitId " +
 				" FROM " +
 				" nd_experiment nde " +
 				" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = " +

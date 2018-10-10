@@ -72,10 +72,10 @@ public class ExperimentModel implements Serializable {
 	@Column(name = "type_id")
 	private Integer typeId;
 
-	//plot_id
+	//OBS_UNIT_ID
 	@Basic(optional = true)
-	@Column(name = "plot_id")
-	private String plotId;
+	@Column(name = "obs_unit_id")
+	private String obsUnitId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 5000)
@@ -147,14 +147,12 @@ public class ExperimentModel implements Serializable {
 	public void setProject(final DmsProject project) {
 		this.project = project;
 	}
-
 	
 	public StockModel getStock() {
-		return stock;
+		return this.stock;
 	}
-
 	
-	public void setStock(StockModel stock) {
+	public void setStock(final StockModel stock) {
 		this.stock = stock;
 	}
 
@@ -166,12 +164,12 @@ public class ExperimentModel implements Serializable {
 		this.phenotypes = phenotypes;
 	}
 
-	public void setPlotId(final String plotId) {
-		this.plotId = plotId;
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 	}
 
-	public String getPlotId() {
-		return plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
 	}
 
 	@Override
@@ -229,8 +227,8 @@ public class ExperimentModel implements Serializable {
 		builder.append(this.geoLocation);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
-		builder.append(", plotId=");
-		builder.append(this.plotId);
+		builder.append(", obsUnitId=");
+		builder.append(this.obsUnitId);
 		builder.append("]");
 		return builder.toString();
 	}

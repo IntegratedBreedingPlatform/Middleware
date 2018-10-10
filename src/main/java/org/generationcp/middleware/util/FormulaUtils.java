@@ -6,7 +6,6 @@ import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,16 +53,19 @@ public final class FormulaUtils {
 		formula.setDefinition(formulaDto.getDefinition());
 		formula.setDescription(formulaDto.getDescription());
 		formula.setActive(formulaDto.getActive());
+		formula.setInputs(convertFormulaVariableListToCVTermList(formulaDto.getInputs()));
 
+		return formula;
+	}
+
+	private static ArrayList convertFormulaVariableListToCVTermList(final List<FormulaVariable> formulaVariables) {
 		final Set<CVTerm> inputs = new LinkedHashSet<>();
-		for (final FormulaVariable formulaVariable : formulaDto.getInputs()) {
+		for (final FormulaVariable formulaVariable : formulaVariables) {
 			final CVTerm input = new CVTerm();
 			input.setCvTermId(formulaVariable.getId());
 			input.setName(formulaVariable.getName());
 			inputs.add(input);
 		}
-		formula.setInputs(new ArrayList<>(inputs));
-
-		return formula;
+		return new ArrayList<>(inputs);
 	}
 }
