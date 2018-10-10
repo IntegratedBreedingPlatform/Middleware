@@ -118,7 +118,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
-				this.locationManager);
+				this.locationManager, this.userDataManager);
 
 		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
 
@@ -251,9 +251,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				Assert.assertEquals(uniqueId, study.getProgramUUID());
 				Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
 				Assert.assertFalse(study.getIsLocked());
-				final Integer createdBy = Integer.valueOf(StudyTestDataInitializer.CREATED_BY);
-				Assert.assertEquals(createdBy, study.getOwnerId());
-				final User user = this.userDataManager.getUserById(createdBy);
+				Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
+				final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
 				final Person person = this.userDataManager.getPersonById(user.getPersonid());
 				Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), study.getOwnerName());
 			}
@@ -516,9 +515,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			if (this.studyReference.getId().equals(details.getId())) {
 				Assert.assertEquals(this.studyReference.getName(), details.getStudyName());
 				Assert.assertEquals(this.studyReference.getStudyType(), details.getStudyType());
+				Assert.assertEquals(this.studyReference.getOwnerId().toString(), details.getCreatedBy());
 			} else if (newStudy.getId().equals(details.getId())) {
 				Assert.assertEquals(newStudy.getName(), details.getStudyName());
 				Assert.assertEquals(newStudy.getStudyType(), details.getStudyType());
+				Assert.assertEquals(newStudy.getOwnerId().toString(), details.getCreatedBy());
 			}
 			// Do not verify unseeded data like study templates which are also retrieved
 			if (details.getProgramUUID() != null) {
@@ -533,7 +534,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(StudyTestDataInitializer.END_DATE, details.getEndDate());
 		Assert.assertEquals(StudyTestDataInitializer.OBJECTIVE, details.getObjective());
 		Assert.assertEquals(this.commonTestProject.getUniqueID(), details.getProgramUUID());
-		Assert.assertEquals(StudyTestDataInitializer.CREATED_BY, details.getCreatedBy());
 		Assert.assertFalse(details.getIsLocked());
 	}
 
@@ -832,9 +832,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getProgramUUID(), studyFromDB.getProgramUUID());
 		Assert.assertEquals(this.studyReference.getStudyType(), studyFromDB.getStudyType());
 		Assert.assertFalse(studyFromDB.getIsLocked());
-		final Integer createdBy = Integer.valueOf(StudyTestDataInitializer.CREATED_BY);
-		Assert.assertEquals(createdBy, studyFromDB.getOwnerId());
-		final User user = this.userDataManager.getUserById(createdBy);
+		Assert.assertEquals(this.studyReference.getOwnerId(), studyFromDB.getOwnerId());
+		final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
 		final Person person = this.userDataManager.getPersonById(user.getPersonid());
 		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), studyFromDB.getOwnerName());
 	}

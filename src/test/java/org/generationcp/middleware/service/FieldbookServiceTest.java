@@ -69,7 +69,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		}
 
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
-				this.locationManager);
+				this.locationManager, this.userDataManager);
 
 		this.studyReference = this.studyTDI.addTestStudy(this.cropPrefix);
 		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
@@ -124,9 +124,8 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getProgramUUID(), study.getProgramUUID());
 		Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
 		Assert.assertFalse(study.getIsLocked());
-		final Integer createdBy = Integer.valueOf(StudyTestDataInitializer.CREATED_BY);
-		Assert.assertEquals(createdBy, study.getOwnerId());
-		final User user = this.userDataManager.getUserById(createdBy);
+		Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
+		final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
 		final Person person = this.userDataManager.getPersonById(user.getPersonid());
 		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), study.getOwnerName());
 	}
