@@ -326,7 +326,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
-		final List<MeasurementData> result = new ArrayList();
+		final List<MeasurementData> result = new ArrayList<>();
 		for (final MeasurementRow measurementRow : observations) {
 			final List<MeasurementData> dataList = measurementRow.getDataList();
 			if (dataList == null || dataList.isEmpty()) {

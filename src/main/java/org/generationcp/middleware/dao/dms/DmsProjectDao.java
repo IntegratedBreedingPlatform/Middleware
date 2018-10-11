@@ -44,7 +44,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
@@ -300,26 +299,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 
 		return criteria.list();
-	}
-
-	private List<DmsProject> getStudiesByStudyProperty(final Integer studyPropertyId, final Criterion valueExpression) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("properties", "p");
-			criteria.add(Restrictions.eq("p.typeId", studyPropertyId));
-			criteria.add(valueExpression);
-			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
-			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-					"Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId
-							+ " in DmsProjectDao: " + e.getMessage(), e);
-		}
 	}
 
 	public List<DmsProject> getStudiesByIds(final Collection<Integer> projectIds) {

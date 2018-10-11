@@ -37,6 +37,7 @@ import java.util.Set;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	private static final String IN_STOCK_DAO = " in StockDao: ";
 	protected static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
@@ -54,7 +55,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			stockIds = criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStockIdsByProperty=" + value + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStockIdsByProperty=" + value + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 		return stockIds;
 	}
@@ -71,7 +72,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in countStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 	}
 
@@ -118,7 +119,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 		return studyReferences;
 	}
@@ -138,7 +139,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 		return stockModels;
 	}
@@ -156,7 +157,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 	}
 
@@ -192,7 +193,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStocksByIds=" + ids + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 
 		return stockModels;
