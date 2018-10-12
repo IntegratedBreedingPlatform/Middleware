@@ -1,32 +1,27 @@
 package org.generationcp.middleware.operation.saver;
 
-import junit.framework.Assert;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ExperimentModelSaverTest {
+public class ExperimentModelSaverTest extends IntegrationTestBase {
+	private ExperimentModelSaver experimentModelSaver;
 
-	@Mock
-	private HibernateSessionProvider sessionProvider;
-
-	private final ExperimentModelSaver experimentModelSaver = new ExperimentModelSaver(sessionProvider);
+	@Before
+	public void setUp() throws Exception {
+		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
+	}
 
 	@Test
 	public void testCreateStudyDesignExperimentProperties() {
@@ -35,11 +30,11 @@ public class ExperimentModelSaverTest {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final VariableList factors = new VariableList();
 
-		factors.add(this.createVariable(101, "Categorical Name 1", TermId.CATEGORICAL_VARIABLE.getId(), VariableType.TREATMENT_FACTOR));
-		factors.add(this.createVariable(102, "999", TermId.NUMERIC_VARIABLE.getId(), VariableType.TREATMENT_FACTOR));
-		factors.add(this.createVariable(103, "Hello", TermId.CHARACTER_VARIABLE.getId(), VariableType.TREATMENT_FACTOR));
-		factors.add(this.createVariable(104, "1", TermId.NUMERIC_VARIABLE.getId(), VariableType.EXPERIMENTAL_DESIGN));
-		factors.add(this.createVariable(105, "Environment", TermId.CHARACTER_VARIABLE.getId(), VariableType.ENVIRONMENT_DETAIL));
+		factors.add(DMSVariableTestDataInitializer.createVariable(101, "Categorical Name 1", TermId.CATEGORICAL_VARIABLE.getId(), VariableType.TREATMENT_FACTOR));
+		factors.add(DMSVariableTestDataInitializer.createVariable(102, "999", TermId.NUMERIC_VARIABLE.getId(), VariableType.TREATMENT_FACTOR));
+		factors.add(DMSVariableTestDataInitializer.createVariable(103, "Hello", TermId.CHARACTER_VARIABLE.getId(), VariableType.TREATMENT_FACTOR));
+		factors.add(DMSVariableTestDataInitializer.createVariable(104, "1", TermId.NUMERIC_VARIABLE.getId(), VariableType.EXPERIMENTAL_DESIGN));
+		factors.add(DMSVariableTestDataInitializer.createVariable(105, "Environment", TermId.CHARACTER_VARIABLE.getId(), VariableType.ENVIRONMENT_DETAIL));
 
 		final List<ExperimentProperty> experimentProperties = experimentModelSaver.createTrialDesignExperimentProperties(experimentModel, factors);
 
@@ -61,7 +56,7 @@ public class ExperimentModelSaverTest {
 		final String variableValue = "Categorical Name 1";
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		final Variable variable = this.createVariable(variableId, variableValue, TermId.CATEGORICAL_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
+		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.CATEGORICAL_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
 		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
@@ -79,7 +74,7 @@ public class ExperimentModelSaverTest {
 		final String variableValue = "20";
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		final Variable variable = this.createVariable(variableId, variableValue, TermId.NUMERIC_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
+		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.NUMERIC_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
 		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
@@ -97,7 +92,7 @@ public class ExperimentModelSaverTest {
 		final String variableValue = "Hello";
 
 		final ExperimentModel experimentModel = new ExperimentModel();
-		final Variable variable = this.createVariable(variableId, variableValue, TermId.CHARACTER_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
+		final Variable variable = DMSVariableTestDataInitializer.createVariable(variableId, variableValue, TermId.CHARACTER_VARIABLE.getId(), VariableType.TREATMENT_FACTOR);
 
 		final ExperimentProperty experimentProperty = experimentModelSaver.createTrialDesignProperty(experimentModel, variable);
 
@@ -108,30 +103,18 @@ public class ExperimentModelSaverTest {
 
 	}
 
-	private Variable createVariable(final Integer variableId, final String variableValue, final Integer dataTypeId, final VariableType variableType) {
-
-		final Variable variable = new Variable();
-		variable.setValue(variableValue);
-
-		final StandardVariable standardVariable = new StandardVariable();
-		final List<Enumeration> enumerations = new ArrayList<>();
-		enumerations.add(new Enumeration(1234, "Categorical Name 1", "Categorical Name Description 1", 1));
-		enumerations.add(new Enumeration(1235, "Categorical Name 2", "Categorical Name Description 2", 2));
-		enumerations.add(new Enumeration(1236, "Categorical Name 3", "Categorical Name Description 3", 3));
-		standardVariable.setEnumerations(enumerations);
-		standardVariable.setDataType(new Term(dataTypeId, "",""));
-		standardVariable.setId(variableId);
-
-		final DMSVariableType dmsVariableType = new DMSVariableType();
-		dmsVariableType.setVariableType(variableType);
-		dmsVariableType.setStandardVariable(standardVariable);
-		dmsVariableType.setRole(variableType.getRole());
-		dmsVariableType.setRank(99);
-
-		variable.setVariableType(dmsVariableType);
-
-		return variable;
-
+	@Test
+	public void testAddOrUpdateExperiment() {
+		final VariableList factors = new VariableList();
+		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
+		final ExperimentValues values = new ExperimentValues();
+		values.setVariableList(factors);
+		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
+		values.setGermplasmId(1);
+		//Save the experiment
+		this.experimentModelSaver.addOrUpdateExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "dfg1");
+		final ExperimentModel experiment = this.experimentModelSaver.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final Phenotype phenotype = this.experimentModelSaver.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		Assert.assertEquals("999", phenotype.getValue());
 	}
-
 }
