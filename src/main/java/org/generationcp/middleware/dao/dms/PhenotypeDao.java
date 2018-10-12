@@ -587,8 +587,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 
-	public int updatePhenotypesByProjectIdAndLocationId(final Integer projectId, final Integer locationId, final Integer stockId,
-			final Integer cvTermId, final String value) {
+	public int updatePhenotypesByExperimentIdAndObervableId(final Integer experimentId, final Integer cvTermId, final String value) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
 			// of synch with
@@ -597,11 +596,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			this.getSession().flush();
 
 			// update the value of phenotypes
-			final String sql =
-				"UPDATE nd_experiment exp "
-					+ "INNER JOIN phenotype pheno ON exp.nd_experiment_id = pheno.nd_experiment_id " + "SET pheno.value = '" + value + "'"
-					+ " WHERE exp.project_id = " + projectId + " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 "
-					+ " AND exp.stock_id = " + stockId + " AND pheno.observable_id = " + cvTermId;
+			final String sql = "UPDATE phenotype pheno "
+					+ "SET pheno.value = '" + value + "'"
+					+ " WHERE pheno.nd_experiment_id = " + experimentId
+					+ " AND pheno.observable_id = " + cvTermId;
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
 			final int returnVal = statement.executeUpdate();
@@ -609,7 +607,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			return returnVal;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in updatePhenotypesByProjectIdAndLocationId=" + projectId + ", " + locationId
+			throw new MiddlewareQueryException("Error in updatePhenotypesByExperimentIdAndObervableId= " + experimentId + ", " + cvTermId + ", " + value
 					+ " in PhenotypeDao: " + e.getMessage(), e);
 		}
 	}
@@ -800,6 +798,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public Integer getPhenotypeIdByProjectAndType(final int projectId, final int typeId) {
 		try {
+			this.getSession().flush();
 			final StringBuilder sql = new StringBuilder().append(" SELECT p.phenotype_id ").append(" FROM phenotype p ")
 					.append(" INNER JOIN nd_experiment ep ON ep.nd_experiment_id = p.nd_experiment_id ")
 					.append("   AND ep.project_id = ").append(projectId).append(" WHERE p.observable_id = ").append(typeId);
@@ -816,14 +815,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return null;
 	}
 
-	public Phenotype getPhenotypeByProjectExperimentAndType(final int projectId, final int experimentId, final int typeId) {
+	public Phenotype getPhenotypeByExperimentIdAndObservableId(final int experimentId, final int observableId) {
 		try {
+			this.getSession().flush();
 			final StringBuilder sql = new StringBuilder()
 					.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id ")
 					.append(" FROM phenotype p ")
-					.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
-					.append("   AND e.project_id = ").append(projectId).append(" WHERE p.observable_id in ( ").append(typeId)
-					.append(") AND e.nd_experiment_id = ").append(experimentId);
+					.append(" WHERE p.observable_id = ").append(observableId)
+					.append(" AND p.nd_experiment_id = ").append(experimentId);
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
 			final List<Object[]> list = query.list();
@@ -838,7 +837,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			return phenotype;
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error in getPhenotypeByProjectExperimentAndType(" + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(),
+					"Error in getPhenotypeByExperimentIdAndObservableId(" + experimentId + ", " + observableId + ") in PhenotypeDao: " + e.getMessage(),
 					e);
 		}
 	}
