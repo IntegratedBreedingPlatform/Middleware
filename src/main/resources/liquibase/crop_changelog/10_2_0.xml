@@ -64,6 +64,7 @@
 				</not>
 			</and>
 		</preConditions>
+		<comment> Add created_date to phenotype table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			alter table phenotype
 			  add COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
@@ -82,6 +83,7 @@
 				</not>
 			</and>
 		</preConditions>
+		<comment> Add updated_date to phenotype table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			alter table phenotype
 			  add COLUMN
