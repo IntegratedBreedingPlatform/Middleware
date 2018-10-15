@@ -302,12 +302,7 @@ public class WorkbookParser {
 		final String endDateStr = WorkbookParser
 				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.END_DATE_ROW_INDEX - rowAdjustMent,
 						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-
-		// determine study type
-		final String studyTypeName = WorkbookParser
-				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX - rowAdjustMent,
-						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final StudyTypeDto studyTypeValue = new StudyTypeDto(studyTypeName);
+		final StudyTypeDto studyTypeValue = determineStudyType(wb, rowAdjustMent);
 
 		// GCP-6991 and GCP-6992
 		if (study == null || StringUtils.isEmpty(study)) {
@@ -318,8 +313,8 @@ public class WorkbookParser {
 			this.errorMessages.add(new Message("error.blank.study.title"));
 		}
 
-		Date startDate = this.validateDate(startDateStr, true, new Message("error.start.date.invalid"));
-		Date endDate = this.validateDate(endDateStr, false, new Message("error.end.date.invalid"));
+		final Date startDate = this.validateDate(startDateStr, true, new Message("error.start.date.invalid"));
+		final Date endDate = this.validateDate(endDateStr, false, new Message("error.end.date.invalid"));
 
 		if (startDate != null && endDate != null && startDate.after(endDate)) {
 			this.errorMessages.add(new Message("error.start.is.after.end.date"));
@@ -344,7 +339,14 @@ public class WorkbookParser {
 		}
 		return studyDetails;
 	}
-	
+
+	StudyTypeDto determineStudyType(final Workbook wb, final int rowAdjustMent) {
+		final String studyTypeName = WorkbookParser
+				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX - rowAdjustMent,
+						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
+		return new StudyTypeDto(StringUtils.isEmpty(studyTypeName)? StudyTypeDto.NURSERY_NAME: studyTypeName);
+	}
+
 	protected Date validateDate(final String dateString, final boolean isStartDate, final Message errorMessage) {
 		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 		Date date = null;
