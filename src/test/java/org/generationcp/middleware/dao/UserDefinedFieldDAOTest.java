@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserDefinedFieldTestDataInitializer;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -111,6 +112,20 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(nameTypesByGID.contains(this.nameTypes.get(0)));
 		Assert.assertTrue(nameTypesByGID.contains(this.nameTypes.get(1)));
 		Assert.assertFalse(nameTypesByGID.contains(this.nameTypes.get(2)));
-	} 
+	}
+
+	@Test
+	public void testGetByFieldTableNameAndFTypeAndFName() {
+		final UserDefinedField udfld = UserDefinedFieldTestDataInitializer.createUserDefinedField("NAMES", "NAME", "FNAME12345");
+		this.userDefinedFieldDao.save(udfld);
+		final List<UserDefinedField> userDefinedFields = this.userDefinedFieldDao.getByFieldTableNameAndFTypeAndFName(udfld.getFtable(), udfld.getFtype(), udfld.getFname());
+		Assert.assertNotNull(userDefinedFields);
+		Assert.assertFalse(userDefinedFields.isEmpty());
+		for(final UserDefinedField userDefinedField: userDefinedFields) {
+			Assert.assertEquals(udfld.getFtable(), userDefinedField.getFtable());
+			Assert.assertEquals(udfld.getFtype(), userDefinedField.getFtype());
+			Assert.assertEquals(udfld.getFname(), userDefinedField.getFname());
+		}
+	}
 
 }

@@ -21,10 +21,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
-import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
+import org.generationcp.middleware.data.initializer.*;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -1242,6 +1239,20 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		assertThat(attributeTypes, is(notNullValue()));
 		for (final UserDefinedField field : attributeTypes) {
 			assertThat("ATRIBUTS", is(equalTo(field.getFtable())));
+		}
+	}
+
+	@Test
+	public void testGetByFieldTableNameAndFTypeAndFName() {
+		final UserDefinedField udfld = UserDefinedFieldTestDataInitializer.createUserDefinedField("NAMES", "NAME", "FNAME12345");
+		this.germplasmDataManager.addUserDefinedField(udfld);
+		final List<UserDefinedField> userDefinedFields = this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndFTypeAndFName(udfld.getFtable(), udfld.getFtype(), udfld.getFname());
+		Assert.assertNotNull(userDefinedFields);
+		Assert.assertFalse(userDefinedFields.isEmpty());
+		for(final UserDefinedField userDefinedField: userDefinedFields) {
+			Assert.assertEquals(udfld.getFtable(), userDefinedField.getFtable());
+			Assert.assertEquals(udfld.getFtype(), userDefinedField.getFtype());
+			Assert.assertEquals(udfld.getFname(), userDefinedField.getFname());
 		}
 	}
 

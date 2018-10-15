@@ -1,12 +1,19 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.Type;
@@ -14,13 +21,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 public class DmsProjectDaoTest {
 
@@ -58,14 +58,18 @@ public class DmsProjectDaoTest {
 		final Object[] mockDBRow2 = new Object[] {2, "My Folder", "My Folder Desc", 0, PROG_UUID, null};
 		mockQueryResult.add(mockDBRow2);
 
+		final Integer ownerId1 = 100;
+		final String ownerName1 = RandomStringUtils.randomAlphabetic(20);
 		final Object[] mockDBRow3 =
 			new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, 1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME,
-				Byte.valueOf("1"), 1};
+				Byte.valueOf("1"), 200, true, ownerId1, ownerName1};
 		mockQueryResult.add(mockDBRow3);
 
+		final Integer ownerId2 = 110;
+		final String ownerName2 = RandomStringUtils.randomAlphabetic(20);
 		final Object[] mockDBRow4 =
 			new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, 2, StudyTypeDto.TRIAL_LABEL, StudyTypeDto.TRIAL_NAME,
-				Byte.valueOf("1"), 1};
+				Byte.valueOf("1"), 201, false, ownerId2, ownerName2};
 		mockQueryResult.add(mockDBRow4);
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
@@ -84,12 +88,20 @@ public class DmsProjectDaoTest {
 
 		final Reference myNursery = result.get(2);
 		Assert.assertTrue(myNursery.isStudy());
-		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, ((StudyReference) myNursery).getStudyType().getName());
+		final StudyReference nurseryResult = (StudyReference) myNursery;
+		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, nurseryResult.getStudyType().getName());
+		Assert.assertTrue(nurseryResult.getIsLocked());
+		Assert.assertEquals(ownerId1, nurseryResult.getOwnerId());
+		Assert.assertEquals(ownerName1, nurseryResult.getOwnerName());
 		this.assertCommonDataMapping(mockDBRow3, myNursery);
 
 		final Reference myTrial = result.get(3);
 		Assert.assertTrue(myTrial.isStudy());
-		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, ((StudyReference) myTrial).getStudyType().getName());
+		final StudyReference trialResult = (StudyReference) myTrial;
+		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, trialResult.getStudyType().getName());
+		Assert.assertFalse(trialResult.getIsLocked());
+		Assert.assertEquals(ownerId2, trialResult.getOwnerId());
+		Assert.assertEquals(ownerName2, trialResult.getOwnerName());
 		this.assertCommonDataMapping(mockDBRow4, myTrial);
 	}
 
