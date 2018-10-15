@@ -47,8 +47,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationManager;
 
-	@Resource
-	private FieldbookService fieldbookMiddlewareService;
+	private FieldbookServiceImpl fieldbookMiddlewareService;
 	
 	@Autowired
 	private UserDataManager userDataManager;
@@ -69,6 +68,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
+		this.fieldbookMiddlewareService = new FieldbookServiceImpl(this.sessionProvder, "TESTCROP");
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
 
 		if (this.workbenchTestDataUtil == null) {
@@ -163,7 +163,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 				FieldbookServiceTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.CRT_CROSS.name(),
 				FieldbookServiceTest.TEST_GERMPLASM_LIST_USER_ID, FieldbookServiceTest.STATUS_ACTIVE, FieldbookServiceTest.PROGRAM_UUID, this.studyReference.getId());
 		testList.setProjectId(this.studyReference.getId());
-		germplasmListDAO.saveOrUpdate(testList);
+		this.germplasmListDAO.saveOrUpdate(testList);
 		Assert.assertTrue(this.fieldbookMiddlewareService.hasAdvancedOrCrossesList(this.studyReference.getId()));
 	}
 
@@ -174,7 +174,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 				FieldbookServiceTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.IMP_CROSS.name(),
 				FieldbookServiceTest.TEST_GERMPLASM_LIST_USER_ID, FieldbookServiceTest.STATUS_ACTIVE, FieldbookServiceTest.PROGRAM_UUID, this.studyReference.getId());
 		testList.setProjectId(this.studyReference.getId());
-		germplasmListDAO.saveOrUpdate(testList);
+		this.germplasmListDAO.saveOrUpdate(testList);
 		Assert.assertTrue(this.fieldbookMiddlewareService.hasAdvancedOrCrossesList(this.studyReference.getId()));
 	}
 }
