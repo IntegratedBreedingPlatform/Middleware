@@ -48,6 +48,9 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationManager;
 
+	@Autowired
+	private UserDataManager userDataManager;
+
 	private GermplasmListDAO dao;
 	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
 	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
@@ -103,7 +106,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
 		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject, this.dataManager,
-				this.locationManager);
+				this.locationManager, this.userDataManager);
 
 		this.studyReference = this.studyTDI.addTestStudy("ABCD");
 
