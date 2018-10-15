@@ -37,6 +37,7 @@ import java.util.Set;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
+	private static final String IN_STOCK_DAO = " in StockDao: ";
 	protected static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
@@ -54,7 +55,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			stockIds = criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStockIdsByProperty=" + value + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStockIdsByProperty=" + value + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 		return stockIds;
 	}
@@ -71,7 +72,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in countStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 	}
 
@@ -81,13 +82,19 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("select distinct p.project_id, p.name, p.description, "
-				+ "st.study_type_id, st.label, st.name, st.visible, st.cvterm_id, p.program_uuid "
+				+ "st.study_type_id, st.label, st.name as studyTypeName, st.visible, st.cvterm_id, p.program_uuid, p.locked, "
+				+ "u.userId, CONCAT(fname, ' ', lname) as ownerName "
 				+ "FROM stock s "
 				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
 				+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = e.project_id "
 				+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
 				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
+				+ "LEFT JOIN users u ON u.userid = p.created_by "
+				+ "LEFT JOIN persons per ON per.personid = u.personid "
 				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
+			query.addScalar("project_id").addScalar("name").addScalar("description").addScalar("study_type_id").addScalar("label")
+					.addScalar("studyTypeName").addScalar("visible").addScalar("cvterm_id").addScalar("program_uuid").addScalar("locked")
+					.addScalar("userId").addScalar("ownerName");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
@@ -101,12 +108,18 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final String studyTypeName = (String) row[5];
 				final boolean visible = ((Byte) row[6]) == 1;
 				final Integer cvtermId = (Integer) row[7];
+				final String programUUID = (String) row[8];
+				final Boolean isLocked = (Boolean) row[9];
+				final Integer ownerId = (Integer) row[10];
+				final String ownerName = (String) row[11];
+				
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], (String) row[8], studyTypeDto));
+				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], programUUID, studyTypeDto,
+						isLocked, ownerId, ownerName));
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 		return studyReferences;
 	}
@@ -126,7 +139,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 		return stockModels;
 	}
@@ -144,7 +157,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 	}
 
@@ -180,7 +193,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStocksByIds=" + ids + StockDao.IN_STOCK_DAO + e.getMessage(), e);
 		}
 
 		return stockModels;

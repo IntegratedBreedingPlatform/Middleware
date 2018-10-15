@@ -334,9 +334,10 @@ public class WorkbookParser {
 			this.errorMessages.add(new Message("error.start.is.after.current.date"));
 		}
 
+		// Study is not locked by default
 		final StudyDetails studyDetails =
 				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null, Util
-					.getCurrentDateAsStringValue(), createdBy);
+					.getCurrentDateAsStringValue(), createdBy, false);
 
 		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
 			this.currentRowZeroBased++;
