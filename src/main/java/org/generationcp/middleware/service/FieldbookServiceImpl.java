@@ -1123,6 +1123,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public boolean hasAdvancedOrCrossesList(final int projectId) {
+		return this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(projectId);
+	}
+
+	@Override
 	public List<ListDataProject> getListDataProject(final int listId) {
 		return this.getListDataProjectDAO().getByListId(listId);
 	}
