@@ -8,15 +8,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
@@ -34,6 +39,15 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Autowired
 	private GermplasmDataManager dataManager;
 
+	@Autowired
+	private OntologyDataManager ontologyManager;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private LocationDataManager locationManager;
+
 	private GermplasmListDAO dao;
 	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
 	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
@@ -49,6 +63,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private GermplasmList list;
 	private Germplasm germplasm;
+	private Project commonTestProject;
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+	private StudyReference studyReference;
+	private StudyTestDataInitializer studyTDI;
 
 	static {
 		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("STUDY");
@@ -73,6 +91,21 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListData germplasmListData = new GermplasmListData(null, this.list, this.germplasm.getGid(), 1, "EntryCode",
 				"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData);
+
+		if (this.workbenchTestDataUtil == null) {
+			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+			this.workbenchTestDataUtil.setUpWorkbench();
+		}
+
+		if (this.commonTestProject == null) {
+			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
+		}
+
+		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
+		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject, this.dataManager,
+				this.locationManager);
+
+		this.studyReference = this.studyTDI.addTestStudy("ABCD");
 
 	}
 
@@ -230,6 +263,39 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("Returned results should contain one item", 
 				1, allGermplasmListsById.size());
 
+	}
+
+	@Test
+	public void testHasAdvancedOrCrossesListForAdvanced() {
+		Assert.assertFalse(this.dao.hasAdvancedOrCrossesList(this.studyReference.getId()));
+		final GermplasmList testList = createGermplasmListTestData("ADV LIST", "Test List Description",
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.ADVANCED.name(),
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID);
+		testList.setProjectId(this.studyReference.getId());
+		saveGermplasm(testList);
+		Assert.assertTrue(this.dao.hasAdvancedOrCrossesList(this.studyReference.getId()));
+	}
+
+	@Test
+	public void testHasAdvancedOrCrossesListForCreatedCrosses() {
+		Assert.assertFalse(this.dao.hasAdvancedOrCrossesList(this.studyReference.getId()));
+		final GermplasmList testList = createGermplasmListTestData("CREATED CROSSES", "Test List Description",
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.CRT_CROSS.name(),
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID);
+		testList.setProjectId(this.studyReference.getId());
+		saveGermplasm(testList);
+		Assert.assertTrue(this.dao.hasAdvancedOrCrossesList(this.studyReference.getId()));
+	}
+
+	@Test
+	public void testHasAdvancedOrCrossesListForImportedCrosses() {
+		Assert.assertFalse(this.dao.hasAdvancedOrCrossesList(this.studyReference.getId()));
+		final GermplasmList testList = createGermplasmListTestData("IMPORTED CROSSES", "Test List Description",
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListType.IMP_CROSS.name(),
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE, GermplasmListDAOTest.PROGRAM_UUID);
+		testList.setProjectId(this.studyReference.getId());
+		saveGermplasm(testList);
+		Assert.assertTrue(this.dao.hasAdvancedOrCrossesList(this.studyReference.getId()));
 	}
 
 	@Test
