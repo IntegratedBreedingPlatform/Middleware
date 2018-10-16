@@ -16,6 +16,7 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -62,6 +63,9 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	@Autowired
 	private FieldbookService fieldbookService;
+	
+	@Autowired
+	private UserDataManager userDataManager;
 	
 	@Mock
 	private Session mockSession;
@@ -508,7 +512,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		studyDataManager.setSessionProvider(this.sessionProvder);
 
 		final StudyTestDataInitializer studyTestDataInitializer =
-				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager);
+				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager, this.userDataManager);
 
 		// First 3 studies have location and season variables at study level
 		// We need to add datasets to studies because search queries expect "Belongs to Study" record in project_relationship

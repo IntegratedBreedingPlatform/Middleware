@@ -12,15 +12,14 @@
 
 package org.generationcp.middleware.domain.etl;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.util.Objects;
 
 public class StudyDetails implements Serializable {
 
@@ -65,14 +64,16 @@ public class StudyDetails implements Serializable {
 	private String studyUpdate;
 
 	private String createdBy;
+	
+	private Boolean isLocked;
 
 	public StudyDetails() {
 
 	}
 
-	public StudyDetails(final String studyName, final String description, final String objective, final String startDate, final String endDate,
-			final StudyTypeDto studyType, final long parentFolderId, final String trialDatasetName, final String measurementDatasetName, final String studyUpdate, final String
-		createdBy) {
+	public StudyDetails(final String studyName, final String description, final String objective, final String startDate,
+			final String endDate, final StudyTypeDto studyType, final long parentFolderId, final String trialDatasetName,
+			final String measurementDatasetName, final String studyUpdate, final String createdBy, final Boolean isLocked) {
 		this.studyName = studyName;
 		this.description = description;
 		this.objective = objective;
@@ -85,13 +86,15 @@ public class StudyDetails implements Serializable {
 		label = studyName;
 		this.studyUpdate = studyUpdate;
 		this.createdBy = createdBy;
+		this.isLocked = isLocked;
 	}
 
 	// Used by getTrialObservationTable
-	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate, final String endDate,
-			final StudyTypeDto studyType, final String piName, final String siteName, final String piId, final String siteId, final String studyUpdate, final String createdBy) {
+	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate,
+			final String endDate, final StudyTypeDto studyType, final String piName, final String siteName, final String piId,
+			final String siteId, final String studyUpdate, final String createdBy, final Boolean isLocked) {
 
-		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy, isLocked);
 		this.id = id;
 		if ((piId != null) && NumberUtils.isNumber(piId)) {
 			this.piId = Double.valueOf(piId).intValue();
@@ -101,16 +104,18 @@ public class StudyDetails implements Serializable {
 		}
 	}
 
-	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate, final String endDate,
-			final StudyTypeDto studyType, final String piName, final String siteName, final String studyUpdate, final String createdBy) {
+	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate,
+			final String endDate, final StudyTypeDto studyType, final String piName, final String siteName, final String studyUpdate,
+			final String createdBy, final Boolean isLocked) {
 
-		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy);
+		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy, isLocked);
 		this.id = id;
 	}
 
-	public StudyDetails(final String studyName, final String description, final String objective, final String startDate, final String endDate, final StudyTypeDto studyType,
-			final String piName, final String siteName, final String studyUpdate, final String createdBy) {
-		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null, studyUpdate, createdBy);
+	public StudyDetails(final String studyName, final String description, final String objective, final String startDate,
+			final String endDate, final StudyTypeDto studyType, final String piName, final String siteName, final String studyUpdate,
+			final String createdBy, final Boolean isLocked) {
+		this(studyName, description, objective, startDate, endDate, studyType, 0, null, null, studyUpdate, createdBy, isLocked);
 		this.siteName = siteName;
 		setPiName(piName);
 	}
@@ -474,5 +479,15 @@ public class StudyDetails implements Serializable {
 
 	public String getCreatedBy() {
 		return this.createdBy;
+	}
+
+	
+	public Boolean getIsLocked() {
+		return isLocked;
+	}
+
+	
+	public void setIsLocked(Boolean isLocked) {
+		this.isLocked = isLocked;
 	}
 }

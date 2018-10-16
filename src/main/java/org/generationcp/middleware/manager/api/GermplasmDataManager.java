@@ -517,13 +517,23 @@ public interface GermplasmDataManager {
 	UserDefinedField getUserDefinedFieldByID(Integer id);
 
 	/**
-	 * Returns the udfld records identified by the given tablename.
+	 * Returns the udfld records identified by the given tablename and field type.
 	 *
 	 * @param tableName - the value of the ftable record
 	 * @param fieldType - the value of the ftype record
 	 * @return the Udflds POJO representing the record
 	 */
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType);
+
+	/**
+	 * Returns the udfld records identified by the given tablename, field type, and field name.
+	 *
+	 * @param tableName - the value of the ftable record
+	 * @param fieldType - the value of the ftype record
+	 * @param fieldName - the value of the fname record
+	 * @return the Udflds POJO representing the record
+	 */
+	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(String tableName, String fieldType, String fieldName);
 
 	/**
 	 * Return the UserDefinedField using local field no
