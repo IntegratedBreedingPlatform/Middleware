@@ -55,6 +55,33 @@
 		</sql>
 	</changeSet>
 
+		<changeSet author="darla" id="v10.2.0-4" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="locked" />
+			</not>
+		</preConditions>
+		<comment>Add locked field in project table and set all studies as non-locked initially</comment>
+		<addColumn tableName="project">
+			<column name="locked" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+
+	<changeSet author="mderamos" id="v10.2.0-4">
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM phenotype phenotype_duplicate INNER JOIN phenotype phenotype
+				WHERE phenotype.phenotype_id > phenotype_duplicate.phenotype_id AND phenotype_duplicate.observable_id = phenotype.observable_id AND phenotype_duplicate.nd_experiment_id = phenotype.nd_experiment_id;
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE phenotype ADD UNIQUE INDEX phenotype_UNIQUE (observable_id ASC, nd_experiment_id ASC);
+		</sql>
+	</changeSet>
+
 	<changeSet author="vanina" id="v10.2.0-4">
  		<preConditions onFail="MARK_RAN">
 			<and>
@@ -95,33 +122,5 @@
 			  ON UPDATE CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
-
-	<changeSet author="darla" id="v10.2.0-4" >
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="project" columnName="locked" />
-			</not>
-		</preConditions>
-		<comment>Add locked field in project table and set all studies as non-locked initially</comment>
-		<addColumn tableName="project">
-			<column name="locked" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0">
-				<constraints nullable="false"/>
-			</column>
-		</addColumn>
-	</changeSet>
-
-
-	<changeSet author="mderamos" id="v10.2.0-4">
-		<preConditions onFail="CONTINUE">
-			<sqlCheck expectedResult="0">
-				SELECT COUNT(*) FROM phenotype phenotype_duplicate INNER JOIN phenotype phenotype
-				WHERE phenotype.phenotype_id > phenotype_duplicate.phenotype_id AND phenotype_duplicate.observable_id = phenotype.observable_id AND phenotype_duplicate.nd_experiment_id = phenotype.nd_experiment_id;
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE phenotype ADD UNIQUE INDEX phenotype_UNIQUE (observable_id ASC, nd_experiment_id ASC);
-		</sql>
-	</changeSet>
-
 
 </databaseChangeLog>
