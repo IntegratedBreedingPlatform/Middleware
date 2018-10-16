@@ -55,6 +55,47 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v10.2.0-4">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="phenotype"/>
+				<not>
+					<columnExists tableName="phenotype" columnName="created_date"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment> Add created_date to phenotype table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			alter table phenotype
+			  add COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
+
+			alter table phenotype
+			  modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v10.2.0-5">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="phenotype"/>
+				<not>
+					<columnExists tableName="phenotype" columnName="updated_date"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment> Add updated_date to phenotype table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			alter table phenotype
+			  add COLUMN
+			  updated_date TIMESTAMP NULL DEFAULT NULL;
+
+			alter table phenotype
+			  modify COLUMN
+			  updated_date TIMESTAMP NULL default CURRENT_TIMESTAMP
+			  ON UPDATE CURRENT_TIMESTAMP;
+		</sql>
+	</changeSet>
+
 	<changeSet author="darla" id="v10.2.0-4" >
 		<preConditions onFail="MARK_RAN">
 			<not>
