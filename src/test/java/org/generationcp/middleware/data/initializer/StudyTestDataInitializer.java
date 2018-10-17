@@ -254,7 +254,7 @@ public class StudyTestDataInitializer {
 
 	}
 	
-	public void addEnvironmentDataset(final int studyId, final String locationId, final String seasonId) throws Exception {
+	public Integer addEnvironmentDataset(final int studyId, final String locationId, final String seasonId) throws Exception {
 		final VariableList locationVariableList = this.createEnvironmentWithLocationAndSeason("1", "RCBD", "SOME SITE NAME", locationId, seasonId);
 		final int geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
 
@@ -268,7 +268,7 @@ public class StudyTestDataInitializer {
 		experimentValue.setLocationId(geolocationId);
 		this.studyDataManager.addExperiment(dataSet.getId(), ExperimentType.TRIAL_ENVIRONMENT, experimentValue, "");
 
-
+		return dataSet.getId();
 	}
 
 	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)
