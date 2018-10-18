@@ -80,7 +80,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE =
 			"Analysis and/or Analysis Summary variable type(s) should not be assigned together with any other variable type";
-
+	private static final String OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS =
+			"Variables cannot be classified as both Observation Unit and Trait. Please check the variable types assigned and try again.";
+		
 	@Autowired
 	private OntologyMethodDataManager methodManager;
 
@@ -566,7 +568,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
 		}
 
-		this.checkForReservedVariableTypes(variableInfo);
+		this.validateVariableTypes(variableInfo);
 
 		// Saving term to database.
 		final CVTerm savedTerm = daoFactory.getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
@@ -637,7 +639,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		this.checkTermIsVariable(term);
 
-		this.checkForReservedVariableTypes(variableInfo);
+		this.validateVariableTypes(variableInfo);
 
 		final CVTermRelationship methodRelation = elements.getMethodRelation();
 		final CVTermRelationship propertyRelation = elements.getPropertyRelation();
@@ -752,11 +754,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	}
 
-	// Throw exception if variable types of variable to be added is "reserved" like "Analysis" or "Analysis Summary"
-	private void checkForReservedVariableTypes(final OntologyVariableInfo variableInfo) {
+	private void validateVariableTypes(final OntologyVariableInfo variableInfo) {
+		// Variable types "Analysis" or "Analysis Summary" cannot be used with other variable types
 		if (!Collections.disjoint(variableInfo.getVariableTypes(), VariableType.getReservedVariableTypes())
 				&& variableInfo.getVariableTypes().size() > 1) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
+		
+		} else if (variableInfo.getVariableTypes().contains(VariableType.OBSERVATION_UNIT)
+				&& variableInfo.getVariableTypes().contains(VariableType.TRAIT)) {
+			throw new MiddlewareException(OntologyVariableDataManagerImpl.OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS);
 		}
 	}
 
