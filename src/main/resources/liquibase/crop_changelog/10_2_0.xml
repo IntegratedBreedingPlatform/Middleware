@@ -123,35 +123,4 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v10.2.0-6">
- 		<preConditions onFail="MARK_RAN">
-			<and>
-				<tableExists tableName="nd_experiment"/>
-				<not>
-					<columnExists tableName="nd_experiment" columnName="parent_id"/>
-				</not>
-			</and>
-		</preConditions>
-		<comment> Add parent_id to nd_experiment table </comment>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE nd_experiment
-			ADD COLUMN parent_id INT(11) NULL DEFAULT NULL;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v10.2.0-7">
- 		<preConditions onFail="MARK_RAN">
-			<and>
-				<tableExists tableName="nd_experiment"/>
-				<not>
-					<columnExists tableName="nd_experiment" columnName="sequence_no"/>
-				</not>
-			</and>
-		</preConditions>
-		<comment> Add sequence_no to nd_experiment table </comment>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE nd_experiment
-			ADD COLUMN sequence_no INT NULL DEFAULT NULL;
-		</sql>
-	</changeSet>
 </databaseChangeLog>
