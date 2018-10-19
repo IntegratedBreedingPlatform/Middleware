@@ -96,7 +96,7 @@ public class ExperimentModel implements Serializable {
 	@JoinColumn(name = "parent_id")
 	private ExperimentModel parent;
 
-	@Column(name = "observationUnitNo")
+	@Column(name = "observation_unit_no")
 	private Integer observationUnitNo;
 
 	public ExperimentModel() {
