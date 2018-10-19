@@ -11,8 +11,9 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
-import java.util.List;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -28,10 +29,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.io.Serializable;
+import java.util.List;
 /**
  *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
@@ -92,6 +91,13 @@ public class ExperimentModel implements Serializable {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 5000)
 	private List<Phenotype> phenotypes;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_id")
+	private ExperimentModel parent;
+
+	@Column(name = "observation_unit_no")
+	private Integer observationUnitNo;
 
 	public ExperimentModel() {
 	}
@@ -172,6 +178,22 @@ public class ExperimentModel implements Serializable {
 		return this.obsUnitId;
 	}
 
+	public ExperimentModel getParent() {
+		return this.parent;
+	}
+
+	public void setParent(final ExperimentModel parent) {
+		this.parent = parent;
+	}
+
+	public Integer getObservationUnitNo() {
+		return this.observationUnitNo;
+	}
+
+	public void setObservationUnitNo(final Integer observationUnitNo) {
+		this.observationUnitNo = observationUnitNo;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -220,17 +242,17 @@ public class ExperimentModel implements Serializable {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("Experiment [ndExperimentId=");
-		builder.append(this.ndExperimentId);
-		builder.append(", geoLocationId=");
-		builder.append(this.geoLocation);
-		builder.append(", typeId=");
-		builder.append(this.typeId);
-		builder.append(", obsUnitId=");
-		builder.append(this.obsUnitId);
-		builder.append("]");
-		return builder.toString();
+		return "ExperimentModel{" +
+			"ndExperimentId=" + ndExperimentId +
+			", geoLocation=" + geoLocation +
+			", typeId=" + typeId +
+			", obsUnitId='" + obsUnitId + '\'' +
+			", properties=" + properties +
+			", project=" + project +
+			", stock=" + stock +
+			", phenotypes=" + phenotypes +
+			", parent=" + parent +
+			", observationUnitNo=" + observationUnitNo +
+			'}';
 	}
-	
 }
