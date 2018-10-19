@@ -96,6 +96,9 @@ public class ExperimentModel implements Serializable {
 	@JoinColumn(name = "parent_id")
 	private ExperimentModel parent;
 
+	@Column(name = "sequence_no")
+	private Integer sequenceNo;
+
 	public ExperimentModel() {
 	}
 
@@ -183,6 +186,14 @@ public class ExperimentModel implements Serializable {
 		this.parent = parent;
 	}
 
+	public Integer getSequenceNo() {
+		return this.sequenceNo;
+	}
+
+	public void setSequenceNo(final Integer sequenceNo) {
+		this.sequenceNo = sequenceNo;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -232,15 +243,16 @@ public class ExperimentModel implements Serializable {
 	@Override
 	public String toString() {
 		return "ExperimentModel{" +
-			"ndExperimentId=" + this.ndExperimentId +
-			", geoLocation=" + this.geoLocation +
-			", typeId=" + this.typeId +
-			", obsUnitId='" + this.obsUnitId + '\'' +
-			", properties=" + this.properties +
-			", project=" + this.project +
-			", stock=" + this.stock +
-			", phenotypes=" + this.phenotypes +
-			", parent=" + this.parent +
+			"ndExperimentId=" + ndExperimentId +
+			", geoLocation=" + geoLocation +
+			", typeId=" + typeId +
+			", obsUnitId='" + obsUnitId + '\'' +
+			", properties=" + properties +
+			", project=" + project +
+			", stock=" + stock +
+			", phenotypes=" + phenotypes +
+			", parent=" + parent +
+			", sequenceNo=" + sequenceNo +
 			'}';
 	}
 }
