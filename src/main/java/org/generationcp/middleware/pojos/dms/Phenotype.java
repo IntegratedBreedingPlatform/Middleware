@@ -26,7 +26,6 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 
@@ -105,8 +104,11 @@ public class Phenotype implements Serializable {
 	@JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
 
-	@Column(name = "sequence_no")
-	private Integer sequenceNo;
+	@Column(name = "created_date", updatable = false, insertable = false)
+	private Date createdDate;
+
+	@Column(name = "updated_date", updatable = false, insertable = false)
+	private Date updatedDate;
 
 	public Phenotype() {
 	}
@@ -203,12 +205,20 @@ public class Phenotype implements Serializable {
 		this.valueStatus = valueStatus;
 	}
 
-	public Integer getSequenceNo() {
-		return this.sequenceNo;
+	public Date getCreatedDate() {
+		return this.createdDate;
 	}
 
-	public void setSequenceNo(final Integer sequenceNo) {
-		this.sequenceNo = sequenceNo;
+	public void setCreatedDate(final Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public Date getUpdatedDate() {
+		return this.updatedDate;
+	}
+
+	public void setUpdatedDate(final Date updatedDate) {
+		this.updatedDate = updatedDate;
 	}
 
 	@Override
@@ -246,7 +256,8 @@ public class Phenotype implements Serializable {
 			", valueStatus=" + this.valueStatus +
 			", assayId=" + this.assayId +
 			", experiment=" + this.experiment +
-			", sequenceNo=" + this.sequenceNo +
+			", createdDate=" + this.createdDate +
+			", updatedDate=" + this.updatedDate +
 			'}';
 	}
 }

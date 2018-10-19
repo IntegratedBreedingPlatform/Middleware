@@ -95,6 +95,11 @@ public class DmsProject implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "deleted", columnDefinition = "TINYINT")
 	private boolean deleted;
+	
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Basic(optional = false)
+	@Column(name = "locked", columnDefinition = "TINYINT")
+	private boolean locked;
 
 	@ManyToOne(targetEntity = StudyType.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "study_type_id")
@@ -183,6 +188,14 @@ public class DmsProject implements Serializable {
 
 	public void setDeleted(final Boolean deleted) {
 		this.deleted = deleted;
+	}
+	
+	public Boolean isLocked() {
+		return this.locked;
+	}
+
+	public void setLocked(final Boolean locked) {
+		this.locked = locked;
 	}
 
 	public StudyType getStudyType() {

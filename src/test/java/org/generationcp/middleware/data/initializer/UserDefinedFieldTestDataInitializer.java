@@ -24,10 +24,23 @@ public class UserDefinedFieldTestDataInitializer {
 		this.populateValidListType();
 	}
 	
-	public UserDefinedField createUserDefinedField(final String fcode, final String fname) {
+	public static UserDefinedField createUserDefinedField(final String fcode, final String fname) {
 		final UserDefinedField udField = new UserDefinedField();
 		udField.setFcode(fcode);
 		udField.setFname(fname);
+		return udField;
+	}
+
+	public static UserDefinedField createUserDefinedField(final String tableName, final String ftype, final String fname) {
+		final UserDefinedField udField = UserDefinedFieldTestDataInitializer.createUserDefinedField("FCODE12345", fname);
+		udField.setFtable(tableName);
+		udField.setFtype(ftype);
+		udField.setFdate(20060123);
+		udField.setFdesc(fname);
+		udField.setFfmt("-");
+		udField.setFuid(0);
+		udField.setLfldno(0);
+		udField.setScaleid(0);
 		return udField;
 	}
 	
@@ -35,7 +48,7 @@ public class UserDefinedFieldTestDataInitializer {
 		this.validListType = new ArrayList<UserDefinedField>();
 		
 		for(Map.Entry<String, String> item: validListTypeMap.entrySet()){
-			this.validListType.add(this.createUserDefinedField(item.getKey(), item.getValue()));
+			this.validListType.add(UserDefinedFieldTestDataInitializer.createUserDefinedField(item.getKey(), item.getValue()));
 		}
 	}
 	

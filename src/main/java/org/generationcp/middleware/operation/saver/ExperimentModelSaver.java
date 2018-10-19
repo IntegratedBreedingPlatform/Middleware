@@ -27,9 +27,11 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExperimentModelSaver extends Saver {
-
+	private static final Logger LOG = LoggerFactory.getLogger(ExperimentModelSaver.class);
 	private static final String P = "P";
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProviderForLocal) {
@@ -48,25 +50,15 @@ public class ExperimentModelSaver extends Saver {
 		final int experimentId =
 				this.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
-
-		// update if existing
-		boolean isUpdated = false;
-		for (final Variable variable : values.getVariableList().getVariables()) {
-			final int val =
-					this.getPhenotypeDao().updatePhenotypesByProjectIdAndLocationId(projectId, values.getLocationId(),
-							values.getGermplasmId(), variable.getVariableType().getId(), variable.getValue());
-
-			if (val > 0) {
-				isUpdated = true;
+		if(experimentId != 0 ) {
+			for (final Variable variable : values.getVariableList().getVariables()) {
+				final int val = this.getPhenotypeDao()
+						.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue());
+				if (val == 0) {
+					this.getPhenotypeSaver().save(experimentId, variable);
+				}
 			}
-
-			if (experimentId != 0 && val == 0) {
-				this.getPhenotypeSaver().save(experimentId, variable);
-			}
-
-		}
-
-		if (!isUpdated && experimentId == 0) {
+		} else {
 			TermId myExperimentType = null;
 			if (values instanceof StudyValues) {
 				myExperimentType = TermId.STUDY_EXPERIMENT;
@@ -118,7 +110,6 @@ public class ExperimentModelSaver extends Saver {
 
 		if (!(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.equals(expType) && TermId.STUDY_INFORMATION.equals(expType))) {
 			final String plotUniqueId = this.getPlotUniqueId(cropPrefix);
-
 			experimentModel.setObsUnitId(plotUniqueId);
 		}
 
@@ -134,7 +125,7 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
-	private Geolocation createNewGeoLocation() {
+	public Geolocation createNewGeoLocation() {
 		final Geolocation location = new Geolocation();
 		location.setDescription("1");
 		this.getGeolocationDao().save(location);
