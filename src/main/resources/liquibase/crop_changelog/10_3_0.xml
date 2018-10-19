@@ -1,0 +1,81 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+	<changeSet author="darla" id="v10.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1812;</sqlCheck>
+		</preConditions>
+		<comment>Add "Observation Unit" variable type</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1812, 1041, 'Observation Unit','Variables used to enumerate the observation units', null, 0, 0);
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v10.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id in (8202, 8203, 8204, 8205, 8206, 8207);</sqlCheck>
+		</preConditions>
+		<comment>Add default enumerator variables for sub observation units</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES 
+			(8202, 1010, 'Observation Date', 'Observation Date', null, 0, 0),
+			(8203, 1010, 'Plants Observed', 'Plants Observed', null, 0, 0),
+			(8204, 1010, 'Quadrats Observed', 'Quadrats Observed', null, 0, 0),
+			(8205, 1040, 'DATE_NO', 'Enumerator for the date of observation', null, 0, 0),
+			(8206, 1040, 'PLANT_NO', 'Enumerator for the observed plant', null, 0, 0),
+			(8207, 1040, 'QUADRAT_NO', 'Enumerator for the observed quadrat', null, 0, 0);
+			
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1200, 8205, 8202),
+			(1210, 8205, 4040),
+			(1220, 8205, 6040),
+			(1200, 8206, 8203),
+			(1210, 8206, 4040),
+			(1220, 8206, 6040),
+			(1200, 8207, 8204),
+			(1210, 8207, 4040),
+			(1220, 8207, 6040);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES
+			(8205, 1800, 'Observation Unit', 0),
+			(8206, 1800, 'Observation Unit', 0),
+			(8207, 1800, 'Observation Unit', 0);
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v10.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id in (10094, 10095, 10096, 10097);</sqlCheck>
+		</preConditions>
+		<comment>Add dataset types for sub observation units</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES 
+			(10094, 2020, 'PSD', 'Plant Sub-Observation Dataset', null, 0, 0),
+			(10095, 2020, 'QSD', 'Quadrats Sub-Observation Dataset', null, 0, 0),
+			(10096, 2020, 'TSD', 'Time Series Sub-Observation Dataset', null, 0, 0),
+			(10097, 2020, 'CSD', 'Custom Sub-Observation Dataset', null, 0, 0);
+			
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1190, 17267, 10094),
+			(1190, 17267, 10095),
+			(1190, 17267, 10096),
+			(1190, 17267, 10097);
+		</sql>
+	</changeSet>
+	
+	
+	
+
+</databaseChangeLog>
