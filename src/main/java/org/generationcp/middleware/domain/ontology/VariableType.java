@@ -43,7 +43,9 @@ public enum VariableType {
 			"Experimental Design Variables",
 			PhenotypicType.TRIAL_DESIGN),
 	ANALYSIS_SUMMARY(1811, "Analysis Summary",
-			"Analysis Summary Variables", PhenotypicType.VARIATE);
+			"Analysis Summary Variables", PhenotypicType.VARIATE),
+	OBSERVATION_UNIT(1812, "Observation Unit",
+			"Observation Unit Variables", PhenotypicType.UNASSIGNED);
 
 	private final Integer id;
 	private final String name;
@@ -107,7 +109,7 @@ public enum VariableType {
 	}
 
 	public static List<Integer> ids() {
-		final List<Integer> variableTypeIds = new ArrayList<Integer>();
+		final List<Integer> variableTypeIds = new ArrayList<>();
 		for (final VariableType variableType : VariableType.values()) {
 			variableTypeIds.add(variableType.getId());
 		}
