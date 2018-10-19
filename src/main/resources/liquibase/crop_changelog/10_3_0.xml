@@ -96,14 +96,14 @@
 			<and>
 				<tableExists tableName="nd_experiment"/>
 				<not>
-					<columnExists tableName="nd_experiment" columnName="observationUnitNo"/>
+					<columnExists tableName="nd_experiment" columnName="observation_unit_no"/>
 				</not>
 			</and>
 		</preConditions>
-		<comment> Add observationUnitNo to nd_experiment table </comment>
+		<comment> Add observation_unit_no to nd_experiment table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE nd_experiment
-			ADD COLUMN observationUnitNo INT NULL DEFAULT NULL;
+			ADD COLUMN observation_unit_no INT NULL DEFAULT NULL;
 		</sql>
 	</changeSet>
 	
