@@ -96,8 +96,8 @@ public class ExperimentModel implements Serializable {
 	@JoinColumn(name = "parent_id")
 	private ExperimentModel parent;
 
-	@Column(name = "sequence_no")
-	private Integer sequenceNo;
+	@Column(name = "observationUnitNo")
+	private Integer observationUnitNo;
 
 	public ExperimentModel() {
 	}
@@ -186,12 +186,12 @@ public class ExperimentModel implements Serializable {
 		this.parent = parent;
 	}
 
-	public Integer getSequenceNo() {
-		return this.sequenceNo;
+	public Integer getObservationUnitNo() {
+		return this.observationUnitNo;
 	}
 
-	public void setSequenceNo(final Integer sequenceNo) {
-		this.sequenceNo = sequenceNo;
+	public void setObservationUnitNo(final Integer observationUnitNo) {
+		this.observationUnitNo = observationUnitNo;
 	}
 
 	@Override
@@ -252,7 +252,7 @@ public class ExperimentModel implements Serializable {
 			", stock=" + stock +
 			", phenotypes=" + phenotypes +
 			", parent=" + parent +
-			", sequenceNo=" + sequenceNo +
+			", observationUnitNo=" + observationUnitNo +
 			'}';
 	}
 }
