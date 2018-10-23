@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -35,10 +36,14 @@ public class VariableInfoBuilder {
 		String localDescriptionProperty = stdVariableProperty.getDescription();
 
 		VariableInfo variableDef = new VariableInfo();
+
 		variableDef.setLocalName(localNameProperty == null ? null : localNameProperty);
 		variableDef.setLocalDescription(localDescriptionProperty == null ? null : localDescriptionProperty);
 		variableDef.setStdVariableId(stdVariableProperty.getVariableId());
 		variableDef.setRank(stdVariableProperty.getRank());
+		if (TermId.MULTIFACTORIAL_INFO.getId() == stdVariableProperty.getTypeId()) {
+			variableDef.setTreatmentLabel(stdVariableProperty.getValue());
+		}
 
 		VariableType varType = VariableType.getById(stdVariableProperty.getTypeId());
 		if (varType != null) {
