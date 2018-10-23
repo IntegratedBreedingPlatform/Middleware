@@ -85,6 +85,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return new ArrayList<>();
 	}
 
+	// Not used, we could poteantially detele it
 	public long countByTrialEnvironmentAndVariate(final int trialEnvironmentId, final int variateVariableId) {
 		try {
 			final SQLQuery query =
@@ -156,6 +157,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	// Should be renamed to getInstanceIds
 	public List<Integer> getLocationIdsOfStudy(final int studyId) {
 		try {
 			final String sql =
