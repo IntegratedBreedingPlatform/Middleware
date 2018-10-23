@@ -118,6 +118,10 @@ public class ProjectPropertySaver {
 		properties.add(
 			new ProjectProperty(project, variableTypeId, value, variableType.getRank(), variableType.getId(), variableType.getLocalName()));
 
+		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+			properties.add(new ProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType
+					.getRank(), variableType.getId(), variableType.getLocalName()));
+		}
 		return properties;
 	}
 
