@@ -19,8 +19,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private DaoFactory daoFactory;
 
-	private DmsProjectDao dmsProjectDao;
-
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	DatasetServiceImpl() {
@@ -29,7 +27,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public DatasetServiceImpl(HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-		dmsProjectDao = daoFactory.getDmsProjectDao();
 		ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 	}
 
