@@ -1041,6 +1041,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
+	
+	public long countPhenotypesForDataset(final Integer datasetId, final List<Integer> traitIds) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+				"SELECT COUNT(1) FROM phenotype ph "
+				+ "INNER JOIN nd_experiment e ON ph.nd_experiment_id = e.nd_experiment_id "
+				+ "WHERE e.project_id = :datasetId AND observable_id in (:traitIds);");
+		
+		query.setParameter("datasetId", datasetId);
+		query.setParameterList("traitIds", traitIds);
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
 
 	@Override
 	public Phenotype save(final Phenotype phenotype) {
