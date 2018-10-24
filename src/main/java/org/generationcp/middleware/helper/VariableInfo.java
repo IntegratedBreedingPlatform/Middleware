@@ -24,7 +24,6 @@ public class VariableInfo {
 
 	private int stdVariableId;
 
-	@Deprecated
 	private String treatmentLabel;
 	
 	private PhenotypicType role;
@@ -63,12 +62,10 @@ public class VariableInfo {
 		this.rank = rank;
 	}
 
-	@Deprecated
 	public String getTreatmentLabel() {
 		return this.treatmentLabel;
 	}
 
-	@Deprecated
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
