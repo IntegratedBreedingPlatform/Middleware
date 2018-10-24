@@ -135,19 +135,8 @@ public class ProjectPropertySaver {
 	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, String value) {
 		objDMSVariableType.setVariableTypeIfNull();
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
-		this.saveProjectProperty(project, variableTypeEnum.getId(), value, objDMSVariableType.getRank(),
-		objDMSVariableType.getStandardVariable().getId(), objDMSVariableType.getLocalName());
-	}
-
-	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank, int variableId,
-		String alias) {
-		final ProjectProperty property = new ProjectProperty();
-		property.setTypeId(typeId);
-		property.setValue(value);
-		property.setRank(rank);
-		property.setProject(project);
-		property.setVariableId(variableId);
-		property.setAlias(alias);
+		final ProjectProperty property = new ProjectProperty(project, variableTypeEnum.getId(), value, objDMSVariableType.getRank(),
+				objDMSVariableType.getStandardVariable().getId(), objDMSVariableType.getLocalName());
 		this.saver.getProjectPropertyDao().save(property);
 		project.addProperty(property);
 	}

@@ -148,19 +148,4 @@ public class DatasetProjectSaver extends Saver {
 		return relationships;
 	}
 
-	public void addPropertiesIfNotExisting(int datasetId, VariableTypeList variableTypeList) throws MiddlewareQueryException {
-		DmsProject datasetProject = this.getDmsProjectDao().getById(datasetId);
-		Hibernate.initialize(datasetProject.getProperties());
-		Map<Integer, ProjectProperty> existingPropertiesMap = new HashMap<Integer, ProjectProperty>();
-		for (ProjectProperty property : datasetProject.getProperties()) {
-			existingPropertiesMap.put(property.getProjectPropertyId(), property);
-		}
-		VariableTypeList additionalProperties = new VariableTypeList();
-		for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
-			if (!existingPropertiesMap.containsKey(variableType.getId())) {
-				additionalProperties.add(variableType);
-			}
-		}
-		this.getProjectPropertySaver().saveProjectProperties(datasetProject, additionalProperties, null);
-	}
 }
