@@ -5,4 +5,7 @@ package org.generationcp.middleware.service.api.dataset;
  */
 public interface DatasetService {
 
+	Integer generateSubObservationDataset(Integer studyId, String datasetName, Integer datasetTypeId, Integer[] instanceIds,
+			Integer observationUnitVariableId, Integer numberOfSubObservationUnits);
+
 }
