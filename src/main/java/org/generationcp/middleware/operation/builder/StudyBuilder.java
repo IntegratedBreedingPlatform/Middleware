@@ -65,6 +65,7 @@ public class StudyBuilder extends Builder {
 		study.setObjective(project.getObjective());
 		study.setName(project.getName());
 		study.setCreatedBy(project.getCreatedBy());
+		study.setLocked(project.isLocked());
 
 		final VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties(),
 				project.getProgramUUID());
