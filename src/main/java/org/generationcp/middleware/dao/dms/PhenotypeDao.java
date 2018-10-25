@@ -59,6 +59,14 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unchecked")
 public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
+	private static final String IN_PHENOTYPE_DAO = " in PhenotypeDao: ";
+
+	private static final String CV_TERM_IDS = "cvTermIds";
+
+	private static final String PROJECT_ID = "projectId";
+
+	private static final String TRAIT_IDS = "traitIds";
+
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeDao.class);
 
 	private static final String GET_OBSERVATIONS = "SELECT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
@@ -221,7 +229,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 							+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) ");
 			query.setParameterList("environmentIds", environmentIds);
-			query.setParameterList("traitIds", traitIds);
+			query.setParameterList(TRAIT_IDS, traitIds);
 
 			List<Object[]> list = new ArrayList<>();
 
@@ -312,7 +320,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 							+ "WHERE e.nd_geolocation_id IN (:environmentIds) " + "    AND p.observable_id IN (:traitIds) "
 							+ "ORDER BY p.observable_id ");
 			query.setParameterList("environmentIds", environmentIds);
-			query.setParameterList("traitIds", traitIds);
+			query.setParameterList(TRAIT_IDS, traitIds);
 
 			List<Object[]> list = new ArrayList<>();
 
@@ -356,7 +364,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 							+ "INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
 							+ "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
 							+ "  AND e.nd_geolocation_id IN (:environmentIds) " + "GROUP BY p.observable_id, p.cvalue_id ");
-			query.setParameterList("traitIds", traitIds);
+			query.setParameterList(TRAIT_IDS, traitIds);
 			query.setParameterList("environmentIds", environmentIds);
 
 			List<Object[]> list = new ArrayList<>();
@@ -394,7 +402,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sb.append(" AND s.dbxref_id IN (:germplasmIds) ");
 			sb.append(PhenotypeDao.ORDER_BY_OBS);
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
-			query.setParameterList("traitIds", traitIds);
+			query.setParameterList(TRAIT_IDS, traitIds);
 			query.setParameterList("germplasmIds", germplasmIds);
 			query.setParameterList("environmentIds", environmentIds);
 
@@ -426,7 +434,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(PhenotypeDao.COUNT_OBSERVATIONS);
-			query.setParameterList("traitIds", traitIds);
+			query.setParameterList(TRAIT_IDS, traitIds);
 			query.setParameterList("environmentIds", environmentIds);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -445,7 +453,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sb.append(PhenotypeDao.ORDER_BY_OBS);
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 
-			query.setParameterList("traitIds", traitIds);
+			query.setParameterList(TRAIT_IDS, traitIds);
 			query.setParameterList("environmentIds", environmentIds);
 			this.setStartAndNumOfRows(query, start, numOfRows);
 			final List<Object[]> list = query.list();
@@ -583,7 +591,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in deletePhenotypesByProjectIdAndLocationId=" + projectId + ", " + locationId
-					+ " in PhenotypeDao: " + e.getMessage(), e);
+					+ IN_PHENOTYPE_DAO + e.getMessage(), e);
 		}
 	}
 
@@ -602,13 +610,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ " AND pheno.observable_id = " + cvTermId;
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
-			final int returnVal = statement.executeUpdate();
-
-			return returnVal;
+			return statement.executeUpdate();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in updatePhenotypesByExperimentIdAndObervableId= " + experimentId + ", " + cvTermId + ", " + value
-					+ " in PhenotypeDao: " + e.getMessage(), e);
+					+ IN_PHENOTYPE_DAO + e.getMessage(), e);
 		}
 	}
 
@@ -624,18 +630,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "AND expprop.value IN (:plotNos) " + "AND exp.type_id = 1155 " + "AND expprop.type_id in (8200, 8380)";
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
-			statement.setParameter("projectId", projectId);
+			statement.setParameter(PROJECT_ID, projectId);
 			statement.setParameter("locationId", locationId);
-			statement.setParameterList("cvTermIds", cvTermIds);
+			statement.setParameterList(CV_TERM_IDS, cvTermIds);
 			statement.setParameterList("plotNos", plotNos);
 
-			final List<Object[]> returnVal = statement.list();
-
-			return returnVal;
+			return statement.list();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error in getPhenotypeIdsByLocationAndPlotNo=" + projectId + ", " + locationId + " in PhenotypeDao: " + e.getMessage(),
+					"Error in getPhenotypeIdsByLocationAndPlotNo=" + projectId + ", " + locationId + IN_PHENOTYPE_DAO + e.getMessage(),
 					e);
 		}
 	}
@@ -656,18 +660,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ "AND expprop.value = :plotNo " + "AND exp.type_id = 1155 " + "AND expprop.type_id in (8200, 8380)";
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
-			statement.setParameter("projectId", projectId);
+			statement.setParameter(PROJECT_ID, projectId);
 			statement.setParameter("locationId", locationId);
-			statement.setParameterList("cvTermIds", cvTermIds);
+			statement.setParameterList(CV_TERM_IDS, cvTermIds);
 			statement.setParameter("plotNo", plotNo);
 
-			final List<Object[]> returnVal = statement.list();
-
-			return returnVal;
+			return statement.list();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error in getPhenotypeIdsByLocationAndPlotNo=" + projectId + ", " + locationId + " in PhenotypeDao: " + e.getMessage(),
+					"Error in getPhenotypeIdsByLocationAndPlotNo=" + projectId + ", " + locationId + IN_PHENOTYPE_DAO + e.getMessage(),
 					e);
 		}
 	}
@@ -902,7 +904,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			criteria.add(Restrictions.eq("experiment", experiment));
 			criteria.addOrder(Order.desc("phenotypeId"));
 			final List list = criteria.list();
-			return (list.size() > 0 ? (Phenotype) list.get(0) : null);
+			return (!list.isEmpty() ? (Phenotype) list.get(0) : null);
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -932,7 +934,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			sqlQuery.setParameterList("cvTermIds", cvTermIds);
+			sqlQuery.setParameterList(CV_TERM_IDS, cvTermIds);
 		}
 
 		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
@@ -1032,7 +1034,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
 
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			query.setParameterList("cvTermIds", cvTermIds);
+			query.setParameterList(CV_TERM_IDS, cvTermIds);
 		}
 
 		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
@@ -1049,7 +1051,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				+ "WHERE e.project_id = :datasetId AND observable_id in (:traitIds);");
 		
 		query.setParameter("datasetId", datasetId);
-		query.setParameterList("traitIds", traitIds);
+		query.setParameterList(TRAIT_IDS, traitIds);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
@@ -1096,7 +1098,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public Boolean hasOutOfSync(final Integer projectId) {
 		final SQLQuery query = this.getSession().createSQLQuery(HAS_OUT_OF_SYNC);
-		query.setParameter("projectId", projectId);
+		query.setParameter(PROJECT_ID, projectId);
 		final BigInteger result = (BigInteger) query.uniqueResult();
 		return result.intValue() > 0;
 	}
