@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -174,12 +176,25 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("1000", phenotype.getValue());
 	}
 	
+	@Test
+	public void testCountPhenotypesForDatasetWhenNoPhenotypes() {
+		this.createEnvironmentData(1, false);
+		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(this.study.getProjectId(), Arrays.asList(this.trait.getCvTermId())));
+	}
+	
+	@Test
+	public void testCountPhenotypesForDataset() {
+		final int numberOfReps = 2;
+		this.createEnvironmentData(numberOfReps, true);
+		Assert.assertEquals(NO_OF_GERMPLASM * numberOfReps, this.phenotypeDao.countPhenotypesForDataset(this.study.getProjectId(), Arrays.asList(this.trait.getCvTermId())));
+	}
+	
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
 		
 		final Geolocation geolocation = new Geolocation();
 		this.geolocationDao.saveOrUpdate(geolocation);
 
-		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {
+		for (int i = 1; i <= NO_OF_GERMPLASM + 1; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
 			this.germplasmDao.save(germplasm);
@@ -192,7 +207,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			stockModel.setGermplasm(germplasm);
 			this.stockDao.saveOrUpdate(stockModel);
 			
-			// Create two experiments for the same stock
+			// Create N experiments for the same stock
 			for (int j=0; j < numberOfReps; j++) {
 				final ExperimentModel experimentModel = new ExperimentModel();
 				experimentModel.setGeoLocation(geolocation);

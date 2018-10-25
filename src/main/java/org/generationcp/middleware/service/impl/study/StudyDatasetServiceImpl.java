@@ -34,5 +34,9 @@ public class StudyDatasetServiceImpl implements StudyDatasetService {
 		}
 		return false;	
 	}
+	
+	protected void setDaoFactory(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
 
 }
