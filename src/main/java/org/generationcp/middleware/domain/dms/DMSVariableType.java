@@ -34,7 +34,6 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 
 	private StandardVariable standardVariable;
 
-	@Deprecated
 	private String treatmentLabel;
 	
 	private PhenotypicType role;
@@ -96,12 +95,10 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		this.standardVariable = standardVariable;
 	}
 
-	@Deprecated
 	public String getTreatmentLabel() {
 		return this.treatmentLabel;
 	}
 
-	@Deprecated
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
