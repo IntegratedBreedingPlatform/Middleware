@@ -51,6 +51,8 @@ public class Study implements Serializable {
 
 	private String createdBy;
 
+	private Boolean locked;
+
 	public Study() {
 	}
 
@@ -226,6 +228,14 @@ public class Study implements Serializable {
 		return createdBy;
 	}
 
+	public Boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked(final Boolean locked) {
+		this.locked = locked;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -238,7 +248,8 @@ public class Study implements Serializable {
 			.equals(this.getProgramUUID(), study.getProgramUUID()) && this.getStudyType() == study.getStudyType() && Objects
 			.equals(this.getDescription(), study.getDescription()) && Objects.equals(this.getStartDate(), study.getStartDate()) && Objects
 			.equals(this.getEndDate(), study.getEndDate()) && Objects.equals(this.getStudyUpdate(), study.getStudyUpdate()) && Objects
-			.equals(this.getObjective(), study.getObjective()) && Objects.equals(this.getCreatedBy(), study.getCreatedBy());
+			.equals(this.getObjective(), study.getObjective()) && Objects.equals(this.getCreatedBy(), study.getCreatedBy()) && Objects
+			.equals(this.isLocked(), study.isLocked());
 	}
 
 	@Override
@@ -247,7 +258,7 @@ public class Study implements Serializable {
 		return Objects
 			.hash(this.getId(), this.getName(), this.getConditions(), this.getConstants(), this.getProgramUUID(), this.getStudyType(), this.getDescription(), this
 					.getStartDate(),
-				this.getEndDate(), this.getStudyUpdate(), this.getObjective(), this.getCreatedBy());
+				this.getEndDate(), this.getStudyUpdate(), this.getObjective(), this.getCreatedBy(), this.isLocked());
 	}
 
 	@Override
@@ -255,6 +266,6 @@ public class Study implements Serializable {
 		return "Study{" + "id=" + id + ", name='" + name + '\'' + ", conditions=" + conditions + ", constants=" + constants
 			+ ", programUUID='" + programUUID + '\'' + ", studyType=" + studyType + ", description='" + description + '\'' + ", startDate='"
 			+ startDate + '\'' + ", endDate='" + endDate + '\'' + ", studyUpdate='" + studyUpdate + '\'' + ", objective='" + objective
-			+ '\'' + ", createdBy='" + createdBy + '\'' + '}';
+			+ '\'' + ", createdBy='" + createdBy + '\'' + ", locked='" + locked + '\'' +'}';
 	}
 }
