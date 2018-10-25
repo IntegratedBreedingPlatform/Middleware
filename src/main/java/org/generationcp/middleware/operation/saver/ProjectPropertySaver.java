@@ -141,6 +141,11 @@ public class ProjectPropertySaver {
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
 		this.saveProjectProperty(project, variableTypeEnum.getId(), value, objDMSVariableType.getRank(),
 		objDMSVariableType.getStandardVariable().getId(), objDMSVariableType.getLocalName());
+
+		if (objDMSVariableType.getTreatmentLabel() != null && !objDMSVariableType.getTreatmentLabel().isEmpty()) {
+			this.saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), objDMSVariableType.getTreatmentLabel(),
+					objDMSVariableType.getRank(), objDMSVariableType.getStandardVariable().getId(), objDMSVariableType.getLocalName());
+		}
 	}
 
 	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank, int variableId,
