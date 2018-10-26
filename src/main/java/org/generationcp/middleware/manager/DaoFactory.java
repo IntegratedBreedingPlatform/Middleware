@@ -7,10 +7,12 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.PlantDao;
+import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -131,5 +133,17 @@ public class DaoFactory {
 		DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.sessionProvider.getSession());
 		return dmsProjectDao;
+	}
+
+//	public ProjectDAO getProjectDAO() {
+//		final ProjectDAO projectDAO = new ProjectDAO();
+//		projectDAO.setSession(this.sessionProvider.getSession());
+//		return projectDAO;
+//	}
+
+	public ExperimentDao getExperimentDao() {
+		final ExperimentDao experimentDao = new ExperimentDao();
+		experimentDao.setSession(this.sessionProvider.getSession());
+		return experimentDao;
 	}
 }
