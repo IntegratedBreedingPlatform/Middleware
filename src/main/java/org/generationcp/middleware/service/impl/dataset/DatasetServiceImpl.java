@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import java.util.List;
 
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -45,10 +46,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+	@Autowired
 	private MeasurementVariableService measurementVariableService;
 
+	@Autowired
 	private GermplasmDescriptors germplasmDescriptors;
 
+	@Autowired
 	private DesignFactors designFactors;
 
 	DatasetServiceImpl() {
@@ -61,9 +65,9 @@ public class DatasetServiceImpl implements DatasetService {
 		this.dmsProjectDao = this.daoFactory.getDmsProjectDAO();
 		this.experimentDao = this.getExperimentDao(currentSession);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
-		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
-		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
-		this.designFactors = new DesignFactors(currentSession);
+//		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
+//		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
+//		this.designFactors = new DesignFactors(currentSession);
 	}
 
 	public ExperimentDao getExperimentDao(final Session currentSession) {
