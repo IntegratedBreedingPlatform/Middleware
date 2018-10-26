@@ -5,6 +5,8 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import java.util.List;
+
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -54,9 +56,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
-		final Session currentSession = sessionProvider.getSessionFactory().getCurrentSession();
+		final Session currentSession = sessionProvider.getSession();
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.dmsProjectDao = this.daoFactory.getDmsProjectDao();
+		this.dmsProjectDao = this.daoFactory.getDmsProjectDAO();
 		this.experimentDao = this.getExperimentDao(currentSession);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
