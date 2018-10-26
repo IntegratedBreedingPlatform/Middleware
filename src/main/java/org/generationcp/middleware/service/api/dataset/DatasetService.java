@@ -6,7 +6,7 @@ public interface DatasetService {
 	
 	long countPhenotypes(Integer datasetId, List<Integer> traitIds);
 
-	Integer generateSubObservationDataset(Integer studyId, String datasetName, Integer datasetTypeId, Integer[] instanceIds,
+	Integer generateSubObservationDataset(Integer studyId, String datasetName, Integer datasetTypeId, List<Integer> instanceIds,
 			Integer observationUnitVariableId, Integer numberOfSubObservationUnits);
 
 }
