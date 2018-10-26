@@ -1,24 +1,24 @@
-package org.generationcp.middleware.service.impl.study;
+package org.generationcp.middleware.service.impl.dataset;
 
 import java.util.List;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.service.api.study.StudyDatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 
 
-public class StudyDatasetServiceImpl implements StudyDatasetService {
+public class DatasetServiceImpl implements DatasetService {
 	
 	private DaoFactory daoFactory;
 	
 
-	public StudyDatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
-	public long countPhenotypesForDataset(final Integer datasetId, final List<Integer> traitIds) {
+	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
 	}
 

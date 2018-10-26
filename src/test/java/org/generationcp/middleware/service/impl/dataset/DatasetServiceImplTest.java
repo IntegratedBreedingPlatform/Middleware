@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.impl.study;
+package org.generationcp.middleware.service.impl.dataset;
 
 import java.util.Arrays;
 
@@ -7,6 +7,7 @@ import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class StudyDatasetServiceImplTest {
+public class DatasetServiceImplTest {
 	
 	@Mock
 	private DaoFactory daoFactory;
@@ -31,13 +32,13 @@ public class StudyDatasetServiceImplTest {
 	private DmsProjectDao dmsProjectDao;
 	
 	@InjectMocks
-	private StudyDatasetServiceImpl studyDatasetService;
+	private DatasetServiceImpl datasetService;
 	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		
-		this.studyDatasetService.setDaoFactory(this.daoFactory);
+		this.datasetService.setDaoFactory(this.daoFactory);
 		Mockito.when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		Mockito.when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 	}
@@ -46,7 +47,7 @@ public class StudyDatasetServiceImplTest {
 	public void testCountPhenotypes() {
 		final long count = 5;
 		Mockito.when(this.phenotypeDao.countPhenotypesForDataset(Matchers.anyInt(), Matchers.anyListOf(Integer.class))).thenReturn(count);
-		Assert.assertEquals(count, this.studyDatasetService.countPhenotypesForDataset(123, Arrays.asList(11, 22)));
+		Assert.assertEquals(count, this.datasetService.countPhenotypes(123, Arrays.asList(11, 22)));
 	}
 	
 	@Test
@@ -59,8 +60,8 @@ public class StudyDatasetServiceImplTest {
 		dataset3.setProjectId(13);
 		Mockito.when(this.dmsProjectDao.getDatasetsByStudy(Matchers.anyInt())).thenReturn(Arrays.asList(dataset1, dataset2, dataset3));
 
-		Assert.assertTrue(this.studyDatasetService.datasetExists(123, 13));
-		Assert.assertFalse(this.studyDatasetService.datasetExists(123, 14));
+		Assert.assertTrue(this.datasetService.datasetExists(123, 13));
+		Assert.assertFalse(this.datasetService.datasetExists(123, 14));
 	}
 
 }
