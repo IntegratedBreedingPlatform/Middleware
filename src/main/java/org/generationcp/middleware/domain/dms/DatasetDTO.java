@@ -10,29 +10,22 @@ public class DatasetDTO implements Serializable {
 
 	private static final long serialVersionUID = 736579292676142736L;
 
-	private Integer projectId;
-	private Integer parent;
+	private Integer datasetId;
 	private Integer datasetTypeId;
 	private String name;
+	private Integer parentDatasetId;
+
 
 	public DatasetDTO(){
 
 	}
 
-	public Integer getProjectId() {
-		return projectId;
+	public Integer getDatasetId() {
+		return datasetId;
 	}
 
-	public void setProjectId(final Integer projectId) {
-		this.projectId = projectId;
-	}
-
-	public Integer getParent() {
-		return parent;
-	}
-
-	public void setParent(final Integer parent) {
-		this.parent = parent;
+	public void setDatasetId(final Integer datasetId) {
+		this.datasetId = datasetId;
 	}
 
 	public Integer getDatasetTypeId() {
@@ -51,6 +44,14 @@ public class DatasetDTO implements Serializable {
 		this.name = name;
 	}
 
+	public Integer getParentDatasetId() {
+		return parentDatasetId;
+	}
+
+	public void setParentDatasetId(final Integer parentDatasetId) {
+		this.parentDatasetId = parentDatasetId;
+	}
+
 	@Override
 	public String toString() {
 		return new ReflectionToStringBuilder(this).toString();
@@ -62,8 +63,8 @@ public class DatasetDTO implements Serializable {
 			return false;
 		}
 		final DatasetDTO castOther = (DatasetDTO) other;
-		return new EqualsBuilder().append(this.projectId, castOther.projectId)
-			.append(this.parent,castOther.parent)
+		return new EqualsBuilder().append(this.datasetId, castOther.datasetId)
+			.append(this.parentDatasetId,castOther.parentDatasetId)
 			.append(this.datasetTypeId,castOther.datasetTypeId)
 			.append(this.name,castOther.name)
 			.isEquals();
@@ -71,6 +72,6 @@ public class DatasetDTO implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.projectId).append(this.parent).append(this.datasetTypeId).append(this.name).toHashCode();
+		return new HashCodeBuilder().append(this.datasetId).append(this.parentDatasetId).append(this.datasetTypeId).append(this.name).toHashCode();
 	}
 }

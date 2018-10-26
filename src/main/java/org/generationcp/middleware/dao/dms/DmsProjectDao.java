@@ -1185,7 +1185,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
 			datasetDTOList.addAll(DatasetDTOs);
 		for (DatasetDTO datasetDTO : DatasetDTOs) {
-			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getProjectId());
+			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getDatasetId());
 
 		}
 
@@ -1206,7 +1206,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
 		datasetDTOs.addAll(DatasetDTOs);
 		for (DatasetDTO datasetDTO : DatasetDTOs) {
-			this.getDatasetByStudyId(datasetDTOs, datasetDTO.getProjectId());
+			this.getDatasetByStudyId(datasetDTOs, datasetDTO.getDatasetId());
 		}
 	}
 
@@ -1215,10 +1215,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 
 			final ProjectionList projectionList = Projections.projectionList();
-			projectionList.add(Projections.property("project.projectId"), "projectId");
-			projectionList.add(Projections.property("pr.objectProject.projectId"), "parent");
+			projectionList.add(Projections.property("project.projectId"), "datasetId");
 			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
 			Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.relatedTos", "pr", CriteriaSpecification.INNER_JOIN);
 			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", 8160));
