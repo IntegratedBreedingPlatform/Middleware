@@ -1,9 +1,12 @@
-package org.generationcp.middleware.service.api.dataset;
+package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
@@ -15,9 +18,9 @@ import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.hibernate.Session;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -67,10 +70,20 @@ public class DatasetServiceImpl implements DatasetService {
 		return experimentDao;
 	}
 
+	@Override
+	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
+		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
+	}
+
+	@Override
 	public Integer generateSubObservationDataset (final Integer studyId, final String datasetName, final Integer datasetTypeId, final Integer[] instanceIds,
 			final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits) {
 
 		return null;
+	}
+
+	protected void setDaoFactory(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 
 	@Override

@@ -5,7 +5,11 @@ import java.util.List;
 /**
  * Created by clarysabel on 10/22/18.
  */
+import java.util.List;
+
 public interface DatasetService {
+
+	long countPhenotypes(Integer datasetId, List<Integer> traitIds);
 
 	Integer generateSubObservationDataset(Integer studyId, String datasetName, Integer datasetTypeId, Integer[] instanceIds,
 			Integer observationUnitVariableId, Integer numberOfSubObservationUnits);
