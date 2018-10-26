@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -18,12 +19,17 @@ import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +49,25 @@ import java.util.Set;
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
+	public static final String PROJECT_NAME = "PROJECT_NAME";
+	public static final String LOCATION_DB_ID = "locationDbId";
+	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
+	public static final String FIELD_MAP_ROW = "FieldMapRow";
+	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
+	public static final String LOCATION_NAME = "LocationName";
+	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	public static final String COL = "COL";
+	public static final String ROW = "ROW";
+	public static final String BLOCK_NO = "BLOCK_NO";
+	public static final String PLOT_NO = "PLOT_NO";
+	public static final String REP_NO = "REP_NO";
+	public static final String ENTRY_CODE = "ENTRY_CODE";
+	public static final String ENTRY_NO = "ENTRY_NO";
+	public static final String DESIGNATION = "DESIGNATION";
+	public static final String GID = "GID";
+	public static final String ENTRY_TYPE = "ENTRY_TYPE";
+	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 
 	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
 			" experiment.nd_experiment_id, " + //
@@ -578,4 +603,264 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	private String getObservationUnitTableQuery(
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors, final String sortBy, final String sortOrder) {
+		final StringBuilder sqlBuilder = new StringBuilder();
+
+		sqlBuilder.append("SELECT \n")
+			.append("    nde.nd_experiment_id,\n")
+			.append("    gl.description AS TRIAL_INSTANCE,\n")
+			.append(
+				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n")
+			.append("    s.dbxref_id AS GID,\n")
+			.append("    s.name DESIGNATION,\n")
+			.append("    s.uniquename ENTRY_NO,\n")
+			.append("    s.value as ENTRY_CODE,\n")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL, \n")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n")
+			.append(
+				"    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.plant_id WHERE parent.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n")
+			.append("    nde.obs_unit_id as OBS_UNIT_ID, \n");
+
+		final String traitClauseFormat =
+			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', ";
+
+		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
+			sqlBuilder.append(String.format(
+				traitClauseFormat,
+				measurementVariable.getName(),
+				measurementVariable.getName(),
+				measurementVariable.getName(),
+				measurementVariable.getName() + "_PhenotypeId",
+				measurementVariable.getName(),
+				measurementVariable.getName() + "_Status",
+				measurementVariable.getName(),
+				measurementVariable.getName() + "_CvalueId"));
+		}
+
+		if (!germplasmDescriptors.isEmpty()) {
+			final String germplasmDescriptorClauseFormat =
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s', \n";
+			for (final String gpFactor : germplasmDescriptors) {
+				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+			}
+		}
+
+		if (!designFactors.isEmpty()) {
+			final String designFactorClauseFormat =
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
+			for (final String designFactor : designFactors) {
+				sqlBuilder.append(String.format(designFactorClauseFormat, designFactor, designFactor));
+			}
+		}
+
+		sqlBuilder.append(" 1=1 FROM \n")
+			.append("	project p \n")
+			.append("	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n")
+			.append("	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n")
+			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n")
+			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id \n")
+			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
+			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
+			.append(
+				"		WHERE p.project_id = :datasetId \n")
+			.append(" GROUP BY nde.nd_experiment_id ");
+
+		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
+		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+		/**
+		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
+		 * with 1 so that they turn into number and are sorted as numbers rather than strings.
+		 */
+		final List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW", "COL", "BLOCK_NO");
+		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
+			orderColumn = "(1 * " + orderColumn + ")";
+		}
+		sqlBuilder.append(" ORDER BY " + orderColumn + " " + direction + " ");
+		return sqlBuilder.toString();
+	}
+
+	public List<ObservationUnitRow> getObservationUnitTable(
+		final int datasetId,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors, final int instanceId, final int pageNumber,
+		final int pageSize,
+		final String sortBy, final String sortOrder) {
+		final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
+			designFactors, sortBy, sortOrder);
+		final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
+			designFactors, observationUnitTableQuery);
+		query.setParameter("datasetId", datasetId);
+		query.setParameter("instanceId", String.valueOf(instanceId));
+
+		query.setFirstResult(pageSize * (pageNumber - 1));
+		query.setMaxResults(pageSize);
+
+		return this.mapResults(query.list(), selectionMethodsAndTraits, germplasmDescriptors, designFactors);
+	}
+
+	private SQLQuery createQueryAndAddScalar(
+		final List<MeasurementVariableDto> selectionMethodsAndTraits,
+		final List<String> germplasmDescriptors, final List<String> designFactors, final String generateQuery) {
+		final SQLQuery query = this.getSession().createSQLQuery(generateQuery);
+
+		this.addScalar(query);
+		query.addScalar("FIELDMAP COLUMN");
+		query.addScalar("FIELDMAP RANGE");
+		query.addScalar("SUM_OF_SAMPLES");
+
+		this.addScalarForTraits(selectionMethodsAndTraits, query, true);
+
+		for (final String gpDescriptor : germplasmDescriptors) {
+			query.addScalar(gpDescriptor, new StringType());
+		}
+
+		for (final String designFactor : designFactors) {
+			query.addScalar(designFactor, new StringType());
+		}
+
+		return query;
+	}
+
+	private void addScalar(final SQLQuery createSQLQuery) {
+		createSQLQuery.addScalar(ExperimentDao.ND_EXPERIMENT_ID);
+		createSQLQuery.addScalar(ExperimentDao.TRIAL_INSTANCE);
+		createSQLQuery.addScalar(ExperimentDao.ENTRY_TYPE);
+		createSQLQuery.addScalar(ExperimentDao.GID);
+		createSQLQuery.addScalar(ExperimentDao.DESIGNATION);
+		createSQLQuery.addScalar(ExperimentDao.ENTRY_NO);
+		createSQLQuery.addScalar(ExperimentDao.ENTRY_CODE);
+		createSQLQuery.addScalar(ExperimentDao.REP_NO);
+		createSQLQuery.addScalar(ExperimentDao.PLOT_NO);
+		createSQLQuery.addScalar(ExperimentDao.BLOCK_NO);
+		createSQLQuery.addScalar(ExperimentDao.ROW);
+		createSQLQuery.addScalar(ExperimentDao.COL);
+		createSQLQuery.addScalar(ExperimentDao.OBS_UNIT_ID, new StringType());
+	}
+
+	private void addScalarForTraits(
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final SQLQuery createSQLQuery, final Boolean addStatus) {
+		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
+			createSQLQuery.addScalar(measurementVariable.getName());
+			createSQLQuery.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
+			if (addStatus) {
+				createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
+			}
+			createSQLQuery.addScalar(measurementVariable.getName() + "_CvalueId");
+		}
+	}
+
+	private List<ObservationUnitRow> mapResults(
+		final List<Object[]> results,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors) {
+		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
+		final int fixedColumns = 16;
+
+		if (results != null && !results.isEmpty()) {
+			for (final Object[] row : results) {
+
+				final Map<String, Object> variables = new HashMap<String, Object>();
+				int counterFour = 0;
+				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
+					final String status = (String) row[fixedColumns + counterFour + 2];
+					variables.put(variable.getName(), new ObservationUnitRow.ObservationUnitData(
+						(Integer) row[fixedColumns + counterFour + 1], //phenotypeId
+						(Integer) row[fixedColumns + counterFour + 3], //categoricalValue
+						(String) row[fixedColumns + counterFour], //variableValue
+						(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
+						)));
+					counterFour += 4;
+				}
+				final ObservationUnitRow observationUnitRow =
+					new ObservationUnitRow();
+
+				observationUnitRow.setObservationUnitId((Integer) row[0]);
+				observationUnitRow.setDesignation((String) row[2]);
+				observationUnitRow.setGid((Integer) row[1]);
+				observationUnitRow.setAction((String) row[0]);
+
+				variables.put(OBS_UNIT_ID, new ObservationUnitRow.ObservationUnitData(
+					(String) row[12]));
+				variables.put(FIELD_MAP_COLUMN, new ObservationUnitRow.ObservationUnitData(
+					(String) row[13]));
+				variables.put("FIELD_MAP_RANGE", new ObservationUnitRow.ObservationUnitData(
+					(String) row[14]));
+				variables.put("SAMPLES", new ObservationUnitRow.ObservationUnitData(
+					(String) row[15]));
+				variables.put(TRIAL_INSTANCE, new ObservationUnitRow.ObservationUnitData(
+					(String) row[1]));
+				variables.put(ENTRY_TYPE, new ObservationUnitRow.ObservationUnitData(
+					(String) row[2]));
+				variables.put(ENTRY_NO, new ObservationUnitRow.ObservationUnitData(
+					(String) row[5]));
+				variables.put(ENTRY_CODE, new ObservationUnitRow.ObservationUnitData(
+					(String) row[6]));
+				variables.put(REP_NO, new ObservationUnitRow.ObservationUnitData(
+					(String) row[7]));
+				variables.put(PLOT_NO, new ObservationUnitRow.ObservationUnitData(
+					(String) row[8]));
+				variables.put(BLOCK_NO, new ObservationUnitRow.ObservationUnitData(
+					(String) row[9]));
+				observationUnitRow.setRowNumber((String) row[10]);
+				observationUnitRow.setColumnNumber((String) row[11]);
+				observationUnitRow.setObsUnitId((String) row[12]);
+				observationUnitRow.setFieldMapColumn((String) row[13]);
+				observationUnitRow.setFieldMapRange((String) row[14]);
+				observationUnitRow.setSamples((String) row[15]);
+				observationUnitRow.setTrialInstance((String) row[1]);
+				observationUnitRow.setEntryType((String) row[2]);
+				observationUnitRow.setEntryNo((String) row[5]);
+				observationUnitRow.setEntryCode((String) row[6]);
+				observationUnitRow.setRepetionNumber((String) row[7]);
+				observationUnitRow.setPlotNumber((String) row[8]);
+				observationUnitRow.setBlockNumber((String) row[9]);
+				observationUnitRow.setVariables(variables);
+				int additionalFactorsIndex = fixedColumns + selectionMethodsAndTraits.size() * 3;
+				for (final String gpDesc : germplasmDescriptors) {
+					observationUnitRow.additionalGermplasmDescriptor(gpDesc, (String) row[additionalFactorsIndex++]);
+				}
+				for (final String designFactor : designFactors) {
+					observationUnitRow.additionalDesignFactor(designFactor, (String) row[additionalFactorsIndex++]);
+				}
+				observationUnitRows.add(observationUnitRow);
+			}
+		}
+
+		return observationUnitRows;
+	}
+
+	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery("select count(*) as totalObservationUnits from "
+				+ "nd_experiment nde \n"
+				+ "    inner join project proj on proj.project_id = nde.project_id \n"
+				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+				+ " where \n"
+				+ "	proj.project_id = :datasetId \n"
+				+ "    and gl.nd_geolocation_id = :instanceId ");
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.setParameter("datasetId", datasetId);
+			query.setParameter("instanceId", instanceId);
+			return (int) query.uniqueResult();
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+					datasetId, instanceId) + he.getMessage(),
+				he);
+		}
+	}
 }
