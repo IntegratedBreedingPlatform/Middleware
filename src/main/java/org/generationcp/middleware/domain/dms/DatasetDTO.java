@@ -4,18 +4,19 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class DatasetDTO {
+import java.io.Serializable;
+
+public class DatasetDTO implements Serializable {
+
+	private static final long serialVersionUID = 736579292676142736L;
 
 	private Integer projectId;
 	private Integer parent;
 	private Integer datasetTypeId;
 	private String name;
 
-	public DatasetDTO(final Integer projectId, final Integer parent, final Integer datasetTypeId, final String name) {
-		this.projectId = projectId;
-		this.parent = parent;
-		this.datasetTypeId = datasetTypeId;
-		this.name = name;
+	public DatasetDTO(){
+
 	}
 
 	public Integer getProjectId() {
