@@ -11,17 +11,10 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
@@ -50,10 +43,19 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -1176,5 +1178,60 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			study.setLocked(isLocked);
 			save(study);
 		}
+	}
+
+	public List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds) {
+		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
+			final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
+			datasetDTOList.addAll(DatasetDTOs);
+		for (DatasetDTO datasetDTO : DatasetDTOs) {
+			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getProjectId());
+
+		}
+
+		if (filterByTypeIds != null && !filterByTypeIds.isEmpty() && !datasetDTOList.isEmpty()) {
+			final List<DatasetDTO> datasetDTOListDeleted = new ArrayList<>();
+			for(DatasetDTO datasetDTO : datasetDTOList){
+				if(!filterByTypeIds.contains(datasetDTO.getDatasetTypeId())){
+					datasetDTOListDeleted.add(datasetDTO);
+				}
+			}
+			datasetDTOList.removeAll(datasetDTOListDeleted);
+		}
+		return datasetDTOList;
+
+	}
+
+	private void getDatasetByStudyId(final List<DatasetDTO> datasetDTOs, final Integer studyId) {
+		final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
+		datasetDTOs.addAll(DatasetDTOs);
+		for (DatasetDTO datasetDTO : DatasetDTOs) {
+			this.getDatasetByStudyId(datasetDTOs, datasetDTO.getProjectId());
+		}
+	}
+
+	private List<DatasetDTO> getDatasetByStudyId(final Integer studyId) {
+		final List<DatasetDTO> datasetDTOS;
+		try {
+
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("project.projectId"), "projectId");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parent");
+			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
+			projectionList.add(Projections.property("project.name"), "name");
+			Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			criteria.createAlias("project.relatedTos", "pr", CriteriaSpecification.INNER_JOIN);
+			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", 8160));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
+			criteria.add(Restrictions.eq("pr.typeId", 1150));
+			criteria.setProjection(projectionList);
+			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
+			datasetDTOS = criteria.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getDatasetByStudyId for studyId=" + studyId + ":" + e.getMessage(), e);
+		}
+		return datasetDTOS;
+
 	}
 }
