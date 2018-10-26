@@ -46,6 +46,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -1045,16 +1046,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 	
 	public long countPhenotypesForDataset(final Integer datasetId, final List<Integer> traitIds) {
-		final SQLQuery query = this.getSession().createSQLQuery(
-				"SELECT COUNT(1) FROM phenotype ph "
-				+ "INNER JOIN nd_experiment e ON ph.nd_experiment_id = e.nd_experiment_id "
-				+ "WHERE e.project_id = :datasetId AND observable_id in (:traitIds);");
-		
-		query.setParameter("datasetId", datasetId);
-		query.setParameterList(TRAIT_IDS, traitIds);
-		return ((BigInteger) query.uniqueResult()).longValue();
-	}
+		final Criteria criteria = this.getSession().createCriteria(Phenotype.class);
+		criteria.createAlias("experiment", "experiment");
+		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
+		criteria.add(Restrictions.in("observableId", traitIds));
+		criteria.setProjection(Projections.rowCount());
 
+		return (Long) criteria.uniqueResult();
+	}
+	
 	@Override
 	public Phenotype save(final Phenotype phenotype) {
 		try {

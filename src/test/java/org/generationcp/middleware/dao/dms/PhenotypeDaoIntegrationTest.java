@@ -194,7 +194,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = new Geolocation();
 		this.geolocationDao.saveOrUpdate(geolocation);
 
-		for (int i = 1; i <= NO_OF_GERMPLASM + 1; i++) {
+		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
 			this.germplasmDao.save(germplasm);
