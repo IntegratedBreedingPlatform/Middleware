@@ -6,8 +6,6 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,20 +46,6 @@ public class DatasetServiceImplTest {
 		final long count = 5;
 		Mockito.when(this.phenotypeDao.countPhenotypesForDataset(Matchers.anyInt(), Matchers.anyListOf(Integer.class))).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countPhenotypes(123, Arrays.asList(11, 22)));
-	}
-	
-	@Test
-	public void testDatasetExists() {
-		final DmsProject dataset1 = new DmsProject();
-		dataset1.setProjectId(11);
-		final DmsProject dataset2 = new DmsProject();
-		dataset2.setProjectId(12);
-		final DmsProject dataset3 = new DmsProject();
-		dataset3.setProjectId(13);
-		Mockito.when(this.dmsProjectDao.getDatasetsByStudy(Matchers.anyInt())).thenReturn(Arrays.asList(dataset1, dataset2, dataset3));
-
-		Assert.assertTrue(this.datasetService.datasetExists(123, 13));
-		Assert.assertFalse(this.datasetService.datasetExists(123, 14));
 	}
 
 }

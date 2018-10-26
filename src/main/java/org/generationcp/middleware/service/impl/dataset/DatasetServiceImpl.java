@@ -22,19 +22,6 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
 	}
 
-	@Override
-	public boolean datasetExists(final Integer studyId, final Integer datasetId) {
-		final List<DmsProject> studyDatasets = this.daoFactory.getDmsProjectDAO().getDatasetsByStudy(studyId);
-		if (studyDatasets != null) {
-			for (final DmsProject dataset : studyDatasets) {
-				if (dataset.getProjectId().equals(datasetId)) {
-					return true;
-				}
-			}
-		}
-		return false;	
-	}
-	
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}

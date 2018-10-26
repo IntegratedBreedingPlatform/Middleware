@@ -6,6 +6,4 @@ public interface DatasetService {
 	
 	long countPhenotypes(Integer datasetId, List<Integer> traitIds);
 	
-	boolean datasetExists(Integer studyId, Integer datasetId);
-
 }
