@@ -41,8 +41,6 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-	private Project project;
-
 	DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
@@ -60,19 +58,6 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Integer generateSubObservationDataset (final Integer studyId, final String datasetName, final Integer datasetTypeId, final List<Integer> instanceIds,
 			final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits) {
-
-		// Study exists
-
-		// Study is not locked
-
-		// Instances in the list belongs to the study
-
-		// observationUnitVariableId has type = ObservationUnit
-
-		// datasetTypeId matches sub-observation unit dataset types
-
-		// numberOfSubObservationUnits <= max allowed
-
 
 		final DmsProject study = daoFactory.getDmsProjectDAO().getById(studyId);
 

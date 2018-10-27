@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.pojomatic.Pojomatic;
 
 /**
  * Variable Type of a Variable. Ontology variable can have zero or more variable types associated to it.
@@ -129,4 +130,5 @@ public enum VariableType {
 	public static List<VariableType> getReservedVariableTypes(){
 		return Arrays.asList(ANALYSIS, ANALYSIS_SUMMARY);
 	}
+
 }
