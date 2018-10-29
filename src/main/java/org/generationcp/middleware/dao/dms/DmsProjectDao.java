@@ -1184,14 +1184,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
 			final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
 			datasetDTOList.addAll(DatasetDTOs);
-		for (DatasetDTO datasetDTO : DatasetDTOs) {
+		for (final DatasetDTO datasetDTO : DatasetDTOs) {
 			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getDatasetId());
 
 		}
 
 		if (filterByTypeIds != null && !filterByTypeIds.isEmpty() && !datasetDTOList.isEmpty()) {
 			final List<DatasetDTO> datasetDTOListDeleted = new ArrayList<>();
-			for(DatasetDTO datasetDTO : datasetDTOList){
+			for(final DatasetDTO datasetDTO : datasetDTOList){
 				if(!filterByTypeIds.contains(datasetDTO.getDatasetTypeId())){
 					datasetDTOListDeleted.add(datasetDTO);
 				}
@@ -1205,7 +1205,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private void getDatasetByStudyId(final List<DatasetDTO> datasetDTOs, final Integer studyId) {
 		final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
 		datasetDTOs.addAll(DatasetDTOs);
-		for (DatasetDTO datasetDTO : DatasetDTOs) {
+		for (final DatasetDTO datasetDTO : DatasetDTOs) {
 			this.getDatasetByStudyId(datasetDTOs, datasetDTO.getDatasetId());
 		}
 	}
