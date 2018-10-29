@@ -75,6 +75,21 @@
 		</sql>
 	</changeSet>
 	
+	<changeSet author="marie" id="v10.3.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT DISTINCT labbr 
+				FROM location
+				WHERE labbr = 'NOLOC';
+			</sqlCheck>
+		</preConditions>
+		<comment>Unspecified locations should be defined as Breeding Location</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location
+			SET ltype=410 
+			WHERE labbr = 'NOLOC';
+		</sql>
+	</changeSet>
 	
 	
 
