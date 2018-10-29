@@ -99,6 +99,7 @@ public class DataSetBuilder extends Builder {
 		dataSet.setDataSetType(this.getDataSetType(project));
 		dataSet.setVariableTypes(this.getVariableTypes(project));
 		dataSet.setLocationIds(this.getLocationIds(project.getProjectId()));
+		dataSet.setProgramUUID(project.getProgramUUID());
 		return dataSet;
 	}
 
