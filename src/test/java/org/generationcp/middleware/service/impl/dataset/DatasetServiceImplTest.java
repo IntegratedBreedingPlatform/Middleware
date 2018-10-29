@@ -4,11 +4,15 @@ import java.util.Arrays;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -29,6 +33,9 @@ public class DatasetServiceImplTest {
 	@Mock
 	private DmsProjectDao dmsProjectDao;
 	
+	@Mock
+	private ProjectPropertyDao projectPropertyDao;
+	
 	@InjectMocks
 	private DatasetServiceImpl datasetService;
 	
@@ -39,6 +46,7 @@ public class DatasetServiceImplTest {
 		this.datasetService.setDaoFactory(this.daoFactory);
 		Mockito.when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		Mockito.when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
+		Mockito.when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 	}
 	
 	@Test
@@ -46,6 +54,25 @@ public class DatasetServiceImplTest {
 		final long count = 5;
 		Mockito.when(this.phenotypeDao.countPhenotypesForDataset(Matchers.anyInt(), Matchers.anyListOf(Integer.class))).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countPhenotypes(123, Arrays.asList(11, 22)));
+	}
+	
+	@Test
+	public void testAddDatasetTrait() {
+		final Integer datasetId = 101;
+		final Integer nextRank = 23;
+		Mockito.doReturn(nextRank).when(this.projectPropertyDao).getNextRank(datasetId);
+		final Integer traitId = 9876;
+		final String alias = "TRAITZ";
+		
+		this.datasetService.addDatasetTrait(datasetId, traitId, alias);
+		final ArgumentCaptor<ProjectProperty> projectPropertyCaptor = ArgumentCaptor.forClass(ProjectProperty.class);
+		Mockito.verify(this.projectPropertyDao).save(projectPropertyCaptor.capture());
+		final ProjectProperty datasetVariable = projectPropertyCaptor.getValue();
+		Assert.assertEquals(datasetId, datasetVariable.getProject().getProjectId());
+		Assert.assertEquals(VariableType.TRAIT.getId(), datasetVariable.getTypeId());
+		Assert.assertEquals(nextRank, datasetVariable.getRank());
+		Assert.assertEquals(traitId, datasetVariable.getVariableId());
+		Assert.assertEquals(alias, datasetVariable.getAlias());
 	}
 
 }
