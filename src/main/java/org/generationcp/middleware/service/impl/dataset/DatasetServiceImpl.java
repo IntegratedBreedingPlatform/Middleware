@@ -26,7 +26,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void addDatasetTrait(final Integer datasetId, final Integer traitId, final String alias) {
+	public void addTrait(final Integer datasetId, final Integer traitId, final String alias) {
 		final ProjectPropertyDao projectPropertyDAO = this.daoFactory.getProjectPropertyDAO();
 		final ProjectProperty projectProperty = new ProjectProperty();
 		projectProperty.setAlias(alias);

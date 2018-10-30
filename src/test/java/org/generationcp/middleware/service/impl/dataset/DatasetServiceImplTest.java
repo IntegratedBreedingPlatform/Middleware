@@ -64,7 +64,7 @@ public class DatasetServiceImplTest {
 		final Integer traitId = 9876;
 		final String alias = "TRAITZ";
 		
-		this.datasetService.addDatasetTrait(datasetId, traitId, alias);
+		this.datasetService.addTrait(datasetId, traitId, alias);
 		final ArgumentCaptor<ProjectProperty> projectPropertyCaptor = ArgumentCaptor.forClass(ProjectProperty.class);
 		Mockito.verify(this.projectPropertyDao).save(projectPropertyCaptor.capture());
 		final ProjectProperty datasetVariable = projectPropertyCaptor.getValue();
