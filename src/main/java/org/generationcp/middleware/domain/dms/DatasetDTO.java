@@ -1,9 +1,11 @@
 package org.generationcp.middleware.domain.dms;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.io.Serializable;
 
+@AutoProperty
 public class DatasetDTO implements Serializable {
 
 	private static final long serialVersionUID = 736579292676142736L;
