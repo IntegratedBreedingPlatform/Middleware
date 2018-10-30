@@ -1180,37 +1180,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds) {
-		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
-			final List<DatasetDTO> datasetDTOs = this.getDatasetByStudyId(studyId);
-			datasetDTOList.addAll(datasetDTOs);
-		for (final DatasetDTO datasetDTO : datasetDTOs) {
-			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getDatasetId());
-
-		}
-
-		if (filterByTypeIds != null && !filterByTypeIds.isEmpty() && !datasetDTOList.isEmpty()) {
-			final List<DatasetDTO> datasetDTOListDeleted = new ArrayList<>();
-			for(final DatasetDTO datasetDTO : datasetDTOList){
-				if(!filterByTypeIds.contains(datasetDTO.getDatasetTypeId())){
-					datasetDTOListDeleted.add(datasetDTO);
-				}
-			}
-			datasetDTOList.removeAll(datasetDTOListDeleted);
-		}
-		return datasetDTOList;
-
-	}
-
-	private void getDatasetByStudyId(final List<DatasetDTO> datasetDTOList, final Integer studyId) {
-		final List<DatasetDTO> datasetDTOs = this.getDatasetByStudyId(studyId);
-		datasetDTOList.addAll(datasetDTOs);
-		for (final DatasetDTO datasetDTO : datasetDTOs) {
-			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getDatasetId());
-		}
-	}
-
-	private List<DatasetDTO> getDatasetByStudyId(final Integer studyId) {
+	public List<DatasetDTO> getDatasets(final Integer parentId) {
 		final List<DatasetDTO> datasetDTOS;
 		try {
 
@@ -1220,16 +1190,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			projectionList.add(Projections.property("project.name"), "name");
 			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
 			Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
-			criteria.createAlias("project.relatedTos", "pr", CriteriaSpecification.INNER_JOIN);
-			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", 8160));
-			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
-			criteria.add(Restrictions.eq("pr.typeId", 1150));
+			criteria.createAlias("project.relatedTos", "pr");
+			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", parentId));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.setProjection(projectionList);
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
 			datasetDTOS = criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getDatasetByStudyId for studyId=" + studyId + ":" + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error getting getDatasets for studyId=" + parentId + ":" + e.getMessage(), e);
 		}
 		return datasetDTOS;
 
