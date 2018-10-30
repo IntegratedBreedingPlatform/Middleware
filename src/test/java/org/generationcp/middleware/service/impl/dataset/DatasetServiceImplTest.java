@@ -1,9 +1,13 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.junit.Assert;
@@ -48,4 +52,23 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(count, this.datasetService.countPhenotypes(123, Arrays.asList(11, 22)));
 	}
 
+	@Test
+	public void testGetDatasetByStudyId() {
+		final List<DatasetDTO> datasetDTOs = createDatasets(Arrays.asList(10094, 10097));
+		Mockito.when(this.dmsProjectDao.getDatasetByStudyId(Matchers.anyInt(), Matchers.anySet())).thenReturn(datasetDTOs);
+		Assert.assertEquals(datasetDTOs, this.datasetService.getDatasetByStudyId(123, null));
+	}
+
+	private static List<DatasetDTO> createDatasets(final List<Integer> datasetTypes) {
+		final List<DatasetDTO> datasets = new ArrayList<>();
+		int num = datasetTypes.size();
+		for (final Integer datasetType : datasetTypes) {
+			final DataSetType dataSetType = DataSetType.findById(datasetType);
+			final DatasetDTO datasetDTO = new DatasetDTO();
+			datasetDTO.setDatasetTypeId(dataSetType.getId());
+			datasetDTO.setName(dataSetType.name() + "_" + num);
+			num--;
+		}
+		return datasets;
+	}
 }
