@@ -1182,9 +1182,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds) {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
-			final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
-			datasetDTOList.addAll(DatasetDTOs);
-		for (final DatasetDTO datasetDTO : DatasetDTOs) {
+			final List<DatasetDTO> datasetDTOs = this.getDatasetByStudyId(studyId);
+			datasetDTOList.addAll(datasetDTOs);
+		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getDatasetId());
 
 		}
@@ -1202,11 +1202,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	private void getDatasetByStudyId(final List<DatasetDTO> datasetDTOs, final Integer studyId) {
-		final List<DatasetDTO> DatasetDTOs = this.getDatasetByStudyId(studyId);
-		datasetDTOs.addAll(DatasetDTOs);
-		for (final DatasetDTO datasetDTO : DatasetDTOs) {
-			this.getDatasetByStudyId(datasetDTOs, datasetDTO.getDatasetId());
+	private void getDatasetByStudyId(final List<DatasetDTO> datasetDTOList, final Integer studyId) {
+		final List<DatasetDTO> datasetDTOs = this.getDatasetByStudyId(studyId);
+		datasetDTOList.addAll(datasetDTOs);
+		for (final DatasetDTO datasetDTO : datasetDTOs) {
+			this.getDatasetByStudyId(datasetDTOList, datasetDTO.getDatasetId());
 		}
 	}
 
