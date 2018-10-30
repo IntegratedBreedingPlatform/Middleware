@@ -16,7 +16,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +100,17 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Boolean isDatasetNameAvailable(final String name, final String projectUUID) {
+		final Integer dmsProjectId = daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(name, projectUUID);
+		return (dmsProjectId == null);
+	}
+
+	@Override
+	public Integer getNumberOfChildren(final Integer parentId) {
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByStudy(parentId).size();
 	}
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(final DmsProject study, final DmsProject dmsProject,

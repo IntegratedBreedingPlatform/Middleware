@@ -9,4 +9,8 @@ public interface DatasetService {
 	Integer generateSubObservationDataset(Integer studyId, String datasetName, Integer datasetTypeId, List<Integer> instanceIds,
 			Integer observationUnitVariableId, Integer numberOfSubObservationUnits);
 
+	Boolean isDatasetNameAvailable(final String name, final String programUUID);
+
+	Integer getNumberOfChildren (final Integer parentId);
+
 }

@@ -319,6 +319,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
+	//Rename by getDatasetsByParent
 	public List<DmsProject> getDatasetsByStudy(final Integer studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
