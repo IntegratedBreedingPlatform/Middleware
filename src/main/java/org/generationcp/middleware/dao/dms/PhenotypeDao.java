@@ -584,12 +584,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			// Delete phenotypes
 			final String sql = "delete pheno " + " from nd_experiment e,"
-					+ "  phenotype pheno" + " where e.project_id = " + projectId
-					+ " and e.nd_geolocation_id = " + locationId + 
-					// REMOVE unnecessary join
-					" and e.nd_experiment_id = e.nd_experiment_id"
+					+ "  phenotype pheno" + " where e.project_id = :projectId "
+					+ " and e.nd_geolocation_id = :locationId "
 					+ " and e.nd_experiment_id = pheno.nd_experiment_id";
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
+			statement.setParameter("projectId", projectId);
+			statement.setParameter("locationId", locationId);
 			statement.executeUpdate();
 
 		} catch (final HibernateException e) {

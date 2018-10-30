@@ -202,6 +202,17 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 	}
 	
+	@Test
+	public void testDeletePhenotypesByProjectIdAndLocationId() {
+		final Integer locationId = this.createEnvironmentData(1, true);
+		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId());
+		final Integer projectId = this.study.getProjectId();
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
+		
+		this.phenotypeDao.deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
+		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
+	}
+	
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
 		
 		final Geolocation geolocation = new Geolocation();
