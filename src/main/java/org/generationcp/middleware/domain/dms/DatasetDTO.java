@@ -1,8 +1,6 @@
 package org.generationcp.middleware.domain.dms;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.pojomatic.Pojomatic;
 
 import java.io.Serializable;
 
@@ -53,25 +51,17 @@ public class DatasetDTO implements Serializable {
 	}
 
 	@Override
-	public String toString() {
-		return new ReflectionToStringBuilder(this).toString();
-	}
-
-	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof DatasetDTO)) {
-			return false;
-		}
-		final DatasetDTO castOther = (DatasetDTO) other;
-		return new EqualsBuilder().append(this.datasetId, castOther.datasetId)
-			.append(this.parentDatasetId,castOther.parentDatasetId)
-			.append(this.datasetTypeId,castOther.datasetTypeId)
-			.append(this.name,castOther.name)
-			.isEquals();
-	}
-
-	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.datasetId).append(this.parentDatasetId).append(this.datasetTypeId).append(this.name).toHashCode();
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
