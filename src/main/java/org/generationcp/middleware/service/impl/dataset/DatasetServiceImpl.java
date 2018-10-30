@@ -14,18 +14,14 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
-import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.hibernate.Session;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -39,10 +35,6 @@ public class DatasetServiceImpl implements DatasetService {
 		{"REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE"};
 
 	private DaoFactory daoFactory;
-
-	private DmsProjectDao dmsProjectDao;
-
-	private ExperimentDao experimentDao;
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
@@ -62,19 +54,13 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
 		final Session currentSession = sessionProvider.getSession();
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.dmsProjectDao = this.daoFactory.getDmsProjectDAO();
-		this.experimentDao = this.getExperimentDao(currentSession);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 //		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
 //		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
 //		this.designFactors = new DesignFactors(currentSession);
 	}
 
-	public ExperimentDao getExperimentDao(final Session currentSession) {
-		final ExperimentDao experimentDao = new ExperimentDao();
-		experimentDao.setSession(currentSession);
-		return experimentDao;
-	}
+
 
 	@Override
 	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
@@ -88,7 +74,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return null;
 	}
 
-	protected void setDaoFactory(DaoFactory daoFactory) {
+	protected void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 
@@ -96,10 +82,10 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final int instanceId, final int pageNumber, final int pageSize,
 		final String sortBy, final String sortOrder) {
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariables(studyId,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
-		return this.getObservationUnitTable(studyId, selectionMethodsAndTraits,
+		return this.getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
 	}
@@ -109,15 +95,15 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final int instanceId, final int pageNumber, final int pageSize,
 		final String sortBy, final String sortOrder) {
-		final int totalObservationUnits = this.countTotalObservationUnitsForDataset(datasetId, instanceId);
-		return this.experimentDao.getObservationUnitTable(datasetId, selectionMethodsAndTraits,
+
+		return this.daoFactory.getExperimentDAO().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			germplasmDescriptors, designFactors, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 
 	}
 
-	private List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {
+	private List<String> findGenericGermplasmDescriptors(final int studyId) {
 
-		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyIdentifier);
+		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyId);
 		/**
 		 * Fixed descriptors are the ones that are NOT stored in stockprop or nd_experimentprop. We dont need additional joins to props
 		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
@@ -155,6 +141,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
-		return this.experimentDao.countTotalObservationUnitsForDataset(datasetId, instanceId);
+		return this.daoFactory.getExperimentDAO().countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
 }

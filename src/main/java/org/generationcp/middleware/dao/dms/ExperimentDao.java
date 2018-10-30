@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.Criteria;
@@ -28,6 +29,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -90,7 +92,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
-
+	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
@@ -609,7 +611,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("SELECT \n")
-			.append("    nde.nd_experiment_id,\n")
+			.append("    nde.nd_experiment_id as ndExperimentId,\n")
 			.append("    gl.description AS TRIAL_INSTANCE,\n")
 			.append(
 				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n")
@@ -631,8 +633,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n")
 			.append(
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n")
-			.append(
-				"    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.plant_id WHERE parent.nd_experiment_id = pl.nd_experiment_id ) 'SUM_OF_SAMPLES', \n")
 			.append("    nde.obs_unit_id as OBS_UNIT_ID, \n");
 
 		final String traitClauseFormat =
@@ -675,8 +675,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id \n")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
+			.append("   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id ")
 			.append(
 				"		WHERE p.project_id = :datasetId \n")
+			.append(" AND gl.nd_geolocation_id = :instanceId")
 			.append(" GROUP BY nde.nd_experiment_id ");
 
 		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
@@ -709,7 +711,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		query.setFirstResult(pageSize * (pageNumber - 1));
 		query.setMaxResults(pageSize);
 
-		return this.mapResults(query.list(), selectionMethodsAndTraits, germplasmDescriptors, designFactors);
+		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = query.list();
+		return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors);
 	}
 
 	private SQLQuery createQueryAndAddScalar(
@@ -720,7 +724,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		this.addScalar(query);
 		query.addScalar("FIELDMAP COLUMN");
 		query.addScalar("FIELDMAP RANGE");
-		query.addScalar("SUM_OF_SAMPLES");
 
 		this.addScalarForTraits(selectionMethodsAndTraits, query, true);
 
@@ -764,23 +767,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private List<ObservationUnitRow> mapResults(
-		final List<Object[]> results,
+		final List<Map<String, Object>> results,
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors) {
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
-		final int fixedColumns = 16;
+		final int fixedColumns = 14;
 
 		if (results != null && !results.isEmpty()) {
-			for (final Object[] row : results) {
+			for (final Map<String, Object> row : results) {
 
-				final Map<String, Object> variables = new HashMap<String, Object>();
+				final Map<String, ObservationUnitData> variables = new HashMap<>();
 				int counterFour = 0;
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
-					final String status = (String) row[fixedColumns + counterFour + 2];
-					variables.put(variable.getName(), new ObservationUnitRow.ObservationUnitData(
-						(Integer) row[fixedColumns + counterFour + 1], //phenotypeId
-						(Integer) row[fixedColumns + counterFour + 3], //categoricalValue
-						(String) row[fixedColumns + counterFour], //variableValue
+					final String status = (String) row.get(variable.getName() + "_Status");
+					variables.put(variable.getName(), new ObservationUnitData(
+						(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
+						(Integer) row.get(variable.getName() + "_CvalueId"), //categoricalValue
+						(String) row.get(variable.getName()), //variableValue
 						(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
 						)));
 					counterFour += 4;
@@ -788,54 +791,46 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final ObservationUnitRow observationUnitRow =
 					new ObservationUnitRow();
 
-				observationUnitRow.setObservationUnitId((Integer) row[0]);
-				observationUnitRow.setDesignation((String) row[2]);
-				observationUnitRow.setGid((Integer) row[1]);
-				observationUnitRow.setAction((String) row[0]);
+				observationUnitRow.setObservationUnitId((Integer) row.get(ND_EXPERIMENT_ID));
+				observationUnitRow.setAction(((Integer) row.get(ND_EXPERIMENT_ID)).toString());
+				observationUnitRow.setGid((Integer) row.get(GID));
+				observationUnitRow.setDesignation((String) row.get(DESIGNATION));
+				variables.put(TRIAL_INSTANCE, new ObservationUnitData(
+					(String) row.get(TRIAL_INSTANCE)));
+				variables.put(ENTRY_TYPE, new ObservationUnitData(
+					(String) row.get(ENTRY_TYPE)));
+				variables.put(ENTRY_NO, new ObservationUnitData(
+					(String) row.get(ENTRY_NO)));
+				variables.put(ENTRY_CODE, new ObservationUnitData(
+					(String) row.get(ENTRY_CODE)));
+				variables.put(REP_NO, new ObservationUnitData(
+					(String) row.get(REP_NO)));
+				variables.put(PLOT_NO, new ObservationUnitData(
+					(String) row.get(PLOT_NO)));
+				variables.put(BLOCK_NO, new ObservationUnitData(
+					(String) row.get(BLOCK_NO)));
+				variables.put(ROW, new ObservationUnitData(
+					(String) row.get(ROW)));
+				variables.put(COL, new ObservationUnitData(
+					(String) row.get(COL)));
+				variables.put(OBS_UNIT_ID, new ObservationUnitData(
+					(String) row.get(OBS_UNIT_ID)));
+				variables.put(FIELD_MAP_COLUMN, new ObservationUnitData(
+					(String) row.get(FIELD_MAP_COLUMN)));
+				variables.put(FIELD_MAP_RANGE, new ObservationUnitData(
+					(String) row.get(FIELD_MAP_RANGE)));
 
-				variables.put(OBS_UNIT_ID, new ObservationUnitRow.ObservationUnitData(
-					(String) row[12]));
-				variables.put(FIELD_MAP_COLUMN, new ObservationUnitRow.ObservationUnitData(
-					(String) row[13]));
-				variables.put("FIELD_MAP_RANGE", new ObservationUnitRow.ObservationUnitData(
-					(String) row[14]));
-				variables.put("SAMPLES", new ObservationUnitRow.ObservationUnitData(
-					(String) row[15]));
-				variables.put(TRIAL_INSTANCE, new ObservationUnitRow.ObservationUnitData(
-					(String) row[1]));
-				variables.put(ENTRY_TYPE, new ObservationUnitRow.ObservationUnitData(
-					(String) row[2]));
-				variables.put(ENTRY_NO, new ObservationUnitRow.ObservationUnitData(
-					(String) row[5]));
-				variables.put(ENTRY_CODE, new ObservationUnitRow.ObservationUnitData(
-					(String) row[6]));
-				variables.put(REP_NO, new ObservationUnitRow.ObservationUnitData(
-					(String) row[7]));
-				variables.put(PLOT_NO, new ObservationUnitRow.ObservationUnitData(
-					(String) row[8]));
-				variables.put(BLOCK_NO, new ObservationUnitRow.ObservationUnitData(
-					(String) row[9]));
-				observationUnitRow.setRowNumber((String) row[10]);
-				observationUnitRow.setColumnNumber((String) row[11]);
-				observationUnitRow.setObsUnitId((String) row[12]);
-				observationUnitRow.setFieldMapColumn((String) row[13]);
-				observationUnitRow.setFieldMapRange((String) row[14]);
-				observationUnitRow.setSamples((String) row[15]);
-				observationUnitRow.setTrialInstance((String) row[1]);
-				observationUnitRow.setEntryType((String) row[2]);
-				observationUnitRow.setEntryNo((String) row[5]);
-				observationUnitRow.setEntryCode((String) row[6]);
-				observationUnitRow.setRepetionNumber((String) row[7]);
-				observationUnitRow.setPlotNumber((String) row[8]);
-				observationUnitRow.setBlockNumber((String) row[9]);
-				observationUnitRow.setVariables(variables);
-				int additionalFactorsIndex = fixedColumns + selectionMethodsAndTraits.size() * 3;
+
+				final int additionalFactorsIndex = fixedColumns + 1 + selectionMethodsAndTraits.size() * 4;
 				for (final String gpDesc : germplasmDescriptors) {
-					observationUnitRow.additionalGermplasmDescriptor(gpDesc, (String) row[additionalFactorsIndex++]);
+					variables.put(gpDesc, new ObservationUnitData(
+						(String) row.get(gpDesc)));
 				}
 				for (final String designFactor : designFactors) {
-					observationUnitRow.additionalDesignFactor(designFactor, (String) row[additionalFactorsIndex++]);
+					variables.put(designFactor, new ObservationUnitData(
+						(String) row.get(designFactor)));
 				}
+				observationUnitRow.setVariables(variables);
 				observationUnitRows.add(observationUnitRow);
 			}
 		}
