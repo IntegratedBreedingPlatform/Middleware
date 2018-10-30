@@ -6,4 +6,6 @@ public interface DatasetService {
 	
 	long countPhenotypes(Integer datasetId, List<Integer> traitIds);
 	
+	void addTrait(Integer datasetId, Integer traitId, String alias);
+	
 }

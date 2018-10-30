@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import java.util.Arrays;
+
 /**
  * The different dataset types used - e.g. study conditions, means, summary, plot.
  *
@@ -37,5 +39,10 @@ public enum DataSetType {
 			}
 		}
 		return null;
+	}
+	
+	public static boolean isSubObservationDatasetType(final DataSetType type)  {
+		return Arrays.asList(PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS)
+				.contains(type);
 	}
 }
