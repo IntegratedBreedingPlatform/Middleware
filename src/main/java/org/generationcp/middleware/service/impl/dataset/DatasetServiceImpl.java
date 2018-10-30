@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -45,8 +46,21 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetByStudyId(studyId, filterByTypeIds);
+	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
+		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
+		filterDatasets(datasetDTOList, studyId, datasetTypeIds);
+		return datasetDTOList;
+	}
+
+	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds) {
+		final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(parentId);
+
+		for (DatasetDTO datasetDTO : datasetDTOs) {
+			if (datasetTypeIds.isEmpty() || datasetTypeIds.contains(datasetDTO.getDatasetTypeId())) {
+				filtered.add(datasetDTO);
+			}
+			filterDatasets(filtered, datasetDTO.getDatasetId(), datasetTypeIds);
+		}
 	}
 
 	protected void setDaoFactory(DaoFactory daoFactory) {
