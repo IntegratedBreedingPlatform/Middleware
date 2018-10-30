@@ -15,6 +15,6 @@ public interface DatasetService {
 	Integer generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds, final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits);
 
-	List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds);
+	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 
 }
