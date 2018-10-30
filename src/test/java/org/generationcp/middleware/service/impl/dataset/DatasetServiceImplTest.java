@@ -1,7 +1,9 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import java.util.Arrays;
+import java.util.Random;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -57,14 +59,15 @@ public class DatasetServiceImplTest {
 	}
 	
 	@Test
-	public void testAddDatasetTrait() {
-		final Integer datasetId = 101;
-		final Integer nextRank = 23;
+	public void testAddVariable() {
+		final Random ran = new Random();
+		final Integer datasetId = ran.nextInt();
+		final Integer nextRank = ran.nextInt();
 		Mockito.doReturn(nextRank).when(this.projectPropertyDao).getNextRank(datasetId);
-		final Integer traitId = 9876;
-		final String alias = "TRAITZ";
+		final Integer traitId = ran.nextInt();
+		final String alias = RandomStringUtils.randomAlphabetic(20);
 		
-		this.datasetService.addTrait(datasetId, traitId, alias);
+		this.datasetService.addVariable(datasetId, traitId, VariableType.TRAIT, alias);
 		final ArgumentCaptor<ProjectProperty> projectPropertyCaptor = ArgumentCaptor.forClass(ProjectProperty.class);
 		Mockito.verify(this.projectPropertyDao).save(projectPropertyCaptor.capture());
 		final ProjectProperty datasetVariable = projectPropertyCaptor.getValue();
