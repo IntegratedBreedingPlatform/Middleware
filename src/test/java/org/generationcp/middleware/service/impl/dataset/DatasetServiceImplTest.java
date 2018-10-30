@@ -55,8 +55,8 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetDatasetByStudyId() {
 		final List<DatasetDTO> datasetDTOs = createDatasets(Arrays.asList(10094, 10097));
-		Mockito.when(this.dmsProjectDao.getDatasetByStudyId(Matchers.anyInt(), Matchers.anySet())).thenReturn(datasetDTOs);
-		Assert.assertEquals(datasetDTOs, this.datasetService.getDatasetByStudyId(123, null));
+		Mockito.when(this.dmsProjectDao.getDatasets(Matchers.anyInt())).thenReturn(datasetDTOs);
+		Assert.assertEquals(datasetDTOs, this.datasetService.getDatasets(123, null));
 	}
 
 	private static List<DatasetDTO> createDatasets(final List<Integer> datasetTypes) {
