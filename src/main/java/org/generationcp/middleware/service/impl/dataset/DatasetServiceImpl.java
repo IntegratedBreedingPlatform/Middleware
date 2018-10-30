@@ -39,6 +39,12 @@ public class DatasetServiceImpl implements DatasetService {
 		projectPropertyDAO.save(projectProperty);
 	}
 	
+	@Override
+	public void removeTrait(Integer datasetId, List<Integer> traitIds) {
+		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, traitIds);
+		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndTraitIds(datasetId, traitIds);
+	}
+	
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}

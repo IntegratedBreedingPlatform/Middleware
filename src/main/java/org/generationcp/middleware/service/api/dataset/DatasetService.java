@@ -8,4 +8,6 @@ public interface DatasetService {
 	
 	void addTrait(Integer datasetId, Integer traitId, String alias);
 	
+	void removeTrait(Integer datasetId, List<Integer> traitIds);
+	
 }

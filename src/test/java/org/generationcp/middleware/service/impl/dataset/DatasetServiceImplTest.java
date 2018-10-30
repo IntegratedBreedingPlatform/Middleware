@@ -1,6 +1,8 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -73,6 +75,16 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(nextRank, datasetVariable.getRank());
 		Assert.assertEquals(traitId, datasetVariable.getVariableId());
 		Assert.assertEquals(alias, datasetVariable.getAlias());
+	}
+	
+	@Test
+	public void testRemoveTrait() {
+		final Random ran = new Random();
+		final int datasetId = ran.nextInt();
+		final List<Integer> traitIds = Arrays.asList(ran.nextInt(), ran.nextInt()); 
+		this.datasetService.removeTrait(datasetId, traitIds);
+		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndTraitIds(datasetId, traitIds);
+		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, traitIds);
 	}
 
 }
