@@ -59,7 +59,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds) {
 		final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(parentId);
 
-		for (DatasetDTO datasetDTO : datasetDTOs) {
+		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			if (datasetTypeIds.isEmpty() || datasetTypeIds.contains(datasetDTO.getDatasetTypeId())) {
 				filtered.add(datasetDTO);
 			}
