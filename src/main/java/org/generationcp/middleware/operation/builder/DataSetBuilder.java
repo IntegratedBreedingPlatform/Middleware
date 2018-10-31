@@ -99,6 +99,7 @@ public class DataSetBuilder extends Builder {
 		dataSet.setDataSetType(this.getDataSetType(project));
 		dataSet.setVariableTypes(this.getVariableTypes(project));
 		dataSet.setLocationIds(this.getLocationIds(project.getProjectId()));
+		dataSet.setProgramUUID(project.getProgramUUID());
 		return dataSet;
 	}
 
@@ -123,7 +124,7 @@ public class DataSetBuilder extends Builder {
 
 	private DataSetType getDataSetType(final DmsProject project) {
 		for (final ProjectProperty property : project.getProperties()) {
-			if (TermId.DATASET_TYPE.getId() == property.getTypeId()) {
+			if (TermId.DATASET_TYPE.getId() == property.getVariableId()) {
 				return DataSetType.findById(Integer.valueOf(property.getValue()));
 			}
 		}

@@ -1,16 +1,23 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 import java.util.List;
+import java.util.Set;
 
 public interface DatasetService {
 	
 	long countPhenotypes(Integer datasetId, List<Integer> traitIds);
 
+	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
+
 	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
 
-	Integer generateSubObservationDataset(Integer studyId, String datasetName, Integer datasetTypeId, List<Integer> instanceIds,
-			Integer observationUnitVariableId, Integer numberOfSubObservationUnits);
+	Integer generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
+		final List<Integer> instanceIds, final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits);
+
+	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 
 }
