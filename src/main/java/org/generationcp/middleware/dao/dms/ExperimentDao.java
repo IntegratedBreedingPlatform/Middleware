@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -701,19 +702,25 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<String> designFactors, final int instanceId, final int pageNumber,
 		final int pageSize,
 		final String sortBy, final String sortOrder) {
-		final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
-			designFactors, sortBy, sortOrder);
-		final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
-			designFactors, observationUnitTableQuery);
-		query.setParameter("datasetId", datasetId);
-		query.setParameter("instanceId", String.valueOf(instanceId));
+		try {
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
+				designFactors, sortBy, sortOrder);
+			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
+				designFactors, observationUnitTableQuery);
+			query.setParameter("datasetId", datasetId);
+			query.setParameter("instanceId", String.valueOf(instanceId));
 
-		query.setFirstResult(pageSize * (pageNumber - 1));
-		query.setMaxResults(pageSize);
+			query.setFirstResult(pageSize * (pageNumber - 1));
+			query.setMaxResults(pageSize);
 
-		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-		final List<Map<String, Object>> results = query.list();
-		return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors);
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = query.list();
+			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors);
+		} catch (final Exception e) {
+			final String error = "An internal error has ocurred when trying to execute the operation";
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareException(error);
+		}
 	}
 
 	private SQLQuery createQueryAndAddScalar(
