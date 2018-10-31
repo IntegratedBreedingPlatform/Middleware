@@ -13,7 +13,7 @@ public interface DatasetService {
 	
 	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 
-	Integer generateSubObservationDataset(Integer studyId, String datasetName, Integer datasetTypeId, List<Integer> instanceIds,
+	DatasetDTO generateSubObservationDataset(Integer studyId, final Integer parentId, String datasetName, Integer datasetTypeId, List<Integer> instanceIds,
 			Integer observationUnitVariableId, Integer numberOfSubObservationUnits);
 
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);

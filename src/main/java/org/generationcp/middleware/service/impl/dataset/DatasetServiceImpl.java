@@ -56,21 +56,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer generateSubObservationDataset (final Integer studyId, final String datasetName, final Integer datasetTypeId, final List<Integer> instanceIds,
+	public DatasetDTO generateSubObservationDataset (final Integer studyId, final Integer parentId, final String datasetName, final Integer datasetTypeId, final List<Integer> instanceIds,
 			final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits) {
 
 		final DmsProject study = daoFactory.getDmsProjectDAO().getById(studyId);
 
 		final String cropPrefix = workbenchDataManager.getProjectByUuid(study.getProgramUUID()).getCropType().getPlotCodePrefix();
 
-		final List<DmsProject> plotDatasets = daoFactory.getDmsProjectDAO()
-				.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.PLOT_DATA.getId()));
-
-		if (plotDatasets == null || plotDatasets.isEmpty()) {
-			throw new MiddlewareException("Study does not have a plot dataset associated to it");
-		}
-
-		final DmsProject plotDataset = plotDatasets.get(0);
+		final DmsProject parentDataset = daoFactory.getDmsProjectDAO().getById(parentId);
 
 		final DmsProject subObservationDataset = new DmsProject();
 
@@ -84,13 +77,13 @@ public class DatasetServiceImpl implements DatasetService {
 		subObservationDataset.setDeleted(false);
 		subObservationDataset.setLocked(false);
 		subObservationDataset.setProperties(projectProperties);
-		subObservationDataset.setRelatedTos(this.buildProjectRelationships(plotDataset, subObservationDataset));
+		subObservationDataset.setRelatedTos(this.buildProjectRelationships(parentDataset, subObservationDataset));
 
 		daoFactory.getDmsProjectDAO().save(subObservationDataset);
 
 		// iterate and create new sub-observation units
 		final List<ExperimentModel> plotObservationUnits =
-				daoFactory.getExperimentDao().getObservationUnits(plotDataset.getProjectId(), instanceIds);
+				daoFactory.getExperimentDao().getObservationUnits(parentDataset.getProjectId(), instanceIds);
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
 				ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(), plotObservationUnit.getTypeId(),
@@ -100,7 +93,8 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 
-		return null;
+		// FIXME Build Dataset
+		return new DatasetDTO();
 	}
 
 	@Override
