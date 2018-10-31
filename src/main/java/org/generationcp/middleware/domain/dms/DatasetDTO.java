@@ -1,37 +1,31 @@
 package org.generationcp.middleware.domain.dms;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
-public class DatasetDTO {
+import java.io.Serializable;
 
-	private Integer projectId;
-	private Integer parent;
+@AutoProperty
+public class DatasetDTO implements Serializable {
+
+	private static final long serialVersionUID = 736579292676142736L;
+
+	private Integer datasetId;
 	private Integer datasetTypeId;
 	private String name;
+	private Integer parentDatasetId;
 
-	public DatasetDTO(final Integer projectId, final Integer parent, final Integer datasetTypeId, final String name) {
-		this.projectId = projectId;
-		this.parent = parent;
-		this.datasetTypeId = datasetTypeId;
-		this.name = name;
+
+	public DatasetDTO(){
+
 	}
 
-	public Integer getProjectId() {
-		return projectId;
+	public Integer getDatasetId() {
+		return datasetId;
 	}
 
-	public void setProjectId(final Integer projectId) {
-		this.projectId = projectId;
-	}
-
-	public Integer getParent() {
-		return parent;
-	}
-
-	public void setParent(final Integer parent) {
-		this.parent = parent;
+	public void setDatasetId(final Integer datasetId) {
+		this.datasetId = datasetId;
 	}
 
 	public Integer getDatasetTypeId() {
@@ -50,26 +44,26 @@ public class DatasetDTO {
 		this.name = name;
 	}
 
-	@Override
-	public String toString() {
-		return new ReflectionToStringBuilder(this).toString();
+	public Integer getParentDatasetId() {
+		return parentDatasetId;
 	}
 
-	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof DatasetDTO)) {
-			return false;
-		}
-		final DatasetDTO castOther = (DatasetDTO) other;
-		return new EqualsBuilder().append(this.projectId, castOther.projectId)
-			.append(this.parent,castOther.parent)
-			.append(this.datasetTypeId,castOther.datasetTypeId)
-			.append(this.name,castOther.name)
-			.isEquals();
+	public void setParentDatasetId(final Integer parentDatasetId) {
+		this.parentDatasetId = parentDatasetId;
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.projectId).append(this.parent).append(this.datasetTypeId).append(this.name).toHashCode();
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
