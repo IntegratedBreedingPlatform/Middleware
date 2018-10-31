@@ -11,24 +11,20 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -50,10 +46,20 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -1165,7 +1171,102 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		return studyReference;
 	}
-	
+
+	public List<MeasurementVariable> getObservationSetColumns(final Integer observationSetId, final List<Integer> variableTypes) {
+
+		final String query = " SELECT "  //
+			+ "   pp.variable_id AS variableId, "  //
+			+ "   variable.name AS variableName, "  //
+			+ "   variable.definition AS description, "  //
+			+ "   variableType.cvterm_id AS variableTypeId, "  //
+			+ "   scale.name AS scale, "  //
+			+ "   method.name AS method, "  //
+			+ "   property.name AS property, "  //
+			+ "   dataType.cvterm_id AS dataTypeId, "  //
+			+ "   category.cvterm_id AS categoryId, "  //
+			+ "   category.name AS categoryName, "  //
+			+ "   category.definition AS categoryDescription, "  //
+			+ "   max.value AS max, "  //
+			+ "   min.value AS min, "  //
+			+ "   formula.definition AS formula "  //
+			+ " FROM project dataset "  //
+			+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "  //
+			+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "  //
+			+ "   INNER JOIN cvterm variableType ON pp.type_id = variableType.cvterm_id "  //
+			+ "   INNER JOIN cvterm_relationship cvtrscale ON variable.cvterm_id = cvtrscale.subject_id " //
+			+ "                                            AND cvtrscale.type_id = " + TermId.HAS_SCALE.getId()  //
+			+ "   INNER JOIN cvterm scale ON cvtrscale.object_id = scale.cvterm_id "  //
+			+ "   INNER JOIN cvterm_relationship cvtrmethod ON variable.cvterm_id = cvtrmethod.subject_id " //
+			+ "                                             AND cvtrmethod.type_id = " + TermId.HAS_METHOD.getId() //
+			+ "   INNER JOIN cvterm method ON cvtrmethod.object_id = method.cvterm_id "  //
+			+ "   INNER JOIN cvterm_relationship cvtrproperty ON variable.cvterm_id = cvtrproperty.subject_id " //
+			+ "                                               AND cvtrproperty.type_id = " + TermId.HAS_PROPERTY.getId() //
+			+ "   INNER JOIN cvterm property ON cvtrproperty.object_id = property.cvterm_id "  //
+			+ "   INNER JOIN cvterm_relationship cvtrdataType ON scale.cvterm_id = cvtrdataType.subject_id " //
+			+ "                                               AND cvtrdataType.type_id = " + TermId.HAS_TYPE.getId() //
+			+ "   INNER JOIN cvterm dataType ON cvtrdataType.object_id = dataType.cvterm_id "  //
+			+ "   LEFT JOIN cvterm_relationship cvtrcategory ON scale.cvterm_id = cvtrcategory.subject_id "
+			+ "                                              AND cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
+			+ "   LEFT JOIN cvterm category ON cvtrcategory.object_id = category.cvterm_id "  //
+			+ "   LEFT JOIN cvtermprop max on scale.cvterm_id = max.cvterm_id AND max.type_id = " + TermId.MAX_VALUE.getId()  //
+			+ "   LEFT JOIN cvtermprop min on scale.cvterm_id = min.cvterm_id AND min.type_id = " + TermId.MIN_VALUE.getId()  //
+			+ "   LEFT JOIN formula ON variable.cvterm_id = formula.target_variable_id "  //
+			+ " WHERE " //
+			+ "   dataset.project_id = :observationSetId " //
+			+ "   AND pp.type_id in (:variableTypes) ";
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameter("observationSetId", observationSetId);
+		sqlQuery.setParameterList("variableTypes", variableTypes);
+		sqlQuery.addScalar("variableId").addScalar("variableName").addScalar("description").addScalar("variableTypeId").addScalar("scale")
+			.addScalar("method").addScalar("property").addScalar("dataTypeId").addScalar("categoryId").addScalar("categoryName")
+			.addScalar("categoryDescription").addScalar("max").addScalar("min").addScalar("formula");
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = sqlQuery.list();
+
+		final Map<Integer, MeasurementVariable> columns = new LinkedHashMap<>();
+
+		for (final Map<String, Object> result : results) {
+			final Integer variableId = (Integer) result.get("variableId");
+
+			if (!columns.containsKey(variableId)) {
+				columns.put(variableId, new MeasurementVariable());
+
+				final MeasurementVariable measurementVariable = columns.get(variableId);
+
+				measurementVariable.setTermId(variableId);
+				measurementVariable.setName(Objects.toString(result.get("variableName")));
+				measurementVariable.setDescription(Objects.toString(result.get("description")));
+				measurementVariable.setScale(Objects.toString(result.get("scale")));
+				measurementVariable.setMethod(Objects.toString(result.get("method")));
+				measurementVariable.setProperty(Objects.toString(result.get("property")));
+				final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
+				measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+				final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
+				measurementVariable.setDataType(dataType.getName());
+				measurementVariable.setDataTypeId(dataType.getId());
+				measurementVariable.setMinRange(result.get("min") != null ? (Double) result.get("min") : null);
+				measurementVariable.setMaxRange(result.get("max") != null ? (Double) result.get("max") : null);
+			}
+
+			final MeasurementVariable measurementVariable = columns.get(variableId);
+
+			final Object categoryId = result.get("categoryId");
+			if (categoryId != null) {
+				if (measurementVariable.getPossibleValues() == null || measurementVariable.getPossibleValues().isEmpty()) {
+					measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
+				}
+				final ValueReference valueReference = //
+					new ValueReference((Integer) categoryId, //
+						Objects.toString(result.get("categoryName")), //
+						Objects.toString(result.get("categoryDescription")));
+				measurementVariable.getPossibleValues().add(valueReference);
+			}
+		}
+
+		return new ArrayList<>(columns.values());
+	}
+
 	public void lockUnlockStudy(final Integer studyId, final Boolean isLocked) {
 		Preconditions.checkNotNull(studyId);
 		
