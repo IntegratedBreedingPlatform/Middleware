@@ -26,12 +26,12 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void addTrait(final Integer datasetId, final Integer traitId, final String alias) {
+	public void addVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias) {
 		final ProjectPropertyDao projectPropertyDAO = this.daoFactory.getProjectPropertyDAO();
 		final ProjectProperty projectProperty = new ProjectProperty();
 		projectProperty.setAlias(alias);
-		projectProperty.setTypeId(VariableType.TRAIT.getId());
-		projectProperty.setVariableId(traitId);
+		projectProperty.setTypeId(type.getId());
+		projectProperty.setVariableId(variableId);
 		final DmsProject dataset = new DmsProject();
 		dataset.setProjectId(datasetId);
 		projectProperty.setProject(dataset);
