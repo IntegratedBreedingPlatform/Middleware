@@ -7,4 +7,6 @@ public interface MeasurementVariableService {
 
 	List<MeasurementVariableDto> getVariables(final int studyIdentifier,Integer... variableTypes);
 
+	List<MeasurementVariableDto> getVariablesForDataset(final int studyIdentifier, Integer... variableTypes);
+
 }
