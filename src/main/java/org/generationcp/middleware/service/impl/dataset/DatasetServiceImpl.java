@@ -55,16 +55,17 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId) {
-		// TODO get plot dataset even if subobs is not a direct descendant
+		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
 			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
 
 		final List<MeasurementVariable> plotDataSetColumns =
-			this.daoFactory.getDmsProjectDAO().getObservationSetColumns(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
 		final List<MeasurementVariable> subObservationSetColumns =
-			this.daoFactory.getDmsProjectDAO().getObservationSetColumns(subObservationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(subObservationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
 
 		// TODO get immediate parent columns
+		// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
 
 		plotDataSetColumns.addAll(subObservationSetColumns);
 		return plotDataSetColumns;
