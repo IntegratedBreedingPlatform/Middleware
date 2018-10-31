@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -44,6 +45,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1203,5 +1206,65 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return datasetDTOS;
 
+	}
+
+	public DatasetDTO getDataset(final Integer datasetId) {
+		final DatasetDTO datasetDTO;
+		try {
+
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("project.projectId"), "datasetId");
+			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
+			projectionList.add(Projections.property("project.name"), "name");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+			Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			criteria.createAlias("project.relatedTos", "pr");
+			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.add(Restrictions.eq("project.projectId", datasetId));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.setProjection(projectionList);
+			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
+			datasetDTO = (DatasetDTO) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getDataset for studyId=" + datasetId + ":" + e.getMessage(), e);
+		}
+		return datasetDTO;
+	}
+
+	public List<StudyInstance> getDatasetInstances(final int datasetId) {
+
+		try {
+			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
+				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" + // 8189 = cvterm for CUSTOM_LOCATION_ABBR
+				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "    inner join project proj on proj.project_id = nde.project_id \n"
+				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
+				+ " where proj.project_id = :datasetId \n"
+				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
+
+			final SQLQuery query =  this.getSession().createSQLQuery(sql);
+			query.setParameter("datasetId", datasetId);
+			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("LOCATION_NAME", new StringType());
+			query.addScalar("LOCATION_ABBR", new StringType());
+			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
+			query.addScalar("INSTANCE_NUMBER", new IntegerType());
+
+			final List queryResults = query.list();
+			final List<StudyInstance> instances = new ArrayList<>();
+			for (final Object result : queryResults) {
+				final Object[] row = (Object[]) result;
+				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[4],(String) row[3]));
+			}
+			return instances;
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing getDatasetInstances(datasetId = " + datasetId + ") query: " + he.getMessage(), he);
+		}
 	}
 }
