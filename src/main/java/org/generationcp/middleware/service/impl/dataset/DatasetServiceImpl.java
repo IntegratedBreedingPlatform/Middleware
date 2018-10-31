@@ -68,7 +68,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer generateSubObservationDataset (final Integer studyId, final String datasetName, final Integer datasetTypeId, final Integer[] instanceIds,
+	public Integer generateSubObservationDataset (final Integer studyId, final String datasetName, final Integer datasetTypeId, final List<Integer> instanceIds,
 			final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits) {
 
 		return null;
