@@ -94,29 +94,29 @@ public class DatasetServiceImplTest {
 		final List<DatasetDTO> datasetDTOs3 = new ArrayList<>();
 		final List<DatasetDTO> datasetDTOs4 = new ArrayList<>();
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
-		DatasetDTO datasetDTOs;
+		DatasetDTO datasetDTO;
 
-		datasetDTOs = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", 10080);
-		datasetDTOs1.add(datasetDTOs);
-		datasetDTOs = createDataset(25021, 25019, "IBP-2015-PLOTDATA", 10090);
-		datasetDTOs1.add(datasetDTOs);
+		datasetDTO = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", 10080);
+		datasetDTOs1.add(datasetDTO);
+		datasetDTO = createDataset(25021, 25019, "IBP-2015-PLOTDATA", 10090);
+		datasetDTOs1.add(datasetDTO);
 		datasetDTOList.addAll(datasetDTOs1);
 
 		Mockito.when(this.dmsProjectDao.getDatasets(25019)).thenReturn(datasetDTOs1);
 		Mockito.when(this.dmsProjectDao.getDatasets(25020)).thenReturn(new ArrayList<DatasetDTO>());
 
-		datasetDTOs = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", 10094);
-		datasetDTOs2.add(datasetDTOs);
+		datasetDTO = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", 10094);
+		datasetDTOs2.add(datasetDTO);
 		datasetDTOList.addAll(datasetDTOs2);
 		Mockito.when(this.dmsProjectDao.getDatasets(25021)).thenReturn(datasetDTOs2);
 
-		datasetDTOs = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", 10094);
-		datasetDTOs3.add(datasetDTOs);
+		datasetDTO = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", 10094);
+		datasetDTOs3.add(datasetDTO);
 		datasetDTOList.addAll(datasetDTOs3);
 		Mockito.when(this.dmsProjectDao.getDatasets(25022)).thenReturn(datasetDTOs3);
 
-		datasetDTOs = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", 10094);
-		datasetDTOs4.add(datasetDTOs);
+		datasetDTO = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", 10094);
+		datasetDTOs4.add(datasetDTO);
 		datasetDTOList.addAll(datasetDTOs4);
 		Mockito.when(this.dmsProjectDao.getDatasets(25023)).thenReturn(datasetDTOs4);
 
@@ -131,29 +131,28 @@ public class DatasetServiceImplTest {
 		final List<DatasetDTO> datasetDTOs3 = new ArrayList<>();
 		final List<DatasetDTO> datasetDTOs4 = new ArrayList<>();
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
-		DatasetDTO datasetDTOs;
+		DatasetDTO datasetDTO;
 
-		datasetDTOs = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", 10080);
-		datasetDTOs1.add(datasetDTOs);
-		datasetDTOs = createDataset(25021, 25019, "IBP-2015-PLOTDATA", 10090);
-		datasetDTOs1.add(datasetDTOs);
+		datasetDTO = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", 10080);
+		datasetDTOs1.add(datasetDTO);
+		datasetDTO = createDataset(25021, 25019, "IBP-2015-PLOTDATA", 10090);
+		datasetDTOs1.add(datasetDTO);
 
 		Mockito.when(this.dmsProjectDao.getDatasets(25019)).thenReturn(datasetDTOs1);
-
 		Mockito.when(this.dmsProjectDao.getDatasets(25020)).thenReturn(new ArrayList<DatasetDTO>());
 
-		datasetDTOs = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", 10094);
-		datasetDTOs2.add(datasetDTOs);
+		datasetDTO = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", 10094);
+		datasetDTOs2.add(datasetDTO);
 		datasetDTOList.addAll(datasetDTOs2);
 		Mockito.when(this.dmsProjectDao.getDatasets(25021)).thenReturn(datasetDTOs2);
 
-		datasetDTOs = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", 10094);
-		datasetDTOs3.add(datasetDTOs);
+		datasetDTO = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", 10094);
+		datasetDTOs3.add(datasetDTO);
 		datasetDTOList.addAll(datasetDTOs3);
 		Mockito.when(this.dmsProjectDao.getDatasets(25022)).thenReturn(datasetDTOs3);
 
-		datasetDTOs = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", 10094);
-		datasetDTOs4.add(datasetDTOs);
+		datasetDTO = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", 10094);
+		datasetDTOs4.add(datasetDTO);
 		datasetDTOList.addAll(datasetDTOs4);
 		Mockito.when(this.dmsProjectDao.getDatasets(25023)).thenReturn(datasetDTOs4);
 
