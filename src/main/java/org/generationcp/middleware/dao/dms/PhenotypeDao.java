@@ -1054,6 +1054,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		return (Long) criteria.uniqueResult();
 	}
+
+	public long countPhenotypesForDatasetAndInstance(final Integer datasetId, final Integer instanceId) {
+		final Criteria criteria = this.getSession().createCriteria(Phenotype.class);
+		criteria.createAlias("experiment", "experiment");
+		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
+		criteria.add(Restrictions.eq("experiment.geoLocation.locationId", instanceId));
+		criteria.setProjection(Projections.rowCount());
+
+		return (Long) criteria.uniqueResult();
+
+	}
 	
 	@Override
 	public Phenotype save(final Phenotype phenotype) {

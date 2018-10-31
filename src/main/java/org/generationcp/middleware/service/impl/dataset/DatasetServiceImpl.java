@@ -22,6 +22,11 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
 	}
 
+	@Override
+	public long countPhenotypesByInstance(final Integer datasetId, final Integer instanceId) {
+		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
+	}
+
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
