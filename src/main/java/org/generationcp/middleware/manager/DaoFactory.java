@@ -21,7 +21,6 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.hibernate.Session;
 
 public class DaoFactory {
 

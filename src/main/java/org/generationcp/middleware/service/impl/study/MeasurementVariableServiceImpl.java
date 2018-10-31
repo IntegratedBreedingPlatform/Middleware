@@ -1,15 +1,14 @@
 package org.generationcp.middleware.service.impl.study;
 
-import org.generationcp.middleware.service.api.study.MeasurementVariableService;
-
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class MeasurementVariableServiceImpl implements MeasurementVariableService {

@@ -1,11 +1,11 @@
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+
+import java.util.Collections;
+import java.util.List;
 
 public class GermplasmDescriptors {
 

@@ -1,16 +1,14 @@
 package org.generationcp.middleware.service.api.dataset;
 
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.ontology.VariableType;
-
 /**
  * Created by clarysabel on 10/22/18.
  */
-import java.util.List;
 
 public interface DatasetService {
 

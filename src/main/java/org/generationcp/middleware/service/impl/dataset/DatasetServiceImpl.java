@@ -1,35 +1,30 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import java.util.ArrayList;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.hibernate.Session;
-import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -85,18 +80,18 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
-		filterDatasets(datasetDTOList, studyId, datasetTypeIds);
+		this.filterDatasets(datasetDTOList, studyId, datasetTypeIds);
 		return datasetDTOList;
 	}
 
 	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds) {
 		final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(parentId);
 
-		for (DatasetDTO datasetDTO : datasetDTOs) {
+		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			if (datasetTypeIds.isEmpty() || datasetTypeIds.contains(datasetDTO.getDatasetTypeId())) {
 				filtered.add(datasetDTO);
 			}
-			filterDatasets(filtered, datasetDTO.getDatasetId(), datasetTypeIds);
+			this.filterDatasets(filtered, datasetDTO.getDatasetId(), datasetTypeIds);
 		}
 	}
 
@@ -114,7 +109,7 @@ public class DatasetServiceImpl implements DatasetService {
 		projectPropertyDAO.save(projectProperty);
 	}
 
-	protected void setDaoFactory(DaoFactory daoFactory) {
+	protected void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 
