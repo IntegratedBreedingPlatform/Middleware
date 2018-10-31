@@ -33,7 +33,9 @@ public class DataSet {
 
 	private VariableTypeList variableTypes;
 
-	private Set<Integer> locationIds = new HashSet<Integer>();
+	private Set<Integer> locationIds = new HashSet<>();
+	
+	private String programUUID;
 
 	public int getId() {
 		return this.id;
@@ -192,5 +194,15 @@ public class DataSet {
 			}
 		}
 		return null;
+	}
+
+	
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 }

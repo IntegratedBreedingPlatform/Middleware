@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -63,6 +67,20 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
+	@Override
+	public void addVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias) {
+		final ProjectPropertyDao projectPropertyDAO = this.daoFactory.getProjectPropertyDAO();
+		final ProjectProperty projectProperty = new ProjectProperty();
+		projectProperty.setAlias(alias);
+		projectProperty.setTypeId(type.getId());
+		projectProperty.setVariableId(variableId);
+		final DmsProject dataset = new DmsProject();
+		dataset.setProjectId(datasetId);
+		projectProperty.setProject(dataset);
+		projectProperty.setRank(projectPropertyDAO.getNextRank(datasetId));
+		projectPropertyDAO.save(projectProperty);
+	}
+	
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
