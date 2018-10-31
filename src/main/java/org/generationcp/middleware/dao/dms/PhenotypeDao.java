@@ -598,7 +598,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 	
-	public void deletePhenotypesByProjectIdAndTraitIds(final Integer projectId, final List<Integer> traitIds) {
+	public void deletePhenotypesByProjectIdAndVariableIds(final Integer projectId, final List<Integer> variableIds) {
 		try {
 			// Delete phenotypes
 			final String sql = "delete pheno " + " from nd_experiment e,"
@@ -607,11 +607,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ " and e.nd_experiment_id = pheno.nd_experiment_id";
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
 			statement.setParameter("projectId", projectId);
-			statement.setParameterList("variableIds", traitIds);
+			statement.setParameterList("variableIds", variableIds);
 			statement.executeUpdate();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in deletePhenotypesByProjectIdAndTraitIds=" + projectId + ", " + traitIds
+			throw new MiddlewareQueryException("Error in deletePhenotypesByProjectIdAndVariableIds=" + projectId + ", " + variableIds
 					+ IN_PHENOTYPE_DAO + e.getMessage(), e);
 		}
 	}

@@ -80,13 +80,13 @@ public class DatasetServiceImplTest {
 	}
 	
 	@Test
-	public void testRemoveTrait() {
+	public void testRemoveVariables() {
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
-		final List<Integer> traitIds = Arrays.asList(ran.nextInt(), ran.nextInt()); 
-		this.datasetService.removeTrait(datasetId, traitIds);
-		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndTraitIds(datasetId, traitIds);
-		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, traitIds);
+		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt()); 
+		this.datasetService.removeVariables(datasetId, variableIds);
+		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
+		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
 	}
 
 }

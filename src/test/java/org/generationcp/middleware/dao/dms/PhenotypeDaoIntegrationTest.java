@@ -198,7 +198,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer projectId = this.study.getProjectId();
 		Assert.assertEquals(NO_OF_GERMPLASM * numberOfReps, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 		
-		this.phenotypeDao.deletePhenotypesByProjectIdAndTraitIds(projectId, traitIds);
+		this.phenotypeDao.deletePhenotypesByProjectIdAndVariableIds(projectId, traitIds);
 		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 	}
 	

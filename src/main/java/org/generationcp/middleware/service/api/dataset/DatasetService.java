@@ -10,6 +10,6 @@ public interface DatasetService {
 	
 	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 	
-	void removeTrait(Integer datasetId, List<Integer> traitIds);
+	void removeVariables(Integer datasetId, List<Integer> variableIds);
 	
 }
