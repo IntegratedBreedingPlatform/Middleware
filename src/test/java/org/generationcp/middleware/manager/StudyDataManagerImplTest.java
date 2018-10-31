@@ -64,6 +64,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.workbench.DatasetType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
@@ -283,6 +284,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DataSet dataset = this.manager.getDataSet(datasetReference.getId());
 		Assert.assertEquals("The dataset name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
 				dataset.getName());
+		Assert.assertEquals(DataSetType.MEANS_DATA, dataset.getDataSetType());
 	}
 
 	@Test
