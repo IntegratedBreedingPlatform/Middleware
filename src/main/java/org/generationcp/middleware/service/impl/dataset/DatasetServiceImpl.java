@@ -80,7 +80,14 @@ public class DatasetServiceImpl implements DatasetService {
 		projectProperty.setRank(projectPropertyDAO.getNextRank(datasetId));
 		projectPropertyDAO.save(projectProperty);
 	}
-	
+
+	@Override
+	public DatasetDTO getDataset(final Integer datasetId) {
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
+		datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+		return datasetDTO;
+	}
+
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
