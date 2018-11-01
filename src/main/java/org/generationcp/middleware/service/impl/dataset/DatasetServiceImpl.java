@@ -1,6 +1,13 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -67,9 +74,6 @@ public class DatasetServiceImpl implements DatasetService {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
 	private MeasurementVariableService measurementVariableService;
 
 	@Autowired
@@ -77,6 +81,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private DesignFactors designFactors;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -133,6 +140,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		final DmsProject plotDataset = plotDatasets.get(0);
+		final DmsProject parentDataset = daoFactory.getDmsProjectDAO().getById(parentId);
 
 		final DmsProject subObservationDataset = new DmsProject();
 
@@ -147,7 +155,7 @@ public class DatasetServiceImpl implements DatasetService {
 		subObservationDataset.setDeleted(false);
 		subObservationDataset.setLocked(false);
 		subObservationDataset.setProperties(projectProperties);
-		subObservationDataset.setRelatedTos(this.buildProjectRelationships(plotDataset, subObservationDataset));
+		subObservationDataset.setRelatedTos(this.buildProjectRelationships(parentDataset, subObservationDataset));
 
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().save(subObservationDataset);
 
