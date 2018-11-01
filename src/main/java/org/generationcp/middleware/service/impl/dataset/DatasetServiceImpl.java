@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -77,8 +78,6 @@ public class DatasetServiceImpl implements DatasetService {
 //		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
 //		this.designFactors = new DesignFactors(currentSession);
 	}
-
-
 
 	@Override
 	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
@@ -143,11 +142,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public DatasetDTO getDataset(final Integer datasetId) {
-		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
-		datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
-		datasetDTO.setVariables(this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
-		return datasetDTO;
+	public DatasetDTO getDataset(final Integer studyId, final Integer datasetId) {
+		final List<DatasetDTO> datasetDTOList = this.getDatasets(studyId, new TreeSet<Integer>());
+		for (final DatasetDTO datasetDto : datasetDTOList)
+			if (datasetDto.getDatasetId().equals(datasetId)) {
+				final DatasetDTO datasetDTO = datasetDto;
+				datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+				datasetDTO.setVariables(
+					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
+				return datasetDTO;
+			}
+
+		return null;
 	}
 
 	protected void setDaoFactory(final DaoFactory daoFactory) {
