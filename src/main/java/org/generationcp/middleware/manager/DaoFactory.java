@@ -12,6 +12,7 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 
 public class DaoFactory {
 
@@ -168,5 +170,11 @@ public class DaoFactory {
 		experimentDao.setSession(this.sessionProvider.getSession());
 		return experimentDao;
 
+	}
+
+	public GeolocationDao getGeolocationDAO() {
+		final GeolocationDao geolocationDao = new GeolocationDao();
+		geolocationDao.setSession(this.sessionProvider.getSession());
+		return geolocationDao;
 	}
 }
