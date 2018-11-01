@@ -1,13 +1,6 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -15,7 +8,6 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -66,6 +58,7 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.OBSERVATION_UNIT.getId());
 
 	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
+		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId());
 
