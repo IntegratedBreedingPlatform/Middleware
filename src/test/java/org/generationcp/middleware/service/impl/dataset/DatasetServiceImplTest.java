@@ -21,9 +21,6 @@ public class DatasetServiceImplTest {
 	private DaoFactory daoFactory;
 	
 	@Mock
-	private HibernateSessionProvider session;
-	
-	@Mock
 	private PhenotypeDao phenotypeDao;
 	
 	@Mock
@@ -46,6 +43,13 @@ public class DatasetServiceImplTest {
 		final long count = 5;
 		Mockito.when(this.phenotypeDao.countPhenotypesForDataset(Matchers.anyInt(), Matchers.anyListOf(Integer.class))).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countPhenotypes(123, Arrays.asList(11, 22)));
+	}
+
+	@Test
+	public void testCountPhenotypesByInstance() {
+		final long count = 6;
+		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(Matchers.anyInt(), Matchers.anyInt())).thenReturn(count);
+		Assert.assertEquals(count, this.datasetService.countPhenotypesByInstance(1, 2));
 	}
 
 }
