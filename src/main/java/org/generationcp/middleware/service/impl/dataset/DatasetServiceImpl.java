@@ -140,7 +140,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		final DmsProject plotDataset = plotDatasets.get(0);
-		final DmsProject parentDataset = daoFactory.getDmsProjectDAO().getById(parentId);
+		final DmsProject parentDataset = this.daoFactory.getDmsProjectDAO().getById(parentId);
 
 		final DmsProject subObservationDataset = new DmsProject();
 
@@ -188,8 +188,10 @@ public class DatasetServiceImpl implements DatasetService {
 		final DataSetType dataType = DataSetType.findById(datasetTypeId);
 		measurementVariable.setDataType(dataType.name());
 		measurementVariable.setDataTypeId(dataType.getId());
-		measurementVariable.setMinRange(Double.valueOf(observationUnitVariable.getScale().getMinValue()));
-		measurementVariable.setMaxRange(Double.valueOf(observationUnitVariable.getScale().getMaxValue()));
+		final String minValue = observationUnitVariable.getScale().getMinValue();
+		measurementVariable.setMinRange(minValue != null ? Double.valueOf(minValue) : null);
+		final String maxValue = observationUnitVariable.getScale().getMaxValue();
+		measurementVariable.setMaxRange(maxValue != null ? Double.valueOf(maxValue) : null);
 		final List<MeasurementVariable> variables = new ArrayList<>();
 		variables.add(measurementVariable);
 

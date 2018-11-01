@@ -31,4 +31,6 @@ public interface DatasetService {
 
 	Integer getNumberOfChildren (final Integer parentId);
 
+	DatasetDTO getDataset(final Integer datasetId);
+
 }
