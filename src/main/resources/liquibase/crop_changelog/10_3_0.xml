@@ -107,16 +107,27 @@
 		<sql dbms="mysql" splitStatements="false">
 			CREATE PROCEDURE addUnspecifiedLocationToFavorites()
 			   BEGIN
+			   
 				DECLARE uuid TEXT(36);
+				DECLARE done INT DEFAULT FALSE;
+
 				DECLARE CUR1 CURSOR FOR
 					SELECT program_uuid FROM project;
+				
+				DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
 				OPEN CUR1;
 			    read_loop: LOOP FETCH CUR1 INTO uuid;
+			    	IF done THEN
+						LEAVE read_loop;
+					END IF;
+
 					INSERT INTO program_favorites 
 						( entity_type, entity_id, program_uuid)
 					VALUES 
 						("LOCATION", 9016, uuid);
 			    END LOOP read_loop;
+
 				CLOSE cur1;
 			   END
 				
