@@ -48,6 +48,10 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
+	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
+		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId());
+
 	private DaoFactory daoFactory;
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -142,6 +146,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+		datasetDTO.setVariables(this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
 		return datasetDTO;
 	}
 
