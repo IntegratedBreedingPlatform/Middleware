@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.impl.dataset;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -37,6 +39,19 @@ public class DatasetServiceImpl implements DatasetService {
 	public static final String[] FIXED_DESIGN_FACTORS =
 		{"REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE"};
 
+	public static final ArrayList<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
+		VariableType.TRAIT.getId(), //
+		VariableType.OBSERVATION_UNIT.getId());
+
+	public static final ArrayList<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
+		VariableType.OBSERVATION_UNIT.getId());
+
+	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
+		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId());
+
 	private DaoFactory daoFactory;
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -50,7 +65,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private DesignFactors designFactors;
 
-	DatasetServiceImpl() {
+	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
@@ -65,6 +80,24 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
+	}
+
+	@Override
+	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId) {
+		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
+		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
+			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+
+		final List<MeasurementVariable> plotDataSetColumns =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
+		final List<MeasurementVariable> subObservationSetColumns =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(subObservationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
+
+		// TODO get immediate parent columns
+		// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
+
+		plotDataSetColumns.addAll(subObservationSetColumns);
+		return plotDataSetColumns;
 	}
 
 	@Override
@@ -104,6 +137,14 @@ public class DatasetServiceImpl implements DatasetService {
 		projectProperty.setProject(dataset);
 		projectProperty.setRank(projectPropertyDAO.getNextRank(datasetId));
 		projectPropertyDAO.save(projectProperty);
+	}
+
+	@Override
+	public DatasetDTO getDataset(final Integer datasetId) {
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
+		datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+		datasetDTO.setVariables(this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
+		return datasetDTO;
 	}
 
 	protected void setDaoFactory(final DaoFactory daoFactory) {
