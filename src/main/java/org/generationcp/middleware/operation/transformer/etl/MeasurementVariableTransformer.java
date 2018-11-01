@@ -113,6 +113,7 @@ public class MeasurementVariableTransformer extends Transformer {
 			measurementVariable.setFactor(isFactor);
 			measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 			measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));
+			measurementVariable.setFormula(stdVariable.getFormula());
 			if (stdVariable.getConstraints() != null) {
 				measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
 				measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
