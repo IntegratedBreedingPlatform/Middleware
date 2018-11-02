@@ -163,7 +163,7 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
-		return this.getDataset(dataset.getProjectId());
+		return this.getDataset(studyId, dataset.getProjectId());
 	}
 
 	@Override
