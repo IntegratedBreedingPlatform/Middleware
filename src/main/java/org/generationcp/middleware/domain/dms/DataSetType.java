@@ -62,6 +62,11 @@ public enum DataSetType {
 		return null;
 	}
 
+	public static boolean isObservationDatasetType(final DataSetType type)  {
+		return Arrays.asList(PLOT_DATA, PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS)
+				.contains(type);
+	}
+
 	public static boolean isSubObservationDatasetType(final DataSetType type)  {
 		return SUBOBSERVATIONS.contains(type);
 	}

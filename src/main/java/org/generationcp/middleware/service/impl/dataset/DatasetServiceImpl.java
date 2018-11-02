@@ -1,17 +1,25 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -50,8 +58,10 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.OBSERVATION_UNIT.getId());
 
 	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
+		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
-		VariableType.SELECTION_METHOD.getId());
+		VariableType.SELECTION_METHOD.getId(),
+		VariableType.OBSERVATION_UNIT.getId());
 
 	private DaoFactory daoFactory;
 
@@ -65,6 +75,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private DesignFactors designFactors;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -103,10 +116,111 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer generateSubObservationDataset (final Integer studyId, final String datasetName, final Integer datasetTypeId, final List<Integer> instanceIds,
-			final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits) {
+	public DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
+		final List<Integer> instanceIds,
+		final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits, final Integer parentId) {
 
-		return null;
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+
+		final String cropPrefix = this.workbenchDataManager.getProjectByUuid(study.getProgramUUID()).getCropType().getPlotCodePrefix();
+
+		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO()
+				.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.PLOT_DATA.getId()));
+
+		if (plotDatasets == null || plotDatasets.isEmpty()) {
+			throw new MiddlewareException("Study does not have a plot dataset associated to it");
+		}
+
+		final DmsProject plotDataset = plotDatasets.get(0);
+		final DmsProject parentDataset = this.daoFactory.getDmsProjectDAO().getById(parentId);
+
+		final DmsProject subObservationDataset = new DmsProject();
+
+		final List<ProjectProperty> projectProperties =
+			this.buildDefaultDatasetProperties(study, subObservationDataset, datasetName, datasetTypeId);
+		final Variable observationUnitVariable = this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), observationUnitVariableId, false, false);
+		projectProperties.add(this.buildDatasetProperty(subObservationDataset, VariableType.OBSERVATION_UNIT.getId(), observationUnitVariableId, null, null, 4, observationUnitVariable));
+
+		subObservationDataset.setName(datasetName);
+		subObservationDataset.setDescription(datasetName);
+		subObservationDataset.setProgramUUID(study.getProgramUUID());
+		subObservationDataset.setDeleted(false);
+		subObservationDataset.setLocked(false);
+		subObservationDataset.setProperties(projectProperties);
+		subObservationDataset.setRelatedTos(this.buildProjectRelationships(parentDataset, subObservationDataset));
+
+		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().save(subObservationDataset);
+
+		// iterate and create new sub-observation units
+		final List<ExperimentModel> plotObservationUnits =
+			this.daoFactory.getExperimentDao().getObservationUnits(plotDataset.getProjectId(), instanceIds);
+		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
+			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
+				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(), plotObservationUnit.getTypeId(),
+						cropPrefix + "P" + RandomStringUtils.randomAlphanumeric(8), subObservationDataset, plotObservationUnit.getStock(),
+						plotObservationUnit, i);
+				this.daoFactory.getExperimentDao().save(experimentModel);
+			}
+		}
+		return this.getDataset(studyId, dataset.getProjectId());
+	}
+
+	@Override
+	public Boolean isDatasetNameAvailable(final String name, final String projectUUID) {
+		final Integer dmsProjectId = this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(name, projectUUID);
+		return (dmsProjectId == null);
+	}
+
+	@Override
+	public Integer getNumberOfChildren(final Integer parentId) {
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByParent(parentId).size();
+	}
+
+	private List<ProjectProperty> buildDefaultDatasetProperties(final DmsProject study, final DmsProject dmsProject,
+			final String datasetName, final Integer datasetTypeId) {
+		final List<ProjectProperty> projectProperties = new ArrayList<>();
+		final ProjectProperty datasetProperty =
+			this.buildDatasetProperty(dmsProject,
+					VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
+						datasetName, null, 1,
+					this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false, false));
+		final ProjectProperty datasetTitleProperty =
+			this.buildDatasetProperty(dmsProject,
+					VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
+						null, null, 2,
+					this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false, false));
+		final ProjectProperty datasetTypeProperty =
+			this.buildDatasetProperty(dmsProject,
+					VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
+						String.valueOf(datasetTypeId), null, 3,
+					this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false, false));
+		projectProperties.add(datasetProperty);
+		projectProperties.add(datasetTitleProperty);
+		projectProperties.add(datasetTypeProperty);
+		return projectProperties;
+	}
+
+	private ProjectProperty buildDatasetProperty(final DmsProject dmsProject, final Integer typeId,
+		final Integer variableId, final String value, final String alias, final Integer rank, final Variable variable) {
+		if (!variable.getVariableTypes().contains(VariableType.getById(typeId))) {
+			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
+		}
+		final ProjectProperty projectProperty =
+				new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
+		return projectProperty;
+	}
+
+	private List<ProjectRelationship> buildProjectRelationships(final DmsProject parentDataset, final DmsProject childDataset)
+			throws MiddlewareQueryException {
+		final ProjectRelationship relationship = new ProjectRelationship();
+		relationship.setSubjectProject(childDataset);
+		relationship.setObjectProject(parentDataset);
+		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
+
+		final List<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
+		relationships.add(relationship);
+
+		return relationships;
 	}
 
 	@Override

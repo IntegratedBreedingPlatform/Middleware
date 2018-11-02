@@ -331,7 +331,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getDatasetsByStudy(final Integer studyId) {
+	public List<DmsProject> getDatasetsByParent(final Integer studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
@@ -342,7 +342,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getDatasetsByParent= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -376,7 +376,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				projects.add(parent);
 
 			} else {
-				final List<DmsProject> datasets = this.getDatasetsByStudy(projectId);
+				final List<DmsProject> datasets = this.getDatasetsByParent(projectId);
 				if (datasets != null && !datasets.isEmpty()) {
 					projects.addAll(datasets);
 				}
@@ -963,7 +963,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> filters, final Integer pageSize, final Integer pageNumber) {
 
-		final Criteria criteria = buildCoreCriteria(filters, getOrderBy(filters));
+		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
 		if (pageNumber != null && pageSize != null) {
 			criteria.setFirstResult(pageSize * (pageNumber - 1));
 			criteria.setMaxResults(pageSize);
@@ -983,7 +983,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public long countStudies(final Map<StudyFilters, String> filters) {
-		final Criteria criteria = buildCoreCriteria(filters, getOrderBy(filters));
+		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
 		criteria.setProjection(Projections.rowCount());
 		return (long) criteria.uniqueResult();
 	}
@@ -1111,7 +1111,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<Reference> getRootFolders(final String programUUID, final Integer studyType) {
-		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyType);
+		return this.getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyType);
 	}
 
 	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID, final Integer studyType) {
@@ -1128,7 +1128,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
 			final List<Object[]> list = query.list();
-			childrenNodes = getChildrenNodesList(list);
+			childrenNodes = this.getChildrenNodesList(list);
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
@@ -1285,7 +1285,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final DmsProject study = (DmsProject) criteria.uniqueResult();
 		if (study != null){
 			study.setLocked(isLocked);
-			save(study);
+			this.save(study);
 		}
 	}
 
@@ -1298,7 +1298,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
 			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
-			Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.relatedTos", "pr");
 			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", parentId));
@@ -1347,6 +1347,43 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				"Unexpected error in executing getDatasetInstances(datasetId = " + datasetId + ") query: " + he.getMessage(), he);
+		}
+	}
+
+	public List<StudyInstance> getStudyInstances(final List<Integer> instanceIds) {
+
+		try {
+			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
+				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
+				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
+				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "    inner join project proj on proj.project_id = nde.project_id \n"
+				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
+				+ " where geoloc.nd_geolocation_id IN (:instanceIds) \n"
+				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameterList("instanceIds", instanceIds);
+			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("LOCATION_NAME", new StringType());
+			query.addScalar("LOCATION_ABBR", new StringType());
+			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
+			query.addScalar("INSTANCE_NUMBER", new IntegerType());
+
+			final List queryResults = query.list();
+			final List<StudyInstance> instances = new ArrayList<>();
+			for (final Object result : queryResults) {
+				final Object[] row = (Object[]) result;
+				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[4], (String) row[3]));
+			}
+			return instances;
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing getDatasetInstances(instanceIds = " + instanceIds + ") query: " + he.getMessage(), he);
 		}
 	}
 }

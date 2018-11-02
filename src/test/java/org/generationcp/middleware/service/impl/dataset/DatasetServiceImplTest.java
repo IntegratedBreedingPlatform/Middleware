@@ -42,10 +42,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private DmsProjectDao dmsProjectDao;
-
+	
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
-
 
 	@InjectMocks
 	private DatasetServiceImpl datasetService;

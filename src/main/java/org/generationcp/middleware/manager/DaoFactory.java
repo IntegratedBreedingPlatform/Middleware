@@ -163,4 +163,11 @@ public class DaoFactory {
 		return experimentDao;
 	}
 
+
+	public ExperimentDao getExperimentDao() {
+		final ExperimentDao experimentDao = new ExperimentDao();
+		experimentDao.setSession(this.sessionProvider.getSession());
+		return experimentDao;
+
+	}
 }
