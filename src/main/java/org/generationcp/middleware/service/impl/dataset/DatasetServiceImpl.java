@@ -60,7 +60,8 @@ public class DatasetServiceImpl implements DatasetService {
 	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
-		VariableType.SELECTION_METHOD.getId());
+		VariableType.SELECTION_METHOD.getId(),
+		VariableType.OBSERVATION_UNIT.getId());
 
 	private DaoFactory daoFactory;
 
@@ -163,39 +164,7 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
-		return this.mapDatasetDTO(datasetName, datasetTypeId, parentId, observationUnitVariable, instanceIds);
-	}
-
-	private DatasetDTO mapDatasetDTO(final String datasetName, final Integer datasetTypeId, final Integer parentId,
-		final Variable observationUnitVariable, final List<Integer> instanceIds) {
-		//mappping observationUnitVariable to MeasurementVariable
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setTermId(observationUnitVariable.getId());
-		measurementVariable.setName(observationUnitVariable.getName());
-		measurementVariable.setDescription(observationUnitVariable.getDefinition());
-		measurementVariable.setScale(observationUnitVariable.getScale().getName());
-		measurementVariable.setMethod(observationUnitVariable.getMethod().getName());
-		measurementVariable.setProperty(observationUnitVariable.getProperty().getName());
-		final VariableType variableType = VariableType.OBSERVATION_UNIT;
-		measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
-		final DataSetType dataType = DataSetType.findById(datasetTypeId);
-		measurementVariable.setDataType(dataType.name());
-		measurementVariable.setDataTypeId(dataType.getId());
-		final String minValue = observationUnitVariable.getScale().getMinValue();
-		measurementVariable.setMinRange(minValue != null ? Double.valueOf(minValue) : null);
-		final String maxValue = observationUnitVariable.getScale().getMaxValue();
-		measurementVariable.setMaxRange(maxValue != null ? Double.valueOf(maxValue) : null);
-		final List<MeasurementVariable> variables = new ArrayList<>();
-		variables.add(measurementVariable);
-
-		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetTypeId(datasetTypeId);
-		datasetDTO.setName(datasetName);
-		datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getStudyInstances(instanceIds));
-		datasetDTO.setParentDatasetId(parentId);
-		datasetDTO.setVariables(variables);
-
-		return datasetDTO;
+		return this.getDataset(dataset.getProjectId());
 	}
 
 	@Override
