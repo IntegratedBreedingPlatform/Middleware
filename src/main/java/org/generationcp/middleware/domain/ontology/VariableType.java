@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.domain.ontology;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,9 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.pojomatic.Pojomatic;
 
 /**
  * Variable Type of a Variable. Ontology variable can have zero or more variable types associated to it.

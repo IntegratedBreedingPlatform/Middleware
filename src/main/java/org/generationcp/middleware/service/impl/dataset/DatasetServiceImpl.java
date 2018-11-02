@@ -5,7 +5,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -174,7 +173,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Integer getNumberOfChildren(final Integer parentId) {
-		return this.daoFactory.getDmsProjectDAO().getDatasetsByStudy(parentId).size();
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByParent(parentId).size();
 	}
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(final DmsProject study, final DmsProject dmsProject,

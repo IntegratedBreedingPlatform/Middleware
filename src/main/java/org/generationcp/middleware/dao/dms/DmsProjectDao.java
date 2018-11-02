@@ -331,8 +331,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	//Rename by getDatasetsByParent
-	public List<DmsProject> getDatasetsByStudy(final Integer studyId) {
+	public List<DmsProject> getDatasetsByParent(final Integer studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
@@ -343,7 +342,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getDatasetsByParent= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -377,7 +376,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				projects.add(parent);
 
 			} else {
-				final List<DmsProject> datasets = this.getDatasetsByStudy(projectId);
+				final List<DmsProject> datasets = this.getDatasetsByParent(projectId);
 				if (datasets != null && !datasets.isEmpty()) {
 					projects.addAll(datasets);
 				}
