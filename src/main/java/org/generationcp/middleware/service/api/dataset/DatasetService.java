@@ -6,10 +6,11 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 
 public interface DatasetService {
-	
+
 	long countPhenotypes(Integer datasetId, List<Integer> traitIds);
-	
+
 	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 
-	Phenotype updatePhenotype(Integer observationId, Integer categoricalValueId, String value, String valueStatus);
+	Phenotype updatePhenotype(
+		Integer observationUnitId, Integer observationId, Integer categoricalValueId, String value, String valueStatus);
 }
