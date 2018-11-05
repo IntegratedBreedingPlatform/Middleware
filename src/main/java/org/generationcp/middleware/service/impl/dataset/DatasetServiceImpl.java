@@ -83,6 +83,14 @@ public class DatasetServiceImpl implements DatasetService {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
+	public DatasetServiceImpl(final MeasurementVariableService measurementVariableService, final GermplasmDescriptors germplasmDescriptors,
+		final DesignFactors designFactors) {
+		super();
+		this.measurementVariableService = measurementVariableService;
+		this.germplasmDescriptors = germplasmDescriptors;
+		this.designFactors = designFactors;
+	}
+
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
 		final Session currentSession = sessionProvider.getSession();
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -324,5 +332,17 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
 		return this.daoFactory.getExperimentDAO().countTotalObservationUnitsForDataset(datasetId, instanceId);
+	}
+
+	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
+		this.germplasmDescriptors = germplasmDescriptors;
+	}
+
+	public void setDesignFactors(final DesignFactors designFactors) {
+		this.designFactors = designFactors;
+	}
+
+	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
+		this.measurementVariableService = measurementVariableService;
 	}
 }
