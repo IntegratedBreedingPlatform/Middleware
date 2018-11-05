@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -76,6 +77,16 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(nextRank, datasetVariable.getRank());
 		Assert.assertEquals(traitId, datasetVariable.getVariableId());
 		Assert.assertEquals(alias, datasetVariable.getAlias());
+	}
+	
+	@Test
+	public void testRemoveVariables() {
+		final Random ran = new Random();
+		final int datasetId = ran.nextInt();
+		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt()); 
+		this.datasetService.removeVariables(datasetId, variableIds);
+		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
+		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
 	}
 
 }
