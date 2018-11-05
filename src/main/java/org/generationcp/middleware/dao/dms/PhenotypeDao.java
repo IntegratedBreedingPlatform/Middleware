@@ -582,12 +582,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			// statement
 			this.getSession().flush();
 
-			// Delete phenotypes and experiment phenotypes
+			// Delete phenotypes
 			final String sql = "delete pheno " + " from nd_experiment e,"
-					+ "  phenotype pheno" + " where e.project_id = " + projectId
-					+ " and e.nd_geolocation_id = " + locationId + " and e.nd_experiment_id = e.nd_experiment_id"
+					+ "  phenotype pheno" + " where e.project_id = :projectId "
+					+ " and e.nd_geolocation_id = :locationId "
 					+ " and e.nd_experiment_id = pheno.nd_experiment_id";
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
+			statement.setParameter("projectId", projectId);
+			statement.setParameter("locationId", locationId);
 			statement.executeUpdate();
 
 		} catch (final HibernateException e) {
@@ -595,6 +597,25 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ IN_PHENOTYPE_DAO + e.getMessage(), e);
 		}
 	}
+	
+	public void deletePhenotypesByProjectIdAndVariableIds(final Integer projectId, final List<Integer> variableIds) {
+		try {
+			// Delete phenotypes
+			final String sql = "delete pheno " + " from nd_experiment e,"
+					+ "  phenotype pheno" + " where e.project_id = :projectId "
+					+ " and pheno.observable_id IN (:variableIds) "
+					+ " and e.nd_experiment_id = pheno.nd_experiment_id";
+			final SQLQuery statement = this.getSession().createSQLQuery(sql);
+			statement.setParameter("projectId", projectId);
+			statement.setParameterList("variableIds", variableIds);
+			statement.executeUpdate();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in deletePhenotypesByProjectIdAndVariableIds=" + projectId + ", " + variableIds
+					+ IN_PHENOTYPE_DAO + e.getMessage(), e);
+		}
+	}
+
 
 	public int updatePhenotypesByExperimentIdAndObervableId(final Integer experimentId, final Integer cvTermId, final String value) {
 		try {

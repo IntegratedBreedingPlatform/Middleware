@@ -13,6 +13,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -187,6 +188,29 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final int numberOfReps = 2;
 		this.createEnvironmentData(numberOfReps, true);
 		Assert.assertEquals(NO_OF_GERMPLASM * numberOfReps, this.phenotypeDao.countPhenotypesForDataset(this.study.getProjectId(), Arrays.asList(this.trait.getCvTermId())));
+	}
+	
+	@Test
+	public void testDeletePhenotypesByProjectIdAndTraitIds() {
+		final int numberOfReps = 2;
+		this.createEnvironmentData(numberOfReps, true);
+		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId());
+		final Integer projectId = this.study.getProjectId();
+		Assert.assertEquals(NO_OF_GERMPLASM * numberOfReps, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
+		
+		this.phenotypeDao.deletePhenotypesByProjectIdAndVariableIds(projectId, traitIds);
+		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
+	}
+	
+	@Test
+	public void testDeletePhenotypesByProjectIdAndLocationId() {
+		final Integer locationId = this.createEnvironmentData(1, true);
+		final List<Integer> traitIds = Arrays.asList(this.trait.getCvTermId());
+		final Integer projectId = this.study.getProjectId();
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
+		
+		this.phenotypeDao.deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
+		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 	}
 	
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {

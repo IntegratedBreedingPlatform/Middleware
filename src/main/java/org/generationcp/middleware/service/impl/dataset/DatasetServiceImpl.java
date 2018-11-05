@@ -43,6 +43,12 @@ public class DatasetServiceImpl implements DatasetService {
 		projectProperty.setRank(projectPropertyDAO.getNextRank(datasetId));
 		projectPropertyDAO.save(projectProperty);
 	}
+	
+	@Override
+	public void removeVariables(final Integer datasetId, final List<Integer> variableIds) {
+		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, variableIds);
+		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
+	}
 
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
