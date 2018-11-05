@@ -1,10 +1,12 @@
 package org.generationcp.middleware.service.api.dataset;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
 import java.util.Objects;
 
+@AutoProperty
 public class ObservationUnitRow {
 
 	private Integer observationUnitId;

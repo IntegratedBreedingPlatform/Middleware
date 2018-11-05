@@ -2,9 +2,11 @@ package org.generationcp.middleware.service.api.dataset;
 
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Objects;
 
+@AutoProperty
 public class ObservationUnitData {
 
 	private Integer observationId;
