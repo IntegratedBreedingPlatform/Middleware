@@ -83,13 +83,18 @@ public class DatasetServiceImpl implements DatasetService {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
+	public DatasetServiceImpl(final MeasurementVariableService measurementVariableService, final GermplasmDescriptors germplasmDescriptors,
+		final DesignFactors designFactors) {
+		super();
+		this.measurementVariableService = measurementVariableService;
+		this.germplasmDescriptors = germplasmDescriptors;
+		this.designFactors = designFactors;
+	}
+
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
 		final Session currentSession = sessionProvider.getSession();
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
-//		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
-//		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
-//		this.designFactors = new DesignFactors(currentSession);
 	}
 
 	@Override
@@ -281,20 +286,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
-		return this.getObservationUnitTable(datasetId, selectionMethodsAndTraits,
+		return this.daoFactory.getExperimentDAO().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
-	}
-
-	private List<ObservationUnitRow> getObservationUnitTable(
-		final int datasetId,
-		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final int instanceId, final int pageNumber, final int pageSize,
-		final String sortBy, final String sortOrder) {
-
-		return this.daoFactory.getExperimentDAO().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
-			germplasmDescriptors, designFactors, instanceId, pageNumber, pageSize, sortBy, sortOrder);
-
 	}
 
 	private List<String> findGenericGermplasmDescriptors(final int studyId) {
@@ -338,5 +332,17 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
 		return this.daoFactory.getExperimentDAO().countTotalObservationUnitsForDataset(datasetId, instanceId);
+	}
+
+	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
+		this.germplasmDescriptors = germplasmDescriptors;
+	}
+
+	public void setDesignFactors(final DesignFactors designFactors) {
+		this.designFactors = designFactors;
+	}
+
+	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
+		this.measurementVariableService = measurementVariableService;
 	}
 }

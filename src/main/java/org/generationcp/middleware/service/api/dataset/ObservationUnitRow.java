@@ -1,8 +1,12 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import java.util.Map;
 import java.util.Objects;
 
+@AutoProperty
 public class ObservationUnitRow {
 
 	private Integer observationUnitId;
@@ -61,37 +65,17 @@ public class ObservationUnitRow {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof ObservationUnitRow))
-			return false;
-		final ObservationUnitRow that = (ObservationUnitRow) o;
-		return Objects.equals(this.getObservationUnitId(), that.getObservationUnitId()) &&
-			Objects.equals(this.getGid(), that.getGid()) &&
-			Objects.equals(this.getDesignation(), that.getDesignation()) &&
-			Objects.equals(this.getAction(), that.getAction()) &&
-			Objects.equals(this.getVariables(), that.getVariables());
+		return Pojomatic.equals(this, o);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(
-			this.getObservationUnitId(),
-			this.getGid(),
-			this.getDesignation(),
-			this.getAction(),
-			this.getVariables());
+		return Pojomatic.hashCode(this);
 	}
 
 	@Override
 	public String toString() {
-		return "ObservationUnitRow{" +
-			"observationUnitId=" + this.observationUnitId +
-			", gid=" + this.gid +
-			", designation='" + this.designation + '\'' +
-			", action='" + this.action + '\'' +
-			", variables=" + this.variables +
-			'}';
+		return Pojomatic.toString(this);
 	}
 }
 

@@ -71,7 +71,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String GID = "GID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-
+	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
 	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
 			" experiment.nd_experiment_id, " + //
 			" plant.plant_id," + //
@@ -93,7 +93,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
-	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
+
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
@@ -606,41 +606,38 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private String getObservationUnitTableQuery(
+	public String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final String sortBy, final String sortOrder) {
-		final StringBuilder sqlBuilder = new StringBuilder();
-
-		sqlBuilder.append("SELECT \n")
-			.append("    nde.nd_experiment_id as ndExperimentId,\n")
-			.append("    gl.description AS TRIAL_INSTANCE,\n")
-			.append(
-				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n")
-			.append("    s.dbxref_id AS GID,\n")
-			.append("    s.name DESIGNATION,\n")
-			.append("    s.uniquename ENTRY_NO,\n")
-			.append("    s.value as ENTRY_CODE,\n")
-			.append(
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n")
-			.append(
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n")
-			.append(
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n")
-			.append(
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n")
-			.append(
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL, \n")
-			.append(
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n")
-			.append(
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n")
-			.append("    nde.obs_unit_id as OBS_UNIT_ID, \n");
+		String sql = "SELECT \n"
+			+ "    nde.nd_experiment_id as ndExperimentId,\n"
+			+ "    gl.description AS TRIAL_INSTANCE,\n"
+			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
+			+ "    s.dbxref_id AS GID,\n"
+			+ "    s.name DESIGNATION,\n"
+			+ "    s.uniquename ENTRY_NO,\n"
+			+ "    s.value as ENTRY_CODE,\n"
+			+ 
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n"
+			+ 
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n"
+			+ 
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n"
+			+ 
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n"
+			+ 
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL, \n"
+			+ 
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n"
+			+ 
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
+			+ "    nde.obs_unit_id as OBS_UNIT_ID, \n";
 
 		final String traitClauseFormat =
 			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', ";
 
 		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
-			sqlBuilder.append(String.format(
+			sql = sql + String.format(
 				traitClauseFormat,
 				measurementVariable.getName(),
 				measurementVariable.getName(),
@@ -649,14 +646,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				measurementVariable.getName(),
 				measurementVariable.getName() + "_Status",
 				measurementVariable.getName(),
-				measurementVariable.getName() + "_CvalueId"));
+				measurementVariable.getName() + "_CvalueId");
 		}
 
 		if (!germplasmDescriptors.isEmpty()) {
 			final String germplasmDescriptorClauseFormat =
 				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s', \n";
 			for (final String gpFactor : germplasmDescriptors) {
-				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+				sql = sql + String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor);
 			}
 		}
 
@@ -664,23 +661,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final String designFactorClauseFormat =
 				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
 			for (final String designFactor : designFactors) {
-				sqlBuilder.append(String.format(designFactorClauseFormat, designFactor, designFactor));
+				sql = sql + String.format(designFactorClauseFormat, designFactor, designFactor);
 			}
 		}
 
-		sqlBuilder.append(" 1=1 FROM \n")
-			.append("	project p \n")
-			.append("	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n")
-			.append("	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n")
-			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n")
-			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id \n")
-			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n")
-			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
-			.append("   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id ")
-			.append(
-				"		WHERE p.project_id = :datasetId \n")
-			.append(" AND gl.nd_geolocation_id = :instanceId")
-			.append(" GROUP BY nde.nd_experiment_id ");
+		sql = sql + " 1=1 FROM \n"
+			+ "	project p \n"
+			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
+			+ "	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
+			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
+			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
+			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+			+ "   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id "
+			+ 
+				"		WHERE p.project_id = :datasetId \n"
+			+ " AND gl.nd_geolocation_id = :instanceId"
+			+ " GROUP BY nde.nd_experiment_id ";
 
 		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
 		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
@@ -692,8 +689,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
 			orderColumn = "(1 * " + orderColumn + ")";
 		}
-		sqlBuilder.append(" ORDER BY " + orderColumn + " " + direction + " ");
-		return sqlBuilder.toString();
+		sql = sql + " ORDER BY " + orderColumn + " " + direction + " ";
+		return sql.toString();
 	}
 
 	public List<ObservationUnitRow> getObservationUnitTable(
@@ -778,13 +775,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors) {
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
-		final int fixedColumns = 14;
 
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
 
 				final Map<String, ObservationUnitData> variables = new HashMap<>();
-				int counterFour = 0;
+
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
 					final String status = (String) row.get(variable.getName() + "_Status");
 					variables.put(variable.getName(), new ObservationUnitData(
@@ -793,10 +789,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						(String) row.get(variable.getName()), //variableValue
 						(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
 						)));
-					counterFour += 4;
 				}
-				final ObservationUnitRow observationUnitRow =
-					new ObservationUnitRow();
+				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 
 				observationUnitRow.setObservationUnitId((Integer) row.get(ND_EXPERIMENT_ID));
 				observationUnitRow.setAction(((Integer) row.get(ND_EXPERIMENT_ID)).toString());
@@ -826,9 +820,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					(String) row.get(FIELD_MAP_COLUMN)));
 				variables.put(FIELD_MAP_RANGE, new ObservationUnitData(
 					(String) row.get(FIELD_MAP_RANGE)));
-
-
-				final int additionalFactorsIndex = fixedColumns + 1 + selectionMethodsAndTraits.size() * 4;
+				
 				for (final String gpDesc : germplasmDescriptors) {
 					variables.put(gpDesc, new ObservationUnitData(
 						(String) row.get(gpDesc)));
