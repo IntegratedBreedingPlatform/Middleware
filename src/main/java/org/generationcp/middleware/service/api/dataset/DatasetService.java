@@ -13,4 +13,7 @@ public interface DatasetService {
 
 	Phenotype updatePhenotype(
 		Integer observationUnitId, Integer observationId, Integer categoricalValueId, String value, String valueStatus);
+	
+	void removeVariables(Integer datasetId, List<Integer> variableIds);
+
 }
