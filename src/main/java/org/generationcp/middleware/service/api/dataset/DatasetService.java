@@ -10,4 +10,6 @@ public interface DatasetService {
 	
 	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 	
+	void removeVariables(Integer datasetId, List<Integer> variableIds);
+	
 }
