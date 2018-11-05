@@ -2,11 +2,13 @@ package org.generationcp.middleware.service.impl.dataset;
 
 import java.util.List;
 
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 
@@ -23,6 +25,19 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
+	}
+
+	@Override
+	public Phenotype updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value, final String valueStatus) {
+
+		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
+		final Phenotype phenotype = phenotypeDao.getById(observationId);
+		phenotype.setValue(value);
+		phenotype.setcValue(categoricalValueId);
+		phenotype.setValueStatus(Phenotype.ValueStatus.valueOf(valueStatus));
+		phenotypeDao.saveOrUpdate(phenotype);
+		return phenotype;
+
 	}
 
 	@Override
