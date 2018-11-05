@@ -1,6 +1,7 @@
 package org.generationcp.middleware.data.initializer;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DMSVariableTypeTestDataInitializer;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 
@@ -13,6 +14,8 @@ public class VariableTypeListTestDataInitializer {
 	private static final String LOCATION_ID = "LOCATION_ID";
 	private static final String LOCATION_NAME = "LOCATION_NAME";
 	private static final String SITE_SOIL_PH = "SITE_SOIL_PH";
+	public static final String N_FERT_NO = "NFert_NO";
+	public static final String N_FERT_KG = "NFert_KG";
 
 	public static VariableTypeList createMeansVariableTypesTestData() {
 		final VariableTypeList meansVariableTypeList = new VariableTypeList();
@@ -27,6 +30,13 @@ public class VariableTypeListTestDataInitializer {
 				StandardVariableTestDataInitializer.createStandardVariableTestData("ASI_MEAN", PhenotypicType.VARIATE),
 				++rank));
 		return meansVariableTypeList;
+	}
+
+	public static  VariableTypeList createTreatmentFactorsVariableTypeList() {
+		final VariableTypeList factors = new VariableTypeList();
+		factors.add(DMSVariableTypeTestDataInitializer.createDmsVariableType(VariableTypeListTestDataInitializer.N_FERT_NO, VariableTypeListTestDataInitializer.N_FERT_KG));
+		factors.add(DMSVariableTypeTestDataInitializer.createDmsVariableType(VariableTypeListTestDataInitializer.N_FERT_KG, VariableTypeListTestDataInitializer.N_FERT_KG));
+		return  factors;
 	}
 
 	public static VariableTypeList createPlotVariableTypesTestData() {

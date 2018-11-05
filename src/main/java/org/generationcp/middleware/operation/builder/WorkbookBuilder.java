@@ -684,7 +684,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	private List<TreatmentVariable> buildTreatmentFactors(final VariableTypeList variables) {
+	List<TreatmentVariable> buildTreatmentFactors(final VariableTypeList variables) {
 		final List<TreatmentVariable> treatmentFactors = new ArrayList<>();
 		List<MeasurementVariable> factors;
 		final Map<String, VariableTypeList> treatmentMap = new HashMap<>();

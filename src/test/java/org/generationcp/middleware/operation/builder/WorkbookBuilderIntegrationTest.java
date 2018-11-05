@@ -9,15 +9,11 @@ import java.util.UUID;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.VariableTypeListTestDataInitializer;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.junit.Assert;
@@ -223,6 +219,14 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(studyDetails.getDescription(), nurseryStudyDetails.getDescription());
 		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
 		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
+	}
+
+	@Test
+	public void testBuildTreatmentFactors() {
+		final List<TreatmentVariable> treatmentFactors = this.workbookBuilder.buildTreatmentFactors(VariableTypeListTestDataInitializer.createTreatmentFactorsVariableTypeList());
+		Assert.assertEquals(1, treatmentFactors.size());
+		Assert.assertEquals(VariableTypeListTestDataInitializer.N_FERT_NO, treatmentFactors.get(0).getValueVariable().getName());
+		Assert.assertEquals(VariableTypeListTestDataInitializer.N_FERT_KG, treatmentFactors.get(0).getLevelVariable().getName());
 	}
 
 	@Test
