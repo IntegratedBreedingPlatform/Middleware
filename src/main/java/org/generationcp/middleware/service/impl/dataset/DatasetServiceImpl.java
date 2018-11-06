@@ -1,8 +1,8 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import java.util.List;
-
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.EnumUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -15,6 +15,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+
+import java.util.List;
 
 public class DatasetServiceImpl implements DatasetService {
 
@@ -56,7 +58,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (hasFormula) {
 			return Optional.of(Phenotype.ValueStatus.MANUALLY_EDITED);
-		} else if (isInputVariable){
+		} else if (isInputVariable) {
 			return Optional.of(Phenotype.ValueStatus.OUT_OF_SYNC);
 		}
 
@@ -76,16 +78,34 @@ public class DatasetServiceImpl implements DatasetService {
 		projectProperty.setRank(projectPropertyDAO.getNextRank(datasetId));
 		projectPropertyDAO.save(projectProperty);
 	}
-	
+
 	@Override
 	public void removeVariables(final Integer datasetId, final List<Integer> variableIds) {
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, variableIds);
 		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 	}
-	
+
 	@Override
 	public boolean isValidObservationUnit(final Integer datasetId, final Integer observationUnitId) {
 		return this.daoFactory.getExperimentDAO().isValidExperiment(datasetId, observationUnitId);
+	}
+
+	/*
+	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
+	 */
+	void updateDependentPhenotypesStatus(final Integer variableId, final Integer observationUnitId) {
+		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
+		if (!formulaList.isEmpty()) {
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
+
+				@Override
+				public Integer apply(final Formula formula) {
+					return formula.getTargetCVTerm().getCvTermId();
+				}
+			});
+			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitId, targetVariableIds);
+		}
+
 	}
 
 	protected void setDaoFactory(DaoFactory daoFactory) {

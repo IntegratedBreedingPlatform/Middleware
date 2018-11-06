@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,6 +64,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	
 	private DmsProject study;
 	private CVTerm trait;
+	private List<ExperimentModel> experiments;
 
 	private ExperimentModelSaver experimentModelSaver;
 
@@ -213,8 +215,22 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 	}
 	
-	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
+	@Test
+	public void testUpdateOutOfSyncPhenotypes(){
+		this.createEnvironmentData(1, true);	
+		final Integer experimentId = this.experiments.get(0).getNdExperimentId();
+		final Integer variableId = this.trait.getCvTermId();
+		final Integer datasetId = this.study.getProjectId();
+		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
 		
+		this.phenotypeDao.updateOutOfSyncPhenotypes(experimentId, Arrays.asList(variableId));
+		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
+		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
+		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());
+	}
+	
+	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
+		this.experiments = new ArrayList<ExperimentModel>();
 		final Geolocation geolocation = new Geolocation();
 		this.geolocationDao.saveOrUpdate(geolocation);
 
@@ -239,7 +255,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
 				experimentModel.setProject(this.study);
 				experimentModel.setStock(stockModel);
-				this.experimentDao.saveOrUpdate(experimentModel);
+				this.experiments.add(this.experimentDao.saveOrUpdate(experimentModel));
 				
 				if (withPhenotype) {
 					final Phenotype phenotype = new Phenotype();
