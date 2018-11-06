@@ -1,22 +1,26 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-import org.apache.commons.lang3.EnumUtils;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 
-import java.util.List;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 
 public class DatasetServiceImpl implements DatasetService {
 
@@ -40,29 +44,27 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype phenotype = phenotypeDao.getByObservationUnitIdAndObservableId(observationUnitId, observationId);
 		phenotype.setValue(value);
 		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
-		phenotype.setValueStatus(EnumUtils.getEnum(Phenotype.ValueStatus.class, valueStatus));
+		final Integer observableId = phenotype.getObservableId();
+		 this.resolveObservationStatus(observableId, phenotype);
 		phenotypeDao.update(phenotype);
+		
+		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
+		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+		
 		return phenotype;
 
 	}
 
-	@Override
-	public Optional<Phenotype.ValueStatus> resolveObservationStatus(final Integer variableId) {
+	void resolveObservationStatus(final Integer variableId, final Phenotype phenotype) {
 
 		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
 		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
-		final List<Formula> inputVariables = formulaDAO.getByInputId(variableId);
+		
+		final Boolean isDerivedTrait = formula != null;	
 
-		final Boolean hasFormula = formula != null;
-		final Boolean isInputVariable = !inputVariables.isEmpty();
-
-		if (hasFormula) {
-			return Optional.of(Phenotype.ValueStatus.MANUALLY_EDITED);
-		} else if (isInputVariable) {
-			return Optional.of(Phenotype.ValueStatus.OUT_OF_SYNC);
-		}
-
-		return Optional.absent();
+		if (isDerivedTrait) {
+			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
+		} 
 	}
 
 	@Override
