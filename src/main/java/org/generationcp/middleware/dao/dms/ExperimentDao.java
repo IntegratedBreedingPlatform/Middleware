@@ -666,7 +666,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		sql = sql + "(SELECT observation_unit_no FROM nd_experiment WHERE nd_experiment_id = nde.nd_experiment_id) AS OBSERVATION_VARIABLE, ";
+		sql = sql + "nde.observation_unit_no AS OBSERVATION_VARIABLE, ";
 		sql = sql + "(SELECT ndep.alias FROM projectprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.project_id = :datasetId AND ispcvt.cvterm_id = 1812) AS OBSERVATION_VARIABLE_NAME, ";
 		sql = sql + " 1=1 FROM \n"
 			+ "	project p \n"
@@ -827,7 +827,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				variables.put(FIELD_MAP_RANGE, new ObservationUnitData(
 					(String) row.get(FIELD_MAP_RANGE)));
 				variables.put((String) row.get(OBSERVATION_VARIABLE_NAME), new ObservationUnitData(
-					((BigInteger) row.get(OBSERVATION_VARIABLE)).toString()));
+					((Integer) row.get(OBSERVATION_VARIABLE)).toString()));
 				variables.put(GID, new ObservationUnitData(
 					gid.toString()));
 
