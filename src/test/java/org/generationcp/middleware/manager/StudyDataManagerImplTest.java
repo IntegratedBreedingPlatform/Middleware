@@ -865,7 +865,16 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<InstanceMetadata> instanceMetadataList = this.manager.getInstanceMetadata(studyId);
 		final Integer instanceId = instanceMetadataList.get(0).getInstanceDbId();
 
-		Assert.assertNotNull(this.manager.getInstanceMetadataByInstanceId(studyId, instanceId));
+		Assert.assertTrue(this.manager.getInstanceMetadataByInstanceId(studyId, instanceId).isPresent());
+
+	}
+
+	@Test
+	public void testGetInstanceMetadataByInstanceIdInstanceNotExists() throws Exception {
+
+		final Integer studyId = this.studyReference.getId();
+		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		Assert.assertFalse(this.manager.getInstanceMetadataByInstanceId(studyId, 999).isPresent());
 
 	}
 

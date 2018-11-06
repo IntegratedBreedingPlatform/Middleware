@@ -682,9 +682,19 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 				+ "    group by geoloc.nd_geolocation_id";
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
-			query.setResultTransformer(Transformers.aliasToBean(InstanceMetadata.class));
+			query.addScalar("instanceDbId", new IntegerType());
+			query.addScalar("instanceNumber");
+			query.addScalar("trialDbId", new IntegerType());
+			query.addScalar("trialName");
+			query.addScalar("instanceDatasetName");
+			query.addScalar("programDbId");
+			query.addScalar("locationName");
+			query.addScalar("locationDbId", new IntegerType());
+			query.addScalar("locationAbbreviation");
+			query.addScalar("season");
 			query.setParameter("studyId", studyId);
 			query.setParameter("instanceId", instanceId);
+			query.setResultTransformer(Transformers.aliasToBean(InstanceMetadata.class));
 			return Optional.fromNullable((InstanceMetadata) query.uniqueResult());
 		}
 
