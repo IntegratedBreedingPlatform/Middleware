@@ -45,6 +45,11 @@ public class DatasetServiceImpl implements DatasetService {
 		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 	}
 	
+	@Override
+	public boolean isValidObservationUnit(final Integer datasetId, final Integer observationUnitId) {
+		return this.daoFactory.getExperimentDAO().isValidExperiment(datasetId, observationUnitId);
+	}
+	
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}

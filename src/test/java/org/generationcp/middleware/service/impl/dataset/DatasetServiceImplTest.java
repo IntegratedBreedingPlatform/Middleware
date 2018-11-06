@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -39,6 +40,9 @@ public class DatasetServiceImplTest {
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
 	
+	@Mock
+	private ExperimentDao experimentDao;
+	
 	@InjectMocks
 	private DatasetServiceImpl datasetService;
 	
@@ -50,6 +54,7 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		Mockito.when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		Mockito.when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
+		Mockito.when(this.daoFactory.getExperimentDAO()).thenReturn(this.experimentDao);
 	}
 	
 	@Test
@@ -87,6 +92,15 @@ public class DatasetServiceImplTest {
 		this.datasetService.removeVariables(datasetId, variableIds);
 		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
+	}
+	
+	@Test
+	public void testIsValidObservation() {
+		final Random ran = new Random();
+		final int datasetId = ran.nextInt();
+		final int observationUnitId = ran.nextInt();
+		this.datasetService.isValidObservationUnit(datasetId, observationUnitId);
+		Mockito.verify(this.experimentDao).isValidExperiment(datasetId, observationUnitId);
 	}
 
 }

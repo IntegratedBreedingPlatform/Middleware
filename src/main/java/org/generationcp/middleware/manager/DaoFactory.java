@@ -11,6 +11,7 @@ import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -147,5 +148,11 @@ public class DaoFactory {
 		final ProjectPropertyDao projectPropDao = new ProjectPropertyDao();
 		projectPropDao.setSession(this.sessionProvider.getSession());
 		return projectPropDao;
+	}
+	
+	public ExperimentDao getExperimentDAO() {
+		final ExperimentDao experimentDao = new ExperimentDao();
+		experimentDao.setSession(this.sessionProvider.getSession());
+		return experimentDao;
 	}
 }

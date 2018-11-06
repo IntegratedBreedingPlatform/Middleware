@@ -12,4 +12,6 @@ public interface DatasetService {
 	
 	void removeVariables(Integer datasetId, List<Integer> variableIds);
 	
+	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
+
 }

@@ -575,5 +575,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(error, e);
 		}
 	}
-
+	
+	public boolean isValidExperiment(final Integer projectId, final Integer experimentId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("project.projectId", projectId));
+		criteria.add(Restrictions.eq("ndExperimentId", experimentId));
+		criteria.setProjection(Projections.property(ND_EXPERIMENT_ID));
+		final Integer id = (Integer) criteria.uniqueResult();
+		return id != null;
+	}
+	
 }
