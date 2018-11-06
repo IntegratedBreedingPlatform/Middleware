@@ -46,7 +46,7 @@ public class ProjectPropertySaver {
 
 	public ProjectPropertySaver(final HibernateSessionProvider sessionProviderForLocal) {
 		this.saver = new Saver(sessionProviderForLocal);
-		daoFactory = new DaoFactory(sessionProviderForLocal);
+		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	public ProjectPropertySaver(final Saver saver) {
@@ -89,13 +89,13 @@ public class ProjectPropertySaver {
 
 	  	variableType.setVariableTypeIfNull();
 
-		VariableType variableTypeEnum = variableType.getVariableType();
+		final VariableType variableTypeEnum = variableType.getVariableType();
 
 		if(variableTypeEnum == null) {
 			throw new RuntimeException("Variable do not have a valid variable type.");
 		}
 
-		int variableTypeId;
+		final int variableTypeId;
 
 		// This makes sure that selection values are actually saved as selections in the projectprop tables. Note roles cannot be used for
 		// this as both selections and traits map to roles. Thus if the role has evaluated to a Trait varible type and the DMSVariableType
@@ -136,7 +136,7 @@ public class ProjectPropertySaver {
 	 * @param value the value of the measurement variable
 	 * @throws MiddlewareQueryException
 	 */
-	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, String value) {
+	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, final String value) {
 		objDMSVariableType.setVariableTypeIfNull();
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
 		this.saveProjectProperty(project, variableTypeEnum.getId(), value, objDMSVariableType.getRank(),
@@ -148,8 +148,8 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank, int variableId,
-		String alias) {
+	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank, final int variableId,
+		final String alias) {
 		final ProjectProperty property = new ProjectProperty();
 		property.setTypeId(typeId);
 		property.setValue(value);
@@ -168,7 +168,7 @@ public class ProjectPropertySaver {
 			final StandardVariable stdvar = new StandardVariable();
 			stdvar.setId(termId.getId());
 			stdvar.setPhenotypicType(role);
-			final CVTerm cvTerm = daoFactory.getCvTermDao().getById(termId.getId());
+			final CVTerm cvTerm = this.daoFactory.getCvTermDao().getById(termId.getId());
 			String localVariableName = termId.toString();
 			String localVariableDescription = termId.toString();
 			if (cvTerm != null) {
@@ -192,7 +192,7 @@ public class ProjectPropertySaver {
 			Hibernate.initialize(geolocation.getProperties());
 
 			for (final MeasurementVariable variable : variables) {
-				Operation operation = variable.getOperation();
+				final Operation operation = variable.getOperation();
 				if (operation == null) {
 					continue;
 				}
@@ -418,7 +418,7 @@ public class ProjectPropertySaver {
 	public void saveFactors(final DmsProject measurementDataset, final List<MeasurementVariable> variables) {
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
-				Operation operation = variable.getOperation();
+				final Operation operation = variable.getOperation();
 				if (operation == null) {
 					continue;
 				}
@@ -442,7 +442,7 @@ public class ProjectPropertySaver {
 
 	public void updateVariablesRanking(final int datasetId, final List<Integer> variableIds) {
 		int rank = this.saver.getProjectPropertyDao().getNextRank(datasetId);
-		List<ProjectProperty> projectProperties =  this.saver.getProjectPropertyDao().getByProjectId(datasetId);
+		final List<ProjectProperty> projectProperties =  this.saver.getProjectPropertyDao().getByProjectId(datasetId);
 
 		rank = this.updateVariableRank(variableIds, rank, projectProperties);
 

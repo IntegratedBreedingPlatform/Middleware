@@ -78,44 +78,45 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 
 	private void setUpNursery() {
 		// Basic Details
-		studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getNurseryDto());
-		studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
-		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
-		studyDetails.setParentFolderId(1);
-		studyDetails.setCreatedBy("1");
+		this.studyDetails = new StudyDetails();
+		this.studyDetails.setStudyType(StudyTypeDto.getNurseryDto());
+		this.studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
+		this.studyDetails.setDescription(this.studyDetails.getStudyName() + " Description");
+		this.studyDetails.setParentFolderId(1);
+		this.studyDetails.setCreatedBy("1");
 
-		setUpWorkbook();
+		this.setUpWorkbook();
 	}
 
 	private void setUpStudy() {
 		// Basic Details
-		studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		studyDetails.setStudyName("Test Study" + new Random().nextInt(100));
-		studyDetails.setDescription(studyDetails.getStudyName() + " Description");
-		studyDetails.setParentFolderId(1);
-		studyDetails.setCreatedBy("1");
+		this.studyDetails = new StudyDetails();
+		this.studyDetails.setStudyType(StudyTypeDto.getTrialDto());
+		this.studyDetails.setStudyName("Test Study" + new Random().nextInt(100));
+		this.studyDetails.setDescription(this.studyDetails.getStudyName() + " Description");
+		this.studyDetails.setParentFolderId(1);
+		this.studyDetails.setCreatedBy("1");
 
-		setUpWorkbook();
+		this.setUpWorkbook();
 	}
 
 	private void setUpWorkbook() {
 		// Create a study (workbook) in database.
-		workbook = new Workbook();
-		workbook.setStudyDetails(studyDetails);
+		this.workbook = new Workbook();
+		this.workbook.setStudyDetails(this.studyDetails);
 
-		programUUID = UUID.randomUUID().toString();
+		this.programUUID = UUID.randomUUID().toString();
 
 		// Conditions
 		final List<MeasurementVariable> conditions = new ArrayList<>();
-		workbook.setConditions(conditions);
+		this.workbook.setConditions(conditions);
 
 		// Constants
-		constants = new ArrayList<>();
-		constants.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter", "pH",
+		this.constants = new ArrayList<>();
+		this.constants
+			.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter", "pH",
 			WorkbookBuilderIntegrationTest.NUMERIC, "7", WorkbookBuilderIntegrationTest.STUDY, PhenotypicType.VARIATE, false));
-		workbook.setConstants(constants);
+		this.workbook.setConstants(this.constants);
 
 		// Factors
 		final List<MeasurementVariable> factors = new ArrayList<>();
@@ -143,18 +144,18 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 			PhenotypicType.TRIAL_DESIGN, true);
 		factors.add(plotFactor);
 
-		workbook.setFactors(factors);
+		this.workbook.setFactors(factors);
 
 		// Variates
-		variates = new ArrayList<>();
+		this.variates = new ArrayList<>();
 		final MeasurementVariable variate =
 			this.createMeasurementVariable(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha",
 			WorkbookBuilderIntegrationTest.GRAIN_YIELD, WorkbookBuilderIntegrationTest.DRY_AND_WEIGH,
 			WorkbookBuilderIntegrationTest.KG_HA, WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.PLOT,
 			PhenotypicType.VARIATE, false);
-		variates.add(variate);
+		this.variates.add(variate);
 
-		workbook.setVariates(variates);
+		this.workbook.setVariates(this.variates);
 
 		// Observations
 		final List<MeasurementRow> observations = new ArrayList<>();
@@ -191,16 +192,16 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 			row.setDataList(dataList);
 			observations.add(row);
 		}
-		workbook.setObservations(observations);
+		this.workbook.setObservations(observations);
 	}
 
 	@Test
 	public void testWorkbookBuilderLoadsNoObservationsByDefaultNursery() {
-		setUpNursery();
+		this.setUpNursery();
 
 		// Save the workbook
-		final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, "9CVR");
-		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
+		final int studyId = this.dataImportService.saveDataset(this.workbook, true, false, this.programUUID, "9CVR");
+		WorkbookBuilderIntegrationTest.LOG.info("Study " + this.studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
 		final Workbook studyWorkbook = this.workbookBuilder.create(studyId);
@@ -215,10 +216,10 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(nurseryStudyDetails);
 		Assert.assertNotNull(nurseryStudyDetails.getId());
 		Assert.assertEquals(studyId, nurseryStudyDetails.getId().intValue());
-		Assert.assertEquals(studyDetails.getStudyName(), nurseryStudyDetails.getStudyName());
-		Assert.assertEquals(studyDetails.getDescription(), nurseryStudyDetails.getDescription());
-		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
-		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
+		Assert.assertEquals(this.studyDetails.getStudyName(), nurseryStudyDetails.getStudyName());
+		Assert.assertEquals(this.studyDetails.getDescription(), nurseryStudyDetails.getDescription());
+		Assert.assertEquals(this.constants.size(), studyWorkbook.getConstants().size());
+		Assert.assertEquals(this.variates.size(), studyWorkbook.getVariates().size());
 	}
 
 	@Test
@@ -231,11 +232,11 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testWorkbookBuilderLoadsNoObservationsByDefaultStudy() {
-		setUpStudy();
+		this.setUpStudy();
 
 		// Save the workbook
-		final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, "9CVR");
-		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
+		final int studyId = this.dataImportService.saveDataset(this.workbook, true, false, this.programUUID, "9CVR");
+		WorkbookBuilderIntegrationTest.LOG.info("Study " + this.studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
 		final Workbook studyWorkbook = this.workbookBuilder.create(studyId);
@@ -252,8 +253,8 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(studyId, studyDetails.getId().intValue());
 		Assert.assertEquals(this.studyDetails.getStudyName(), studyDetails.getStudyName());
 		Assert.assertEquals(this.studyDetails.getDescription(), studyDetails.getDescription());
-		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
-		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
+		Assert.assertEquals(this.constants.size(), studyWorkbook.getConstants().size());
+		Assert.assertEquals(this.variates.size(), studyWorkbook.getVariates().size());
 
 		final int measurementDataSetId = this.workbookBuilder.getMeasurementDataSetId(studyId, studyDetails.getStudyName());
 		final Workbook workbookCompleteDataset = this.workbookBuilder.getDataSetBuilder().buildCompleteDataset(measurementDataSetId);
