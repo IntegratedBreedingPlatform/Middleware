@@ -2,13 +2,15 @@ package org.generationcp.middleware.service.impl.dataset;
 
 import java.util.List;
 
-
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.EnumUtils;
+import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -40,6 +42,25 @@ public class DatasetServiceImpl implements DatasetService {
 		phenotypeDao.update(phenotype);
 		return phenotype;
 
+	}
+
+	@Override
+	public Optional<Phenotype.ValueStatus> resolveObservationStatus(final Integer variableId) {
+
+		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
+		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
+		final List<Formula> inputVariables = formulaDAO.getByInputId(variableId);
+
+		final Boolean hasFormula = formula != null;
+		final Boolean isInputVariable = !inputVariables.isEmpty();
+
+		if (hasFormula) {
+			return Optional.of(Phenotype.ValueStatus.MANUALLY_EDITED);
+		} else if (isInputVariable){
+			return Optional.of(Phenotype.ValueStatus.OUT_OF_SYNC);
+		}
+
+		return Optional.absent();
 	}
 
 	@Override
