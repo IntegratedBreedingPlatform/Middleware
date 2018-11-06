@@ -799,46 +799,35 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 				observationUnitRow.setObservationUnitId((Integer) row.get(ND_EXPERIMENT_ID));
 				observationUnitRow.setAction(((Integer) row.get(ND_EXPERIMENT_ID)).toString());
+
 				final Integer gid = (Integer) row.get(GID);
 				observationUnitRow.setGid(gid);
-				observationUnitRow.setDesignation((String) row.get(DESIGNATION));
-				variables.put(TRIAL_INSTANCE, new ObservationUnitData(
-					(String) row.get(TRIAL_INSTANCE)));
-				variables.put(ENTRY_TYPE, new ObservationUnitData(
-					(String) row.get(ENTRY_TYPE)));
-				variables.put(ENTRY_NO, new ObservationUnitData(
-					(String) row.get(ENTRY_NO)));
-				variables.put(ENTRY_CODE, new ObservationUnitData(
-					(String) row.get(ENTRY_CODE)));
-				variables.put(REP_NO, new ObservationUnitData(
-					(String) row.get(REP_NO)));
-				variables.put(PLOT_NO, new ObservationUnitData(
-					(String) row.get(PLOT_NO)));
-				variables.put(BLOCK_NO, new ObservationUnitData(
-					(String) row.get(BLOCK_NO)));
-				variables.put(ROW, new ObservationUnitData(
-					(String) row.get(ROW)));
-				variables.put(COL, new ObservationUnitData(
-					(String) row.get(COL)));
-				variables.put(OBS_UNIT_ID, new ObservationUnitData(
-					(String) row.get(OBS_UNIT_ID)));
-				variables.put(FIELD_MAP_COLUMN, new ObservationUnitData(
-					(String) row.get(FIELD_MAP_COLUMN)));
-				variables.put(FIELD_MAP_RANGE, new ObservationUnitData(
-					(String) row.get(FIELD_MAP_RANGE)));
-				variables.put((String) row.get(OBSERVATION_VARIABLE_NAME), new ObservationUnitData(
-					((Integer) row.get(OBSERVATION_VARIABLE)).toString()));
-				variables.put(GID, new ObservationUnitData(
-					gid.toString()));
+				variables.put(GID, new ObservationUnitData(gid.toString()));
 
+				final String designation = (String) row.get(DESIGNATION);
+				observationUnitRow.setDesignation(designation);
+				variables.put(DESIGNATION, new ObservationUnitData(designation));
+
+				variables.put(TRIAL_INSTANCE, new ObservationUnitData((String) row.get(TRIAL_INSTANCE)));
+				variables.put(ENTRY_TYPE, new ObservationUnitData((String) row.get(ENTRY_TYPE)));
+				variables.put(ENTRY_NO, new ObservationUnitData((String) row.get(ENTRY_NO)));
+				variables.put(ENTRY_CODE, new ObservationUnitData((String) row.get(ENTRY_CODE)));
+				variables.put(REP_NO, new ObservationUnitData((String) row.get(REP_NO)));
+				variables.put(PLOT_NO, new ObservationUnitData((String) row.get(PLOT_NO)));
+				variables.put(BLOCK_NO, new ObservationUnitData((String) row.get(BLOCK_NO)));
+				variables.put(ROW, new ObservationUnitData((String) row.get(ROW)));
+				variables.put(COL, new ObservationUnitData((String) row.get(COL)));
+				variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
+				variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
+				variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
+				variables.put((String) row.get(OBSERVATION_VARIABLE_NAME),
+					new ObservationUnitData(((Integer) row.get(OBSERVATION_VARIABLE)).toString()));
 
 				for (final String gpDesc : germplasmDescriptors) {
-					variables.put(gpDesc, new ObservationUnitData(
-						(String) row.get(gpDesc)));
+					variables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
 				}
 				for (final String designFactor : designFactors) {
-					variables.put(designFactor, new ObservationUnitData(
-						(String) row.get(designFactor)));
+					variables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
 				}
 				observationUnitRow.setVariables(variables);
 				observationUnitRows.add(observationUnitRow);
