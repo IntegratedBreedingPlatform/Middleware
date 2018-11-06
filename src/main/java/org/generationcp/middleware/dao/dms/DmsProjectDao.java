@@ -1250,8 +1250,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
-					measurementVariable.setMinRange(result.get("min") != null ? (Double) result.get("min") : null);
-					measurementVariable.setMaxRange(result.get("max") != null ? (Double) result.get("max") : null);
+					measurementVariable.setMinRange(typeSafeObjectToDouble(result.get("min")));
+					measurementVariable.setMaxRange(typeSafeObjectToDouble(result.get("max")));
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
