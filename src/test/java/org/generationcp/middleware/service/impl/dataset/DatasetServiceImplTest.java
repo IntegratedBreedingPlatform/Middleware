@@ -182,6 +182,16 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
+	public void testRemoveVariables() {
+		final Random ran = new Random();
+		final int datasetId = ran.nextInt();
+		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt());
+		this.datasetService.removeVariables(datasetId, variableIds);
+		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
+		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
+	}
+
+	@Test
 	public void testGetDatasets() {
 		final List<DatasetDTO> datasetDTOList = setUpDatasets(null);
 		final List<DatasetDTO> result = this.datasetService.getDatasets(25019, new TreeSet<Integer>());

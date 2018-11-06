@@ -263,4 +263,13 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+	
+	public void deleteProjectVariables(final Integer projectId, final List<Integer> variableIds) {
+		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and variable_id IN (:variableIds)";
+		final Query query =
+				this.getSession().createSQLQuery(sql);
+		query.setParameter("projectId", projectId);
+		query.setParameterList("variableIds", variableIds);
+		query.executeUpdate();
+	}
 }

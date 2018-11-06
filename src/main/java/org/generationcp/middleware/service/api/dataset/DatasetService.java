@@ -13,6 +13,8 @@ public interface DatasetService {
 
 	void addVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias);
 
+	void removeVariables(Integer datasetId, List<Integer> variableIds);
+
 	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
 
 	DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
