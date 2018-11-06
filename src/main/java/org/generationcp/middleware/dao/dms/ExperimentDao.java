@@ -93,7 +93,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
-
+	public static final String OBSERVATION_VARIABLE_NAME = "OBSERVATION_VARIABLE_NAME";
+	public static final String OBSERVATION_VARIABLE = "OBSERVATION_VARIABLE";
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
@@ -665,6 +666,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
+		sql = sql + "(SELECT observation_unit_no FROM nd_experiment WHERE nd_experiment_id = nde.nd_experiment_id) AS OBSERVATION_VARIABLE, ";
+		sql = sql + "(SELECT ndep.alias FROM projectprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.project_id = :datasetId AND ispcvt.cvterm_id = 1812) AS OBSERVATION_VARIABLE_NAME, ";
 		sql = sql + " 1=1 FROM \n"
 			+ "	project p \n"
 			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
@@ -739,6 +742,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			query.addScalar(designFactor, new StringType());
 		}
 
+		query.addScalar(OBSERVATION_VARIABLE);
+		query.addScalar(OBSERVATION_VARIABLE_NAME);
 		return query;
 	}
 
@@ -794,7 +799,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 				observationUnitRow.setObservationUnitId((Integer) row.get(ND_EXPERIMENT_ID));
 				observationUnitRow.setAction(((Integer) row.get(ND_EXPERIMENT_ID)).toString());
-				observationUnitRow.setGid((Integer) row.get(GID));
+				final Integer gid = (Integer) row.get(GID);
+				observationUnitRow.setGid(gid);
 				observationUnitRow.setDesignation((String) row.get(DESIGNATION));
 				variables.put(TRIAL_INSTANCE, new ObservationUnitData(
 					(String) row.get(TRIAL_INSTANCE)));
@@ -820,7 +826,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					(String) row.get(FIELD_MAP_COLUMN)));
 				variables.put(FIELD_MAP_RANGE, new ObservationUnitData(
 					(String) row.get(FIELD_MAP_RANGE)));
-				
+				variables.put((String) row.get(OBSERVATION_VARIABLE_NAME), new ObservationUnitData(
+					((BigInteger) row.get(OBSERVATION_VARIABLE)).toString()));
+				variables.put(GID, new ObservationUnitData(
+					gid.toString()));
+
+
 				for (final String gpDesc : germplasmDescriptors) {
 					variables.put(gpDesc, new ObservationUnitData(
 						(String) row.get(gpDesc)));
