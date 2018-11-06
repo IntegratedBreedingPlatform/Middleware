@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -752,6 +753,8 @@ public interface StudyDataManager {
 	Long countAllStudies(final Map<StudyFilters, String> filters);
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
+
+	Optional<InstanceMetadata> getInstanceMetadataByInstanceId(int studyId, int instanceId);
 
 	Phenotype getPhenotypeById(int phenotypeId);
 

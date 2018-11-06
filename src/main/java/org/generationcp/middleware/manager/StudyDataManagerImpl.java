@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -1075,6 +1076,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
 		return this.getGeolocationDao().getInstanceMetadata(studyId);
+	}
+
+	@Override
+	public Optional<InstanceMetadata> getInstanceMetadataByInstanceId(final int studyId, final int instanceId) {
+		return this.getGeolocationDao().getInstanceMetadataByInstanceId(studyId, instanceId);
 	}
 
 	@Override

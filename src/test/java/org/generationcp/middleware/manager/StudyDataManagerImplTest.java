@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -851,6 +852,23 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.manager.getStudyDetails(studyId).getIsLocked());
 	}
 
+	@Test
+	public void testGetInstanceMetadataByInstanceId() throws Exception {
+
+		final Random random = new Random();
+		final Integer studyId = this.studyReference.getId();
+		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+		this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+		this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+
+		final List<InstanceMetadata> instanceMetadataList = this.manager.getInstanceMetadata(studyId);
+		final Integer instanceId = instanceMetadataList.get(0).getInstanceDbId();
+
+		Assert.assertNotNull(this.manager.getInstanceMetadataByInstanceId(studyId, instanceId));
+
+	}
+
 	public void testUpdateExperimentValues() {
 		final VariableList factors = new VariableList();
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
@@ -877,5 +895,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("900", updatedPhenotype.getValue());
 		Assert.assertEquals("1000", savedPhenotype.getValue());
 	}
+
+
 
 }
