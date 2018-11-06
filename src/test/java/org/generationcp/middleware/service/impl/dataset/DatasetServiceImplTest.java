@@ -1,10 +1,12 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -12,7 +14,9 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +47,9 @@ public class DatasetServiceImplTest {
 	@Mock
 	private ExperimentDao experimentDao;
 	
+	@Mock
+	private FormulaDAO formulaDao;
+	
 	@InjectMocks
 	private DatasetServiceImpl datasetService;
 	
@@ -55,6 +62,7 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		Mockito.when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 		Mockito.when(this.daoFactory.getExperimentDAO()).thenReturn(this.experimentDao);
+		Mockito.when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 	}
 	
 	@Test
@@ -101,6 +109,35 @@ public class DatasetServiceImplTest {
 		final int observationUnitId = ran.nextInt();
 		this.datasetService.isValidObservationUnit(datasetId, observationUnitId);
 		Mockito.verify(this.experimentDao).isValidExperiment(datasetId, observationUnitId);
+	}
+	
+	@Test
+	public void testUpdateDependentPhenotypesWhenNotInputVariable() {
+		final Random ran = new Random();
+		final int variableId = ran.nextInt();
+		final int observationUnitId = ran.nextInt();
+		Mockito.doReturn(new ArrayList<Formula>()).when(this.formulaDao).getByInputId(variableId);
+		this.datasetService.updateDependentPhenotypesStatus(variableId, observationUnitId);
+		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(Matchers.anyInt(), Matchers.anyListOf(Integer.class));
+	}
+
+	@Test
+	public void testUpdateDependentPhenotypes() {
+		final Random ran = new Random();
+		final int variableId = ran.nextInt();
+		final int observationUnitId = ran.nextInt();
+		final Formula formula1 = new Formula();
+		final CVTerm term1 = new CVTerm();
+		term1.setCvTermId(ran.nextInt());
+		formula1.setTargetCVTerm(term1);
+		final Formula formula2 = new Formula();
+		final CVTerm term2 = new CVTerm();
+		term2.setCvTermId(ran.nextInt());
+		formula2.setTargetCVTerm(term2);
+		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(variableId);
+		this.datasetService.updateDependentPhenotypesStatus(variableId, observationUnitId);
+		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitId,
+				Arrays.asList(term1.getCvTermId(), term2.getCvTermId()));
 	}
 
 }
