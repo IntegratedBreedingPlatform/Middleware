@@ -1,8 +1,8 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.ontology.VariableType;
+
+import java.util.List;
 
 public interface DatasetService {
 
@@ -13,5 +13,5 @@ public interface DatasetService {
 	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 
 	void removeVariables(Integer datasetId, List<Integer> variableIds);
-	
+
 }

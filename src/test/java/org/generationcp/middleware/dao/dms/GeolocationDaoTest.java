@@ -12,20 +12,11 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -33,6 +24,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class GeolocationDaoTest {
 
@@ -62,9 +61,10 @@ public class GeolocationDaoTest {
 		environmentIds.add(5822);
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
 		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
-		final Object[] result = new Object[] { GeolocationDaoTest.ENVIRONMENT_ID, GeolocationDaoTest.AFRICA_RICE_CENTER,
-				GeolocationDaoTest.LOCATION_ID, GeolocationDaoTest.STUDY_ID, GeolocationDaoTest.STUDY_NAME,
-				GeolocationDaoTest.STUDY_DESCRIPTION, GeolocationDaoTest.ADRAR, GeolocationDaoTest.ALGERIA };
+		final Object[] result = new Object[] {
+			GeolocationDaoTest.ENVIRONMENT_ID, GeolocationDaoTest.AFRICA_RICE_CENTER,
+			GeolocationDaoTest.LOCATION_ID, GeolocationDaoTest.STUDY_ID, GeolocationDaoTest.STUDY_NAME,
+			GeolocationDaoTest.STUDY_DESCRIPTION, GeolocationDaoTest.ADRAR, GeolocationDaoTest.ALGERIA};
 		mockQueryResult.add(result);
 		Mockito.when(mockQuery.list()).thenReturn(mockQueryResult);
 
@@ -74,7 +74,7 @@ public class GeolocationDaoTest {
 
 		final TrialEnvironment trialEnvironment = environments.get(0);
 		Assert.assertEquals("The environment id should be " + GeolocationDaoTest.ENVIRONMENT_ID,
-				GeolocationDaoTest.ENVIRONMENT_ID, trialEnvironment.getId());
+			GeolocationDaoTest.ENVIRONMENT_ID, trialEnvironment.getId());
 
 		final LocationDto locationDto = trialEnvironment.getLocation();
 		Assert.assertEquals(Integer.valueOf(GeolocationDaoTest.LOCATION_ID), locationDto.getId());
