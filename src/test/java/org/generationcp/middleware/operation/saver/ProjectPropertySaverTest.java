@@ -12,10 +12,9 @@ import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.data.initializer.DMSProjectTestDataInitializer;
+import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -47,6 +46,7 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 	private ProjectPropertySaver projectPropSaver;
 
 	private ProjectPropertyDao projectPropDao;
+
 	private List<ProjectProperty> dummyProjectPropIds;
 
 	private static final String propertyName = "Property Name";
@@ -114,6 +114,59 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 		}
 
 		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, projectProperties);
+	}
+
+	@Test
+	public void testCreateVariableProperties() {
+		final DmsProject dmsProject = DMSProjectTestDataInitializer.testCreateDMSProject(1, "Project Name", "Description", "1001");
+		final DMSVariableType variableType = DMSVariableTypeTestDataInitializer.createDmsVariableType("NFERT_NO", "localDescription", 1);
+		variableType.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		variableType.setStandardVariable(StandardVariableTestDataInitializer.createStandardVariable(8241, "NFERT_NO"));
+		final VariableList variableList = new VariableList();
+
+		final List<ProjectProperty> projectProperties = this.projectPropSaver.createVariableProperties(dmsProject, variableType, variableList);
+
+		Assert.assertEquals(1, projectProperties.size());
+		final ProjectProperty projectProperty = projectProperties.get(0);
+		Assert.assertEquals(dmsProject.getName(), projectProperty.getProject().getName());
+		Assert.assertEquals(variableType.getVariableType().getId(), projectProperty.getTypeId());
+		Assert.assertEquals("1", projectProperty.getRank().toString());
+		Assert.assertEquals(String.valueOf(variableType.getStandardVariable().getId()), projectProperty.getVariableId().toString());
+		Assert.assertEquals(variableType.getLocalName(), projectProperty.getAlias());
+	}
+
+	@Test
+	public void testCreateVariablePropertiesForTreatMentFactor() {
+		final DmsProject dmsProject = DMSProjectTestDataInitializer.testCreateDMSProject(1, "Project Name", "Description", "1001");
+		final DMSVariableType variableType = DMSVariableTypeTestDataInitializer.createDmsVariableType("NFERT_NO", "localDescription", 1);
+		variableType.setVariableType(VariableType.TREATMENT_FACTOR);
+		variableType.setStandardVariable(StandardVariableTestDataInitializer.createStandardVariable(8241, variableType.getLocalName()));
+		variableType.setTreatmentLabel("NFert_kg_ha");
+
+		final VariableList variableList = new VariableList();
+		final Variable variable = new Variable();
+		variable.setValue("1");
+		variable.setVariableType(variableType);
+		variableList.add(variable);
+
+		final List<ProjectProperty> projectProperties = this.projectPropSaver.createVariableProperties(dmsProject, variableType, variableList);
+
+		Assert.assertEquals(2, projectProperties.size());
+		final ProjectProperty projectProperty = projectProperties.get(0);
+		Assert.assertEquals(dmsProject.getName(), projectProperty.getProject().getName());
+		Assert.assertEquals(variableType.getVariableType().getId(), projectProperty.getTypeId());
+		Assert.assertEquals("1", projectProperty.getRank().toString());
+		Assert.assertEquals(String.valueOf(variableType.getStandardVariable().getId()), projectProperty.getVariableId().toString());
+		Assert.assertEquals(variableType.getLocalName(), projectProperty.getAlias());
+		Assert.assertEquals("1", projectProperty.getValue());
+
+		final ProjectProperty multiFactorialProperty = projectProperties.get(1);
+		Assert.assertEquals(dmsProject.getName(), multiFactorialProperty.getProject().getName());
+		Assert.assertEquals(String.valueOf(TermId.MULTIFACTORIAL_INFO.getId()), multiFactorialProperty.getTypeId().toString());
+		Assert.assertEquals("1", multiFactorialProperty.getRank().toString());
+		Assert.assertEquals(String.valueOf(variableType.getStandardVariable().getId()), multiFactorialProperty.getVariableId().toString());
+		Assert.assertEquals(variableType.getLocalName(), multiFactorialProperty.getAlias());
+		Assert.assertEquals(variableType.getTreatmentLabel(), multiFactorialProperty.getValue());
 	}
 
 	@Test
@@ -356,7 +409,7 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 	private int callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(final List<Integer> variableIds,
 			final List<ProjectProperty> projectProperties) throws MiddlewareQueryException {
 		final int startRank = projectProperties.size() + 1;
-		this.projectPropSaver.updateVariablesRanking(this.datasetId, variableIds);
+		this.projectPropSaver.updateVariablesRanking(1, variableIds);
 
 		return startRank;
 	}

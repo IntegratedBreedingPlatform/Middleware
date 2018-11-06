@@ -77,7 +77,7 @@ public class ProjectPropertySaver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType, final VariableList variableList) {
+	List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType, final VariableList variableList) {
 
 	  	// Setting property, scale and method to standard variable
 	  	final StandardVariableSummary standardVariableSummary =
