@@ -697,6 +697,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
 			orderColumn = "(1 * " + orderColumn + ")";
 		}
+		else {
+			orderColumn = "`" + orderColumn + "`";
+		}
+
 		sql = sql + " ORDER BY " + orderColumn + " " + direction + " ";
 		return sql.toString();
 	}
