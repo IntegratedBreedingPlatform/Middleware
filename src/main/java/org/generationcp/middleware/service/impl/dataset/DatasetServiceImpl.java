@@ -70,6 +70,7 @@ public class DatasetServiceImpl implements DatasetService {
 		phenotype.setValue(observation.getValue());
 		final Integer observationUnitId = observation.getObservationUnitId();
 		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+
 		this.resolveObservationStatus(variableId, phenotype);
 
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
@@ -86,7 +87,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
-		final Phenotype phenotype = phenotypeDao.getByObservationUnitIdAndObservableId(observationUnitId, observationId);
+		final Phenotype phenotype = phenotypeDao.getPhenotypeByExperimentIdAndObservableId(observationUnitId, observationId);
 		phenotype.setValue(value);
 		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
 		final Integer observableId = phenotype.getObservableId();

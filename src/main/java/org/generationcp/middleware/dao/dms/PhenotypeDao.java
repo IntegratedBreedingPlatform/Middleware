@@ -1128,16 +1128,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final BigInteger result = (BigInteger) query.uniqueResult();
 		return result.intValue() > 0;
 	}
-
-	public Phenotype getByObservationUnitIdAndObservableId(final Integer observationUnitId, final Integer observationId) {
-
-		final Criteria criteria = this.getSession().createCriteria(Phenotype.class);
-		criteria.createAlias("experiment", "experiment");
-		criteria.add(Restrictions.eq("experiment.ndExperimentId", observationUnitId));
-		criteria.add(Restrictions.eq("phenotypeId", observationId));
-
-		return (Phenotype) criteria.uniqueResult();
-	}
 	
 	public void updateOutOfSyncPhenotypes(final Integer experimentId, final List<Integer> targetVariableIds) {
 		final String sql = "UPDATE phenotype pheno "
