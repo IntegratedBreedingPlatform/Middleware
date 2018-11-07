@@ -94,8 +94,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
-	public static final String OBSERVATION_VARIABLE_NAME = "OBSERVATION_VARIABLE_NAME";
-	public static final String OBSERVATION_VARIABLE = "OBSERVATION_VARIABLE";
+	public static final String OBSERVATION_UNIT_NO_NAME = "OBSERVATION_UNIT_NO_NAME";
+	public static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
@@ -610,7 +610,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationVariableName) {
+		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName) {
 		String sql = "SELECT \n"
 			+ "    nde.nd_experiment_id as observationUnitId,\n"
 			+ "    gl.description AS TRIAL_INSTANCE,\n"
@@ -667,8 +667,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		sql = sql + "nde.observation_unit_no AS OBSERVATION_VARIABLE, ";
-		//sql = sql + "(SELECT pp.alias FROM projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.type_id WHERE pp.project_id = :datasetId AND cvt.cvterm_id = 1812) AS OBSERVATION_VARIABLE_NAME, ";
+		sql = sql + "nde.observation_unit_no AS OBSERVATION_UNIT_NO, ";
 		sql = sql + " 1=1 FROM \n"
 			+ "	project p \n"
 			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
@@ -683,8 +682,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ " GROUP BY observationUnitId ";
 
 		String orderColumn;
-		if (observationVariableName != null && StringUtils.isNotBlank(sortBy) && observationVariableName.equalsIgnoreCase(sortBy)) {
-			orderColumn = OBSERVATION_VARIABLE;
+		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
+			orderColumn = OBSERVATION_UNIT_NO;
 		} else {
 			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
 		}
@@ -750,8 +749,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			query.addScalar(designFactor, new StringType());
 		}
 
-		query.addScalar(OBSERVATION_VARIABLE);
-		//query.addScalar(OBSERVATION_VARIABLE_NAME);
+		query.addScalar(OBSERVATION_UNIT_NO);
 		return query;
 	}
 
@@ -829,7 +827,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
 				variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
 				variables.put(observationVariableName,
-					new ObservationUnitData(((Integer) row.get(OBSERVATION_VARIABLE)).toString()));
+					new ObservationUnitData(((Integer) row.get(OBSERVATION_UNIT_NO)).toString()));
 
 				for (final String gpDesc : germplasmDescriptors) {
 					variables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
@@ -882,8 +880,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public String getObservationVariableName(final int datasetId) {
 		final SQLQuery query = this.getSession()
 			.createSQLQuery(
-				"SELECT pp.alias AS OBSERVATION_VARIABLE_NAME FROM projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.type_id WHERE pp.project_id = :datasetId AND cvt.cvterm_id = 1812 ");
-		query.addScalar("OBSERVATION_VARIABLE_NAME", new StringType());
+				"SELECT pp.alias AS OBSERVATION_UNIT_NO_NAME FROM projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.type_id WHERE pp.project_id = :datasetId AND cvt.cvterm_id = 1812 ");
+		query.addScalar("OBSERVATION_UNIT_NO_NAME", new StringType());
 		query.setParameter("datasetId", datasetId);
 		return (query.list() != null && !query.list().isEmpty() ? (String) query.list().get(0) : null);
 	}
