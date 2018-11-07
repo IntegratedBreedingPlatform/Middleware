@@ -21,9 +21,9 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
-
 public class DatasetServiceImpl implements DatasetService {
 
+	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 	private DaoFactory daoFactory;
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -33,38 +33,6 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
-	}
-
-	@Override
-	public Phenotype updatePhenotype(
-		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
-
-		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
-		final Phenotype phenotype = phenotypeDao.getByObservationUnitIdAndObservableId(observationUnitId, observationId);
-		phenotype.setValue(value);
-		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
-		final Integer observableId = phenotype.getObservableId();
-		this.resolveObservationStatus(observableId, phenotype);
-
-		phenotypeDao.update(phenotype);
-		
-		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
-		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
-		
-		return phenotype;
-
-	}
-
-	void resolveObservationStatus(final Integer variableId, final Phenotype phenotype) {
-
-		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
-		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
-		
-		final Boolean isDerivedTrait = formula != null;	
-
-		if (isDerivedTrait) {
-			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
-		} 
 	}
 
 	@Override
@@ -92,6 +60,70 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getExperimentDAO().isValidExperiment(datasetId, observationUnitId);
 	}
 
+	@Override
+	public ObservationDto addPhenotype(final ObservationDto observation) {
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setcValue(observation.getCategoricalValueId());
+		final Integer variableId = observation.getVariableId();
+		phenotype.setObservableId(variableId);
+		phenotype.setValue(observation.getValue());
+		final Integer observationUnitId = observation.getObservationUnitId();
+		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		this.resolveObservationStatus(variableId, phenotype);
+
+		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
+		observation.setObservationId(savedRecord.getPhenotypeId());
+		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
+		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
+
+		return observation;
+	}
+
+	@Override
+	public ObservationDto updatePhenotype(
+		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
+		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
+
+		final Phenotype phenotype = phenotypeDao.getByObservationUnitIdAndObservableId(observationUnitId, observationId);
+		phenotype.setValue(value);
+		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
+		final Integer observableId = phenotype.getObservableId();
+		this.resolveObservationStatus(observableId, phenotype);
+
+		phenotypeDao.update(phenotype);
+
+		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
+		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+
+		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		final ObservationDto observation = new ObservationDto();
+		observation.setObservationId(phenotype.getPhenotypeId());
+		observation.setCategoricalValueId(phenotype.getcValueId());
+		observation.setStatus(phenotype.getValueStatus() != null ? phenotype.getValueStatus().getName() : null);
+		observation.setUpdatedDate(dateFormat.format(phenotype.getUpdatedDate()));
+		observation.setCreatedDate(dateFormat.format(phenotype.getCreatedDate()));
+		observation.setValue(phenotype.getValue());
+		observation.setObservationUnitId(phenotype.getExperiment().getNdExperimentId());
+		observation.setVariableId(phenotype.getObservableId());
+
+		return observation;
+
+	}
+
+	void resolveObservationStatus(final Integer variableId, final Phenotype phenotype) {
+
+		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
+		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
+
+		final Boolean isDerivedTrait = formula != null;
+
+		if (isDerivedTrait) {
+			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
+		}
+	}
+
 	/*
 	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
 	 */
@@ -110,28 +142,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	}
 
-	
-	@Override
-	public ObservationDto addPhenotype(final ObservationDto observation) {
-		final Phenotype phenotype = new Phenotype();
-		phenotype.setCreatedDate(new Date());
-		phenotype.setcValue(observation.getCategoricalValueId());
-		final Integer variableId = observation.getVariableId();
-		phenotype.setObservableId(variableId);
-		phenotype.setValue(observation.getValue());
-		final Integer observationUnitId = observation.getObservationUnitId();
-		phenotype.setExperiment(new ExperimentModel(observationUnitId));
-		this.resolveObservationStatus(variableId, phenotype);
-		
-		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
-		observation.setObservationId(savedRecord.getPhenotypeId());
-		final SimpleDateFormat dateFormat = new SimpleDateFormat("");
-		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
-		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
-		
-		return observation;
-	}
-	
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
