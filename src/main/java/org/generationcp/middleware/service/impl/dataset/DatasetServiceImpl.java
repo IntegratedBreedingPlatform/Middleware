@@ -37,8 +37,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Phenotype updatePhenotype(
-		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value,
-		final String valueStatus) {
+		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
 
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		final Phenotype phenotype = phenotypeDao.getByObservationUnitIdAndObservableId(observationUnitId, observationId);
@@ -46,6 +45,7 @@ public class DatasetServiceImpl implements DatasetService {
 		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
 		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(observableId, phenotype);
+
 		phenotypeDao.update(phenotype);
 		
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable

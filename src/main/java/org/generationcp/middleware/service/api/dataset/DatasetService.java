@@ -19,6 +19,6 @@ public interface DatasetService {
 	ObservationDto addPhenotype(ObservationDto observation);
 
 	Phenotype updatePhenotype(
-		Integer observationUnitId, Integer observationId, Integer categoricalValueId, String value, String valueStatus);
+		Integer observationUnitId, Integer observationId, Integer categoricalValueId, String value);
 
 }
