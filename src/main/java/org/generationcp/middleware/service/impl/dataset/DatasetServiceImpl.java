@@ -45,7 +45,7 @@ public class DatasetServiceImpl implements DatasetService {
 		phenotype.setValue(value);
 		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
 		final Integer observableId = phenotype.getObservableId();
-		 this.resolveObservationStatus(observableId, phenotype);
+		this.resolveObservationStatus(observableId, phenotype);
 		phenotypeDao.update(phenotype);
 		
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
@@ -110,6 +110,28 @@ public class DatasetServiceImpl implements DatasetService {
 
 	}
 
+	
+	@Override
+	public ObservationDto addPhenotype(final ObservationDto observation) {
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setcValue(observation.getCategoricalValueId());
+		final Integer variableId = observation.getVariableId();
+		phenotype.setObservableId(variableId);
+		phenotype.setValue(observation.getValue());
+		final Integer observationUnitId = observation.getObservationUnitId();
+		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		this.resolveObservationStatus(variableId, phenotype);
+		
+		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
+		observation.setObservationId(savedRecord.getPhenotypeId());
+		final SimpleDateFormat dateFormat = new SimpleDateFormat("");
+		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
+		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
+		
+		return observation;
+	}
+	
 	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
