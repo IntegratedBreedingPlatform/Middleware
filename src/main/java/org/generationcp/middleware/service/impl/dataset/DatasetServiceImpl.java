@@ -63,6 +63,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public ObservationDto addPhenotype(final ObservationDto observation) {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
 		phenotype.setcValue(observation.getCategoricalValueId());
 		final Integer variableId = observation.getVariableId();
 		phenotype.setObservableId(variableId);
