@@ -52,6 +52,7 @@ import java.util.Set;
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
+	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	public static final String PROJECT_NAME = "PROJECT_NAME";
 	public static final String LOCATION_DB_ID = "locationDbId";
 	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
@@ -609,9 +610,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final String sortBy, final String sortOrder) {
+		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationVariableName) {
 		String sql = "SELECT \n"
-			+ "    nde.nd_experiment_id as ndExperimentId,\n"
+			+ "    nde.nd_experiment_id as observationUnitId,\n"
 			+ "    gl.description AS TRIAL_INSTANCE,\n"
 			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
 			+ "    s.dbxref_id AS GID,\n"
@@ -667,7 +668,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		sql = sql + "nde.observation_unit_no AS OBSERVATION_VARIABLE, ";
-		sql = sql + "(SELECT ndep.alias FROM projectprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.project_id = :datasetId AND ispcvt.cvterm_id = 1812) AS OBSERVATION_VARIABLE_NAME, ";
+		//sql = sql + "(SELECT pp.alias FROM projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.type_id WHERE pp.project_id = :datasetId AND cvt.cvterm_id = 1812) AS OBSERVATION_VARIABLE_NAME, ";
 		sql = sql + " 1=1 FROM \n"
 			+ "	project p \n"
 			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
@@ -677,12 +678,17 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 			+ "   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id "
-			+ 
-				"		WHERE p.project_id = :datasetId \n"
+			+ " WHERE p.project_id = :datasetId \n"
 			+ " AND gl.nd_geolocation_id = :instanceId"
-			+ " GROUP BY nde.nd_experiment_id ";
+			+ " GROUP BY observationUnitId ";
 
-		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
+		String orderColumn;
+		if (observationVariableName != null && StringUtils.isNotBlank(sortBy) && observationVariableName.equalsIgnoreCase(sortBy)) {
+			orderColumn = OBSERVATION_VARIABLE;
+		} else {
+			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
+		}
+
 		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
 		/**
 		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
@@ -703,8 +709,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final int pageSize,
 		final String sortBy, final String sortOrder) {
 		try {
+			final String observationVariableName = this.getObservationVariableName(datasetId);
+
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
-				designFactors, sortBy, sortOrder);
+				designFactors, sortBy, sortOrder, observationVariableName);
 			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
 				designFactors, observationUnitTableQuery);
 			query.setParameter("datasetId", datasetId);
@@ -715,7 +723,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = query.list();
-			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors);
+			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
 			ExperimentDao.LOG.error(error);
@@ -743,12 +751,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		query.addScalar(OBSERVATION_VARIABLE);
-		query.addScalar(OBSERVATION_VARIABLE_NAME);
+		//query.addScalar(OBSERVATION_VARIABLE_NAME);
 		return query;
 	}
 
 	private void addScalar(final SQLQuery createSQLQuery) {
-		createSQLQuery.addScalar(ExperimentDao.ND_EXPERIMENT_ID);
+		createSQLQuery.addScalar(ExperimentDao.OBSERVATION_UNIT_ID);
 		createSQLQuery.addScalar(ExperimentDao.TRIAL_INSTANCE);
 		createSQLQuery.addScalar(ExperimentDao.ENTRY_TYPE);
 		createSQLQuery.addScalar(ExperimentDao.GID);
@@ -778,7 +786,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	private List<ObservationUnitRow> mapResults(
 		final List<Map<String, Object>> results,
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors) {
+		final List<String> designFactors, final String observationVariableName) {
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 
 		if (results != null && !results.isEmpty()) {
@@ -797,8 +805,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 
-				observationUnitRow.setObservationUnitId((Integer) row.get(ND_EXPERIMENT_ID));
-				observationUnitRow.setAction(((Integer) row.get(ND_EXPERIMENT_ID)).toString());
+				observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
+				observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
 
 				final Integer gid = (Integer) row.get(GID);
 				observationUnitRow.setGid(gid);
@@ -820,7 +828,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
 				variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
 				variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
-				variables.put((String) row.get(OBSERVATION_VARIABLE_NAME),
+				variables.put(observationVariableName,
 					new ObservationUnitData(((Integer) row.get(OBSERVATION_VARIABLE)).toString()));
 
 				for (final String gpDesc : germplasmDescriptors) {
@@ -869,5 +877,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public String getObservationVariableName(final int datasetId) {
+		final SQLQuery query = this.getSession()
+			.createSQLQuery(
+				"SELECT pp.alias AS OBSERVATION_VARIABLE_NAME FROM projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.type_id WHERE pp.project_id = :datasetId AND cvt.cvterm_id = 1812 ");
+		query.addScalar("OBSERVATION_VARIABLE_NAME", new StringType());
+		query.setParameter("datasetId", datasetId);
+		return (query.list() != null && !query.list().isEmpty() ? (String) query.list().get(0) : null);
 	}
 }
