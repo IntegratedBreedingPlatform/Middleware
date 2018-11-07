@@ -25,6 +25,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -278,7 +279,8 @@ public class DatasetServiceImplTest {
 
 	}
 
-	/*@Test
+	@Ignore
+	@Test
 	public void testGetObservations() throws Exception {
 		this.datasetService = new DatasetServiceImpl(this.mockSessionProvider);
 		this.datasetService.setGermplasmDescriptors(this.germplasmDescriptors);
@@ -345,15 +347,8 @@ public class DatasetServiceImplTest {
 		map.put(ENTRY_CODE, "12");
 		map.put(OBS_UNIT_ID, "obunit123");
 		results.add(map);
-//		Mockito.when(mockQuery.list()).thenReturn(results);
-		Mockito.when(this.datasetService.getObservationUnitRows(
-			DatasetServiceImplTest.STUDY_ID,
-			DatasetServiceImplTest.DATASET_ID,
-			DatasetServiceImplTest.INSTANCE_ID,
-			1,
-			10,
-			null,
-			null)).thenReturn(results);
+		Mockito.when(mockQuery.list()).thenReturn(results);
+
 		// Method to test
 		final List<ObservationUnitRow> actualMeasurements = this.datasetService.getObservationUnitRows(DatasetServiceImplTest.STUDY_ID,
 			DatasetServiceImplTest.DATASET_ID,
@@ -364,6 +359,6 @@ public class DatasetServiceImplTest {
 			null);
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
-	}*/
+	}
 
 }
