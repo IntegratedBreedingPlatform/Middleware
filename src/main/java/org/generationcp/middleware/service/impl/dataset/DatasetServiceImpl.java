@@ -1,9 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -18,8 +16,9 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 public class DatasetServiceImpl implements DatasetService {
 
@@ -87,7 +86,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
-		final Phenotype phenotype = phenotypeDao.getPhenotypeByExperimentIdAndObservableId(observationUnitId, observationId);
+		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		phenotype.setValue(value);
 		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
 		final Integer observableId = phenotype.getObservableId();

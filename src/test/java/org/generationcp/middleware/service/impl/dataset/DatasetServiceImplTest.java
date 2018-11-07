@@ -175,7 +175,7 @@ public class DatasetServiceImplTest {
 		existingPhenotype.setObservableId(observableId);
 
 		when(formulaDao.getByTargetVariableId(observableId)).thenReturn(new Formula());
-		when(phenotypeDao.getPhenotypeByExperimentIdAndObservableId(observationUnitId, observationId)).thenReturn(existingPhenotype);
+		when(phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
 		final ObservationDto savedObservation =
 			this.datasetService.updatePhenotype(observationUnitId, observationId, categoricalValueId, value);
