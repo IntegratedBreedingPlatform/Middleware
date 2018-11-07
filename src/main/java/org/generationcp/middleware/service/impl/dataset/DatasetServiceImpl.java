@@ -78,6 +78,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
 		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
+		observation.setStatus(savedRecord.getValueStatus() != null ? savedRecord.getValueStatus().getName() : null);
 
 		return observation;
 	}
