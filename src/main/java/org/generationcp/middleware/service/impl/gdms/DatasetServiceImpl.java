@@ -16,8 +16,8 @@ import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.gdms.DatasetRetrieveDto;
-import org.generationcp.middleware.service.api.gdms.DatasetUploadDto;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
+import org.generationcp.middleware.service.api.gdms.DatasetUploadDto;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,8 +150,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 			if (!markersNotFound.isEmpty()) {
 				throw new MiddlewareException(
-						"Some of the data uploaded is not present in the system. Please verify your file again. Markers not found: "
-								+ StringUtils.join(markersNotFound, ","));
+					"Some of the data uploaded is not present in the system. Please verify your file again. Markers not found: "
+						+ StringUtils.join(markersNotFound, ","));
 			}
 		}
 	}
@@ -168,8 +168,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 			if (!samplesNotFound.isEmpty()) {
 				throw new MiddlewareException(
-						"Some of the data uploaded is not present in the system. Please verify your file again. Samples not found: "
-								+ StringUtils.join(samplesNotFound, ","));
+					"Some of the data uploaded is not present in the system. Please verify your file again. Samples not found: "
+						+ StringUtils.join(samplesNotFound, ","));
 			}
 		}
 	}
@@ -178,8 +178,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer numberOfRows = datasetUploadDto.getCharValues().length;
 		final Integer numberOfColums = datasetUploadDto.getCharValues()[0].length;
 
-		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetUploadDto.getMarkers().size() && numberOfRows == datasetUploadDto
-				.getSampleAccessions().size())) {
+		if (!(numberOfRows > 0 && numberOfColums > 0 && numberOfColums == datasetUploadDto.getMarkers().size()
+			&& numberOfRows == datasetUploadDto
+			.getSampleAccessions().size())) {
 			throw new MiddlewareException("Invalid matrix size");
 		}
 	}

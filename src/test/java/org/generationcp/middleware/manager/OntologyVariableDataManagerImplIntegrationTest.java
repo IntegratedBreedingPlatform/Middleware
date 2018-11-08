@@ -307,6 +307,24 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.variableManager.addVariable(variableInfo);
 		Assert.fail("'Analysis' variable type should not be assigned together with 'Analysis Summary' variable type");
 	}
+	
+	@Test(expected = MiddlewareException.class)
+	public void testAddObservationUnitVariableTypeShouldNotBeTrait() throws Exception {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.addVariableType(VariableType.OBSERVATION_UNIT);
+		variableInfo.addVariableType(VariableType.TRAIT);
+		this.variableManager.addVariable(variableInfo);
+		Assert.fail("'Observation Unit' variable type should not be assigned together 'Trait' variable type");
+	}
+
+	@Test(expected = MiddlewareException.class)
+	public void testUpdateObservationUnitVariableTypeShouldNotBeTrait() throws Exception {
+		this.testVariableInfo.addVariableType(VariableType.OBSERVATION_UNIT);
+		this.testVariableInfo.addVariableType(VariableType.TRAIT);
+		this.variableManager.updateVariable(this.testVariableInfo);
+		Assert.fail("'Observation Unit' variable type should not be assigned together 'Trait' variable type");
+	}
 
 	@Test
 	public void testUpdateVariable() throws Exception {

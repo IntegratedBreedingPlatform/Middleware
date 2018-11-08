@@ -8,14 +8,12 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
-import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -34,7 +32,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableInfoDaoElements;
-import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -51,10 +48,8 @@ import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,13 +69,18 @@ import java.util.Set;
 @Transactional
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
+	private static final String PROPERTY_IDS = "propertyIds";
+	private static final String VARIABLE_IDS = "variableIds";
+	private static final String SCALE_IDS = "scaleIds";
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
 	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE =
 			"Analysis and/or Analysis Summary variable type(s) should not be assigned together with any other variable type";
-
+	private static final String OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS =
+			"Variables cannot be classified as both Observation Unit and Trait. Please check the variable types assigned and try again.";
+		
 	@Autowired
 	private OntologyMethodDataManager methodManager;
 
@@ -121,6 +121,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public List<Variable> getWithFilter(final VariableFilter variableFilter) {
 
@@ -149,7 +150,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				// check if propertyIds not empty and add filter clause of it
 				if (!variableFilter.getPropertyIds().isEmpty()) {
 					filterClause += " and vpr.pid in (:propertyIds)";
-					listParameters.put("propertyIds", variableFilter.getPropertyIds());
+					listParameters.put(PROPERTY_IDS, variableFilter.getPropertyIds());
 				}
 
 				// check if property class list is not empty then get properties by classes and add filter clause of it
@@ -163,12 +164,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					pSQLQuery.setParameterList("classNames", variableFilter.getPropertyClasses());
 					final List queryResults = pSQLQuery.list();
 
-					if (!listParameters.containsKey("propertyIds")) {
+					if (!listParameters.containsKey(PROPERTY_IDS)) {
 						filterClause += " and vpr.pid in (:propertyIds)";
-						listParameters.put("propertyIds", variableFilter.getPropertyIds());
+						listParameters.put(PROPERTY_IDS, variableFilter.getPropertyIds());
 					}
 
-					final List<Integer> propertyIds = listParameters.get("propertyIds");
+					final List<Integer> propertyIds = listParameters.get(PROPERTY_IDS);
 					for (final Object row : queryResults) {
 						propertyIds.add(this.typeSafeObjectToInteger(row));
 					}
@@ -182,7 +183,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				// check if scaleIds not empty and add filter clause of it
 				if (!variableFilter.getScaleIds().isEmpty()) {
 					filterClause += " and vsr.sid in (:scaleIds)";
-					listParameters.put("scaleIds", variableFilter.getScaleIds());
+					listParameters.put(SCALE_IDS, variableFilter.getScaleIds());
 				}
 
 				// check of data type list is not empty then get scales by data types and add filter clause of it
@@ -203,12 +204,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					sSQLQuery.setParameterList("dataTypeIds", dataTypeIds);
 					final List queryResults = sSQLQuery.list();
 
-					if (!listParameters.containsKey("scaleIds")) {
+					if (!listParameters.containsKey(SCALE_IDS)) {
 						filterClause += " and vsr.sid in (:scaleIds)";
-						listParameters.put("scaleIds", variableFilter.getScaleIds());
+						listParameters.put(SCALE_IDS, variableFilter.getScaleIds());
 					}
 
-					final List<Integer> scaleIds = listParameters.get("scaleIds");
+					final List<Integer> scaleIds = listParameters.get(SCALE_IDS);
 					for (final Object row : queryResults) {
 						scaleIds.add(this.typeSafeObjectToInteger(row));
 					}
@@ -222,7 +223,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				// check if variableIds not empty and add filter clause of it
 				if (!variableFilter.getVariableIds().isEmpty()) {
 					filterClause += " and v.cvterm_id in (:variableIds)";
-					listParameters.put("variableIds", variableFilter.getVariableIds());
+					listParameters.put(VARIABLE_IDS, variableFilter.getVariableIds());
 				}
 
 				// check if excludedVariableIds not empty and add filter clause of it
@@ -248,12 +249,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					vSQLQuery.setParameterList("variableTypeNames", variableTypeNames);
 					final List queryResults = vSQLQuery.list();
 
-					if (!listParameters.containsKey("variableIds")) {
+					if (!listParameters.containsKey(VARIABLE_IDS)) {
 						filterClause += " and v.cvterm_id in (:variableIds)";
-						listParameters.put("variableIds", variableFilter.getVariableIds());
+						listParameters.put(VARIABLE_IDS, variableFilter.getVariableIds());
 					}
 
-					final List<Integer> variableIds = listParameters.get("variableIds");
+					final List<Integer> variableIds = listParameters.get(VARIABLE_IDS);
 					for (final Object row : queryResults) {
 						variableIds.add(this.typeSafeObjectToInteger(row));
 					}
@@ -355,8 +356,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 									+ "where tr.subject_id in (:propertyIds) or tr.subject_id in (:scaleIds)")
 					.addScalar("sid").addScalar("tid").addScalar("rid").addScalar("rn").addScalar("rd");
 
-			rQuery.setParameterList("propertyIds", pMap.keySet());
-			rQuery.setParameterList("scaleIds", sMap.keySet());
+			rQuery.setParameterList(PROPERTY_IDS, pMap.keySet());
+			rQuery.setParameterList(SCALE_IDS, sMap.keySet());
 
 			final List rQueryResults = rQuery.list();
 
@@ -388,9 +389,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			// set parameter to query
 			pQuery.setParameterList("methodIds", mMap.keySet());
-			pQuery.setParameterList("propertyIds", pMap.keySet());
-			pQuery.setParameterList("scaleIds", sMap.keySet());
-			pQuery.setParameterList("variableIds", map.keySet());
+			pQuery.setParameterList(PROPERTY_IDS, pMap.keySet());
+			pQuery.setParameterList(SCALE_IDS, sMap.keySet());
+			pQuery.setParameterList(VARIABLE_IDS, map.keySet());
 
 			final List pQueryResults = pQuery.list();
 
@@ -566,7 +567,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
 		}
 
-		this.checkForReservedVariableTypes(variableInfo);
+		this.validateVariableTypes(variableInfo);
 
 		// Saving term to database.
 		final CVTerm savedTerm = daoFactory.getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
@@ -637,7 +638,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		this.checkTermIsVariable(term);
 
-		this.checkForReservedVariableTypes(variableInfo);
+		this.validateVariableTypes(variableInfo);
 
 		final CVTermRelationship methodRelation = elements.getMethodRelation();
 		final CVTermRelationship propertyRelation = elements.getPropertyRelation();
@@ -731,7 +732,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 
 		final String previousAlias = variableOverrides == null ? null : variableOverrides.getAlias();
-		final String newAlias = variableInfo.getAlias().equals("") ? null : variableInfo.getAlias();
+		final String newAlias = "".equals(variableInfo.getAlias()) ? null : variableInfo.getAlias();
 		boolean isFavorite = variableInfo.isFavorite();
 
 		if (newAlias != null && previousAlias == null) {
@@ -752,11 +753,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	}
 
-	// Throw exception if variable types of variable to be added is "reserved" like "Analysis" or "Analysis Summary"
-	private void checkForReservedVariableTypes(final OntologyVariableInfo variableInfo) {
+	private void validateVariableTypes(final OntologyVariableInfo variableInfo) {
+		// Variable types "Analysis" or "Analysis Summary" cannot be used with other variable types
 		if (!Collections.disjoint(variableInfo.getVariableTypes(), VariableType.getReservedVariableTypes())
 				&& variableInfo.getVariableTypes().size() > 1) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
+		
+		} else if (variableInfo.getVariableTypes().contains(VariableType.OBSERVATION_UNIT)
+				&& variableInfo.getVariableTypes().contains(VariableType.TRAIT)) {
+			throw new MiddlewareException(OntologyVariableDataManagerImpl.OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS);
 		}
 	}
 
@@ -851,8 +856,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameter("variableId", variableId);
-		final List list = query.list();
-		return list.size() > 0;
+		return !query.list().isEmpty();
 	}
 
 	private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
@@ -948,7 +952,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameterList("variablesIds", variablesIds);
-		return query.list().size() > 0;
+		return !query.list().isEmpty();
 	}
 
 	@Override
