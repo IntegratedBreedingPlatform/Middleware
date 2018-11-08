@@ -576,4 +576,27 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public boolean isInstanceExistsInDataset(final int datasetId, final int instanceId) {
+
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(e.nd_experiment_id) FROM nd_experiment e ")
+			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
+
+		try {
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("datasetId", datasetId);
+			query.setParameter("instanceId", instanceId);
+
+			final BigInteger count = (BigInteger) query.uniqueResult();
+			return count.intValue() > 0;
+
+		} catch (final HibernateException e) {
+			final String error =
+				"Error at isInstanceExistsInDataset=" + datasetId + "," + instanceId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
+		}
+	}
+
 }

@@ -856,28 +856,32 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetInstanceMetadataByInstanceId() throws Exception {
+	public void testIsInstanceExistsInDataset() throws Exception {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
-		this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
-		this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
-		this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.manager.getActiveSession().flush();
 
 		final List<InstanceMetadata> instanceMetadataList = this.manager.getInstanceMetadata(studyId);
 		final Integer instanceId = instanceMetadataList.get(0).getInstanceDbId();
 
-		Assert.assertTrue(this.manager.getInstanceMetadataByInstanceId(studyId, instanceId).isPresent());
+		Assert.assertTrue(this.manager.isInstanceExistsInDataset(datasetId, instanceId));
 
 	}
 
 	@Test
-	public void testGetInstanceMetadataByInstanceIdInstanceNotExists() throws Exception {
+	public void testIsInstanceExistsInDatasetInstanceNotExists() throws Exception {
 
+		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
-		Assert.assertFalse(this.manager.getInstanceMetadataByInstanceId(studyId, 999).isPresent());
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+
+		Assert.assertFalse(this.manager.isInstanceExistsInDataset(datasetId, 999));
 
 	}
 

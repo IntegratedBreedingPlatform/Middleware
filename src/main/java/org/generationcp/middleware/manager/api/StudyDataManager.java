@@ -754,8 +754,6 @@ public interface StudyDataManager {
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
-	Optional<InstanceMetadata> getInstanceMetadataByInstanceId(int studyId, int instanceId);
-
 	Phenotype getPhenotypeById(int phenotypeId);
 
 	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId, Phenotype.ValueStatus valueStatus);
@@ -853,5 +851,7 @@ public interface StudyDataManager {
 	StudyReference getStudyReference(final Integer studyId);
 	
 	void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked);
+
+	boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId);
 
 }

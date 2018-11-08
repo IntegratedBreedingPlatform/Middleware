@@ -1097,11 +1097,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Optional<InstanceMetadata> getInstanceMetadataByInstanceId(final int studyId, final int instanceId) {
-		return this.getGeolocationDao().getInstanceMetadataByInstanceId(studyId, instanceId);
-	}
-
-	@Override
 	public Phenotype getPhenotypeById(final int phenotypeId) {
 		return getPhenotypeDao().getById(phenotypeId);
 	}
@@ -1271,6 +1266,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked) {
 		this.getDmsProjectDao().lockUnlockStudy(studyId, isLocked);
 		
+	}
+
+	@Override
+	public boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId) {
+		return this.getExperimentDao().isInstanceExistsInDataset(datasetId, instanceId);
 	}
 
 	@Override
