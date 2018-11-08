@@ -1141,4 +1141,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		statement.setParameterList("variableIds", targetVariableIds);
 		statement.executeUpdate();
 	}
+	
+	public boolean isValidPhenotype(final Integer experimentId, final Integer phenotypeId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
+		final ExperimentModel experiment = new ExperimentModel();
+		experiment.setNdExperimentId(experimentId);
+		criteria.add(Restrictions.eq("experiment", experiment));
+		criteria.setProjection(Projections.property("phenotypeId"));
+		final Integer id = (Integer) criteria.uniqueResult();
+		return id != null;
+	}
 }

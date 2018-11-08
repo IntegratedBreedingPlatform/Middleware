@@ -15,6 +15,8 @@ public interface DatasetService {
 	
 	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
 	
+	boolean isValidObservation(Integer observationUnitId, Integer observationId);
+	
 	ObservationDto addPhenotype(ObservationDto observation);
 
 	ObservationDto updatePhenotype(

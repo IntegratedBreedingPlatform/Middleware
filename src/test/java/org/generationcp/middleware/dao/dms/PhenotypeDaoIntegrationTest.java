@@ -64,7 +64,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	
 	private DmsProject study;
 	private CVTerm trait;
-	private List<ExperimentModel> experiments;
+	private List<Phenotype> phenotypes;
 
 	private ExperimentModelSaver experimentModelSaver;
 
@@ -218,7 +218,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testUpdateOutOfSyncPhenotypes(){
 		this.createEnvironmentData(1, true);	
-		final Integer experimentId = this.experiments.get(0).getNdExperimentId();
+		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		final Integer datasetId = this.study.getProjectId();
 		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
@@ -229,8 +229,17 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());
 	}
 	
+	@Test
+	public void testIsValidPhenotype() {
+		this.createEnvironmentData(1, true);
+		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
+		final Integer phenotypeId = this.phenotypes.get(0).getPhenotypeId();
+		Assert.assertTrue(this.phenotypeDao.isValidPhenotype(experimentId,  phenotypeId));
+		Assert.assertFalse(this.phenotypeDao.isValidPhenotype(experimentId + 1,  phenotypeId));
+	}
+	
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
-		this.experiments = new ArrayList<ExperimentModel>();
+		this.phenotypes = new ArrayList<Phenotype>();
 		final Geolocation geolocation = new Geolocation();
 		this.geolocationDao.saveOrUpdate(geolocation);
 
@@ -255,14 +264,14 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
 				experimentModel.setProject(this.study);
 				experimentModel.setStock(stockModel);
-				this.experiments.add(this.experimentDao.saveOrUpdate(experimentModel));
+				this.experimentDao.saveOrUpdate(experimentModel);
 				
 				if (withPhenotype) {
 					final Phenotype phenotype = new Phenotype();
 					phenotype.setObservableId(this.trait.getCvTermId());
 					phenotype.setExperiment(experimentModel);
 					phenotype.setValue(i + "." + j);
-					this.phenotypeDao.save(phenotype);
+					this.phenotypes.add(this.phenotypeDao.save(phenotype));
 				}
 			}
 

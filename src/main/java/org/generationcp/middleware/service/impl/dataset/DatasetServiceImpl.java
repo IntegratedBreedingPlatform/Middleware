@@ -58,6 +58,11 @@ public class DatasetServiceImpl implements DatasetService {
 	public boolean isValidObservationUnit(final Integer datasetId, final Integer observationUnitId) {
 		return this.daoFactory.getExperimentDAO().isValidExperiment(datasetId, observationUnitId);
 	}
+	
+	@Override
+	public boolean isValidObservation(final Integer observationUnitId, final Integer observationId) {
+		return this.daoFactory.getPhenotypeDAO().isValidPhenotype(observationUnitId, observationId);
+	}
 
 	@Override
 	public ObservationDto addPhenotype(final ObservationDto observation) {

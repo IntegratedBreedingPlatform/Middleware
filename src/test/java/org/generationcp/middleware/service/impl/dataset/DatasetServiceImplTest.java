@@ -110,7 +110,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testIsValidObservation() {
+	public void testIsValidObservationUnit() {
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
 		final int observationUnitId = ran.nextInt();
@@ -248,6 +248,15 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(
 			observationUnitId,
 			Arrays.asList(term1.getCvTermId(), term2.getCvTermId()));
+	}
+	
+	@Test
+	public void testIsValidObservation() {
+		final Random ran = new Random();
+		final int pbservationUnitId = ran.nextInt();
+		final int observationId = ran.nextInt();
+		this.datasetService.isValidObservation(pbservationUnitId, observationId);
+		Mockito.verify(this.phenotypeDao).isValidPhenotype(pbservationUnitId, observationId);
 	}
 
 }
