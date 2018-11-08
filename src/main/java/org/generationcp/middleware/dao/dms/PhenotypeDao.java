@@ -852,7 +852,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			this.getSession().flush();
 			final StringBuilder sql = new StringBuilder()
-				.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id ")
+				.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id, p.status ")
 				.append(" FROM phenotype p ")
 				.append(" WHERE p.observable_id = ").append(observableId)
 				.append(" AND p.nd_experiment_id = ").append(experimentId);
