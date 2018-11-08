@@ -1,5 +1,14 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import static org.mockito.Mockito.when;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -8,7 +17,6 @@ import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -25,22 +33,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
-import static org.mockito.Mockito.when;
-
 public class DatasetServiceImplTest {
 
 	@Mock
 	private DaoFactory daoFactory;
-
-	@Mock
-	private HibernateSessionProvider session;
 
 	@Mock
 	private PhenotypeDao phenotypeDao;
@@ -257,6 +253,13 @@ public class DatasetServiceImplTest {
 		final int observationId = ran.nextInt();
 		this.datasetService.isValidObservation(pbservationUnitId, observationId);
 		Mockito.verify(this.phenotypeDao).isValidPhenotype(pbservationUnitId, observationId);
+	}
+	
+	@Test
+	public void testCountPhenotypesByInstance() {
+		final long count = 6;
+		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(Matchers.anyInt(), Matchers.anyInt())).thenReturn(count);
+		Assert.assertEquals(count, this.datasetService.countPhenotypesByInstance(1, 2));
 	}
 
 }

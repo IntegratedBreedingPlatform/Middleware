@@ -9,6 +9,8 @@ public interface DatasetService {
 
 	long countPhenotypes(Integer datasetId, List<Integer> traitIds);
 
+	long countPhenotypesByInstance(Integer datasetId, Integer instanceId);
+
 	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 	
 	void removeVariables(Integer datasetId, List<Integer> variableIds);

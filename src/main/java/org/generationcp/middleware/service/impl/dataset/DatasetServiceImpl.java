@@ -35,6 +35,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public long countPhenotypesByInstance(final Integer datasetId, final Integer instanceId) {
+		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
+	}
+
+	@Override
 	public void addVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias) {
 		final ProjectPropertyDao projectPropertyDAO = this.daoFactory.getProjectPropertyDAO();
 		final ProjectProperty projectProperty = new ProjectProperty();
