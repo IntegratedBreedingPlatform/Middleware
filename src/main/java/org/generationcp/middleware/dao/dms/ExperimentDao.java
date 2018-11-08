@@ -579,7 +579,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public boolean isInstanceExistsInDataset(final int datasetId, final int instanceId) {
 
 		final StringBuilder sql = new StringBuilder();
-		sql.append("SELECT COUNT(e.nd_experiment_id) FROM nd_experiment e ")
+		sql.append("SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e ")
 			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
 
 		try {
