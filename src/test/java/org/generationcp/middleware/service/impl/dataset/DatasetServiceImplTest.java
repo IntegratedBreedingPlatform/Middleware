@@ -1,15 +1,10 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.junit.Assert;
@@ -22,43 +17,44 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 public class DatasetServiceImplTest {
-	
+
 	@Mock
 	private DaoFactory daoFactory;
-	
-	@Mock
-	private HibernateSessionProvider session;
-	
+
 	@Mock
 	private PhenotypeDao phenotypeDao;
-	
+
 	@Mock
 	private DmsProjectDao dmsProjectDao;
-	
+
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
-	
+
 	@InjectMocks
 	private DatasetServiceImpl datasetService;
-	
+
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		
+
 		this.datasetService.setDaoFactory(this.daoFactory);
 		Mockito.when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		Mockito.when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		Mockito.when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 	}
-	
+
 	@Test
 	public void testCountPhenotypes() {
 		final long count = 5;
 		Mockito.when(this.phenotypeDao.countPhenotypesForDataset(Matchers.anyInt(), Matchers.anyListOf(Integer.class))).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countPhenotypes(123, Arrays.asList(11, 22)));
 	}
-	
+
 	@Test
 	public void testAddVariable() {
 		final Random ran = new Random();
@@ -67,7 +63,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(nextRank).when(this.projectPropertyDao).getNextRank(datasetId);
 		final Integer traitId = ran.nextInt();
 		final String alias = RandomStringUtils.randomAlphabetic(20);
-		
+
 		this.datasetService.addVariable(datasetId, traitId, VariableType.TRAIT, alias);
 		final ArgumentCaptor<ProjectProperty> projectPropertyCaptor = ArgumentCaptor.forClass(ProjectProperty.class);
 		Mockito.verify(this.projectPropertyDao).save(projectPropertyCaptor.capture());
@@ -78,15 +74,22 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(traitId, datasetVariable.getVariableId());
 		Assert.assertEquals(alias, datasetVariable.getAlias());
 	}
-	
+
 	@Test
 	public void testRemoveVariables() {
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
-		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt()); 
+		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt());
 		this.datasetService.removeVariables(datasetId, variableIds);
 		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
+	}
+
+	@Test
+	public void testCountPhenotypesByInstance() {
+		final long count = 6;
+		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(Matchers.anyInt(), Matchers.anyInt())).thenReturn(count);
+		Assert.assertEquals(count, this.datasetService.countPhenotypesByInstance(1, 2));
 	}
 
 }

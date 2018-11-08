@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -850,5 +851,7 @@ public interface StudyDataManager {
 	StudyReference getStudyReference(final Integer studyId);
 	
 	void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked);
+
+	boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId);
 
 }
