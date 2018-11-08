@@ -327,7 +327,7 @@ public class ExperimentDaoTest {
 		Assert.assertTrue(this.experimentDao.isInstanceExistsInDataset(datasetId, instanceId));
 
 		Mockito.verify(this.mockSession).createSQLQuery(
-			"SELECT COUNT(e.nd_experiment_id) FROM nd_experiment e  WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
+			"SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e  WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
 		Mockito.verify(query).setParameter("datasetId", datasetId);
 		Mockito.verify(query).setParameter("instanceId", instanceId);
 	}
