@@ -24,6 +24,11 @@ public class DatasetDTO implements Serializable {
 
 	}
 
+	public DatasetDTO(final Integer datasetId) {
+		this();
+		this.datasetId = datasetId;
+	}
+
 	public Integer getDatasetId() {
 		return datasetId;
 	}
