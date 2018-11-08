@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 
 public interface DatasetService {
 

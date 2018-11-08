@@ -70,6 +70,7 @@ public class DatasetServiceImpl implements DatasetService {
 		phenotype.setValue(observation.getValue());
 		final Integer observationUnitId = observation.getObservationUnitId();
 		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		phenotype.setName(String.valueOf(variableId));
 
 		this.resolveObservationStatus(variableId, phenotype);
 

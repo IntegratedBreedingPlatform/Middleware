@@ -150,6 +150,7 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(phenotypeToBeSaved.getExperiment().getNdExperimentId(), observationDto.getObservationUnitId());
 		Assert.assertEquals(Phenotype.ValueStatus.MANUALLY_EDITED, phenotypeToBeSaved.getValueStatus());
 		Assert.assertEquals(savedObservation.getObservationId(), savedPhenotype.getPhenotypeId());
+		Assert.assertEquals(phenotypeToBeSaved.getName(), observationDto.getVariableId().toString());
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DatasetServiceImpl.DATE_FORMAT);
 		Assert.assertEquals(savedObservation.getCreatedDate(), dateFormat.format(savedPhenotype.getCreatedDate()));
