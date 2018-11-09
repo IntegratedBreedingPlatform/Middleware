@@ -932,24 +932,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return phenotypes;
 	}
 
-	public Phenotype getByExperimentAndTrait(final Integer experimentId, final Integer termId) {
-		try {
-			final ExperimentModel experiment = new ExperimentModel();
-			experiment.setNdExperimentId(experimentId);
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("observableId", termId));
-			criteria.add(Restrictions.eq("experiment", experiment));
-			criteria.addOrder(Order.desc("phenotypeId"));
-			final List list = criteria.list();
-			return (!list.isEmpty() ? (Phenotype) list.get(0) : null);
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getByExperimentAndTrait(" + experimentId + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
-		}
-
-	}
-
 	public List<PhenotypeSearchDTO> searchPhenotypes(
 		final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
 		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
