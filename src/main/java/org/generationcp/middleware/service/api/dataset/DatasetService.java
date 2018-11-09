@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -13,9 +14,18 @@ public interface DatasetService {
 
 	long countPhenotypesByInstance(Integer datasetId, Integer instanceId);
 
-	void addVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias);
+	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 
-	void removeVariables(final Integer datasetId, final List<Integer> variableIds);
+	void removeVariables(Integer datasetId, List<Integer> variableIds);
+
+	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
+
+	boolean isValidObservation(Integer observationUnitId, Integer observationId);
+
+	ObservationDto addPhenotype(ObservationDto observation);
+
+	ObservationDto updatePhenotype(
+		Integer observationUnitId, Integer observationId, Integer categoricalValueId, String value);
 
 	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
 
@@ -36,5 +46,4 @@ public interface DatasetService {
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 
 	Integer getNumberOfChildren (final Integer parentId);
-
 }

@@ -157,13 +157,6 @@ public class DaoFactory {
 		return projectRelationshipDao;
 	}
 
-	public ExperimentDao getExperimentDAO() {
-		final ExperimentDao experimentDao = new ExperimentDao();
-		experimentDao.setSession(this.sessionProvider.getSession());
-		return experimentDao;
-	}
-
-
 	public ExperimentDao getExperimentDao() {
 		final ExperimentDao experimentDao = new ExperimentDao();
 		experimentDao.setSession(this.sessionProvider.getSession());
