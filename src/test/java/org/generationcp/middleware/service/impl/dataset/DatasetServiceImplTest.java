@@ -193,6 +193,13 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
+	public void testCountPhenotypesByInstance() {
+		final long count = 6;
+		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(Matchers.anyInt(), Matchers.anyInt())).thenReturn(count);
+		Assert.assertEquals(count, this.datasetService.countPhenotypesByInstance(1, 2));
+	}
+
+	@Test
 	public void testGetDatasets() {
 		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(null);
 		final List<DatasetDTO> result = this.datasetService.getDatasets(25019, new TreeSet<Integer>());

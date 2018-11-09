@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -108,6 +107,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public long countPhenotypesByInstance(final Integer datasetId, final Integer instanceId) {
+		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
+	}
+
+	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
@@ -135,7 +139,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final String cropPrefix = this.workbenchDataManager.getProjectByUuid(study.getProgramUUID()).getCropType().getPlotCodePrefix();
 
 		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO()
-				.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.PLOT_DATA.getId()));
+			.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.PLOT_DATA.getId()));
 
 		if (plotDatasets == null || plotDatasets.isEmpty()) {
 			throw new MiddlewareException("Study does not have a plot dataset associated to it");
@@ -167,8 +171,8 @@ public class DatasetServiceImpl implements DatasetService {
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
 				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(), plotObservationUnit.getTypeId(),
-						cropPrefix + "P" + RandomStringUtils.randomAlphanumeric(8), subObservationDataset, plotObservationUnit.getStock(),
-						plotObservationUnit, i);
+					cropPrefix + "P" + RandomStringUtils.randomAlphanumeric(8), subObservationDataset, plotObservationUnit.getStock(),
+					plotObservationUnit, i);
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
@@ -187,23 +191,23 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(final DmsProject study, final DmsProject dmsProject,
-			final String datasetName, final Integer datasetTypeId) {
+		final String datasetName, final Integer datasetTypeId) {
 		final List<ProjectProperty> projectProperties = new ArrayList<>();
 		final ProjectProperty datasetProperty =
 			this.buildDatasetProperty(dmsProject,
-					VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
-						datasetName, null, 1,
-					this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false, false));
+				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
+				datasetName, null, 1,
+				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false, false));
 		final ProjectProperty datasetTitleProperty =
 			this.buildDatasetProperty(dmsProject,
-					VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
-						null, null, 2,
-					this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false, false));
+				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
+				null, null, 2,
+				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false, false));
 		final ProjectProperty datasetTypeProperty =
 			this.buildDatasetProperty(dmsProject,
-					VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
-						String.valueOf(datasetTypeId), null, 3,
-					this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false, false));
+				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
+				String.valueOf(datasetTypeId), null, 3,
+				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false, false));
 		projectProperties.add(datasetProperty);
 		projectProperties.add(datasetTitleProperty);
 		projectProperties.add(datasetTypeProperty);
@@ -216,12 +220,12 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
 		}
 		final ProjectProperty projectProperty =
-				new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
+			new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
 		return projectProperty;
 	}
 
 	private List<ProjectRelationship> buildProjectRelationships(final DmsProject parentDataset, final DmsProject childDataset)
-			throws MiddlewareQueryException {
+		throws MiddlewareQueryException {
 		final ProjectRelationship relationship = new ProjectRelationship();
 		relationship.setSubjectProject(childDataset);
 		relationship.setObjectProject(parentDataset);
@@ -286,7 +290,8 @@ public class DatasetServiceImpl implements DatasetService {
 		return null;
 	}
 
-	protected void setDaoFactory(final DaoFactory daoFactory) {
+
+	protected void setDaoFactory(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 

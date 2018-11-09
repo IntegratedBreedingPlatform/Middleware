@@ -608,6 +608,29 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public boolean isInstanceExistsInDataset(final int datasetId, final int instanceId) {
+
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e ")
+			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
+
+		try {
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("datasetId", datasetId);
+			query.setParameter("instanceId", instanceId);
+
+			final BigInteger count = (BigInteger) query.uniqueResult();
+			return count.intValue() > 0;
+
+		} catch (final HibernateException e) {
+			final String error =
+				"Error at isInstanceExistsInDataset=" + datasetId + "," + instanceId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
+		}
+	}
+
 	public String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName) {
@@ -619,19 +642,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    s.name DESIGNATION,\n"
 			+ "    s.uniquename ENTRY_NO,\n"
 			+ "    s.value as ENTRY_CODE,\n"
-			+ 
+			+
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n"
-			+ 
+			+
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n"
-			+ 
+			+
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n"
-			+ 
+			+
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n"
-			+ 
+			+
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL, \n"
-			+ 
+			+
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n"
-			+ 
+			+
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
 			+ "    nde.obs_unit_id as OBS_UNIT_ID, \n";
 

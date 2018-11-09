@@ -11,9 +11,11 @@ public interface DatasetService {
 
 	long countPhenotypes(final Integer datasetId, final List<Integer> traitIds);
 
+	long countPhenotypesByInstance(Integer datasetId, Integer instanceId);
+
 	void addVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias);
 
-	void removeVariables(Integer datasetId, List<Integer> variableIds);
+	void removeVariables(final Integer datasetId, final List<Integer> variableIds);
 
 	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
 
@@ -34,6 +36,5 @@ public interface DatasetService {
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 
 	Integer getNumberOfChildren (final Integer parentId);
-
 
 }

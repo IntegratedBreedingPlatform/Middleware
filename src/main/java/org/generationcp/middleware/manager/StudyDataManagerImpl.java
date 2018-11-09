@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -19,7 +20,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -1247,6 +1266,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked) {
 		this.getDmsProjectDao().lockUnlockStudy(studyId, isLocked);
 		
+	}
+
+	@Override
+	public boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId) {
+		return this.getExperimentDao().isInstanceExistsInDataset(datasetId, instanceId);
 	}
 
 	@Override
