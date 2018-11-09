@@ -1,8 +1,9 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import org.generationcp.middleware.domain.ontology.VariableType;
-
 import java.util.List;
+
+import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 public interface DatasetService {
 
@@ -11,7 +12,16 @@ public interface DatasetService {
 	long countPhenotypesByInstance(Integer datasetId, Integer instanceId);
 
 	void addVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
-
+	
 	void removeVariables(Integer datasetId, List<Integer> variableIds);
+	
+	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
+	
+	boolean isValidObservation(Integer observationUnitId, Integer observationId);
+	
+	ObservationDto addPhenotype(ObservationDto observation);
+
+	ObservationDto updatePhenotype(
+		Integer observationUnitId, Integer observationId, Integer categoricalValueId, String value);
 
 }
