@@ -11,24 +11,21 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -37,6 +34,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -50,10 +48,24 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -319,7 +331,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>();
 	}
 
-	public List<DmsProject> getDatasetsByStudy(final Integer studyId) {
+	public List<DmsProject> getDatasetsByParent(final Integer studyId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
@@ -330,7 +342,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getDatasetsByParent= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -364,7 +376,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				projects.add(parent);
 
 			} else {
-				final List<DmsProject> datasets = this.getDatasetsByStudy(projectId);
+				final List<DmsProject> datasets = this.getDatasetsByParent(projectId);
 				if (datasets != null && !datasets.isEmpty()) {
 					projects.addAll(datasets);
 				}
@@ -951,7 +963,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> filters, final Integer pageSize, final Integer pageNumber) {
 
-		final Criteria criteria = buildCoreCriteria(filters, getOrderBy(filters));
+		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
 		if (pageNumber != null && pageSize != null) {
 			criteria.setFirstResult(pageSize * (pageNumber - 1));
 			criteria.setMaxResults(pageSize);
@@ -971,7 +983,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public long countStudies(final Map<StudyFilters, String> filters) {
-		final Criteria criteria = buildCoreCriteria(filters, getOrderBy(filters));
+		final Criteria criteria = this.buildCoreCriteria(filters, this.getOrderBy(filters));
 		criteria.setProjection(Projections.rowCount());
 		return (long) criteria.uniqueResult();
 	}
@@ -1099,7 +1111,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<Reference> getRootFolders(final String programUUID, final Integer studyType) {
-		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyType);
+		return this.getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyType);
 	}
 
 	public List<Reference> getChildrenOfFolder(final Integer folderId, final String programUUID, final Integer studyType) {
@@ -1116,7 +1128,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
 			final List<Object[]> list = query.list();
-			childrenNodes = getChildrenNodesList(list);
+			childrenNodes = this.getChildrenNodesList(list);
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
@@ -1165,7 +1177,106 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		return studyReference;
 	}
-	
+
+	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId, final List<Integer> variableTypes) {
+
+		try {
+			final String query = " SELECT "  //
+				+ "   pp.variable_id AS variableId, "  //
+				+ "   pp.alias AS variableName, "  //
+				+ "   variable.definition AS description, "  //
+				+ "   variableType.cvterm_id AS variableTypeId, "  //
+				+ "   scale.name AS scale, "  //
+				+ "   method.name AS method, "  //
+				+ "   property.name AS property, "  //
+				+ "   dataType.cvterm_id AS dataTypeId, "  //
+				+ "   category.cvterm_id AS categoryId, "  //
+				+ "   category.name AS categoryName, "  //
+				+ "   category.definition AS categoryDescription, "  //
+				+ "   max.value AS max, "  //
+				+ "   min.value AS min "  //
+				+ " FROM project dataset "  //
+				+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "  //
+				+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "  //
+				+ "   INNER JOIN cvterm variableType ON pp.type_id = variableType.cvterm_id "  //
+				+ "   INNER JOIN cvterm_relationship cvtrscale ON variable.cvterm_id = cvtrscale.subject_id " //
+				+ "                                            AND cvtrscale.type_id = " + TermId.HAS_SCALE.getId()  //
+				+ "   INNER JOIN cvterm scale ON cvtrscale.object_id = scale.cvterm_id "  //
+				+ "   INNER JOIN cvterm_relationship cvtrmethod ON variable.cvterm_id = cvtrmethod.subject_id " //
+				+ "                                             AND cvtrmethod.type_id = " + TermId.HAS_METHOD.getId() //
+				+ "   INNER JOIN cvterm method ON cvtrmethod.object_id = method.cvterm_id "  //
+				+ "   INNER JOIN cvterm_relationship cvtrproperty ON variable.cvterm_id = cvtrproperty.subject_id " //
+				+ "                                               AND cvtrproperty.type_id = " + TermId.HAS_PROPERTY.getId() //
+				+ "   INNER JOIN cvterm property ON cvtrproperty.object_id = property.cvterm_id "  //
+				+ "   INNER JOIN cvterm_relationship cvtrdataType ON scale.cvterm_id = cvtrdataType.subject_id " //
+				+ "                                               AND cvtrdataType.type_id = " + TermId.HAS_TYPE.getId() //
+				+ "   INNER JOIN cvterm dataType ON cvtrdataType.object_id = dataType.cvterm_id "  //
+				+ "   LEFT JOIN cvterm_relationship cvtrcategory ON scale.cvterm_id = cvtrcategory.subject_id "
+				+ "                                              AND cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
+				+ "   LEFT JOIN cvterm category ON cvtrcategory.object_id = category.cvterm_id "  //
+				+ "   LEFT JOIN cvtermprop max on scale.cvterm_id = max.cvterm_id AND max.type_id = " + TermId.MAX_VALUE.getId()  //
+				+ "   LEFT JOIN cvtermprop min on scale.cvterm_id = min.cvterm_id AND min.type_id = " + TermId.MIN_VALUE.getId()  //
+				+ " WHERE " //
+				+ "   dataset.project_id = :observationSetId " //
+				+ "   AND pp.type_id in (:variableTypes) ";
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+			sqlQuery.setParameter("observationSetId", observationSetId);
+			sqlQuery.setParameterList("variableTypes", variableTypes);
+			sqlQuery.addScalar("variableId").addScalar("variableName").addScalar("description").addScalar("variableTypeId").addScalar("scale")
+				.addScalar("method").addScalar("property").addScalar("dataTypeId").addScalar("categoryId").addScalar("categoryName")
+				.addScalar("categoryDescription").addScalar("max").addScalar("min");
+			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = sqlQuery.list();
+
+			final Map<Integer, MeasurementVariable> variables = new LinkedHashMap<>();
+
+			for (final Map<String, Object> result : results) {
+				final Integer variableId = (Integer) result.get("variableId");
+
+				if (!variables.containsKey(variableId)) {
+					variables.put(variableId, new MeasurementVariable());
+
+					final MeasurementVariable measurementVariable = variables.get(variableId);
+
+					measurementVariable.setTermId(variableId);
+					measurementVariable.setName(Objects.toString(result.get("variableName")));
+					measurementVariable.setDescription(Objects.toString(result.get("description")));
+					measurementVariable.setScale(Objects.toString(result.get("scale")));
+					measurementVariable.setMethod(Objects.toString(result.get("method")));
+					measurementVariable.setProperty(Objects.toString(result.get("property")));
+					final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
+					measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
+					measurementVariable.setDataType(dataType.getName());
+					measurementVariable.setDataTypeId(dataType.getId());
+					measurementVariable.setMinRange(typeSafeObjectToDouble(result.get("min")));
+					measurementVariable.setMaxRange(typeSafeObjectToDouble(result.get("max")));
+				}
+
+				final MeasurementVariable measurementVariable = variables.get(variableId);
+
+				final Object categoryId = result.get("categoryId");
+				if (categoryId != null) {
+					if (measurementVariable.getPossibleValues() == null || measurementVariable.getPossibleValues().isEmpty()) {
+						measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
+					}
+					final ValueReference valueReference = //
+						new ValueReference((Integer) categoryId, //
+							Objects.toString(result.get("categoryName")), //
+							Objects.toString(result.get("categoryDescription")));
+					if (!measurementVariable.getPossibleValues().contains(valueReference)) {
+						measurementVariable.getPossibleValues().add(valueReference);
+					}
+				}
+			}
+
+			return new ArrayList<>(variables.values());
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting datasets variables for dataset=" + observationSetId + ": " + e.getMessage(), e);
+		}
+	}
+
 	public void lockUnlockStudy(final Integer studyId, final Boolean isLocked) {
 		Preconditions.checkNotNull(studyId);
 		
@@ -1174,7 +1285,68 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final DmsProject study = (DmsProject) criteria.uniqueResult();
 		if (study != null){
 			study.setLocked(isLocked);
-			save(study);
+			this.save(study);
+		}
+	}
+
+	public List<DatasetDTO> getDatasets(final Integer parentId) {
+		final List<DatasetDTO> datasetDTOS;
+		try {
+
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("project.projectId"), "datasetId");
+			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
+			projectionList.add(Projections.property("project.name"), "name");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			criteria.createAlias("project.relatedTos", "pr");
+			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", parentId));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.setProjection(projectionList);
+			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
+			datasetDTOS = criteria.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getDatasets for studyId=" + parentId + ":" + e.getMessage(), e);
+		}
+		return datasetDTOS;
+
+	}
+
+	public List<StudyInstance> getDatasetInstances(final int datasetId) {
+
+		try {
+			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
+				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" + // 8189 = cvterm for CUSTOM_LOCATION_ABBR
+				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "    inner join project proj on proj.project_id = nde.project_id \n"
+				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
+				+ " where proj.project_id = :datasetId \n"
+				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
+
+			final SQLQuery query =  this.getSession().createSQLQuery(sql);
+			query.setParameter("datasetId", datasetId);
+			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("LOCATION_NAME", new StringType());
+			query.addScalar("LOCATION_ABBR", new StringType());
+			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
+			query.addScalar("INSTANCE_NUMBER", new IntegerType());
+
+			final List queryResults = query.list();
+			final List<StudyInstance> instances = new ArrayList<>();
+			for (final Object result : queryResults) {
+				final Object[] row = (Object[]) result;
+				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[4],(String) row[3]));
+			}
+			return instances;
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing getDatasetInstances(datasetId = " + datasetId + ") query: " + he.getMessage(), he);
 		}
 	}
 }
