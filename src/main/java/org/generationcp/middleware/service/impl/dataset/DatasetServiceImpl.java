@@ -291,7 +291,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 
-	protected void setDaoFactory(DaoFactory daoFactory) {
+	protected void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 
@@ -301,8 +301,11 @@ public class DatasetServiceImpl implements DatasetService {
 		final String sortedColumnTermId, final String sortOrder) {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+		String sortBy = sortedColumnTermId;
+		if (sortedColumnTermId != null) {
+			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
+		}
 
-		final String sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
 		return this.daoFactory.getExperimentDAO().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
