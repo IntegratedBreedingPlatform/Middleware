@@ -116,36 +116,6 @@ public class DatasetServiceImplTest {
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String REP_NO = "REP_NO";
 
-	private static final String QUERY = "SELECT \n"
-		+ "    nde.nd_experiment_id as ndExperimentId,\n"
-		+ "    gl.description AS TRIAL_INSTANCE,\n"
-		+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
-		+ "    s.dbxref_id AS GID,\n"
-		+ "    s.name DESIGNATION,\n"
-		+ "    s.uniquename ENTRY_NO,\n"
-		+ "    s.value as ENTRY_CODE,\n"
-		+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n"
-		+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n"
-		+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n"
-		+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n"
-		+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL, \n"
-		+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n"
-		+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
-		+ "    nde.obs_unit_id as OBS_UNIT_ID, \n"
-		+ "    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = 'STOCK_ID') 'STOCK_ID', \n"
-		+ "    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = 'FACT1') 'FACT1', \n"
-		+ " 1=1 FROM \n"
-		+ "\tproject p \n"
-		+ "\tINNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
-		+ "\tINNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
-		+ "\tINNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-		+ "\tINNER JOIN stock s ON s.stock_id = nde.stock_id \n"
-		+ "\tLEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
-		+ "\tLEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
-		+ "   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id \t\tWHERE p.project_id = :datasetId \n"
-		+ " AND gl.nd_geolocation_id = :instanceId GROUP BY nde.nd_experiment_id  ORDER BY (1 * PLOT_NO) asc ";
-
-
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
 
@@ -448,7 +418,7 @@ public class DatasetServiceImplTest {
 
 	}
 
-	@Ignore
+	@Ignore // TODO move to integration tests
 	@Test
 	public void testGetObservations() throws Exception {
 		this.datasetService = new DatasetServiceImpl(this.mockSessionProvider);
@@ -500,9 +470,6 @@ public class DatasetServiceImplTest {
 		final int pageSize = 100;
 		Mockito.when(this.experimentDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		Mockito.when(this.experimentDao.getObservationUnitTable(DATASET_ID, projectTraits, GERMPLASM_DESCRIPTORS, DESING_FACTORS, INSTANCE_ID, 1, 100,null, null)).thenReturn(testMeasurements);
-		Mockito.when((this.experimentDao.getObservationUnitTableQuery(projectTraits, GERMPLASM_DESCRIPTORS, DESING_FACTORS, null, null,
-			"PLANT_NO"))).thenReturn(
-			QUERY);
 
 		Mockito.when(this.mockSession.createSQLQuery(Mockito.anyString())).thenReturn(mockQuery);
 		final List<Map<String, Object>> results = new ArrayList<>();
