@@ -1,8 +1,12 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -17,8 +21,10 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -33,7 +39,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,6 +51,8 @@ import java.util.TreeSet;
  */
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
+
+	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
 	public static final String[] FIXED_GERMPLASM_DESCRIPTOR = {"GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID"};
@@ -276,6 +286,102 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public boolean isValidObservationUnit(final Integer datasetId, final Integer observationUnitId) {
+		return this.daoFactory.getExperimentDao().isValidExperiment(datasetId, observationUnitId);
+	}
+
+	@Override
+	public boolean isValidObservation(final Integer observationUnitId, final Integer observationId) {
+		return this.daoFactory.getPhenotypeDAO().isValidPhenotype(observationUnitId, observationId);
+	}
+
+	@Override
+	public ObservationDto addPhenotype(final ObservationDto observation) {
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(observation.getCategoricalValueId());
+		final Integer variableId = observation.getVariableId();
+		phenotype.setObservableId(variableId);
+		phenotype.setValue(observation.getValue());
+		final Integer observationUnitId = observation.getObservationUnitId();
+		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		phenotype.setName(String.valueOf(variableId));
+
+		this.resolveObservationStatus(variableId, phenotype);
+
+		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
+		observation.setObservationId(savedRecord.getPhenotypeId());
+		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
+		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
+		observation.setStatus(savedRecord.getValueStatus() != null ? savedRecord.getValueStatus().getName() : null);
+
+		return observation;
+	}
+
+	@Override
+	public ObservationDto updatePhenotype(
+		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
+		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
+
+		final Phenotype phenotype = phenotypeDao.getById(observationId);
+		phenotype.setValue(value);
+		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
+		final Integer observableId = phenotype.getObservableId();
+		this.resolveObservationStatus(observableId, phenotype);
+
+		phenotypeDao.update(phenotype);
+
+		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
+		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+
+		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		final ObservationDto observation = new ObservationDto();
+		observation.setObservationId(phenotype.getPhenotypeId());
+		observation.setCategoricalValueId(phenotype.getcValueId());
+		observation.setStatus(phenotype.getValueStatus() != null ? phenotype.getValueStatus().getName() : null);
+		observation.setUpdatedDate(dateFormat.format(phenotype.getUpdatedDate()));
+		observation.setCreatedDate(dateFormat.format(phenotype.getCreatedDate()));
+		observation.setValue(phenotype.getValue());
+		observation.setObservationUnitId(phenotype.getExperiment().getNdExperimentId());
+		observation.setVariableId(phenotype.getObservableId());
+
+		return observation;
+
+	}
+
+	void resolveObservationStatus(final Integer variableId, final Phenotype phenotype) {
+
+		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
+		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
+
+		final Boolean isDerivedTrait = formula != null;
+
+		if (isDerivedTrait) {
+			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
+		}
+	}
+
+	/*
+	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
+	 */
+	void updateDependentPhenotypesStatus(final Integer variableId, final Integer observationUnitId) {
+		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
+		if (!formulaList.isEmpty()) {
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
+
+				@Override
+				public Integer apply(final Formula formula) {
+					return formula.getTargetCVTerm().getCvTermId();
+				}
+			});
+			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitId, targetVariableIds);
+		}
+
+	}
+
+	@Override
 	public DatasetDTO getDataset(final Integer studyId, final Integer datasetId) {
 		final List<DatasetDTO> datasetDTOList = this.getDatasets(studyId, new TreeSet<Integer>());
 		for (final DatasetDTO datasetDto : datasetDTOList)
@@ -306,7 +412,8 @@ public class DatasetServiceImpl implements DatasetService {
 			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
 		}
 
-		return this.daoFactory.getExperimentDAO().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
+		final String sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
+		return this.daoFactory.getExperimentDao().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
 	}
@@ -351,7 +458,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
-		return this.daoFactory.getExperimentDAO().countTotalObservationUnitsForDataset(datasetId, instanceId);
+		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
