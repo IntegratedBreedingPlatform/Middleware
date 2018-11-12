@@ -75,7 +75,37 @@
 		</sql>
 	</changeSet>
 	
-	
+	<changeSet author="vanina" id="v10.3.0-4">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="nd_experiment"/>
+				<not>
+					<columnExists tableName="nd_experiment" columnName="parent_id"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment> Add parent_id to nd_experiment table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			ADD COLUMN parent_id INT(11) NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v10.3.0-5">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="nd_experiment"/>
+				<not>
+					<columnExists tableName="nd_experiment" columnName="observation_unit_no"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment> Add observation_unit_no to nd_experiment table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			ADD COLUMN observation_unit_no INT NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
 	
 
 </databaseChangeLog>

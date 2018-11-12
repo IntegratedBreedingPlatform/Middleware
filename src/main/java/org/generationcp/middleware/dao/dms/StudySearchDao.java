@@ -42,6 +42,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	private static final String UNION_DISTINCT = "  UNION DISTINCT";
 	private static final Logger LOG = LoggerFactory.getLogger(StudySearchDao.class);
 	private static final String NOT_IN_DELETED_STUDIES_QUERY = " AND p.deleted = 0 ";
+	private static final String HAS_STUDY_TYPE = " and p.study_type_id is not null ";
 
 	public List<StudyReference> searchStudies(final BrowseStudyQueryFilter filter, final List<Integer> locationIds) {
 
@@ -107,8 +108,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		return "from project p " + " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id" + " NOT IN ("
 			+ TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
 			+ "where p.program_uuid = :programUUID AND p.name " + this.buildMatchCondition(studySearchMatchingOption, name)
-			+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
-
+			+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY + StudySearchDao.HAS_STUDY_TYPE;
 	}
 
 	private String buildMatchCondition(final StudySearchMatchingOption studySearchMatchingOption, final String name) {
