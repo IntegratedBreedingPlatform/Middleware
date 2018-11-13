@@ -1,0 +1,38 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarissa" id="v10.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_fingermillet_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on fingermillet scales 20600 and 20601 from categorical to numeric data type.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm_relationship SET object_id = 1110 WHERE subject_id = 20600 AND object_id = 1130;
+
+			UPDATE cvterm_relationship SET object_id = 1110 WHERE subject_id = 20601 AND object_id = 1130;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarissa" id="v10.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM variable_overrides WHERE expected_min=0 AND expected_max=0;
+			</sqlCheck>
+        </preConditions>
+		<comment>
+			Removes the entries where there are both zeroes for min and max.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM variable_overrides WHERE expected_min=0 AND expected_max=0;
+		</sql>
+	</changeSet>
+
+	
+	    
+
+</databaseChangeLog>
