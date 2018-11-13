@@ -242,24 +242,5 @@
 			  ]]>
 		</sql>
 	</changeSet>
-	
-	<changeSet author="clarissa" id="v10.4.0-6">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-				information_schema.routines
-				WHERE
-				routine_schema = DATABASE()
-				AND specific_name = 'getMetrics';
-			</sqlCheck>
-		</preConditions>
-		<comment>Run getMetrics procedure</comment>
-		<sql dbms="mysql" splitStatements="false">
-			CALL getMetrics();
-		</sql>
-	</changeSet>
-	
 
 </databaseChangeLog>
