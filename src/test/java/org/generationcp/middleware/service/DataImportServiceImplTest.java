@@ -649,7 +649,7 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testRetrieveLocIdOfUnspecifiedLocation() {
 
-		Assert.assertEquals(String.valueOf(UNSPECIFIED_LOCATION_LOCID), this.dataImportService.retrieveLocIdOfUnspecifiedLocation());
+		Assert.assertEquals(String.valueOf(UNSPECIFIED_LOCATION_LOCID), this.locationDataManager.retrieveLocIdOfUnspecifiedLocation());
 
 	}
 
