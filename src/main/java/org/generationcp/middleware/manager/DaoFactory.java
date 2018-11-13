@@ -11,8 +11,10 @@ import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -29,7 +31,7 @@ public class DaoFactory {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
-	public DaoFactory(HibernateSessionProvider sessionProvider) {
+	public DaoFactory(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
 
@@ -77,24 +79,24 @@ public class DaoFactory {
 
 	public CVTermRelationshipDao getCvTermRelationshipDao() {
 		final CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
-		cvTermRelationshipDao.setSession(sessionProvider.getSession());
+		cvTermRelationshipDao.setSession(this.sessionProvider.getSession());
 		return cvTermRelationshipDao;
 	}
 
 	public LotDAO getLotDao() {
-		LotDAO lotDao = new LotDAO();
+		final LotDAO lotDao = new LotDAO();
 		lotDao.setSession(this.sessionProvider.getSession());
 		return lotDao;
 	}
 
 	public TransactionDAO getTransactionDAO() {
-		TransactionDAO transactionDao = new TransactionDAO();
+		final TransactionDAO transactionDao = new TransactionDAO();
 		transactionDao.setSession(this.sessionProvider.getSession());
 		return transactionDao;
 	}
 
 	public StockTransactionDAO getStockTransactionDAO() {
-		StockTransactionDAO stockTransactionDao = new StockTransactionDAO();
+		final StockTransactionDAO stockTransactionDao = new StockTransactionDAO();
 		stockTransactionDao.setSession(this.sessionProvider.getSession());
 		return stockTransactionDao;
 	}
@@ -106,25 +108,25 @@ public class DaoFactory {
 	}
 
 	public GermplasmListDAO getGermplasmListDAO() {
-		GermplasmListDAO germplasmListDao = new GermplasmListDAO();
+		final GermplasmListDAO germplasmListDao = new GermplasmListDAO();
 		germplasmListDao.setSession(this.sessionProvider.getSession());
 		return germplasmListDao;
 	}
 
 	public GermplasmListDataDAO getGermplasmListDataDAO() {
-		GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
+		final GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
 		germplasmListDataDao.setSession(this.sessionProvider.getSession());
 		return germplasmListDataDao;
 	}
 
 	public LocationDAO getLocationDAO() {
-		LocationDAO locationDao = new LocationDAO();
+		final LocationDAO locationDao = new LocationDAO();
 		locationDao.setSession(this.sessionProvider.getSession());
 		return locationDao;
 	}
 
 	public PersonDAO getPersonDAO() {
-		PersonDAO personDao = new PersonDAO();
+		final PersonDAO personDao = new PersonDAO();
 		personDao.setSession(this.sessionProvider.getSession());
 		return personDao;
 	}
@@ -140,12 +142,25 @@ public class DaoFactory {
 		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.sessionProvider.getSession());
 		return dmsProjectDao;
-				
+
 	}
-	
+
 	public ProjectPropertyDao getProjectPropertyDAO() {
 		final ProjectPropertyDao projectPropDao = new ProjectPropertyDao();
 		projectPropDao.setSession(this.sessionProvider.getSession());
 		return projectPropDao;
+	}
+
+	public ProjectRelationshipDao getProjectRelationshipDao() {
+		final ProjectRelationshipDao projectRelationshipDao = new ProjectRelationshipDao();
+		projectRelationshipDao.setSession(this.sessionProvider.getSession());
+		return projectRelationshipDao;
+	}
+
+	public ExperimentDao getExperimentDao() {
+		final ExperimentDao experimentDao = new ExperimentDao();
+		experimentDao.setSession(this.sessionProvider.getSession());
+		return experimentDao;
+
 	}
 }

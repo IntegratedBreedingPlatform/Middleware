@@ -74,102 +74,38 @@
 			(1190, 17267, 10097);
 		</sql>
 	</changeSet>
-	
-	<changeSet author="marie" id="v10.3.0-4">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT DISTINCT labbr 
-				FROM location
-				WHERE labbr = 'NOLOC';
-			</sqlCheck>
+
+	<changeSet author="vanina" id="v10.3.0-4">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="nd_experiment"/>
+				<not>
+					<columnExists tableName="nd_experiment" columnName="parent_id"/>
+				</not>
+			</and>
 		</preConditions>
-		<comment>Unspecified locations should be defined as Breeding Location</comment>
+		<comment> Add parent_id to nd_experiment table </comment>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE location
-			SET ltype=410 
-			WHERE labbr = 'NOLOC';
+			ALTER TABLE nd_experiment
+			ADD COLUMN parent_id INT(11) NULL DEFAULT NULL;
 		</sql>
 	</changeSet>
 
-	<changeSet author="marie" id="v10.3.0-5">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				SELECT
-				COUNT(*)
-				FROM
-				information_schema.routines
-				WHERE
-				routine_schema = DATABASE()
-				AND specific_name = 'addUnspecifiedLocationToFavorites';
-			</sqlCheck>
+	<changeSet author="vanina" id="v10.3.0-5">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="nd_experiment"/>
+				<not>
+					<columnExists tableName="nd_experiment" columnName="observation_unit_no"/>
+				</not>
+			</and>
 		</preConditions>
-		<comment>Unspecified locations should be favorite location for all existing programs</comment>
-		<sql dbms="mysql" splitStatements="false">
-			CREATE PROCEDURE addUnspecifiedLocationToFavorites()
-			   BEGIN
-			   
-				DECLARE uuid TEXT(36);
-				DECLARE done INT DEFAULT FALSE;
-
-				DECLARE CUR1 CURSOR FOR
-					SELECT program_uuid FROM project;
-				
-				DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-				OPEN CUR1;
-			    read_loop: LOOP FETCH CUR1 INTO uuid;
-			    	IF done THEN
-						LEAVE read_loop;
-					END IF;
-
-					INSERT INTO program_favorites 
-						( entity_type, entity_id, program_uuid)
-					VALUES 
-						("LOCATION", 9016, uuid);
-			    END LOOP read_loop;
-
-				CLOSE cur1;
-			   END
-				
+		<comment> Add observation_unit_no to nd_experiment table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment
+			ADD COLUMN observation_unit_no INT NULL DEFAULT NULL;
 		</sql>
 	</changeSet>
-
-	<changeSet author="marie" id="v10.3.0-6">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-				information_schema.routines
-				WHERE
-				routine_schema = DATABASE()
-				AND specific_name = 'addUnspecifiedLocationToFavorites';
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="false">
-			call addUnspecifiedLocationToFavorites();
-		</sql>
-	</changeSet>
-
-	<changeSet author="marie" id="v10.3.0-7">
-
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-				information_schema.routines
-				WHERE
-				routine_schema = DATABASE()
-				AND specific_name = 'addUnspecifiedLocationToFavorites';
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="false">
-			DROP PROCEDURE addUnspecifiedLocationToFavorites;
-		</sql>
-
-	</changeSet>
-	
 	
 
 </databaseChangeLog>

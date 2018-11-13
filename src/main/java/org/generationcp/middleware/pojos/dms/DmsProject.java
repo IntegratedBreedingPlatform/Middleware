@@ -126,6 +126,26 @@ public class DmsProject implements Serializable {
 		super();
 	}
 
+	public DmsProject(final String name, final String description, final String programUUID, final List<ProjectProperty> properties,
+			final List<ProjectRelationship> relatedTos, final List<ProjectRelationship> relatedBys, final boolean deleted,
+			final boolean locked, final StudyType studyType, final String startDate, final String endDate, final String studyUpdate,
+			final String objective, final String createdBy) {
+		this.name = name;
+		this.description = description;
+		this.programUUID = programUUID;
+		this.properties = properties;
+		this.relatedTos = relatedTos;
+		this.relatedBys = relatedBys;
+		this.deleted = deleted;
+		this.locked = locked;
+		this.studyType = studyType;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.studyUpdate = studyUpdate;
+		this.objective = objective;
+		this.createdBy = createdBy;
+	}
+
 	public Integer getProjectId() {
 		return this.projectId;
 	}
