@@ -496,5 +496,14 @@ public class DatasetServiceImplTest {
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
 	}
+	
+	@Test
+	public void testDeletePhenotype() {
+		final Integer phenotypeId = new Random().nextInt();
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setPhenotypeId(phenotypeId);
+		this.datasetService.deletePhenotype(phenotypeId);
+		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
+	}
 
 }

@@ -459,6 +459,13 @@ public class DatasetServiceImpl implements DatasetService {
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
 		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
+	
+	@Override
+	public void deletePhenotype(final Integer phenotypeId) {
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setPhenotypeId(phenotypeId);
+		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
+	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
 		this.germplasmDescriptors = germplasmDescriptors;
@@ -471,4 +478,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
 	}
+
+	
 }
