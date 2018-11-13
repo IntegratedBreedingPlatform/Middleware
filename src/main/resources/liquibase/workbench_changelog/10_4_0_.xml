@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
-	<changeSet author="clarissa" id="v10.3.0-1">
+	<changeSet author="clarissa" id="v10.4.0-1">
         <preConditions onFail="MARK_RAN">
         	<not>
 				<tableExists tableName="metrics"/>
@@ -38,7 +38,7 @@
         </sql>
     </changeSet>
 	
-	<changeSet author="clarissa" id="v10.3.0-2">
+	<changeSet author="clarissa" id="v10.4.0-2">
         <preConditions onFail="MARK_RAN">
         	<not>
 				<columnExists tableName="metrics" columnName="phenotypes"/>
@@ -52,7 +52,7 @@
         </sql>
     </changeSet>
 	
-	<changeSet author="clarissa" id="v10.3.0-3">
+	<changeSet author="clarissa" id="v10.4.0-3">
         <preConditions onFail="MARK_RAN">
         	<not>
 				<columnExists tableName="metrics" columnName="plots"/>
@@ -66,7 +66,7 @@
         </sql>
     </changeSet>
 	
-	<changeSet author="clarissa" id="v10.3.0-4">
+	<changeSet author="clarissa" id="v10.4.0-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -84,7 +84,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="clarissa" id="v10.3.0-5">
+	<changeSet author="clarissa" id="v10.4.0-5">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -243,7 +243,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="clarissa" id="v10.3.0-6">
+	<changeSet author="clarissa" id="v10.4.0-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT

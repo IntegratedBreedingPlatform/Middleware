@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="clarissa" id="v10.3.0-1">
+	<changeSet author="clarissa" id="v10.4.0-1">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">select case when ('ibdbv2_fingermillet_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
 		</preConditions>
@@ -18,7 +18,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarissa" id="v10.3.0-2">
+	<changeSet author="clarissa" id="v10.4.0-2">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0 FROM variable_overrides WHERE expected_min=0 AND expected_max=0;
