@@ -684,16 +684,15 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	private List<TreatmentVariable> buildTreatmentFactors(final VariableTypeList variables) {
+	List<TreatmentVariable> buildTreatmentFactors(final VariableTypeList variables) {
 		final List<TreatmentVariable> treatmentFactors = new ArrayList<>();
 		List<MeasurementVariable> factors;
 		final Map<String, VariableTypeList> treatmentMap = new HashMap<>();
 		if (variables != null && variables.getFactors() != null
 				&& !variables.getFactors().getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getFactors().getVariableTypes()) {
-				if (variable.getRole() == PhenotypicType.TRIAL_DESIGN && variable.getTreatmentLabel() != null
+				if (variable.getTreatmentLabel() != null
 						&& !variable.getTreatmentLabel().isEmpty()) {
-
 					VariableTypeList list = treatmentMap.get(variable.getTreatmentLabel());
 					if (list == null) {
 						list = new VariableTypeList();

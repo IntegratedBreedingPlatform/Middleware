@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -73,6 +67,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private static final String LOCATION_NAME = "LOCATION NAME";
@@ -123,7 +124,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
-				this.locationManager, this.userDataManager);
+			this.locationManager, this.userDataManager);
 
 		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
 
@@ -139,9 +140,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStudy() throws Exception {
 		final Study study = this.manager.getStudy(this.studyReference.getId());
 		Assert.assertEquals("The study name should be " + StudyTestDataInitializer.STUDY_NAME, StudyTestDataInitializer.STUDY_NAME,
-				study.getName());
+			study.getName());
 		Assert.assertEquals("The study description should be " + StudyTestDataInitializer.STUDY_DESCRIPTION,
-				StudyTestDataInitializer.STUDY_DESCRIPTION, study.getDescription());
+			StudyTestDataInitializer.STUDY_DESCRIPTION, study.getDescription());
 	}
 
 	@Test
@@ -172,7 +173,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testSearchStudiesForName() throws Exception {
 		// Study search query expect datasets for studies to be returned
 		this.studyTDI.addTestDataset(this.studyReference.getId());
-		
+
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
 		filter.setStudySearchMatchingOption(StudySearchMatchingOption.EXACT_MATCHES);
 		filter.setProgramUUID(this.studyReference.getProgramUUID());
@@ -191,7 +192,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testSearchStudiesForStartDate() throws Exception {
 		// Study search query expect datasets for studies to be returned
 		this.studyTDI.addTestDataset(this.studyReference.getId());
-		
+
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
 		filter.setStartDate(new Integer(StudyTestDataInitializer.START_DATE));
 		filter.setProgramUUID(this.studyReference.getProgramUUID());
@@ -228,7 +229,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String subFolderName = "Sub folder Name";
 		final String subFolderDescription = "Sub Folder Description";
 		final int subFolderID =
-				this.manager.addSubFolder(mainFolder.getProjectId(), subFolderName, subFolderDescription, uniqueId, "objective");
+			this.manager.addSubFolder(mainFolder.getProjectId(), subFolderName, subFolderDescription, uniqueId, "objective");
 		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId(), true);
 
 		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), uniqueId);
@@ -274,7 +275,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(datasetReferences);
 		Assert.assertTrue(datasetReferences.size() > 0);
 		Assert.assertEquals("The dataset name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
-				datasetReferences.get(0).getName());
+			datasetReferences.get(0).getName());
 	}
 
 	@Test
@@ -282,7 +283,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DatasetReference datasetReference = this.studyTDI.addTestDataset(this.studyReference.getId());
 		final DataSet dataset = this.manager.getDataSet(datasetReference.getId());
 		Assert.assertEquals("The dataset name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
-				dataset.getName());
+			dataset.getName());
+		Assert.assertEquals(DataSetType.MEANS_DATA, dataset.getDataSetType());
 	}
 
 	@Test
@@ -292,8 +294,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final int propertyId = 2120;
 		final VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
 		Assert.assertEquals(
-				"The size should be 1 since we added 1 factor, with property id = " + propertyId + ", in the set up of the data set", 1,
-				factors.size());
+			"The size should be 1 since we added 1 factor, with property id = " + propertyId + ", in the set up of the data set", 1,
+			factors.size());
 	}
 
 	@Test
@@ -310,8 +312,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DataSetType dataSetType = DataSetType.MEANS_DATA;
 		final List<DataSet> datasets = this.manager.getDataSetsByType(this.studyReference.getId(), dataSetType);
 		Assert.assertTrue("Datasets' size should be greter than 0", datasets.size() > 0);
-		Assert.assertTrue("The size should be greater than 0 since we are sure that it will return at least one data set",
-				datasets.size() > 0);
+		Assert.assertTrue(
+			"The size should be greater than 0 since we are sure that it will return at least one data set",
+			datasets.size() > 0);
 	}
 
 	@Test
@@ -320,20 +323,20 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DataSetType dataSetType = DataSetType.MEANS_DATA;
 		final DataSet dataset = this.manager.findOneDataSetByType(this.studyReference.getId(), dataSetType);
 		Assert.assertEquals("Dataset's name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
-				dataset.getName());
+			dataset.getName());
 	}
 
 	@Test
 	public void testGetAllStudyDetails() throws Exception {
 		final List<StudyDetails> nurseryStudyDetails =
-				this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
+			this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
 		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
 		final List<StudyDetails> updatedNurseryStudyDetails =
-				this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
+			this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
 		Assert.assertEquals("The size after adding new nursery should be equal to the size before adding a new nursery + 1",
-				sizeAfterAddingNewNursery, sizeBeforeAddingNewNursery + 1);
+			sizeAfterAddingNewNursery, sizeBeforeAddingNewNursery + 1);
 	}
 
 	@Test
@@ -352,7 +355,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
-				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyDataManagerImplTest.crossExpansionProperties);
+			this.manager.getFieldMapInfoOfStudy(trialIdList, StudyDataManagerImplTest.crossExpansionProperties);
 		// compare the size to the minimum possible value of field map infos' size
 		Assert.assertTrue("The size should be greater than 0", fieldMapInfos.size() > 0);
 	}
@@ -382,8 +385,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
 		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
-				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+			FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
+			FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 
@@ -400,33 +403,33 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			this.manager.updateFieldMapWithBlockInformation(infos, true);
 
 			final FieldMapTrialInstanceInfo resultTrialInstance =
-					infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+				infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
 
 			Assert.assertEquals(
-					"Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + resultTrialInstance.getRowsInBlock() + " instead.",
-					FieldMapDataUtil.ROWS_IN_BLOCK, resultTrialInstance.getRowsInBlock().intValue());
+				"Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + resultTrialInstance.getRowsInBlock() + " instead.",
+				FieldMapDataUtil.ROWS_IN_BLOCK, resultTrialInstance.getRowsInBlock().intValue());
 			Assert.assertEquals(
-					"Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + resultTrialInstance.getRangesInBlock() + " instead.",
-					FieldMapDataUtil.RANGES_IN_BLOCK, resultTrialInstance.getRangesInBlock().intValue());
+				"Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + resultTrialInstance.getRangesInBlock() + " instead.",
+				FieldMapDataUtil.RANGES_IN_BLOCK, resultTrialInstance.getRangesInBlock().intValue());
 			Assert.assertEquals("Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got " + resultTrialInstance.getRowsPerPlot()
-					+ " instead.", FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, resultTrialInstance.getRowsPerPlot().intValue());
+				+ " instead.", FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, resultTrialInstance.getRowsPerPlot().intValue());
 			Assert.assertEquals(
-					"Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + resultTrialInstance.getPlantingOrder() + " instead.",
-					FieldMapDataUtil.PLANTING_ORDER, resultTrialInstance.getPlantingOrder().intValue());
+				"Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + resultTrialInstance.getPlantingOrder() + " instead.",
+				FieldMapDataUtil.PLANTING_ORDER, resultTrialInstance.getPlantingOrder().intValue());
 			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got "
 					+ resultTrialInstance.getMachineRowCapacity() + " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY,
-					resultTrialInstance.getMachineRowCapacity().intValue());
+				resultTrialInstance.getMachineRowCapacity().intValue());
 			Assert.assertEquals(
-					"Expected " + StudyDataManagerImplTest.BLOCK_NAME + " but got " + resultTrialInstance.getBlockName() + " instead.",
-					StudyDataManagerImplTest.BLOCK_NAME, resultTrialInstance.getBlockName());
+				"Expected " + StudyDataManagerImplTest.BLOCK_NAME + " but got " + resultTrialInstance.getBlockName() + " instead.",
+				StudyDataManagerImplTest.BLOCK_NAME, resultTrialInstance.getBlockName());
 			Assert.assertEquals("Expected " + StudyDataManagerImplTest.LOCATION_NAME + " but got " + resultTrialInstance.getLocationName()
-					+ " instead.", StudyDataManagerImplTest.LOCATION_NAME, resultTrialInstance.getLocationName());
+				+ " instead.", StudyDataManagerImplTest.LOCATION_NAME, resultTrialInstance.getLocationName());
 			Assert.assertEquals(
-					"Expected " + StudyDataManagerImplTest.LOCATION_NAME + " but got " + resultTrialInstance.getSiteName() + " instead.",
-					StudyDataManagerImplTest.LOCATION_NAME, resultTrialInstance.getSiteName());
+				"Expected " + StudyDataManagerImplTest.LOCATION_NAME + " but got " + resultTrialInstance.getSiteName() + " instead.",
+				StudyDataManagerImplTest.LOCATION_NAME, resultTrialInstance.getSiteName());
 			Assert.assertEquals(
-					"Expected " + StudyDataManagerImplTest.FIELD_NAME + " but got " + resultTrialInstance.getFieldName() + " instead.",
-					StudyDataManagerImplTest.FIELD_NAME, resultTrialInstance.getFieldName());
+				"Expected " + StudyDataManagerImplTest.FIELD_NAME + " but got " + resultTrialInstance.getFieldName() + " instead.",
+				StudyDataManagerImplTest.FIELD_NAME, resultTrialInstance.getFieldName());
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
@@ -437,8 +440,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
 		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
-				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+			FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
+			FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
@@ -454,8 +457,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
 			Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot() + " instead.", trialInstance.getRowsPerPlot());
 			Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder() + " instead.", trialInstance.getPlantingOrder());
-			Assert.assertNull("Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.",
-					trialInstance.getMachineRowCapacity());
+			Assert.assertNull(
+				"Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.",
+				trialInstance.getMachineRowCapacity());
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
@@ -465,7 +469,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStudyType() {
 		try {
 			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(),
-					this.manager.getStudyType(this.studyReference.getStudyType().getId()));
+				this.manager.getStudyType(this.studyReference.getStudyType().getId()));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -474,8 +478,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyTypeNullEdgeCase() {
 		try {
-			Assert.assertNull("Expected null return value but was non null.",
-					this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
+			Assert.assertNull(
+				"Expected null return value but was non null.",
+				this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -500,14 +505,14 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyDetailsByStudyType() throws Exception {
 		final List<StudyDetails> trialStudyDetails =
-				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
+			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
 		final StudyReference newStudy = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY", cropPrefix);
 		final List<StudyDetails> updatedStudyDetails =
-				this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
+			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewStudy = updatedStudyDetails.size();
 		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
-				sizeAfterAddingNewStudy, sizeBeforeAddingNewTrial + 1);
+			sizeAfterAddingNewStudy, sizeBeforeAddingNewTrial + 1);
 		for (final StudyDetails details : updatedStudyDetails) {
 			if (this.studyReference.getId().equals(details.getId())) {
 				Assert.assertEquals(this.studyReference.getName(), details.getStudyName());
@@ -537,15 +542,15 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetNurseryAndTrialStudyDetails() throws Exception {
 		final List<StudyDetails> studyDetailsList =
-				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
+			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
 		final StudyReference nursery = this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
 		final StudyReference trial = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL", cropPrefix);
 		final List<StudyDetails> newStudyDetailsList =
-				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
+			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
 		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy,
-				sizeBeforeAddingNewStudy + 2);
+			sizeBeforeAddingNewStudy + 2);
 		for (final StudyDetails details : newStudyDetailsList) {
 			if (nursery.getId().equals(details.getId())) {
 				Assert.assertEquals(nursery.getName(), details.getStudyName());
@@ -578,10 +583,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(dataSetId);
 		Assert.assertNotNull(trialEnvironments.getTrialEnvironments());
 		Assert.assertFalse(trialEnvironments.getTrialEnvironments().isEmpty());
-		
-		final String trialInstanceNumberActual = this.manager.getTrialInstanceNumberByGeolocationId(trialEnvironments.getTrialEnvironments().iterator().next().getId());
+
+		final String trialInstanceNumberActual =
+			this.manager.getTrialInstanceNumberByGeolocationId(trialEnvironments.getTrialEnvironments().iterator().next().getId());
 		Assert.assertEquals("1", trialInstanceNumberActual);
-		
+
 	}
 
 	@Test
@@ -631,9 +637,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertTrue(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
-				locationNameIdValue, ""));
+			locationNameIdValue, ""));
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
-				locationNameIdValue, programUUID));
+			locationNameIdValue, programUUID));
 
 	}
 
@@ -661,9 +667,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getProjectPropertySaver().saveVariableType(project, dmsVariableType, locationNameIdValue);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
-				locationNameIdValue, ""));
+			locationNameIdValue, ""));
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
-				locationNameIdValue, programUUID));
+			locationNameIdValue, programUUID));
 
 	}
 
@@ -702,7 +708,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
-				locationNameIdValue, programUUID));
+			locationNameIdValue, programUUID));
 
 	}
 
@@ -742,9 +748,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
-				locationNameIdValue, ""));
+			locationNameIdValue, ""));
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
-				locationNameIdValue, programUUID));
+			locationNameIdValue, programUUID));
 
 	}
 
@@ -813,7 +819,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final int subFolderID = this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 
 		final List<Reference> childrenNodes =
-				this.manager.getChildrenOfFolderByStudyType(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), null);
+			this.manager.getChildrenOfFolderByStudyType(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), null);
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertEquals("The id of the subFolder should be " + subFolderID, subFolderID, (int) childrenNodes.get(0).getId());
@@ -849,6 +855,36 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.manager.getStudyDetails(studyId).getIsLocked());
 	}
 
+	@Test
+	public void testIsInstanceExistsInDataset() throws Exception {
+
+		final Random random = new Random();
+		final Integer studyId = this.studyReference.getId();
+		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.manager.getActiveSession().flush();
+
+		final List<InstanceMetadata> instanceMetadataList = this.manager.getInstanceMetadata(studyId);
+		final Integer instanceId = instanceMetadataList.get(0).getInstanceDbId();
+
+		Assert.assertTrue(this.manager.isInstanceExistsInDataset(datasetId, instanceId));
+
+	}
+
+	@Test
+	public void testIsInstanceExistsInDatasetInstanceNotExists() throws Exception {
+
+		final Random random = new Random();
+		final Integer studyId = this.studyReference.getId();
+		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+
+		Assert.assertFalse(this.manager.isInstanceExistsInDataset(datasetId, 999));
+
+	}
+
 	public void testUpdateExperimentValues() {
 		final VariableList factors = new VariableList();
 		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
@@ -858,7 +894,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		//Save the experiment
 		this.manager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, cropPrefix);
 		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
-		Phenotype updatedPhenotype = this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		Phenotype updatedPhenotype =
+			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", updatedPhenotype.getValue());
 
 		//Change the value of the variable
@@ -866,12 +903,13 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		//Add another variable for the save scenario
 		values.getVariableList().add(
-				DMSVariableTestDataInitializer.createVariable(1002, "1000", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
+			DMSVariableTestDataInitializer.createVariable(1002, "1000", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 
 		this.manager.updateExperimentValues(Arrays.asList(values), 1);
 
 		updatedPhenotype = this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
-		final Phenotype savedPhenotype = this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1002);
+		final Phenotype savedPhenotype =
+			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1002);
 		Assert.assertEquals("900", updatedPhenotype.getValue());
 		Assert.assertEquals("1000", savedPhenotype.getValue());
 	}

@@ -1,19 +1,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
@@ -31,6 +18,20 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created by clarysabel on 1/26/18.
@@ -311,6 +312,24 @@ public class ExperimentDaoTest {
 				Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.SAMPLE_EXPERIMENT.getId()));
 		Mockito.verify(query).setMaxResults(numOfRows);
 		Mockito.verify(query).setFirstResult(start);
+	}
+
+	@Test
+	public void testIsInstanceExistsInDataset() {
+
+		final Random ran = new Random();
+		final int datasetId = ran.nextInt();
+		final int instanceId = ran.nextInt();
+
+		final SQLQuery query = Mockito.mock(SQLQuery.class);
+		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(query);
+		Mockito.when(query.uniqueResult()).thenReturn(BigInteger.valueOf(1));
+		Assert.assertTrue(this.experimentDao.isInstanceExistsInDataset(datasetId, instanceId));
+
+		Mockito.verify(this.mockSession).createSQLQuery(
+			"SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e  WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
+		Mockito.verify(query).setParameter("datasetId", datasetId);
+		Mockito.verify(query).setParameter("instanceId", instanceId);
 	}
 
 }

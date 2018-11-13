@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.domain.ontology;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 
 /**
  * Variable Type of a Variable. Ontology variable can have zero or more variable types associated to it.
@@ -43,7 +43,9 @@ public enum VariableType {
 			"Experimental Design Variables",
 			PhenotypicType.TRIAL_DESIGN),
 	ANALYSIS_SUMMARY(1811, "Analysis Summary",
-			"Analysis Summary Variables", PhenotypicType.VARIATE);
+			"Analysis Summary Variables", PhenotypicType.VARIATE),
+	OBSERVATION_UNIT(1812, "Observation Unit",
+			"Observation Unit Variables", PhenotypicType.UNASSIGNED);
 
 	private final Integer id;
 	private final String name;
@@ -107,7 +109,7 @@ public enum VariableType {
 	}
 
 	public static List<Integer> ids() {
-		final List<Integer> variableTypeIds = new ArrayList<Integer>();
+		final List<Integer> variableTypeIds = new ArrayList<>();
 		for (final VariableType variableType : VariableType.values()) {
 			variableTypeIds.add(variableType.getId());
 		}
@@ -127,4 +129,5 @@ public enum VariableType {
 	public static List<VariableType> getReservedVariableTypes(){
 		return Arrays.asList(ANALYSIS, ANALYSIS_SUMMARY);
 	}
+
 }

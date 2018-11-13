@@ -14,17 +14,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -44,6 +50,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	public static final String REP_NO = "REP_NO";
 	public static final String SITE_SOIL_PH = "SITE_SOIL_PH";
 	public static final String SITE_SOIL_PH_TERMID = "9999";
+	private static DmsProjectDao projectDao;
 	private static ProjectPropertyDao projectPropDao;
 	private static CVTermDao cvTermDao;
 
@@ -71,6 +78,9 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		projectPropDao = new ProjectPropertyDao();
 		projectPropDao.setSession(this.sessionProvder.getSession());
+		
+		projectDao = new DmsProjectDao();
+		projectDao.setSession(this.sessionProvder.getSession());
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
 		}
@@ -154,6 +164,40 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 				}
 			}
 		}
+	}
+	
+	@Test
+	public void testDeleteProjectVariables() {
+		final DmsProject project = new DmsProject();
+		project.setName(RandomStringUtils.randomAlphabetic(20));
+		project.setDescription(RandomStringUtils.randomAlphabetic(20));
+		projectDao.save(project);
+
+		final CVTerm trait1 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		final CVTerm trait2 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		cvTermDao.save(trait1);
+		cvTermDao.save(trait2);
+		
+		final ProjectProperty property1 = new ProjectProperty();
+		property1.setAlias(RandomStringUtils.randomAlphabetic(20));
+		property1.setRank(1);
+		property1.setTypeId(VariableType.GERMPLASM_DESCRIPTOR.getId());
+		property1.setProject(project);
+		property1.setVariableId(trait1.getCvTermId());
+		projectPropDao.save(property1);
+		
+		final ProjectProperty property2 = new ProjectProperty();
+		property2.setAlias(RandomStringUtils.randomAlphabetic(20));
+		property2.setRank(2);
+		property2.setTypeId(VariableType.TRAIT.getId());
+		property2.setProject(project);
+		property2.setVariableId(trait2.getCvTermId());
+		projectPropDao.save(property2);
+		
+		final Integer projectId = project.getProjectId();
+		Assert.assertEquals(2, projectPropDao.getByProjectId(projectId).size());
+		projectPropDao.deleteProjectVariables(projectId, Arrays.asList(trait1.getCvTermId(), trait2.getCvTermId()));
+		Assert.assertTrue(projectPropDao.getByProjectId(projectId).isEmpty());
 	}
 
 	private List<Object[]> createObjectToConvert() {

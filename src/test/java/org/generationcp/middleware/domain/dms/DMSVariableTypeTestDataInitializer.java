@@ -13,6 +13,23 @@ public class DMSVariableTypeTestDataInitializer {
 		return dmsVariableTypes;
 	}
 
+	public static DMSVariableType createDmsVariableType(final String variableName, final String treatmentLabel) {
+		final DMSVariableType dmsVariableType = new DMSVariableType(variableName, variableName,
+				StandardVariableTestDataInitializer.createStandardVariableTestData(variableName, PhenotypicType.STUDY),
+				2);
+		dmsVariableType.setTreatmentLabel(treatmentLabel);
+		dmsVariableType.setRole(PhenotypicType.STUDY);
+		return dmsVariableType;
+	}
+
+	public static DMSVariableType createDmsVariableType(final String localName, final String localDescription, final int rank) {
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setLocalName(localName);
+		dmsVariableType.setLocalDescription(localDescription);
+		dmsVariableType.setRank(rank);
+		return  dmsVariableType;
+	}
+
 	public static DMSVariableType createDMSVariableType() {
 		final DMSVariableType variable = new DMSVariableType();
 		variable.setLocalName("TRIAL_INSTANCE");
