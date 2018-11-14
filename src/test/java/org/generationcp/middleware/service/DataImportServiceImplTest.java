@@ -647,13 +647,6 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testRetrieveLocIdOfUnspecifiedLocation() {
-
-		Assert.assertEquals(String.valueOf(UNSPECIFIED_LOCATION_LOCID), this.locationDataManager.retrieveLocIdOfUnspecifiedLocation());
-
-	}
-
-	@Test
 	public void testCreateLocationVariable() {
 
 		final MeasurementVariable locationMeasurementVariable = this.dataImportService.createLocationVariable(PROGRAM_UUID);
