@@ -574,4 +574,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return types.get(name.toUpperCase()) != null ? types.get(name.toUpperCase()).getFldno() : null;
 	}
 
+	public String retrieveLocIdOfUnspecifiedLocation() {
+ 		String unspecifiedLocationId = "";
+		final List<Location> locations = this.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+		if (!locations.isEmpty()) {
+			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
+		}
+		return unspecifiedLocationId;
+	}
+
 }
