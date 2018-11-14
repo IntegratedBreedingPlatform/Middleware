@@ -32,7 +32,20 @@
 		</sql>
 	</changeSet>
 
-	
-	    
+	<changeSet author="marie" id="v10.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) 
+				FROM location
+				WHERE labbr = 'NOLOC';
+			</sqlCheck>
+		</preConditions>
+		<comment>Unspecified location should be defined as Breeding Location</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location
+			SET ltype=410 
+			WHERE labbr = 'NOLOC';
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
