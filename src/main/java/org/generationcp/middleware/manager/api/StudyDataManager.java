@@ -346,21 +346,6 @@ public interface StudyDataManager {
 	DatasetReference findOneDataSetReferenceByType(int studyId, DataSetType type);
 
 	/**
-	 * Deletes the dataset matching the given ID.
-	 *
-	 * @param datasetId the dataset id
-	 */
-	void deleteDataSet(int datasetId);
-
-	/**
-	 * Deletes location matching the given dataset ID and location ID.
-	 *
-	 * @param datasetId  the dataset id
-	 * @param locationId the location id
-	 */
-	void deleteExperimentsByLocation(int datasetId, int locationId);
-
-	/**
 	 * Retrieves the local name associated to the given project ID and standard variable ID.
 	 *
 	 * @param projectId          the project id

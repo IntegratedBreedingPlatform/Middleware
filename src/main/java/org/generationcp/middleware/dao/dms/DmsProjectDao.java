@@ -641,7 +641,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
 			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 			.append("WHERE p.deleted != " + DELETED_STUDY + " ")
-			.append(" AND p.study_type_id = '" + studyType.getId() )
+			.append(" AND p.study_type_id = '" + studyType.getId())
 			.append("'   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
 			.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
 			.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
@@ -755,7 +755,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append(" ")
 			// 8180
 			.append("WHERE p.deleted != " + DELETED_STUDY + " ")
-			.append( " AND p.study_type_id IS NOT NULL ")
+			.append(" AND p.study_type_id IS NOT NULL ")
 			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
 			.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
@@ -1349,4 +1349,42 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				"Unexpected error in executing getDatasetInstances(datasetId = " + datasetId + ") query: " + he.getMessage(), he);
 		}
 	}
+
+	public void deleteDataset(final int datasetId) {
+		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+
+			// Delete from project relationship
+			SQLQuery statement =
+					this.getSession().createSQLQuery(
+							"delete pr " + "from project_relationship pr " + "where pr.subject_project_id = " + datasetId);
+			statement.executeUpdate();
+
+			// Delete experiments
+			statement =
+					this.getSession().createSQLQuery(
+							"delete e, pheno, eprop " + "from nd_experiment e, "
+									+ "phenotype pheno, nd_experimentprop eprop "
+									+ "where e.project_id = " + datasetId
+									+ "  and e.nd_experiment_id = pheno.nd_experiment_id "
+									+ "  and e.nd_experiment_id = eprop.nd_experiment_id");
+			statement.executeUpdate();
+
+			// Delete project stuff
+			statement =
+					this.getSession().createSQLQuery(
+							"delete p, pp " + "from project p, projectprop pp " + "where p.project_id = " + datasetId
+									+ "  and p.project_id = pp.project_id");
+			statement.executeUpdate();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in delete=" + datasetId + " in DmsProjectDao: " + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 }

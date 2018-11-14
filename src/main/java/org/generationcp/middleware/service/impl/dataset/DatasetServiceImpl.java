@@ -460,6 +460,19 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
 
+	@Override
+	public void deleteDataset(final int datasetId) {
+
+		try {
+
+			this.daoFactory.getDmsProjectDAO().deleteDataset(datasetId);
+
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
+		}
+	}
+
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
 		this.germplasmDescriptors = germplasmDescriptors;
 	}
