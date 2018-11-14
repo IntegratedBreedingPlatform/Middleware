@@ -48,4 +48,24 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="marie" id="v10.4.0-4">
+		<comment>Unspecified location should be favorite location for all existing programs</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO program_favorites (entity_type, entity_id, program_uuid)
+			SELECT DISTINCT 'LOCATION', location.locid, project.project_uuid
+			  FROM location
+			  INNER JOIN workbench.workbench_project project
+			  INNER JOIN workbench.workbench_crop crop
+			        WHERE crop.crop_name = project.crop_type
+			            AND crop.db_name = DATABASE()
+			            AND location.labbr='NOLOC'
+			            AND location.lname='Unspecified Location'
+			            AND NOT EXISTS
+			            (SELECT * FROM program_favorites
+							WHERE program_favorites.program_uuid = project.project_uuid
+			                AND program_favorites.entity_id = location.locid
+			                AND program_favorites.entity_type = 'LOCATION');
+		</sql>
+	</changeSet>
+	
 </databaseChangeLog>
