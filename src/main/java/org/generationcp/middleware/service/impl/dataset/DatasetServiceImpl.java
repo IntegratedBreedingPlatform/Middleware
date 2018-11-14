@@ -462,9 +462,13 @@ public class DatasetServiceImpl implements DatasetService {
 	
 	@Override
 	public void deletePhenotype(final Integer phenotypeId) {
-		final Phenotype phenotype = new Phenotype();
-		phenotype.setPhenotypeId(phenotypeId);
+		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
+		final Integer observableId = phenotype.getObservableId();
+		final Integer observationUnitId = phenotype.getExperiment().getNdExperimentId();
 		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
+		
+		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
+		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
 	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {

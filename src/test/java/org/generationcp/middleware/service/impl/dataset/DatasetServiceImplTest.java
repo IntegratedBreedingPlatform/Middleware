@@ -499,11 +499,30 @@ public class DatasetServiceImplTest {
 	
 	@Test
 	public void testDeletePhenotype() {
-		final Integer phenotypeId = new Random().nextInt();
+		final Random random = new Random();
+		final Integer observableId = random.nextInt();
+		final Integer observationUnitId = random.nextInt();
+		final Integer phenotypeId = random.nextInt();
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setPhenotypeId(phenotypeId);
+		phenotype.setObservableId(observableId);
+		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		when(this.phenotypeDao.getById(phenotypeId)).thenReturn(phenotype);
+		
+		final Formula formula1 = new Formula();
+		final CVTerm term1 = new CVTerm();
+		term1.setCvTermId(random.nextInt());
+		formula1.setTargetCVTerm(term1);
+		final Formula formula2 = new Formula();
+		final CVTerm term2 = new CVTerm();
+		term2.setCvTermId(random.nextInt());
+		formula2.setTargetCVTerm(term2);
+		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(observableId);
+		
+		
 		this.datasetService.deletePhenotype(phenotypeId);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
+		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitId, Arrays.asList(term1.getCvTermId(), term2.getCvTermId()));
 	}
 
 }
