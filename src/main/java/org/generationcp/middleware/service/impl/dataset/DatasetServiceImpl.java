@@ -33,6 +33,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
+import org.generationcp.middleware.util.FormulaUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -390,6 +391,13 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 				datasetDTO.setVariables(
 					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
+
+				for (final MeasurementVariable variable : datasetDTO.getVariables()) {
+					final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
+					if (formula != null) {
+						variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
+					}
+				}
 				return datasetDTO;
 			}
 
