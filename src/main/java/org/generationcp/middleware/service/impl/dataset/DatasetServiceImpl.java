@@ -33,6 +33,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,6 +199,11 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Integer getNumberOfChildren(final Integer parentId) {
 		return this.daoFactory.getDmsProjectDAO().getDatasetsByParent(parentId).size();
+	}
+
+	@Override
+	public List<StudyInstance> getDatasetInstances(final Integer datasetId) {
+		return this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId);
 	}
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(final DmsProject study, final DmsProject dmsProject,
