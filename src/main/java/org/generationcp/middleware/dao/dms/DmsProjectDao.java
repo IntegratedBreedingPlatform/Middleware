@@ -1218,7 +1218,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   LEFT JOIN cvtermprop min on scale.cvterm_id = min.cvterm_id AND min.type_id = " + TermId.MIN_VALUE.getId()  //
 				+ " WHERE " //
 				+ "   dataset.project_id = :observationSetId " //
-				+ "   AND pp.type_id in (:variableTypes) ";
+				+ "   AND pp.type_id in (:variableTypes) "
+				+ " ORDER BY pp.rank "
+				;
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 			sqlQuery.setParameter("observationSetId", observationSetId);
