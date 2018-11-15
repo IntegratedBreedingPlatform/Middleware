@@ -459,6 +459,17 @@ public class DatasetServiceImpl implements DatasetService {
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
 		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
+	
+	@Override
+	public void deletePhenotype(final Integer phenotypeId) {
+		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
+		final Integer observableId = phenotype.getObservableId();
+		final Integer observationUnitId = phenotype.getExperiment().getNdExperimentId();
+		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
+		
+		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
+		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+	}
 
 	@Override
 	public void deleteDataset(final int datasetId) {
@@ -484,4 +495,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
 	}
+
+	
 }
