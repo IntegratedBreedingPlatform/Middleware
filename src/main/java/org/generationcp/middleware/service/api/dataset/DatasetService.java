@@ -49,4 +49,7 @@ public interface DatasetService {
 	Integer getNumberOfChildren (final Integer parentId);
 
 	List<StudyInstance> getDatasetInstances(Integer datasetId);
+	
+	void deletePhenotype(final Integer phenotypeId);
+
 }
