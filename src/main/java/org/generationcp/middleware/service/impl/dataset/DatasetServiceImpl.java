@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -28,6 +29,8 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -356,7 +359,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
 		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
 
-		final Boolean isDerivedTrait = formula != null;
+		final boolean isDerivedTrait = formula != null;
 
 		if (isDerivedTrait) {
 			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
@@ -403,7 +406,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final int instanceId, final int pageNumber, final int pageSize,
+		final int studyId, final Integer datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
 		final String sortedColumnTermId, final String sortOrder) {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
@@ -469,6 +472,33 @@ public class DatasetServiceImpl implements DatasetService {
 		
 		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+	}
+
+	@Override
+	public ObservationUnitImportResult validateImportDataset(final Integer studyId, final Integer datasetId,
+		final ObservationUnitImportResult observationUnitImportResult) {
+		final List<ObservationUnitRow> observationUnitRows = this.getObservationUnitRows(studyId, datasetId, null, null, null, null, null);
+		final ObservationUnitImportResult result = new ObservationUnitImportResult();
+		final List<ObservationUnitRow> rows = observationUnitImportResult.getObservationUnitRows();
+		result.setObservationUnitRows(rows);
+
+		for (final ObservationUnitRow row : rows) {
+			final ObservationUnitData data = row.getVariables().get(ExperimentDao.OBS_UNIT_ID);
+			if (data == null || data.getValue() == null || data.getValue().isEmpty()) {
+				result.setErrors(Lists.newArrayList("error.import.obsUnitId"));
+				break;
+			}
+
+
+		}
+
+		return null;
+
+	}
+
+	@Override
+	public List<String> importDataset(final Integer datasetId, final ObservationUnitImportResult observationUnitImportResult) {
+		return null;
 	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {

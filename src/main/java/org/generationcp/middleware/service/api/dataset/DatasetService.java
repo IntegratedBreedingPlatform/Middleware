@@ -37,15 +37,21 @@ public interface DatasetService {
 
 	DatasetDTO getDataset(final Integer studyId, final Integer datasetId);
 
-	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
-
 	List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final int instanceId, final int pageNumber, final int pageSize,
-		final String sortBy, final String sortOrder);
+		int studyId, Integer datasetId, Integer instanceId, Integer pageNumber, Integer pageSize,
+		String sortedColumnTermId, String sortOrder);
+
+	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
 
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 
 	Integer getNumberOfChildren (final Integer parentId);
 	
 	void deletePhenotype(final Integer phenotypeId);
+
+	ObservationUnitImportResult validateImportDataset(Integer studyId, Integer datasetId,
+		ObservationUnitImportResult observationUnitImportResult);
+
+	List<String> importDataset(Integer datasetId, ObservationUnitImportResult observationUnitImportResult);
+
 }

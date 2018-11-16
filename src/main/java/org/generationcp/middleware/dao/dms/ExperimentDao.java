@@ -642,9 +642,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName) {
+		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName, final boolean includesInstanceFilter) {
 		
-		StringBuilder sql = new StringBuilder("SELECT  " //
+		final StringBuilder sql = new StringBuilder("SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, " //
 			+ "    gl.description AS TRIAL_INSTANCE, " //
 			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  "
@@ -703,9 +703,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ "   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
-			+ " WHERE p.project_id = :datasetId " //
-			+ " AND gl.nd_geolocation_id = :instanceId" //
-			+ " GROUP BY observationUnitId ");
+			+ " WHERE p.project_id = :datasetId "); //
+
+		if (includesInstanceFilter) {
+			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
+		}
+
+		sql.append(" GROUP BY observationUnitId ");
 
 		String orderColumn;
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
@@ -734,18 +738,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<ObservationUnitRow> getObservationUnitTable(
 		final int datasetId,
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final int instanceId, final int pageNumber,
+		final List<String> designFactors, final Integer instanceId, final int pageNumber,
 		final int pageSize,
 		final String sortBy, final String sortOrder) {
 		try {
+			final boolean includesInstanceFilter = (instanceId != null);
+
 			final String observationVariableName = this.getObservationVariableName(datasetId);
 
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
-				designFactors, sortBy, sortOrder, observationVariableName);
+				designFactors, sortBy, sortOrder, observationVariableName, includesInstanceFilter);
 			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
 				designFactors, observationUnitTableQuery);
 			query.setParameter("datasetId", datasetId);
-			query.setParameter("instanceId", String.valueOf(instanceId));
+
+			if (includesInstanceFilter) {
+				query.setParameter("instanceId", String.valueOf(instanceId));
+			}
 
 			query.setFirstResult(pageSize * (pageNumber - 1));
 			query.setMaxResults(pageSize);
