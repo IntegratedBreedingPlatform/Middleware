@@ -471,6 +471,19 @@ public class DatasetServiceImpl implements DatasetService {
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
 	}
 
+	@Override
+	public void deleteDataset(final int datasetId) {
+
+		try {
+
+			this.daoFactory.getDmsProjectDAO().deleteDataset(datasetId);
+
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
+		}
+	}
+
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
 		this.germplasmDescriptors = germplasmDescriptors;
 	}

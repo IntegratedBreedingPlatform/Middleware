@@ -392,32 +392,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void deleteDataSet(final int datasetId) {
-
-		try {
-
-			this.getDataSetDestroyer().deleteDataSet(datasetId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void deleteExperimentsByLocation(final int datasetId, final int locationId) {
-
-		try {
-
-			this.getDataSetDestroyer().deleteExperimentsByLocation(datasetId, locationId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in deleteExperimentsByLocation " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public String getLocalNameByStandardVariableId(final Integer projectId, final Integer standardVariableId) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(projectId);
