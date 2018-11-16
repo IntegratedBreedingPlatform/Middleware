@@ -12,9 +12,12 @@ public class ObservationUnitImportResult {
 
 	private List<String> errors;
 
-	public ObservationUnitImportResult(final List<ObservationUnitRow> observationUnitRows, final List<String> errors) {
+	private Integer notFoundCounter;
+
+	public ObservationUnitImportResult(final List<ObservationUnitRow> observationUnitRows, final List<String> errors, final Integer notFoundCounter) {
 		this.observationUnitRows = observationUnitRows;
 		this.errors = errors;
+		this.notFoundCounter = notFoundCounter;
 	}
 
 	public ObservationUnitImportResult() {
@@ -35,6 +38,18 @@ public class ObservationUnitImportResult {
 
 	public void setErrors(final List<String> errors) {
 		this.errors = errors;
+	}
+
+	public Integer getNotFoundCounter() {
+		return this.notFoundCounter;
+	}
+
+	public void setNotFoundCounter(final Integer notFoundCounter) {
+		this.notFoundCounter = notFoundCounter;
+	}
+
+	public void addNotFound() {
+		this.notFoundCounter++;
 	}
 
 	@Override

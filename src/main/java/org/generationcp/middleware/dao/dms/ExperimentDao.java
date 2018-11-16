@@ -742,25 +742,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final int pageSize,
 		final String sortBy, final String sortOrder) {
 		try {
-			final boolean includesInstanceFilter = (instanceId != null);
-
 			final String observationVariableName = this.getObservationVariableName(datasetId);
-
-			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
-				designFactors, sortBy, sortOrder, observationVariableName, includesInstanceFilter);
-			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
-				designFactors, observationUnitTableQuery);
-			query.setParameter("datasetId", datasetId);
-
-			if (includesInstanceFilter) {
-				query.setParameter("instanceId", String.valueOf(instanceId));
-			}
-
-			query.setFirstResult(pageSize * (pageNumber - 1));
-			query.setMaxResults(pageSize);
-
-			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-			final List<Map<String, Object>> results = query.list();
+			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
+				datasetId,
+				selectionMethodsAndTraits,
+				germplasmDescriptors,
+				designFactors,
+				instanceId,
+				pageNumber,
+				pageSize,
+				sortBy,
+				sortOrder,
+				observationVariableName);
 			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -820,67 +813,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private List<ObservationUnitRow> mapResults(
-		final List<Map<String, Object>> results,
-		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final String observationVariableName) {
-		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 
-		if (results != null && !results.isEmpty()) {
-			for (final Map<String, Object> row : results) {
-
-				final Map<String, ObservationUnitData> variables = new HashMap<>();
-
-				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
-					final String status = (String) row.get(variable.getName() + "_Status");
-					variables.put(variable.getName(), new ObservationUnitData(
-						(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
-						(Integer) row.get(variable.getName() + "_CvalueId"), //categoricalValue
-						(String) row.get(variable.getName()), //variableValue
-						(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
-						)));
-				}
-				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
-
-				observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
-				observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
-
-				final Integer gid = (Integer) row.get(GID);
-				observationUnitRow.setGid(gid);
-				variables.put(GID, new ObservationUnitData(gid.toString()));
-
-				final String designation = (String) row.get(DESIGNATION);
-				observationUnitRow.setDesignation(designation);
-				variables.put(DESIGNATION, new ObservationUnitData(designation));
-
-				variables.put(TRIAL_INSTANCE, new ObservationUnitData((String) row.get(TRIAL_INSTANCE)));
-				variables.put(ENTRY_TYPE, new ObservationUnitData((String) row.get(ENTRY_TYPE)));
-				variables.put(ENTRY_NO, new ObservationUnitData((String) row.get(ENTRY_NO)));
-				variables.put(ENTRY_CODE, new ObservationUnitData((String) row.get(ENTRY_CODE)));
-				variables.put(REP_NO, new ObservationUnitData((String) row.get(REP_NO)));
-				variables.put(PLOT_NO, new ObservationUnitData((String) row.get(PLOT_NO)));
-				variables.put(BLOCK_NO, new ObservationUnitData((String) row.get(BLOCK_NO)));
-				variables.put(ROW, new ObservationUnitData((String) row.get(ROW)));
-				variables.put(COL, new ObservationUnitData((String) row.get(COL)));
-				variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
-				variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
-				variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
-				variables.put(observationVariableName,
-					new ObservationUnitData(((Integer) row.get(OBSERVATION_UNIT_NO)).toString()));
-
-				for (final String gpDesc : germplasmDescriptors) {
-					variables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
-				}
-				for (final String designFactor : designFactors) {
-					variables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
-				}
-				observationUnitRow.setVariables(variables);
-				observationUnitRows.add(observationUnitRow);
-			}
-		}
-
-		return observationUnitRows;
-	}
 
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
 		try {
@@ -923,5 +856,154 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		query.addScalar("OBSERVATION_UNIT_NO_NAME", new StringType());
 		query.setParameter("datasetId", datasetId);
 		return (query.list() != null && !query.list().isEmpty() ? (String) query.list().get(0) : null);
+	}
+
+	public Map<String, ObservationUnitRow> getObservationUnitsAsMap(
+		final int datasetId,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors, final Integer instanceId, final Integer pageNumber,
+		final Integer pageSize,
+		final String sortBy, final String sortOrder) {
+		try {
+			final String observationVariableName = this.getObservationVariableName(datasetId);
+			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
+				datasetId,
+				selectionMethodsAndTraits,
+				germplasmDescriptors,
+				designFactors,
+				instanceId,
+				pageNumber,
+				pageSize,
+				sortBy,
+				sortOrder,
+				observationVariableName);
+			return this.mapResultsToMap(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
+		} catch (final Exception e) {
+			final String error = "An internal error has ocurred when trying to execute the operation";
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareException(error);
+		}
+	}
+
+	private List<Map<String, Object>> getObservationUnitsQueryResult(
+		final int datasetId,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors, final Integer instanceId, final int pageNumber,
+		final int pageSize,
+		final String sortBy, final String sortOrder, final String observationVariableName) {
+		try {
+			final boolean includesInstanceFilter = (instanceId != null);
+
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
+				designFactors, sortBy, sortOrder, observationVariableName, includesInstanceFilter);
+			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
+				designFactors, observationUnitTableQuery);
+			query.setParameter("datasetId", datasetId);
+
+			if (includesInstanceFilter) {
+				query.setParameter("instanceId", String.valueOf(instanceId));
+			}
+
+			query.setFirstResult(pageSize * (pageNumber - 1));
+			query.setMaxResults(pageSize);
+
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = query.list();
+			return results;
+
+		} catch (final Exception e) {
+			final String error = "An internal error has ocurred when trying to execute the operation";
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareException(error);
+		}
+	}
+
+	private Map<String, ObservationUnitRow> mapResultsToMap(final List<Map<String, Object>> results,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors, final String observationVariableName) {
+		final Map<String, ObservationUnitRow> observationUnitRows = new HashMap<>();
+
+		if (results != null && !results.isEmpty()) {
+			for (final Map<String, Object> row : results) {
+
+				final ObservationUnitRow observationUnitRow =
+					this.getObservationUnitRow(selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName, row);
+
+				observationUnitRows.put(String.valueOf(observationUnitRow.getVariables().get(OBS_UNIT_ID)), observationUnitRow);
+			}
+		}
+
+		return observationUnitRows;
+	}
+
+	private List<ObservationUnitRow> mapResults(
+		final List<Map<String, Object>> results,
+		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors, final String observationVariableName) {
+		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
+
+		if (results != null && !results.isEmpty()) {
+			for (final Map<String, Object> row : results) {
+
+				final ObservationUnitRow observationUnitRow =
+					this.getObservationUnitRow(selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName, row);
+				observationUnitRows.add(observationUnitRow);
+			}
+		}
+
+		return observationUnitRows;
+	}
+
+	private ObservationUnitRow getObservationUnitRow(final List<MeasurementVariableDto> selectionMethodsAndTraits,
+		final List<String> germplasmDescriptors, final List<String> designFactors, final String observationVariableName,
+		final Map<String, Object> row) {
+		final Map<String, ObservationUnitData> variables = new HashMap<>();
+
+		for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
+			final String status = (String) row.get(variable.getName() + "_Status");
+			variables.put(variable.getName(), new ObservationUnitData(
+				(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
+				(Integer) row.get(variable.getName() + "_CvalueId"), //categoricalValue
+				(String) row.get(variable.getName()), //variableValue
+				(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
+				), variable.getId()));
+		}
+		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+
+		observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
+		observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
+
+		final Integer gid = (Integer) row.get(GID);
+		observationUnitRow.setGid(gid);
+		variables.put(GID, new ObservationUnitData(gid.toString()));
+
+		final String designation = (String) row.get(DESIGNATION);
+		observationUnitRow.setDesignation(designation);
+		variables.put(DESIGNATION, new ObservationUnitData(designation));
+
+		variables.put(TRIAL_INSTANCE, new ObservationUnitData((String) row.get(TRIAL_INSTANCE)));
+		variables.put(ENTRY_TYPE, new ObservationUnitData((String) row.get(ENTRY_TYPE)));
+		variables.put(ENTRY_NO, new ObservationUnitData((String) row.get(ENTRY_NO)));
+		variables.put(ENTRY_CODE, new ObservationUnitData((String) row.get(ENTRY_CODE)));
+		variables.put(REP_NO, new ObservationUnitData((String) row.get(REP_NO)));
+		variables.put(PLOT_NO, new ObservationUnitData((String) row.get(PLOT_NO)));
+		variables.put(BLOCK_NO, new ObservationUnitData((String) row.get(BLOCK_NO)));
+		variables.put(ROW, new ObservationUnitData((String) row.get(ROW)));
+		variables.put(COL, new ObservationUnitData((String) row.get(COL)));
+		variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
+		variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
+		variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
+		variables.put(
+			observationVariableName,
+			new ObservationUnitData(((Integer) row.get(OBSERVATION_UNIT_NO)).toString()));
+
+		for (final String gpDesc : germplasmDescriptors) {
+			variables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
+		}
+		for (final String designFactor : designFactors) {
+			variables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
+		}
+		observationUnitRow.setVariables(variables);
+		return observationUnitRow;
 	}
 }

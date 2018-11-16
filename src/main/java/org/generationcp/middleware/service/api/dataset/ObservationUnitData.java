@@ -17,12 +17,15 @@ public class ObservationUnitData {
 
 	private Phenotype.ValueStatus status;
 
+	private Integer variableId;
+
 	public ObservationUnitData(final Integer observationId, final Integer categoricalValueId, final String value,
-		final Phenotype.ValueStatus status) {
+		final Phenotype.ValueStatus status, final Integer variableId) {
 		this.observationId = observationId;
 		this.categoricalValueId = categoricalValueId;
 		this.value = value;
 		this.status = status;
+		this.variableId = variableId;
 	}
 
 	public ObservationUnitData() {
@@ -62,6 +65,14 @@ public class ObservationUnitData {
 
 	public void setStatus(final Phenotype.ValueStatus status) {
 		this.status = status;
+	}
+
+	public Integer getVariableId() {
+		return this.variableId;
+	}
+
+	public void setVariableId(final Integer variableId) {
+		this.variableId = variableId;
 	}
 
 	@Override

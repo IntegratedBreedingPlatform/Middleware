@@ -2,6 +2,8 @@ package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -44,8 +46,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -477,22 +481,49 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public ObservationUnitImportResult validateImportDataset(final Integer studyId, final Integer datasetId,
 		final ObservationUnitImportResult observationUnitImportResult) {
-		final List<ObservationUnitRow> observationUnitRows = this.getObservationUnitRows(studyId, datasetId, null, null, null, null, null);
+
+		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
+			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+
+		final List<Integer> currentTraitIds = (List<Integer>) CollectionUtils.collect(selectionMethodsAndTraits, new Transformer() {
+
+			@Override
+			public Integer transform(final Object input) {
+				final MeasurementVariableDto variable = (MeasurementVariableDto) input;
+				return variable.getId();
+			}
+		});
+
+		final Map<String, ObservationUnitRow> currentData =
+			this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
+				this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), null,
+				null, null, null, null);
+
 		final ObservationUnitImportResult result = new ObservationUnitImportResult();
 		final List<ObservationUnitRow> rows = observationUnitImportResult.getObservationUnitRows();
 		result.setObservationUnitRows(rows);
 
 		for (final ObservationUnitRow row : rows) {
-			final ObservationUnitData data = row.getVariables().get(ExperimentDao.OBS_UNIT_ID);
-			if (data == null || data.getValue() == null || data.getValue().isEmpty()) {
+			final ObservationUnitData obsUnitId = row.getVariables().get(ExperimentDao.OBS_UNIT_ID);
+			if (obsUnitId == null || obsUnitId.getValue() == null || obsUnitId.getValue().isEmpty()) {
 				result.setErrors(Lists.newArrayList("error.import.obsUnitId"));
 				break;
 			}
+			final ObservationUnitRow currentRow = currentData.get(obsUnitId.getValue());
 
+			if (currentRow == null) {
+				result.addNotFound();
+			}
+
+
+
+			for (final ObservationUnitData variable : row.getVariables().values()) {
+
+			}
 
 		}
 
-		return null;
+		return result;
 
 	}
 
