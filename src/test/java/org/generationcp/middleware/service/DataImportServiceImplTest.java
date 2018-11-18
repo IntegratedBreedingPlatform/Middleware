@@ -121,6 +121,8 @@ public class DataImportServiceImplTest {
 		unspecifiedLocation.setLocid(UNSPECIFIED_LOCATION_LOCID);
 		locations.add(unspecifiedLocation);
 		Mockito.when(this.locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
+		Mockito.when(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation()).thenReturn(String.valueOf(UNSPECIFIED_LOCATION_LOCID));
+
 
 		final StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable();
 		standardVariable.setId(TermId.LOCATION_ID.getId());
