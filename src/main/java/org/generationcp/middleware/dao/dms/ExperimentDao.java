@@ -57,7 +57,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String LOCATION_DB_ID = "locationDbId";
 	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
 	public static final String FIELD_MAP_ROW = "FieldMapRow";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	public static final String FIELD_MAP_COLUMN = "FIELDMAP COLUMN";
 	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
 	public static final String LOCATION_NAME = "LocationName";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
@@ -72,7 +72,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String GID = "GID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
+	public static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
 	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
 			" experiment.nd_experiment_id, " + //
 			" plant.plant_id," + //
