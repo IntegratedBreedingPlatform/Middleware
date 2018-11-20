@@ -3,8 +3,6 @@ package org.generationcp.middleware.service.api.dataset;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @AutoProperty
@@ -68,19 +66,6 @@ public class ObservationUnitRow {
 
 	public String getObsUnitId() {
 		return this.obsUnitId;
-	}
-
-	public Map<String, ObservationUnitData> getMeasuredVariables(final List<Integer> selectionMethodsAndTraitsIds) {
-		final Map<String, ObservationUnitData> observationUnitDataCollection = new HashMap<>();
-		for (final String variable : this.variables.keySet()) {
-			final ObservationUnitData observationUnitData = this.variables.get(variable);
-			final Integer variableId = observationUnitData.getVariableId();
-			if (selectionMethodsAndTraitsIds.contains(variableId)) {
-				observationUnitDataCollection.put(variable, observationUnitData);
-			}
-		}
-
-		return observationUnitDataCollection;
 	}
 
 	public void setVariables(final Map<String, ObservationUnitData> variables) {
