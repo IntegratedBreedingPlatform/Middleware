@@ -451,6 +451,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return fieldMapInfos;
 	}
 
+	@Override
+	public Map<Integer, Boolean> hasFieldMap(final int studyId) {
+		return this.getExperimentPropertyDao().hasFieldMap(studyId);
+
+	}
+
 	private void setPedigree(final List<FieldMapDatasetInfo> fieldMapDatasetInfos, final CrossExpansionProperties crossExpansionProperties,
 			final Map<Integer, String> pedigreeStringMap) {
 		//TODO: Caching of the pedigree string is just a temporary fix. This must be properly fixed.
