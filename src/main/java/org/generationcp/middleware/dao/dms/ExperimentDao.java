@@ -642,7 +642,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName, final boolean includesInstanceFilter) {
+		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName,
+		final boolean includesInstanceFilter, final boolean includesObservationUnitIdFilter) {
 		
 		final StringBuilder sql = new StringBuilder("SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, " //
@@ -709,6 +710,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
 		}
 
+		if (includesObservationUnitIdFilter) {
+			sql.append(" AND nde.obs_unit_id IN (:observationUnitIds)"); //
+		}
+
+
 		sql.append(" GROUP BY observationUnitId ");
 
 		String orderColumn;
@@ -753,7 +759,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				pageSize,
 				sortBy,
 				sortOrder,
-				observationVariableName);
+				observationVariableName, false, null);
 			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -863,7 +869,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final Integer instanceId, final Integer pageNumber,
 		final Integer pageSize,
-		final String sortBy, final String sortOrder) {
+		final String sortBy, final String sortOrder, final List<Integer> observationUnitIds) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(datasetId);
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
@@ -876,7 +882,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				pageSize,
 				sortBy,
 				sortOrder,
-				observationVariableName);
+				observationVariableName, true, observationUnitIds);
 			return this.mapResultsToMap(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -890,18 +896,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final Integer instanceId, final int pageNumber,
 		final int pageSize,
-		final String sortBy, final String sortOrder, final String observationVariableName) {
+		final String sortBy, final String sortOrder, final String observationVariableName, final boolean includesObservationUnitIdFilter,
+		final List<Integer> observationUnitIds) {
 		try {
 			final boolean includesInstanceFilter = (instanceId != null);
 
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
-				designFactors, sortBy, sortOrder, observationVariableName, includesInstanceFilter);
+				designFactors, sortBy, sortOrder, observationVariableName, includesInstanceFilter, includesObservationUnitIdFilter);
 			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
 				designFactors, observationUnitTableQuery);
 			query.setParameter("datasetId", datasetId);
 
 			if (includesInstanceFilter) {
 				query.setParameter("instanceId", String.valueOf(instanceId));
+			}
+
+			if (includesObservationUnitIdFilter) {
+				query.setParameter("observationUnitIds", observationUnitIds);
 			}
 
 			query.setFirstResult(pageSize * (pageNumber - 1));

@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.dataset;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -10,14 +11,11 @@ public class ObservationUnitImportResult {
 
 	private List<ObservationUnitRow> observationUnitRows;
 
-	private List<String> errors;
+	private BindingResult warnings;
 
-	private Integer notFoundCounter;
-
-	public ObservationUnitImportResult(final List<ObservationUnitRow> observationUnitRows, final List<String> errors, final Integer notFoundCounter) {
+	public ObservationUnitImportResult(final List<ObservationUnitRow> observationUnitRows, final BindingResult warnings) {
 		this.observationUnitRows = observationUnitRows;
-		this.errors = errors;
-		this.notFoundCounter = notFoundCounter;
+		this.warnings = warnings;
 	}
 
 	public ObservationUnitImportResult() {
@@ -32,24 +30,12 @@ public class ObservationUnitImportResult {
 		this.observationUnitRows = observationUnitRows;
 	}
 
-	public List<String> getErrors() {
-		return this.errors;
+	public BindingResult getWarnings() {
+		return this.warnings;
 	}
 
-	public void setErrors(final List<String> errors) {
-		this.errors = errors;
-	}
-
-	public Integer getNotFoundCounter() {
-		return this.notFoundCounter;
-	}
-
-	public void setNotFoundCounter(final Integer notFoundCounter) {
-		this.notFoundCounter = notFoundCounter;
-	}
-
-	public void addNotFound() {
-		this.notFoundCounter++;
+	public void setWarnings(final BindingResult warnings) {
+		this.warnings = warnings;
 	}
 
 	@Override
@@ -65,5 +51,9 @@ public class ObservationUnitImportResult {
 	@Override
 	public String toString() {
 		return Pojomatic.toString(this);
+	}
+
+	public void addWarning(final String s) {
+		this.warnings.reject(s);
 	}
 }
