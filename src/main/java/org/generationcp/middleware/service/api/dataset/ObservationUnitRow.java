@@ -1,10 +1,15 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.Transformer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @AutoProperty
 public class ObservationUnitRow {
@@ -57,6 +62,19 @@ public class ObservationUnitRow {
 
 	public Map<String, ObservationUnitData> getVariables() {
 		return this.variables;
+	}
+
+	public Map<String, ObservationUnitData> getMeasuredVariables(final List<Integer> selectionMethodsAndTraitsIds) {
+		Map<String, ObservationUnitData> observationUnitDataCollection = new HashMap<>();
+		for (String variable : this.variables.keySet()) {
+			final ObservationUnitData observationUnitData = this.variables.get(variable);
+			final Integer variableId = observationUnitData.getVariableId();
+			if (selectionMethodsAndTraitsIds.contains(variableId)) {
+				observationUnitDataCollection.put(variable, observationUnitData);
+			}
+		}
+
+		return observationUnitDataCollection;
 	}
 
 	public void setVariables(final Map<String, ObservationUnitData> variables) {
