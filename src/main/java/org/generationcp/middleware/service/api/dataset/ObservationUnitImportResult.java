@@ -1,9 +1,14 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.dataset.DatasetGeneratorInput;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @AutoProperty
@@ -19,7 +24,8 @@ public class ObservationUnitImportResult {
 	}
 
 	public ObservationUnitImportResult() {
-
+		this.warnings = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+		this.observationUnitRows = Lists.newArrayList();
 	}
 
 	public List<ObservationUnitRow> getObservationUnitRows() {

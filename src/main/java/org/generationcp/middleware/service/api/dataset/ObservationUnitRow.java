@@ -1,12 +1,8 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +19,8 @@ public class ObservationUnitRow {
 	private String action;
 
 	private Map<String, ObservationUnitData> variables;
+
+	private String obsUnitId;
 
 	public ObservationUnitRow() {
 
@@ -64,9 +62,17 @@ public class ObservationUnitRow {
 		return this.variables;
 	}
 
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
+	}
+
+	public String getObsUnitId() {
+		return this.obsUnitId;
+	}
+
 	public Map<String, ObservationUnitData> getMeasuredVariables(final List<Integer> selectionMethodsAndTraitsIds) {
-		Map<String, ObservationUnitData> observationUnitDataCollection = new HashMap<>();
-		for (String variable : this.variables.keySet()) {
+		final Map<String, ObservationUnitData> observationUnitDataCollection = new HashMap<>();
+		for (final String variable : this.variables.keySet()) {
 			final ObservationUnitData observationUnitData = this.variables.get(variable);
 			final Integer variableId = observationUnitData.getVariableId();
 			if (selectionMethodsAndTraitsIds.contains(variableId)) {
@@ -95,6 +101,7 @@ public class ObservationUnitRow {
 	public String toString() {
 		return Pojomatic.toString(this);
 	}
+
 }
 
 

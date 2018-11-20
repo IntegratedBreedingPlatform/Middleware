@@ -868,7 +868,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final Integer instanceId, final Integer pageNumber,
 		final Integer pageSize,
-		final String sortBy, final String sortOrder, final List<Integer> observationUnitIds) {
+		final String sortBy, final String sortOrder, final List<String> observationUnitIds) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(datasetId);
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
@@ -896,7 +896,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<String> designFactors, final Integer instanceId, final Integer pageNumber,
 		final Integer pageSize,
 		final String sortBy, final String sortOrder, final String observationVariableName,
-		final List<Integer> observationUnitIds) {
+		final List<String> observationUnitIds) {
 		try {
 			final boolean includesInstanceFilter = (instanceId != null);
 
@@ -913,7 +913,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			if (includesObservationUnitIdFilter) {
-				query.setParameter("observationUnitIds", observationUnitIds);
+				query.setParameterList("observationUnitIds", observationUnitIds);
 			}
 
 			if (pageNumber != null && pageSize != null) {
@@ -943,7 +943,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final ObservationUnitRow observationUnitRow =
 					this.getObservationUnitRow(selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName, row);
 
-				observationUnitRows.put(String.valueOf(observationUnitRow.getVariables().get(OBS_UNIT_ID)), observationUnitRow);
+				observationUnitRows.put(String.valueOf(observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue()), observationUnitRow);
 			}
 		}
 
@@ -986,7 +986,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
 		observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
-
+		observationUnitRow.setObsUnitId((String) row.get(OBS_UNIT_ID));
 		final Integer gid = (Integer) row.get(GID);
 		observationUnitRow.setGid(gid);
 		variables.put(GID, new ObservationUnitData(gid.toString()));

@@ -506,19 +506,19 @@ public class DatasetServiceImpl implements DatasetService {
 					}
 				});
 
-			final List<Integer> observationUnitIds =
-				(List<Integer>) CollectionUtils.collect(observationUnitImportResult.getObservationUnitRows(), new Transformer() {
+			final List<String> observationUnitIds =
+				(List<String>) CollectionUtils.collect(observationUnitImportResult.getObservationUnitRows(), new Transformer() {
 
 					@Override
-					public Integer transform(final Object input) {
+					public String transform(final Object input) {
 						final ObservationUnitRow row = (ObservationUnitRow) input;
-						return row.getObservationUnitId();
+						return row.getObsUnitId();
 					}
 				});
 
 			final Map<String, ObservationUnitRow> currentData =
 				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
-					this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), null,
+					Lists.<String>newArrayList(), Lists.<String>newArrayList(), null,
 					1, null, null, null, observationUnitIds);
 
 
@@ -538,7 +538,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 				final ObservationUnitRow currentRow = currentData.get(obsUnitId.getValue());
 				//Some of the data in the import sheet will overwrite measurement data that has already been recorded.
-				for (String variable : row.getVariables().keySet()) {
+				for (final String variable : row.getVariables().keySet()) {
 					final ObservationUnitData observationUnitData = row.getVariables().get(variable);
 					final Integer variableId = observationUnitData.getVariableId();
 					if (selectionMethodsAndTraitsIds.contains(variableId) && observationUnitData.getValue() != null) {
