@@ -42,11 +42,11 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -413,7 +413,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final int studyId, final Integer datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
 		final String sortedColumnTermId, final String sortOrder) {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
-			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		String sortBy = sortedColumnTermId;
 		if (sortedColumnTermId != null) {
 			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
