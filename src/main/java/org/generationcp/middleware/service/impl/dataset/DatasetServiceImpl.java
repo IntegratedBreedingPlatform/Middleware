@@ -73,8 +73,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
-		VariableType.SELECTION_METHOD.getId(), //
-		VariableType.OBSERVATION_UNIT.getId());
+		VariableType.SELECTION_METHOD.getId());
 
 	private DaoFactory daoFactory;
 
