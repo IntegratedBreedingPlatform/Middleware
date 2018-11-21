@@ -104,7 +104,6 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
 			experimentModel.setProject(this.study);
 			experimentModel.setStock(stockModel);
 			this.experiments.add(this.experimentDao.saveOrUpdate(experimentModel));
