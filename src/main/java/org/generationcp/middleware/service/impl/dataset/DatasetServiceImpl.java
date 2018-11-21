@@ -514,15 +514,6 @@ public class DatasetServiceImpl implements DatasetService {
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
 		if (selectionMethodsAndTraits.size() > 0) {
-			final List<Integer> selectionMethodsAndTraitsIds =
-				(List<Integer>) CollectionUtils.collect(selectionMethodsAndTraits, new Transformer() {
-
-					@Override
-					public Integer transform(final Object input) {
-						final MeasurementVariableDto variable = (MeasurementVariableDto) input;
-						return variable.getId();
-					}
-				});
 
 			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().keySet());
 
@@ -535,9 +526,6 @@ public class DatasetServiceImpl implements DatasetService {
 				//"xx number of observation units were not found in the dataset you selected. Please review the imported file. Would you like to proceed with the import?"
 				result.getWarnings().reject("warning.import.not.found", Integer.toString(difference));
 			}
-
-			final List<String> duplicatedObservationUnitIds = new ArrayList<>();
-			final boolean isDuplicatedObservationUnitId = false;
 
 			for (final String row : rows.keySet()) {
 				final ObservationUnitRow currentRow = currentData.get(row);
