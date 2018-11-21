@@ -1,46 +1,43 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import org.generationcp.middleware.domain.dataset.DatasetGeneratorInput;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @AutoProperty
 public class ObservationUnitImportResult {
 
-	private Map<String, Map<String, String>> observationUnitRows;
+	private Table observationUnitRows;
 
-	private BindingResult warnings;
+	private List<String> warnings;
 
-	public ObservationUnitImportResult(final Map<String, Map<String, String>> observationUnitRows, final BindingResult warnings) {
+	public ObservationUnitImportResult(final Table observationUnitRows, final List<String>  warnings) {
 		this.observationUnitRows = observationUnitRows;
 		this.warnings = warnings;
 	}
 
 	public ObservationUnitImportResult() {
-		this.warnings = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
-		this.observationUnitRows = Collections.emptyMap();
+		this.warnings = Lists.newArrayList();
 	}
 
-	public Map<String, Map<String, String>> getObservationUnitRows() {
+	public Table getObservationUnitRows() {
 		return this.observationUnitRows;
 	}
 
-	public void setObservationUnitRows(final Map<String, Map<String, String>> observationUnitRows) {
+	public void setObservationUnitRows(final Table observationUnitRows) {
 		this.observationUnitRows = observationUnitRows;
 	}
 
-	public BindingResult getWarnings() {
+	public List<String> getWarnings() {
 		return this.warnings;
 	}
 
 	public void setWarnings(final BindingResult warnings) {
-		this.warnings = warnings;
+		this.warnings = (List<String>) warnings;
 	}
 
 	@Override
@@ -59,6 +56,6 @@ public class ObservationUnitImportResult {
 	}
 
 	public void addWarning(final String s) {
-		this.warnings.reject(s);
+		this.warnings.add(s);
 	}
 }

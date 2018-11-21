@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.RandomStringUtils;
@@ -49,6 +50,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +61,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -114,6 +117,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
+
+	@Autowired
+	ResourceBundleMessageSource messageSource;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -506,8 +512,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer studyId, final Integer datasetId,
 		final String programUUID, final ObservationUnitImportResult observationUnitImportResult) {
 
+		boolean isOverwritten = false;
 		final ObservationUnitImportResult result = new ObservationUnitImportResult();
-		final Map<String, Map<String, String>> rows = observationUnitImportResult.getObservationUnitRows();
+		final Table rows = observationUnitImportResult.getObservationUnitRows();
 		result.setObservationUnitRows(rows);
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
@@ -515,26 +522,30 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (selectionMethodsAndTraits.size() > 0) {
 
-			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().keySet());
+			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().columnKeySet());
 
 			final Map<String, ObservationUnitRow> currentData =
 				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
 					observationUnitIds);
 
-			final int difference = currentData.values().size() - observationUnitImportResult.getObservationUnitRows().size();
+			final Integer difference = currentData.values().size() - observationUnitImportResult.getObservationUnitRows().size();
 			if (difference != 0) {
 				//"xx number of observation units were not found in the dataset you selected. Please review the imported file. Would you like to proceed with the import?"
-				result.getWarnings().reject("warning.import.not.found", Integer.toString(difference));
+				final String message = this.messageSource.getMessage("warning.import.not.found", new String[] {difference.toString()}, LocaleContextHolder.getLocale());
+				result.getWarnings().add(message);
 			}
 
-			for (final String row : rows.keySet()) {
+			for (final Object row : rows.columnKeySet()) {
 				final ObservationUnitRow currentRow = currentData.get(row);
-				final Map<String, String> variables = rows.get(row);
+				final Map<String, String> variables = rows.column(row);
 				for (final String variableName : variables.keySet()) {
 					final String importedVariable = variables.get(variableName);
 					final ObservationUnitData variable = currentRow.getVariables().get(variableName);
-					if (variable != null && variable.getValue() != null && !variable.getValue().equalsIgnoreCase(importedVariable)) {
-						result.addWarning("warning.import.overwrite.data");
+
+					if (!isOverwritten && variable != null && variable.getValue() != null && !variable.getValue().equalsIgnoreCase(importedVariable)) {
+						final String message = this.messageSource.getMessage("warning.import.overwrite.data", new String[] {difference.toString()}, LocaleContextHolder.getLocale());
+						result.getWarnings().add(message);
+						isOverwritten = true;
 					}
 
 					final StandardVariable
@@ -542,7 +553,7 @@ public class DatasetServiceImpl implements DatasetService {
 					final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
 					if (!this.isValidValue(measurementVariable, importedVariable)) {
 						//The numeric variableName {0} contains an invalid value {1} containing characters. Please check the data file and try again.
-						result.addWarning("warning.import.save.invalidCellValue");
+						throw new MiddlewareRequestException("", "warning.import.save.invalidCellValue", null);
 					}
 				}
 			}
