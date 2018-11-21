@@ -49,8 +49,9 @@ public interface DatasetService {
 	
 	void deletePhenotype(final Integer phenotypeId);
 
-	ObservationUnitImportResult validateImportDataset(Integer studyId, Integer datasetId,
-		ObservationUnitImportResult observationUnitImportResult);
+	ObservationUnitImportResult validateImportDataset(
+		Integer studyId, Integer datasetId,
+		final String programUUID, ObservationUnitImportResult observationUnitImportResult);
 
 	List<String> importDataset(Integer datasetId, ObservationUnitImportResult observationUnitImportResult);
 

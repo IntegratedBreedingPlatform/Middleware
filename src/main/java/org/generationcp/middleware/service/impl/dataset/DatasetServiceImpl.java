@@ -5,6 +5,8 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -12,18 +14,22 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -38,6 +44,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +55,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +90,9 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.SELECTION_METHOD.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
 
+
+	private static final String DATA_TYPE_NUMERIC = "Numeric";
+
 	private DaoFactory daoFactory;
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -99,6 +111,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private MeasurementVariableTransformer measurementVariableTransformer;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -418,13 +433,15 @@ public class DatasetServiceImpl implements DatasetService {
 		if (sortedColumnTermId != null) {
 			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
 		}
-
-		final ObservationUnitImportResult o = new ObservationUnitImportResult();
-		o.setObservationUnitRows(this.daoFactory.getExperimentDao().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
-			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
-			pageNumber, pageSize, sortBy, sortOrder));
-		this.validateImportDataset(studyId, datasetId, o);
-
+	//TODO delete this
+	/*	final ObservationUnitImportResult o = new ObservationUnitImportResult();
+		final Map<String, Map<String, String>> observationUnitRows = new HashMap<>();
+		final Map<String, String> data = new HashMap<>();
+		data.put("Aflatox_M_ppb", "12");
+		observationUnitRows.put("839f9d543dd8d", data);
+		o.setObservationUnitRows(observationUnitRows);
+		this.validateImportDataset(studyId, datasetId, "079878e1-ce3b-48f5-89f3-df7c82c96363", o);
+	*/
 		return this.daoFactory.getExperimentDao().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
@@ -485,11 +502,12 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationUnitImportResult validateImportDataset(final Integer studyId, final Integer datasetId,
-		final ObservationUnitImportResult observationUnitImportResult) {
+	public ObservationUnitImportResult validateImportDataset(
+		final Integer studyId, final Integer datasetId,
+		final String programUUID, final ObservationUnitImportResult observationUnitImportResult) {
 
 		final ObservationUnitImportResult result = new ObservationUnitImportResult();
-		final List<ObservationUnitRow> rows = observationUnitImportResult.getObservationUnitRows();
+		final Map<String, Map<String, String>> rows = observationUnitImportResult.getObservationUnitRows();
 		result.setObservationUnitRows(rows);
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
@@ -506,22 +524,11 @@ public class DatasetServiceImpl implements DatasetService {
 					}
 				});
 
-			final List<String> observationUnitIds =
-				(List<String>) CollectionUtils.collect(observationUnitImportResult.getObservationUnitRows(), new Transformer() {
-
-					@Override
-					public String transform(final Object input) {
-						final ObservationUnitRow row = (ObservationUnitRow) input;
-						return row.getObsUnitId();
-					}
-				});
+			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().keySet());
 
 			final Map<String, ObservationUnitRow> currentData =
 				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
-					Lists.<String>newArrayList(), Lists.<String>newArrayList(), null,
-					1, null, null, null, observationUnitIds);
-
-
+					observationUnitIds);
 
 			final int difference = currentData.values().size() - observationUnitImportResult.getObservationUnitRows().size();
 			if (difference != 0) {
@@ -529,25 +536,52 @@ public class DatasetServiceImpl implements DatasetService {
 				result.getWarnings().reject("warning.import.not.found", Integer.toString(difference));
 			}
 
-			for (final ObservationUnitRow row : rows) {
-				final ObservationUnitData obsUnitId = row.getVariables().get(ExperimentDao.OBS_UNIT_ID);
-				if (obsUnitId == null || obsUnitId.getValue() == null || obsUnitId.getValue().isEmpty()) {
-					//Error: Observation Unit Id field is empty (OBS_UNIT_ID) - please remedy in spreadsheet and try again
-					throw new MiddlewareException("warning.import.obsUnitId");
-				}
+			final List<String> duplicatedObservationUnitIds = new ArrayList<>();
+			final boolean isDuplicatedObservationUnitId = false;
 
-				final ObservationUnitRow currentRow = currentData.get(obsUnitId.getValue());
-				//Some of the data in the import sheet will overwrite measurement data that has already been recorded.
-				for (final String variable : row.getVariables().keySet()) {
-					final ObservationUnitData observationUnitData = row.getVariables().get(variable);
-					final Integer variableId = observationUnitData.getVariableId();
-					if (selectionMethodsAndTraitsIds.contains(variableId) && observationUnitData.getValue() != null) {
+			for (final String row : rows.keySet()) {
+				final ObservationUnitRow currentRow = currentData.get(row);
+				final Map<String, String> variables = rows.get(row);
+				for (final String variableName : variables.keySet()) {
+					final String importedVariable = variables.get(variableName);
+					final ObservationUnitData variable = currentRow.getVariables().get(variableName);
+					if (variable != null && variable.getValue() != null && !variable.getValue().equalsIgnoreCase(importedVariable)) {
 						result.addWarning("warning.import.overwrite.data");
+					}
+
+					final StandardVariable
+						standardVariable = this.ontologyDataManager.getStandardVariable(variable.getVariableId(), programUUID);
+					final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
+					if (!this.isValidValue(measurementVariable, importedVariable)) {
+						//The numeric variableName {0} contains an invalid value {1} containing characters. Please check the data file and try again.
+						result.addWarning("warning.import.save.invalidCellValue");
 					}
 				}
 			}
 		}
 		return result;
+	}
+
+	private boolean isValidValue(
+		final MeasurementVariable var, final String value) {
+		if (StringUtils.isBlank(value)) {
+			return true;
+		}
+		if (var.getMinRange() != null && var.getMaxRange() != null) {
+			return this.validateIfValueIsMissingOrNumber(value.trim());
+		} else if (var != null && var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
+			return Util.isValidDate(value);
+		} else if (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC)) {
+			return this.validateIfValueIsMissingOrNumber(value.trim());
+		}
+		return true;
+	}
+
+	private boolean validateIfValueIsMissingOrNumber(final String value) {
+		if (MeasurementData.MISSING_VALUE.equals(value.trim())) {
+			return true;
+		}
+		return NumberUtils.isNumber(value);
 	}
 
 	@Override
@@ -566,6 +600,4 @@ public class DatasetServiceImpl implements DatasetService {
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
 	}
-
-	
 }

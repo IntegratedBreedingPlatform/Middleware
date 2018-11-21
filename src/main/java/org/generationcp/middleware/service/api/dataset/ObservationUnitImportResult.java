@@ -1,38 +1,37 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dataset.DatasetGeneratorInput;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class ObservationUnitImportResult {
 
-	private List<ObservationUnitRow> observationUnitRows;
+	private Map<String, Map<String, String>> observationUnitRows;
 
 	private BindingResult warnings;
 
-	public ObservationUnitImportResult(final List<ObservationUnitRow> observationUnitRows, final BindingResult warnings) {
+	public ObservationUnitImportResult(final Map<String, Map<String, String>> observationUnitRows, final BindingResult warnings) {
 		this.observationUnitRows = observationUnitRows;
 		this.warnings = warnings;
 	}
 
 	public ObservationUnitImportResult() {
 		this.warnings = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
-		this.observationUnitRows = Lists.newArrayList();
+		this.observationUnitRows = Collections.emptyMap();
 	}
 
-	public List<ObservationUnitRow> getObservationUnitRows() {
+	public Map<String, Map<String, String>> getObservationUnitRows() {
 		return this.observationUnitRows;
 	}
 
-	public void setObservationUnitRows(final List<ObservationUnitRow> observationUnitRows) {
+	public void setObservationUnitRows(final Map<String, Map<String, String>> observationUnitRows) {
 		this.observationUnitRows = observationUnitRows;
 	}
 
