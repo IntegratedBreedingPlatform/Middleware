@@ -419,6 +419,12 @@ public class DatasetServiceImpl implements DatasetService {
 			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
 		}
 
+		final ObservationUnitImportResult o = new ObservationUnitImportResult();
+		o.setObservationUnitRows(this.daoFactory.getExperimentDao().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
+			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
+			pageNumber, pageSize, sortBy, sortOrder));
+		this.validateImportDataset(studyId, datasetId, o);
+
 		return this.daoFactory.getExperimentDao().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
@@ -482,56 +488,66 @@ public class DatasetServiceImpl implements DatasetService {
 	public ObservationUnitImportResult validateImportDataset(final Integer studyId, final Integer datasetId,
 		final ObservationUnitImportResult observationUnitImportResult) {
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
-			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-
-		final List<Integer> currentTraitIds = (List<Integer>) CollectionUtils.collect(selectionMethodsAndTraits, new Transformer() {
-			@Override
-			public Integer transform(final Object input) {
-				final MeasurementVariableDto variable = (MeasurementVariableDto) input;
-				return variable.getId();
-			}
-		});
-
-		final List<Integer> observationUnitIds =
-			(List<Integer>) CollectionUtils.collect(observationUnitImportResult.getObservationUnitRows(), new Transformer() {
-				@Override
-				public Integer transform(final Object input) {
-					final ObservationUnitRow row = (ObservationUnitRow) input;
-					return row.getObservationUnitId();
-				}
-			});
-
-		final Map<String, ObservationUnitRow> currentData =
-			this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
-				this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), null,
-				null, null, null, null, observationUnitIds);
-
 		final ObservationUnitImportResult result = new ObservationUnitImportResult();
 		final List<ObservationUnitRow> rows = observationUnitImportResult.getObservationUnitRows();
 		result.setObservationUnitRows(rows);
 
-		final int difference = currentData.values().size() - observationUnitImportResult.getObservationUnitRows().size();
-		if (difference != 0) {
-			//"xx number of observation units were not found in the dataset you selected. Please review the imported file. Would you like to proceed with the import?"
-			result.getWarnings().reject("error.import.not.found", Integer.toString(difference));
-		}
+		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
+			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
-		for (final ObservationUnitRow row : rows) {
-			final ObservationUnitData obsUnitId = row.getVariables().get(ExperimentDao.OBS_UNIT_ID);
-			if (obsUnitId == null || obsUnitId.getValue() == null || obsUnitId.getValue().isEmpty()) {
-				//Error: Observation Unit Id field is empty (OBS_UNIT_ID) - please remedy in spreadsheet and try again
-				throw new MiddlewareException("error.import.obsUnitId");
+		if (selectionMethodsAndTraits.size() > 0) {
+			final List<Integer> selectionMethodsAndTraitsIds =
+				(List<Integer>) CollectionUtils.collect(selectionMethodsAndTraits, new Transformer() {
+
+					@Override
+					public Integer transform(final Object input) {
+						final MeasurementVariableDto variable = (MeasurementVariableDto) input;
+						return variable.getId();
+					}
+				});
+
+			final List<String> observationUnitIds =
+				(List<String>) CollectionUtils.collect(observationUnitImportResult.getObservationUnitRows(), new Transformer() {
+
+					@Override
+					public String transform(final Object input) {
+						final ObservationUnitRow row = (ObservationUnitRow) input;
+						return row.getObsUnitId();
+					}
+				});
+
+			final Map<String, ObservationUnitRow> currentData =
+				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
+					Lists.<String>newArrayList(), Lists.<String>newArrayList(), null,
+					1, null, null, null, observationUnitIds);
+
+
+
+			final int difference = currentData.values().size() - observationUnitImportResult.getObservationUnitRows().size();
+			if (difference != 0) {
+				//"xx number of observation units were not found in the dataset you selected. Please review the imported file. Would you like to proceed with the import?"
+				result.getWarnings().reject("warning.import.not.found", Integer.toString(difference));
 			}
 
-			final ObservationUnitRow currentRow = currentData.get(obsUnitId.getValue());
-			for (final ObservationUnitData variable : row.getVariables().values()) {
+			for (final ObservationUnitRow row : rows) {
+				final ObservationUnitData obsUnitId = row.getVariables().get(ExperimentDao.OBS_UNIT_ID);
+				if (obsUnitId == null || obsUnitId.getValue() == null || obsUnitId.getValue().isEmpty()) {
+					//Error: Observation Unit Id field is empty (OBS_UNIT_ID) - please remedy in spreadsheet and try again
+					throw new MiddlewareException("warning.import.obsUnitId");
+				}
+
+				final ObservationUnitRow currentRow = currentData.get(obsUnitId.getValue());
 				//Some of the data in the import sheet will overwrite measurement data that has already been recorded.
+				for (final String variable : row.getVariables().keySet()) {
+					final ObservationUnitData observationUnitData = row.getVariables().get(variable);
+					final Integer variableId = observationUnitData.getVariableId();
+					if (selectionMethodsAndTraitsIds.contains(variableId) && observationUnitData.getValue() != null) {
+						result.addWarning("warning.import.overwrite.data");
+					}
+				}
 			}
 		}
-
 		return result;
-
 	}
 
 	@Override

@@ -714,7 +714,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(" AND nde.obs_unit_id IN (:observationUnitIds)"); //
 		}
 
-
 		sql.append(" GROUP BY observationUnitId ");
 
 		String orderColumn;
@@ -759,7 +758,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				pageSize,
 				sortBy,
 				sortOrder,
-				observationVariableName, false, null);
+				observationVariableName, null);
 			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -869,7 +868,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final Integer instanceId, final Integer pageNumber,
 		final Integer pageSize,
-		final String sortBy, final String sortOrder, final List<Integer> observationUnitIds) {
+		final String sortBy, final String sortOrder, final List<String> observationUnitIds) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(datasetId);
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
@@ -882,7 +881,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				pageSize,
 				sortBy,
 				sortOrder,
-				observationVariableName, true, observationUnitIds);
+				observationVariableName, observationUnitIds);
 			return this.mapResultsToMap(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -894,12 +893,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	private List<Map<String, Object>> getObservationUnitsQueryResult(
 		final int datasetId,
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final Integer instanceId, final int pageNumber,
-		final int pageSize,
-		final String sortBy, final String sortOrder, final String observationVariableName, final boolean includesObservationUnitIdFilter,
-		final List<Integer> observationUnitIds) {
+		final List<String> designFactors, final Integer instanceId, final Integer pageNumber,
+		final Integer pageSize,
+		final String sortBy, final String sortOrder, final String observationVariableName,
+		final List<String> observationUnitIds) {
 		try {
 			final boolean includesInstanceFilter = (instanceId != null);
+
+			final boolean includesObservationUnitIdFilter = (observationUnitIds != null && !observationUnitIds.isEmpty());
 
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
 				designFactors, sortBy, sortOrder, observationVariableName, includesInstanceFilter, includesObservationUnitIdFilter);
@@ -912,11 +913,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			if (includesObservationUnitIdFilter) {
-				query.setParameter("observationUnitIds", observationUnitIds);
+				query.setParameterList("observationUnitIds", observationUnitIds);
 			}
 
-			query.setFirstResult(pageSize * (pageNumber - 1));
-			query.setMaxResults(pageSize);
+			if (pageNumber != null && pageSize != null) {
+				query.setFirstResult(pageSize * (pageNumber - 1));
+				query.setMaxResults(pageSize);
+			}
 
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = query.list();
@@ -940,7 +943,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final ObservationUnitRow observationUnitRow =
 					this.getObservationUnitRow(selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName, row);
 
-				observationUnitRows.put(String.valueOf(observationUnitRow.getVariables().get(OBS_UNIT_ID)), observationUnitRow);
+				observationUnitRows.put(String.valueOf(observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue()), observationUnitRow);
 			}
 		}
 
@@ -983,7 +986,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
 		observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
-
+		observationUnitRow.setObsUnitId((String) row.get(OBS_UNIT_ID));
 		final Integer gid = (Integer) row.get(GID);
 		observationUnitRow.setGid(gid);
 		variables.put(GID, new ObservationUnitData(gid.toString()));
