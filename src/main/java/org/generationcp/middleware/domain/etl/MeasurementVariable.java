@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.util.Debug;
+import org.apache.commons.lang3.StringUtils;
 
 public class MeasurementVariable {
 
@@ -199,7 +200,7 @@ public class MeasurementVariable {
 	}
 
 	public void setValue(final String value) {
-		this.value = value;
+		this.value = StringUtils.defaultString(value);
 	}
 
 	public String getLabel() {

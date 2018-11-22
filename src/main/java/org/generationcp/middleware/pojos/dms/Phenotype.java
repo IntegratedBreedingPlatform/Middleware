@@ -26,6 +26,7 @@ import javax.persistence.TableGenerator;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_phenotype
@@ -168,7 +169,7 @@ public class Phenotype implements Serializable {
 	}
 
 	public void setValue(final String value) {
-		this.value = value;
+		this.value = StringUtils.defaultString(value);
 	}
 
 	public Integer getcValueId() {

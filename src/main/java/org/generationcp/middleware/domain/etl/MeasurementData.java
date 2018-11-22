@@ -112,7 +112,7 @@ public class MeasurementData {
 	}
 
 	public void setValue(final String value) {
-		this.value = value;
+		this.value = StringUtils.defaultString(value);
 	}
 
 	public Integer getPhenotypeId() {
@@ -185,7 +185,7 @@ public class MeasurementData {
 	}
 
 	public void setcValueId(final String cValueId) {
-		this.cValueId = cValueId;
+		this.cValueId = StringUtils.defaultString(cValueId);
 	}
 
 	public String getDisplayValue() {
