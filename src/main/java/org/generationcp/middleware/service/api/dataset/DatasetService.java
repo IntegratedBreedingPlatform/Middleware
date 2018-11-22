@@ -53,6 +53,7 @@ public interface DatasetService {
 		Integer studyId, Integer datasetId,
 		final String programUUID, ObservationUnitImportResult observationUnitImportResult);
 
-	List<String> importDataset(Integer datasetId, ObservationUnitImportResult observationUnitImportResult);
+	ObservationUnitImportResult importDataset(Integer datasetId, ObservationUnitImportResult observationUnitImportResult,
+		final String programUUID);
 
 }
