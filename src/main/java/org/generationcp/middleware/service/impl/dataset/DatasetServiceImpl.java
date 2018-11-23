@@ -13,7 +13,6 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -43,7 +42,6 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -496,112 +494,6 @@ public class DatasetServiceImpl implements DatasetService {
 			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds) {
 		return this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
 				observationUnitIds);
-	}
-
-	@Override
-	public ObservationUnitImportResult validateImportDataset(
-		final Integer studyId, final Integer datasetId,
-		final String programUUID, final ObservationUnitImportResult observationUnitImportResult) {
-
-		boolean isOverwritten = false;
-		final ObservationUnitImportResult result = new ObservationUnitImportResult();
-		final Table<String, String, String> table = observationUnitImportResult.getObservationUnitRows();
-		result.setObservationUnitRows(table);
-
-		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
-			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-
-		if (selectionMethodsAndTraits.size() > 0) {
-
-			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().columnKeySet());
-
-			final Map<String, ObservationUnitRow> currentData =
-				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
-					observationUnitIds);
-
-			final int difference = currentData.values().size() - observationUnitImportResult.getObservationUnitRows().size();
-			if (difference != 0) {
-				final String message = this.messageSource.getMessage(
-					"warning.import.not.found",
-					new String[] {Integer.toString(difference)},
-					LocaleContextHolder.getLocale());
-				result.getWarnings().add(message);
-			}
-			for (final String observationUnitId : table.rowKeySet()) {
-				final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations =
-					currentData.get(observationUnitId);
-
-				for (final String variableName : table.columnKeySet()) {
-
-					final org.generationcp.middleware.service.api.dataset.ObservationUnitData observation =
-						storedObservations.getVariables().get(variableName);
-
-					final StandardVariable
-						standardVariable = this.ontologyDataManager.getStandardVariable(observation.getVariableId(), programUUID);
-					final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
-				}
-			}
-			for (final Object observationUnitId : table.rowKeySet()) {
-				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
-
-				for (final String variableName : table.columnKeySet()) {
-					final String importedVariable = table.get(observationUnitId, variableName);
-
-					final MeasurementVariableDto measurementVariableDto =
-						(MeasurementVariableDto) CollectionUtils.find(selectionMethodsAndTraits, new Predicate() {
-
-							@Override
-							public boolean evaluate(final Object object) {
-								final MeasurementVariableDto dto = (MeasurementVariableDto) object;
-								return dto.getName().equals(importedVariable);
-							}
-						});
-
-					final StandardVariable
-						standardVariable = this.ontologyDataManager.getStandardVariable(measurementVariableDto.getId(), programUUID);
-					final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
-					if (!this.isValidValue(measurementVariable, importedVariable)) {
-						throw new MiddlewareRequestException("", "warning.import.save.invalidCellValue", null);
-					}
-
-					if (currentRow != null) {
-						final ObservationUnitData variable = currentRow.getVariables().get(variableName);
-						if (!isOverwritten && variable != null && variable.getValue() != null && !variable.getValue()
-							.equalsIgnoreCase(importedVariable)) {
-							final String message = this.messageSource.getMessage(
-								"warning.import.overwrite.data",
-								new String[] {Integer.toString(difference)},
-								LocaleContextHolder.getLocale());
-							result.getWarnings().add(message);
-							isOverwritten = true;
-						}
-					}
-				}
-			}
-		}
-		return result;
-	}
-
-	private boolean isValidValue(
-		final MeasurementVariable var, final String value) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-		if (var.getMinRange() != null && var.getMaxRange() != null) {
-			return this.validateIfValueIsMissingOrNumber(value.trim());
-		} else if (var != null && var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
-			return Util.isValidDate(value);
-		} else if (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC)) {
-			return this.validateIfValueIsMissingOrNumber(value.trim());
-		}
-		return true;
-	}
-
-	private boolean validateIfValueIsMissingOrNumber(final String value) {
-		if (MeasurementData.MISSING_VALUE.equals(value.trim())) {
-			return true;
-		}
-		return NumberUtils.isNumber(value);
 	}
 
 	@Override
