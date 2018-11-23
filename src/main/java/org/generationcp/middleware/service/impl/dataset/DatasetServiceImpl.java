@@ -33,7 +33,6 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,18 +58,18 @@ public class DatasetServiceImpl implements DatasetService {
 	public static final String[] FIXED_DESIGN_FACTORS =
 		{"REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE"};
 
-	public static final ArrayList<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	public static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
-	public static final ArrayList<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	public static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.EXPERIMENTAL_DESIGN.getId(), //
 		VariableType.TREATMENT_FACTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
-	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
+	public static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId());
@@ -107,7 +106,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
-		final Session currentSession = sessionProvider.getSession();
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 	}
@@ -470,6 +468,19 @@ public class DatasetServiceImpl implements DatasetService {
 		
 		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+	}
+
+	@Override
+	public void deleteDataset(final int datasetId) {
+
+		try {
+
+			this.daoFactory.getDmsProjectDAO().deleteDataset(datasetId);
+
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
+		}
 	}
 
 	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {

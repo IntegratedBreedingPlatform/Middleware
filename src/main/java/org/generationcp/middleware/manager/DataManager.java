@@ -35,7 +35,6 @@ import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
-import org.generationcp.middleware.operation.destroyer.DataSetDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
@@ -645,10 +644,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final CvTermRelationshipSaver getTermRelationshipSaver() {
 		return new CvTermRelationshipSaver(this.sessionProvider);
-	}
-
-	protected final DataSetDestroyer getDataSetDestroyer() {
-		return new DataSetDestroyer(this.sessionProvider);
 	}
 
 	protected final TraitGroupBuilder getTraitGroupBuilder() {
