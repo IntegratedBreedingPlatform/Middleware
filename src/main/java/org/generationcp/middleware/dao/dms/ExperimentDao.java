@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1073,5 +1072,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 		observationUnitRow.setVariables(variables);
 		return observationUnitRow;
+	}
+
+	public ExperimentModel getByObsUnitId(final String obsUnitId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("obsUnitId", obsUnitId));
+			return (ExperimentModel) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			final String message = "Error at getExperimentsByProjectIds query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }
