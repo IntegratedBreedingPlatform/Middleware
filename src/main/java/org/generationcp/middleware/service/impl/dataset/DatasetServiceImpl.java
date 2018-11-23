@@ -52,25 +52,23 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
-	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
-	public static final String[] FIXED_GERMPLASM_DESCRIPTOR = {"GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID"};
-	public static final String[] FIXED_DESIGN_FACTORS =
+	private static final String[] FIXED_GERMPLASM_DESCRIPTOR = {"GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID"};
+	protected static final String[] FIXED_DESIGN_FACTORS =
 		{"REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE"};
 
-	public static final ArrayList<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.TRAIT.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
-	public static final ArrayList<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
-	public static final ArrayList<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
-		VariableType.SELECTION_METHOD.getId(),
-		VariableType.OBSERVATION_UNIT.getId());
+		VariableType.SELECTION_METHOD.getId());
 
 	private DaoFactory daoFactory;
 
@@ -101,7 +99,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
-		final Session currentSession = sessionProvider.getSession();
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 	}
@@ -221,9 +218,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!variable.getVariableTypes().contains(VariableType.getById(typeId))) {
 			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
 		}
-		final ProjectProperty projectProperty =
-			new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
-		return projectProperty;
+		return new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
 	}
 
 	private List<ProjectRelationship> buildProjectRelationships(final DmsProject parentDataset, final DmsProject childDataset)
@@ -233,7 +228,7 @@ public class DatasetServiceImpl implements DatasetService {
 		relationship.setObjectProject(parentDataset);
 		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
 
-		final List<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
+		final List<ProjectRelationship> relationships = new ArrayList<>();
 		relationships.add(relationship);
 
 		return relationships;
