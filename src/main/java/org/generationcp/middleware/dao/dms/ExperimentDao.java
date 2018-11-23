@@ -754,9 +754,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final List<Map<String, Object>> results = query.list();
 			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
+			ExperimentDao.LOG.error(e.getMessage());
 			final String error = "An internal error has ocurred when trying to execute the operation";
-			ExperimentDao.LOG.error(error);
-			throw new MiddlewareException(error);
+			throw new MiddlewareException(error, e);
 		}
 	}
 
