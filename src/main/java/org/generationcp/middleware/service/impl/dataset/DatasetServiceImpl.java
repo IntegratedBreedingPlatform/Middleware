@@ -1,8 +1,12 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.apache.commons.lang.RandomStringUtils;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -18,7 +22,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
@@ -33,18 +36,13 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -89,9 +87,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private DesignFactors designFactors;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -146,8 +141,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
-		final String cropPrefix = this.workbenchDataManager.getProjectByUuid(study.getProgramUUID()).getCropType().getPlotCodePrefix();
-
 		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO()
 			.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.PLOT_DATA.getId()));
 
@@ -180,9 +173,8 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getExperimentDao().getObservationUnits(plotDataset.getProjectId(), instanceIds);
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
-				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(), plotObservationUnit.getTypeId(),
-					cropPrefix + "P" + RandomStringUtils.randomAlphanumeric(8), subObservationDataset, plotObservationUnit.getStock(),
-					plotObservationUnit, i);
+				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(),
+						plotObservationUnit.getTypeId(), subObservationDataset, plotObservationUnit.getStock(), plotObservationUnit, i);
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
