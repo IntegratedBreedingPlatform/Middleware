@@ -54,10 +54,6 @@ public interface DatasetService {
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
-	ObservationUnitImportResult validateImportDataset(
-		Integer studyId, Integer datasetId,
-		final String programUUID, ObservationUnitImportResult observationUnitImportResult);
-
 	ObservationUnitImportResult importDataset(Integer datasetId, ObservationUnitImportResult observationUnitImportResult,
 		final String programUUID);
 
