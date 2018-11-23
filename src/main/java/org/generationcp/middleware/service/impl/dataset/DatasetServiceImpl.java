@@ -3,13 +3,10 @@ package org.generationcp.middleware.service.impl.dataset;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -57,11 +54,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -505,6 +499,22 @@ public class DatasetServiceImpl implements DatasetService {
 		
 		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+	}
+
+	/**
+	 *
+	 * @param datasetId
+	 * @param selectionMethodsAndTraits
+	 * @param observationUnitIds
+	 * @return A map where the key element is the observation unit id (OBS_UNIT_ID) in nd_experiment table, and value is
+	 * 		a observationUnitRow that contains only values for the specified measurement variables
+	 */
+	@Override
+	public Map<String, ObservationUnitRow> getObservationUnitsAsMap(
+			final int datasetId,
+			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds) {
+		return this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
+				observationUnitIds);
 	}
 
 	@Override

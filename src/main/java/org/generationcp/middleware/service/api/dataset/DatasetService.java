@@ -4,8 +4,10 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface DatasetService {
@@ -48,6 +50,9 @@ public interface DatasetService {
 	Integer getNumberOfChildren (final Integer parentId);
 	
 	void deletePhenotype(final Integer phenotypeId);
+
+	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
+			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
 	ObservationUnitImportResult validateImportDataset(
 		Integer studyId, Integer datasetId,
