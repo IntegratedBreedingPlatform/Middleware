@@ -3,10 +3,9 @@ package org.generationcp.middleware.service.impl.dataset;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -432,15 +431,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (sortedColumnTermId != null) {
 			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
 		}
-	//TODO delete this
-	/*	final ObservationUnitImportResult o = new ObservationUnitImportResult();
-		final Map<String, Map<String, String>> observationUnitRows = new HashMap<>();
-		final Map<String, String> data = new HashMap<>();
-		data.put("Aflatox_M_ppb", "12");
-		observationUnitRows.put("839f9d543dd8d", data);
-		o.setObservationUnitRows(observationUnitRows);
-		this.validateImportDataset(studyId, datasetId, "079878e1-ce3b-48f5-89f3-df7c82c96363", o);
-	*/
+
 		return this.daoFactory.getExperimentDao().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
 			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
@@ -523,8 +514,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		boolean isOverwritten = false;
 		final ObservationUnitImportResult result = new ObservationUnitImportResult();
-		final Table rows = observationUnitImportResult.getObservationUnitRows();
-		result.setObservationUnitRows(rows);
+		final Table<String, String, String> table = observationUnitImportResult.getObservationUnitRows();
+		result.setObservationUnitRows(table);
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
@@ -539,17 +530,31 @@ public class DatasetServiceImpl implements DatasetService {
 
 			final int difference = currentData.values().size() - observationUnitImportResult.getObservationUnitRows().size();
 			if (difference != 0) {
-				final String message = this.messageSource.getMessage("warning.import.not.found",
+				final String message = this.messageSource.getMessage(
+					"warning.import.not.found",
 					new String[] {Integer.toString(difference)},
 					LocaleContextHolder.getLocale());
 				result.getWarnings().add(message);
 			}
+			for (final String observationUnitId : table.rowKeySet()) {
+				final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations =
+					currentData.get(observationUnitId);
 
-			for (final Object row : rows.columnKeySet()) {
-				final ObservationUnitRow currentRow = currentData.get(row);
-				final Map<String, String> variables = rows.column(row);
-				for (final String variableName : variables.keySet()) {
-					final String importedVariable = variables.get(variableName);
+				for (final String variableName : table.columnKeySet()) {
+
+					final org.generationcp.middleware.service.api.dataset.ObservationUnitData observation =
+						storedObservations.getVariables().get(variableName);
+
+					final StandardVariable
+						standardVariable = this.ontologyDataManager.getStandardVariable(observation.getVariableId(), programUUID);
+					final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
+				}
+			}
+			for (final Object observationUnitId : table.rowKeySet()) {
+				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
+
+				for (final String variableName : table.columnKeySet()) {
+					final String importedVariable = table.get(observationUnitId, variableName);
 
 					final MeasurementVariableDto measurementVariableDto =
 						(MeasurementVariableDto) CollectionUtils.find(selectionMethodsAndTraits, new Predicate() {
@@ -572,7 +577,8 @@ public class DatasetServiceImpl implements DatasetService {
 						final ObservationUnitData variable = currentRow.getVariables().get(variableName);
 						if (!isOverwritten && variable != null && variable.getValue() != null && !variable.getValue()
 							.equalsIgnoreCase(importedVariable)) {
-							final String message = this.messageSource.getMessage("warning.import.overwrite.data",
+							final String message = this.messageSource.getMessage(
+								"warning.import.overwrite.data",
 								new String[] {Integer.toString(difference)},
 								LocaleContextHolder.getLocale());
 							result.getWarnings().add(message);
@@ -608,89 +614,95 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationUnitImportResult importDataset(final Integer datasetId, final ObservationUnitImportResult observationUnitImportResult,
+	public ObservationUnitImportResult importDataset(
+		final Integer datasetId, final ObservationUnitImportResult observationUnitImportResult,
 		final String programUUID) {
-			final ObservationUnitImportResult result = new ObservationUnitImportResult();
-			final Table table = observationUnitImportResult.getObservationUnitRows();
-			result.setObservationUnitRows(table);
+		final ObservationUnitImportResult result = new ObservationUnitImportResult();
+		final Table<String, String, String> table = observationUnitImportResult.getObservationUnitRows();
+		result.setObservationUnitRows(table);
 
-			final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+		final List<MeasurementVariable>
+			measurementVariableList = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
 
-			if (selectionMethodsAndTraits.size() > 0) {
+		final List<MeasurementVariableDto> selectionMethodsAndTraits =
+			(List<MeasurementVariableDto>) CollectionUtils.collect(measurementVariableList, new Transformer() {
 
-				final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().columnKeySet());
+				@Override
+				public Object transform(final Object input) {
+					final MeasurementVariable variable = (MeasurementVariable) input;
+					return new MeasurementVariableDto(variable.getTermId(), variable.getName());
+				}
+			});
 
-				final Map<String, ObservationUnitRow> currentData =
-					this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
-						observationUnitIds);
+		if (measurementVariableList.size() > 0) {
 
-				final Map<Integer, List<MeasurementVariable>> formulasMap =	this.getVariatesMapUsedInFormulas(selectionMethodsAndTraits);
+			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().rowKeySet());
 
-				for (final Object obsUnitId : table.rowKeySet()) {
-					final ObservationUnitRow currentRow = currentData.get(obsUnitId);
-					final Map<String, String> variables = table.column(obsUnitId);
-					final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId.toString());
-					for (final String variableName : variables.keySet()) {
-						final String importedVariableValue = variables.get(variableName);
-						final MeasurementVariableDto measurementVariableDto =
-							(MeasurementVariableDto) CollectionUtils.find(selectionMethodsAndTraits, new Predicate() {
+			final Map<String, ObservationUnitRow> currentData =
+				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
+					observationUnitIds);
+			final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
-								@Override
-								public boolean evaluate(final Object object) {
-									final MeasurementVariableDto dto = (MeasurementVariableDto) object;
-									return dto.getName().equalsIgnoreCase(variableName);
+			for (final Object observationUnitId : table.rowKeySet()) {
+				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
+
+				final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
+				for (final String variableName : table.columnKeySet()) {
+					final String importedVariable = table.get(observationUnitId, variableName);
+					final MeasurementVariable measurementVariable =
+						(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
+
+							@Override
+							public boolean evaluate(final Object object) {
+								final MeasurementVariable variable = (MeasurementVariable) object;
+								return variable.getName().equalsIgnoreCase(variableName);
+							}
+						});
+
+					Integer categoricalValueId = null;
+					if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+						if (importedVariable != null) {
+							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
+								if (importedVariable.equalsIgnoreCase(possibleValue.getName())) {
+									categoricalValueId = possibleValue.getId();
+									break;
 								}
-							});
-
-						final StandardVariable
-							standardVariable = this.ontologyDataManager.getStandardVariable(measurementVariableDto.getId(), programUUID);
-						final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
-						if (!this.isValidValue(measurementVariable, importedVariableValue)) {
-							throw new MiddlewareRequestException("", "warning.import.save.invalidCellValue", null);
-						}
-
-						Integer categoricalValueId = null;
-						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-							if (importedVariableValue != null) {
-								for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
-									if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
-										categoricalValueId = possibleValue.getId();
-									}
-								}
 							}
-
-						}
-						if (currentRow != null) {
-							final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
-							this.updatePhenotype(observationUnitData.getObservationId(), categoricalValueId, importedVariableValue);
-						}
-						else {
-
-							final ObservationDto observationDto = new ObservationDto();
-							observationDto.setVariableId(measurementVariable.getTermId());
-							observationDto.setCategoricalValueId(categoricalValueId);
-							observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
-							observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
-							if (measurementVariable.getFormula() != null) {
-								observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
-							}
-							else {
-								observationDto.setStatus(null);
-							}
-							observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
-							observationDto.setValue(importedVariableValue);
-							this.addPhenotype(observationDto);
 						}
 					}
-					this.setMeasurementDataAsOutOfSync(formulasMap, experimentModel);
+
+					final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
+					if (observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData.getValue()
+						.isEmpty()) {
+						this.updatePhenotype(observationUnitData.getObservationId(), categoricalValueId, importedVariable);
+					} else {
+
+						final ObservationDto observationDto = new ObservationDto();
+						observationDto.setVariableId(measurementVariable.getTermId());
+						observationDto.setCategoricalValueId(categoricalValueId);
+						observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
+						observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
+						observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
+						observationDto.setValue(importedVariable);
+						if (measurementVariable.getFormula() != null) {
+							observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
+						} else {
+							observationDto.setStatus(null);
+						}
+						this.addPhenotype(observationDto);
+					}
 				}
 
+				final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariables);
+				this.setMeasurementDataAsOutOfSync(formulasMap, experimentModel);
 			}
-			return result;
-		}
 
-	private void setMeasurementDataAsOutOfSync(final Map<Integer, List<MeasurementVariable>> formulasMap,
+		}
+		return result;
+	}
+
+	private void setMeasurementDataAsOutOfSync(
+		final Map<Integer, List<MeasurementVariable>> formulasMap,
 		final ExperimentModel experimentModel) {
 		for (final Integer measurementVariableId : formulasMap.keySet()) {
 			final List<Phenotype> phenotypes = experimentModel.getPhenotypes();
@@ -717,10 +729,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private Map<Integer, List<MeasurementVariable>> getVariatesMapUsedInFormulas(
-		final List<MeasurementVariableDto> variableDtos) {
+		final List<MeasurementVariable> measurementVariables) {
 		final Map<Integer, List<MeasurementVariable>> map = new HashMap<>();
 
-		final Collection<MeasurementVariable> formulas = CollectionUtils.select(variableDtos, new Predicate() {
+		final Collection<MeasurementVariable> formulas = CollectionUtils.select(measurementVariables, new Predicate() {
 
 			@Override
 			public boolean evaluate(final Object o) {
@@ -729,20 +741,23 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		});
 
-		for (final MeasurementVariableDto row : variableDtos) {
-			final List<MeasurementVariable> formulasFromCVTermId = this.getFormulasFromCVTermId(row, formulas);
-			if (!formulasFromCVTermId.isEmpty()) {
-				map.put(row.getId(), formulasFromCVTermId);
+		if (!formulas.isEmpty()) {
+			for (final MeasurementVariable row : measurementVariables) {
+				final List<MeasurementVariable> formulasFromCVTermId = this.getFormulasFromCVTermId(row, formulas);
+				if (!formulasFromCVTermId.isEmpty()) {
+					map.put(row.getTermId(), formulasFromCVTermId);
+				}
 			}
 		}
 		return map;
 	}
 
-	private List<MeasurementVariable> getFormulasFromCVTermId(final MeasurementVariableDto variable,
+	private List<MeasurementVariable> getFormulasFromCVTermId(
+		final MeasurementVariable variable,
 		final Collection<MeasurementVariable> measurementVariables) {
 		final List<MeasurementVariable> result = new ArrayList<>();
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
-			if (measurementVariable.getFormula().isInputVariablePresent(variable.getId())) {
+			if (measurementVariable.getFormula().isInputVariablePresent(variable.getTermId())) {
 				result.add(measurementVariable);
 			}
 		}
@@ -754,7 +769,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		phenotype.setValue(value);
-		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
+		phenotype.setcValue(categoricalValueId == null || categoricalValueId == 0 ? null : categoricalValueId);
 		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(observableId, phenotype);
 

@@ -11,7 +11,7 @@ import java.util.List;
 @AutoProperty
 public class ObservationUnitImportResult {
 
-	private Table observationUnitRows;
+	private Table<String, String, String> observationUnitRows;
 
 	private List<String> warnings;
 
