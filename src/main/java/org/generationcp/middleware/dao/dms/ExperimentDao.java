@@ -808,7 +808,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (addStatus) {
 				createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
 			}
-			createSQLQuery.addScalar(measurementVariable.getName() + "_CvalueId");
+			createSQLQuery.addScalar(measurementVariable.getName() + "_CvalueId", new IntegerType());
 		}
 	}
 
