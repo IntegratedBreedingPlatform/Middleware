@@ -57,7 +57,7 @@ public class PhenotypeSaverTest extends IntegrationTestBase {
 		values.setGermplasmId(1);
 
 		//Save the experiment
-		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "jf10");
+		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 
 		final Phenotype toBeSaved = new Phenotype();
