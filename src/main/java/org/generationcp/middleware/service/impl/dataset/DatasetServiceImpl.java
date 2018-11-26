@@ -2,7 +2,6 @@ package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -18,7 +17,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
@@ -34,8 +32,6 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.util.FormulaUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,21 +50,20 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
-	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
-	public static final String[] FIXED_GERMPLASM_DESCRIPTOR = {"GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID"};
-	public static final String[] FIXED_DESIGN_FACTORS =
+	private static final String[] FIXED_GERMPLASM_DESCRIPTOR = {"GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID"};
+	protected static final String[] FIXED_DESIGN_FACTORS =
 		{"REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE"};
 
-	public static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.TRAIT.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
-	public static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
-	public static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId());
@@ -88,9 +83,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private DesignFactors designFactors;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -144,8 +136,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
-		final String cropPrefix = this.workbenchDataManager.getProjectByUuid(study.getProgramUUID()).getCropType().getPlotCodePrefix();
-
 		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO()
 			.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.PLOT_DATA.getId()));
 
@@ -178,9 +168,8 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getExperimentDao().getObservationUnits(plotDataset.getProjectId(), instanceIds);
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
-				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(), plotObservationUnit.getTypeId(),
-					cropPrefix + "P" + RandomStringUtils.randomAlphanumeric(8), subObservationDataset, plotObservationUnit.getStock(),
-					plotObservationUnit, i);
+				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(),
+						plotObservationUnit.getTypeId(), subObservationDataset, plotObservationUnit.getStock(), plotObservationUnit, i);
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
@@ -227,9 +216,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!variable.getVariableTypes().contains(VariableType.getById(typeId))) {
 			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
 		}
-		final ProjectProperty projectProperty =
-			new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
-		return projectProperty;
+		return new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
 	}
 
 	private List<ProjectRelationship> buildProjectRelationships(final DmsProject parentDataset, final DmsProject childDataset)
@@ -239,7 +226,7 @@ public class DatasetServiceImpl implements DatasetService {
 		relationship.setObjectProject(parentDataset);
 		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
 
-		final List<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
+		final List<ProjectRelationship> relationships = new ArrayList<>();
 		relationships.add(relationship);
 
 		return relationships;

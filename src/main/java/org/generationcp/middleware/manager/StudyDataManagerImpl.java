@@ -184,13 +184,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
-			final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description,
+			final String programUUID, final StudyTypeDto studyType, final String description,
 			final String startDate, final String endDate, final String objective, final String name, final String createdBy) {
 
 		try {
 
 			final DmsProject project = this.getStudySaver()
-					.saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, cropPrefix, studyType, description,
+					.saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, studyType, description,
 							startDate, endDate, objective, name, createdBy);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), programUUID, studyType);
@@ -259,12 +259,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues,
-			final String cropPrefix) {
+	public void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues) {
 
 		try {
 
-			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues, cropPrefix);
+			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues);
 
 		} catch (final Exception e) {
 
@@ -274,12 +273,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void addOrUpdateExperiment(final int dataSetId, final ExperimentType experimentType,
-			final List<ExperimentValues> experimentValuesList, final String cropPrefix) {
+			final List<ExperimentValues> experimentValuesList) {
 
 		try {
 
 			for (final ExperimentValues experimentValues : experimentValuesList) {
-				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues, cropPrefix);
+				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
 			}
 
 		} catch (final Exception e) {

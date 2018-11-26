@@ -51,7 +51,6 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	private StudyReference studyReference;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	private StudyTestDataInitializer studyTDI;
-	private final String cropPrefix = "ABCD";
 	private StudyDataManagerImpl manager;
 	private Project commonTestProject;
 
@@ -72,7 +71,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
 				this.locationManager, this.userDataManager);
 
-		this.studyReference = this.studyTDI.addTestStudy(this.cropPrefix);
+		this.studyReference = this.studyTDI.addTestStudy();
 		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
 		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.PLOT_DATA);
 	}
