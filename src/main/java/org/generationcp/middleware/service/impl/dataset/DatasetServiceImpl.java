@@ -57,10 +57,13 @@ public class DatasetServiceImpl implements DatasetService {
 	protected static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
 	protected static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
+		VariableType.EXPERIMENTAL_DESIGN.getId(), //
+		VariableType.TREATMENT_FACTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
 	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
@@ -312,7 +315,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		phenotype.setValue(value);
-		phenotype.setcValue(categoricalValueId == 0 ? null : categoricalValueId);
+		phenotype.setcValue(categoricalValueId != null && categoricalValueId != 0 ? categoricalValueId : null);
 		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(observableId, phenotype);
 
