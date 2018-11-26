@@ -86,6 +86,10 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.SELECTION_METHOD.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
 
+	public static final ArrayList<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList( //
+			VariableType.TRAIT.getId(), //
+			VariableType.SELECTION_METHOD.getId());
+
 	private DaoFactory daoFactory;
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -491,10 +495,11 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Map<String, ObservationUnitRow> getObservationUnitsAsMap(
 			final int datasetId,
-			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds) {
+			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds) {
 		return this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
 				observationUnitIds);
 	}
+
 
 	@Override
 	public ObservationUnitImportResult importDataset(
@@ -522,7 +527,7 @@ public class DatasetServiceImpl implements DatasetService {
 			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().rowKeySet());
 
 			final Map<String, ObservationUnitRow> currentData =
-				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, selectionMethodsAndTraits,
+				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
 					observationUnitIds);
 			final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
@@ -582,6 +587,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 		}
 		return result;
+	}
+
+	@Override
+	public List<MeasurementVariable> getDatasetMeasurementVariables(final Integer datasetId) {
+		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, MEASUREMENT_VARIABLE_TYPES);
 	}
 
 	private void setMeasurementDataAsOutOfSync(

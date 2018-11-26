@@ -11,9 +11,11 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -640,7 +642,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public String getObservationUnitTableQuery(
+	private String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName) {
 		
@@ -858,14 +860,22 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public Map<String, ObservationUnitRow> getObservationUnitsAsMap(
 		final int datasetId,
-		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds) {
+		final List<MeasurementVariable> measurementVariables, final List<String> observationUnitIds) {
+
+		Function<MeasurementVariable, MeasurementVariableDto> measurementVariableFullToDto =
+				new Function<MeasurementVariable,MeasurementVariableDto>() {
+					public MeasurementVariableDto apply(MeasurementVariable i) { return new MeasurementVariableDto(i.getTermId(), i.getName()); }
+				};
+
+		final List<MeasurementVariableDto> measurementVariableDtos = Lists.transform(measurementVariables, measurementVariableFullToDto);
+
 		try {
 			final String observationVariableName = this.getObservationVariableName(datasetId);
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				datasetId,
-				selectionMethodsAndTraits,
+					measurementVariableDtos,
 				observationVariableName, observationUnitIds);
-			return this.mapResultsToMap(results, selectionMethodsAndTraits, observationVariableName);
+			return this.mapResultsToMap(results, measurementVariableDtos, observationVariableName);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
 			ExperimentDao.LOG.error(error);

@@ -52,9 +52,10 @@ public interface DatasetService {
 	void deletePhenotype(final Integer phenotypeId);
 
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
-			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds);
+			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
 	ObservationUnitImportResult importDataset(Integer datasetId, ObservationUnitImportResult observationUnitImportResult,
 		final String programUUID);
 
+	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 }
