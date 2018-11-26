@@ -301,7 +301,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 			if (StringUtils.isEmpty(this.sampleObsUnitId)) {
 				this.sampleObsUnitId = savedExperiment.getObsUnitId();
 			}
-			System.out.println(savedExperiment.getNdExperimentId() + ", ouid=" + savedExperiment.getObsUnitId() + ", sample=" + this.sampleObsUnitId);
 
 			final Plant plant = PlantTestDataInitializer.createPlant();
 			plant.setExperiment(experimentModel);
