@@ -114,11 +114,10 @@ public class ExperimentModel implements Serializable {
 		this.typeId = typeId;
 	}
 
-	public ExperimentModel(final Geolocation geoLocation, final Integer typeId, final String obsUnitId, final DmsProject project,
-			final StockModel stock, final ExperimentModel parent, final Integer observationUnitNo) {
+	public ExperimentModel(final Geolocation geoLocation, final Integer typeId, final DmsProject project, final StockModel stock,
+			final ExperimentModel parent, final Integer observationUnitNo) {
 		this.geoLocation = geoLocation;
 		this.typeId = typeId;
-		this.obsUnitId = obsUnitId;
 		this.project = project;
 		this.stock = stock;
 		this.parent = parent;
