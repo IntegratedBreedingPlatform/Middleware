@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * DAO class for {@link ExperimentModel}.
@@ -914,5 +915,28 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		query.addScalar("OBSERVATION_UNIT_NO_NAME", new StringType());
 		query.setParameter("datasetId", datasetId);
 		return (query.list() != null && !query.list().isEmpty() ? (String) query.list().get(0) : null);
+	}
+	
+	@Override
+	public ExperimentModel saveOrUpdate(final ExperimentModel experiment) {
+		try {
+			this.generateObsUnitId(experiment);
+			super.saveOrUpdate(experiment);
+			return experiment;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in saveOrUpdate(ExperimentModel): " + experiment + ",  "+ e.getMessage(), e);
+		}
+	}
+
+	private void generateObsUnitId(final ExperimentModel experiment) {
+		if (experiment.getNdExperimentId() == null) {
+			experiment.setObsUnitId(UUID.randomUUID().toString());
+		}
+	}
+	
+	@Override
+	public ExperimentModel save(ExperimentModel entity) {
+		this.generateObsUnitId(entity);
+		return super.save(entity);
 	}
 }

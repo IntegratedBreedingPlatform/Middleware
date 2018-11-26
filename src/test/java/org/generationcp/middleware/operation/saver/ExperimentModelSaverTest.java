@@ -112,7 +112,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.experimentModelSaver.addOrUpdateExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "dfg1");
+		this.experimentModelSaver.addOrUpdateExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentModelSaver.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		final Phenotype phenotype = this.experimentModelSaver.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());

@@ -11,8 +11,9 @@
 
 package org.generationcp.middleware.manager.api;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.BiMap;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -48,8 +49,7 @@ import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.BiMap;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets from the CHADO schema.
@@ -189,7 +189,6 @@ public interface StudyDataManager {
 	 * @param variableTypeList The conditions and constants of the Study
 	 * @param studyValues      The values for the variables to insert
 	 * @param programUUID      the program UUID
-	 * @param cropPrefix
 	 * @param studyType
 	 * @param description
 	 * @param objective
@@ -198,7 +197,7 @@ public interface StudyDataManager {
 	 * @return StudyReference corresponding to the newly-created Study
 	 */
 	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
-		final String cropPrefix, final StudyTypeDto studyType, final String description, final String startDate, final String endDate,
+		final StudyTypeDto studyType, final String description, final String startDate, final String endDate,
 		final String objective, final String name, final String createdBy);
 
 	/**
@@ -227,10 +226,8 @@ public interface StudyDataManager {
 	 * @param experimentType   The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *                         ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
-	 * @param cropPrefix
 	 */
-	void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues,
-			final String cropPrefix);
+	void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues);
 
 	/**
 	 * Adds or updates experiment rows to the dataset.
@@ -239,10 +236,8 @@ public interface StudyDataManager {
 	 * @param experimentType   The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *                         ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
-	 * @param plotCodePrefix
 	 */
-	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues,
-			String plotCodePrefix);
+	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues);
 
 	/**
 	 * Adds a Trial Environment. Accepts a variable list and sets up the trial environment data in the local database. It will throw an
