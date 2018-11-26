@@ -33,15 +33,15 @@ public class ExperimentModelSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public void addExperiment(final int projectId, final ExperimentType experimentType, final Values values, final String cropPrefix) {
+	public void addExperiment(final int projectId, final ExperimentType experimentType, final Values values) {
 		final TermId myExperimentType = this.mapExperimentType(experimentType);
-		final ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
+		final ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
 
 		this.getExperimentDao().save(experimentModel);
 		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 	}
 
-	public void addOrUpdateExperiment(final int projectId, final ExperimentType experimentType, final Values values, final String cropPrefix) {
+	public void addOrUpdateExperiment(final int projectId, final ExperimentType experimentType, final Values values) {
 		final int experimentId =
 				this.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
@@ -61,7 +61,7 @@ public class ExperimentModelSaver extends Saver {
 				myExperimentType = this.mapExperimentType(experimentType);
 			}
 
-			final ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
+			final ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
 
 			this.getExperimentDao().save(experimentModel);
 			this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
@@ -86,7 +86,7 @@ public class ExperimentModelSaver extends Saver {
 		return null;
 	}
 
-	private ExperimentModel create(final int projectId, final Values values, final TermId expType, final String cropPrefix) {
+	private ExperimentModel create(final int projectId, final Values values, final TermId expType) {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final DmsProject project = new DmsProject();
 		project.setProjectId(projectId);
