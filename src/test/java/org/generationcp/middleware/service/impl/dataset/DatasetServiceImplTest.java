@@ -524,5 +524,14 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
 		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitId, Arrays.asList(term1.getCvTermId(), term2.getCvTermId()));
 	}
+	
+    @Test
+    public void testGetDatasetInstances() {
+        final Random random = new Random();
+        final Integer datasetId = random.nextInt();
+        this.datasetService.getDatasetInstances(datasetId);
+        Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
+    }
+
 
 }
