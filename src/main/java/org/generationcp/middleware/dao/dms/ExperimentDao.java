@@ -863,9 +863,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final int datasetId,
 		final List<MeasurementVariable> measurementVariables, final List<String> observationUnitIds) {
 
-		Function<MeasurementVariable, MeasurementVariableDto> measurementVariableFullToDto =
+		final Function<MeasurementVariable, MeasurementVariableDto> measurementVariableFullToDto =
 				new Function<MeasurementVariable,MeasurementVariableDto>() {
-					public MeasurementVariableDto apply(MeasurementVariable i) { return new MeasurementVariableDto(i.getTermId(), i.getName()); }
+					public MeasurementVariableDto apply(final MeasurementVariable i) { return new MeasurementVariableDto(i.getTermId(), i.getName()); }
 				};
 
 		final List<MeasurementVariableDto> measurementVariableDtos = Lists.transform(measurementVariables, measurementVariableFullToDto);
@@ -993,9 +993,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
 					final String status = (String) row.get(variable.getName() + "_Status");
+					final BigInteger categoricalValueId = (BigInteger) row.get(variable.getName() + "_CvalueId");
 					variables.put(variable.getName(), new ObservationUnitData(
 						(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
-						(Integer) row.get(variable.getName() + "_CvalueId"), //categoricalValue
+						categoricalValueId != null ? categoricalValueId.intValue() : null, //categoricalValue
 						(String) row.get(variable.getName()), //variableValue
 						(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
 						), variable.getId()));
@@ -1039,9 +1040,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
 			final String status = (String) row.get(variable.getName() + "_Status");
+			final BigInteger categoricalValueId = (BigInteger) row.get(variable.getName() + "_CvalueId");
 			variables.put(variable.getName(), new ObservationUnitData(
 				(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
-				(Integer) row.get(variable.getName() + "_CvalueId"), //categoricalValue
+				categoricalValueId != null ? categoricalValueId.intValue() : null, //categoricalValue
 				(String) row.get(variable.getName()), //variableValue
 				(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
 				), variable.getId()));
@@ -1116,7 +1118,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 	
 	@Override
-	public ExperimentModel save(ExperimentModel entity) {
+	public ExperimentModel save(final ExperimentModel entity) {
 		this.generateObsUnitId(entity);
 		return super.save(entity);
 	}

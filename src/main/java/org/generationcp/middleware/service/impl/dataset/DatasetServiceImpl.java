@@ -6,13 +6,6 @@ import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -29,6 +22,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
@@ -46,16 +40,22 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
+import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -359,14 +359,18 @@ public class DatasetServiceImpl implements DatasetService {
 
 	void resolveObservationStatus(final Integer variableId, final Phenotype phenotype) {
 
-		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
-		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
-
-		final boolean isDerivedTrait = formula != null;
+		final boolean isDerivedTrait = this.isDerivedTrait(variableId);
 
 		if (isDerivedTrait) {
 			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
 		}
+	}
+
+	private boolean isDerivedTrait(final Integer variableId) {
+		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
+		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
+
+		return formula != null;
 	}
 
 	/*
@@ -494,17 +498,14 @@ public class DatasetServiceImpl implements DatasetService {
 				observationUnitIds);
 	}
 
-
 	@Override
 	public ObservationUnitImportResult importDataset(
-		final Integer datasetId, final ObservationUnitImportResult observationUnitImportResult,
-		final String programUUID) {
+		final Integer datasetId, final Table<String, String, String> table, final boolean isDryTest) {
 		final ObservationUnitImportResult result = new ObservationUnitImportResult();
-		final Table<String, String, String> table = observationUnitImportResult.getObservationUnitRows();
-		result.setObservationUnitRows(table);
 
 		final List<MeasurementVariable>
-			measurementVariableList = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
+			measurementVariableList =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits =
 			(List<MeasurementVariableDto>) CollectionUtils.collect(measurementVariableList, new Transformer() {
@@ -518,19 +519,28 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (measurementVariableList.size() > 0) {
 
-			final List<String> observationUnitIds = new ArrayList<>(observationUnitImportResult.getObservationUnitRows().rowKeySet());
+			for (final MeasurementVariable variable : measurementVariableList) {
+				final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
+				if (formula != null) {
+					variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
+				}
+			}
+
+			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 
 			final Map<String, ObservationUnitRow> currentData =
 				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
 					observationUnitIds);
-			final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
+			result.setObservationUnitRows(Lists.newArrayList(currentData.values()));
+
+			final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
 			for (final Object observationUnitId : table.rowKeySet()) {
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
 				for (final String variableName : table.columnKeySet()) {
-					final String importedVariable = table.get(observationUnitId, variableName);
+					final String importedVariableValue = table.get(observationUnitId, variableName);
 					final MeasurementVariable measurementVariable =
 						(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
 
@@ -541,31 +551,38 @@ public class DatasetServiceImpl implements DatasetService {
 							}
 						});
 
-					Integer categoricalValueId = null;
+					BigInteger categoricalValueId = null;
 					if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						if (importedVariable != null) {
+						if (importedVariableValue != null) {
 							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
-								if (importedVariable.equalsIgnoreCase(possibleValue.getName())) {
-									categoricalValueId = possibleValue.getId();
+								if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
+									categoricalValueId = BigInteger.valueOf(possibleValue.getId());
 									break;
 								}
 							}
 						}
 					}
-
-					final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
-					if (observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData.getValue()
+					final boolean isDerivedTrait = this.isDerivedTrait(measurementVariable.getTermId());
+					ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
+					final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
+					if (isDryTest && observationUnitData == null) {
+						observationUnitData = new ObservationUnitData();
+						this.setObservationUnitData(importedVariableValue, categoricalValue, isDerivedTrait, observationUnitData);
+					} else if (isDryTest && observationUnitData != null) {
+						this.setObservationUnitData(importedVariableValue, categoricalValue, isDerivedTrait, observationUnitData);
+					} else if (!isDryTest && observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData
+						.getValue()
 						.isEmpty()) {
-						this.updatePhenotype(observationUnitData.getObservationId(), categoricalValueId, importedVariable);
+						this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue);
 					} else {
-
 						final ObservationDto observationDto = new ObservationDto();
 						observationDto.setVariableId(measurementVariable.getTermId());
-						observationDto.setCategoricalValueId(categoricalValueId);
+
+						observationDto.setCategoricalValueId(categoricalValue);
 						observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
 						observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
 						observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
-						observationDto.setValue(importedVariable);
+						observationDto.setValue(importedVariableValue);
 						if (measurementVariable.getFormula() != null) {
 							observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
 						} else {
@@ -574,13 +591,47 @@ public class DatasetServiceImpl implements DatasetService {
 						this.addPhenotype(observationDto);
 					}
 				}
-
-				final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariables);
 				this.setMeasurementDataAsOutOfSync(formulasMap, experimentModel);
 			}
 
 		}
 		return result;
+	}
+
+	private void setObservationUnitData(
+		final String importedVariableValue, final Integer categoricalValueId, final boolean isDerivedTrait,
+		final ObservationUnitData observationUnitData) {
+		observationUnitData.setCategoricalValueId(categoricalValueId);
+		observationUnitData.setValue(importedVariableValue);
+		if (isDerivedTrait) {
+			observationUnitData.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
+		}
+	}
+
+	private void setMeasurementDataAsOutOfSync(
+		final Map<Integer, List<MeasurementVariable>> formulasMap,
+		final ObservationUnitRow observationUnitRow) {
+		for (final Integer measurementVariableId : formulasMap.keySet()) {
+			final Collection<ObservationUnitData> observationUnitDataCollection = observationUnitRow.getVariables().values();
+			final List<MeasurementVariable> formulas = formulasMap.get(measurementVariableId);
+			for (final MeasurementVariable formula : formulas) {
+				final ObservationUnitData observationUnitData = this.findObservationUnitDataByTermId(formula.getTermId(), observationUnitDataCollection);
+				if (observationUnitData != null) {
+					observationUnitData.setStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
+				}
+			}
+		}
+	}
+
+	private ObservationUnitData findObservationUnitDataByTermId(final Integer termId, final Collection<ObservationUnitData> phenotypes) {
+		return (ObservationUnitData) CollectionUtils.find(phenotypes, new Predicate() {
+
+			@Override
+			public boolean evaluate(final Object object) {
+				final Phenotype dto = (Phenotype) object;
+				return dto.getObservableId().equals(termId);
+			}
+		});
 	}
 
 	@Override

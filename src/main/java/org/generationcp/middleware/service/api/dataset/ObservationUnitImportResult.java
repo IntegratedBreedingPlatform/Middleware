@@ -1,43 +1,29 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Table;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
-import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
 @AutoProperty
 public class ObservationUnitImportResult {
 
-	private Table<String, String, String> observationUnitRows;
+	private List<ObservationUnitRow> observationUnitRows;
 
-	private List<String> warnings;
-
-	public ObservationUnitImportResult(final Table observationUnitRows, final List<String>  warnings) {
+	public ObservationUnitImportResult(final List<ObservationUnitRow> observationUnitRows) {
 		this.observationUnitRows = observationUnitRows;
-		this.warnings = warnings;
 	}
 
 	public ObservationUnitImportResult() {
-		this.warnings = Lists.newArrayList();
+
 	}
 
-	public Table getObservationUnitRows() {
+	public List<ObservationUnitRow> getObservationUnitRows() {
 		return this.observationUnitRows;
 	}
 
-	public void setObservationUnitRows(final Table observationUnitRows) {
+	public void setObservationUnitRows(final List<ObservationUnitRow> observationUnitRows) {
 		this.observationUnitRows = observationUnitRows;
-	}
-
-	public List<String> getWarnings() {
-		return this.warnings;
-	}
-
-	public void setWarnings(final BindingResult warnings) {
-		this.warnings = (List<String>) warnings;
 	}
 
 	@Override
@@ -53,9 +39,5 @@ public class ObservationUnitImportResult {
 	@Override
 	public String toString() {
 		return Pojomatic.toString(this);
-	}
-
-	public void addWarning(final String s) {
-		this.warnings.add(s);
 	}
 }

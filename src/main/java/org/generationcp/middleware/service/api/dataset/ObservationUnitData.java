@@ -4,8 +4,6 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.Objects;
-
 @AutoProperty
 public class ObservationUnitData {
 

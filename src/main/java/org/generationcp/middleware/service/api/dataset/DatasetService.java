@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -54,8 +55,7 @@ public interface DatasetService {
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
-	ObservationUnitImportResult importDataset(Integer datasetId, ObservationUnitImportResult observationUnitImportResult,
-		final String programUUID);
+	ObservationUnitImportResult importDataset(Integer datasetId, Table<String, String, String> observationUnitRows, final boolean isDryTest);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 }
