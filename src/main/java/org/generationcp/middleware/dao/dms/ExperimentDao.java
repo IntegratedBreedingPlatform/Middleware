@@ -618,24 +618,24 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return id != null;
 	}
 	
-	public boolean isInstanceExistsInDataset(final int datasetId, final int instanceId) {
+	public boolean areAllInstancesExistInDataset(final int datasetId, final Set<Integer> instanceIds) {
 
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e ")
-			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
+			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id in (:instanceIds)");
 
 		try {
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameter("datasetId", datasetId);
-			query.setParameter("instanceId", instanceId);
+			query.setParameterList("instanceIds", instanceIds);
 
 			final BigInteger count = (BigInteger) query.uniqueResult();
-			return count.intValue() > 0;
+			return count.intValue() == instanceIds.size();
 
 		} catch (final HibernateException e) {
 			final String error =
-				"Error at isInstanceExistsInDataset=" + datasetId + "," + instanceId + " query at ExperimentDao: " + e.getMessage();
+				"Error at areAllInstancesExistInDataset=" + datasetId + "," + instanceIds + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(error);
 			throw new MiddlewareQueryException(error, e);
 		}
