@@ -548,7 +548,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		}
 	}
 
-	public Map<Integer, Boolean> hasFieldMap(final int projectId) {
+	public Map<Integer, Boolean> getInstanceHasFieldMapAsMap(final int projectId) {
 
 		final StringBuilder sql = new StringBuilder().append("SELECT \n")
 			.append("           geo.nd_geolocation_id AS instanceId , \n")

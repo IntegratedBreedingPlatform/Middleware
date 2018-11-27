@@ -44,6 +44,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -451,8 +452,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<Integer, Boolean> hasFieldMap(final int studyId) {
-		return this.getExperimentPropertyDao().hasFieldMap(studyId);
+	public Map<Integer, Boolean> getInstanceHasFieldMapAsMap(final int studyId) {
+		return this.getExperimentPropertyDao().getInstanceHasFieldMapAsMap(studyId);
 
 	}
 
@@ -1276,6 +1277,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId) {
 		return this.getExperimentDao().isInstanceExistsInDataset(datasetId, instanceId);
+	}
+
+	@Override
+	public String getBlockId(final int datasetId, final String trialInstance) {
+		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+
+	}
+
+	@Override
+	public FieldmapBlockInfo getBlockInformation(final int blockId) {
+		return locationDataManager.getBlockInformation(blockId);
 	}
 
 	@Override

@@ -35,6 +35,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
@@ -398,7 +399,7 @@ public interface StudyDataManager {
 	 * @param studyId
 	 * @return
 	 */
-	Map<Integer, Boolean> hasFieldMap(int studyId);
+	Map<Integer, Boolean> getInstanceHasFieldMapAsMap(int studyId);
 
 	/**
 	 * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
@@ -856,4 +857,7 @@ public interface StudyDataManager {
 
 	boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId);
 
+	String getBlockId(int datasetId, String trialInstance);
+
+	FieldmapBlockInfo getBlockInformation(int blockId);
 }

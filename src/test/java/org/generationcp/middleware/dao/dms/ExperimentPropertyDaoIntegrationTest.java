@@ -121,7 +121,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		final Integer env1 = this.createEnvironmentData(true);
 		final Integer env2 = this.createEnvironmentData(false);
 		final Integer env3 = this.createEnvironmentData(true);
-		final Map<Integer, Boolean> map = this.experimentPropertyDao.hasFieldMap(this.study.getProjectId());
+		final Map<Integer, Boolean> map = this.experimentPropertyDao.getInstanceHasFieldMapAsMap(this.study.getProjectId());
 		Assert.assertEquals(3, map.size());
 		Assert.assertNotNull(map.get(env1));
 		Assert.assertTrue(map.get(env1));
