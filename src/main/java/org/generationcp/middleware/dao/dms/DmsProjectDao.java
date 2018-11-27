@@ -1183,8 +1183,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final String query = " SELECT "  //
 				+ "   pp.variable_id AS variableId, "  //
-				+ "   pp.alias AS variableName, "  //
+				+ "   variable.name AS variableName, "  //
 				+ "   variable.definition AS description, "  //
+				+ "   pp.alias AS alias, "  //
 				+ "   variableType.cvterm_id AS variableTypeId, "  //
 				+ "   scale.name AS scale, "  //
 				+ "   method.name AS method, "  //
@@ -1225,9 +1226,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 			sqlQuery.setParameter("observationSetId", observationSetId);
 			sqlQuery.setParameterList("variableTypes", variableTypes);
-			sqlQuery.addScalar("variableId").addScalar("variableName").addScalar("description").addScalar("variableTypeId").addScalar("scale")
-				.addScalar("method").addScalar("property").addScalar("dataTypeId").addScalar("categoryId").addScalar("categoryName")
-				.addScalar("categoryDescription").addScalar("max").addScalar("min");
+			sqlQuery.addScalar("variableId").addScalar("variableName").addScalar("description").addScalar("alias")
+				.addScalar("variableTypeId").addScalar("scale").addScalar("method").addScalar("property").addScalar("dataTypeId")
+				.addScalar("categoryId").addScalar("categoryName").addScalar("categoryDescription").addScalar("max").addScalar("min");
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
 
@@ -1243,6 +1244,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 					measurementVariable.setTermId(variableId);
 					measurementVariable.setName(Objects.toString(result.get("variableName")));
+					measurementVariable.setAlias(Objects.toString(result.get("alias")));
 					measurementVariable.setDescription(Objects.toString(result.get("description")));
 					measurementVariable.setScale(Objects.toString(result.get("scale")));
 					measurementVariable.setMethod(Objects.toString(result.get("method")));
