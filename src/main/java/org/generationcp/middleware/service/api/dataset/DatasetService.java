@@ -55,7 +55,9 @@ public interface DatasetService {
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
-	ObservationUnitImportResult importDataset(Integer datasetId, Table<String, String, String> observationUnitRows, final boolean isDryTest);
+	void importDataset(final Integer datasetId, final Table<String, String, String> table);
+
+	ObservationUnitImportResult previewImportDataset(final Integer datasetId, final Table<String, String, String> table);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 }

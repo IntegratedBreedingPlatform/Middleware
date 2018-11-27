@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -499,23 +498,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationUnitImportResult importDataset(
-		final Integer datasetId, final Table<String, String, String> table, final boolean isDryTest) {
-		final ObservationUnitImportResult result = new ObservationUnitImportResult();
-
+	public void importDataset(final Integer datasetId, final Table<String, String, String> table) {
 		final List<MeasurementVariable>
 			measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
-
-		final List<MeasurementVariableDto> selectionMethodsAndTraits =
-			(List<MeasurementVariableDto>) CollectionUtils.collect(measurementVariableList, new Transformer() {
-
-				@Override
-				public Object transform(final Object input) {
-					final MeasurementVariable variable = (MeasurementVariable) input;
-					return new MeasurementVariableDto(variable.getTermId(), variable.getName());
-				}
-			});
 
 		if (measurementVariableList.size() > 0) {
 
@@ -531,8 +517,6 @@ public class DatasetServiceImpl implements DatasetService {
 			final Map<String, ObservationUnitRow> currentData =
 				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
 					observationUnitIds);
-
-			result.setObservationUnitRows(Lists.newArrayList(currentData.values()));
 
 			final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
 			for (final Object observationUnitId : table.rowKeySet()) {
@@ -563,14 +547,9 @@ public class DatasetServiceImpl implements DatasetService {
 						}
 					}
 					final boolean isDerivedTrait = this.isDerivedTrait(measurementVariable.getTermId());
-					ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
+					final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
 					final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
-					if (isDryTest && observationUnitData == null) {
-						observationUnitData = new ObservationUnitData();
-						this.setObservationUnitData(importedVariableValue, categoricalValue, isDerivedTrait, observationUnitData);
-					} else if (isDryTest && observationUnitData != null) {
-						this.setObservationUnitData(importedVariableValue, categoricalValue, isDerivedTrait, observationUnitData);
-					} else if (!isDryTest && observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData
+					if (observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData
 						.getValue()
 						.isEmpty()) {
 						this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue);
@@ -593,7 +572,72 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 				this.setMeasurementDataAsOutOfSync(formulasMap, experimentModel);
 			}
+		}
+	}
 
+	@Override
+	public ObservationUnitImportResult previewImportDataset(final Integer datasetId, final Table<String, String, String> table) {
+		final ObservationUnitImportResult result = new ObservationUnitImportResult();
+		final List<MeasurementVariable>
+			measurementVariableList =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
+
+		if (measurementVariableList.size() > 0) {
+
+			for (final MeasurementVariable variable : measurementVariableList) {
+				final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
+				if (formula != null) {
+					variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
+				}
+			}
+
+			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
+
+			final Map<String, ObservationUnitRow> currentData =
+				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
+					observationUnitIds);
+
+			final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
+			for (final Object observationUnitId : table.rowKeySet()) {
+				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
+
+				for (final String variableName : table.columnKeySet()) {
+					final String importedVariableValue = table.get(observationUnitId, variableName);
+					final MeasurementVariable measurementVariable =
+						(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
+
+							@Override
+							public boolean evaluate(final Object object) {
+								final MeasurementVariable variable = (MeasurementVariable) object;
+								return variable.getName().equalsIgnoreCase(variableName);
+							}
+						});
+
+					BigInteger categoricalValueId = null;
+					if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+						if (importedVariableValue != null) {
+							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
+								if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
+									categoricalValueId = BigInteger.valueOf(possibleValue.getId());
+									break;
+								}
+							}
+						}
+					}
+					final boolean isDerivedTrait = this.isDerivedTrait(measurementVariable.getTermId());
+					ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
+					final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
+					result.setObservationUnitRows(Lists.newArrayList(currentData.values()));
+
+					if (observationUnitData == null) {
+						observationUnitData = new ObservationUnitData();
+					}
+
+					this.setObservationUnitData(importedVariableValue, categoricalValue, isDerivedTrait, observationUnitData);
+
+				}
+				this.setMeasurementDataAsOutOfSync(formulasMap, currentRow);
+			}
 		}
 		return result;
 	}
