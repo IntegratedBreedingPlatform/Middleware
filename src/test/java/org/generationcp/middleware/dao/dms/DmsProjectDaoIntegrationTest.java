@@ -86,10 +86,10 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetDatasetInstances() {
-		final Integer env1 = this.createEnvironmentData("1", 1, Optional.<String>absent());
-		final Integer env2 = this.createEnvironmentData("2", 2, Optional.<String>absent());
+		final Integer env1 = this.createEnvironmentData("1", 1, Optional.<String>absent(), Optional.of(1));
+		final Integer env2 = this.createEnvironmentData("2", 2, Optional.<String>absent(), Optional.of(2));
 		final String customLocation = RandomStringUtils.randomAlphabetic(10);
-		final Integer env3 = this.createEnvironmentData("3", 3, Optional.of(customLocation));
+		final Integer env3 = this.createEnvironmentData("3", 3, Optional.of(customLocation), Optional.<Integer>absent());
 		final List<StudyInstance> instances = this.dmsProjectDao.getDatasetInstances(this.study.getProjectId());
 		Assert.assertEquals(3, instances.size());
 		
@@ -99,6 +99,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Afghanistan", instance1.getLocationName());
 		Assert.assertEquals("AFG", instance1.getLocationAbbreviation());
 		Assert.assertNull(instance1.getCustomLocationAbbreviation());
+		Assert.assertTrue(instance1.isHasFieldmap());
 		
 		final StudyInstance instance2 = instances.get(1);
 		Assert.assertEquals(env2.intValue(), instance2.getInstanceDbId());
@@ -106,6 +107,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", instance2.getLocationName());
 		Assert.assertEquals("ALB", instance2.getLocationAbbreviation());
 		Assert.assertNull(instance2.getCustomLocationAbbreviation());
+		Assert.assertTrue(instance2.isHasFieldmap());
 		
 		final StudyInstance instance3 = instances.get(2);
 		Assert.assertEquals(env3.intValue(), instance3.getInstanceDbId());
@@ -113,9 +115,10 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Algeria", instance3.getLocationName());
 		Assert.assertEquals("DZA", instance3.getLocationAbbreviation());
 		Assert.assertEquals(customLocation, instance3.getCustomLocationAbbreviation());
+		Assert.assertFalse(instance3.isHasFieldmap());
 	}
 	
-	private Integer createEnvironmentData(final String instanceNumber, final Integer locationId, Optional<String> customAbbev) {
+	private Integer createEnvironmentData(final String instanceNumber, final Integer locationId, Optional<String> customAbbev, Optional<Integer> blockId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(instanceNumber);
 		this.geolocationDao.saveOrUpdate(geolocation);
@@ -134,6 +137,15 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			prop2.setRank(2);
 			prop2.setValue(customAbbev.get());
 			this.geolocPropDao.save(prop2);
+		}
+		
+		if (blockId.isPresent()){
+			final GeolocationProperty prop3 = new GeolocationProperty();
+			prop3.setGeolocation(geolocation);
+			prop3.setType(TermId.BLOCK_ID.getId());
+			prop3.setRank(3);
+			prop3.setValue(blockId.get().toString());
+			this.geolocPropDao.save(prop3);
 		}
 		
 		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {
