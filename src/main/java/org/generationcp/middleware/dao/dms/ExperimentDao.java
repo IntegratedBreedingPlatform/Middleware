@@ -56,13 +56,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
-	public static final String PROJECT_NAME = "PROJECT_NAME";
-	public static final String LOCATION_DB_ID = "locationDbId";
-	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
-	public static final String FIELD_MAP_ROW = "FieldMapRow";
 	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
-	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
-	public static final String LOCATION_NAME = "LocationName";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	public static final String COL = "COL";
 	public static final String ROW = "ROW";
@@ -97,7 +91,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
-	public static final String OBSERVATION_UNIT_NO_NAME = "OBSERVATION_UNIT_NO_NAME";
 	public static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 
 	@SuppressWarnings("unchecked")
@@ -158,7 +151,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ExperimentModel> getExperimentsByProjectIds(final List<Integer> projectIds) {
-		final List<ExperimentModel> list = new ArrayList<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("project.projectId", projectIds));
@@ -353,34 +345,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 
-	}
-
-	@SuppressWarnings("rawtypes")
-	public boolean checkIfObsUnitIdExists(final String obsUnitId) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("obsUnitId", obsUnitId));
-			final List list = criteria.list();
-			return list != null && !list.isEmpty();
-		} catch (final HibernateException e) {
-			final String message = "Error at checkIfObsUnitIdExists=" + obsUnitId + " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	public boolean checkIfObsUnitIdsExist(final List<String> obsUnitIds) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.in("obsUnitId", obsUnitIds));
-			final List list = criteria.list();
-			return list != null && !list.isEmpty();
-		} catch (final HibernateException e) {
-			final String message = "Error at checkIfObsUnitIdExists=" + obsUnitIds + " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
 	}
 
 	public Map<Integer, List<PlantDTO>> getSampledPlants (final Integer studyId) {
@@ -645,7 +609,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private String getObservationUnitTableQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName) {
+		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName,
+		final boolean includesInstanceFilter) {
 		
 		final StringBuilder sql = new StringBuilder("SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, " //
@@ -708,7 +673,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
 			+ " WHERE p.project_id = :datasetId "); //
 
-		sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
+		if (includesInstanceFilter) {
+			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
+		}
 
 		sql.append(" GROUP BY observationUnitId ");
 
@@ -739,8 +706,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<ObservationUnitRow> getObservationUnitTable(
 		final int datasetId,
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-		final List<String> designFactors, final Integer instanceId, final int pageNumber,
-		final int pageSize,
+		final List<String> designFactors, final Integer instanceId, final Integer pageNumber,
+		final Integer pageSize,
 		final String sortBy, final String sortOrder) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(datasetId);
@@ -871,12 +838,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> measurementVariableDtos = Lists.transform(measurementVariables, measurementVariableFullToDto);
 
 		try {
-			final String observationVariableName = this.getObservationVariableName(datasetId);
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				datasetId,
-					measurementVariableDtos,
-				observationVariableName, observationUnitIds);
-			return this.mapResultsToMap(results, measurementVariableDtos, observationVariableName);
+					measurementVariableDtos, observationUnitIds);
+			return this.mapResultsToMap(results, measurementVariableDtos);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
 			ExperimentDao.LOG.error(error);
@@ -885,11 +850,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private List<Map<String, Object>> getObservationUnitsQueryResult(
-		final int datasetId, final List<MeasurementVariableDto> selectionMethodsAndTraits, final String observationVariableName,
-		final List<String> observationUnitIds) {
+		final int datasetId, final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds) {
 
 		try {
-			final String observationUnitTableQuery = this.getObservationUnitsQuery(selectionMethodsAndTraits, observationVariableName);
+			final String observationUnitTableQuery = this.getObservationUnitsQuery(selectionMethodsAndTraits);
 			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, observationUnitTableQuery);
 			query.setParameter("datasetId", datasetId);
 			query.setParameterList("observationUnitIds", observationUnitIds);
@@ -914,7 +878,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private String getObservationUnitsQuery(
-		final List<MeasurementVariableDto> selectionMethodsAndTraits, final String observationVariableName) {
+		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		{
 
 			final StringBuilder sql = new StringBuilder("SELECT nde.obs_unit_id as OBS_UNIT_ID,  ");
@@ -955,13 +919,17 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final Integer pageSize,
 		final String sortBy, final String sortOrder, final String observationVariableName) {
 		try {
+			final boolean includesInstanceFilter = (instanceId != null);
+
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(selectionMethodsAndTraits, germplasmDescriptors,
-				designFactors, sortBy, sortOrder, observationVariableName);
+				designFactors, sortBy, sortOrder, observationVariableName, includesInstanceFilter);
 			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
 				designFactors, observationUnitTableQuery);
 			query.setParameter("datasetId", datasetId);
 
-			query.setParameter("instanceId", String.valueOf(instanceId));
+			if (includesInstanceFilter) {
+				query.setParameter("instanceId", String.valueOf(instanceId));
+			}
 
 			if (pageNumber != null && pageSize != null) {
 				query.setFirstResult(pageSize * (pageNumber - 1));
@@ -981,8 +949,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private Map<String, ObservationUnitRow> mapResultsToMap(
 		final List<Map<String, Object>> results,
-		final List<MeasurementVariableDto> selectionMethodsAndTraits,
-		final String observationVariableName) {
+		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		final Map<String, ObservationUnitRow> observationUnitRows = new HashMap<>();
 
 		if (results != null && !results.isEmpty()) {

@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ public interface DatasetService {
 
 	void importDataset(final Integer datasetId, final Table<String, String, String> table);
 
-	ObservationUnitImportResult previewImportDataset(final Integer datasetId, final Table<String, String, String> table);
+	List<ObservationUnitRow> previewImportDataset(final Integer studyId, final Integer datasetId, final Table<String, String, String> table);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 }

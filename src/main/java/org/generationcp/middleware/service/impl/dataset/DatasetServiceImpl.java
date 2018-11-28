@@ -33,7 +33,6 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -114,14 +113,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
-	}
-
-	public DatasetServiceImpl(final MeasurementVariableService measurementVariableService, final GermplasmDescriptors germplasmDescriptors,
-		final DesignFactors designFactors) {
-		super();
-		this.measurementVariableService = measurementVariableService;
-		this.germplasmDescriptors = germplasmDescriptors;
-		this.designFactors = designFactors;
 	}
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -546,7 +537,7 @@ public class DatasetServiceImpl implements DatasetService {
 							}
 						}
 					}
-					final boolean isDerivedTrait = this.isDerivedTrait(measurementVariable.getTermId());
+
 					final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
 					final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
 					if (observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData
@@ -576,11 +567,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationUnitImportResult previewImportDataset(final Integer datasetId, final Table<String, String, String> table) {
-		final ObservationUnitImportResult result = new ObservationUnitImportResult();
+	public List<ObservationUnitRow> previewImportDataset(
+		final Integer studyId, final Integer datasetId, final Table<String, String, String> table) {
+
 		final List<MeasurementVariable>
 			measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
+
+		final List<ObservationUnitRow> currentData = this.getObservationUnitRows(studyId, datasetId, null, null, null, null, null);
 
 		if (measurementVariableList.size() > 0) {
 
@@ -591,15 +585,11 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 
-			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
-
-			final Map<String, ObservationUnitRow> currentData =
-				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
-					observationUnitIds);
-
 			final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
-			for (final Object observationUnitId : table.rowKeySet()) {
-				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
+			final Map<Integer, Boolean> derivedTraits = new HashMap<>();
+			for (final ObservationUnitRow currentRow : currentData) {
+
+				final String observationUnitId = currentRow.getObsUnitId();
 
 				for (final String variableName : table.columnKeySet()) {
 					final String importedVariableValue = table.get(observationUnitId, variableName);
@@ -624,10 +614,15 @@ public class DatasetServiceImpl implements DatasetService {
 							}
 						}
 					}
-					final boolean isDerivedTrait = this.isDerivedTrait(measurementVariable.getTermId());
+
+					Boolean isDerivedTrait = derivedTraits.get(measurementVariable.getTermId());
+					if (isDerivedTrait == null) {
+						isDerivedTrait = this.isDerivedTrait(measurementVariable.getTermId());
+						derivedTraits.put(measurementVariable.getTermId(), isDerivedTrait);
+					}
+
 					ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
 					final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
-					result.setObservationUnitRows(Lists.newArrayList(currentData.values()));
 
 					if (observationUnitData == null) {
 						observationUnitData = new ObservationUnitData();
@@ -639,7 +634,7 @@ public class DatasetServiceImpl implements DatasetService {
 				this.setMeasurementDataAsOutOfSync(formulasMap, currentRow);
 			}
 		}
-		return result;
+		return currentData;
 	}
 
 	private void setObservationUnitData(
@@ -672,8 +667,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 			@Override
 			public boolean evaluate(final Object object) {
-				final Phenotype dto = (Phenotype) object;
-				return dto.getObservableId().equals(termId);
+				final ObservationUnitData dto = (ObservationUnitData) object;
+				return dto.getVariableId() != null && dto.getVariableId().equals(termId);
 			}
 		});
 	}
