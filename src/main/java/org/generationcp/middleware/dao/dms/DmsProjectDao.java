@@ -1252,8 +1252,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
 					measurementVariable.setVariableType(variableType);
 					measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
-					measurementVariable.setVariableType(variableType);
-					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId")); 
+					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
 					measurementVariable.setMinRange(typeSafeObjectToDouble(result.get("min")));
