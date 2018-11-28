@@ -106,7 +106,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
-	private final String cropPrefix = "ABCD";
 
 	@Before
 	public void setUp() throws Exception {
@@ -126,7 +125,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
 			this.locationManager, this.userDataManager);
 
-		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
+		this.studyReference = this.studyTDI.addTestStudy();
 
 		final StudyType studyType = new StudyType();
 		studyType.setStudyTypeId(6);
@@ -331,7 +330,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> nurseryStudyDetails =
 			this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
+		this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY");
 		final List<StudyDetails> updatedNurseryStudyDetails =
 			this.manager.getAllStudyDetails(StudyTypeDto.getNurseryDto(), this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
@@ -490,7 +489,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testDeleteProgramStudies() throws Exception {
 		final String uniqueId = "100001001001";
 		this.studyTDI.createFolderTestData(uniqueId);
-		this.studyTDI.addTestStudy(uniqueId, cropPrefix);
+		this.studyTDI.addTestStudy(uniqueId);
 
 		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
 		final int sizeBeforeDelete = programStudiesAndFolders.size();
@@ -507,7 +506,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> trialStudyDetails =
 			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
-		final StudyReference newStudy = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY", cropPrefix);
+		final StudyReference newStudy = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY");
 		final List<StudyDetails> updatedStudyDetails =
 			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewStudy = updatedStudyDetails.size();
@@ -544,8 +543,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> studyDetailsList =
 			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
-		final StudyReference nursery = this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY", cropPrefix);
-		final StudyReference trial = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL", cropPrefix);
+		final StudyReference nursery = this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY");
+		final StudyReference trial = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL");
 		final List<StudyDetails> newStudyDetailsList =
 			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
@@ -892,7 +891,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		values.setLocationId(manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
-		this.manager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, cropPrefix);
+		this.manager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype updatedPhenotype =
 			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);

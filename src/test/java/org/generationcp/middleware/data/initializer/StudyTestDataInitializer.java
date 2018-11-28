@@ -65,26 +65,23 @@ public class StudyTestDataInitializer {
 		this.userDataManager = userDataManager;
 	}
 
-	public StudyReference addTestStudy(final String cropPrefix) throws Exception {
+	public StudyReference addTestStudy() throws Exception {
 		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyTypeDto.getTrialDto(),
-			cropPrefix,
 			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 				.END_DATE, StudyTestDataInitializer.OBJECTIVE);
 	}
 	
-	public StudyReference addTestStudy(final String uniqueId, final String cropPrefix) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyTypeDto.getTrialDto(), cropPrefix,
-			StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
+	public StudyReference addTestStudy(final String uniqueId) throws Exception {
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyTypeDto.getTrialDto(), StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 			.END_DATE,StudyTestDataInitializer.OBJECTIVE);
 	}
 	
-	public StudyReference addTestStudy(final StudyTypeDto studyType, final String studyName, final String cropPrefix) throws Exception {
-		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
+	public StudyReference addTestStudy(final StudyTypeDto studyType, final String studyName) throws Exception {
+		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, StudyTestDataInitializer.STUDY_DESCRIPTION, StudyTestDataInitializer.START_DATE, StudyTestDataInitializer
 			.END_DATE, StudyTestDataInitializer.OBJECTIVE);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyTypeDto studyType, final String cropPrefix,
-		final String description, final String startDate, final String endDate, final String objective) throws
+	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyTypeDto studyType, final String description, final String startDate, final String endDate, final String objective) throws
 		Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
@@ -93,7 +90,7 @@ public class StudyTestDataInitializer {
 		
 		final Integer userId = addTestUser();
 
-		final StudyReference addedStudy = this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix,
+		final StudyReference addedStudy = this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, 
 			studyType, description, startDate, endDate, objective, studyName, String.valueOf(userId));
 		addedStudy.setOwnerId(userId);
 		return addedStudy;
@@ -107,9 +104,8 @@ public class StudyTestDataInitializer {
 		return userId;
 	}
 
-	public StudyReference addTestStudy(final String studyName, final StudyTypeDto studyType, final String seasonId, final String
-		locationId,
-		final String startDate, final String cropPrefix) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final StudyTypeDto studyType, final String seasonId, final String locationId,
+			final String startDate) throws Exception {
 
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
@@ -125,8 +121,7 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = this.createStudyValues(variableList);
 		final Integer userId = addTestUser();
 
-		final StudyReference addedStudy = this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), cropPrefix,
-			studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
+		final StudyReference addedStudy = this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
 				.END_DATE, StudyTestDataInitializer.OBJECTIVE, studyName, String.valueOf(userId));
 		addedStudy.setOwnerId(userId);
 		return addedStudy;
@@ -266,7 +261,7 @@ public class StudyTestDataInitializer {
 		
 		final ExperimentValues experimentValue = new ExperimentValues();
 		experimentValue.setLocationId(geolocationId);
-		this.studyDataManager.addExperiment(dataSet.getId(), ExperimentType.TRIAL_ENVIRONMENT, experimentValue, "");
+		this.studyDataManager.addExperiment(dataSet.getId(), ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
 
 		return dataSet.getId();
 	}
