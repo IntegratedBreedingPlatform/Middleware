@@ -395,13 +395,6 @@ public interface StudyDataManager {
 	List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 * Returns a map of intanceIds and boolean to determine if the instance has field map or not.
-	 * @param studyId
-	 * @return
-	 */
-	Map<Integer, Boolean> getInstanceHasFieldMapAsMap(int studyId);
-
-	/**
 	 * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
 	 *
 	 * @param info   the info

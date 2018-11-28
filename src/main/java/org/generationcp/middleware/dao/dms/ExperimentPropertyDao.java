@@ -548,44 +548,4 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		}
 	}
 
-	public Map<Integer, Boolean> getInstanceHasFieldMapAsMap(final int projectId) {
-
-		final StringBuilder sql = new StringBuilder().append("SELECT \n")
-			.append("           geo.nd_geolocation_id AS instanceId , \n")
-			.append("           COUNT(DISTINCT blk.value) AS hasFieldMap \n")
-			.append("FROM       nd_experiment nde \n")
-			.append("INNER JOIN project_relationship pr \n")
-			.append("ON         pr.object_project_id = :projectId \n")
-			.append("AND        pr.type_id = \n")
-			.append(TermId.BELONGS_TO_STUDY.getId() + "\n")
-			.append("AND        nde.project_id = pr.subject_project_id \n")
-			.append("INNER JOIN nd_experiment geo \n")
-			.append("ON         nde.nd_experiment_id = geo.nd_experiment_id \n")
-			.append("AND        geo.type_id = \n")
-			.append(TermId.PLOT_EXPERIMENT.getId() + "\n")
-			.append("LEFT JOIN  nd_geolocationprop blk \n")
-			.append("ON         blk.nd_geolocation_id = geo.nd_geolocation_id \n")
-			.append("AND        blk.type_id = \n")
-			.append(TermId.BLOCK_ID.getId() + "\n")
-			.append(" GROUP BY instanceId");
-
-		final SQLQuery query =
-			this.getSession().createSQLQuery(sql.toString())
-				.addScalar("instanceId")
-				.addScalar("hasFieldMap");
-		query.setParameter("projectId", projectId);
-
-		final List<Object[]> list = query.list();
-
-		final Map<Integer, Boolean> map = new HashMap<>();
-		if (list != null && !list.isEmpty()) {
-			for (final Object[] object : list) {
-				final Integer instanceId = (Integer) object[0];
-				final BigInteger hasFieldMap = (BigInteger) object[1];
-				map.put(instanceId, hasFieldMap.intValue() == 1) ;
-			}
-		}
-		return map;
-	}
-
 }
