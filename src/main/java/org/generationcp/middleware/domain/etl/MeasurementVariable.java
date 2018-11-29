@@ -59,6 +59,10 @@ public class MeasurementVariable {
 
 	private Double maxRange;
 
+	private Double scaleMinRange;
+
+	private Double scaleMaxRange;
+
 	private boolean required;
 
 	private String treatmentLabel;
@@ -374,6 +378,22 @@ public class MeasurementVariable {
 	 */
 	public void setMaxRange(final Double maxRange) {
 		this.maxRange = maxRange;
+	}
+
+	public Double getScaleMinRange() {
+		return scaleMinRange;
+	}
+
+	public void setScaleMinRange(final Double scaleMinRange) {
+		this.scaleMinRange = scaleMinRange;
+	}
+
+	public Double getScaleMaxRange() {
+		return scaleMaxRange;
+	}
+
+	public void setScaleMaxRange(final Double scaleMaxRange) {
+		this.scaleMaxRange = scaleMaxRange;
 	}
 
 	/**

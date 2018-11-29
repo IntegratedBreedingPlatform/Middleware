@@ -50,6 +50,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.Type;
@@ -1194,8 +1195,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   category.cvterm_id AS categoryId, "  //
 				+ "   category.name AS categoryName, "  //
 				+ "   category.definition AS categoryDescription, "  //
-				+ "   max.value AS max, "  //
-				+ "   min.value AS min "  //
+				+ "   scaleMinRange.value AS scaleMinRange, "  //
+				+ "   scaleMaxRange.value AS scaleMaxRange, "  //
+				+ "   vo.expected_min AS expectedMin, "  //
+				+ "   vo.expected_max AS expectedMax "  //
 				+ " FROM project dataset "  //
 				+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "  //
 				+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "  //
@@ -1215,8 +1218,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   LEFT JOIN cvterm_relationship cvtrcategory ON scale.cvterm_id = cvtrcategory.subject_id "
 				+ "                                              AND cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
 				+ "   LEFT JOIN cvterm category ON cvtrcategory.object_id = category.cvterm_id "  //
-				+ "   LEFT JOIN cvtermprop max on scale.cvterm_id = max.cvterm_id AND max.type_id = " + TermId.MAX_VALUE.getId()  //
-				+ "   LEFT JOIN cvtermprop min on scale.cvterm_id = min.cvterm_id AND min.type_id = " + TermId.MIN_VALUE.getId()  //
+				+ "   LEFT JOIN cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id " //
+				+ "                                         AND scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId() //
+				+ "   LEFT JOIN cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id " //
+				+ "                                         AND scaleMinRange.type_id = " + TermId.MIN_VALUE.getId() //
+				+ "   LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id "  //
 				+ " WHERE " //
 				+ "   dataset.project_id = :observationSetId " //
 				+ "   AND pp.type_id in (:variableTypes) "
@@ -1226,9 +1232,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 			sqlQuery.setParameter("observationSetId", observationSetId);
 			sqlQuery.setParameterList("variableTypes", variableTypes);
-			sqlQuery.addScalar("variableId").addScalar("variableName").addScalar("description").addScalar("alias")
-				.addScalar("variableTypeId").addScalar("scale").addScalar("method").addScalar("property").addScalar("dataTypeId")
-				.addScalar("categoryId").addScalar("categoryName").addScalar("categoryDescription").addScalar("max").addScalar("min");
+			sqlQuery
+				.addScalar("variableId")
+				.addScalar("variableName")
+				.addScalar("description")
+				.addScalar("alias")
+				.addScalar("variableTypeId")
+				.addScalar("scale")
+				.addScalar("method")
+				.addScalar("property")
+				.addScalar("dataTypeId")
+				.addScalar("categoryId")
+				.addScalar("categoryName")
+				.addScalar("categoryDescription")
+				.addScalar("scaleMinRange", new DoubleType())
+				.addScalar("scaleMaxRange", new DoubleType())
+				.addScalar("expectedMin", new DoubleType())
+				.addScalar("expectedMax", new DoubleType())
+			;
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
 
@@ -1243,20 +1264,28 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final MeasurementVariable measurementVariable = variables.get(variableId);
 
 					measurementVariable.setTermId(variableId);
-					measurementVariable.setName(Objects.toString(result.get("variableName")));
-					measurementVariable.setAlias(Objects.toString(result.get("alias")));
-					measurementVariable.setDescription(Objects.toString(result.get("description")));
-					measurementVariable.setScale(Objects.toString(result.get("scale")));
-					measurementVariable.setMethod(Objects.toString(result.get("method")));
-					measurementVariable.setProperty(Objects.toString(result.get("property")));
+					measurementVariable.setName((String) result.get("variableName"));
+					measurementVariable.setAlias((String) result.get("alias"));
+					measurementVariable.setDescription((String) result.get("description"));
+					measurementVariable.setScale((String) result.get("scale"));
+					measurementVariable.setMethod((String) result.get("method"));
+					measurementVariable.setProperty((String) result.get("property"));
 					final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
 					measurementVariable.setVariableType(variableType);
 					measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
 					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
-					measurementVariable.setMinRange(typeSafeObjectToDouble(result.get("min")));
-					measurementVariable.setMaxRange(typeSafeObjectToDouble(result.get("max")));
+
+					final Double scaleMinRange = (Double) result.get("scaleMinRange");
+					final Double scaleMaxRange = (Double) result.get("scaleMaxRange");
+					final Double expectedMin = (Double) result.get("expectedMin");
+					final Double expectedMax = (Double) result.get("expectedMax");
+
+					measurementVariable.setMinRange(scaleMinRange != null ? scaleMinRange : expectedMin);
+					measurementVariable.setMaxRange(scaleMaxRange != null ? scaleMaxRange : expectedMax);
+					measurementVariable.setScaleMinRange(scaleMinRange);
+					measurementVariable.setScaleMaxRange(scaleMaxRange);
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
