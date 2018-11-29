@@ -1223,6 +1223,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   LEFT JOIN cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id " //
 				+ "                                         AND scaleMinRange.type_id = " + TermId.MIN_VALUE.getId() //
 				+ "   LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id "  //
+				+ "                                      AND dataset.program_uuid = vo.program_uuid " //
 				+ " WHERE " //
 				+ "   dataset.project_id = :observationSetId " //
 				+ "   AND pp.type_id in (:variableTypes) "
