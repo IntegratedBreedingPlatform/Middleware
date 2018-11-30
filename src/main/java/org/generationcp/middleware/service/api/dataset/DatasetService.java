@@ -47,6 +47,8 @@ public interface DatasetService {
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 
 	Integer getNumberOfChildren (final Integer parentId);
+
+	List<StudyInstance> getDatasetInstances(Integer datasetId);
 	
 	void deletePhenotype(final Integer phenotypeId);
 
