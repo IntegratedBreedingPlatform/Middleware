@@ -13,17 +13,19 @@ public class StudyInstance {
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
 	private int instanceNumber;
+	private boolean hasFieldmap;
 
 	public StudyInstance() {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final String locationName, final String locationAbbreviation, final int instanceNumber, final String customLocationAbbreviation) {
+	public StudyInstance(final int instanceDbId, final String locationName, final String locationAbbreviation, final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
 		this.instanceDbId = instanceDbId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
+		this.hasFieldmap = hasFieldMap;
 	}
 
 	public int getInstanceDbId() {
@@ -65,6 +67,14 @@ public class StudyInstance {
 
 	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
 		this.customLocationAbbreviation = customLocationAbbreviation;
+	}
+
+	public boolean isHasFieldmap() {
+		return hasFieldmap;
+	}
+
+	public void setHasFieldmap(boolean hasFieldmap) {
+		this.hasFieldmap = hasFieldmap;
 	}
 
 	@Override

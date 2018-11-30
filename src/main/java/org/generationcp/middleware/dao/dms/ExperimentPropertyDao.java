@@ -547,4 +547,5 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
 }
