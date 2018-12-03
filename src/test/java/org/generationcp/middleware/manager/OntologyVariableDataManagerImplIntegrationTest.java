@@ -467,4 +467,9 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertEquals(size, VariableCache.getCacheSize());
 		Assert.assertNull(VariableCache.getFromCache(variable1Id));
 	}
+
+	@Test
+	public void testGetDataType() {
+		Assert.assertEquals(DataType.NUMERIC_VARIABLE, this.variableManager.getDataType(this.testVariableInfo.getId()).get());
+	}
 }
