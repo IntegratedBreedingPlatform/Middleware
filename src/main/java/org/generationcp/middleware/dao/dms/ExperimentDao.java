@@ -974,12 +974,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 
 				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
-				observationUnitRow.setObsUnitId((String) row.get(OBS_UNIT_ID));
-
-				variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
+				final String obsUnitId = (String) row.get(OBS_UNIT_ID);
+				observationUnitRow.setObsUnitId(obsUnitId);
 				observationUnitRow.setVariables(variables);
-
-				observationUnitRows.put(String.valueOf(observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue()), observationUnitRow);
+				observationUnitRows.put(obsUnitId, observationUnitRow);
 			}
 		}
 

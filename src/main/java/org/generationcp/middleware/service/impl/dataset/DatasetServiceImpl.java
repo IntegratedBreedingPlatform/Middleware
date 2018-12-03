@@ -498,7 +498,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void importDataset(final Integer datasetId, final Table<String, String, String> table) {
 		final List<MeasurementVariable>
 			measurementVariableList =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (measurementVariableList.size() > 0) {
 
@@ -517,7 +517,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 			final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
 			for (final Object observationUnitId : table.rowKeySet()) {
-
+				final List<Phenotype> phenotypes = new ArrayList<>();
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
@@ -549,9 +549,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 						final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
 						final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
-						if (observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData
-							.getValue().isEmpty()) {
-							this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue);
+						if (observationUnitData != null && observationUnitData.getObservationId() != null) {
+							phenotypes.add(this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue));
 						} else {
 							final ObservationDto observationDto = new ObservationDto();
 							observationDto.setVariableId(measurementVariable.getTermId());
@@ -566,11 +565,12 @@ public class DatasetServiceImpl implements DatasetService {
 							} else {
 								observationDto.setStatus(null);
 							}
-							this.addPhenotype(observationDto);
+							phenotypes.add(this.createPhenotype(observationDto));
 						}
 					}
 				}
-				this.setMeasurementDataAsOutOfSync(formulasMap, experimentModel);
+
+				this.setMeasurementDataAsOutOfSync(formulasMap, phenotypes);
 			}
 		}
 	}
@@ -689,9 +689,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void setMeasurementDataAsOutOfSync(
 		final Map<Integer, List<MeasurementVariable>> formulasMap,
-		final ExperimentModel experimentModel) {
+		final List<Phenotype> phenotypes) {
 		for (final Integer measurementVariableId : formulasMap.keySet()) {
-			final List<Phenotype> phenotypes = experimentModel.getPhenotypes();
 			final List<MeasurementVariable> formulas = formulasMap.get(measurementVariableId);
 			for (final MeasurementVariable formula : formulas) {
 				final Phenotype phenotype = this.findPhenotypeByTermId(formula.getTermId(), phenotypes);
@@ -763,7 +762,31 @@ public class DatasetServiceImpl implements DatasetService {
 		return phenotype;
 	}
 
-		public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
+	private Phenotype createPhenotype(final ObservationDto observation) {
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(observation.getCategoricalValueId());
+		final Integer variableId = observation.getVariableId();
+		phenotype.setObservableId(variableId);
+		phenotype.setValue(observation.getValue());
+		final Integer observationUnitId = observation.getObservationUnitId();
+		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		phenotype.setName(String.valueOf(variableId));
+
+		this.resolveObservationStatus(variableId, phenotype);
+
+		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
+		observation.setObservationId(savedRecord.getPhenotypeId());
+		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
+		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
+		observation.setStatus(savedRecord.getValueStatus() != null ? savedRecord.getValueStatus().getName() : null);
+
+		return phenotype;
+	}
+
+	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
 		this.germplasmDescriptors = germplasmDescriptors;
 	}
 
