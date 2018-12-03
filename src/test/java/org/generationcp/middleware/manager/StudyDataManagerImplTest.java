@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -69,6 +70,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -855,7 +857,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsInstanceExistsInDataset() throws Exception {
+	public void testAreAllInstancesExistInDataset() throws Exception {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
@@ -868,19 +870,37 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<InstanceMetadata> instanceMetadataList = this.manager.getInstanceMetadata(studyId);
 		final Integer instanceId = instanceMetadataList.get(0).getInstanceDbId();
 
-		Assert.assertTrue(this.manager.isInstanceExistsInDataset(datasetId, instanceId));
+		Assert.assertTrue(this.manager.areAllInstancesExistInDataset(datasetId, new HashSet<Integer>(Arrays.asList(instanceId))));
 
 	}
 
 	@Test
-	public void testIsInstanceExistsInDatasetInstanceNotExists() throws Exception {
+	public void testAreAllInstancesExistInDatasetOnlyOneInstanceIdExists() throws Exception {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
 		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
 
-		Assert.assertFalse(this.manager.isInstanceExistsInDataset(datasetId, 999));
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.manager.getActiveSession().flush();
+
+		final List<InstanceMetadata> instanceMetadataList = this.manager.getInstanceMetadata(studyId);
+		final Integer instanceId = instanceMetadataList.get(0).getInstanceDbId();
+
+		Assert.assertFalse(this.manager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(instanceId, 999)));
+
+	}
+
+	@Test
+	public void testAreAllInstancesExistInDatasetInstanceInstancesDoNotExist() throws Exception {
+
+		final Random random = new Random();
+		final Integer studyId = this.studyReference.getId();
+		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+
+		Assert.assertFalse(this.manager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(999)));
 
 	}
 

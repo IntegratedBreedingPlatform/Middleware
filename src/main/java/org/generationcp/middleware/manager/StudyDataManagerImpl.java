@@ -11,11 +11,10 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -44,6 +43,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -80,10 +80,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -1242,8 +1243,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId) {
-		return this.getExperimentDao().isInstanceExistsInDataset(datasetId, instanceId);
+	public boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds) {
+		return this.getExperimentDao().areAllInstancesExistInDataset(datasetId, instanceIds);
+	}
+
+	@Override
+	public String getBlockId(final int datasetId, final String trialInstance) {
+		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+
+	}
+
+	@Override
+	public FieldmapBlockInfo getBlockInformation(final int blockId) {
+		return locationDataManager.getBlockInformation(blockId);
 	}
 
 	@Override

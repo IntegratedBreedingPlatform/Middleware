@@ -228,18 +228,29 @@ public class StudyServiceImplTest {
 	@Test
 	public void testGetStudyInstances() throws Exception {
 
-		final Object[] testDBRow = {12345, "Gujarat, India", "GUJ", "", 1};
-		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
+		final Object[] testDBRow = {12345, "Gujarat, India", "GUJ", "", "1", 1};
+		final Object[] testDBRow2 = {1, "Afghanistan", "AFG", "Afghanz", "", 2};
+		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow, testDBRow2);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
 
 		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(123);
 
-		Assert.assertEquals(1, studyInstances.size());
-		Assert.assertEquals(testDBRow[0], studyInstances.get(0).getInstanceDbId());
-		Assert.assertEquals(testDBRow[1], studyInstances.get(0).getLocationName());
-		Assert.assertEquals(testDBRow[2], studyInstances.get(0).getLocationAbbreviation());
-		Assert.assertEquals(testDBRow[3], studyInstances.get(0).getCustomLocationAbbreviation());
-		Assert.assertEquals(testDBRow[4], studyInstances.get(0).getInstanceNumber());
+		Assert.assertEquals(2, studyInstances.size());
+		final StudyInstance firstInstance = studyInstances.get(0);
+		Assert.assertEquals(testDBRow[0], firstInstance.getInstanceDbId());
+		Assert.assertEquals(testDBRow[1], firstInstance.getLocationName());
+		Assert.assertEquals(testDBRow[2], firstInstance.getLocationAbbreviation());
+		Assert.assertEquals(testDBRow[3], firstInstance.getCustomLocationAbbreviation());
+		Assert.assertTrue(firstInstance.isHasFieldmap());
+		Assert.assertEquals(testDBRow[5], firstInstance.getInstanceNumber());
+		
+		final StudyInstance secondInstance = studyInstances.get(1);
+		Assert.assertEquals(testDBRow2[0], secondInstance.getInstanceDbId());
+		Assert.assertEquals(testDBRow2[1], secondInstance.getLocationName());
+		Assert.assertEquals(testDBRow2[2], secondInstance.getLocationAbbreviation());
+		Assert.assertEquals(testDBRow2[3], secondInstance.getCustomLocationAbbreviation());
+		Assert.assertFalse(secondInstance.isHasFieldmap());
+		Assert.assertEquals(testDBRow2[5], secondInstance.getInstanceNumber());
 	}
 
 	@Test

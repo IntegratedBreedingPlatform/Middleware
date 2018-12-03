@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,8 @@ public interface DatasetService {
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 
 	Integer getNumberOfChildren (final Integer parentId);
+
+	List<StudyInstance> getDatasetInstances(Integer datasetId);
 
 	void deletePhenotype(final Integer phenotypeId);
 

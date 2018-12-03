@@ -11,9 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -35,6 +33,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
@@ -49,7 +48,9 @@ import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
-import com.google.common.collect.BiMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets from the CHADO schema.
@@ -832,6 +833,9 @@ public interface StudyDataManager {
 	
 	void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked);
 
-	boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId);
+	boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds);
 
+	String getBlockId(int datasetId, String trialInstance);
+
+	FieldmapBlockInfo getBlockInformation(int blockId);
 }

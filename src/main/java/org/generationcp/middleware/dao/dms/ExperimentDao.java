@@ -58,7 +58,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String LOCATION_DB_ID = "locationDbId";
 	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
 	public static final String FIELD_MAP_ROW = "FieldMapRow";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	public static final String FIELD_MAP_COLUMN = "FIELDMAP COLUMN";
 	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
 	public static final String LOCATION_NAME = "LocationName";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
@@ -73,7 +73,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String GID = "GID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
+	public static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
 	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
 			" experiment.nd_experiment_id, " + //
 			" plant.plant_id," + //
@@ -618,24 +618,24 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return id != null;
 	}
 	
-	public boolean isInstanceExistsInDataset(final int datasetId, final int instanceId) {
+	public boolean areAllInstancesExistInDataset(final int datasetId, final Set<Integer> instanceIds) {
 
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e ")
-			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
+			.append(" WHERE e.project_id = :datasetId and e.nd_geolocation_id in (:instanceIds)");
 
 		try {
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameter("datasetId", datasetId);
-			query.setParameter("instanceId", instanceId);
+			query.setParameterList("instanceIds", instanceIds);
 
 			final BigInteger count = (BigInteger) query.uniqueResult();
-			return count.intValue() > 0;
+			return count.intValue() == instanceIds.size();
 
 		} catch (final HibernateException e) {
 			final String error =
-				"Error at isInstanceExistsInDataset=" + datasetId + "," + instanceId + " query at ExperimentDao: " + e.getMessage();
+				"Error at areAllInstancesExistInDataset=" + datasetId + "," + instanceIds + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(error);
 			throw new MiddlewareQueryException(error, e);
 		}
