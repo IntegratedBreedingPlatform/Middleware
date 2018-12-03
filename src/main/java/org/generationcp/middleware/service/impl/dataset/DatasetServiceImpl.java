@@ -517,54 +517,57 @@ public class DatasetServiceImpl implements DatasetService {
 
 			final Map<Integer, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
 			for (final Object observationUnitId : table.rowKeySet()) {
+
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
 				for (final String variableName : table.columnKeySet()) {
 					final String importedVariableValue = table.get(observationUnitId, variableName);
-					final MeasurementVariable measurementVariable =
-						(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
 
-							@Override
-							public boolean evaluate(final Object object) {
-								final MeasurementVariable variable = (MeasurementVariable) object;
-								return variable.getName().equalsIgnoreCase(variableName);
-							}
-						});
+					if (importedVariableValue != null && !importedVariableValue.isEmpty()) {
+						final MeasurementVariable measurementVariable =
+							(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
 
-					BigInteger categoricalValueId = null;
-					if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						if (importedVariableValue != null) {
-							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
-								if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
-									categoricalValueId = BigInteger.valueOf(possibleValue.getId());
-									break;
+								@Override
+								public boolean evaluate(final Object object) {
+									final MeasurementVariable variable = (MeasurementVariable) object;
+									return variable.getName().equalsIgnoreCase(variableName);
+								}
+							});
+
+						BigInteger categoricalValueId = null;
+						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+							if (importedVariableValue != null) {
+								for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
+									if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
+										categoricalValueId = BigInteger.valueOf(possibleValue.getId());
+										break;
+									}
 								}
 							}
 						}
-					}
 
-					final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
-					final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
-					if (observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData
-						.getValue()
-						.isEmpty()) {
-						this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue);
-					} else {
-						final ObservationDto observationDto = new ObservationDto();
-						observationDto.setVariableId(measurementVariable.getTermId());
-
-						observationDto.setCategoricalValueId(categoricalValue);
-						observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
-						observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
-						observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
-						observationDto.setValue(importedVariableValue);
-						if (measurementVariable.getFormula() != null) {
-							observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
+						final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
+						final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
+						if (observationUnitData != null && observationUnitData.getValue() != null && !observationUnitData
+							.getValue().isEmpty()) {
+							this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue);
 						} else {
-							observationDto.setStatus(null);
+							final ObservationDto observationDto = new ObservationDto();
+							observationDto.setVariableId(measurementVariable.getTermId());
+
+							observationDto.setCategoricalValueId(categoricalValue);
+							observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
+							observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
+							observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
+							observationDto.setValue(importedVariableValue);
+							if (measurementVariable.getFormula() != null) {
+								observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
+							} else {
+								observationDto.setStatus(null);
+							}
+							this.addPhenotype(observationDto);
 						}
-						this.addPhenotype(observationDto);
 					}
 				}
 				this.setMeasurementDataAsOutOfSync(formulasMap, experimentModel);
