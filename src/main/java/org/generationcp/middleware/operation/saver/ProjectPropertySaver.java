@@ -395,13 +395,14 @@ public class ProjectPropertySaver {
 
 	private void deleteVariable(final DmsProject project, final int termId) {
 		if (project.getProperties() != null) {
+			final List<ProjectProperty> deletedProjectProperties = new ArrayList<>();
 			for (final ProjectProperty property : project.getProperties()) {
 				if (property.getVariableId().equals(termId)) {
 					this.saver.getProjectPropertyDao().makeTransient(property);
-					project.getProperties().remove(property);
-					break;
+					deletedProjectProperties.add(property);
 				}
 			}
+			project.getProperties().removeAll(deletedProjectProperties);
 		}
 	}
 
