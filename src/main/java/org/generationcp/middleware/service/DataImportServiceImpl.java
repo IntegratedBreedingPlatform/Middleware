@@ -341,7 +341,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Optional<MeasurementVariable> locationIdMeasurementVariable =
 				this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), measurementVariables);
 		if (locationIdMeasurementVariable.isPresent() && StringUtils.isEmpty(locationIdMeasurementVariable.get().getValue())) {
-			locationIdMeasurementVariable.get().setValue(this.retrieveLocIdOfUnspecifiedLocation());
+			locationIdMeasurementVariable.get().setValue(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation());
 		}
 
 	}
@@ -375,7 +375,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// Creates a LOCATION_ID Variable with default value of "Unspecified Location".
 		// This variable will be added to an imported study with no LOCATION_ID Variable specified in the file.
-		final String unspecifiedLocationId = this.retrieveLocIdOfUnspecifiedLocation();
+		final String unspecifiedLocationId = this.locationDataManager.retrieveLocIdOfUnspecifiedLocation();
 		final MeasurementVariable variable = this.createMeasurementVariable(TermId.LOCATION_ID.getId(), unspecifiedLocationId, Operation.ADD,
 				PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
 		variable.setName(Workbook.DEFAULT_LOCATION_ID_VARIABLE_ALIAS);
@@ -399,16 +399,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		var.setOperation(operation);
 		return var;
 
-	}
-
-	protected String retrieveLocIdOfUnspecifiedLocation() {
-
-		String unspecifiedLocationId = "";
-		final List<Location> locations = this.locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
-		if (!locations.isEmpty()) {
-			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
-		}
-		return unspecifiedLocationId;
 	}
 
 	/**

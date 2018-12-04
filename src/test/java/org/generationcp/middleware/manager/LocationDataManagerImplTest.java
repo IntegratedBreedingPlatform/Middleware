@@ -680,4 +680,17 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 				is(equalTo(locationFinal.getAdditionalInfo().getInfoValue("province"))));
 	}
 
+	@Test
+	public void testRetrieveLocIdOfUnspecifiedLocation() {
+		final String unspecifiedLocationID = this.manager.retrieveLocIdOfUnspecifiedLocation();
+		final String unspecifiedLocationName = "Unspecified Location";
+		final String unspecifiedLocationAbbr = "NOLOC";
+
+		Assert.assertNotNull(unspecifiedLocationID);
+		Location unspecifiedLocation = this.manager.getLocationByID(Integer.parseInt(unspecifiedLocationID));
+		Assert.assertEquals(unspecifiedLocationName, unspecifiedLocation.getLname());
+		Assert.assertEquals(unspecifiedLocationAbbr, unspecifiedLocation.getLabbr());
+	}
+
+
 }
