@@ -32,30 +32,7 @@ public class DataSetDaoTest {
 		this.dao.setSession(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
 	}
-	
-	@Test
-	public void testDelete() {
-		final int datasetId = 1234;
-		this.dao.delete(datasetId);
-		
-		Mockito.verify(this.mockSession).flush();
-		final String deleteProjectRelationshipSql = "delete pr " + "from project_relationship pr " + "where pr.subject_project_id = " + datasetId;
-		final String deleteExperimentSql = "delete e, pheno, eprop " + "from nd_experiment e, "
-				+ "phenotype pheno, nd_experimentprop eprop "
-				+ "where e.project_id = " + datasetId
-				+ "  and e.nd_experiment_id = pheno.nd_experiment_id "
-				+ "  and e.nd_experiment_id = eprop.nd_experiment_id";
-		final String deleteProjectSql = "delete p, pp " + "from project p, projectprop pp " + "where p.project_id = " + datasetId
-				+ "  and p.project_id = pp.project_id";
-		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(this.mockSession, Mockito.times(3)).createSQLQuery(sqlCaptor.capture());
-		final List<String> queries = sqlCaptor.getAllValues();
-		Assert.assertEquals(deleteProjectRelationshipSql, queries.get(0));
-		Assert.assertEquals(deleteExperimentSql, queries.get(1));
-		Assert.assertEquals(deleteProjectSql, queries.get(2));
-		Mockito.verify(this.mockQuery, Mockito.times(3)).executeUpdate();
-	}
-	
+
 	@Test
 	public void testDeleteExperimentsByLocation_WithExperimentProperties() {
 		Mockito.doReturn(1).when(this.mockQuery).executeUpdate();

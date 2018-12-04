@@ -73,10 +73,13 @@ public class DatasetServiceImpl implements DatasetService {
 	protected static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
 	protected static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
+		VariableType.EXPERIMENTAL_DESIGN.getId(), //
+		VariableType.TREATMENT_FACTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
 	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
@@ -115,6 +118,14 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+	}
+
+	public DatasetServiceImpl(final MeasurementVariableService measurementVariableService, final GermplasmDescriptors germplasmDescriptors,
+		final DesignFactors designFactors) {
+		super();
+		this.measurementVariableService = measurementVariableService;
+		this.germplasmDescriptors = germplasmDescriptors;
+		this.designFactors = designFactors;
 	}
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -334,8 +345,16 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public ObservationDto updatePhenotype(
 		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
-		final Phenotype phenotype = this.updatePhenotype(observationId, categoricalValueId, value);
+		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
+
+		final Phenotype phenotype = phenotypeDao.getById(observationId);
+		phenotype.setValue(value);
+		phenotype.setcValue(categoricalValueId != null && categoricalValueId != 0 ? categoricalValueId : null);
 		final Integer observableId = phenotype.getObservableId();
+		this.resolveObservationStatus(observableId, phenotype);
+
+		phenotypeDao.update(phenotype);
+
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
 
@@ -397,6 +416,13 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 				datasetDTO.setVariables(
 					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
+
+				for (final MeasurementVariable variable : datasetDTO.getVariables()) {
+					final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
+					if (formula != null) {
+						variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
+					}
+				}
 				return datasetDTO;
 			}
 
@@ -410,18 +436,17 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final Integer datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
+		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
 		final String sortedColumnTermId, final String sortOrder) {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		String sortBy = sortedColumnTermId;
 		if (sortedColumnTermId != null) {
 			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
 		}
 
-		return this.daoFactory.getExperimentDao()
-				.getObservationUnitTable(datasetId, selectionMethodsAndTraits, this.findGenericGermplasmDescriptors(studyId),
-						this.findAdditionalDesignFactors(studyId), instanceId,
+		return this.daoFactory.getExperimentDao().getObservationUnitTable(datasetId, selectionMethodsAndTraits,
+			this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), instanceId,
 			pageNumber, pageSize, sortBy, sortOrder);
 	}
 
@@ -477,6 +502,19 @@ public class DatasetServiceImpl implements DatasetService {
 		
 		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+	}
+
+	@Override
+	public void deleteDataset(final int datasetId) {
+
+		try {
+
+			this.daoFactory.getDmsProjectDAO().deleteDataset(datasetId);
+
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -817,4 +855,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
 	}
+
+	
 }

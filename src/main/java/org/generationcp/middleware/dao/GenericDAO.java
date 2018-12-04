@@ -265,20 +265,4 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	/**
-	 * TODO move {@link DatabaseBroker#typeSafeObjectToBoolean(java.lang.Object)} here
-	 */
-	protected static Double typeSafeObjectToDouble(final Object val) {
-		if (val == null) {
-			return null;
-		}
-		if (val instanceof Double) {
-			return (Double) val;
-		}
-		if (val instanceof String) {
-			return Double.valueOf((String) val);
-		}
-		throw new NumberFormatException("Cannot cast " + val.getClass() + " to Double for value: " + val);
-	}
-
 }

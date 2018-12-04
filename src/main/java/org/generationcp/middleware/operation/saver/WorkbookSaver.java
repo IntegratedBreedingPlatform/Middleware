@@ -193,25 +193,25 @@ public class WorkbookSaver extends Saver {
 
 		// get the trial and measurement dataset id to use in deletion of
 		// experiments
-		Integer trialDatasetId = workbook.getTrialDatasetId();
-		Integer datasetId = workbook.getMeasurementDatesetId();
-		int totalRows = 0;
+		Integer environmentDatasetId = workbook.getTrialDatasetId();
+		Integer plotDatasetId = workbook.getMeasurementDatesetId();
+		int savedEnvironmentsCount = 0;
 		boolean isDeleteTrialObservations = false;
-		if (trialDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			trialDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+		if (environmentDatasetId == null && workbook.getStudyDetails().getId() != null) {
+			environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
 		}
-		if (datasetId == null && workbook.getStudyDetails().getId() != null) {
-			datasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
-		}
-
-		if (trialDatasetId != null) {
-			totalRows = (int) this.getStudyDataManager().countExperiments(trialDatasetId);
+		if (plotDatasetId == null && workbook.getStudyDetails().getId() != null) {
+			plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
 		}
 
-		if ((totalRows != workbook.getTrialObservations().size() && totalRows > 0 || isDeleteObservations) && trialDatasetId != null) {
+		if (environmentDatasetId != null) {
+			savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
+		}
+
+		if ((savedEnvironmentsCount != workbook.getTrialObservations().size() && savedEnvironmentsCount > 0 || isDeleteObservations) && environmentDatasetId != null) {
 			isDeleteTrialObservations = true;
 			// delete measurement data
-			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
+			this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
 			// reset trial observation details such as experimentid, stockid and
 			// geolocationid
 			this.resetTrialObservations(workbook.getTrialObservations());
@@ -242,7 +242,7 @@ public class WorkbookSaver extends Saver {
 			this.getExperimentDao().saveOrUpdate(studyExperiment);
 
 			// delete trial observations
-			this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(trialDatasetId);
+			this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
 		}
 
 		final int studyId;
@@ -251,14 +251,14 @@ public class WorkbookSaver extends Saver {
 		} else {
 			studyId = workbook.getStudyDetails().getId();
 		}
-		trialDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
+		environmentDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
 
-		this.saveOrUpdateTrialObservations(trialDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, totalRows,
+		this.saveOrUpdateTrialObservations(environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount,
 				isDeleteObservations, programUUID);
 
-		datasetId =
+		plotDatasetId =
 				this.createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
-		this.createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
+		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
 
 		if (!retainValues) {
 			// clean up some variable references to save memory space before
@@ -271,11 +271,11 @@ public class WorkbookSaver extends Saver {
 			workbook.setVariates(null);
 		} else {
 			workbook.getStudyDetails().setId(studyId);
-			workbook.setTrialDatasetId(trialDatasetId);
-			workbook.setMeasurementDatesetId(datasetId);
+			workbook.setTrialDatasetId(environmentDatasetId);
+			workbook.setMeasurementDatesetId(plotDatasetId);
 		}
 
-		this.createMeasurementEffectExperiments(datasetId, effectVariables, workbook.getObservations(), trialHeaders);
+		this.createMeasurementEffectExperiments(plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 		return studyId;
 	}

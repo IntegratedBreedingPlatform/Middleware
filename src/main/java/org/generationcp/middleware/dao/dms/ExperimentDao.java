@@ -730,9 +730,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				observationVariableName);
 			return this.mapResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, observationVariableName);
 		} catch (final Exception e) {
+			ExperimentDao.LOG.error(e.getMessage());
 			final String error = "An internal error has ocurred when trying to execute the operation";
-			ExperimentDao.LOG.error(error);
-			throw new MiddlewareException(error);
+			throw new MiddlewareException(error, e);
 		}
 	}
 
@@ -783,7 +783,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (addStatus) {
 				createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
 			}
-			createSQLQuery.addScalar(measurementVariable.getName() + "_CvalueId");
+			createSQLQuery.addScalar(measurementVariable.getName() + "_CvalueId", new IntegerType());
 		}
 	}
 	

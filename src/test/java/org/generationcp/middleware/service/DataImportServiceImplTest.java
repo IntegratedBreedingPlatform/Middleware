@@ -121,6 +121,8 @@ public class DataImportServiceImplTest {
 		unspecifiedLocation.setLocid(UNSPECIFIED_LOCATION_LOCID);
 		locations.add(unspecifiedLocation);
 		Mockito.when(this.locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
+		Mockito.when(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation()).thenReturn(String.valueOf(UNSPECIFIED_LOCATION_LOCID));
+
 
 		final StandardVariable standardVariable = StandardVariableTestDataInitializer.createStandardVariable();
 		standardVariable.setId(TermId.LOCATION_ID.getId());
@@ -643,13 +645,6 @@ public class DataImportServiceImplTest {
 		// The added variable should not be deleted from the list because it is not obsolete.
 		Assert.assertEquals(1, measurementVariables.size());
 		Assert.assertEquals(adObsolete, measurementVariables.get(0));
-
-	}
-
-	@Test
-	public void testRetrieveLocIdOfUnspecifiedLocation() {
-
-		Assert.assertEquals(String.valueOf(UNSPECIFIED_LOCATION_LOCID), this.dataImportService.retrieveLocIdOfUnspecifiedLocation());
 
 	}
 

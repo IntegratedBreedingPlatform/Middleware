@@ -148,6 +148,13 @@ public interface StudyDataManager {
 	List<Experiment> getExperimentsOfFirstInstance(final int dataSetId,final  int start,final int numOfRows);
 
 	/**
+	 * Gets the treatment factor variables of the study
+	 * @param dataSetId
+	 * @return
+	 */
+	VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId);
+
+	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 *
 	 * @param dataSetId the data set id
@@ -340,21 +347,6 @@ public interface StudyDataManager {
 	 * @return the data set reference
 	 */
 	DatasetReference findOneDataSetReferenceByType(int studyId, DataSetType type);
-
-	/**
-	 * Deletes the dataset matching the given ID.
-	 *
-	 * @param datasetId the dataset id
-	 */
-	void deleteDataSet(int datasetId);
-
-	/**
-	 * Deletes location matching the given dataset ID and location ID.
-	 *
-	 * @param datasetId  the dataset id
-	 * @param locationId the location id
-	 */
-	void deleteExperimentsByLocation(int datasetId, int locationId);
 
 	/**
 	 * Retrieves the local name associated to the given project ID and standard variable ID.

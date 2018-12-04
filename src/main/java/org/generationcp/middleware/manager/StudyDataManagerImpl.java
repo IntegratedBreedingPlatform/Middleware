@@ -235,6 +235,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId) {
+		return this.getDataSetBuilder().getTreatmentFactorVariableTypes(dataSetId);
+	}
+
+	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(final int trialDataSetId, final int dataSetId, final int start,
 			final int numRows) {
 		final VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
@@ -389,32 +394,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			return new DatasetReference(dataSetProject.getProjectId(), dataSetProject.getName(), dataSetProject.getDescription());
 		}
 		return null;
-	}
-
-	@Override
-	public void deleteDataSet(final int datasetId) {
-
-		try {
-
-			this.getDataSetDestroyer().deleteDataSet(datasetId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void deleteExperimentsByLocation(final int datasetId, final int locationId) {
-
-		try {
-
-			this.getDataSetDestroyer().deleteExperimentsByLocation(datasetId, locationId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in deleteExperimentsByLocation " + e.getMessage(), e);
-		}
 	}
 
 	@Override

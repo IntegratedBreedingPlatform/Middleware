@@ -30,43 +30,6 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetDao.class);
 
-	public void delete(final int datasetId) {
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-			
-			// Delete from project relationship
-			SQLQuery statement =
-					this.getSession().createSQLQuery(
-							"delete pr " + "from project_relationship pr " + "where pr.subject_project_id = " + datasetId);
-			statement.executeUpdate();
-
-			// Delete experiments
-			statement =
-					this.getSession().createSQLQuery(
-							"delete e, pheno, eprop " + "from nd_experiment e, "
-									+ "phenotype pheno, nd_experimentprop eprop "
-									+ "where e.project_id = " + datasetId
-									+ "  and e.nd_experiment_id = pheno.nd_experiment_id "
-									+ "  and e.nd_experiment_id = eprop.nd_experiment_id");
-			statement.executeUpdate();
-
-			// Delete project stuff
-			statement =
-					this.getSession().createSQLQuery(
-							"delete p, pp " + "from project p, projectprop pp " + "where p.project_id = " + datasetId
-									+ "  and p.project_id = pp.project_id");
-			statement.executeUpdate();
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error in delete=" + datasetId + " in DataSetDao: " + e.getMessage();
-			DataSetDao.LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
 	public void deleteExperimentsByLocation(final int datasetId, final int locationId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
