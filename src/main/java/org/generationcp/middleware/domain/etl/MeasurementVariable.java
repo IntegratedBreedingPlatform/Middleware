@@ -27,6 +27,12 @@ public class MeasurementVariable {
 
 	private String name;
 
+	/**
+	 * Some of the old code may still fill the name with the alias
+	 * The explicit field is preferred in the new code
+	 */
+	private String alias;
+
 	private String description;
 
 	private String scale;
@@ -52,6 +58,10 @@ public class MeasurementVariable {
 	private Double minRange;
 
 	private Double maxRange;
+
+	private Double scaleMinRange;
+
+	private Double scaleMaxRange;
 
 	private boolean required;
 
@@ -152,6 +162,14 @@ public class MeasurementVariable {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(final String alias) {
+		this.alias = alias;
 	}
 
 	public String getDescription() {
@@ -360,6 +378,22 @@ public class MeasurementVariable {
 	 */
 	public void setMaxRange(final Double maxRange) {
 		this.maxRange = maxRange;
+	}
+
+	public Double getScaleMinRange() {
+		return scaleMinRange;
+	}
+
+	public void setScaleMinRange(final Double scaleMinRange) {
+		this.scaleMinRange = scaleMinRange;
+	}
+
+	public Double getScaleMaxRange() {
+		return scaleMaxRange;
+	}
+
+	public void setScaleMaxRange(final Double scaleMaxRange) {
+		this.scaleMaxRange = scaleMaxRange;
 	}
 
 	/**
