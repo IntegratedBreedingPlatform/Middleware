@@ -14,9 +14,10 @@ package org.generationcp.middleware.manager.ontology.api;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
@@ -95,6 +96,8 @@ public interface OntologyVariableDataManager {
 	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
 
 	public List<VariableType> getVariableTypes(Integer variableId);
+
+	Optional<DataType> getDataType(Integer variableId);
 
 	void deleteVariablesFromCache(List<Integer> variablesIds);
 }
