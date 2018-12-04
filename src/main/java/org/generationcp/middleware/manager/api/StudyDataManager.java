@@ -148,6 +148,13 @@ public interface StudyDataManager {
 	List<Experiment> getExperimentsOfFirstInstance(final int dataSetId,final  int start,final int numOfRows);
 
 	/**
+	 * Gets the treatment factor variables of the study
+	 * @param dataSetId
+	 * @return
+	 */
+	VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId);
+
+	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 *
 	 * @param dataSetId the data set id
