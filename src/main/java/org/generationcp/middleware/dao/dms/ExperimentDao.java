@@ -964,10 +964,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
 					final String status = (String) row.get(variable.getName() + "_Status");
-					final BigInteger categoricalValueId = (BigInteger) row.get(variable.getName() + "_CvalueId");
+					final Integer categoricalValueId = (Integer) row.get(variable.getName() + "_CvalueId");
 					variables.put(variable.getName(), new ObservationUnitData(
 						(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
-						categoricalValueId != null ? categoricalValueId.intValue() : null, //categoricalValue
+						categoricalValueId != null ? categoricalValueId : null, //categoricalValue
 						(String) row.get(variable.getName()), //variableValue
 						(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
 						), variable.getId()));
