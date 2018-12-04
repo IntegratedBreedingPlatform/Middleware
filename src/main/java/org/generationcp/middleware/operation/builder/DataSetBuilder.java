@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.DatasetUtil;
+import org.generationcp.middleware.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +86,20 @@ public class DataSetBuilder extends Builder {
 			final Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
 			for (final VariableInfo variableInfo : variableInfoList) {
 				variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
+			}
+		}
+		return variableTypeList.sort();
+	}
+
+	public VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId)  {
+		final VariableTypeList variableTypeList = new VariableTypeList();
+		final DmsProject project = this.dmsProjectDao.getById(dataSetId);
+		if (project != null) {
+			final Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
+			for (final VariableInfo variableInfo : variableInfoList) {
+				if(!StringUtil.isEmpty(variableInfo.getTreatmentLabel())) {
+					variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
+				}
 			}
 		}
 		return variableTypeList.sort();
