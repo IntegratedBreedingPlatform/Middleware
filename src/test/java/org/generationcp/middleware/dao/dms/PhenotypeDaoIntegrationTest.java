@@ -12,6 +12,10 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -40,9 +44,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private static final int NO_OF_GERMPLASM = 5;
@@ -63,6 +64,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private DmsProject study;
 	private CVTerm trait;
+	private List<Phenotype> phenotypes;
 
 	private ExperimentModelSaver experimentModelSaver;
 
@@ -150,7 +152,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "jf10");
+		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
@@ -166,7 +168,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setGermplasmId(1);
 
 		//Save the experiment
-		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values, "jf10");
+		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
@@ -228,9 +230,32 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.phenotypeDao.deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
 		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 	}
-
+	
+	@Test
+	public void testUpdateOutOfSyncPhenotypes(){
+		this.createEnvironmentData(1, true);	
+		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
+		final Integer variableId = this.trait.getCvTermId();
+		final Integer datasetId = this.study.getProjectId();
+		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
+		
+		this.phenotypeDao.updateOutOfSyncPhenotypes(experimentId, Arrays.asList(variableId));
+		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
+		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
+		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());
+	}
+	
+	@Test
+	public void testIsValidPhenotype() {
+		this.createEnvironmentData(1, true);
+		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
+		final Integer phenotypeId = this.phenotypes.get(0).getPhenotypeId();
+		Assert.assertTrue(this.phenotypeDao.isValidPhenotype(experimentId,  phenotypeId));
+		Assert.assertFalse(this.phenotypeDao.isValidPhenotype(experimentId + 1,  phenotypeId));
+	}
+	
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
-
+		this.phenotypes = new ArrayList<Phenotype>();
 		final Geolocation geolocation = new Geolocation();
 		this.geolocationDao.saveOrUpdate(geolocation);
 
@@ -252,7 +277,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 				final ExperimentModel experimentModel = new ExperimentModel();
 				experimentModel.setGeoLocation(geolocation);
 				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-				experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
 				experimentModel.setProject(this.study);
 				experimentModel.setStock(stockModel);
 				this.experimentDao.saveOrUpdate(experimentModel);
@@ -262,7 +286,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 					phenotype.setObservableId(this.trait.getCvTermId());
 					phenotype.setExperiment(experimentModel);
 					phenotype.setValue(i + "." + j);
-					this.phenotypeDao.save(phenotype);
+					this.phenotypes.add(this.phenotypeDao.save(phenotype));
 				}
 			}
 

@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarissa" id="v10.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when ('ibdbv2_fingermillet_merged' = DATABASE()) then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<comment>
+			Apply fix on fingermillet scales 20600 and 20601 from categorical to numeric data type.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm_relationship SET object_id = 1110 WHERE subject_id = 20600 AND object_id = 1130;
+
+			UPDATE cvterm_relationship SET object_id = 1110 WHERE subject_id = 20601 AND object_id = 1130;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarissa" id="v10.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM variable_overrides WHERE expected_min=0 AND expected_max=0;
+			</sqlCheck>
+        </preConditions>
+		<comment>
+			Removes the entries where there are both zeroes for min and max.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM variable_overrides WHERE expected_min=0 AND expected_max=0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v10.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME = 'nd_experiment'
+						AND COLUMN_NAME = 'obs_unit_id'
+						AND COLUMN_TYPE = 'char(13)'
+						AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+        </preConditions>
+		<comment>
+			Change the length of obs_unit_id field in nd_experiment_table to be able to store UUIDs
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE nd_experiment MODIFY obs_unit_id VARCHAR(36);
+		</sql>
+	</changeSet>
+	
+	<changeSet author="marie" id="v10.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) 
+				FROM location
+				WHERE labbr = 'NOLOC';
+			</sqlCheck>
+		</preConditions>
+		<comment>Unspecified location should be defined as Breeding Location</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location
+			SET ltype=410 
+			WHERE labbr = 'NOLOC';
+		</sql>
+	</changeSet>
+
+	<changeSet author="marie" id="v10.4.0-5">
+		<comment>Unspecified location should be favorite location for all existing programs</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO program_favorites (entity_type, entity_id, program_uuid)
+			SELECT DISTINCT 'LOCATION', location.locid, project.project_uuid
+			  FROM location
+			  INNER JOIN workbench.workbench_project project
+			  INNER JOIN workbench.workbench_crop crop
+			        WHERE crop.crop_name = project.crop_type
+			            AND crop.db_name = DATABASE()
+			            AND location.labbr='NOLOC'
+			            AND location.lname='Unspecified Location'
+			            AND NOT EXISTS
+			            (SELECT * FROM program_favorites
+							WHERE program_favorites.program_uuid = project.project_uuid
+			                AND program_favorites.entity_id = location.locid
+			                AND program_favorites.entity_type = 'LOCATION');
+		</sql>
+	</changeSet>
+	
+</databaseChangeLog>

@@ -11,6 +11,14 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -24,8 +32,8 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -37,21 +45,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -851,7 +850,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			this.getSession().flush();
 			final StringBuilder sql = new StringBuilder()
-				.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id ")
+				.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id, p.status ")
 				.append(" FROM phenotype p ")
 				.append(" WHERE p.observable_id = ").append(observableId)
 				.append(" AND p.nd_experiment_id = ").append(experimentId);
@@ -862,7 +861,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			if (list != null && !list.isEmpty()) {
 				for (final Object[] row : list) {
 					phenotype = new Phenotype((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3], (Integer) row[4],
-						(String) row[5], (Integer) row[6], (Integer) row[7]);
+							(String) row[5], (Integer) row[6], (Integer) row[7]);
+					final String status = (String)row[8];
+					if (status != null) {						
+						phenotype.setValueStatus(ValueStatus.valueOf(status));
+					}
+
 				}
 			}
 
@@ -924,24 +928,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				"Error in getByProjectAndType(" + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(), e);
 		}
 		return phenotypes;
-	}
-
-	public Phenotype getByExperimentAndTrait(final Integer experimentId, final Integer termId) {
-		try {
-			final ExperimentModel experiment = new ExperimentModel();
-			experiment.setNdExperimentId(experimentId);
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("observableId", termId));
-			criteria.add(Restrictions.eq("experiment", experiment));
-			criteria.addOrder(Order.desc("phenotypeId"));
-			final List list = criteria.list();
-			return (!list.isEmpty() ? (Phenotype) list.get(0) : null);
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getByExperimentAndTrait(" + experimentId + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
-		}
-
 	}
 
 	public List<PhenotypeSearchDTO> searchPhenotypes(
@@ -1144,5 +1130,27 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		query.setParameter(PROJECT_ID, projectId);
 		final BigInteger result = (BigInteger) query.uniqueResult();
 		return result.intValue() > 0;
+	}
+	
+	public void updateOutOfSyncPhenotypes(final Integer experimentId, final List<Integer> targetVariableIds) {
+		final String sql = "UPDATE phenotype pheno "
+				+ "SET pheno.status = :status "
+				+ " WHERE pheno.nd_experiment_id = :experimentId " 
+				+ " AND pheno.observable_id in (:variableIds) ";
+
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
+		statement.setParameter("experimentId", experimentId);
+		statement.setParameterList("variableIds", targetVariableIds);
+		statement.executeUpdate();
+	}
+	
+	public boolean isValidPhenotype(final Integer experimentId, final Integer phenotypeId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
+		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
+		criteria.setProjection(Projections.property("phenotypeId"));
+		final Integer id = (Integer) criteria.uniqueResult();
+		return id != null;
 	}
 }

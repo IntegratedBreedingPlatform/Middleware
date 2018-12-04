@@ -503,4 +503,11 @@ public interface LocationDataManager {
 	 * @return Returns map with key locid with a Map whit additional info.
 
 	 */
+
+	/**
+	 * Returns location ID of unspecified location
+	 *
+	 * @return the location ID of unspecified lication
+	 */
+	String retrieveLocIdOfUnspecifiedLocation();
 }

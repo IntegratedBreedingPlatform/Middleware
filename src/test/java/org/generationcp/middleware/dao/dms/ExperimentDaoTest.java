@@ -315,21 +315,21 @@ public class ExperimentDaoTest {
 	}
 
 	@Test
-	public void testIsInstanceExistsInDataset() {
+	public void testIsAreAllInstancesExistInDataset() {
 
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
-		final int instanceId = ran.nextInt();
+		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(ran.nextInt()));
 
 		final SQLQuery query = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(query);
 		Mockito.when(query.uniqueResult()).thenReturn(BigInteger.valueOf(1));
-		Assert.assertTrue(this.experimentDao.isInstanceExistsInDataset(datasetId, instanceId));
+		Assert.assertTrue(this.experimentDao.areAllInstancesExistInDataset(datasetId, instanceIds));
 
 		Mockito.verify(this.mockSession).createSQLQuery(
-			"SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e  WHERE e.project_id = :datasetId and e.nd_geolocation_id = :instanceId");
+			"SELECT COUNT(DISTINCT e.nd_geolocation_id) FROM nd_experiment e  WHERE e.project_id = :datasetId and e.nd_geolocation_id in (:instanceIds)");
 		Mockito.verify(query).setParameter("datasetId", datasetId);
-		Mockito.verify(query).setParameter("instanceId", instanceId);
+		Mockito.verify(query).setParameterList("instanceIds", instanceIds);
 	}
 
 }

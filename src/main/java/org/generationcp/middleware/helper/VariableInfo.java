@@ -24,7 +24,6 @@ public class VariableInfo {
 
 	private int stdVariableId;
 
-	@Deprecated
 	private String treatmentLabel;
 	
 	private PhenotypicType role;
@@ -35,7 +34,7 @@ public class VariableInfo {
 		return this.localName;
 	}
 
-	public void setLocalName(String localName) {
+	public void setLocalName(final String localName) {
 		this.localName = localName;
 	}
 
@@ -43,7 +42,7 @@ public class VariableInfo {
 		return this.localDescription;
 	}
 
-	public void setLocalDescription(String localDescription) {
+	public void setLocalDescription(final String localDescription) {
 		this.localDescription = localDescription;
 	}
 
@@ -51,7 +50,7 @@ public class VariableInfo {
 		return this.stdVariableId;
 	}
 
-	public void setStdVariableId(int stdVariableId) {
+	public void setStdVariableId(final int stdVariableId) {
 		this.stdVariableId = stdVariableId;
 	}
 
@@ -59,39 +58,37 @@ public class VariableInfo {
 		return this.rank;
 	}
 
-	public void setRank(int rank) {
+	public void setRank(final int rank) {
 		this.rank = rank;
 	}
 
-	@Deprecated
 	public String getTreatmentLabel() {
 		return this.treatmentLabel;
 	}
 
-	@Deprecated
-	public void setTreatmentLabel(String treatmentLabel) {
+	public void setTreatmentLabel(final String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
 
 	public PhenotypicType getRole() {
-		return role;
+		return this.role;
 	}
 
-	public void setRole(PhenotypicType role) {
+	public void setRole(final PhenotypicType role) {
 		this.role = role;
 	}
 
 	public VariableType getVariableType() {
-		return variableType;
+		return this.variableType;
 	}
 
-	public void setVariableType(VariableType variableType) {
+	public void setVariableType(final VariableType variableType) {
 		this.variableType = variableType;
 	}
 
 	@Override
 	public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("VariableInfo [localName=");
         builder.append(this.localName);
         builder.append(", localDescription=");

@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -49,7 +50,6 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 	private FieldbookServiceImpl fieldbookMiddlewareService;
 	
-	@Autowired
 	private UserDataManager userDataManager;
 
 	private StudyReference studyReference;
@@ -70,6 +70,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	public void setUp() throws Exception {
 		this.fieldbookMiddlewareService = new FieldbookServiceImpl(this.sessionProvder, "TESTCROP");
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
+		this.userDataManager = new UserDataManagerImpl(this.sessionProvder);
 
 		if (this.workbenchTestDataUtil == null) {
 			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
@@ -86,7 +87,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
 				this.locationManager, this.userDataManager);
 
-		this.studyReference = this.studyTDI.addTestStudy(this.cropPrefix);
+		this.studyReference = this.studyTDI.addTestStudy();
 		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
 		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.PLOT_DATA);
 	}
@@ -124,7 +125,8 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetStudyReferenceByNameAndProgramUUID() {
-		Optional<StudyReference> studyOptional = this.fieldbookMiddlewareService.getStudyReferenceByNameAndProgramUUID(RandomStringUtils.random(5), this.commonTestProject.getUniqueID());
+		Optional<StudyReference> studyOptional = this.fieldbookMiddlewareService.getStudyReferenceByNameAndProgramUUID(
+				RandomStringUtils.random(5), this.commonTestProject.getUniqueID());
 		Assert.assertFalse(studyOptional.isPresent());
 		
 		studyOptional = this.fieldbookMiddlewareService.getStudyReferenceByNameAndProgramUUID(this.studyReference.getName(), RandomStringUtils.random(5));

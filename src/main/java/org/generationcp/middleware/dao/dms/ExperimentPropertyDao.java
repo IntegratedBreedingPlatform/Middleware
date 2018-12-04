@@ -498,8 +498,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					new StringBuilder().append("SELECT DISTINCT levelprop.value level_value, ep.value ")
 							.append(" FROM nd_experimentprop ep ")
 							.append(" INNER JOIN nd_experimentprop levelprop ON levelprop.nd_experiment_id = ep.nd_experiment_id ")
-							.append("   AND levelprop.type_id = ").append(levelId).append(" WHERE ep.type_id = ").append(amountId)
-							.append("   AND ep.project_id = ").append(measurementDatasetId)
+							.append("   AND levelprop.type_id = ").append(levelId)
+							.append(" INNER JOIN nd_experiment e ON ep.nd_experiment_id= e.nd_experiment_id ")
+							.append(" WHERE ep.type_id = ").append(amountId)
+							.append("   AND e.project_id = ").append(measurementDatasetId)
 							.append(" ORDER BY CAST(levelprop.value AS UNSIGNED) ");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
@@ -545,4 +547,5 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
 }

@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -44,6 +43,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -84,6 +84,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -184,13 +185,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
-			final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description,
+			final String programUUID, final StudyTypeDto studyType, final String description,
 			final String startDate, final String endDate, final String objective, final String name, final String createdBy) {
 
 		try {
 
 			final DmsProject project = this.getStudySaver()
-					.saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, cropPrefix, studyType, description,
+					.saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, studyType, description,
 							startDate, endDate, objective, name, createdBy);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), programUUID, studyType);
@@ -234,6 +235,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId) {
+		return this.getDataSetBuilder().getTreatmentFactorVariableTypes(dataSetId);
+	}
+
+	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(final int trialDataSetId, final int dataSetId, final int start,
 			final int numRows) {
 		final VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
@@ -259,12 +265,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues,
-			final String cropPrefix) {
+	public void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues) {
 
 		try {
 
-			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues, cropPrefix);
+			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues);
 
 		} catch (final Exception e) {
 
@@ -274,12 +279,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void addOrUpdateExperiment(final int dataSetId, final ExperimentType experimentType,
-			final List<ExperimentValues> experimentValuesList, final String cropPrefix) {
+			final List<ExperimentValues> experimentValuesList) {
 
 		try {
 
 			for (final ExperimentValues experimentValues : experimentValuesList) {
-				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues, cropPrefix);
+				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
 			}
 
 		} catch (final Exception e) {
@@ -389,32 +394,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			return new DatasetReference(dataSetProject.getProjectId(), dataSetProject.getName(), dataSetProject.getDescription());
 		}
 		return null;
-	}
-
-	@Override
-	public void deleteDataSet(final int datasetId) {
-
-		try {
-
-			this.getDataSetDestroyer().deleteDataSet(datasetId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void deleteExperimentsByLocation(final int datasetId, final int locationId) {
-
-		try {
-
-			this.getDataSetDestroyer().deleteExperimentsByLocation(datasetId, locationId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in deleteExperimentsByLocation " + e.getMessage(), e);
-		}
 	}
 
 	@Override
@@ -1251,7 +1230,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	 */
 	@Override
 	public Phenotype getPhenotype(final Integer experimentId, final Integer termId) {
-		return this.getPhenotypeDao().getByExperimentAndTrait(experimentId, termId);
+		return this.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experimentId, termId);
 	}
 
 	/**
@@ -1269,8 +1248,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean isInstanceExistsInDataset(final Integer datasetId, final Integer instanceId) {
-		return this.getExperimentDao().isInstanceExistsInDataset(datasetId, instanceId);
+	public boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds) {
+		return this.getExperimentDao().areAllInstancesExistInDataset(datasetId, instanceIds);
+	}
+
+	@Override
+	public String getBlockId(final int datasetId, final String trialInstance) {
+		return this.daoFactory.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+
+	}
+
+	@Override
+	public FieldmapBlockInfo getBlockInformation(final int blockId) {
+		return locationDataManager.getBlockInformation(blockId);
 	}
 
 	@Override
