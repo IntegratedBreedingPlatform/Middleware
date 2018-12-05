@@ -23,6 +23,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
@@ -107,6 +108,9 @@ public class Phenotype implements Serializable {
 
 	@Column(name = "updated_date", updatable = false, insertable = false)
 	private Date updatedDate;
+
+	@Transient
+	private boolean changed = false;
 
 	public Phenotype() {
 	}
@@ -217,6 +221,14 @@ public class Phenotype implements Serializable {
 
 	public void setUpdatedDate(final Date updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public boolean isChanged() {
+		return this.changed;
+	}
+
+	public void setChanged(final boolean changed) {
+		this.changed = changed;
 	}
 
 	@Override
