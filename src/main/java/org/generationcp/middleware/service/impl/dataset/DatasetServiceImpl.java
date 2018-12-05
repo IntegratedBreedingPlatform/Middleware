@@ -314,9 +314,14 @@ public class DatasetServiceImpl implements DatasetService {
 		phenotype.setExperiment(new ExperimentModel(observationUnitId));
 		phenotype.setName(String.valueOf(variableId));
 
+		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(variableId, phenotype);
 
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
+
+		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
+		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+
 		observation.setObservationId(savedRecord.getPhenotypeId());
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
