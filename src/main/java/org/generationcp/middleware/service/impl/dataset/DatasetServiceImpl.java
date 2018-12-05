@@ -21,10 +21,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -108,24 +106,10 @@ public class DatasetServiceImpl implements DatasetService {
 	private DesignFactors designFactors;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private MeasurementVariableTransformer measurementVariableTransformer;
-
-	@Autowired
 	ResourceBundleMessageSource messageSource;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
-	}
-
-	public DatasetServiceImpl(final MeasurementVariableService measurementVariableService, final GermplasmDescriptors germplasmDescriptors,
-		final DesignFactors designFactors) {
-		super();
-		this.measurementVariableService = measurementVariableService;
-		this.germplasmDescriptors = germplasmDescriptors;
-		this.designFactors = designFactors;
 	}
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -612,7 +596,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 						}
 
-						if (phenotype != null && measurementVariable.getFormula() == null) {
+						if (phenotype != null) {
 							phenotypes.add(phenotype);
 						}
 					}
@@ -622,117 +606,6 @@ public class DatasetServiceImpl implements DatasetService {
 				this.setMeasurementDataAsOutOfSync(formulasMap, phenotypes);
 			}
 		}
-	}
-
-	@Override
-	public List<ObservationUnitRow> previewImportDataset(
-		final Integer studyId, final Integer datasetId, final Table<String, String, String> table) {
-
-		final List<MeasurementVariable>
-			measurementVariableList =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES);
-
-		final List<ObservationUnitRow> currentData = this.getObservationUnitRows(studyId, datasetId, null, null, null, null, null);
-
-		if (measurementVariableList.size() > 0) {
-
-			for (final MeasurementVariable variable : measurementVariableList) {
-				final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
-				if (formula != null) {
-					variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
-				}
-			}
-
-			final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
-			final Map<Integer, Boolean> derivedTraits = new HashMap<>();
-			for (final ObservationUnitRow currentRow : currentData) {
-
-				final String observationUnitId = currentRow.getObsUnitId();
-
-				for (final String variableName : table.columnKeySet()) {
-					final String importedVariableValue = table.get(observationUnitId, variableName);
-					final MeasurementVariable measurementVariable =
-						(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
-
-							@Override
-							public boolean evaluate(final Object object) {
-								final MeasurementVariable variable = (MeasurementVariable) object;
-								return variable.getName().equalsIgnoreCase(variableName);
-							}
-						});
-
-					BigInteger categoricalValueId = null;
-					if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						if (importedVariableValue != null) {
-							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
-								if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
-									categoricalValueId = BigInteger.valueOf(possibleValue.getId());
-									break;
-								}
-							}
-						}
-					}
-
-					Boolean isDerivedTrait = derivedTraits.get(measurementVariable.getTermId());
-					if (isDerivedTrait == null) {
-						isDerivedTrait = this.isDerivedTrait(measurementVariable.getTermId());
-						derivedTraits.put(measurementVariable.getTermId(), isDerivedTrait);
-					}
-
-					ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
-					final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
-
-					if (observationUnitData == null) {
-						observationUnitData = new ObservationUnitData();
-					}
-
-					this.setObservationUnitData(importedVariableValue, categoricalValue, isDerivedTrait, observationUnitData);
-
-				}
-				this.setObservationUnitAsOutOfSync(formulasMap, currentRow);
-			}
-		}
-		return currentData;
-	}
-
-	private void setObservationUnitData(
-		final String importedVariableValue, final Integer categoricalValueId, final boolean isDerivedTrait,
-		final ObservationUnitData observationUnitData) {
-		observationUnitData.setCategoricalValueId(categoricalValueId);
-		observationUnitData.setValue(importedVariableValue);
-		if (isDerivedTrait) {
-			observationUnitData.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
-		}
-	}
-
-	private void setObservationUnitAsOutOfSync(
-		final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap,
-		final ObservationUnitRow observationUnitRow) {
-		for (final MeasurementVariable measurementVariable : formulasMap.keySet()) {
-
-			final Collection<ObservationUnitData> observationUnitDataCollection = observationUnitRow.getVariables().values();
-			final ObservationUnitData key =
-				this.findObservationUnitDataByTermId(measurementVariable.getTermId(), observationUnitDataCollection);
-			final List<MeasurementVariable> formulas = formulasMap.get(measurementVariable);
-			for (final MeasurementVariable formula : formulas) {
-				final ObservationUnitData observationUnitData =
-					this.findObservationUnitDataByTermId(formula.getTermId(), observationUnitDataCollection);
-				if (key != null) { //TODO add isChanged
-					observationUnitData.setStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
-				}
-			}
-		}
-	}
-
-	private ObservationUnitData findObservationUnitDataByTermId(final Integer termId, final Collection<ObservationUnitData> phenotypes) {
-		return (ObservationUnitData) CollectionUtils.find(phenotypes, new Predicate() {
-
-			@Override
-			public boolean evaluate(final Object object) {
-				final ObservationUnitData dto = (ObservationUnitData) object;
-				return dto.getVariableId() != null && dto.getVariableId().equals(termId);
-			}
-		});
 	}
 
 	@Override
@@ -748,7 +621,7 @@ public class DatasetServiceImpl implements DatasetService {
 			final List<MeasurementVariable> formulas = formulasMap.get(measurementVariable);
 			for (final MeasurementVariable formula : formulas) {
 				final Phenotype value = this.findPhenotypeByTermId(formula.getTermId(), phenotypes);
-				if (key != null && key.isChanged()) {
+				if (key != null && key.isChanged() && value != null) {
 					value.setValueStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
 					this.daoFactory.getPhenotypeDAO().saveOrUpdate(value);
 				}
@@ -855,6 +728,4 @@ public class DatasetServiceImpl implements DatasetService {
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
 	}
-
-	
 }

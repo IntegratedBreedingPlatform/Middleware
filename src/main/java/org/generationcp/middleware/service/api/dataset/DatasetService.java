@@ -59,8 +59,6 @@ public interface DatasetService {
 
 	void importDataset(final Integer datasetId, final Table<String, String, String> table);
 
-	List<ObservationUnitRow> previewImportDataset(final Integer studyId, final Integer datasetId, final Table<String, String, String> table);
-
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 
 	void deleteDataset(int datasetId);
