@@ -52,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -972,6 +973,16 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			variableTypes.add(VariableType.getByName(property.getValue()));
 		}
 		return variableTypes;
+	}
+
+	@Override
+	public Optional<DataType> getDataType(final Integer variableId) {
+		List<CVTermRelationship> relationships = daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(Arrays.asList(variableId), TermId.HAS_SCALE.getId());
+		if (!relationships.isEmpty()) {
+			final Integer scaleId = relationships.get(0).getObjectId();
+			return Optional.of(this.scaleManager.getScaleById(scaleId, false).getDataType());
+		}
+		return Optional.absent();
 	}
 
 	@Override
