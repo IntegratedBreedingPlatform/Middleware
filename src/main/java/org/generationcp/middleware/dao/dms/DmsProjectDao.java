@@ -216,6 +216,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";
 
+	private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id)  FROM projectprop pp inner join project p on (p.project_id = pp.project_id)\n"
+			+ "WHERE pp.value = :variableId\n" + "and p.deleted = 0";
+
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
 		for (final Object[] row : list) {
@@ -1421,6 +1424,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error in delete=" + datasetId + " in DmsProjectDao: " + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countByVariable(int variableId) throws MiddlewareQueryException {
+		try {
+			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
+			query.setParameter("variableId", variableId);
+
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (HibernateException e) {
+			final String errorMessage = "Error at countByVariable=" + variableId + " in DmsProjectDao: " + e.getMessage();
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
