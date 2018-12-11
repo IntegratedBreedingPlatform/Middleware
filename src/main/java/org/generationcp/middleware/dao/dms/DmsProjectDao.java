@@ -1284,11 +1284,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 					final Integer formulaId = (Integer) result.get("formulaId");
 					if (formulaId != null) {
-						measurementVariable.setFormula(FormulaUtils.convertToFormulaDto(((Formula) this.getSession()
+						final Formula formula = (Formula) this.getSession()
 							.createCriteria(Formula.class)
 							.add(Restrictions.eq("formulaId", formulaId))
 							.add(Restrictions.eq("active", true))
-							.uniqueResult())));
+							.uniqueResult();
+						if (formula != null) {
+							measurementVariable.setFormula(FormulaUtils.convertToFormulaDto(formula));
+						}
 					}
 
 					final Double scaleMinRange = (Double) result.get("scaleMinRange");
