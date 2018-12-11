@@ -405,13 +405,6 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 				datasetDTO.setVariables(
 					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
-
-				for (final MeasurementVariable variable : datasetDTO.getVariables()) {
-					final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
-					if (formula != null) {
-						variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
-					}
-				}
 				return datasetDTO;
 			}
 
@@ -529,13 +522,6 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (measurementVariableList.size() > 0) {
-
-			for (final MeasurementVariable variable : measurementVariableList) {
-				final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
-				if (formula != null) {
-					variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
-				}
-			}
 
 			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 

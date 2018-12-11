@@ -30,11 +30,13 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -1195,6 +1197,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   category.cvterm_id AS categoryId, "  //
 				+ "   category.name AS categoryName, "  //
 				+ "   category.definition AS categoryDescription, "  //
+				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id LIMIT 1) AS formulaId, "  //
 				+ "   scaleMinRange.value AS scaleMinRange, "  //
 				+ "   scaleMaxRange.value AS scaleMaxRange, "  //
 				+ "   vo.expected_min AS expectedMin, "  //
@@ -1250,6 +1253,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar("scaleMaxRange", new DoubleType())
 				.addScalar("expectedMin", new DoubleType())
 				.addScalar("expectedMax", new DoubleType())
+				.addScalar("formulaId", new IntegerType());
 			;
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
@@ -1277,6 +1281,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
+
+					final Integer formulaId = (Integer) result.get("formulaId");
+					if (formulaId != null) {
+						measurementVariable.setFormula(FormulaUtils.convertToFormulaDto(((Formula) this.getSession()
+							.createCriteria(Formula.class)
+							.add(Restrictions.eq("formulaId", formulaId))
+							.add(Restrictions.eq("active", true))
+							.uniqueResult())));
+					}
 
 					final Double scaleMinRange = (Double) result.get("scaleMinRange");
 					final Double scaleMaxRange = (Double) result.get("scaleMaxRange");
