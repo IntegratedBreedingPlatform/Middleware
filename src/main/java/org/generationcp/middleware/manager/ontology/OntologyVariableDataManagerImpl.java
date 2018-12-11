@@ -531,7 +531,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				// setting variable studies
 				variable.setStudies(0);
 
-				variable.setDataSets((int) this.getDmsProjectDao().countByVariable(id));
+				variable.setDatasets((int) this.getDmsProjectDao().countByVariable(id));
 
 				//setting variable observations, first observations will be null so set it to 0
 				Integer observations = 0;
