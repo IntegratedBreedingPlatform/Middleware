@@ -1303,6 +1303,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setMaxRange(scaleMaxRange != null ? scaleMaxRange : expectedMax);
 					measurementVariable.setScaleMinRange(scaleMinRange);
 					measurementVariable.setScaleMaxRange(scaleMaxRange);
+					measurementVariable.setVariableMinRange(expectedMin);
+					measurementVariable.setVariableMaxRange(expectedMax);
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
