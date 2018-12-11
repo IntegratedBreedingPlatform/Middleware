@@ -527,21 +527,20 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			variable.setIsFavorite(programFavorite != null);
 
 			if (calculateVariableUsage) {
-				// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is
-				// editable or not
-				variable.setStudies(0);
-				variable.setObservations(0);
 
 				// setting variable studies
-				variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
+				variable.setStudies(0);
+
+				variable.setDatasets((int) this.getDmsProjectDao().countByVariable(id));
 
 				//setting variable observations, first observations will be null so set it to 0
-				variable.setObservations(0);
+				Integer observations = 0;
 				for (VariableType v : variable.getVariableTypes()) {
-					long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
-					variable.setObservations((int) (variable.getObservations() + observation));
+					long observationsPerType = this.getExperimentDao().countByObservedVariable(id, v.getId());
+					observations = (int) (observations + observationsPerType);
 				}
-
+				variable.setObservations(observations);
+				//it can be replaced by observations > 0
 				variable.setHasUsage(this.isVariableUsedInStudy(id));
 
 			} else {

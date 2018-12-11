@@ -217,7 +217,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " WHERE p.project_id = :studyId \n";
 
 	private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id)  FROM projectprop pp inner join project p on (p.project_id = pp.project_id)\n"
-			+ "WHERE pp.value = :variableId\n" + "and p.deleted = 0";
+			+ "WHERE pp.variable_id = :variableId and p.deleted = 0";
 
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
