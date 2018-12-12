@@ -106,9 +106,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION = "SELECT count(e.nd_experiment_id)\n"
 			+ "FROM nd_experiment e INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id\n"
-			+ "WHERE (8170 = :variableId AND g.description IS NOT NULL)  OR (8191 = :variableId AND g.latitude IS NOT NULL)\n"
-			+ "OR (8192 = :variableId AND g.longitude IS NOT NULL) OR (8193 = :variableId AND g.geodetic_datum IS NOT NULL)\n"
-			+ "OR (8194 = :variableId AND g.altitude IS NOT NULL)\n";
+			+ "WHERE (" + TermId.TRIAL_INSTANCE_FACTOR.getId() + " = :variableId AND g.description IS NOT NULL)  OR (" + TermId.LATITUDE.getId() + " = :variableId AND g.latitude IS NOT NULL)\n"
+			+ "OR (" + TermId.LONGITUDE.getId() + "= :variableId AND g.longitude IS NOT NULL) OR (" + TermId.GEODETIC_DATUM.getId() + " = :variableId AND g.geodetic_datum IS NOT NULL)\n"
+			+ "OR ("+ TermId.ALTITUDE.getId()+" = :variableId AND g.altitude IS NOT NULL)\n";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP = "SELECT count(e.nd_experiment_id)\n"
 			+ "FROM nd_experiment e INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id\n"
@@ -120,8 +120,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK = "SELECT count(e.nd_experiment_id)\n"
 			+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id\n"
-			+ "WHERE (8230 = :variableId AND s.uniquename IS NOT NULL)  OR (8240 = :variableId AND s.dbxref_id IS NOT NULL)\n"
-			+ "OR (8250 = :variableId AND s.name IS NOT NULL) OR (8300 = :variableId AND s.value IS NOT NULL)";
+			+ "WHERE ("+ TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR ("+ TermId.GID.getId() +" = :variableId AND s.dbxref_id IS NOT NULL)\n"
+			+ "OR ("+TermId.DESIG.getId()+" = :variableId AND s.name IS NOT NULL) OR ("+TermId.ENTRY_CODE.getId()+" = :variableId AND s.value IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(e.nd_experiment_id)\n"
 			+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id\n"
