@@ -102,7 +102,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP = "SELECT count(e.nd_experiment_id)\n"
 			+ "FROM nd_experiment e INNER JOIN projectprop pp ON pp.project_id = e.project_id\n"
-			+ "AND pp.type_id = 1070 and pp.value = :variableId";
+			+ "AND pp.value = :variableId";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION = "SELECT count(e.nd_experiment_id)\n"
 			+ "FROM nd_experiment e INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id\n"
