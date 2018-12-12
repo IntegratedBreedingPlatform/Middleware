@@ -60,10 +60,10 @@ public interface TermDataManager {
 			throws MiddlewareException;
 
 	/**
-	 * Return list of scale's values that are being referred in phenotypes of non-deleted studies
+	 * Return list of scale's values that are being used in non-deleted studies
 	 *
 	 * @param scaleId
 	 * @return
 	 */
-	public List<String> getCategoriesReferredInPhenotype(int scaleId);
+	public List<String> getCategoriesUsedInStudies(int scaleId);
 }

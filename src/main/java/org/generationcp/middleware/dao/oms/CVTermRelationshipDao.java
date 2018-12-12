@@ -263,23 +263,17 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		}
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public List<String> getCategoriesReferredInPhenotype(final int scaleId) {
+	public List<String> getCategoriesUsedInStudies(final int scaleId) {
 		try {
-
-			final SQLQuery query = this.getSession().createSQLQuery("SELECT v.name category "
-					+ " FROM cvterm_relationship scale_values "
-					+ "INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id "
-					+ "WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = 1190 "
-					+ "AND EXISTS ( SELECT 1 " + " 	 FROM phenotype p "
-					+ " 	INNER JOIN nd_experiment ep on ep.nd_experiment_id = p.nd_experiment_id "
-					+ "     WHERE cvalue_id = v.cvterm_id "
-					+ "       AND ep.project_id not in (SELECT p.project_id FROM project p WHERE p.deleted = 1))");
-			query.setParameter("scaleId", scaleId);
-			query.addScalar("category", CVTermRelationshipDao.STRING);
-			return query.list();
+			final List<String> allCategories = new ArrayList<>();
+			allCategories.addAll(getScaleCategoriesUsedInObservations(scaleId));
+			allCategories.addAll(getScaleCategoriesUsedAsConditions(scaleId));
+			allCategories.addAll(getScaleCategoriesUsedAsGermplasmDescriptors(scaleId));
+			allCategories.addAll(getScaleCategoriesUsedAsTrialDesignFactors(scaleId));
+			allCategories.addAll(getScaleCategoriesUsedAsEnvironmentFactors(scaleId));
+			return allCategories;
 		} catch (final HibernateException e) {
-			final String message = "Error in getCategoriesReferredInPhenotype in CVTermRelationshipDao: "
+			final String message = "Error in getCategoriesUsedInStudies in CVTermRelationshipDao: "
 					+ e.getMessage();
 			CVTermRelationshipDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
@@ -287,4 +281,97 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	protected List<String> getScaleCategoriesUsedInObservations(final int scaleId) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+				"SELECT v.name category "
+				+ " FROM cvterm_relationship scale_values "
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id "
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId() 
+				+ " AND EXISTS ( "
+				+ "     SELECT 1    	 "
+				+ "     FROM phenotype p "
+				+ "     INNER JOIN nd_experiment ep on ep.nd_experiment_id = p.nd_experiment_id "
+				+ "     INNER JOIN project pr ON pr.project_id = ep.project_id and pr.deleted = 0 "
+				+ "     WHERE cvalue_id = v.cvterm_id)"
+				+ "");
+		query.setParameter("scaleId", scaleId);
+		query.addScalar("category", CVTermRelationshipDao.STRING);
+		return query.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected List<String> getScaleCategoriesUsedAsConditions(final int scaleId) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+				"SELECT categ.name category "
+				+ " FROM cvterm_relationship scale_values "
+				+ " INNER JOIN cvterm categ ON categ.cvterm_id = scale_values.object_id "
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId() 
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId() 
+				+ " AND EXISTS ( "
+				+ "     SELECT 1    	 "
+				+ "     FROM projectprop pp "
+				+ "     INNER JOIN project pr ON pr.project_id =pp.project_id and pr.deleted = 0 "
+				+ "		WHERE pp.variable_id = var.subject_id and pp.value = categ.cvterm_id)");
+		query.setParameter("scaleId", scaleId);
+		query.addScalar("category", CVTermRelationshipDao.STRING);
+		return query.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected List<String> getScaleCategoriesUsedAsGermplasmDescriptors(final int scaleId) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+				"SELECT categ.name category "
+				+ " FROM cvterm_relationship scale_values "
+				+ " INNER JOIN cvterm categ ON categ.cvterm_id = scale_values.object_id "
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId() 
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId()
+				+ " AND EXISTS ( "
+				+ "      SELECT 1 "
+				+ "      FROM stockprop sp "
+				+ "      INNER JOIN nd_experiment ep on ep.stock_id = sp.stock_id "
+				+ "      INNER JOIN project pr ON pr.project_id =ep.project_id and pr.deleted = 0 "
+				+ "      WHERE sp.type_id = var.subject_id and sp.value = categ.cvterm_id)");
+		query.setParameter("scaleId", scaleId);
+		query.addScalar("category", CVTermRelationshipDao.STRING);
+		return query.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected List<String> getScaleCategoriesUsedAsEnvironmentFactors(final int scaleId) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+				"SELECT categ.name category "
+				+ " FROM cvterm_relationship scale_values "
+				+ " INNER JOIN cvterm categ ON categ.cvterm_id = scale_values.object_id "
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId() 
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId() 
+				+ " AND EXISTS ( "
+				+ "      SELECT 1 "
+				+ "      FROM nd_geolocationprop gp "
+				+ "      INNER JOIN nd_experiment ep on ep.nd_geolocation_id = gp.nd_geolocation_id "
+				+ "      INNER JOIN project pr ON pr.project_id =ep.project_id and pr.deleted = 0 "
+				+ "      WHERE gp.type_id = var.subject_id and gp.value = categ.cvterm_id)");
+		query.setParameter("scaleId", scaleId);
+		query.addScalar("category", CVTermRelationshipDao.STRING);
+		return query.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected List<String> getScaleCategoriesUsedAsTrialDesignFactors(final int scaleId) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+				"SELECT categ.name category "
+				+ " FROM cvterm_relationship scale_values "
+				+ " INNER JOIN cvterm categ ON categ.cvterm_id = scale_values.object_id "
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE .getId()
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE .getId()
+				+ " AND EXISTS ( "
+				+ "      SELECT 1 "
+				+ "      FROM nd_experimentprop e "
+				+ "      INNER JOIN nd_experiment ep on e.nd_experiment_id = ep.nd_experiment_id "
+				+ "      INNER JOIN project pr ON pr.project_id =ep.project_id and pr.deleted = 0 "
+				+ "      WHERE e.type_id = var.subject_id and e.value = categ.cvterm_id)");
+		query.setParameter("scaleId", scaleId);
+		query.addScalar("category", CVTermRelationshipDao.STRING);
+		return query.list();
+	}
 }
