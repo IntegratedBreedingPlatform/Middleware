@@ -166,7 +166,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<ProjectProperty> projectProperties =
 			this.buildDefaultDatasetProperties(study, subObservationDataset, datasetName, datasetTypeId);
-		final Variable observationUnitVariable = this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), observationUnitVariableId, false, false);
+		final Variable observationUnitVariable = this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), observationUnitVariableId, false);
+
 		projectProperties.add(this.buildDatasetProperty(subObservationDataset, VariableType.OBSERVATION_UNIT.getId(), observationUnitVariableId, null, null, 4, observationUnitVariable));
 
 		subObservationDataset.setName(datasetName);
@@ -211,21 +212,37 @@ public class DatasetServiceImpl implements DatasetService {
 	private List<ProjectProperty> buildDefaultDatasetProperties(final DmsProject study, final DmsProject dmsProject,
 		final String datasetName, final Integer datasetTypeId) {
 		final List<ProjectProperty> projectProperties = new ArrayList<>();
+//		final ProjectProperty datasetProperty =
+//			this.buildDatasetProperty(dmsProject,
+//				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
+//				datasetName, null, 1,
+//				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false, false));
+//		final ProjectProperty datasetTitleProperty =
+//			this.buildDatasetProperty(dmsProject,
+//				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
+//				null, null, 2,
+//				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false, false));
+//		final ProjectProperty datasetTypeProperty =
+//			this.buildDatasetProperty(dmsProject,
+//				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
+//				String.valueOf(datasetTypeId), null, 3,
+//				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false, false));
+
 		final ProjectProperty datasetProperty =
-			this.buildDatasetProperty(dmsProject,
-				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
-				datasetName, null, 1,
-				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false, false));
+				this.buildDatasetProperty(dmsProject,
+						VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
+						datasetName, null, 1,
+						this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false));
 		final ProjectProperty datasetTitleProperty =
-			this.buildDatasetProperty(dmsProject,
-				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
-				null, null, 2,
-				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false, false));
+				this.buildDatasetProperty(dmsProject,
+						VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
+						null, null, 2,
+						this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false));
 		final ProjectProperty datasetTypeProperty =
-			this.buildDatasetProperty(dmsProject,
-				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
-				String.valueOf(datasetTypeId), null, 3,
-				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false, false));
+				this.buildDatasetProperty(dmsProject,
+						VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
+						String.valueOf(datasetTypeId), null, 3,
+						this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false));
 		projectProperties.add(datasetProperty);
 		projectProperties.add(datasetTitleProperty);
 		projectProperties.add(datasetTypeProperty);
