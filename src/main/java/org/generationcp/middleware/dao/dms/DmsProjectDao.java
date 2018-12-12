@@ -178,14 +178,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         AND geoloc.nd_geolocation_id = :studyId "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
-	//TODO consider to have this query also for subobs dataset. Now is only for STUDY
 	static final String GET_PROJECTID_BY_STUDYDBID =
 			"SELECT DISTINCT pr.object_project_id"
 				+ " FROM project_relationship pr"
 				+ " INNER JOIN project p ON p.project_id = pr.subject_project_id"
 				+ " INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id"
 				+ " INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
-				+ " INNER JOIN projectprop pp ON pp.project_id = pr.subject_project_id"
+				+ " INNER JOIN projectprop pp ON pp.project_id = p.project_id"
 				+ " WHERE gl.nd_geolocation_id = :studyDbId"
 				+ " AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
 				+ "	AND pp.value = " + DataSetType.SUMMARY_DATA.getId()
