@@ -37,7 +37,6 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -297,8 +296,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public boolean isValidObservation(final Integer observationUnitId, final Integer observationId) {
-		return this.daoFactory.getPhenotypeDAO().isValidPhenotype(observationUnitId, observationId);
+	public Phenotype getPhenotype(final Integer observationUnitId, final Integer observationId) {
+		return this.daoFactory.getPhenotypeDAO().getPhenotype(observationUnitId, observationId);
 	}
 
 	@Override
