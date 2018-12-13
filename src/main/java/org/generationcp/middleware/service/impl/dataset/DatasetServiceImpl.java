@@ -559,7 +559,7 @@ public class DatasetServiceImpl implements DatasetService {
 								@Override
 								public boolean evaluate(final Object object) {
 									final MeasurementVariable variable = (MeasurementVariable) object;
-									return variable.getName().equalsIgnoreCase(variableName);
+									return variable.getAlias().equalsIgnoreCase(variableName);
 								}
 							});
 
