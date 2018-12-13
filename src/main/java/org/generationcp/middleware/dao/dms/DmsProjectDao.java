@@ -144,7 +144,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	static final String GET_STUDY_METADATA_BY_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
-		+ "		CONCAT(pmain.name, '-', geoloc.description) AS studyName, "
+		+ "		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, "
 		+ "     pmain.study_type_id AS studyType, "
 		+ "     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
 		+ "                 geoprop.value, "
