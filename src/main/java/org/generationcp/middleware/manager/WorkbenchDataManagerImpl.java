@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -647,11 +648,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public IbdbUserMap getIbdbUserMap(final Integer workbenchUserId, final Long projectId) {
 
-		IbdbUserMap bbdbUserMap = null;
+		IbdbUserMap ibdbUserMap = null;
 		try {
 
-			bbdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
-
+			ibdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
@@ -659,7 +659,24 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 							+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
 		}
 
-		return bbdbUserMap;
+		return ibdbUserMap;
+	}
+
+	@Override
+	public void deleteIbdbUserMap(final List<Integer> workbenchUserIds, final Long projectId) {
+		try {
+			for(int workbenchUserId: workbenchUserIds) {
+				IbdbUserMap ibdbUserMap = null;
+				ibdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
+				Preconditions.checkArgument(ibdbUserMap != null, "ibdbUserMap does not exist");
+				this.getIbdbUserMapDao().makeTransient(ibdbUserMap);
+			}
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException(
+				"Error encountered while deleting  IbdbUserMap: WorkbenchDataManager.deleteIbdbUserMap(workbenchUserIds="
+					+ workbenchUserIds + ", projectId=" + projectId + "): " + e.getMessage(), e);
+		}
 	}
 
 	@Override
