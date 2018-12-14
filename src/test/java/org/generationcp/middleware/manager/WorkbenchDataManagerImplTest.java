@@ -95,14 +95,14 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final Integer userId = this.workbenchDataManager.addUser(user);
 		final IbdbUserMap ibdbUserMap = new IbdbUserMap();
 		ibdbUserMap.setWorkbenchUserId(userId);
-		ibdbUserMap.setProjectId(new Long(10001));
+		ibdbUserMap.setProjectId(this.commonTestProject.getProjectId());
 		ibdbUserMap.setIbdbUserId(1);
 		this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
 
-		IbdbUserMap addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, (new Long(10001)));
+		IbdbUserMap addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
 		Assert.assertNotNull(addedIbdbUserMap);
-		this.workbenchDataManager.deleteIbdbUserMap(Arrays.asList(userId), (new Long(10001)));
-		addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, (new Long(10001)));
+		this.workbenchDataManager.deleteIbdbUserMap(Arrays.asList(userId), this.commonTestProject.getProjectId());
+		addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
 		Assert.assertNull(addedIbdbUserMap);
 	}
 
