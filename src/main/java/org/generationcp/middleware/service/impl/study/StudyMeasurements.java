@@ -176,16 +176,6 @@ public class StudyMeasurements {
 		return Collections.unmodifiableList(measurements);
 	}
 
-	private int setQueryParameters(final int studyIdentifier, final List<MeasurementVariableDto> measurementVariables,
-			final SQLQuery createSQLQuery) {
-		int counter = 0;
-		for (final MeasurementVariableDto measurementVariable : measurementVariables) {
-			createSQLQuery.setParameter(counter++, measurementVariable.getName());
-		}
-		createSQLQuery.setParameter(counter++, studyIdentifier);
-		return counter;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
 			final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
@@ -194,7 +184,7 @@ public class StudyMeasurements {
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalarWithBlockRowCol(measurementVariables,
 				generateQuery);
 
-		this.setQueryParameters(projectBusinessIdentifier, measurementVariables, createSQLQuery);
+		createSQLQuery.setParameter("projectId", projectBusinessIdentifier);
 
 		if (instanceId != null) {
 			createSQLQuery.setParameter("instanceId", instanceId);

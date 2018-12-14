@@ -21,6 +21,10 @@
 
 package org.generationcp.middleware.util;
 
+import com.google.common.base.Function;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,12 +39,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-
-import com.google.common.base.Function;
 
 /**
  * A utility class used to get primitive values of wrapper classes, check for null values, and list functions such as getting the max,
@@ -66,11 +64,11 @@ public class Util {
 	 * @param value
 	 * @return the boolean value of <code>value</code>. If <code>value</code> is null, this method returns false.
 	 */
-	public static boolean getValue(Boolean value) {
+	public static boolean getValue(final Boolean value) {
 		return Util.getValue(value, false);
 	}
 
-	public static boolean getValue(Boolean value, boolean defaultValue) {
+	public static boolean getValue(final Boolean value, final boolean defaultValue) {
 		return value == null ? defaultValue : value;
 	}
 
@@ -81,12 +79,12 @@ public class Util {
 	 * @param objs
 	 * @return true if the obj is one of the objects
 	 */
-	public static boolean isOneOf(Object obj, Object... objs) {
+	public static boolean isOneOf(final Object obj, final Object... objs) {
 		if (objs == null) {
 			return false;
 		}
 
-		for (Object tmp : objs) {
+		for (final Object tmp : objs) {
 			if (obj.equals(tmp)) {
 				return true;
 			}
@@ -101,8 +99,8 @@ public class Util {
 	 * @param args
 	 * @return true if all values are null.
 	 */
-	public static boolean isAllNull(Object... args) {
-		for (Object obj : args) {
+	public static boolean isAllNull(final Object... args) {
+		for (final Object obj : args) {
 			if (obj != null) {
 				return false;
 			}
@@ -117,12 +115,12 @@ public class Util {
 	 * @param values
 	 * @return true if value is equal to all values.
 	 */
-	public static boolean isAllEqualTo(Double value, Double... values) {
+	public static boolean isAllEqualTo(final Double value, final Double... values) {
 		if (values == null) {
 			return false;
 		}
 
-		for (Double val : values) {
+		for (final Double val : values) {
 			if (!value.equals(val)) {
 				return false;
 			}
@@ -137,7 +135,7 @@ public class Util {
 	 * @param list
 	 * @return true if the given list is empty.
 	 */
-	public static boolean isEmpty(List<?> list) {
+	public static boolean isEmpty(final List<?> list) {
 		return list == null || list.isEmpty();
 	}
 
@@ -148,10 +146,10 @@ public class Util {
 	 * @param values
 	 * @return Maximum of the given values.
 	 */
-	public static int max(int value1, int... values) {
+	public static int max(final int value1, final int... values) {
 		int max = value1;
 
-		for (int value : values) {
+		for (final int value : values) {
 			if (value > max) {
 				max = value;
 			}
@@ -166,7 +164,7 @@ public class Util {
 	 * @param objects
 	 * @return the read-only list.
 	 */
-	public static <T> List<T> makeReadOnlyList(T... objects) {
+	public static <T> List<T> makeReadOnlyList(final T... objects) {
 		if (objects == null) {
 			return Collections.unmodifiableList(new ArrayList<T>());
 		}
@@ -175,10 +173,10 @@ public class Util {
 	}
 
 	public static Integer getCurrentDateAsInteger() {
-		Calendar now = Calendar.getInstance();
-		SimpleDateFormat formatter = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-		String dateNowStr = formatter.format(now.getTime());
-		Integer dateNowInt = Integer.valueOf(dateNowStr);
+		final Calendar now = Calendar.getInstance();
+		final SimpleDateFormat formatter = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+		final String dateNowStr = formatter.format(now.getTime());
+		final Integer dateNowInt = Integer.valueOf(dateNowStr);
 		return dateNowInt;
 
 	}
@@ -190,17 +188,17 @@ public class Util {
 	 * @param <Result> Result Type
 	 * @return List<Result> Projected data
 	 */
-	public static <Source, Result> List<Result> convertAll(List<Source> source, Function<Source, Result> projection) {
-		ArrayList<Result> results = new ArrayList<>();
-		for (Source element : source) {
+	public static <Source, Result> List<Result> convertAll(final List<Source> source, final Function<Source, Result> projection) {
+		final ArrayList<Result> results = new ArrayList<>();
+		for (final Source element : source) {
 			results.add(projection.apply(element));
 		}
 		return results;
 	}
 
-	public static void checkAndThrowForNullObjects(Object... objects) throws MiddlewareException {
+	public static void checkAndThrowForNullObjects(final Object... objects) throws MiddlewareException {
 		final String insufficientData = "One or more required fields are missing.";
-		for (Object o : objects) {
+		for (final Object o : objects) {
 			if (o != null) {
 				continue;
 			}
@@ -215,15 +213,15 @@ public class Util {
 	 * @param <Source> Source Type
 	 * @return List<Result> Projected data
 	 */
-	public static <Key, Source> Map<Key, Source> mapAll(List<Source> source, Function<Source, Key> projection) {
-		Map<Key, Source> results = new HashMap<>();
-		for (Source element : source) {
+	public static <Key, Source> Map<Key, Source> mapAll(final List<Source> source, final Function<Source, Key> projection) {
+		final Map<Key, Source> results = new HashMap<>();
+		for (final Source element : source) {
 			results.put(projection.apply(element), element);
 		}
 		return results;
 	}
 
-	public static boolean isNonNullValidNumericString(Object value) {
+	public static boolean isNonNullValidNumericString(final Object value) {
 		return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
 	}
 
@@ -269,7 +267,7 @@ public class Util {
 	 * @return calendar instance
 	 */
 	public static Calendar getCalendarInstance() {
-		Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
+		final Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
 		return Calendar.getInstance(currentLocale);
 	}
 
@@ -278,7 +276,7 @@ public class Util {
 	 * 
 	 * @return current date as String
 	 */
-	public static String getCurrentDateAsStringValue(String format) {
+	public static String getCurrentDateAsStringValue(final String format) {
 		return Util.getSimpleDateFormat(format).format(Util.getCurrentDate().getTime());
 	}
 
@@ -287,9 +285,9 @@ public class Util {
 	 * 
 	 * @return SimpleDateFormat
 	 */
-	public static SimpleDateFormat getSimpleDateFormat(String format) {
-		Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
-		SimpleDateFormat formatter = new SimpleDateFormat(format, currentLocale);
+	public static SimpleDateFormat getSimpleDateFormat(final String format) {
+		final Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
+		final SimpleDateFormat formatter = new SimpleDateFormat(format, currentLocale);
 		formatter.setLenient(false);
 		return formatter;
 	}
@@ -299,7 +297,7 @@ public class Util {
 	 * 
 	 * @return date in the specified format as String
 	 */
-	public static String formatDateAsStringValue(Date date, String format) {
+	public static String formatDateAsStringValue(final Date date, final String format) {
 		return Util.getSimpleDateFormat(format).format(date.getTime());
 	}
 
@@ -309,43 +307,43 @@ public class Util {
 	 * @return date object
 	 * @throws ParseException
 	 */
-	public static Date parseDate(String date, String format) throws ParseException {
-		SimpleDateFormat formatter = Util.getSimpleDateFormat(format);
+	public static Date parseDate(final String date, final String format) throws ParseException {
+		final SimpleDateFormat formatter = Util.getSimpleDateFormat(format);
 		return formatter.parse(date);
 	}
 
-	public static String nullIfEmpty(String value) {
+	public static String nullIfEmpty(final String value) {
 		if (StringUtils.isEmpty(value)) {
 			return null;
 		}
 		return value;
 	}
 
-	public static Double zeroIfNull(Double value) {
+	public static Double zeroIfNull(final Double value) {
 		if (value == null) {
 			return 0.0;
 		}
 		return value;
 	}
 
-	public static String prependToCSV(String valueToPrepend, String csv) {
+	public static String prependToCSV(final String valueToPrepend, final String csv) {
 		return valueToPrepend + ", " + csv;
 	}
 
-	public static String prependToCSVAndArrange(String valueToPrepend, String csv) {
-		String updatedValue = Util.prependToCSV(valueToPrepend, csv);
-		String[] values = updatedValue.split(",");
-		Set<String> valueSet = new TreeSet<String>();
-		for (String value : values) {
+	public static String prependToCSVAndArrange(final String valueToPrepend, final String csv) {
+		final String updatedValue = Util.prependToCSV(valueToPrepend, csv);
+		final String[] values = updatedValue.split(",");
+		final Set<String> valueSet = new TreeSet<String>();
+		for (final String value : values) {
 			valueSet.add(value.trim());
 		}
 		return Util.convertCollectionToCSV(valueSet);
 	}
 
-	public static String convertCollectionToCSV(Collection<?> collection) {
+	public static String convertCollectionToCSV(final Collection<?> collection) {
 		int i = 0;
-		StringBuilder csv = new StringBuilder();
-		for (Object value : collection) {
+		final StringBuilder csv = new StringBuilder();
+		for (final Object value : collection) {
 			if (i != 0) {
 				csv.append(", ");
 			}
@@ -364,10 +362,76 @@ public class Util {
 	 * @return String converted date from old format to new format
 	 * @throws ParseException
 	 */
-	public static String convertDate(String date, String oldFormat, String newFormat) throws ParseException {
-		SimpleDateFormat sdf = Util.getSimpleDateFormat(oldFormat);
-		Date d = sdf.parse(date);
+	public static String convertDate(final String date, final String oldFormat, final String newFormat) throws ParseException {
+		final SimpleDateFormat sdf = Util.getSimpleDateFormat(oldFormat);
+		final Date d = sdf.parse(date);
 		sdf.applyPattern(newFormat);
 		return sdf.format(d);
 	}
+
+	public static boolean isValidDate(final String dateString) {
+		if (dateString == null || dateString.length() != Util.DATE_AS_NUMBER_FORMAT.length()) {
+			return false;
+		}
+
+		final int date;
+		try {
+			date = Integer.parseInt(dateString);
+		} catch (final NumberFormatException e) {
+			return false;
+		}
+
+		final int year = date / 10000;
+		final int month = date % 10000 / 100;
+		final int day = date % 100;
+
+		return Util.isValidDate(year, month, day);
+	}
+
+	public static boolean isValidDate(final int year, final int month, final int day) {
+		final boolean yearOk = Util.isValidYear(year);
+		final boolean monthOk = month >= 1 && month <= 12;
+		final boolean dayOk = day >= 1 && day <= Util.daysInMonth(year, month);
+		return yearOk && monthOk && dayOk;
+	}
+
+	public static boolean isValidYear(final Integer year) {
+		if (year < 1900) {
+			return false;
+		} else if (year > 9999) {
+			return false;
+		}
+		return true;
+	}
+
+	public static int daysInMonth(final int year, final int month) {
+		final int daysInMonth;
+		if (month == 2) {
+			if (Util.isLeapYear(year)) {
+				daysInMonth = 29;
+			} else {
+				daysInMonth = 28;
+			}
+		} else if (month == 4 || month == 6 || month == 9 || month == 11) {
+			daysInMonth = 30;
+		} else {
+			daysInMonth = 31;
+		}
+		return daysInMonth;
+	}
+
+	public static boolean isLeapYear(final int year) {
+		boolean isLeapYear = false;
+		if (year % 400 == 0) {
+			isLeapYear = true;
+		} else if (year % 100 == 0) {
+			isLeapYear = false;
+		} else if (year % 4 == 0) {
+			isLeapYear = true;
+		} else {
+			isLeapYear = false;
+		}
+		return isLeapYear;
+	}
+
 }
