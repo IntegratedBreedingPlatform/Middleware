@@ -295,6 +295,19 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testDeleteVariableWhereMultipleVariablesAreNeededTobeDeleted() {
+		DmsProject project = this.dmsProjectDao.getById(studyReference.getId());
+		MeasurementVariable mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1");
+		this.projectPropSaver.insertVariable(project, mvar, 1);
+		mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "2");
+		this.projectPropSaver.insertVariable(project, mvar, 2);
+		project = this.dmsProjectDao.getById(studyReference.getId());
+		Assert.assertEquals(2, project.getProperties().size());
+		this.projectPropSaver.deleteVariable(project, mvar.getTermId());
+		Assert.assertEquals(0, project.getProperties().size());
+	}
+
+	@Test
 	public void testCreateVariableTypeShouldMapProperties() {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setVariableType(VariableType.ANALYSIS);
