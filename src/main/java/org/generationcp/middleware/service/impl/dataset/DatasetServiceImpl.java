@@ -37,7 +37,6 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -297,8 +296,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public boolean isValidObservation(final Integer observationUnitId, final Integer observationId) {
-		return this.daoFactory.getPhenotypeDAO().isValidPhenotype(observationUnitId, observationId);
+	public Phenotype getPhenotype(final Integer observationUnitId, final Integer observationId) {
+		return this.daoFactory.getPhenotypeDAO().getPhenotype(observationUnitId, observationId);
 	}
 
 	@Override
@@ -405,13 +404,6 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 				datasetDTO.setVariables(
 					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
-
-				for (final MeasurementVariable variable : datasetDTO.getVariables()) {
-					final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
-					if (formula != null) {
-						variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
-					}
-				}
 				return datasetDTO;
 			}
 
@@ -529,13 +521,6 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (measurementVariableList.size() > 0) {
-
-			for (final MeasurementVariable variable : measurementVariableList) {
-				final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
-				if (formula != null) {
-					variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
-				}
-			}
 
 			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 

@@ -55,6 +55,9 @@ public class MeasurementVariable {
 
 	private String possibleValuesString;
 
+	/**
+	 * For consistency with the old code, we keep minRange and maxRange to be either scale range when it's present or variable range
+	 */
 	private Double minRange;
 
 	private Double maxRange;
@@ -62,6 +65,10 @@ public class MeasurementVariable {
 	private Double scaleMinRange;
 
 	private Double scaleMaxRange;
+
+	private Double variableMinRange;
+
+	private Double variableMaxRange;
 
 	private boolean required;
 
@@ -394,6 +401,22 @@ public class MeasurementVariable {
 
 	public void setScaleMaxRange(final Double scaleMaxRange) {
 		this.scaleMaxRange = scaleMaxRange;
+	}
+
+	public Double getVariableMinRange() {
+		return variableMinRange;
+	}
+
+	public void setVariableMinRange(final Double variableMinRange) {
+		this.variableMinRange = variableMinRange;
+	}
+
+	public Double getVariableMaxRange() {
+		return variableMaxRange;
+	}
+
+	public void setVariableMaxRange(final Double variableMaxRange) {
+		this.variableMaxRange = variableMaxRange;
 	}
 
 	/**
