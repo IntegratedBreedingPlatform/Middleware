@@ -53,6 +53,7 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -285,13 +286,23 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId) {
 		return this.getProjectUserInfoDao().getByProjectIdAndUserId(projectId, userId);
 	}
-	
+
 	@Override
-	public void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos) {
-		ProjectUserInfoDAO dao = this.getProjectUserInfoDao();
-		for(ProjectUserInfo projectUserInfo: projectUserInfos) {
-			dao.makeTransient(projectUserInfo);
-		}
+	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
+		// of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getCurrentSession().flush();
+		final String sql = "DELETE project_user_info, ibdb_user_map FROM workbench_project_user_info project_user_info"
+			+ " INNER JOIN workbench_ibdb_user_map ibdb_user_map"
+			+ " ON project_user_info.project_id = ibdb_user_map.project_id"
+			+ " AND project_user_info.user_id = ibdb_user_map.workbench_user_id"
+			+ " WHERE project_user_info.project_id = :projectId AND project_user_info.user_id in (:workbenchUserIds)";
+		final SQLQuery statement = this.getCurrentSession().createSQLQuery(sql);
+		statement.setParameter("projectId", projectId);
+		statement.setParameterList("workbenchUserIds", workbenchUserIds);
+		statement.executeUpdate();
 	}
 
 	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
@@ -655,28 +666,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while retrieving Local IbdbUserMap: WorkbenchDataManager.getIbdbUserMap(workbenchUserId="
-							+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
+				"Error encountered while retrieving Local IbdbUserMap: WorkbenchDataManager.getIbdbUserMap(workbenchUserId="
+					+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
 		}
 
 		return ibdbUserMap;
-	}
-
-	@Override
-	public void deleteIbdbUserMap(final List<Integer> workbenchUserIds, final Long projectId) {
-		try {
-			for(int workbenchUserId: workbenchUserIds) {
-				IbdbUserMap ibdbUserMap = null;
-				ibdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
-				Preconditions.checkArgument(ibdbUserMap != null, "ibdbUserMap does not exist");
-				this.getIbdbUserMapDao().makeTransient(ibdbUserMap);
-			}
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting  IbdbUserMap: WorkbenchDataManager.deleteIbdbUserMap(workbenchUserIds="
-					+ workbenchUserIds + ", projectId=" + projectId + "): " + e.getMessage(), e);
-		}
 	}
 
 	@Override

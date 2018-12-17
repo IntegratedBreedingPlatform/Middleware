@@ -478,14 +478,6 @@ public interface WorkbenchDataManager {
 	Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId);
 
 	/**
-	 * Delete the mapping between Workbench user record and the crop databse user record
-	 *
-	 * @param workbenchUserIds the ids of the users to be deleted in the map
-	 * @param projectId the project id
-	 */
-	void deleteIbdbUserMap(List<Integer> workbenchUserIds, Long projectId);
-
-	/**
 	 * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
 	 *
 	 * @param workbenchUserId - the specified Workbench User ID
@@ -680,12 +672,14 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
-	
+
 	/**
-	 * Deletes the given list of ProjectUserInfoObjects
-	 * @param projectUserInfos
+	 * Deletes the Project_User_Info and IBDB_User_Map entries of the removed program members
+	 *
+	 * @param workbenchUserIds - the user ids of the removed program members
+	 * @param projectId - the project id
 	 */
-	void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos);
+	void removeUsersFromProgram (List<Integer> workbenchUserIds, Long projectId);
 
 	/**
 	 * Returns ProjectUserInfo with the given project id and user id

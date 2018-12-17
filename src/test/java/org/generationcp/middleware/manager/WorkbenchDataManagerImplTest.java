@@ -90,23 +90,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testdeleteIbdbUserMap() {
-		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
-		final Integer userId = this.workbenchDataManager.addUser(user);
-		final IbdbUserMap ibdbUserMap = new IbdbUserMap();
-		ibdbUserMap.setWorkbenchUserId(userId);
-		ibdbUserMap.setProjectId(this.commonTestProject.getProjectId());
-		ibdbUserMap.setIbdbUserId(1);
-		this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
-
-		IbdbUserMap addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
-		Assert.assertNotNull(addedIbdbUserMap);
-		this.workbenchDataManager.deleteIbdbUserMap(Arrays.asList(userId), this.commonTestProject.getProjectId());
-		addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
-		Assert.assertNull(addedIbdbUserMap);
-	}
-
-	@Test
 	public void testAddPerson() {
 		final Person person = this.workbenchTestDataUtil.createTestPersonData();
 		final Integer result = this.workbenchDataManager.addPerson(person);
@@ -859,19 +842,35 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testDeleteProjectUserInfo() {
-		final Project project = this.workbenchTestDataUtil.createTestProjectData();
-		this.workbenchDataManager.addProject(project);
-		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
-		final Integer userId1 = this.workbenchDataManager.addUser(user1);
-		
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, userId1);
+	public void testRemoveUsersFromProgram() {
+		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
+		final Integer userId = this.workbenchDataManager.addUser(user);
+
+		//Add project user info entry and assert that it has been added to the db
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(this.commonTestProject, userId);
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
-		ProjectUserInfo result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), userId1);
-		Assert.assertEquals(userId1, result.getUserId());
-		Assert.assertEquals(project.getProjectId(), result.getProject().getProjectId());
-		this.workbenchDataManager.deleteProjectUserInfos(Arrays.asList(result));
-		result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), userId1);
+		ProjectUserInfo result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(this.commonTestProject.getProjectId(), userId);
+		Assert.assertEquals(userId, result.getUserId());
+		Assert.assertEquals(this.commonTestProject.getProjectId(), result.getProject().getProjectId());
+
+		//Add IBDB User Map entry and assert the it has been added to the DB
+		final IbdbUserMap ibdbUserMap = new IbdbUserMap();
+		ibdbUserMap.setWorkbenchUserId(userId);
+		ibdbUserMap.setProjectId(this.commonTestProject.getProjectId());
+		ibdbUserMap.setIbdbUserId(1);
+		this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
+		IbdbUserMap addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
+		Assert.assertNotNull(addedIbdbUserMap);
+
+
+		this.workbenchDataManager.removeUsersFromProgram(Arrays.asList(userId), this.commonTestProject.getProjectId());
+
+		//Assert that the project user info entry has been deleted
+		result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(this.commonTestProject.getProjectId(), userId);
 		Assert.assertNull(result);
+
+		//Assert that the IBDB User Map entry has been deleted
+		addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
+		Assert.assertNull(addedIbdbUserMap);
 	}
 }
