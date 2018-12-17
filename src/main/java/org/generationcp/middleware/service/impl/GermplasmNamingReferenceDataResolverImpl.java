@@ -80,13 +80,13 @@ public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNaming
 		Variable variable = null;
 		List<String> programIdentifiers = new ArrayList<>();
 		if (levelCode == 1) {
-			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3001, true, false);
+			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3001, true);
 			if (variable == null || !variable.getName().equals("Project_Prefix")) {
 				throw new IllegalStateException(
 						"Missing required reference data. Please ensure an ontology variable with name Project_Prefix (id 3001) has been setup. It is required for Level 1 coding.");
 			}
 		} else if (levelCode == 2) {
-			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3002, true, false);
+			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3002, true);
 			if (variable == null || !variable.getName().equals("CIMMYT_Target_Region")) {
 				throw new IllegalStateException(
 						"Missing required reference data. Please ensure an ontology variable with name CIMMYT_Target_Region (id 3002) has been setup. It is required for Level 2 coding.");

@@ -41,6 +41,7 @@ public class Variable extends Term {
 	private String minValue;
 	private String maxValue;
 	private Integer observations;
+	private Integer datasets;
 	private Integer studies;
 	private Boolean hasPair;
   	private Boolean hasUsage;
@@ -172,11 +173,20 @@ public class Variable extends Term {
 		this.hasUsage = hasUsage;
   	}
 
+	public Integer getDatasets() {
+		return datasets;
+	}
+
+	public void setDatasets(final Integer datasets) {
+		this.datasets = datasets;
+	}
+
 	@Override
 	public String toString() {
 		return "Variable{" + "alias='" + this.alias + '\'' + ", variableTypes=" + this.variableTypes + ", property=" + this.property
 				+ ", method=" + this.method + ", scale=" + this.scale + ", isFavorite=" + this.isFavorite + ", minValue='" + this.minValue
-				+ '\'' + ", maxValue='" + this.maxValue + '\'' + ", observations=" + this.observations + ", studies=" + this.studies + "} "
+				+ '\'' + ", maxValue='" + this.maxValue + '\'' + ", observations=" + this.observations + ", studies=" + this.studies +
+				", datasets=" + this.datasets + "} "
 				+ super.toString();
 	}
 
@@ -219,6 +229,10 @@ public class Variable extends Term {
 
 		if (this.observations != null) {
 			Debug.println(indent + 3, "observations:" + this.observations);
+		}
+
+		if (this.datasets != null) {
+			Debug.println(indent + 3, "datasets:" + this.datasets);
 		}
 
 		if (this.formula != null) {

@@ -457,8 +457,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public Variable getVariable(final String programUuid, final Integer id, final boolean filterObsolete,
-			final boolean calculateVariableUsage) {
+	public Variable getVariable(final String programUuid, final Integer id, final boolean filterObsolete) {
 
 		final Variable cachedVariable = VariableCache.getFromCache(id, programUuid);
 		if (cachedVariable != null) {
@@ -526,20 +525,10 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					this.getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 			variable.setIsFavorite(programFavorite != null);
 
-			if (calculateVariableUsage) {
-				// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is
-				// editable or not
-				variable.setStudies(0);
-				variable.setObservations(0);
-
-				variable.setHasUsage(this.isVariableUsedInStudy(id));
-
-			} else {
-				final int unknownUsage = -1;
-				variable.setStudies(unknownUsage);
-				variable.setObservations(unknownUsage);
-
-			}
+			final int unknownUsage = -1;
+			variable.setStudies(unknownUsage);
+			variable.setObservations(unknownUsage);
+			variable.setDatasets(unknownUsage);
 
 			VariableCache.addToCache(id, variable, programUuid);
 
@@ -549,6 +538,26 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		} finally {
 			OntologyVariableDataManagerImpl.LOG.debug("" + monitor.stop() + ". This instance was for variable id: " + id);
 		}
+	}
+
+	@Override
+	public void fillVariableUsage(Variable variable) {
+
+		// setting variable studies
+		variable.setStudies(0);
+
+		variable.setDatasets((int) this.getDmsProjectDao().countByVariable(variable.getId()));
+
+		//setting variable observations, first observations will be null so set it to 0
+		Integer observations = 0;
+		for (VariableType v : variable.getVariableTypes()) {
+			long observationsPerType = this.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
+			observations = (int) (observations + observationsPerType);
+		}
+		variable.setObservations(observations);
+		//it can be replaced by observations > 0
+		variable.setHasUsage(this.isVariableUsedInStudy(variable.getId()));
+
 	}
 
 	@Override
@@ -820,7 +829,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			return null;
 		}
 
-		final Variable variable = this.getVariable(programUuid, variableId, true, false);
+		final Variable variable = this.getVariable(programUuid, variableId, true);
 		for (final TermSummary summary : variable.getScale().getCategories()) {
 			if (summary.getId().equals(categoricalValueId)) {
 				return summary.getDefinition();
@@ -839,7 +848,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			return null;
 		}
 
-		final Variable variable = this.getVariable(programUuid, variableId, true, false);
+		final Variable variable = this.getVariable(programUuid, variableId, true);
 		for (final TermSummary summary : variable.getScale().getCategories()) {
 			if (summary.getId().equals(categoricalValueId)) {
 				return StringUtil.removeBraces(summary.getName());
