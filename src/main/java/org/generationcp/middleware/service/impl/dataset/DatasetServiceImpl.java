@@ -544,7 +544,7 @@ public class DatasetServiceImpl implements DatasetService {
 								@Override
 								public boolean evaluate(final Object object) {
 									final MeasurementVariable variable = (MeasurementVariable) object;
-									return variable.getName().equalsIgnoreCase(variableName);
+									return variable.getAlias().equalsIgnoreCase(variableName);
 								}
 							});
 
@@ -560,7 +560,7 @@ public class DatasetServiceImpl implements DatasetService {
 							}
 						}
 
-						final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
+						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
 						final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
 						Phenotype phenotype = null;
 						if (observationUnitData != null && observationUnitData.getObservationId() != null && !importedVariableValue
