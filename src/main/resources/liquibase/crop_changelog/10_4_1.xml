@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="vanina" id="v11.0.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+			<sqlCheck expectedResult="0">SELECT count(1)
+										FROM projectprop pp, cvtermprop c, project_relationship pr, project p, study_type st
+										WHERE pp.variable_id = c.cvterm_id
+											AND c.type_id = 1800
+											AND c.value = 'Nursery Condition'
+											AND pp.project_id = pr.subject_project_id
+											AND pr.object_project_id = p.project_id
+											AND p.study_type_id = st.study_type_id
+											AND st.name = 'N';
+			</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Correct the type_id of nursery condition in projectprop
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop pp, cvtermprop c, project_relationship pr, project p
+			SET pp.type_id=1803
+			WHERE pp.variable_id = c.cvterm_id
+				AND c.type_id = 1800
+				AND c.value = 'Nursery Condition'
+				AND pp.project_id = pr.subject_project_id
+				AND pr.object_project_id = p.project_id
+				AND p.study_type = 'N';
+		</sql>
+	</changeSet>
+	
+	<changeSet author="vanina" id="v11.0.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+			<sqlCheck expectedResult="0">SELECT count(1)
+										from projectprop pp, cvtermprop c, project_relationship pr, project p, study_type st
+										WHERE pp.variable_id = c.cvterm_id
+											AND c.type_id = 1800
+											AND c.value = 'Trial Condition'
+											AND pp.project_id = pr.subject_project_id
+											AND pr.object_project_id = p.project_id
+											AND p.study_type_id = st.study_type_id
+											AND st.name = 'T';
+			</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Correct the type_id of trial condition in projectprop
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop pp, cvtermprop c, project_relationship pr, project p
+			SET pp.type_id=1802
+			WHERE pp.variable_id = c.cvterm_id
+				AND c.type_id = 1800
+				AND c.value = 'Trial Condition'
+				AND pp.project_id = pr.subject_project_id
+				AND pr.object_project_id = p.project_id
+				AND p.study_type = 'T';
+		</sql>
+	</changeSet>
+	
+</databaseChangeLog>
