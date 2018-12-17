@@ -122,7 +122,6 @@ public class ObservationsTest {
 		when(mockScale.getCategories()).thenReturn(
 				Collections.singletonList(new TermSummary(TEST_TERM_ID, TEST_TERM_NAME, TEST_CATEGORICAL_DESCRIPTION)));
 		when(mockScale.getDataType()).thenReturn(DataType.CATEGORICAL_VARIABLE);
-//		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false, false)).thenReturn(mockVariable);
 		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false)).thenReturn(mockVariable);
 
 		this.observation.updataObsevationTraits(this.observationDto, programUuid);
@@ -155,7 +154,6 @@ public class ObservationsTest {
 
 		final String programUuid = UUID.randomUUID().toString();
 
-//		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false, false)).thenReturn(mockVariable);
 		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false)).thenReturn(mockVariable);
 
 		this.observation.updataObsevationTraits(this.observationDto, programUuid);
@@ -188,7 +186,6 @@ public class ObservationsTest {
 
 		final String programUuid = UUID.randomUUID().toString();
 
-//		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false, false)).thenReturn(mockVariable);
 		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false)).thenReturn(mockVariable);
 
 		this.observation.updataObsevationTraits(this.observationDto, programUuid);
