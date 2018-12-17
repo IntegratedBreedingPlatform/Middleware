@@ -130,10 +130,7 @@ public class PhenotypeSaver extends Saver {
 			final ExperimentModel experiment = new ExperimentModel();
 			experiment.setNdExperimentId(experimentId);
 			phenotype.setExperiment(experiment);
-			final int val = this.getPhenotypeDao().updatePhenotypesByExperimentIdAndObervableId(experimentId, phenotype.getObservableId(), phenotype.getValue());
-			if(val == 0) {
-				this.getPhenotypeDao().save(phenotype);
-			}
+			this.getPhenotypeDao().merge(phenotype);
 		}
 	}
 

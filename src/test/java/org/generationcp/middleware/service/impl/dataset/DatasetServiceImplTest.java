@@ -315,8 +315,8 @@ public class DatasetServiceImplTest {
 		final Random ran = new Random();
 		final int pbservationUnitId = ran.nextInt();
 		final int observationId = ran.nextInt();
-		this.datasetService.isValidObservation(pbservationUnitId, observationId);
-		Mockito.verify(this.phenotypeDao).isValidPhenotype(pbservationUnitId, observationId);
+		this.datasetService.getPhenotype(pbservationUnitId, observationId);
+		Mockito.verify(this.phenotypeDao).getPhenotype(pbservationUnitId, observationId);
 	}
 
 	@Test
