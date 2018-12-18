@@ -11,7 +11,14 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -58,6 +65,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -65,16 +73,11 @@ import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
+import com.google.common.collect.Sets;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
@@ -932,5 +935,37 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("900", updatedPhenotype.getValue());
 		Assert.assertEquals("1000", savedPhenotype.getValue());
 	}
+	
+	@Test
+	public void testSaveOrUpdatePhenotypeValue() {
+		// Need to spy to mock updating of dependent phenotypes
+		final StudyDataManagerImpl mockManager = Mockito.spy(this.manager);
+		Mockito.doNothing().when(mockManager).updateDependentPhenotypesStatus(Matchers.anyInt(), Matchers.anyInt());
+		final ExperimentValues values = new ExperimentValues();
+		values.setLocationId(mockManager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
+		//Save the experiment
+		mockManager.addExperiment(this.studyReference.getId(), ExperimentType.TRIAL_ENVIRONMENT, values);
+		final ExperimentModel experiment = mockManager.getExperimentDao().getExperimentByProjectIdAndLocation(this.studyReference.getId(), values.getLocationId());
+		
+		// Create phenotype
+		final String originalValue = "999";
+		final Integer experimentId = experiment.getNdExperimentId();
+		final int variableId = TermId.ENTRY_NO.getId();
+		mockManager.saveOrUpdatePhenotypeValue(experimentId, variableId, originalValue, null, DataType.NUMERIC_VARIABLE.getId(), ValueStatus.MANUALLY_EDITED);
+		Phenotype phenotype = mockManager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
+		Assert.assertNotNull(phenotype);
+		Assert.assertEquals(originalValue, phenotype.getValue());
+		Assert.assertEquals(ValueStatus.MANUALLY_EDITED, phenotype.getValueStatus());
+		
+		// Update phenotype
+		final String newValue = "123";
+		mockManager.saveOrUpdatePhenotypeValue(experimentId, variableId, newValue, phenotype, DataType.NUMERIC_VARIABLE.getId(), ValueStatus.MANUALLY_EDITED);
+		phenotype = mockManager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
+		Assert.assertNotNull(phenotype);
+		Assert.assertEquals(newValue, phenotype.getValue());
+		Mockito.verify(mockManager, Mockito.times(2)).updateDependentPhenotypesStatus(Matchers.eq(variableId), Matchers.eq(experimentId));
+	}
+	
+	
 
 }
