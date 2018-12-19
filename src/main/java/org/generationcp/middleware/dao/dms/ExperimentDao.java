@@ -650,7 +650,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName,
 		final boolean includesInstanceFilter) {
-		
+
+		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
+		// same for columns -> DatasetServiceImpl.getSubObservationSetColumns
 		final StringBuilder sql = new StringBuilder("SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, " //
 			+ "    gl.description AS TRIAL_INSTANCE, " //
@@ -694,7 +696,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (!designFactors.isEmpty()) {
 			final String designFactorClauseFormat =
-				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = parent.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
 			for (final String designFactor : designFactors) {
 				sql.append(String.format(designFactorClauseFormat, designFactor, designFactor));
 			}
