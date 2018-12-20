@@ -17,11 +17,24 @@
 			Added start date for empty cases in project table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			update project
-			set start_date = (select ifnull(l.listdate, DATE_FORMAT(NOW(), '%Y%m%d'))
-                  from (select * from project) p
-                         left join listnms l on (l.projectid = p.project_id and l.listtype = 'STUDY')
-            where start_date is null and p.program_uuid is not null and study_type_id is not null and l.listtype = 'STUDY' and project.project_id = p.project_id);
+			UPDATE project
+			SET
+				start_date = (SELECT
+						IFNULL(l.listdate, DATE_FORMAT(NOW(), '%Y%m%d'))
+					FROM
+						(SELECT
+							*
+						FROM
+							project) p
+							LEFT JOIN
+						listnms l ON (l.projectid = p.project_id
+							AND l.listtype = 'STUDY')
+					WHERE
+						project.project_id = p.project_id)
+			WHERE
+				start_date IS NULL
+					AND program_uuid IS NOT NULL
+        			AND study_type_id IS NOT NULL;
 		</sql>
 	</changeSet>
 </databaseChangeLog>
