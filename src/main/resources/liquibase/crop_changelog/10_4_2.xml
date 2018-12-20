@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="vanina" id="v10.4.1-1">
+	<changeSet author="vanina" id="v10.4.2-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
 			<sqlCheck expectedResult="0">select count(1)
