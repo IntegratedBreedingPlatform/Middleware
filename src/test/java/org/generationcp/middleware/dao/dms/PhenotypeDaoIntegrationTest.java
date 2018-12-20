@@ -12,10 +12,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -43,6 +39,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
@@ -250,8 +250,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.createEnvironmentData(1, true);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer phenotypeId = this.phenotypes.get(0).getPhenotypeId();
-		Assert.assertTrue(this.phenotypeDao.isValidPhenotype(experimentId,  phenotypeId));
-		Assert.assertFalse(this.phenotypeDao.isValidPhenotype(experimentId + 1,  phenotypeId));
+		Assert.assertNotNull(this.phenotypeDao.getPhenotype(experimentId,  phenotypeId));
+		Assert.assertNull(this.phenotypeDao.getPhenotype(experimentId + 1,  phenotypeId));
 	}
 	
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {

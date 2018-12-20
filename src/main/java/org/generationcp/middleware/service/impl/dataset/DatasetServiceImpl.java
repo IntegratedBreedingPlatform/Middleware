@@ -37,7 +37,6 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -166,7 +165,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<ProjectProperty> projectProperties =
 			this.buildDefaultDatasetProperties(study, subObservationDataset, datasetName, datasetTypeId);
-		final Variable observationUnitVariable = this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), observationUnitVariableId, false, false);
+		final Variable observationUnitVariable = this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), observationUnitVariableId, false);
+
 		projectProperties.add(this.buildDatasetProperty(subObservationDataset, VariableType.OBSERVATION_UNIT.getId(), observationUnitVariableId, null, null, 4, observationUnitVariable));
 
 		subObservationDataset.setName(datasetName);
@@ -211,21 +211,22 @@ public class DatasetServiceImpl implements DatasetService {
 	private List<ProjectProperty> buildDefaultDatasetProperties(final DmsProject study, final DmsProject dmsProject,
 		final String datasetName, final Integer datasetTypeId) {
 		final List<ProjectProperty> projectProperties = new ArrayList<>();
+
 		final ProjectProperty datasetProperty =
-			this.buildDatasetProperty(dmsProject,
-				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
-				datasetName, null, 1,
-				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false, false));
+				this.buildDatasetProperty(dmsProject,
+						VariableType.STUDY_DETAIL.getId(), TermId.DATASET_NAME.getId(),
+						datasetName, null, 1,
+						this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_NAME.getId(), false));
 		final ProjectProperty datasetTitleProperty =
-			this.buildDatasetProperty(dmsProject,
-				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
-				null, null, 2,
-				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false, false));
+				this.buildDatasetProperty(dmsProject,
+						VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
+						null, null, 2,
+						this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false));
 		final ProjectProperty datasetTypeProperty =
-			this.buildDatasetProperty(dmsProject,
-				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
-				String.valueOf(datasetTypeId), null, 3,
-				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false, false));
+				this.buildDatasetProperty(dmsProject,
+						VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
+						String.valueOf(datasetTypeId), null, 3,
+						this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false));
 		projectProperties.add(datasetProperty);
 		projectProperties.add(datasetTitleProperty);
 		projectProperties.add(datasetTypeProperty);
@@ -297,8 +298,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public boolean isValidObservation(final Integer observationUnitId, final Integer observationId) {
-		return this.daoFactory.getPhenotypeDAO().isValidPhenotype(observationUnitId, observationId);
+	public Phenotype getPhenotype(final Integer observationUnitId, final Integer observationId) {
+		return this.daoFactory.getPhenotypeDAO().getPhenotype(observationUnitId, observationId);
 	}
 
 	@Override
@@ -405,13 +406,6 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 				datasetDTO.setVariables(
 					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
-
-				for (final MeasurementVariable variable : datasetDTO.getVariables()) {
-					final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
-					if (formula != null) {
-						variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
-					}
-				}
 				return datasetDTO;
 			}
 
@@ -530,13 +524,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (measurementVariableList.size() > 0) {
 
-			for (final MeasurementVariable variable : measurementVariableList) {
-				final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variable.getTermId());
-				if (formula != null) {
-					variable.setFormula(FormulaUtils.convertToFormulaDto(formula));
-				}
-			}
-
 			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 
 			final Map<String, ObservationUnitRow> currentData =
@@ -559,7 +546,7 @@ public class DatasetServiceImpl implements DatasetService {
 								@Override
 								public boolean evaluate(final Object object) {
 									final MeasurementVariable variable = (MeasurementVariable) object;
-									return variable.getName().equalsIgnoreCase(variableName);
+									return variable.getAlias().equalsIgnoreCase(variableName);
 								}
 							});
 
@@ -575,7 +562,7 @@ public class DatasetServiceImpl implements DatasetService {
 							}
 						}
 
-						final ObservationUnitData observationUnitData = currentRow.getVariables().get(variableName);
+						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
 						final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
 						Phenotype phenotype = null;
 						if (observationUnitData != null && observationUnitData.getObservationId() != null && !importedVariableValue

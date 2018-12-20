@@ -79,14 +79,16 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetVariable() throws Exception {
-		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+
 		Assert.assertNotNull(variable);
 	}
 
 	@Test
 	public void testUpdateVariable() throws Exception {
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+
 		Assert.assertNotNull(updatedVariable);
 	}
 

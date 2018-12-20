@@ -31,11 +31,13 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -219,6 +221,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id AND gpSiteName.type_id = " + TermId.TRIAL_LOCATION.getId()+ " \n"
 		+ "   LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id AND gpSiteId.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 		+ " WHERE p.project_id = :studyId \n";
+
+	private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id)  FROM projectprop pp inner join project p on (p.project_id = pp.project_id)\n"
+			+ "WHERE pp.variable_id = :variableId and p.deleted = 0";
 
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
@@ -1054,6 +1059,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   category.cvterm_id AS categoryId, "  //
 				+ "   category.name AS categoryName, "  //
 				+ "   category.definition AS categoryDescription, "  //
+				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id LIMIT 1) AS formulaId, "  //
 				+ "   scaleMinRange.value AS scaleMinRange, "  //
 				+ "   scaleMaxRange.value AS scaleMaxRange, "  //
 				+ "   vo.expected_min AS expectedMin, "  //
@@ -1109,6 +1115,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar("scaleMaxRange", new DoubleType())
 				.addScalar("expectedMin", new DoubleType())
 				.addScalar("expectedMax", new DoubleType())
+				.addScalar("formulaId", new IntegerType());
 			;
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
@@ -1137,6 +1144,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
 
+					final Integer formulaId = (Integer) result.get("formulaId");
+					if (formulaId != null) {
+						final Formula formula = (Formula) this.getSession()
+							.createCriteria(Formula.class)
+							.add(Restrictions.eq("formulaId", formulaId))
+							.add(Restrictions.eq("active", true))
+							.uniqueResult();
+						if (formula != null) {
+							measurementVariable.setFormula(FormulaUtils.convertToFormulaDto(formula));
+						}
+					}
+
 					final Double scaleMinRange = (Double) result.get("scaleMinRange");
 					final Double scaleMaxRange = (Double) result.get("scaleMaxRange");
 					final Double expectedMin = (Double) result.get("expectedMin");
@@ -1146,6 +1165,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setMaxRange(scaleMaxRange != null ? scaleMaxRange : expectedMax);
 					measurementVariable.setScaleMinRange(scaleMinRange);
 					measurementVariable.setScaleMaxRange(scaleMaxRange);
+					measurementVariable.setVariableMinRange(expectedMin);
+					measurementVariable.setVariableMaxRange(expectedMax);
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
@@ -1280,6 +1301,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error in delete=" + datasetId + " in DmsProjectDao: " + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countByVariable(int variableId) throws MiddlewareQueryException {
+		try {
+			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
+			query.setParameter("variableId", variableId);
+
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (HibernateException e) {
+			final String errorMessage = "Error at countByVariable=" + variableId + " in DmsProjectDao: " + e.getMessage();
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
