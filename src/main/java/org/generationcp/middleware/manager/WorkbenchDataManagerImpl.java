@@ -289,20 +289,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
-		// of synch with
-		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-		// statement
-		this.getCurrentSession().flush();
-		final String sql = "DELETE project_user_info, ibdb_user_map FROM workbench_project_user_info project_user_info"
-			+ " INNER JOIN workbench_ibdb_user_map ibdb_user_map"
-			+ " ON project_user_info.project_id = ibdb_user_map.project_id"
-			+ " AND project_user_info.user_id = ibdb_user_map.workbench_user_id"
-			+ " WHERE project_user_info.project_id = :projectId AND project_user_info.user_id in (:workbenchUserIds)";
-		final SQLQuery statement = this.getCurrentSession().createSQLQuery(sql);
-		statement.setParameter("projectId", projectId);
-		statement.setParameterList("workbenchUserIds", workbenchUserIds);
-		statement.executeUpdate();
+		this.getIbdbUserMapDao().removeUsersFromProgram(workbenchUserIds, projectId);
 	}
 
 	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
