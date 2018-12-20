@@ -20,8 +20,8 @@
 			update project
 			set start_date = (select ifnull(l.listdate, DATE_FORMAT(NOW(), '%Y%m%d'))
                   from (select * from project) p
-                         left join listnms l on l.projectid = p.project_id
-                  where start_date is null and p.program_uuid is not null and study_type_id is not null and l.listtype = 'STUDY' and project.project_id = p.project_id);
+                         left join listnms l on (l.projectid = p.project_id and l.listtype = 'STUDY')
+            where start_date is null and p.program_uuid is not null and study_type_id is not null and l.listtype = 'STUDY' and project.project_id = p.project_id);
 		</sql>
 	</changeSet>
 </databaseChangeLog>
