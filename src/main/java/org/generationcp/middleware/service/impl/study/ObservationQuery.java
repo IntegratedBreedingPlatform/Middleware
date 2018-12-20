@@ -144,7 +144,7 @@ class ObservationQuery {
 			+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " //
 			+ TermId.COLUMN_NO.getId() //
 			+ " WHERE p.project_id = (select p.project_id from project_relationship pr INNER JOIN project p on p.project_id = pr.subject_project_id " //
-			+ whereText + orderByText;
+			+ whereText + " GROUP BY nde.nd_experiment_id " + orderByText;
 	}
 
 	String getSingleObservationQuery(final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors, final List<String> designFactors) {

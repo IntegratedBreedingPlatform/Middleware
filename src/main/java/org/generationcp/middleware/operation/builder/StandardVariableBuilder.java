@@ -63,7 +63,7 @@ public class StandardVariableBuilder extends Builder {
 
 	public StandardVariable create(final int standardVariableId, final String programUUID) {
 
-		final Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId, false, false);
+		final Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId, false);
 
 		return this.getStandardVariableTransformer().transformVariable(variable);
 	}

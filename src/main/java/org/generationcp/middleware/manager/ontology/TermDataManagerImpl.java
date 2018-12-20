@@ -106,7 +106,7 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 	}
 
 	@Override
-	public List<String> getCategoriesReferredInPhenotype(final int scaleId) {
-		return daoFactory.getCvTermRelationshipDao().getCategoriesReferredInPhenotype(scaleId);
+	public List<String> getCategoriesUsedInStudies(final int scaleId) {
+		return daoFactory.getCvTermRelationshipDao().getCategoriesUsedInStudies(scaleId);
 	}
 }

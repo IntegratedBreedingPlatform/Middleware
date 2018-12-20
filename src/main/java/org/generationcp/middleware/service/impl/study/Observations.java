@@ -39,7 +39,7 @@ public class Observations {
 				final Integer traitId = measurement.getMeasurementVariable().getId();
 
 				// Update Trait
-				final Variable variable = ontologyVariableDataManager.getVariable(programUuid, traitId, false, false);
+				final Variable variable = ontologyVariableDataManager.getVariable(programUuid, traitId, false);
 
 				if (phenotypeId != null && phenotypeId != 0) {
 					this.updatePhenotype(variable, phenotypeId, variableValue);
