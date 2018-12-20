@@ -22,21 +22,19 @@
         <preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT count(*)FROM workbench_ibdb_user_map ibdb_user_map
-						LEFT JOIN workbench_project_user_info project_user_info
-							ON project_user_info.project_id = ibdb_user_map.project_id
-							AND project_user_info.user_id = ibdb_user_map.workbench_user_id
-						WHERE project_user_info.project_id IS NULL AND project_user_info.user_id IS NULL
+					SELECT count(*) FROM workbench_ibdb_user_map WHERE NOT EXISTS
+						(SELECT * FROM workbench_project_user_info WHERE
+							project_id = workbench_ibdb_user_map.project_id
+							AND user_id = workbench_ibdb_user_map.workbench_user_id)
 				</sqlCheck>
 			</not>
         </preConditions>
         <comment>Clean up workbench_ibdb_user_map table, delete the removed users from a program</comment>
         <sql dbms="mysql" splitStatements="true">
-            DELETE ibdb_user_map FROM workbench_ibdb_user_map ibdb_user_map
-  				LEFT JOIN workbench_project_user_info project_user_info
-  					ON project_user_info.project_id = ibdb_user_map.project_id
-					AND project_user_info.user_id = ibdb_user_map.workbench_user_id
-      			WHERE project_user_info.project_id IS NULL AND project_user_info.user_id IS NULL
+			DELETE FROM workbench_ibdb_user_map WHERE NOT EXISTS
+				(SELECT * FROM workbench_project_user_info WHERE
+					project_id = workbench_ibdb_user_map.project_id
+					AND user_id = workbench_ibdb_user_map.workbench_user_id)
         </sql>
     </changeSet>
 
