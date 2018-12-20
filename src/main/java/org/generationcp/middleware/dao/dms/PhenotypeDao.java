@@ -11,14 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -51,6 +43,14 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -1145,12 +1145,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		statement.executeUpdate();
 	}
 	
-	public boolean isValidPhenotype(final Integer experimentId, final Integer phenotypeId) {
+	public Phenotype getPhenotype(final Integer experimentId, final Integer phenotypeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
 		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
-		criteria.setProjection(Projections.property("phenotypeId"));
-		final Integer id = (Integer) criteria.uniqueResult();
-		return id != null;
+		return (Phenotype) criteria.uniqueResult();
 	}
 }

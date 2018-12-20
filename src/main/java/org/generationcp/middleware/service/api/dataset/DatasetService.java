@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface DatasetService {
 
 	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
 
-	boolean isValidObservation(Integer observationUnitId, Integer observationId);
+	Phenotype getPhenotype(Integer observationUnitId, Integer observationId);
 
 	ObservationDto addPhenotype(ObservationDto observation);
 

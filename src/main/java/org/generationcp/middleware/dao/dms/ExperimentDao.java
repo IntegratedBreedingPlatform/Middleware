@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.PlantDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -98,6 +99,38 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
 	public static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
+
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP = "SELECT count(e.nd_experiment_id)\n"
+			+ "FROM nd_experiment e INNER JOIN projectprop pp ON pp.project_id = e.project_id\n"
+			+ "AND pp.value = :variableId";
+
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION = "SELECT count(e.nd_experiment_id)\n"
+			+ "FROM nd_experiment e INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id\n"
+			+ "WHERE (" + TermId.TRIAL_INSTANCE_FACTOR.getId() + " = :variableId AND g.description IS NOT NULL)  OR (" + TermId.LATITUDE.getId() + " = :variableId AND g.latitude IS NOT NULL)\n"
+			+ "OR (" + TermId.LONGITUDE.getId() + "= :variableId AND g.longitude IS NOT NULL) OR (" + TermId.GEODETIC_DATUM.getId() + " = :variableId AND g.geodetic_datum IS NOT NULL)\n"
+			+ "OR ("+ TermId.ALTITUDE.getId()+" = :variableId AND g.altitude IS NOT NULL)\n";
+
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP = "SELECT count(e.nd_experiment_id)\n"
+			+ "FROM nd_experiment e INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id\n"
+			+ "WHERE gp.type_id = :variableId AND gp.value IS NOT NULL";
+
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP = "SELECT count(e.nd_experiment_id)\n"
+			+ "FROM nd_experiment e INNER JOIN nd_experimentprop ep ON ep.nd_experiment_id = e.nd_experiment_id\n"
+			+ "WHERE ep.type_id = :variableId AND ep.value IS NOT NULL";
+
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK = "SELECT count(e.nd_experiment_id)\n"
+			+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id\n"
+			+ "WHERE ("+ TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR ("+ TermId.GID.getId() +" = :variableId AND s.dbxref_id IS NOT NULL)\n"
+			+ "OR ("+TermId.DESIG.getId()+" = :variableId AND s.name IS NOT NULL) OR ("+TermId.ENTRY_CODE.getId()+" = :variableId AND s.value IS NOT NULL)";
+
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(e.nd_experiment_id)\n"
+			+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id\n"
+			+ "WHERE sp.type_id = :variableId AND sp.value IS NOT NULL";
+
+	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE = "SELECT count(e.nd_experiment_id)\n"
+			+ "FROM nd_experiment e  INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id\n"
+			+ "AND p.observable_id = :variableId AND (p.value IS NOT NULL  OR p.cvalue_id IS NOT NULL)";
+
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
@@ -617,7 +650,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
 		final List<String> designFactors, final String sortBy, final String sortOrder, final String observationUnitNoName,
 		final boolean includesInstanceFilter) {
-		
+
+		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
+		// same for columns -> DatasetServiceImpl.getSubObservationSetColumns
 		final StringBuilder sql = new StringBuilder("SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, " //
 			+ "    gl.description AS TRIAL_INSTANCE, " //
@@ -661,7 +696,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (!designFactors.isEmpty()) {
 			final String designFactorClauseFormat =
-				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = parent.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
 			for (final String designFactor : designFactors) {
 				sql.append(String.format(designFactorClauseFormat, designFactor, designFactor));
 			}
@@ -1067,6 +1102,46 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public long countByObservedVariable(int variableId, int variableTypeId) throws MiddlewareQueryException {
+		try {
+			String sql = null;
+			if (VariableType.STUDY_DETAIL.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP;
+			} else if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId || TermId.LATITUDE.getId() == variableId
+					|| TermId.LONGITUDE.getId() == variableId || TermId.GEODETIC_DATUM.getId() == variableId
+					|| TermId.ALTITUDE.getId() == variableId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION;
+			} else if (VariableType.ENVIRONMENT_DETAIL.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP;
+			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId
+					|| VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP;
+			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId
+					|| TermId.ENTRY_CODE.getId() == variableId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK;
+			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
+			} else if (VariableType.TRAIT.getId() == variableTypeId || VariableType.ANALYSIS.getId() == variableTypeId
+					|| VariableType.STUDY_CONDITION.getId() == variableTypeId || VariableType.SELECTION_METHOD.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE;
+			}
+
+			if (sql != null) {
+				SQLQuery query = this.getSession().createSQLQuery(sql);
+				if (sql.indexOf(":variableId") > -1) {
+					query.setParameter("variableId", variableId);
+				}
+				return ((BigInteger) query.uniqueResult()).longValue();
+			}
+
+		} catch (HibernateException e) {
+			final String message = "Error at countByObservationVariable query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return 0;
 	}
 	
 	@Override
