@@ -130,7 +130,8 @@ public class SampleListServiceImpl implements SampleListService {
 					maxSequenceNumberByGID.put(gid, maxSequence);
 				}
 
-				final Integer sampleNumber = Integer.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue());
+				final int sampleNumber =
+					(Double.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue())).intValue();
 				Integer plantNumber = maxPlantNumbers.get(observationDto.getMeasurementId());
 				if (plantNumber == null) {
 					plantNumber = 0;
@@ -230,7 +231,7 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 		try {
-			User cropUser = this.daoFactory.getUserDao().getUserByUserName(username);
+			final User cropUser = this.daoFactory.getUserDao().getUserByUserName(username);
 			final SampleList sampleFolder = new SampleList();
 			sampleFolder.setCreatedDate(new Date());
 			sampleFolder.setCreatedBy(cropUser);
