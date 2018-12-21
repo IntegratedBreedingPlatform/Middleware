@@ -8,22 +8,36 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.data.initializer.DMSProjectTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
+import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.StudyDataManagerImplTest;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -43,21 +57,66 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 	private static final List<Integer> VARS_TO_DELETE = Arrays.asList(8377, 8263, 20310);
 
 
+	private StudyDataManagerImpl manager;
+
+	@Autowired
+	private OntologyDataManager ontologyManager;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private GermplasmDataManager germplasmDataDM;
+
+	@Autowired
+	private LocationDataManager locationManager;
+
+	@Autowired
+	private UserDataManager userDataManager;
+
 	private ProjectPropertySaver projectPropSaver;
 
 	private ProjectPropertyDao projectPropDao;
+
+	private DmsProjectDao dmsProjectDao;
 
 	private List<ProjectProperty> dummyProjectPropIds;
 
 	private static final String propertyName = "Property Name";
 
+	private Project commonTestProject;
+	private StudyReference studyReference;
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+	private StudyTestDataInitializer studyTDI;
+
 	@Before
-	public void setup() {
+	public void setup() throws Exception {
+		this.manager = new StudyDataManagerImpl(this.sessionProvder);
 		this.projectPropSaver = new ProjectPropertySaver(this.sessionProvder);
 		this.projectPropDao = new ProjectPropertyDao();
 		this.projectPropDao.setSession(this.sessionProvder.getSession());
-
+		this.dmsProjectDao = new DmsProjectDao();
+		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 		this.dummyProjectPropIds = ProjectPropertySaverTest.getDummyProjectPropIds();
+
+		if (this.workbenchTestDataUtil == null) {
+			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+			this.workbenchTestDataUtil.setUpWorkbench();
+		}
+
+		if (this.commonTestProject == null) {
+			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
+		}
+
+		if (this.workbenchTestDataUtil == null) {
+			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+			this.workbenchTestDataUtil.setUpWorkbench();
+		}
+		final Properties mockProperties = Mockito.mock(Properties.class);
+		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
+		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
+			this.locationManager, this.userDataManager);
+		this.studyReference = this.studyTDI.addTestStudy();
 	}
 
 	@Ignore
@@ -222,6 +281,30 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 1, dmsProject.getProperties().size());
 		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Variable Type", VariableType.TRAIT.getId(),
 				dmsProject.getProperties().get(0).getTypeId());
+	}
+
+	@Test
+	public void testDeleteVariable() {
+		DmsProject project = this.dmsProjectDao.getById(studyReference.getId());
+		final MeasurementVariable mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1");
+		this.projectPropSaver.insertVariable(project, mvar, 1);
+		project = this.dmsProjectDao.getById(studyReference.getId());
+		Assert.assertEquals(1, project.getProperties().size());
+		this.projectPropSaver.deleteVariable(project, mvar.getTermId());
+		Assert.assertEquals(0, project.getProperties().size());
+	}
+
+	@Test
+	public void testDeleteVariableWhereMultipleVariablesAreNeededTobeDeleted() {
+		DmsProject project = this.dmsProjectDao.getById(studyReference.getId());
+		MeasurementVariable mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1");
+		this.projectPropSaver.insertVariable(project, mvar, 1);
+		mvar = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "2");
+		this.projectPropSaver.insertVariable(project, mvar, 2);
+		project = this.dmsProjectDao.getById(studyReference.getId());
+		Assert.assertEquals(2, project.getProperties().size());
+		this.projectPropSaver.deleteVariable(project, mvar.getTermId());
+		Assert.assertEquals(0, project.getProperties().size());
 	}
 
 	@Test
