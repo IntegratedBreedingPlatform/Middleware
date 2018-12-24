@@ -64,9 +64,6 @@ public class DatasetServiceImplTest {
 	private HibernateSessionProvider mockSessionProvider;
 
 	@Mock
-	private HibernateSessionProvider session;
-
-	@Mock
 	private Session mockSession;
 
 	@Mock
@@ -105,12 +102,10 @@ public class DatasetServiceImplTest {
 	public static final String GID = "GID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_ROW = "FieldMapRow";
 	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
 	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
-	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
 	public static final String LOCATION_NAME = "LocationName";
-		public static final String COL = "COL";
+	public static final String COL = "COL";
 	public static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
 	public static final String PLOT_NO = "PLOT_NO";
@@ -320,8 +315,8 @@ public class DatasetServiceImplTest {
 		final Random ran = new Random();
 		final int pbservationUnitId = ran.nextInt();
 		final int observationId = ran.nextInt();
-		this.datasetService.isValidObservation(pbservationUnitId, observationId);
-		Mockito.verify(this.phenotypeDao).isValidPhenotype(pbservationUnitId, observationId);
+		this.datasetService.getPhenotype(pbservationUnitId, observationId);
+		Mockito.verify(this.phenotypeDao).getPhenotype(pbservationUnitId, observationId);
 	}
 
 	@Test
@@ -465,9 +460,6 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setVariables(variables);
 
 		final List<ObservationUnitRow> testMeasurements = Collections.<ObservationUnitRow>singletonList(observationUnitRow);
-		final int instanceId = 1;
-		final int pageNumber = 1;
-		final int pageSize = 100;
 		Mockito.when(this.experimentDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		Mockito.when(this.experimentDao.getObservationUnitTable(DATASET_ID, projectTraits, GERMPLASM_DESCRIPTORS, DESING_FACTORS, INSTANCE_ID, 1, 100,null, null)).thenReturn(testMeasurements);
 

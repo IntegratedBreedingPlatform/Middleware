@@ -17,6 +17,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -81,4 +82,20 @@ public class IbdbUserMapDAO extends GenericDAO<IbdbUserMap, Long> {
 		return null;
 	}
 
+	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
+		// of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+		final String sql = "DELETE project_user_info, ibdb_user_map FROM workbench_project_user_info project_user_info"
+			+ " INNER JOIN workbench_ibdb_user_map ibdb_user_map"
+			+ " ON project_user_info.project_id = ibdb_user_map.project_id"
+			+ " AND project_user_info.user_id = ibdb_user_map.workbench_user_id"
+			+ " WHERE project_user_info.project_id = :projectId AND project_user_info.user_id in (:workbenchUserIds)";
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("projectId", projectId);
+		statement.setParameterList("workbenchUserIds", workbenchUserIds);
+		statement.executeUpdate();
+	}
 }

@@ -1,12 +1,15 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface DatasetService {
@@ -21,7 +24,7 @@ public interface DatasetService {
 
 	boolean isValidObservationUnit(Integer datasetId, Integer observationUnitId);
 
-	boolean isValidObservation(Integer observationUnitId, Integer observationId);
+	Phenotype getPhenotype(Integer observationUnitId, Integer observationId);
 
 	ObservationDto addPhenotype(ObservationDto observation);
 
@@ -41,7 +44,7 @@ public interface DatasetService {
 	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
 
 	List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final int instanceId, final int pageNumber, final int pageSize,
+		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
 		final String sortBy, final String sortOrder);
 
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
@@ -51,6 +54,13 @@ public interface DatasetService {
 	List<StudyInstance> getDatasetInstances(Integer datasetId);
 
 	void deletePhenotype(final Integer phenotypeId);
+
+	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
+			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
+
+	void importDataset(final Integer datasetId, final Table<String, String, String> table);
+
+	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 
 	void deleteDataset(int datasetId);
 

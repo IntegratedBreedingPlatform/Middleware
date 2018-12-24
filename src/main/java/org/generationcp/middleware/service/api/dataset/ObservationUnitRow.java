@@ -4,7 +4,6 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
-import java.util.Objects;
 
 @AutoProperty
 public class ObservationUnitRow {
@@ -18,6 +17,8 @@ public class ObservationUnitRow {
 	private String action;
 
 	private Map<String, ObservationUnitData> variables;
+
+	private String obsUnitId;
 
 	public ObservationUnitRow() {
 
@@ -59,6 +60,14 @@ public class ObservationUnitRow {
 		return this.variables;
 	}
 
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
+	}
+
+	public String getObsUnitId() {
+		return this.obsUnitId;
+	}
+
 	public void setVariables(final Map<String, ObservationUnitData> variables) {
 		this.variables = variables;
 	}
@@ -77,6 +86,7 @@ public class ObservationUnitRow {
 	public String toString() {
 		return Pojomatic.toString(this);
 	}
+
 }
 
 

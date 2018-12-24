@@ -84,7 +84,8 @@ public class ObservationsTest {
 		when(mockScale.getDataType()).thenReturn(DataType.NUMERIC_VARIABLE);
 
 		final String programUuid = UUID.randomUUID().toString();
-		when(this.mockOntologyVariableDataManager.getVariable(programUuid, TEST_TRAIT_ID, false, false)).thenReturn(mockVariable);
+		when(this.mockOntologyVariableDataManager.getVariable(programUuid, TEST_TRAIT_ID, false)).thenReturn(mockVariable);
+
 		this.observation.updataObsevationTraits(this.observationDto, programUuid);
 
 		verify(this.mockSession, times(1)).save(isA(Phenotype.class));
@@ -121,7 +122,8 @@ public class ObservationsTest {
 		when(mockScale.getCategories()).thenReturn(
 				Collections.singletonList(new TermSummary(TEST_TERM_ID, TEST_TERM_NAME, TEST_CATEGORICAL_DESCRIPTION)));
 		when(mockScale.getDataType()).thenReturn(DataType.CATEGORICAL_VARIABLE);
-		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false, false)).thenReturn(mockVariable);
+		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false)).thenReturn(mockVariable);
+
 		this.observation.updataObsevationTraits(this.observationDto, programUuid);
 
 		verify(this.mockSession, times(1)).save(isA(Phenotype.class));
@@ -152,7 +154,8 @@ public class ObservationsTest {
 
 		final String programUuid = UUID.randomUUID().toString();
 
-		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false, false)).thenReturn(mockVariable);
+		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false)).thenReturn(mockVariable);
+
 		this.observation.updataObsevationTraits(this.observationDto, programUuid);
 		verify(this.mockSession, times(1)).update(isA(Phenotype.class));
 		verify(mockPhenotype, times(1)).setValue(CHARACTER_TEST_VALUE);
@@ -183,7 +186,8 @@ public class ObservationsTest {
 
 		final String programUuid = UUID.randomUUID().toString();
 
-		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false, false)).thenReturn(mockVariable);
+		when(this.mockOntologyVariableDataManager.getVariable(programUuid, 999, false)).thenReturn(mockVariable);
+
 		this.observation.updataObsevationTraits(this.observationDto, programUuid);
 		verify(this.mockSession, times(1)).update(isA(Phenotype.class));
 		verify(mockPhenotype, times(1)).setValue(TEST_TERM_NAME);

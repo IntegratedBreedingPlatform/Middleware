@@ -672,12 +672,14 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
-	
+
 	/**
-	 * Deletes the given list of ProjectUserInfoObjects
-	 * @param projectUserInfos
+	 * Deletes the Project_User_Info and IBDB_User_Map entries of the removed program members
+	 *
+	 * @param workbenchUserIds - the user ids of the removed program members
+	 * @param projectId - the project id
 	 */
-	void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos);
+	void removeUsersFromProgram (List<Integer> workbenchUserIds, Long projectId);
 
 	/**
 	 * Returns ProjectUserInfo with the given project id and user id

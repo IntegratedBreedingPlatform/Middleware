@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -52,6 +53,7 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -284,13 +286,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId) {
 		return this.getProjectUserInfoDao().getByProjectIdAndUserId(projectId, userId);
 	}
-	
+
 	@Override
-	public void deleteProjectUserInfos(List<ProjectUserInfo> projectUserInfos) {
-		ProjectUserInfoDAO dao = this.getProjectUserInfoDao();
-		for(ProjectUserInfo projectUserInfo: projectUserInfos) {
-			dao.makeTransient(projectUserInfo);
-		}
+	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
+		this.getIbdbUserMapDao().removeUsersFromProgram(workbenchUserIds, projectId);
 	}
 
 	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
@@ -647,19 +646,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public IbdbUserMap getIbdbUserMap(final Integer workbenchUserId, final Long projectId) {
 
-		IbdbUserMap bbdbUserMap = null;
+		IbdbUserMap ibdbUserMap = null;
 		try {
 
-			bbdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
-
+			ibdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while retrieving Local IbdbUserMap: WorkbenchDataManager.getIbdbUserMap(workbenchUserId="
-							+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
+				"Error encountered while retrieving Local IbdbUserMap: WorkbenchDataManager.getIbdbUserMap(workbenchUserId="
+					+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
 		}
 
-		return bbdbUserMap;
+		return ibdbUserMap;
 	}
 
 	@Override
