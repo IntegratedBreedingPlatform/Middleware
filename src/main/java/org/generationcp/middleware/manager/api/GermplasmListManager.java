@@ -17,7 +17,6 @@ import java.util.Map;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -54,19 +53,6 @@ public interface GermplasmListManager {
 	List<GermplasmList> getAllGermplasmLists(int start, int numOfRows);
 
 	/**
-	 * Returns all Germplasm list records.
-	 *
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
-	 *
-	 * @return List of GermplasmList POJOs
-	 * @deprecated
-	 */
-	@Deprecated
-	List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance);
-
-	/**
 	 * Returns the total number of Germplasm Lists.
 	 *
 	 * @return The count of all germplasm lists.
@@ -86,20 +72,6 @@ public interface GermplasmListManager {
 	List<GermplasmList> getGermplasmListByName(String name, String programUUID, int start, int numOfRows, Operation operation);
 
 	/**
-	 * Returns all the Germplasm List records with names matching the given parameter.
-	 *
-	 * @param name
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param operation - can be equal or like
-	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
-	 * @return List of GermplasmList POJOs
-	 * @deprecated
-	 */
-	@Deprecated
-	List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance);
-
-	/**
 	 * Returns the number of Germplasm List records with names matching the given parameter.
 	 *
 	 * @param name
@@ -108,17 +80,6 @@ public interface GermplasmListManager {
 	 */
 	long countGermplasmListByName(String name, Operation operation);
 
-	/**
-	 * Returns the number of Germplasm List records with names matching the given parameter.
-	 *
-	 * @param name
-	 * @param operation can be Operation.EQUAL or Operation.LIKE
-	 * @param database - can either be Database.CENTRAL or Database.LOCAL
-	 * @return The count of Germplasm lists based on the given name and operation
-	 * @deprecated
-	 */
-	@Deprecated
-	long countGermplasmListByName(String name, Operation operation, Database database);
 
 	/**
 	 * Returns the number of Germplasm List records that have the given status.
@@ -127,7 +88,7 @@ public interface GermplasmListManager {
 	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return The count of Germplasm lists based on the given status.
 	 */
-	long countGermplasmListByStatus(Integer status, Database instance);
+	long countGermplasmListByStatus(Integer status);
 
 	/**
 	 * Returns the germplasm lists that are associated with the specified GID.
@@ -217,7 +178,7 @@ public interface GermplasmListManager {
 	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return - List of GermplasmList POJOs
 	 */
-	List<GermplasmList> getAllTopLevelLists(int start, int numOfRows, Database instance);
+	List<GermplasmList> getAllTopLevelLists(int start, int numOfRows);
 
 	/**
 	 * Returns the Top Level Germplasm List Folders present in the program of the specified database. Retrieval from the database is done by

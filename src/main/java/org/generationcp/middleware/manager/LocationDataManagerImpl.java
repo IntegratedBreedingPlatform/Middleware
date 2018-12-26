@@ -349,7 +349,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getAllBreedingLocations() {
 
 		final List<Location> allLocations =
-				this.getFromInstanceByMethod(daoFactory.getLocationDAO(), Database.LOCAL, "getAllBreedingLocations", new Object[] {},
+				this.getFromInstanceByMethod(daoFactory.getLocationDAO(), "getAllBreedingLocations", new Object[] {},
 						new Class[] {});
 
 		return allLocations;
