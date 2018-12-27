@@ -336,7 +336,7 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetDataset() {
 		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(null);
-		final DatasetDTO result = this.datasetService.getDataset(25019,datasetDTOList.get(4).getDatasetId());
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
 	}
 

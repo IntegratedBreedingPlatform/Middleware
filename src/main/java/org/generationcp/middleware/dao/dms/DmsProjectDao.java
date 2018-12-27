@@ -1320,4 +1320,29 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+
+	public DatasetDTO getDataset(final Integer datasetId) {
+		final DatasetDTO datasetDTOS;
+		try {
+
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("project.projectId"), "datasetId");
+			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
+			projectionList.add(Projections.property("project.name"), "name");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			criteria.createAlias("project.relatedTos", "pr");
+			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.add(Restrictions.eq("project.projectId", datasetId));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.setProjection(projectionList);
+			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
+			datasetDTOS = (DatasetDTO) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error getting getDataset for datasetId =" + datasetId + ":" + e.getMessage(), e);
+		}
+		return datasetDTOS;
+
+	}
 }
