@@ -336,6 +336,7 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetDataset() {
 		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(null);
+		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTOList.get(4));
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
 	}
