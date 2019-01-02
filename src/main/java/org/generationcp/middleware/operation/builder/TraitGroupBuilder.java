@@ -25,20 +25,20 @@ import org.generationcp.middleware.manager.DaoFactory;
 
 public class TraitGroupBuilder extends Builder {
 
-	private DaoFactory daoFactory;
+	private final DaoFactory daoFactory;
 
-	public TraitGroupBuilder(HibernateSessionProvider sessionProviderForLocal) {
+	public TraitGroupBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 		daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
 	/**
 	 * Gets all the Trait Classes with properties and standard variables in a hierarchical structure.
-	 * 
+	 *
 	 * @return list of all trait class references in a hierarchy
 	 * @
 	 */
-	public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables)  {
+	public List<TraitClassReference> getAllTraitGroupsHierarchy(final boolean includePropertiesAndVariables) {
 
 		// Step 1: Get all Trait Classes
 		List<TraitClassReference> traitClasses = this.getAllTraitClasses();
@@ -48,7 +48,7 @@ public class TraitGroupBuilder extends Builder {
 			this.setPropertiesOfTraitClasses(traitClasses);
 
 			// Step 3: Get all StandardVariables of Properties
-			for (TraitClassReference traitClass : traitClasses) {
+			for (final TraitClassReference traitClass : traitClasses) {
 				this.setStandardVariablesOfProperties(traitClass.getProperties());
 			}
 		}
@@ -62,20 +62,20 @@ public class TraitGroupBuilder extends Builder {
 
 	/**
 	 * Gets all Trait Classes in a flat table form.
-	 * 
+	 *
 	 * @return
 	 * @
 	 */
-	private List<TraitClassReference> getAllTraitClasses()  {
-		List<TraitClassReference> traitClasses = new ArrayList<>();
+	private List<TraitClassReference> getAllTraitClasses() {
+		final List<TraitClassReference> traitClasses = new ArrayList<>();
 		traitClasses.addAll(daoFactory.getCvTermDao().getAllTraitClasses());
 		Collections.sort(traitClasses);
 		return traitClasses;
 	}
 
-	private List<TraitClassReference> buildTree(List<TraitClassReference> traitClasses, int parentTraitClassId) {
-		List<TraitClassReference> childrenTraitClasses = new ArrayList<>();
-		for (TraitClassReference traitClass : traitClasses) {
+	private List<TraitClassReference> buildTree(final List<TraitClassReference> traitClasses, final int parentTraitClassId) {
+		final List<TraitClassReference> childrenTraitClasses = new ArrayList<>();
+		for (final TraitClassReference traitClass : traitClasses) {
 			if (traitClass.getParentTraitClassId() == parentTraitClassId) {
 				traitClass.setTraitClassChildren(this.buildTree(traitClasses, traitClass.getId()));
 				childrenTraitClasses.add(traitClass);
@@ -84,32 +84,32 @@ public class TraitGroupBuilder extends Builder {
 		return childrenTraitClasses;
 	}
 
-	private void sortTree(List<TraitClassReference> traitClasses) {
-		for (TraitClassReference traitClass : traitClasses) {
+	private void sortTree(final List<TraitClassReference> traitClasses) {
+		for (final TraitClassReference traitClass : traitClasses) {
 			this.sortChildren(traitClass);
 		}
 	}
 
-	private void sortChildren(TraitClassReference traitClass) {
+	private void sortChildren(final TraitClassReference traitClass) {
 		traitClass.sortTraitClassChildren();
-		for (TraitClassReference child : traitClass.getTraitClassChildren()) {
+		for (final TraitClassReference child : traitClass.getTraitClassChildren()) {
 			this.sortChildren(child);
 		}
 	}
 
-	private void setPropertiesOfTraitClasses(List<TraitClassReference> traitClasses)  {
+	private void setPropertiesOfTraitClasses(final List<TraitClassReference> traitClasses) {
 
-		List<Integer> traitClassIds = new ArrayList<>();
-		for (TraitClassReference traitClass : traitClasses) {
+		final List<Integer> traitClassIds = new ArrayList<>();
+		for (final TraitClassReference traitClass : traitClasses) {
 			traitClassIds.add(traitClass.getId());
 		}
 		Collections.sort(traitClassIds);
 
-		Map<Integer, List<PropertyReference>> retrievedProperties = daoFactory.getCvTermDao().getPropertiesOfTraitClasses(traitClassIds);
+		final Map<Integer, List<PropertyReference>> retrievedProperties = daoFactory.getCvTermDao().getPropertiesOfTraitClasses(traitClassIds);
 
 		if (!retrievedProperties.isEmpty()) {
-			for (TraitClassReference traitClass : traitClasses) {
-				List<PropertyReference> traitClassProperties = traitClass.getProperties();
+			for (final TraitClassReference traitClass : traitClasses) {
+				final List<PropertyReference> traitClassProperties = traitClass.getProperties();
 				if (traitClassProperties != null && retrievedProperties.get(traitClass.getId()) != null) {
 					traitClassProperties.addAll(retrievedProperties.get(traitClass.getId()));
 					traitClass.setProperties(traitClassProperties);
@@ -120,20 +120,19 @@ public class TraitGroupBuilder extends Builder {
 
 	}
 
-	private void setStandardVariablesOfProperties(List<PropertyReference> traitClassProperties)
-			 {
-		List<Integer> propertyIds = new ArrayList<>();
-		for (PropertyReference property : traitClassProperties) {
+	private void setStandardVariablesOfProperties(final List<PropertyReference> traitClassProperties) {
+		final List<Integer> propertyIds = new ArrayList<>();
+		for (final PropertyReference property : traitClassProperties) {
 			propertyIds.add(property.getId());
 		}
 		Collections.sort(propertyIds);
 
-		Map<Integer, List<StandardVariableReference>> retrievedVariables =
-				daoFactory.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
+		final Map<Integer, List<StandardVariableReference>> retrievedVariables =
+			daoFactory.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
 
 		if (!retrievedVariables.isEmpty()) {
-			for (PropertyReference property : traitClassProperties) {
-				List<StandardVariableReference> propertyVariables = property.getStandardVariables();
+			for (final PropertyReference property : traitClassProperties) {
+				final List<StandardVariableReference> propertyVariables = property.getStandardVariables();
 				if (propertyVariables != null && retrievedVariables.get(property.getId()) != null) {
 					propertyVariables.addAll(retrievedVariables.get(property.getId()));
 					property.setStandardVariables(propertyVariables);
