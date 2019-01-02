@@ -62,7 +62,7 @@ public class FieldbookListUtilTest {
 		Map<Integer, String> mockData = Maps.newHashMap();
 		mockData.put(100, "StockID101, StockID102");
 
-		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyList())).thenReturn(mockData);
+		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyListOf(Integer.class))).thenReturn(mockData);
 
 		ListDataProject listDataProject = ListDataProjectTestDataInitializer
 				.createListDataProject(germplasmList, 100, 0, 1, "entryCode", "seedSource", "designation", "groupName",
@@ -85,7 +85,7 @@ public class FieldbookListUtilTest {
 
 		InventoryDataManager inventoryDataManager = Mockito.mock(InventoryDataManager.class);
 
-		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyList())).thenReturn(mockData);
+		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyListOf(Integer.class))).thenReturn(mockData);
 		GermplasmListData germplasmListData = GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, 101, 1);
 
 		FieldbookListUtil.populateStockIdInGermplasmListData(Lists.newArrayList(germplasmListData),inventoryDataManager);

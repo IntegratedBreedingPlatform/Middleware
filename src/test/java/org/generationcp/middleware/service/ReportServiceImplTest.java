@@ -77,7 +77,8 @@ public class ReportServiceImplTest {
 
 		Mockito.doReturn(pedigreeTreeNodeMap).when(this.germplasmDataManager).getDirectParentsForStudy(TEST_STUDY_ID);
 		Mockito.doCallRealMethod().when(unitUnderTest).appendParentsInformation(TEST_STUDY_ID, measurementRowList);
-        Mockito.doCallRealMethod().when(unitUnderTest).provideParentInformation(Mockito.any(GermplasmPedigreeTreeNode.class), Mockito.anyList());
+        Mockito.doCallRealMethod().when(unitUnderTest).provideParentInformation(Mockito.any(GermplasmPedigreeTreeNode.class), Mockito.anyListOf(
+                MeasurementData.class));
 
 		unitUnderTest.appendParentsInformation(TEST_STUDY_ID, measurementRowList);
 
@@ -101,7 +102,7 @@ public class ReportServiceImplTest {
         // here we create a new empty map to simulate a scenario when no parental information is available for the given input
         Mockito.doReturn(new HashMap<Integer, GermplasmPedigreeTreeNode>()).when(this.germplasmDataManager).getDirectParentsForStudy(TEST_STUDY_ID);
         Mockito.doCallRealMethod().when(unitUnderTest).appendParentsInformation(TEST_STUDY_ID, measurementRowList);
-        Mockito.doCallRealMethod().when(unitUnderTest).provideBlankParentInformationValues(Mockito.anyList());
+        Mockito.doCallRealMethod().when(unitUnderTest).provideBlankParentInformationValues(Mockito.anyListOf(MeasurementData.class));
 
         unitUnderTest.appendParentsInformation(TEST_STUDY_ID, measurementRowList);
 

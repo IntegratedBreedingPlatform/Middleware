@@ -377,12 +377,12 @@ public class StudyServiceImplTest {
 		final List<Object[]> results = new ArrayList<>();
 		final Object[] result = {1, 1, "Test", 1, "desig", 1, "entry code", "1", "PLOT_NO", "1", 1, 1, "OBS_UNIT_ID", "LOC_NAME", "LOC_ABBR", 1, 1, 1, 1, "Study Name", 1};
 		results.add(result);
-		Mockito.when(this.studyMeasurements.getAllStudyDetailsAsTable(Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt())).thenReturn(results);
+		Mockito.when(this.studyMeasurements.getAllStudyDetailsAsTable(Matchers.anyInt(), Matchers.anyListOf(MeasurementVariableDto.class), Matchers.anyInt())).thenReturn(results);
 		Mockito.when(this.measurementVariableService.getVariables(1, VariableType.TRAIT.getId())).thenReturn(Arrays.asList(new MeasurementVariableDto(TermId.ALTITUDE.getId(), TermId.ALTITUDE.name())));
 		Mockito.when(this.studyDataManager.getProjectStartDateByProjectId(1)).thenReturn("20180821");
 		
 		final TrialObservationTable dto = this.studyServiceImpl.getTrialObservationTable(1, 1);
-		Mockito.verify(this.studyMeasurements).getAllStudyDetailsAsTable(Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt());
+		Mockito.verify(this.studyMeasurements).getAllStudyDetailsAsTable(Matchers.anyInt(), Matchers.anyListOf(MeasurementVariableDto.class), Matchers.anyInt());
 		Mockito.verify(this.measurementVariableService).getVariables(1, VariableType.TRAIT.getId());
 		Assert.assertNotNull(dto.getHeaderRow());
 		Assert.assertEquals("1", dto.getStudyDbId().toString());

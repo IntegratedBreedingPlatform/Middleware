@@ -17,7 +17,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.type.PrimitiveType;
+import org.hibernate.type.Type;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class PhenotypeDaoTest {
 		this.dao.setSession(this.session);
 		
 		Mockito.when(this.query.addScalar(Matchers.anyString())).thenReturn(this.query);
-		Mockito.when(this.query.addScalar(Matchers.anyString(), Matchers.any(PrimitiveType.class))).thenReturn(this.query);
+		Mockito.when(this.query.addScalar(Matchers.anyString(), Matchers.any(Type.class))).thenReturn(this.query);
 		Mockito.when(this.session.createSQLQuery(Matchers.anyString())).thenReturn(this.query);
 	}
 
@@ -73,8 +73,10 @@ public class PhenotypeDaoTest {
 		// Observations
 		final SQLQuery objsQuery = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.session.createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS)).thenReturn(objsQuery);
+
+		Mockito.when(objsQuery.addScalar(Matchers.anyString(), Matchers.any(Type.class))).thenReturn(objsQuery);
 		Mockito.when(objsQuery.addScalar(Matchers.anyString())).thenReturn(objsQuery);
-		Mockito.when(objsQuery.addScalar(Matchers.anyString(), Matchers.any(PrimitiveType.class))).thenReturn(objsQuery);
+
 		final List<Object[]> searchPhenotypeObservationMockResults = this.getSearchPhenotypeObservationMockResults();
 		Mockito.when(objsQuery.list()).thenReturn(searchPhenotypeObservationMockResults);
 

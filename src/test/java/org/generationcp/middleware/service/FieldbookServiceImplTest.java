@@ -118,7 +118,6 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
-		Mockito.doReturn(this.criteria).when(this.session).createCriteria(UserDefinedField.class);
 		this.dbBroker.setSessionProvider(this.sessionProvider);
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();

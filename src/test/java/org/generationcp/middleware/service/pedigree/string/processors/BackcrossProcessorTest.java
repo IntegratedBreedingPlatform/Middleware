@@ -24,11 +24,14 @@ public class BackcrossProcessorTest {
 
 		// Main goal is to diable any nametype based name resolution
 		Mockito.when(mockFixedLineNameResolver.nameTypeBasedResolution(Mockito.any(GermplasmNode.class))).thenReturn(
-				Optional.<String>fromNullable(null));
+				Optional.<String>absent());
+		Mockito.when(mockFixedLineNameResolver.nameTypeBasedResolution(null)).thenReturn(Optional.<String>absent());
 		mockCrossExpansionProperties = Mockito.mock(CrossExpansionProperties.class);
 
 		// Main goal is to return default backcross notation
 		Mockito.when(mockCrossExpansionProperties.getBackcrossNotation(Mockito.anyString())).thenReturn(
+				new ImmutablePair<String, String>("*", "*"));
+		Mockito.when(mockCrossExpansionProperties.getBackcrossNotation(null)).thenReturn(
 				new ImmutablePair<String, String>("*", "*"));
 		Mockito.when(mockFixedLineNameResolver.getCrossExpansionProperties()).thenReturn(mockCrossExpansionProperties);
 	}

@@ -5,14 +5,16 @@ import static org.junit.Assert.assertEquals;
 
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
-import org.generationcp.middleware.service.pedigree.string.processors.SingleCrossHybridProcessor;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import com.google.common.base.Optional;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SingleCrossHybridProcessorTest {
 
 	private FixedLineNameResolver fixedLineNameResolver;
@@ -22,6 +24,8 @@ public class SingleCrossHybridProcessorTest {
 		fixedLineNameResolver = Mockito.mock(FixedLineNameResolver.class);
 		// We use any and null value because in the test be do not want any fixed line based name resolution
 		Mockito.when(fixedLineNameResolver.nameTypeBasedResolution(Mockito.any(GermplasmNode.class))).thenReturn(
+				Optional.<String>fromNullable(null));
+		Mockito.when(fixedLineNameResolver.nameTypeBasedResolution(null)).thenReturn(
 				Optional.<String>fromNullable(null));
 	}
 
