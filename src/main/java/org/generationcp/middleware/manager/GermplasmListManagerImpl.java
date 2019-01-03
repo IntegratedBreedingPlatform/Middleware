@@ -143,10 +143,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public List<GermplasmList> getGermplasmListByGID(final Integer gid, final int start, final int numOfRows) {
-
-		final List<String> methodNames = Arrays.asList("countByGID", "getByGID");
-		return this.getFromCentralAndLocalByMethod(daoFactory.getGermplasmListDAO(), methodNames, start, numOfRows, new Object[] {gid},
-			new Class[] {Integer.class});
+		return daoFactory.getGermplasmListDAO().getByGID(gid, start, numOfRows);
 	}
 
 	@Override
@@ -178,10 +175,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public List<GermplasmListData> getGermplasmListDataByListIdAndGID(final Integer listId, final Integer gid) {
-
-		return this
-			.getFromInstanceByIdAndMethod(daoFactory.getGermplasmListDataDAO(), listId, "getByListIdAndGID", new Object[] {listId, gid},
-				new Class[] {Integer.class, Integer.class});
+		return Arrays.asList(daoFactory.getGermplasmListDataDAO().getByListIdAndGid(listId, gid));
 	}
 
 	@Override
@@ -192,20 +186,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public GermplasmListData getGermplasmListDataByListIdAndLrecId(final Integer listId, final Integer lrecId) {
 		return daoFactory.getGermplasmListDataDAO().getByListIdAndLrecId(listId, lrecId);
-	}
-
-	@Override
-	public List<GermplasmListData> getGermplasmListDataByGID(final Integer gid, final int start, final int numOfRows) {
-
-		final List<String> methodNames = Arrays.asList("countByGID", "getByGID");
-		return this.getFromCentralAndLocalByMethod(daoFactory.getGermplasmListDataDAO(), methodNames, start, numOfRows, new Object[] {gid},
-			new Class[] {Integer.class});
-	}
-
-	@Override
-	public long countGermplasmListDataByGID(final Integer gid) {
-
-		return this.countAllByMethod(daoFactory.getGermplasmListDataDAO(), "countByGID", new Object[] {gid}, new Class[] {Integer.class});
 	}
 
 	@Override

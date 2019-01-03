@@ -149,24 +149,6 @@ public interface GermplasmListManager {
 	GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId);
 
 	/**
-	 * Returns the germplasm list entries associated with the Germplasm identified by the given gid.
-	 *
-	 * @param gid
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of GermplasmListData POJOs
-	 */
-	List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows);
-
-	/**
-	 * Returns the number of germplasm list entries associated with the Germplasm identified by the given gid.
-	 *
-	 * @param gid
-	 * @return The count of Germplasm List data based on the given GID
-	 */
-	long countGermplasmListDataByGID(Integer gid);
-
-	/**
 	 * Returns the Top Level Germplasm List Folders present in the specified database.
 	 *
 	 * @param start     - the starting index of the sublist of results to be returned
