@@ -845,4 +845,6 @@ public interface StudyDataManager {
 	String getBlockId(int datasetId, String trialInstance);
 
 	FieldmapBlockInfo getBlockInformation(int blockId);
+
+	Boolean existInstances(final Set<Integer> instanceIds);
 }

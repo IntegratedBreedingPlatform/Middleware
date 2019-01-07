@@ -1285,5 +1285,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyReference getStudyReference(final Integer studyId) {
 		return this.getDmsProjectDao().getStudyReference(studyId);
 	}
+
+	public Boolean existInstances(final Set<Integer> instanceIds) {
+		return this.getGeolocationDao().existInstances(instanceIds);
+	}
 	
 }

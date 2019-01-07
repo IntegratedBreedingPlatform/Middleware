@@ -709,4 +709,13 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return Optional.absent();
 
 	}
+
+	public Boolean existInstances(final Set<Integer> instanceIds) {
+		for (Integer instanceId : instanceIds) {
+			if (this.getById(instanceId) == null) {
+				return Boolean.FALSE;
+			}
+		}
+		return Boolean.TRUE;
+	}
 }
