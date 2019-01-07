@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import com.google.common.base.Optional;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SingleCrossHybridProcessorTest {
