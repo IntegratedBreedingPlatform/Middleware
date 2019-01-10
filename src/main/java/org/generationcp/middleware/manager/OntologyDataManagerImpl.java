@@ -985,4 +985,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return this.getTermBuilder().findTermByName(name, cvId);
 	}
 
+	public void setDaoFactory(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
 }
