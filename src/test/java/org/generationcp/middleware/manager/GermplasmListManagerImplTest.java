@@ -206,9 +206,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmListById() {
-		final Integer id = Integer.valueOf(1);
-		final GermplasmList list = this.manager.getGermplasmListById(id);
-		Assert.assertEquals(id, list.getId());
+		final GermplasmList list = this.manager.getGermplasmListById(listId);
+		Assert.assertEquals(listId, list.getId());
 	}
 
 	@Test
