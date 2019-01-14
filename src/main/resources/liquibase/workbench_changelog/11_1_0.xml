@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	
+	<changeSet author="nahuel" id="v11.1.0-1">
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM workbench_tool where name = "sample_manager";
+			</sqlCheck>
+		</preConditions>
+		<comment>Update Sample Manager URL - Add angular route hash</comment>
+		<update tableName="workbench_tool">
+			<column name="path" value="/ibpworkbench/controller/jhipster#sample-browse" />
+			<where> name = 'sample_manager'</where>
+		</update>
+    </changeSet>
+
+</databaseChangeLog>
