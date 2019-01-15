@@ -52,7 +52,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 
 /**
@@ -189,7 +188,7 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
-		return this.getDataset(studyId, dataset.getProjectId());
+		return this.getDataset(dataset.getProjectId());
 	}
 
 	@Override
@@ -398,18 +397,15 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public DatasetDTO getDataset(final Integer studyId, final Integer datasetId) {
-		final List<DatasetDTO> datasetDTOList = this.getDatasets(studyId, new TreeSet<Integer>());
-		for (final DatasetDTO datasetDto : datasetDTOList)
-			if (datasetDto.getDatasetId().equals(datasetId)) {
-				final DatasetDTO datasetDTO = datasetDto;
-				datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
-				datasetDTO.setVariables(
-					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
-				return datasetDTO;
-			}
+	public DatasetDTO getDataset(final Integer datasetId) {
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
+		if (datasetDTO != null) {
+			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
+			datasetDTO.setVariables(
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
+		}
 
-		return null;
+		return datasetDTO;
 	}
 
 
