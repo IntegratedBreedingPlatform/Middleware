@@ -109,8 +109,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.distinct(Projections.property("id")), "listId");
 		projectionList.add(Projections.property(SampleListDao.LIST_NAME), SampleListDao.LIST_NAME);
 
-		criteria.createAlias(SampleListDao.SAMPLES, SampleListDao.SAMPLES).createAlias("samples.plant", "plant")
-				.createAlias("plant.experiment", "experiment").createAlias("experiment.project", "project")
+		criteria.createAlias(SampleListDao.SAMPLES, SampleListDao.SAMPLES)
+				.createAlias("samples.experiment", "experiment").createAlias("experiment.project", "project")
 				.createAlias("project.relatedTos", "relatedTos").createAlias("relatedTos.objectProject", "objectProject")
 				.add(Restrictions.eq("objectProject.projectId", trialId)).setProjection(projectionList)
 				.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class));
@@ -143,22 +143,20 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		projectionList.add(Projections.property("stock.name"), "designation");
 		projectionList.add(Projections.property("properties.value"), "plotNumber");
-		projectionList.add(Projections.property("plant.plantNumber"), "plantNo");
 		projectionList.add(Projections.property("sample.sampleName"), "sampleName");
 		projectionList.add(Projections.property("sample.entryNumber"), "entryNumber");
 		projectionList.add(CustomProjections.concatProperties(" ","person.firstName", "person.lastName"), "takenBy");
 		projectionList.add(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey");
-		projectionList.add(Projections.property("plant.plantBusinessKey"), "plantBusinessKey");
 		projectionList.add(Projections.property("experiment.obsUnitId"), "obsUnitId");
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
 		projectionList.add(Projections.property("germplasm.gid"), "gid");
 		projectionList.add(Projections.property("sample.plateId"), "plateId");
 		projectionList.add(Projections.property("sample.well"), "well");
 
-		criteria.createAlias(SampleListDao.SAMPLES, "sample").createAlias("samples.plant", "plant")
+		criteria.createAlias(SampleListDao.SAMPLES, "sample")
 				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
 				.createAlias("user.person", "person", CriteriaSpecification.LEFT_JOIN)
-				.createAlias("plant.experiment", "experiment")
+				.createAlias("samples.experiment", "experiment")
 				.createAlias("experiment.stock", "stock")
 				.createAlias("stock.germplasm", "germplasm")
 				.createAlias("experiment.properties", "properties").add(Restrictions.eq("id", sampleListId))
