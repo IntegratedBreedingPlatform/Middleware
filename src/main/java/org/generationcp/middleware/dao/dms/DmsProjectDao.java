@@ -1322,7 +1322,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 
 	public DatasetDTO getDataset(final Integer datasetId) {
-		final DatasetDTO datasetDTOS;
+		final DatasetDTO datasetDTO;
 		try {
 
 			final ProjectionList projectionList = Projections.projectionList();
@@ -1337,12 +1337,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.setProjection(projectionList);
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
-			datasetDTOS = (DatasetDTO) criteria.uniqueResult();
+			datasetDTO = (DatasetDTO) criteria.uniqueResult();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getDataset for datasetId =" + datasetId + ":" + e.getMessage(), e);
+			final String errorMessage = "Error getting getDataset for datasetId =" + datasetId + ":" + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return datasetDTOS;
+		return datasetDTO;
 
 	}
 }
