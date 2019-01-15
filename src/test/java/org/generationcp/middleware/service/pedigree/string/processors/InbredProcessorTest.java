@@ -25,6 +25,8 @@ public class InbredProcessorTest {
 		// We use any and null value because in the test be do not want any fixed line based name resolution
 		Mockito.when(fixedLineNameResolver.nameTypeBasedResolution(Mockito.any(GermplasmNode.class))).thenReturn(
 				Optional.<String>fromNullable(null));
+		Mockito.when(fixedLineNameResolver.nameTypeBasedResolution(null)).thenReturn(
+				Optional.<String>fromNullable(null));
 	}
 
 	@Test

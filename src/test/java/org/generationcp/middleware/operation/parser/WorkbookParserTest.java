@@ -32,7 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,7 +238,6 @@ public class WorkbookParserTest {
 	private void setupHeaderValidationMocks(final WorkbookParser moleWorkbookParser, final Workbook sampleWorkbook, final Section section)
 			throws IOException, WorkbookParserException {
 		// mock / skip other parsing logic and validations
-		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).loadFileToExcelWorkbook(file);
 		Mockito.doNothing().when(moleWorkbookParser).validateExistenceOfSheets(sampleWorkbook);
 		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook, CREATED_BY);
 
