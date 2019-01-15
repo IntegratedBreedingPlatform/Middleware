@@ -2,7 +2,6 @@ package org.generationcp.middleware.service.impl.sampleList;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
-import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
@@ -16,7 +15,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -78,9 +76,6 @@ public class SampleListServiceImplTest {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Mock
-	private PlantDao plantDao;
-
-	@Mock
 	private Study study;
 
 	@Mock
@@ -101,7 +96,6 @@ public class SampleListServiceImplTest {
 		when(daoFactory.getUserDao()).thenReturn(this.userDAO);
 		when(daoFactory.getSampleDao()).thenReturn(this.sampleDao);
 		when(daoFactory.getSampleListDao()).thenReturn(this.sampleListDao);
-		when(daoFactory.getPlantDao()).thenReturn(this.plantDao);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -592,9 +586,9 @@ public class SampleListServiceImplTest {
 		when(this.studyMeasurements.getSampleObservations(studyId, instanceIds, selectionVariableId)).thenReturn(observationDtos);
 		when(this.study.getName()).thenReturn("Maizing_Study");
 		when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
-		when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
+		// when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
 		when(this.sampleService
-				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, 1, preferredNameGid,
+				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX , 1, preferredNameGid,
 						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleList);
 		final SampleList rootSampleList = new SampleList();
@@ -784,9 +778,7 @@ public class SampleListServiceImplTest {
 
 	private Sample createSample(final SampleList sampleList, final String businessKey) {
 		final User createdBy = new User();
-		final Plant plant = new Plant();
-		plant.setPlantBusinessKey(businessKey);
-		final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, createdBy);
+		final Sample sample = SampleTestDataInitializer.createSample(sampleList, createdBy);
 		sample.setSampleBusinessKey(businessKey);
 		return sample;
 	}

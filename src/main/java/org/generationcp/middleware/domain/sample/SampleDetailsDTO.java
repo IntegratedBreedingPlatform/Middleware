@@ -18,7 +18,6 @@ public class SampleDetailsDTO implements Serializable {
 	private Integer studyDbId;
 	private Integer locationDbId;
 	private String obsUnitId;
-	private String plantBusinessKey;
 	private String sampleBusinessKey;
 	private String takenBy;
 	private Date sampleDate;
@@ -36,7 +35,6 @@ public class SampleDetailsDTO implements Serializable {
 	private String harvestDate;
 	private String sampleName;
 	private String designation;
-	private Integer plantNo;
 	private String displayDate;
 	private Integer entryNumber;
 	private String plotNumber;
@@ -48,10 +46,9 @@ public class SampleDetailsDTO implements Serializable {
 
 	}
 
-	public SampleDetailsDTO(final Integer studyDbId, final String obsUnitId, final String plantBusinessKey, final String sampleBusinessKey) {
+	public SampleDetailsDTO(final Integer studyDbId, final String obsUnitId, final String sampleBusinessKey) {
 		this.setStudyDbId(studyDbId);
 		this.setObsUnitId(obsUnitId);
-		this.setPlantBusinessKey(plantBusinessKey);
 		this.setSampleBusinessKey(sampleBusinessKey);
 	}
 
@@ -93,14 +90,6 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setObsUnitId(final String obsUnitId) {
 		this.obsUnitId = obsUnitId;
-	}
-
-	public String getPlantBusinessKey() {
-		return this.plantBusinessKey;
-	}
-
-	public void setPlantBusinessKey(final String plantBusinessKey) {
-		this.plantBusinessKey = plantBusinessKey;
 	}
 
 	public String getSampleBusinessKey() {
@@ -225,13 +214,12 @@ public class SampleDetailsDTO implements Serializable {
 		final SampleDetailsDTO sampleDetailsDto = (SampleDetailsDTO) other;
 		return new EqualsBuilder().append(this.studyDbId, sampleDetailsDto.studyDbId)
 			.append(this.locationDbId, sampleDetailsDto.locationDbId).append(this.obsUnitId, sampleDetailsDto.obsUnitId)
-			.append(this.plantBusinessKey, sampleDetailsDto.plantBusinessKey)
 			.append(this.sampleBusinessKey, sampleDetailsDto.sampleBusinessKey).append(this.gid, sampleDetailsDto.gid).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.studyDbId).append(this.locationDbId).append(this.obsUnitId).append(this.plantBusinessKey)
+		return new HashCodeBuilder().append(this.studyDbId).append(this.locationDbId).append(this.obsUnitId)
 			.append(this.sampleBusinessKey).append(this.gid).hashCode();
 	}
 
@@ -248,24 +236,12 @@ public class SampleDetailsDTO implements Serializable {
 		this.designation = designation;
 	}
 
-	public void setPlantNo(final Integer plantNo) {
-		this.plantNo = plantNo;
-	}
-
 	public String getSampleName() {
 		return this.sampleName;
 	}
 
 	public String getDesignation() {
 		return this.designation;
-	}
-
-	public Integer getPlantNo() {
-		return this.plantNo;
-	}
-
-	public void setDisplayDate(final String displayDate) {
-		this.displayDate = displayDate;
 	}
 
 	public String getDisplayDate() {

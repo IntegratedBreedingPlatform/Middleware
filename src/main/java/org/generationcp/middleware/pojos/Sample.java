@@ -5,6 +5,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -65,9 +67,11 @@ public class Sample implements Serializable {
 	@Column(name = "sample_bk")
 	private String sampleBusinessKey;
 
-	@JoinColumn(name = "plant_id")
-	@OneToOne(targetEntity = Plant.class, cascade = CascadeType.ALL)
-	private Plant plant;
+	@ManyToOne(targetEntity = ExperimentModel.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "nd_experiment_id")
+	@NotFound(action = NotFoundAction.IGNORE)
+	@Basic(optional = false)
+	private ExperimentModel experiment;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sample_list")
@@ -167,14 +171,6 @@ public class Sample implements Serializable {
 		this.sampleBusinessKey = sampleBusinessKey;
 	}
 
-	public Plant getPlant() {
-		return this.plant;
-	}
-
-	public void setPlant(final Plant plant) {
-		this.plant = plant;
-	}
-
 	public String getPlateId() {
 		return plateId;
 	}
@@ -189,6 +185,14 @@ public class Sample implements Serializable {
 
 	public void setWell(String well) {
 		this.well = well;
+	}
+
+	public ExperimentModel getExperiment() {
+		return this.experiment;
+	}
+
+	public void setExperiment(final ExperimentModel experiment) {
+		this.experiment = experiment;
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,9 +111,7 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
-			final Collection<Integer> experimentIds = this.getExperimentIds(observationDtos);
 			final Collection<Integer> gids = this.getGids(observationDtos);
-			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(experimentIds);
 			final Map<Integer, Integer> maxSequenceNumberByGID = this.getMaxSequenceNumberByGID(gids);
 			final List<Sample> samples = new ArrayList<>();
 			int entryNumber = 0;
@@ -132,21 +131,16 @@ public class SampleListServiceImpl implements SampleListService {
 
 				final int sampleNumber =
 					(Double.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue())).intValue();
-				Integer plantNumber = maxPlantNumbers.get(observationDto.getMeasurementId());
-				if (plantNumber == null) {
-					plantNumber = 0;
-				}
+
 
 				for (int i = 0; i < sampleNumber; i++) {
-
-					plantNumber++;
 					maxSequence++;
 					entryNumber++;
 
 					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
 
 					final Sample sample = this.sampleService
-							.buildSample(sampleListDTO.getCropName(), cropPrefix, plantNumber, entryNumber, sampleName,
+							.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
 									sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user,
 									sampleListDTO.getCreatedDate(), takenBy);
 					samples.add(sample);
@@ -160,10 +154,6 @@ public class SampleListServiceImpl implements SampleListService {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
-	}
-
-	private Map<Integer, Integer> getMaxPlantNumber(final Collection<Integer> experimentIds) {
-		return this.daoFactory.getPlantDao().getMaxPlantNumber(experimentIds);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -191,7 +181,8 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	private Map<Integer, Integer> getMaxSequenceNumberByGID(final Collection<Integer> gids) {
-		return this.daoFactory.getPlantDao().getMaxSequenceNumber(gids);
+		// TODO: return this.daoFactory.getPlantDao().getMaxSequenceNumber(gids);
+		return new HashMap<>();
 	}
 
 	/**

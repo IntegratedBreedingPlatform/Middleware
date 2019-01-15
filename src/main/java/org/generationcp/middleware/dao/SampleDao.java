@@ -19,7 +19,6 @@ import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -130,16 +129,14 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("person.firstName")) //row[3]
 				.add(Projections.property("person.lastName")) //row[4]
 				.add(Projections.property("sampleList.listName")) //row[5]
-				.add(Projections.property("plant.plantNumber")) //row[6]
-				.add(Projections.property("plant.plantBusinessKey")) //row[7]
-				.add(Projections.property("dataset.datasetId")) //row[8]
-				.add(Projections.property("dataset.datasetName")) //row[9]
-				.add(Projections.property("germplasm.gid")) //row[10]
-				.add(Projections.property("stock.name")) //row[11] TODO preferred name
-				.add(Projections.property("samplingDate")) //row[12]
-				.add(Projections.property("entryNumber")) //row[13]
-				.add(Projections.property("sample.plateId")) //row[14]
-				.add(Projections.property("sample.well")) //row[15]
+				.add(Projections.property("dataset.datasetId")) //row[6]
+				.add(Projections.property("dataset.datasetName")) //row[7]
+				.add(Projections.property("germplasm.gid")) //row[8]
+				.add(Projections.property("stock.name")) //row[9] TODO preferred name
+				.add(Projections.property("samplingDate")) //row[10]
+				.add(Projections.property("entryNumber")) //row[11]
+				.add(Projections.property("sample.plateId")) //row[12]
+				.add(Projections.property("sample.well")) //row[13]
 			)).list();
 		return this.mapSampleDTOS(result);
 	}
@@ -152,29 +149,27 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			SampleDTO dto = sampleDTOMap.get(sampleId);
 			if (dto == null) {
 				dto = new SampleDTO();
-				dto.setEntryNo((Integer) row[13]);
+				dto.setEntryNo((Integer) row[11]);
 				dto.setSampleId(sampleId);
 				dto.setSampleName((String) row[1]);
 				dto.setSampleBusinessKey((String) row[2]);
 				if(row[3] != null && row[4] != null) dto.setTakenBy(row[3] + " " + row[4]);
 				dto.setSampleList((String) row[5]);
-				dto.setPlantNumber((Integer) row[6]);
-				dto.setPlantBusinessKey((String) row[7]);
-				dto.setGid((Integer) row[10]);
-				dto.setDesignation((String) row[11]);
-				if (row[12] != null) {
-					dto.setSamplingDate((Date) row[12]);
+				dto.setGid((Integer) row[8]);
+				dto.setDesignation((String) row[9]);
+				if (row[10] != null) {
+					dto.setSamplingDate((Date) row[10]);
 				}
 				dto.setDatasets(new HashSet<SampleDTO.Dataset>());
-				dto.setPlateId((String) row[14]);
-				dto.setWell((String) row[15]);
+				dto.setPlateId((String) row[12]);
+				dto.setWell((String) row[13]);
 			}
 
-			if ((row[8] != null) && (row[9] != null)) {
+			if ((row[6] != null) && (row[7] != null)) {
 				final SampleDTO.Dataset dataset;
 				dataset = new SampleDTO().new Dataset();
-				dataset.setDatasetId((Integer) row[8]);
-				dataset.setName((String) row[9]);
+				dataset.setDatasetId((Integer) row[6]);
+				dataset.setName((String) row[7]);
 				dto.getDatasets().add(dataset);
 			}
 
@@ -220,11 +215,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				sampleDTO.setTakenBy(person.getFirstName() + " " + person.getLastName());
 			}
 			sampleDTO.setSampleList(sample.getSampleList().getListName());
-			final Plant plant = sample.getPlant();
-			sampleDTO.setPlantNumber(plant.getPlantNumber());
-			sampleDTO.setPlantBusinessKey(plant.getPlantBusinessKey());
-			if (plant.getExperiment() != null && plant.getExperiment().getStock() != null) {
-				final StockModel stock = plant.getExperiment().getStock();
+
+			if (sample.getExperiment() != null && sample.getExperiment().getStock() != null) {
+				final StockModel stock = sample.getExperiment().getStock();
 				sampleDTO.setGid(stock.getGermplasm().getGid());
 				sampleDTO.setDesignation(stock.getName()); // TODO preferred name - see BMS-5033
 			}

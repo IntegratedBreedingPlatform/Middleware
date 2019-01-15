@@ -16,7 +16,7 @@ import java.util.Set;
 
 public interface SampleService {
 
-	Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final Integer entryNumber,
+	Sample buildSample(final String cropName, final String cropPrefix, final Integer entryNumber,
 		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
 		Date createdDate, User takenBy);
 

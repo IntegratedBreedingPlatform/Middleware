@@ -13,7 +13,6 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
@@ -22,7 +21,6 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -152,8 +150,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("SAMPLE-" + LIST_NAME + 1, sample.getSampleName());
 		Assert.assertEquals("BUSINESS-KEY-" + LIST_NAME + 1, sample.getSampleBusinessKey());
 		Assert.assertEquals("TEST-LIST-FOR-SAMPLE-DAO-1", sample.getSampleList());
-		Assert.assertEquals("0", sample.getPlantNumber().toString());
-		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
 		Assert.assertNotNull(sample.getGid());
 		Assert.assertEquals("Germplasm 1", sample.getDesignation());
 		Assert.assertEquals("PLATEID-1", sample.getPlateId());
@@ -175,8 +171,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("BUSINESS-KEY-" + LIST_NAME + 1, sample.getSampleBusinessKey());
 		Assert.assertNull(sample.getTakenBy());
 		Assert.assertEquals("TEST-LIST-FOR-SAMPLE-DAO-1", sample.getSampleList());
-		Assert.assertEquals("0", sample.getPlantNumber().toString());
-		Assert.assertEquals("PABCD", sample.getPlantBusinessKey());
 		Assert.assertNotNull(sample.getGid());
 		Assert.assertEquals("Germplasm 1", sample.getDesignation());
 		Assert.assertEquals("PLATEID-1", sample.getPlateId());
@@ -302,15 +296,13 @@ public class SampleDaoTest extends IntegrationTestBase {
 				this.sampleObsUnitId = savedExperiment.getObsUnitId();
 			}
 
-			final Plant plant = PlantTestDataInitializer.createPlant();
-			plant.setExperiment(experimentModel);
-
-			final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, user);
+			final Sample sample = SampleTestDataInitializer.createSample(sampleList, user);
 			sample.setSampleName("SAMPLE-" + listName + i);
 			sample.setSampleBusinessKey("BUSINESS-KEY-" + listName + i);
 			sample.setEntryNumber(i);
 			sample.setPlateId("PLATEID-" + i);
 			sample.setWell("WELL-" + i);
+			sample.setExperiment(experimentModel);
 			if (takenByIsNull)
 				sample.setTakenBy(null);
 			this.sampleDao.saveOrUpdate(sample);

@@ -19,8 +19,6 @@ public class SampleDTO {
 	private String sampleBusinessKey;
 	private String takenBy;
 	private String sampleList;
-	private Integer plantNumber;
-	private String plantBusinessKey;
 	private String plateId;
 	private String well;
 	private Set<Dataset> datasets = new HashSet<>();
@@ -77,14 +75,12 @@ public class SampleDTO {
 	}
 
 	public SampleDTO(final String sampleName, final String sampleBusinessKey, final String takenBy, final Date samplingDate,
-		final String sampleList, final Integer plantNumber, final String plantBusinessKey, final Integer sampleId) {
+		final String sampleList, final Integer sampleId) {
 		this.sampleName = sampleName;
 		this.sampleBusinessKey = sampleBusinessKey;
 		this.takenBy = takenBy;
 		this.samplingDate = samplingDate;
 		this.sampleList = sampleList;
-		this.plantNumber = plantNumber;
-		this.plantBusinessKey = plantBusinessKey;
 		this.sampleId = sampleId;
 	}
 
@@ -126,22 +122,6 @@ public class SampleDTO {
 
 	public void setSampleList(final String sampleList) {
 		this.sampleList = sampleList;
-	}
-
-	public Integer getPlantNumber() {
-		return plantNumber;
-	}
-
-	public void setPlantNumber(final Integer plantNumber) {
-		this.plantNumber = plantNumber;
-	}
-
-	public String getPlantBusinessKey() {
-		return plantBusinessKey;
-	}
-
-	public void setPlantBusinessKey(final String plantBusinessKey) {
-		this.plantBusinessKey = plantBusinessKey;
 	}
 
 	public Integer getSampleId() { return sampleId; }
@@ -220,8 +200,6 @@ public class SampleDTO {
 			.append(sampleBusinessKey, sampleDTO.sampleBusinessKey)
 			.append(takenBy, sampleDTO.takenBy)
 			.append(sampleList, sampleDTO.sampleList)
-			.append(plantNumber, sampleDTO.plantNumber)
-			.append(plantBusinessKey, sampleDTO.plantBusinessKey)
 			.append(datasets, sampleDTO.datasets)
 			.append(samplingDate, sampleDTO.samplingDate)
 			.isEquals();
@@ -238,8 +216,6 @@ public class SampleDTO {
 			.append(sampleBusinessKey)
 			.append(takenBy)
 			.append(sampleList)
-			.append(plantNumber)
-			.append(plantBusinessKey)
 			.append(datasets)
 			.append(samplingDate)
 			.toHashCode();
