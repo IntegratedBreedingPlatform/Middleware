@@ -34,8 +34,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
-import org.generationcp.middleware.service.impl.study.DesignFactors;
-import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,13 +97,10 @@ public class DatasetServiceImpl implements DatasetService {
 	private MeasurementVariableService measurementVariableService;
 
 	@Autowired
-	private GermplasmDescriptors germplasmDescriptors;
-
-	@Autowired
-	private DesignFactors designFactors;
-
-	@Autowired
 	ResourceBundleMessageSource messageSource;
+
+	@Autowired
+	private StudyService studyService;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -431,40 +427,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private List<String> findGenericGermplasmDescriptors(final int studyId) {
 
-		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyId);
-		/**
-		 * Fixed descriptors are the ones that are NOT stored in stockprop or nd_experimentprop. We dont need additional joins to props
-		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
-		 */
-		final List<String> fixedGermplasmDescriptors =
-			Lists.newArrayList(FIXED_GERMPLASM_DESCRIPTOR);
-		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
-
-		for (final String gpDescriptor : allGermplasmDescriptors) {
-			if (!fixedGermplasmDescriptors.contains(gpDescriptor)) {
-				genericGermplasmDescriptors.add(gpDescriptor);
-			}
-		}
-		return genericGermplasmDescriptors;
+		return this.studyService.getGenericGermplasmDescriptors(studyId);
 	}
 
 	private List<String> findAdditionalDesignFactors(final int studyIdentifier) {
-
-		final List<String> allDesignFactors = this.designFactors.find(studyIdentifier);
-		/**
-		 * Fixed design factors are already being retrieved individually in Measurements query. We are only interested in additional
-		 * EXPERIMENTAL_DESIGN and TREATMENT FACTOR variables
-		 */
-		final List<String> fixedDesignFactors =
-			Lists.newArrayList(FIXED_DESIGN_FACTORS);
-		final List<String> additionalDesignFactors = Lists.newArrayList();
-
-		for (final String designFactor : allDesignFactors) {
-			if (!fixedDesignFactors.contains(designFactor)) {
-				additionalDesignFactors.add(designFactor);
-			}
-		}
-		return additionalDesignFactors;
+		return this.studyService.getAdditionalDesignFactors(studyIdentifier);
 	}
 
 	@Override
@@ -705,15 +672,11 @@ public class DatasetServiceImpl implements DatasetService {
 		return phenotype;
 	}
 
-	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
-		this.germplasmDescriptors = germplasmDescriptors;
-	}
-
-	public void setDesignFactors(final DesignFactors designFactors) {
-		this.designFactors = designFactors;
-	}
-
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
+	}
+
+	public void setStudyService(final StudyService studyService) {
+		this.studyService = studyService;
 	}
 }

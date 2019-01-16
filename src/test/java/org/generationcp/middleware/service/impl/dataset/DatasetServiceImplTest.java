@@ -24,8 +24,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
-import org.generationcp.middleware.service.impl.study.DesignFactors;
-import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -76,13 +75,10 @@ public class DatasetServiceImplTest {
 	private ExperimentDao experimentDao;
 
 	@Mock
-	private GermplasmDescriptors germplasmDescriptors;
-
-	@Mock
-	private DesignFactors designFactors;
-
-	@Mock
 	private MeasurementVariableService measurementVariableService;
+
+	@Mock
+	private StudyService studyService;
 
 	private static final int STUDY_ID = 1234;
 	private static final String FACT1 = "FACT1";
@@ -235,8 +231,8 @@ public class DatasetServiceImplTest {
 		existingPhenotype.setExperiment(new ExperimentModel(observationUnitId));
 		existingPhenotype.setObservableId(observableId);
 
-		when(formulaDao.getByTargetVariableId(observableId)).thenReturn(new Formula());
-		when(phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
+		when(this.formulaDao.getByTargetVariableId(observableId)).thenReturn(new Formula());
+		when(this.phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
 		final ObservationDto savedObservation =
 			this.datasetService.updatePhenotype(observationUnitId, observationId, categoricalValueId, value);
@@ -261,7 +257,7 @@ public class DatasetServiceImplTest {
 	public void testResolveObservationStatusVaribleHasFormula() {
 		final Random ran = new Random();
 		final int variableId = ran.nextInt();
-		when(formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
+		when(this.formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
 
 		final Phenotype phenotype = new Phenotype();
 		this.datasetService.resolveObservationStatus(variableId, phenotype);
@@ -275,7 +271,7 @@ public class DatasetServiceImplTest {
 		final int variableId = ran.nextInt();
 
 		final Phenotype phenotype = new Phenotype();
-		when(formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
+		when(this.formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
 
 		Assert.assertNull(phenotype.getValueStatus());
 	}
@@ -418,14 +414,13 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetObservations() throws Exception {
 		this.datasetService = new DatasetServiceImpl(this.mockSessionProvider);
-		this.datasetService.setGermplasmDescriptors(this.germplasmDescriptors);
-		this.datasetService.setDesignFactors(this.designFactors);
 		this.datasetService.setMeasurementVariableService(this.measurementVariableService);
+		this.datasetService.setStudyService(this.studyService);
 
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
-		Mockito.when(this.germplasmDescriptors.find(DatasetServiceImplTest.STUDY_ID))
+		Mockito.when(this.studyService.getGenericGermplasmDescriptors(DatasetServiceImplTest.STUDY_ID))
 			.thenReturn(GERMPLASM_DESCRIPTORS);
-		Mockito.when(this.designFactors.find(DatasetServiceImplTest.STUDY_ID))
+		Mockito.when(this.studyService.getAdditionalDesignFactors(DatasetServiceImplTest.STUDY_ID))
 			.thenReturn(DESING_FACTORS);
 
 		final MeasurementVariableService mockTraits = Mockito.mock(MeasurementVariableService.class);
@@ -521,7 +516,7 @@ public class DatasetServiceImplTest {
     @Test
     public void testGetDatasetInstances() {
         final Random random = new Random();
-        final Integer datasetId = random.nextInt();
+        final int datasetId = random.nextInt();
         this.datasetService.getDatasetInstances(datasetId);
         Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
     }
