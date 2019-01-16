@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 
 public class MeasurementTestDataInitializer {
 
@@ -42,6 +43,7 @@ public class MeasurementTestDataInitializer {
 		} else {
 			measurementData.setValue(value);
 		}
+		measurementData.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
 		return measurementData;
 	}
 

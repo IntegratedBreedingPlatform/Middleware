@@ -696,10 +696,10 @@ public class SampleListServiceImplTest {
 	public void testCountSamplesByUIDs() {
 
 		final int sampleListId = 1;
-		when(sampleDao.countBySampleUIDs(Mockito.anySet(), Mockito.eq(sampleListId))).thenReturn(1l);
+		when(sampleDao.countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId))).thenReturn(1l);
 
 		final long count = this.sampleListService.countSamplesByUIDs(new HashSet<String>(), sampleListId);
-		Mockito.verify(sampleDao).countBySampleUIDs(Mockito.anySet(), Mockito.eq(sampleListId));
+		Mockito.verify(sampleDao).countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId));
 
 		Assert.assertEquals(1l, count);
 

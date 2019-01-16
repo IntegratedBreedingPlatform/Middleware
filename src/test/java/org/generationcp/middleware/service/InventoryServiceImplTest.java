@@ -44,12 +44,10 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.exceptions.verification.TooLittleActualInvocations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryServiceImplTest {
-
-	public static final String TEST_INVENTORY_ID = "TR1-123";
 
 	private static final String TEST_LIST_NAME = "LIST-TEST";
 
@@ -189,23 +187,25 @@ public class InventoryServiceImplTest {
 		final ListDataProject listDataProject = this.createListDataProjectTestData();
 
 		Mockito.doReturn(null).when(this.lotDAO)
-				.getByEntityTypeEntityIdsLocationIdAndScaleId(Mockito.anyString(), Mockito.anyList(), Mockito.anyInt(), Mockito.anyInt());
+				.getByEntityTypeEntityIdsLocationIdAndScaleId(Mockito.anyString(), Mockito.anyListOf(Integer.class), Mockito.anyInt(),
+						Mockito.anyInt());
 
 		final Lot lot = this.createLotTestData(details);
 		Mockito.doReturn(lot)
 				.when(this.lotBuilder)
 				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId());
-		Mockito.doReturn(1).when(this.lotDAO).saveOrUpdate(lot);
+		final Lot savedLot = new Lot();
+		savedLot.setId(1);
+		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
 
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
 				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
-		Mockito.doReturn(1).when(this.transactionDAO).saveOrUpdate(transaction);
-
-		final StockTransaction stockTransaction = this.createStockTransactionTestData(listDataProject, transaction);
-		Mockito.doReturn(1).when(this.stockTransactionDAO).saveOrUpdate(stockTransaction);
+		final Transaction savedTransaction = new Transaction();
+		savedTransaction.setId(1);
+		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
 
 		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject);
 
@@ -233,17 +233,18 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(lot)
 				.when(this.lotBuilder)
 				.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId());
-		Mockito.doReturn(1).when(this.lotDAO).saveOrUpdate(lot);
+		final Lot savedLot = new Lot();
+		savedLot.setId(1);
+		Mockito.doReturn(savedLot).when(this.lotDAO).saveOrUpdate(lot);
 
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
 				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
-		Mockito.doReturn(1).when(this.transactionDAO).saveOrUpdate(transaction);
-
-		final StockTransaction stockTransaction = this.createStockTransactionTestData(listDataProject, transaction);
-		Mockito.doReturn(1).when(this.stockTransactionDAO).saveOrUpdate(stockTransaction);
+		final Transaction savedTransaction = new Transaction();
+		savedTransaction.setId(1);
+		Mockito.doReturn(savedTransaction).when(this.transactionDAO).saveOrUpdate(transaction);
 
 		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject);
 
@@ -359,9 +360,9 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(lstListId).when(this.germplasmListDAO).getListDataListIDFromListDataProjectListID(advanceListId);
 		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId);
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
-		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyList());
-		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyList());
-		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyList());
+		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyListOf(Integer.class));
 
 		List<InventoryDetails> result = this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(advanceListId);
 
@@ -397,9 +398,9 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(lstListId).when(this.germplasmListDAO).getListDataListIDFromListDataProjectListID(crossesId);
 		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId);
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
-		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyList());
-		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyList());
-		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyList());
+		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyListOf(Integer.class));
 
 		List<InventoryDetails> result =
 				this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(crossesId, GermplasmListType.CROSSES.name());
