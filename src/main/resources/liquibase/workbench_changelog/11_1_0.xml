@@ -12,7 +12,7 @@
 		</preConditions>
 		<comment>Update Sample Manager URL - Add angular route hash</comment>
 		<update tableName="workbench_tool">
-			<column name="path" value="/ibpworkbench/controller/jhipster#sample-browse" />
+			<column name="path" value="/ibpworkbench/controller/jhipster#sample-manager" />
 			<where> name = 'sample_manager'</where>
 		</update>
     </changeSet>
