@@ -1,8 +1,16 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Table;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -41,16 +49,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 
 
 /**
@@ -566,6 +567,16 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getDatasetMeasurementVariables(final Integer datasetId) {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, MEASUREMENT_VARIABLE_TYPES);
+	}
+	
+	@Override
+	public List<MeasurementVariable> getAllDatasetVariables(final Integer datasetId) {
+		return new ArrayList<>();
+	}
+	
+	@Override
+	public Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, int datasetId, final List<Integer> instanceIds) {
+		return new HashMap<>();
 	}
 
 	private void setMeasurementDataAsOutOfSync(

@@ -61,7 +61,12 @@ public interface DatasetService {
 	void importDataset(final Integer datasetId, final Table<String, String, String> table);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
+	
+	List<MeasurementVariable> getAllDatasetVariables(Integer datasetId);
 
 	void deleteDataset(int datasetId);
+	
+	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
+			final int studyId, final int datasetId, final List<Integer> instanceIds);
 
 }
