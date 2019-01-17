@@ -39,6 +39,7 @@ import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -1213,5 +1214,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Boolean existInstances(final Set<Integer> instanceIds) {
 		return this.getGeolocationDao().existInstances(instanceIds);
 	}
-	
+
+	@Override
+	public List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes) {
+		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectId, variableTypes);
+	}
+
 }

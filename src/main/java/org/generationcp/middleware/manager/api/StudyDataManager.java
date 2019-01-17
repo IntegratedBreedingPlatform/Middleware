@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -755,4 +756,7 @@ public interface StudyDataManager {
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
 	Boolean existInstances(final Set<Integer> instanceIds);
+
+	List<MeasurementVariable> getMeasurementVariables(final Integer projectIdId, final List<Integer> variableTypes);
+
 }
