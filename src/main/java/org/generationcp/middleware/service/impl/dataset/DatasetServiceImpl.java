@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,7 +64,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
-	private static final String[] FIXED_GERMPLASM_DESCRIPTOR = {"GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID"};
 	protected static final String[] FIXED_DESIGN_FACTORS =
 		{"REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE"};
 
@@ -71,6 +72,10 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
+	
+	protected static final List<Integer> ENVIRONMENT_VARIABLE_TYPES = Lists.newArrayList( //
+			VariableType.ENVIRONMENT_DETAIL.getId(),
+			VariableType.STUDY_CONDITION.getId());
 
 	protected static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
@@ -83,7 +88,7 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId());
 
-	public static final ArrayList<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList( //
 			VariableType.TRAIT.getId(), //
 			VariableType.SELECTION_METHOD.getId());
 
@@ -571,7 +576,44 @@ public class DatasetServiceImpl implements DatasetService {
 	
 	@Override
 	public List<MeasurementVariable> getAllDatasetVariables(final Integer datasetId) {
-		return new ArrayList<>();
+		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
+		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
+			.getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
+		
+		final DmsProject study = this.daoFactory.getProjectRelationshipDao()
+				.getObjectBySubjectIdAndTypeId(plotDataset.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
+		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(study.getProjectId(),
+				Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+
+		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getDataSetsByStudyAndProjectProperty(study.getProjectId(), TermId.DATASET_TYPE.getId(),
+				String.valueOf(DataSetType.SUMMARY_DATA.getId())).get(0);
+		final List<MeasurementVariable> environmentDetailsVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(trialDataset.getProjectId(), ENVIRONMENT_VARIABLE_TYPES);
+		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
+		Collections.sort(environmentDetailsVariables, new Comparator<MeasurementVariable>() {
+			@Override
+			public int compare(MeasurementVariable var1, MeasurementVariable var2) {
+				final String value1 = var1.getValue();
+				final String value2 = var2.getValue();
+		        if (value1 != null && value2 != null)
+		            return value1.compareTo(value2);
+		        return (value1 == null) ? 1 : -1;
+		    }
+		});
+		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
+				.getObservationSetVariables(trialDataset.getProjectId(), Lists.newArrayList(VariableType.TRAIT.getId()));
+		
+		final List<MeasurementVariable> plotDataSetColumns =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
+		final List<MeasurementVariable> subObservationSetColumns =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
+
+		final List<MeasurementVariable> allVariables = new ArrayList<>();
+		allVariables.addAll(studyVariables);
+		allVariables.addAll(environmentDetailsVariables);
+		allVariables.addAll(environmentConditions);
+		allVariables.addAll(plotDataSetColumns);
+		allVariables.addAll(subObservationSetColumns);
+		return allVariables;
 	}
 	
 	@Override
