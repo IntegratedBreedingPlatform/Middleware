@@ -603,7 +603,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		final List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
 		Mockito.when(germplasmListManager.getGermplasmDao()).thenReturn(germplasmDAO);
 		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
-		Mockito.doCallRealMethod().when(germplasmListManager).getCodeFixedGidsByGidList(Mockito.anyList());
+		Mockito.doCallRealMethod().when(germplasmListManager).getCodeFixedGidsByGidList(gids);
 		final Set<Integer> result = germplasmListManager.getCodeFixedGidsByGidList(gids);
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.contains(gid1.getGid()));

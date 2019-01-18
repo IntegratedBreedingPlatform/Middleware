@@ -225,8 +225,10 @@ public class DatasetServiceImplTest {
 	@Test (expected = MiddlewareException.class)
 	public void testGetDataset_ExceptionWhenQueryingData() throws Exception{
 		final String datasetName = "name";
-		Mockito.when(datasetDAO.getByName(datasetName)).thenReturn(new Dataset());
-		Mockito.when(charValuesDAO.getCharValueElementsByDatasetId(Mockito.anyInt())).thenThrow(MiddlewareQueryException.class);
+		final Dataset dataset = new Dataset();
+		dataset.setDatasetId(1);
+		Mockito.when(datasetDAO.getByName(datasetName)).thenReturn(dataset);
+		Mockito.when(charValuesDAO.getCharValueElementsByDatasetId(1)).thenThrow(MiddlewareQueryException.class);
 		datasetService.getDataset(datasetName);
 	}
 

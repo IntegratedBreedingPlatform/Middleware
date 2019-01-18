@@ -1,11 +1,11 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import java.util.List;
-
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+
+import java.util.List;
 
 public interface StudyService {
 
@@ -69,4 +69,8 @@ public interface StudyService {
 	 * @return Number of phenotypes
 	 */
 	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
+
+	List<String> getGenericGermplasmDescriptors(final int studyIdentifier);
+
+	List<String> getAdditionalDesignFactors(final int studyIdentifier);
 }
