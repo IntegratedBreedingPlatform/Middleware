@@ -23,7 +23,7 @@ public class LiquibaseInitBeanTest {
 		DataSourceProperties dsProperties = new DataSourceProperties(new Properties());
 
 		Mockito.doReturn(Lists.newArrayList("ibdbv2_maize_merged", "ibdbv2_wheat_merged")).when(dsUtils)
-				.retrieveCropDatabases(Mockito.any(SingleConnectionDataSource.class));
+				.retrieveCropDatabases(null);
 
 		BeanDefinitionRegistry beanDefinitionRegistry = new SimpleBeanDefinitionRegistry();
 

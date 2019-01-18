@@ -32,7 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -120,7 +120,6 @@ public class DataImportServiceImplTest {
 		unspecifiedLocation.setLname(Location.UNSPECIFIED_LOCATION);
 		unspecifiedLocation.setLocid(UNSPECIFIED_LOCATION_LOCID);
 		locations.add(unspecifiedLocation);
-		Mockito.when(this.locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
 		Mockito.when(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation()).thenReturn(String.valueOf(UNSPECIFIED_LOCATION_LOCID));
 
 
@@ -445,7 +444,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsAllGidsExist() {
 
 		// The count of matched record in germplasm should match the number of observation in data file.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySet()))
+		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySetOf(Integer.class)))
 				.thenReturn(Long.valueOf(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS));
 
 		final List<Message> messages = new ArrayList<>();
@@ -459,7 +458,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsDoNotExist() {
 
 		// Retun a number not equal to no of observation to simulate that there are gids that do not exist in the database.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySet())).thenReturn(Long.valueOf(0L));
+		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySetOf(Integer.class))).thenReturn(Long.valueOf(0L));
 
 		final List<Message> messages = new ArrayList<>();
 		this.dataImportService.checkForInvalidGids(this.workbook, messages);
@@ -509,7 +508,6 @@ public class DataImportServiceImplTest {
 
 		final StandardVariable testStandardVariable = this.createTestCategoricalStandardVariable(EARASP_1_5_NAME);
 		testStandardVariable.setDataType(new Term(TermId.NUMERIC_VARIABLE.getId(), "Numeric variable", ""));
-		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID)).thenReturn(testStandardVariable);
 
 		final List<MeasurementVariable> variates = new ArrayList<>();
 
