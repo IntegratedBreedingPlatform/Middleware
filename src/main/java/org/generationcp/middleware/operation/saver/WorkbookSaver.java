@@ -407,7 +407,7 @@ public class WorkbookSaver extends Saver {
 
 		watch.restart("save geolocation");
 
-		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
+        this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
 
 		final Geolocation g = this.getGeolocationSaver()
 				.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
@@ -471,7 +471,7 @@ public class WorkbookSaver extends Saver {
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
 
-							this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
+					        this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
 
 							final Geolocation g = this.getGeolocationSaver()
 									.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
@@ -513,18 +513,22 @@ public class WorkbookSaver extends Saver {
 		return 0;
 	}
 
-	protected void assignLocationVariableWithUnspecifiedLocationIfEmpty(final VariableList variableList, final LocationDAO locationDAO) {
+	protected String getLocationIdByLocationName(final String locationName, final LocationDAO locationDAO) {
+
+		String foundLocationId = "";
+		final List<Location> locations = locationDAO.getByName(locationName, Operation.EQUAL);
+		foundLocationId = (!locations.isEmpty()) ? String.valueOf(locations.get(0).getLocid()) : this.getLocationIdByLocationName(Location.UNSPECIFIED_LOCATION, locationDAO);
+	
+		return foundLocationId;
+	}
+
+	protected void assignLocationIdGivenLocationName(final VariableList variableList, final LocationDAO locationDAO) {
 
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
-		if (locationIdVariable != null && StringUtils.isEmpty(locationIdVariable.getValue())) {
-			String unspecifiedLocationLocId = "";
-			final List<Location> locations = locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
-			if (!locations.isEmpty()) {
-				unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
-			}
-			locationIdVariable.setValue(unspecifiedLocationLocId);
+		if(locationIdVariable != null){
+			String foundLocationId = this.getLocationIdByLocationName(locationIdVariable.getValue(), locationDAO); // "", 
+			locationIdVariable.setValue(foundLocationId);
 		}
-
 	}
 
 	void setVariableListValues(final VariableList variableList, final List<MeasurementVariable> measurementVariables) {
