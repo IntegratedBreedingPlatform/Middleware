@@ -407,7 +407,7 @@ public class WorkbookSaver extends Saver {
 
 		watch.restart("save geolocation");
 
-        this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
+		this.assignLocationIdGivenLocationName(geolocation, daoFactory.getLocationDAO());
 
 		final Geolocation g = this.getGeolocationSaver()
 				.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
@@ -470,8 +470,7 @@ public class WorkbookSaver extends Saver {
 
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
-
-					        this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
+							this.assignLocationIdGivenLocationName(geolocation, daoFactory.getLocationDAO());
 
 							final Geolocation g = this.getGeolocationSaver()
 									.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
