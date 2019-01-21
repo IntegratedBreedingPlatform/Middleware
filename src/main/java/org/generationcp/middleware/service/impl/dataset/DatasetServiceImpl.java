@@ -575,17 +575,15 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 	
 	@Override
-	public List<MeasurementVariable> getAllDatasetVariables(final Integer datasetId) {
+	public List<MeasurementVariable> getAllDatasetVariables(final Integer studyId, final Integer datasetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
 			.getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
 		
-		final DmsProject study = this.daoFactory.getProjectRelationshipDao()
-				.getObjectBySubjectIdAndTypeId(plotDataset.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
-		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(study.getProjectId(),
+		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(studyId,
 				Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getDataSetsByStudyAndProjectProperty(study.getProjectId(), TermId.DATASET_TYPE.getId(),
+		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
 				String.valueOf(DataSetType.SUMMARY_DATA.getId())).get(0);
 		final List<MeasurementVariable> environmentDetailsVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(trialDataset.getProjectId(), ENVIRONMENT_VARIABLE_TYPES);
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
