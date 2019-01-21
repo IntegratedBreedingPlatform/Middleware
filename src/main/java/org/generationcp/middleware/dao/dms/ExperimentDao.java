@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -31,6 +32,8 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -44,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1166,4 +1170,34 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		this.generateObsUnitId(entity);
 		return super.save(entity);
 	}
+
+	public List<Pair<String, Long>> countObservationsPerInstance(final Integer datasetId) {
+
+		try {
+			ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.groupProperty("g.description"))
+				.add(Projections.rowCount());
+
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("geoLocation", "g");
+			criteria.setProjection(projectionList);
+			criteria.add(Restrictions.eq("project.projectId", datasetId));
+			final List<Object[]> rows = criteria.list();
+
+			final List<Pair<String, Long>> results = new LinkedList<>();
+			for (Object[] row : rows) {
+				final Pair<String, Long> pair = Pair.of((String) row[0], (Long) row[1]);
+				results.add(pair);
+			}
+			return results;
+
+		} catch (
+			final HibernateException e) {
+			final String message =
+				"Error at countObservationsPerInstance=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }
