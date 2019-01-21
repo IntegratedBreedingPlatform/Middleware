@@ -1092,7 +1092,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id "  //
 				+ "                                      AND dataset.program_uuid = vo.program_uuid " //
 				+ "   LEFT JOIN cvtermprop cropOntology ON cropOntology.cvterm_id = variable.cvterm_id" //
-				+ "        AND cropOntology.type_id = " + TermId.CROP_ONTOLOGY_ID
+				+ "        AND cropOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
 				+ " WHERE " //
 				+ "   dataset.project_id = :observationSetId " //
 				+ "   AND pp.type_id in (:variableTypes) "
