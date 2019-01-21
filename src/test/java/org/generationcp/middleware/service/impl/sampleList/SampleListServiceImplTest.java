@@ -605,7 +605,7 @@ public class SampleListServiceImplTest {
 		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
 	}
 
-	private SampleListDTO createSampleListDTO(final int studyId, final Integer selectionVariableId, final List<Integer> instanceIds) {
+	private SampleListDTO createSampleListDTO(final int datasetId, final Integer selectionVariableId, final List<Integer> instanceIds) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
 		sampleListDTO.setCreatedBy(SampleListServiceImplTest.ADMIN);
@@ -617,7 +617,7 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setSamplingDate(Util.getCurrentDate());
 
 		sampleListDTO.setSelectionVariableId(selectionVariableId);
-		sampleListDTO.setStudyId(studyId);
+		sampleListDTO.setDatasetId(datasetId);
 		sampleListDTO.setTakenBy(SampleListServiceImplTest.ADMIN);
 		sampleListDTO.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 		sampleListDTO.setCreatedDate(Util.getCurrentDate());

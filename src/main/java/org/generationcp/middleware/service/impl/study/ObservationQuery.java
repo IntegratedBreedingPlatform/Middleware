@@ -28,8 +28,8 @@ class ObservationQuery {
 		+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id  "
 		+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  "
 		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  " + " WHERE  "
-		+ "\tp.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId  "
-		+ "    AND name LIKE '%PLOTDATA'))  " + " AND gl.description IN (:instanceIds)  "
+		+ " p.project_id = :datasetId "
+		+ " AND gl.description IN (:instanceIds)  "
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId " + " GROUP BY nde.nd_experiment_id";
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,

@@ -62,7 +62,6 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getSelectionVariableId(), "The Selection Variable Id must not be empty");
-		Preconditions.checkNotNull(sampleListDTO.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDTO.getListName(), "The List Name must not be empty");
 		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDTO.getListName()), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDTO.getListName().length() <= 100, "List Name must not exceed 100 characters");
@@ -101,7 +100,7 @@ public class SampleListServiceImpl implements SampleListService {
 			sampleList.setHierarchy(parent);
 
 			final List<ObservationDto> observationDtos = this.studyMeasurements
-					.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(),
+					.getSampleObservations(sampleListDTO.getDatasetId(), sampleListDTO.getInstanceIds(),
 							sampleListDTO.getSelectionVariableId());
 
 			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
