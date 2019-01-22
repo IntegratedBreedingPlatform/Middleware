@@ -14,7 +14,7 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	long countPhenotypes(final Integer datasetId, final List<Integer> traitIds);
+	long countPhenotypes(final Integer datasetId, final List<Integer> variableIds);
 
 	long countPhenotypesByInstance(Integer datasetId, Integer instanceId);
 

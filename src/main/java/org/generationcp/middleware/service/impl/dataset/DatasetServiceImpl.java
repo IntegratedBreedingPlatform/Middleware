@@ -125,8 +125,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public long countPhenotypes(final Integer datasetId, final List<Integer> traitIds) {
-		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, traitIds);
+	public long countPhenotypes(final Integer datasetId, final List<Integer> variableIds) {
+		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, variableIds);
 	}
 
 	@Override
