@@ -55,6 +55,8 @@ public interface DatasetService {
 
 	void deletePhenotype(final Integer phenotypeId);
 
+	List<MeasurementVariable> getVariables(Integer datasetId, VariableType variableType);
+
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
@@ -63,5 +65,4 @@ public interface DatasetService {
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 
 	void deleteDataset(int datasetId);
-
 }

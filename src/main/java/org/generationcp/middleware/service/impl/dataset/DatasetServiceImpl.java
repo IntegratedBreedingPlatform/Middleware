@@ -44,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -461,6 +462,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<MeasurementVariable> getVariables(final Integer datasetId, final VariableType variableType) {
+		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, Arrays.asList(variableType.getId()));
 	}
 
 	/**
