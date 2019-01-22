@@ -524,8 +524,8 @@ public class WorkbookSaver extends Saver {
 	protected void assignLocationIdGivenLocationName(final VariableList variableList, final LocationDAO locationDAO) {
 
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
-		if(locationIdVariable != null){
-			String foundLocationId = this.getLocationIdByLocationName(locationIdVariable.getValue(), locationDAO); // "", 
+		if( locationIdVariable != null && (StringUtils.isEmpty(locationIdVariable.getValue()) || StringUtils.equals(locationIdVariable.getVariableType().getStandardVariable().getName(), Location.LOCATION_NAME))){
+			String foundLocationId = this.getLocationIdByLocationName(locationIdVariable.getValue(), locationDAO); 
 			locationIdVariable.setValue(foundLocationId);
 		}
 	}

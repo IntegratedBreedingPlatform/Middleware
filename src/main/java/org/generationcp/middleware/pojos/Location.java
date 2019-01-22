@@ -60,6 +60,7 @@ public class Location implements Serializable, Comparable<Location> {
 
 	public static final int UNKNOWN_LOCATION_ID = 0;
 	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
+	public static final String LOCATION_NAME = "LOCATION_NAME";
 	
 	public static final Integer[] BREEDING_LOCATION_TYPE_IDS = {410, 411, 412};
 
