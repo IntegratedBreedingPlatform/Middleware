@@ -86,7 +86,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public long countLocationsByUniqueID(final String programUUID) {
-		return this.countAllByMethod(daoFactory.getLocationDAO(), "countByUniqueID", new Object[] {programUUID}, new Class[] {String.class});
+		return this
+			.countAllByMethod(daoFactory.getLocationDAO(), "countByUniqueID", new Object[] {programUUID}, new Class[] {String.class});
 	}
 
 	@Override
@@ -97,17 +98,19 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getLocationsByName(final String name, final int start, final int numOfRows, final Operation op,
-			final String programUUID) {
+	public List<Location> getLocationsByName(
+		final String name, final int start, final int numOfRows, final Operation op,
+		final String programUUID) {
 		final List<String> methods = Arrays.asList("countByNameAndUniqueID", "getByNameAndUniqueID");
-		return this.getFromCentralAndLocalByMethod(daoFactory.getLocationDAO(), methods, start, numOfRows, new Object[] {name, op, programUUID},
+		return this
+			.getFromCentralAndLocalByMethod(daoFactory.getLocationDAO(), methods, start, numOfRows, new Object[] {name, op, programUUID},
 				new Class[] {String.class, Operation.class, String.class});
 	}
 
 	@Override
 	public long countLocationsByName(final String name, final Operation op, final String programUUID) {
 		return this.countAllByMethod(daoFactory.getLocationDAO(), "countByNameAndUniqueID", new Object[] {name, op, programUUID},
-				new Class[] {String.class, Operation.class, String.class});
+			new Class[] {String.class, Operation.class, String.class});
 	}
 
 	/**
@@ -129,7 +132,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getLocationsByName(final String name, final int start, final int numOfRows, final Operation op) {
 		final List<String> methods = Arrays.asList("countByName", "getByName");
 		return this.getFromCentralAndLocalByMethod(daoFactory.getLocationDAO(), methods, start, numOfRows, new Object[] {name, op},
-				new Class[] {String.class, Operation.class});
+			new Class[] {String.class, Operation.class});
 	}
 
 	/**
@@ -139,7 +142,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Deprecated
 	public long countLocationsByName(final String name, final Operation op) {
 		return this.countAllByMethod(daoFactory.getLocationDAO(), "countByName", new Object[] {name, op},
-				new Class[] {String.class, Operation.class});
+			new Class[] {String.class, Operation.class});
 	}
 
 	@Override
@@ -151,7 +154,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getLocationsByCountry(final Country country, final int start, final int numOfRows) {
 		final List<String> methods = Arrays.asList("countByCountry", "getByCountry");
 		return this.getFromCentralAndLocalByMethod(daoFactory.getLocationDAO(), methods, start, numOfRows, new Object[] {country},
-				new Class[] {Country.class});
+			new Class[] {Country.class});
 	}
 
 	@Override
@@ -162,32 +165,32 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByType(final Integer type) {
 		return this.getAllByMethod(daoFactory.getLocationDAO(), LocationDataManagerImpl.GET_BY_TYPE, new Object[] {type},
-				new Class[] {Integer.class});
+			new Class[] {Integer.class});
 	}
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type, final String programUUID) {
 		return this.getAllByMethod(daoFactory.getLocationDAO(), LocationDataManagerImpl.GET_BY_TYPE, new Object[] {type, programUUID},
-				new Class[] {Integer.class, String.class});
+			new Class[] {Integer.class, String.class});
 	}
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type, final int start, final int numOfRows) {
 		final List<String> methods = Arrays.asList(LocationDataManagerImpl.COUNT_BY_TYPE, LocationDataManagerImpl.GET_BY_TYPE);
 		return this.getFromCentralAndLocalByMethod(daoFactory.getLocationDAO(), methods, start, numOfRows, new Object[] {type},
-				new Class[] {Integer.class});
+			new Class[] {Integer.class});
 	}
 
 	@Override
 	public long countLocationsByType(final Integer type) {
 		return this.countAllByMethod(daoFactory.getLocationDAO(), LocationDataManagerImpl.COUNT_BY_TYPE, new Object[] {type},
-				new Class[] {Integer.class});
+			new Class[] {Integer.class});
 	}
 
 	@Override
 	public long countLocationsByType(final Integer type, final String programUUID) {
 		return this.countAllByMethod(daoFactory.getLocationDAO(), LocationDataManagerImpl.COUNT_BY_TYPE, new Object[] {type, programUUID},
-				new Class[] {Integer.class, String.class});
+			new Class[] {Integer.class, String.class});
 	}
 
 	@Override
@@ -211,7 +214,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final Map<String, UserDefinedField> types = new HashMap<>();
 
 		final List<UserDefinedField> dTypeFields =
-				this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(), tableType.getType());
+			this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(), tableType.getType());
 		for (final UserDefinedField dTypeField : dTypeFields) {
 			types.put(dTypeField.getFcode(), dTypeField);
 		}
@@ -222,7 +225,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
 		return super.getAllByMethod(this.getUserDefinedFieldDao(), "getByFieldTableNameAndType", new Object[] {tableName, fieldType},
-				new Class[] {String.class, String.class});
+			new Class[] {String.class, String.class});
 	}
 
 	@Override
@@ -255,8 +258,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Location: LocationDataManager.addLocation(location=" + location + "): " + e
-							.getMessage(), e);
+				"Error encountered while saving Location: LocationDataManager.addLocation(location=" + location + "): " + e
+					.getMessage(), e);
 		}
 		return idLocationSaved;
 	}
@@ -277,8 +280,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations + "): " + e
-							.getMessage(), e);
+				"Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations + "): " + e
+					.getMessage(), e);
 		}
 		return idLocationsSaved;
 	}
@@ -300,8 +303,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location + ", locdes=" + locdes + "): "
-							+ e.getMessage(), e);
+				"Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location + ", locdes=" + locdes + "): "
+					+ e.getMessage(), e);
 		}
 		return idLocationSaved;
 	}
@@ -316,8 +319,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location + "): " + e
-							.getMessage(), e);
+				"Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location + "): " + e
+					.getMessage(), e);
 		}
 	}
 
@@ -329,19 +332,19 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByCountryAndType(final Country country, final Integer type) {
 		return super.getAllByMethod(daoFactory.getLocationDAO(), "getByCountryAndType", new Object[] {country, type},
-				new Class[] {Country.class, Integer.class});
+			new Class[] {Country.class, Integer.class});
 	}
 
 	@Override
 	public List<Location> getLocationsByNameCountryAndType(final String name, final Country country, final Integer type) {
 		return super.getAllByMethod(daoFactory.getLocationDAO(), "getByNameCountryAndType", new Object[] {name, country, type},
-				new Class[] {String.class, Country.class, Integer.class});
+			new Class[] {String.class, Country.class, Integer.class});
 	}
 
 	@Override
 	public List<LocationDetails> getLocationDetailsByLocId(final Integer locationId, final int start, final int numOfRows) {
 		return super.getAllByMethod(daoFactory.getLocationDAO(), "getLocationDetails", new Object[] {locationId, start, numOfRows},
-				new Class[] {Integer.class, Integer.class, Integer.class});
+			new Class[] {Integer.class, Integer.class, Integer.class});
 
 	}
 
@@ -349,8 +352,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getAllBreedingLocations() {
 
 		final List<Location> allLocations =
-				this.getFromInstanceByMethod(daoFactory.getLocationDAO(), Database.LOCAL, "getAllBreedingLocations", new Object[] {},
-						new Class[] {});
+			this.getFromInstanceByMethod(daoFactory.getLocationDAO(), "getAllBreedingLocations", new Object[] {},
+				new Class[] {});
 
 		return allLocations;
 	}
@@ -366,8 +369,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final Integer fieldLtypeFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
 
 		return super.getAllByMethod(daoFactory.getLocationDAO(), "getLocationsByDTypeAndLType",
-				new Object[] {String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId},
-				new Class[] {String.class, Integer.class, Integer.class});
+			new Object[] {String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId},
+			new Class[] {String.class, Integer.class, Integer.class});
 	}
 
 	@Override
@@ -376,8 +379,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final Integer blockLtypeFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
 		return super.getAllByMethod(daoFactory.getLocationDAO(), "getLocationsByDTypeAndLType",
-				new Object[] {String.valueOf(fieldId), blockParentFldId, blockLtypeFldId},
-				new Class[] {String.class, Integer.class, Integer.class});
+			new Object[] {String.valueOf(fieldId), blockParentFldId, blockLtypeFldId},
+			new Class[] {String.class, Integer.class, Integer.class});
 	}
 
 	@Override
@@ -422,7 +425,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		}
 
 		return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew,
-				deletedPlots, fieldId);
+			deletedPlots, fieldId);
 	}
 
 	@Override
@@ -430,8 +433,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final Integer fieldLtype = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
 		final Integer relationshipType = this.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
 		final List<Location> locations =
-				super.getAllByMethod(daoFactory.getLocationDAO(), "getByTypeWithParent", new Object[] {fieldLtype, relationshipType},
-						new Class[] {Integer.class, Integer.class});
+			super.getAllByMethod(daoFactory.getLocationDAO(), "getByTypeWithParent", new Object[] {fieldLtype, relationshipType},
+				new Class[] {Integer.class, Integer.class});
 
 		final Set<Integer> parentIds = new HashSet<>();
 		for (final Location location : locations) {
@@ -454,7 +457,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getAllProvincesByCountry(final Integer countryId) {
-		final List<Location> provinces = super.getAllByMethod(daoFactory.getLocationDAO(), "getAllProvincesByCountry", new Object[] {countryId},
+		final List<Location> provinces =
+			super.getAllByMethod(daoFactory.getLocationDAO(), "getAllProvincesByCountry", new Object[] {countryId},
 				new Class[] {Integer.class});
 
 		return provinces;
@@ -462,7 +466,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getAllProvinces() {
-		final List<Location> provinces = super.getAllByMethod(daoFactory.getLocationDAO(), "getAllProvinces", new Object[] {}, new Class[] {});
+		final List<Location> provinces =
+			super.getAllByMethod(daoFactory.getLocationDAO(), "getAllProvinces", new Object[] {}, new Class[] {});
 		return provinces;
 	}
 
@@ -492,8 +497,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			}
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
-							+ programUUID + "): " + e.getMessage(), e);
+				"Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
+					+ programUUID + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -510,8 +515,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				final List<Locdes> existingLocdesList = this.getLocDesDao().getByLocation(locId);
 				for (final Locdes locdes : locdesList) {
 					this.getLocdesSaver()
-							.saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(), locdes.getDval(),
-									locdes.getUserId());
+						.saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(), locdes.getDval(),
+							locdes.getUserId());
 				}
 			} catch (final Exception e) {
 				this.logAndThrowException("Error encountered with saveOrUpdateLocdesList(): " + e.getMessage(), e);
@@ -543,8 +548,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName,
-			final String programUUID) {
+	public List<LocationDetails> getFilteredLocations(
+		final Integer countryId, final Integer locationType, final String locationName,
+		final String programUUID) {
 		return daoFactory.getLocationDAO().getFilteredLocations(countryId, locationType, locationName, programUUID);
 	}
 
@@ -555,9 +561,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber, final int pageSize,
-			final Map<LocationFilters, Object> filters) {
-		final List<LocationDetailsDto> locationsDetailsDto = daoFactory.getLocationDAO().getLocationsByFilter(pageNumber, pageSize, filters);
+	public List<LocationDetailsDto> getLocationsByFilter(
+		final int pageNumber, final int pageSize,
+		final Map<LocationFilters, Object> filters) {
+		final List<LocationDetailsDto> locationsDetailsDto =
+			daoFactory.getLocationDAO().getLocationsByFilter(pageNumber, pageSize, filters);
 		return locationsDetailsDto;
 	}
 
@@ -566,7 +574,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final Map<String, UserDefinedField> types = new HashMap<>();
 
 		final List<UserDefinedField> dTypeFields =
-				this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(), tableType.getType());
+			this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(), tableType.getType());
 		for (final UserDefinedField dTypeField : dTypeFields) {
 			types.put(dTypeField.getFname().toUpperCase(), dTypeField);
 		}
@@ -575,7 +583,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	public String retrieveLocIdOfUnspecifiedLocation() {
- 		String unspecifiedLocationId = "";
+		String unspecifiedLocationId = "";
 		final List<Location> locations = this.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 		if (!locations.isEmpty()) {
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
