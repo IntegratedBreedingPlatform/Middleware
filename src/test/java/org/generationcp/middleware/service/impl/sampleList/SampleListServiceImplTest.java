@@ -38,6 +38,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -636,8 +637,8 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setListName("Test");
 		list.add(sampleListDTO);
 
-		when(this.sampleListService.getSampleLists(studyId)).thenReturn(list);
-		final List<SampleListDTO> result = this.sampleListService.getSampleLists(studyId);
+		when(this.sampleListService.getSampleLists(Arrays.asList(studyId))).thenReturn(list);
+		final List<SampleListDTO> result = this.sampleListService.getSampleLists(Arrays.asList(studyId));
 		final SampleListDTO dto = result.get(0);
 		Assert.assertEquals(1, result.size());
 		Assert.assertNotNull(dto);

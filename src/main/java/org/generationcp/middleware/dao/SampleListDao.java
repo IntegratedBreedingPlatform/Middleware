@@ -101,7 +101,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		}
 	}
 
-	public List<SampleListDTO> getSampleLists(final Integer trialId) {
+	public List<SampleListDTO> getSampleLists(final List<Integer> datasetIds) {
 
 		final Criteria criteria = this.getSession().createCriteria(SampleList.class);
 
@@ -111,8 +111,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		criteria.createAlias(SampleListDao.SAMPLES, SampleListDao.SAMPLES)
 				.createAlias("samples.experiment", "experiment").createAlias("experiment.project", "project")
-				.createAlias("project.relatedTos", "relatedTos").createAlias("relatedTos.objectProject", "objectProject")
-				.add(Restrictions.eq("objectProject.projectId", trialId)).setProjection(projectionList)
+				.add(Restrictions.in("project.projectId", datasetIds)).setProjection(projectionList)
 				.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class));
 
 		return criteria.list();

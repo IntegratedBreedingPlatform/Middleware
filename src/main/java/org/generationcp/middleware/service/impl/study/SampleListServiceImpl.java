@@ -397,8 +397,8 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public List<SampleListDTO> getSampleLists(final Integer trialId) {
-		return this.daoFactory.getSampleListDao().getSampleLists(trialId);
+	public List<SampleListDTO> getSampleLists(final List<Integer> datasetIds) {
+		return this.daoFactory.getSampleListDao().getSampleLists(datasetIds);
 	}
 
 	@Override

@@ -165,6 +165,10 @@ public class ManagerFactory implements Serializable {
 		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
+	public org.generationcp.middleware.service.api.dataset.DatasetService getDatasetMiddlewareService() {
+		return new org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl(this.sessionProvider);
+	}
+
 	public OntologyDataManager getNewOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.sessionProvider);
 	}
