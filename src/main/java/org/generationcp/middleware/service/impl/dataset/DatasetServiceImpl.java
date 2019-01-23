@@ -465,8 +465,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getVariables(final Integer datasetId, final VariableType variableType) {
-		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, Arrays.asList(variableType.getId()));
+	public List<MeasurementVariableDto> getVariables(final Integer datasetId, final VariableType variableType) {
+		return measurementVariableService.getVariablesForDataset(datasetId, variableType.getId());
 	}
 
 	/**
