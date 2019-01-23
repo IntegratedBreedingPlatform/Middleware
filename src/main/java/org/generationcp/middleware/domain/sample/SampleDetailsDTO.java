@@ -41,6 +41,7 @@ public class SampleDetailsDTO implements Serializable {
 	private Integer sampleEntryNo;
 	private String plateId;
 	private String well;
+	private Integer observationUnitNumber;
 
 	public SampleDetailsDTO() {
 
@@ -204,6 +205,14 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setHarvestDate(final String harvestDate) {
 		this.harvestDate = harvestDate;
+	}
+
+	public Integer getObservationUnitNumber() {
+		return observationUnitNumber;
+	}
+
+	public void setObservationUnitNumber(final Integer observationUnitNumber) {
+		this.observationUnitNumber = observationUnitNumber;
 	}
 
 	@Override

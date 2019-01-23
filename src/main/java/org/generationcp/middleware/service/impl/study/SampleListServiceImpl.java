@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
@@ -437,6 +438,12 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 		}
 		this.daoFactory.getSampleListDao().saveOrUpdate(sampleList);
+	}
+
+	@Override
+	public String getObservationVariableName(final Integer sampleListId) {
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDatasetOfSampleList(sampleListId);
+		return this.daoFactory.getExperimentDao().getObservationVariableName(datasetDTO.getDatasetId());
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {

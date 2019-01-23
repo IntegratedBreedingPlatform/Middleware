@@ -134,4 +134,6 @@ public interface SampleListService {
 	List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
 
 	void updateSamplePlateInfo(Integer sampleListId, Map<String, SamplePlateInfo> plateInfoMap);
+
+	String getObservationVariableName(Integer sampleListId);
 }

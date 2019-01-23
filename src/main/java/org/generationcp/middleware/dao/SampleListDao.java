@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -15,10 +16,12 @@ import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.workbench.DatasetType;
 import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
@@ -147,10 +150,18 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(CustomProjections.concatProperties(" ","person.firstName", "person.lastName"), "takenBy");
 		projectionList.add(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey");
 		projectionList.add(Projections.property("experiment.obsUnitId"), "obsUnitId");
+		projectionList.add(Projections.property("experiment.observationUnitNo"), "observationUnitNumber");
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
 		projectionList.add(Projections.property("germplasm.gid"), "gid");
 		projectionList.add(Projections.property("sample.plateId"), "plateId");
 		projectionList.add(Projections.property("sample.well"), "well");
+
+		final Conjunction plotNoConjunction = Restrictions.conjunction();
+		plotNoConjunction.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()));
+		plotNoConjunction.add(Restrictions.eq("pp.value", String.valueOf(DataSetType.PLOT_DATA.getId())));
+
+		final Conjunction datasetConjunction = Restrictions.conjunction();
+		datasetConjunction.add(Restrictions.or(plotNoConjunction, Restrictions.ne("pp.value", String.valueOf(DataSetType.PLOT_DATA.getId()))));
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample")
 				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
@@ -158,9 +169,15 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 				.createAlias("samples.experiment", "experiment")
 				.createAlias("experiment.stock", "stock")
 				.createAlias("stock.germplasm", "germplasm")
-				.createAlias("experiment.properties", "properties").add(Restrictions.eq("id", sampleListId))
-				.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId())).setProjection(projectionList)
+				.createAlias("experiment.properties", "properties", CriteriaSpecification.LEFT_JOIN)
+				.createAlias("experiment.project", "project")
+				.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()))
+				.add(Restrictions.eq("id", sampleListId))
+				.add(datasetConjunction)
+				.setProjection(projectionList)
 				.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class)).addOrder(Order.asc("sample.sampleId"));
+
+
 
 		return criteria.list();
 	}
