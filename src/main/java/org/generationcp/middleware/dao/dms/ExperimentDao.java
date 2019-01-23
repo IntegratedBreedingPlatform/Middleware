@@ -747,14 +747,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 	
 	public List<ObservationUnitRow> getObservationUnitAllVariableValues(
-			final int datasetId,
+			final int datasetId, final Integer datasetEnvironmentId,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-			final List<String> designFactors, final List<String> environmentFactors, final Integer instanceId) {
+			final List<String> designFactors, final List<String> environmentFactors, final List<String> environmentConditions, final Integer instanceId) {
 			try {
 				final String observationVariableName = this.getObservationVariableName(datasetId);
-			final List<Map<String, Object>> results = this.getObservationUnitsAllVariablesResult(datasetId, selectionMethodsAndTraits,
-					germplasmDescriptors, designFactors, environmentFactors, instanceId, observationVariableName);
-			return this.mapAllVariableResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, environmentFactors, observationVariableName);
+			final List<Map<String, Object>> results = this.getObservationUnitsAllVariablesResult(datasetId, datasetEnvironmentId, selectionMethodsAndTraits,
+					germplasmDescriptors, designFactors, environmentFactors, environmentConditions, instanceId, observationVariableName);
+			return this.mapAllVariableResults(results, selectionMethodsAndTraits, germplasmDescriptors, designFactors, environmentFactors, environmentConditions, observationVariableName);
 			} catch (final HibernateException e) {
 				ExperimentDao.LOG.error(e.getMessage());
 				final String error = "An internal error has ocurred when trying to execute the operation: " + e.getMessage();
@@ -814,12 +814,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	
 	private SQLQuery createQueryAndAddScalar(
 			final List<MeasurementVariableDto> selectionMethodsAndTraits,
-			final List<String> germplasmDescriptors, final List<String> designFactors, final List<String> environmentFactors, final String generateQuery) {
+			final List<String> germplasmDescriptors, final List<String> designFactors, final List<String> environmentFactors, final List<String> environmentConditions,  final String generateQuery) {
 			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors, designFactors, generateQuery);
 			query.addScalar(LOCATION_ID);
 			query.addScalar(EXPT_DESIGN);
 			for (final String envFactor : environmentFactors) {
 				query.addScalar(envFactor, new StringType());
+			}
+			for (final String envCondition : environmentConditions) {
+				query.addScalar(envCondition, new StringType());
 			}
 			return query;
 		}
@@ -981,17 +984,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 	
-	private List<Map<String, Object>> getObservationUnitsAllVariablesResult(final int datasetId,
+	private List<Map<String, Object>> getObservationUnitsAllVariablesResult(final int datasetId, final Integer datasetEnvironmentId,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-			final List<String> designFactors, final List<String> environmentFactors, final Integer instanceId,
+			final List<String> designFactors, final List<String> environmentFactors, final List<String> environmentConditions, final Integer instanceId,
 			final String observationVariableName) {
 		try {
 			final String observationUnitTableQuery = this.getObservationUnitAllVariablesQuery(selectionMethodsAndTraits, germplasmDescriptors,
-					designFactors, environmentFactors, observationVariableName);
+					designFactors, environmentFactors, environmentConditions, observationVariableName);
 			final SQLQuery query = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors,
-					designFactors, environmentFactors, observationUnitTableQuery);
+					designFactors, environmentFactors, environmentConditions, observationUnitTableQuery);
+			if(!environmentConditions.isEmpty()) query.setParameter("datasetEnvironmentId", String.valueOf(datasetEnvironmentId));
 			query.setParameter("datasetId", datasetId);
 			query.setParameter("instanceId", String.valueOf(instanceId));
+
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = query.list();
 			return results;
@@ -1005,7 +1010,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	
 	private String getObservationUnitAllVariablesQuery(
 			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDesciptors,
-			final List<String> designFactors, final List<String> environmentFactors, final String observationUnitNoName) {
+			final List<String> designFactors, final List<String> environmentFactors, final List<String> environmentConditions, final String observationUnitNoName) {
 
 			// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 			// same for columns -> DatasetServiceImpl.getSubObservationSetColumns
@@ -1065,6 +1070,17 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s', \n";
 				for (final String envFactor : environmentFactors) {
 					sql.append(String.format(envFactorFormat, envFactor, envFactor));
+				}
+			}
+
+			if (!environmentConditions.isEmpty()) {
+				final String envConditionFormat =
+					"    (SELECT pheno.value from phenotype pheno "
+						+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
+						+ "		INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId "
+						+ "		WHERE envnde.nd_geolocation_id = gl.nd_geolocation_id) '%s', \n";
+				for (final String envCondition : environmentConditions) {
+					sql.append(String.format(envConditionFormat, envCondition, envCondition));
 				}
 			}
 
@@ -1156,7 +1172,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	private List<ObservationUnitRow> mapAllVariableResults(
 			final List<Map<String, Object>> results,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-			final List<String> designFactors, final List<String> envFactors, final String observationVariableName) {
+			final List<String> designFactors, final List<String> envFactors, final List<String> envConditions, final String observationVariableName) {
 			final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 
 			if (results != null && !results.isEmpty()) {
@@ -1167,6 +1183,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					observationUnitRow.getVariables().put(EXPT_DESIGN, new ObservationUnitData((String) row.get(EXPT_DESIGN)));
 					for (final String envFactor : envFactors) {
 						observationUnitRow.getVariables().put(envFactor, new ObservationUnitData((String) row.get(envFactor)));
+					}
+					for (final String envCondition : envConditions) {
+						observationUnitRow.getVariables().put(envCondition, new ObservationUnitData((String) row.get(envCondition)));
 					}
 					observationUnitRows.add(observationUnitRow);
 				}
