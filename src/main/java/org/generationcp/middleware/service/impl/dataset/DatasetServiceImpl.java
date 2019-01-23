@@ -685,4 +685,10 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<Pair<String, Long>> countObservationsGroupedByInstance(final Integer datasetId) {
 		return daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
 	}
+
+	@Override
+	public List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes) {
+		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectId, variableTypes);
+	}
+
 }

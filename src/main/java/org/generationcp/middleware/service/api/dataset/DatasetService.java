@@ -68,4 +68,6 @@ public interface DatasetService {
 
 	List<Pair<String, Long>> countObservationsGroupedByInstance(Integer datasetId);
 
+	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+
 }
