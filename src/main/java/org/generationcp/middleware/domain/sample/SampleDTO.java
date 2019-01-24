@@ -21,6 +21,10 @@ public class SampleDTO {
 	private String sampleList;
 	private String plateId;
 	private String well;
+	private String datasetType;
+	private String studyName;
+	private String enumerator;
+	private String observationUnitId;
 	private Set<Dataset> datasets = new HashSet<>();
 
 	// FIXME Jackson use UTC as default timezone
@@ -168,6 +172,38 @@ public class SampleDTO {
 		this.well = well;
 	}
 
+	public String getDatasetType() {
+		return datasetType;
+	}
+
+	public void setDatasetType(final String datasetType) {
+		this.datasetType = datasetType;
+	}
+
+	public String getStudyName() {
+		return studyName;
+	}
+
+	public void setStudyName(final String studyName) {
+		this.studyName = studyName;
+	}
+
+	public String getEnumerator() {
+		return enumerator;
+	}
+
+	public void setEnumerator(final String enumerator) {
+		this.enumerator = enumerator;
+	}
+
+	public String getObservationUnitId() {
+		return observationUnitId;
+	}
+
+	public void setObservationUnitId(final String observationUnitId) {
+		this.observationUnitId = observationUnitId;
+	}
+
 	public Set<Dataset> getDatasets() {
 		if (datasets == null) {
 			return new HashSet<>();
@@ -202,6 +238,10 @@ public class SampleDTO {
 			.append(sampleList, sampleDTO.sampleList)
 			.append(datasets, sampleDTO.datasets)
 			.append(samplingDate, sampleDTO.samplingDate)
+			.append(datasetType, sampleDTO.datasetType)
+			.append(studyName, sampleDTO.studyName)
+			.append(enumerator, sampleDTO.enumerator)
+			.append(observationUnitId, sampleDTO.observationUnitId)
 			.isEquals();
 	}
 
@@ -218,6 +258,10 @@ public class SampleDTO {
 			.append(sampleList)
 			.append(datasets)
 			.append(samplingDate)
+			.append(datasetType)
+			.append(studyName)
+			.append(enumerator)
+			.append(observationUnitId)
 			.toHashCode();
 	}
 }

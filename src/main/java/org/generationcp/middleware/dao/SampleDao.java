@@ -1,6 +1,27 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.domain.dms.SampleDetailsBean;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.Sample;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.springframework.data.domain.Pageable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -10,29 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Sample;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
-import org.generationcp.middleware.pojos.gdms.Dataset;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.data.domain.Pageable;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 	protected static final String SQL_SAMPLES_AND_EXPERIMENTS =
@@ -182,60 +180,83 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		final int pageSize = pageable.getPageSize();
 		final int start = pageSize * pageable.getPageNumber();
 
-		final List<Sample> samples = criteria
+		final List<SampleDetailsBean> result = criteria
 			.setFirstResult(start)
 			.setMaxResults(pageSize)
 			.createAlias("sample.sampleList", "sampleList")
 			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
+			.createAlias("experiment.project", "project")
+			.createAlias("experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("experimentProperty.typeId", TermId.PLOT_NO.getId()))
+			.createAlias("project.properties", "projectProperty", Criteria.INNER_JOIN, Restrictions.eq("projectProperty.variableId", TermId.DATASET_TYPE.getId()))
+			.createAlias("project.relatedTos", "relatedTos")
+			.createAlias("relatedTos.objectProject", "objectProject")
+			.createAlias("objectProject.studyType", "studyType")
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
+			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
+			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)
+			.setProjection(Projections.distinct(Projections.projectionList()
+				.add(Projections.alias(Projections.property("sample.sampleId"), "sampleId"))
+				.add(Projections.alias(Projections.property("germplasm.gid"), "gid"))
+				.add(Projections.alias(Projections.property("stock.name"), "designation"))
+				.add(Projections.alias(Projections.property("sample.sampleName"), "sampleName"))
+				.add(Projections.alias(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey"))
+				.add(Projections.alias(Projections.property("person.firstName"), "takenByFirstName"))
+				.add(Projections.alias(Projections.property("person.lastName"), "takenByLastName"))
+				.add(Projections.alias(Projections.property("sampleList.listName"), "sampleList"))
+				.add(Projections.alias(Projections.property("sample.samplingDate"), "samplingDate"))
+				.add(Projections.alias(Projections.property("sample.plateId"), "plateId"))
+				.add(Projections.alias(Projections.property("sample.well"), "well"))
+				.add(Projections.alias(Projections.property("projectProperty.value"), "datasetType"))
+				.add(Projections.alias(Projections.property("objectProject.name"), "studyName"))
+				.add(Projections.alias(Projections.property("experiment.observationUnitNo"), "enumerator"))
+				.add(Projections.alias(Projections.property("experimentProperty.value"), "plotNo"))
+				.add(Projections.alias(Projections.property("experiment.obsUnitId"), "observationUnitId"))
+				.add(Projections.alias(Projections.property("dataset.datasetId"), "gdmsDatasetId"))
+				.add(Projections.alias(Projections.property("dataset.datasetName"), "gdmsDatasetName")))
+			).setResultTransformer(Transformers.aliasToBean(SampleDetailsBean.class))
 			.list();
+
 
 		final List<SampleDTO> sampleDTOs = new ArrayList<>();
 
-		for (final Sample sample : samples) {
+		for (final SampleDetailsBean resultBean : result) {
 
-			final Integer sampleId = sample.getSampleId();
 			final SampleDTO sampleDTO = new SampleDTO();
-			sampleDTO.setEntryNo(sample.getEntryNumber());
-			sampleDTO.setSampleId(sampleId);
-			sampleDTO.setSampleName(sample.getSampleName());
-			sampleDTO.setSampleBusinessKey(sample.getSampleBusinessKey());
-			final User takenBy = sample.getTakenBy();
-			if (takenBy != null && takenBy.getPerson() != null) {
-				final Person person = takenBy.getPerson();
-				sampleDTO.setTakenBy(person.getFirstName() + " " + person.getLastName());
-			}
-			sampleDTO.setSampleList(sample.getSampleList().getListName());
 
-			if (sample.getExperiment() != null && sample.getExperiment().getStock() != null) {
-				final StockModel stock = sample.getExperiment().getStock();
-				sampleDTO.setGid(stock.getGermplasm().getGid());
-				sampleDTO.setDesignation(stock.getName()); // TODO preferred name - see BMS-5033
+			sampleDTO.setSampleId(resultBean.getSampleId());
+			sampleDTO.setGid(resultBean.getGid());
+			sampleDTO.setDesignation(resultBean.getDesignation());
+			sampleDTO.setSampleName(resultBean.getSampleName());
+			sampleDTO.setSampleBusinessKey(resultBean.getSampleBusinessKey());
+			if (resultBean.getTakenByFirstName() != null && resultBean.getTakenByLastName() != null) {
+				sampleDTO.setTakenBy(resultBean.getTakenByFirstName() + " " + resultBean.getTakenByLastName());
 			}
-			if (sample.getSamplingDate() != null) {
-				sampleDTO.setSamplingDate(sample.getSamplingDate());
-			}
-			sampleDTO.setPlateId(sample.getPlateId());
-			sampleDTO.setWell(sample.getWell());
+			sampleDTO.setSampleList(resultBean.getSampleList());
+			sampleDTO.setSamplingDate(resultBean.getSamplingDate());
+			sampleDTO.setPlateId(resultBean.getPlateId());
+			sampleDTO.setWell(resultBean.getWell());
 
-			if (sample.getAccMetadataSets() != null) {
+			if (resultBean.getDatasetType() !=  null) {
+				sampleDTO.setDatasetType(DataSetType.findById(Integer.valueOf(resultBean.getDatasetType())).name());
+			}
+
+			sampleDTO.setStudyName(resultBean.getStudyName());
+			sampleDTO.setEnumerator(resultBean.getEnumerator() != null ? resultBean.getEnumerator() : resultBean.getPlotNo());
+			sampleDTO.setObservationUnitId(resultBean.getObservationUnitId());
+			if (resultBean.getGdmsDatasetId() != null) {
 				sampleDTO.setDatasets(new HashSet<SampleDTO.Dataset>());
-
-				for (final AccMetadataSet accMetadataSet : sample.getAccMetadataSets()) {
-					final SampleDTO.Dataset datasetDto = new SampleDTO().new Dataset();
-					final Dataset dataset = accMetadataSet.getDataset();
-					datasetDto.setDatasetId(dataset.getDatasetId());
-					datasetDto.setName(dataset.getDatasetName());
-					sampleDTO.getDatasets().add(datasetDto);
-				}
+				final SampleDTO.Dataset dataset = sampleDTO.new Dataset();
+				dataset.setDatasetId(resultBean.getGdmsDatasetId());
+				dataset.setName(resultBean.getGdmsDatasetName());
 			}
 			sampleDTOs.add(sampleDTO);
 		}
 
 		return sampleDTOs;
+
 	}
 
 	@SuppressWarnings("rawtypes")
