@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.TermId;
