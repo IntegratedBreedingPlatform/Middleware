@@ -57,7 +57,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 	private DaoFactory daoFactory;
 	
-	private String sampleObsUnitId;
+	private Integer ndExperimentId;
 
 	@Before
 	public void setUp() throws Exception {
@@ -100,7 +100,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	@Test
 	public void testCountFilterWithObsUnitId() {
 
-		final Long countAllSample = this.sampleDao.countFilter(this.sampleObsUnitId, this.listId);
+		final Long countAllSample = this.sampleDao.countFilter(this.ndExperimentId, this.listId);
 
 		Assert.assertEquals(1, countAllSample.intValue());
 
@@ -134,7 +134,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		final Pageable pageable = Mockito.mock(Pageable.class);
 		Mockito.when(pageable.getPageSize()).thenReturn(10);
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
-		final List<SampleDTO> result = this.sampleDao.filter(this.sampleObsUnitId, this.listId, pageable);
+		final List<SampleDTO> result = this.sampleDao.filter(this.ndExperimentId, this.listId, pageable);
 		Assert.assertEquals(1, result.size());
 	}
 
@@ -143,7 +143,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		final Pageable pageable = Mockito.mock(Pageable.class);
 		Mockito.when(pageable.getPageSize()).thenReturn(10);
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
-		final List<SampleDTO> result = this.sampleDao.filter(this.sampleObsUnitId, this.listId, pageable);
+		final List<SampleDTO> result = this.sampleDao.filter(this.ndExperimentId, this.listId, pageable);
 		Assert.assertEquals(1, result.size());
 		final SampleDTO sample = result.get(0);
 		Assert.assertNotNull(sample.getSampleId());
@@ -163,7 +163,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		final Pageable pageable = Mockito.mock(Pageable.class);
 		Mockito.when(pageable.getPageSize()).thenReturn(10);
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
-		final List<SampleDTO> result = this.sampleDao.filter(this.sampleObsUnitId, this.listId, pageable);
+		final List<SampleDTO> result = this.sampleDao.filter(this.ndExperimentId, this.listId, pageable);
 		Assert.assertEquals(1, result.size());
 		final SampleDTO sample = result.get(0);
 		Assert.assertNotNull(sample.getSampleId());
@@ -244,7 +244,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 	}
 
 	private Integer createSampleListForFilter(final String listName, final boolean takenByIsNull, final int sampleSize) {
-		this.sampleObsUnitId = "";
+		this.ndExperimentId = null;
 		
 		final DmsProject project = new DmsProject();
 		project.setName("Test Project");
@@ -292,8 +292,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 			experimentModel.setProject(project);
 			experimentModel.setStock(stockModel);
 			final ExperimentModel savedExperiment = this.experimentDao.saveOrUpdate(experimentModel);
-			if (StringUtils.isEmpty(this.sampleObsUnitId)) {
-				this.sampleObsUnitId = savedExperiment.getObsUnitId();
+			if (this.ndExperimentId == null) {
+				this.ndExperimentId = savedExperiment.getNdExperimentId();
 			}
 
 			final Sample sample = SampleTestDataInitializer.createSample(sampleList, user);

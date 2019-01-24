@@ -57,11 +57,12 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
 	public static final String SAMPLE_ID = "sampleId";
 
-	public List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable) {
+	public List<SampleDTO> filter(final Integer ndExperimentId, final Integer listId, final Pageable pageable) {
 		final Criteria criteria = this.getSession().createCriteria(Sample.class, SAMPLE);
 		addOrder(criteria, pageable);
-		if (StringUtils.isNotBlank(obsUnitId)) {
-			criteria.add(Restrictions.eq("experiment.obsUnitId", obsUnitId));
+		if (ndExperimentId != null) {
+			criteria.add(Restrictions.or(Restrictions.eq("experiment.ndExperimentId", ndExperimentId),
+				Restrictions.eq("experiment.parent.ndExperimentId", ndExperimentId)));
 		}
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
@@ -75,10 +76,13 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return (Sample) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
 
-	public long countFilter(final String obsUnitId, final Integer listId) {
+	public long countFilter(final Integer ndExperimentId, final Integer listId) {
+
 		final Criteria criteria = this.getSession().createCriteria(Sample.class, SAMPLE);
-		if (StringUtils.isNotBlank(obsUnitId)) {
-			criteria.add(Restrictions.eq("experiment.obsUnitId", obsUnitId));
+
+		if (ndExperimentId != null) {
+			criteria.add(Restrictions.or(Restrictions.eq("experiment.ndExperimentId", ndExperimentId),
+				Restrictions.eq("experiment.parent.ndExperimentId", ndExperimentId)));
 		}
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
@@ -189,11 +193,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.project", "project")
-			.createAlias("experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("experimentProperty.typeId", TermId.PLOT_NO.getId()))
-			.createAlias("project.properties", "projectProperty", Criteria.INNER_JOIN, Restrictions.eq("projectProperty.variableId", TermId.DATASET_TYPE.getId()))
+			.createAlias("experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("typeId", TermId.PLOT_NO.getId()))
+			.createAlias("project.properties", "projectProperty", Criteria.INNER_JOIN, Restrictions.eq("variableId", TermId.DATASET_TYPE.getId()))
 			.createAlias("project.relatedTos", "relatedTos")
 			.createAlias("relatedTos.objectProject", "objectProject")
-			.createAlias("objectProject.studyType", "studyType")
+			.createAlias("objectProject.studyType", "studyType", Criteria.LEFT_JOIN)
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
