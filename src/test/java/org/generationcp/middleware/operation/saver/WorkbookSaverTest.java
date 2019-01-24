@@ -337,7 +337,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final Variable locationVariable = createLocationVariable();
 		final String locationVariableValue = "";
 		locationVariable.setValue(locationVariableValue);
-		locationVariable.getVariableType().getStandardVariable().setName(Location.LOCATION_NAME);
+		locationVariable.getVariableType().setLocalName(Location.LOCATION_NAME);
 		variableList.add(locationVariable);
 
 		// Empty Location
@@ -369,7 +369,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final Variable locationVariable = createLocationVariable();
 		final String locationVariableValue = "Existing Location";
 		locationVariable.setValue(locationVariableValue);
-		locationVariable.getVariableType().getStandardVariable().setName(Location.LOCATION_NAME);
+		locationVariable.getVariableType().setLocalName(Location.LOCATION_NAME);
 		variableList.add(locationVariable);
 
 		workbookSaver.assignLocationIdGivenLocationName(variableList, locationDAO);
