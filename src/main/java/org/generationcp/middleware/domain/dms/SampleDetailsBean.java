@@ -21,7 +21,7 @@ public class SampleDetailsBean {
 	private String well;
 	private String datasetType;
 	private String studyName;
-	private String enumerator;
+	private Integer enumerator;
 	private String plotNo;
 	private String observationUnitId;
 	private Integer gdmsDatasetId;
@@ -131,11 +131,11 @@ public class SampleDetailsBean {
 		this.studyName = studyName;
 	}
 
-	public String getEnumerator() {
+	public Integer getEnumerator() {
 		return enumerator;
 	}
 
-	public void setEnumerator(final String enumerator) {
+	public void setEnumerator(final Integer enumerator) {
 		this.enumerator = enumerator;
 	}
 

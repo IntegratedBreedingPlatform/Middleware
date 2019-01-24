@@ -193,8 +193,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.project", "project")
-			.createAlias("experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("typeId", TermId.PLOT_NO.getId()))
 			.createAlias("project.properties", "projectProperty", Criteria.INNER_JOIN, Restrictions.eq("variableId", TermId.DATASET_TYPE.getId()))
+			.createAlias("experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("typeId", TermId.PLOT_NO.getId()))
 			.createAlias("project.relatedTos", "relatedTos")
 			.createAlias("relatedTos.objectProject", "objectProject")
 			.createAlias("objectProject.studyType", "studyType", Criteria.LEFT_JOIN)
@@ -249,7 +249,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			}
 
 			sampleDTO.setStudyName(resultBean.getStudyName());
-			sampleDTO.setEnumerator(resultBean.getEnumerator() != null ? resultBean.getEnumerator() : resultBean.getPlotNo());
+			sampleDTO.setEnumerator(resultBean.getEnumerator() != null ? String.valueOf(resultBean.getEnumerator()) : resultBean.getPlotNo());
 			sampleDTO.setObservationUnitId(resultBean.getObservationUnitId());
 			if (resultBean.getGdmsDatasetId() != null) {
 				sampleDTO.setDatasets(new HashSet<SampleDTO.Dataset>());
