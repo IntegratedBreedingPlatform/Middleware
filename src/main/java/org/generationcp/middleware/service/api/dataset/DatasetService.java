@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.api.dataset;
 
 import com.google.common.collect.Table;
-import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -66,7 +65,7 @@ public interface DatasetService {
 
 	void deleteDataset(int datasetId);
 
-	List<Pair<String, Long>> countObservationsGroupedByInstance(Integer datasetId);
+	Map<String, Long> countObservationsGroupedByInstance(Integer datasetId);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 

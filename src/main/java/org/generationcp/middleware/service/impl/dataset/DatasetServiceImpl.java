@@ -682,7 +682,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<Pair<String, Long>> countObservationsGroupedByInstance(final Integer datasetId) {
+	public Map<String, Long> countObservationsGroupedByInstance(final Integer datasetId) {
 		return daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
 	}
 
