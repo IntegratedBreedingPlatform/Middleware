@@ -1142,7 +1142,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setProperty((String) result.get("property"));
 					final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
 					measurementVariable.setVariableType(variableType);
-					measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+					//TODO: fix the saving of Treatment Factor Variables in the projectprop table.
+					// Right now, the saved typeid is 1100. It should be 1809(VariableType.TREATMENT_FACTOR.getid())
+					if(variableType != null) {
+						measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+					}
 					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());

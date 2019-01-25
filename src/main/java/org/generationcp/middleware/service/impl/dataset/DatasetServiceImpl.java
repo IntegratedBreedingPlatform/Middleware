@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -629,14 +630,32 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
 		final List<MeasurementVariable> subObservationSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
-
+		final List<MeasurementVariable> treatmentFactors =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
+		this.removeTreatmentFactorsFromPlotDatasetColumns(treatmentFactors, plotDataSetColumns);
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(studyVariables);
 		allVariables.addAll(environmentDetailsVariables);
 		allVariables.addAll(environmentConditions);
+		allVariables.addAll(treatmentFactors);
 		allVariables.addAll(plotDataSetColumns);
 		allVariables.addAll(subObservationSetColumns);
 		return allVariables;
+	}
+
+	void removeTreatmentFactorsFromPlotDatasetColumns(final List<MeasurementVariable> treatmentFactors, final List<MeasurementVariable> plotDataSetColumns) {
+		if(!treatmentFactors.isEmpty()) {
+			Iterator itr = plotDataSetColumns.iterator();
+			while (itr.hasNext()) {
+				MeasurementVariable duplicate = (MeasurementVariable) itr.next();
+				for(MeasurementVariable treatmentFactor: treatmentFactors) {
+					if(duplicate.getTermId() == treatmentFactor.getTermId()) {
+						itr.remove();
+						break;
+					}
+				}
+			}
+		}
 	}
 	
 	@Override
