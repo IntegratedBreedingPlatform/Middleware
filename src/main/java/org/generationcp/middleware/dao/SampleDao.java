@@ -17,9 +17,12 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +50,15 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
 		+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
 		+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n" + "GROUP BY sp.nd_experiment_id";
+
+	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
+		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           0,"
+		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1))*1) AS max_sequence_no"
+		+ " FROM nd_experiment nde "
+		+ " INNER JOIN stock st ON st.stock_id = nde.stock_id "
+		+ " INNER JOIN sample s ON s.nd_experiment_id = nde.nd_experiment_id WHERE st.dbxref_id IN (:gids)"
+		+ " GROUP BY st.dbxref_id;";
+
 
 	private static final String SAMPLE = "sample";
 	private static final String SAMPLE_EXPERIMENT = "sample.experiment";
@@ -374,4 +386,25 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return queryResults.isEmpty() ? false : true;
 	}
+
+	public Map<Integer, Integer> getMaxSequenceNumber(final Collection<Integer> gids) {
+		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(SampleDao.MAX_SEQUENCE_NUMBER_QUERY);
+		createSQLQuery.addScalar("gid", new StringType());
+		createSQLQuery.addScalar("max_sequence_no", new IntegerType());
+		createSQLQuery.setParameterList("gids", gids);
+		return this.mapResultsToSampleSequence(createSQLQuery.list());
+	}
+
+	private Map<Integer, Integer> mapResultsToSampleSequence(final List<Object[]> results) {
+		final Map<Integer, Integer> map = new HashMap<>();
+		if (results != null && !results.isEmpty()) {
+
+			for (final Object[] row : results) {
+				map.put(Integer.valueOf((String) row[0]), (Integer) row[1]);
+			}
+		}
+		return map;
+	}
+
+
 }

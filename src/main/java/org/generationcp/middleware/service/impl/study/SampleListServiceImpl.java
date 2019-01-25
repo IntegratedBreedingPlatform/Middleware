@@ -137,7 +137,7 @@ public class SampleListServiceImpl implements SampleListService {
 					maxSequence++;
 					entryNumber++;
 
-					final String sampleName = observationDto.getDesignation() + ':' + String.valueOf(maxSequence);
+					final String sampleName = observationDto.getDesignation() + ':' + maxSequence;
 
 					final Sample sample = this.sampleService
 							.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
@@ -181,8 +181,7 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	private Map<Integer, Integer> getMaxSequenceNumberByGID(final Collection<Integer> gids) {
-		// TODO: return this.daoFactory.getPlantDao().getMaxSequenceNumber(gids);
-		return new HashMap<>();
+		return this.daoFactory.getSampleDao().getMaxSequenceNumber(gids);
 	}
 
 	/**
