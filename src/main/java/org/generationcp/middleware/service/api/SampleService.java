@@ -31,7 +31,7 @@ public interface SampleService {
 
 	Map<String, SampleDTO> getSamplesBySampleUID (final Set<String> sampleUIDs);
 
-	List<SampleGermplasmDetailDTO> getByGid(final Integer gid);
+	List<SampleDTO> getByGid(final Integer gid);
 
 	Boolean studyHasSamples(final Integer studyId);
 }

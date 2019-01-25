@@ -183,7 +183,7 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid) {
+	public List<SampleDTO> getByGid(final Integer gid) {
 		return this.daoFactory.getSampleDao().getByGid(gid);
 	}
 

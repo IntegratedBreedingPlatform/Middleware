@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +24,7 @@ public class SampleDTO {
 	private String well;
 	private String datasetType;
 	private String studyName;
+	private Integer studyId;
 	private String enumerator;
 	private String observationUnitId;
 	private Set<Dataset> datasets = new HashSet<>();
@@ -34,6 +36,12 @@ public class SampleDTO {
 	public class Dataset {
 		private String name;
 		private int datasetId;
+
+		public Dataset(final Integer datasetId, final String name) {
+			this.datasetId = datasetId;
+			this.name = name;
+		}
+
 
 		public String getName() {
 			return name;
@@ -215,6 +223,26 @@ public class SampleDTO {
 		this.datasets = datasets;
 	}
 
+	public void addDataset(final Integer datasetId, final String datasetName) {
+
+		if (null == this.datasets) {
+			this.datasets = new HashSet<>();
+		}
+
+		final Dataset dataset = new Dataset(datasetId, datasetName);
+		if (!this.datasets.contains(dataset)) {
+			this.datasets.add(dataset);
+		}
+	}
+
+	public Integer getStudyId() {
+		return studyId;
+	}
+
+	public void setStudyId(final Integer studyId) {
+		this.studyId = studyId;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {
@@ -242,6 +270,7 @@ public class SampleDTO {
 			.append(studyName, sampleDTO.studyName)
 			.append(enumerator, sampleDTO.enumerator)
 			.append(observationUnitId, sampleDTO.observationUnitId)
+			.append(studyId, sampleDTO.studyId)
 			.isEquals();
 	}
 
@@ -262,6 +291,7 @@ public class SampleDTO {
 			.append(studyName)
 			.append(enumerator)
 			.append(observationUnitId)
+			.append(studyId)
 			.toHashCode();
 	}
 }

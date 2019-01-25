@@ -20,8 +20,11 @@ public class SampleDetailsBean {
 	private String plateId;
 	private String well;
 	private String datasetType;
-	private String studyName;
-	private Integer enumerator;
+	private String projectName;
+	private Integer projectId;
+	private String parentProjectName;
+	private Integer parentProjectId;
+	private Integer observationUnitNo;
 	private String plotNo;
 	private String observationUnitId;
 	private Integer gdmsDatasetId;
@@ -123,20 +126,45 @@ public class SampleDetailsBean {
 		this.datasetType = datasetType;
 	}
 
-	public String getStudyName() {
-		return studyName;
+	public String getProjectName() {
+		return projectName;
 	}
 
-	public void setStudyName(final String studyName) {
-		this.studyName = studyName;
+	public void setProjectName(final String projectName) {
+		this.projectName = projectName;
 	}
 
-	public Integer getEnumerator() {
-		return enumerator;
+
+	public Integer getProjectId() {
+		return projectId;
 	}
 
-	public void setEnumerator(final Integer enumerator) {
-		this.enumerator = enumerator;
+	public void setProjectId(final Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getParentProjectName() {
+		return parentProjectName;
+	}
+
+	public void setParentProjectName(final String parentProjectName) {
+		this.parentProjectName = parentProjectName;
+	}
+
+	public Integer getParentProjectId() {
+		return parentProjectId;
+	}
+
+	public void setParentProjectId(final Integer parentProjectId) {
+		this.parentProjectId = parentProjectId;
+	}
+
+	public Integer getObservationUnitNo() {
+		return observationUnitNo;
+	}
+
+	public void setObservationUnitNo(final Integer observationUnitNo) {
+		this.observationUnitNo = observationUnitNo;
 	}
 
 	public String getPlotNo() {
