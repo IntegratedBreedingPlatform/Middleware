@@ -78,14 +78,23 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable) {
+		Integer ndExperimentId = null;
 		final ExperimentModel experiment = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
-		return this.daoFactory.getSampleDao().filter(experiment.getNdExperimentId(), listId, pageable);
+		if (experiment != null) {
+			ndExperimentId = experiment.getNdExperimentId();
+		}
+		return this.daoFactory.getSampleDao().filter(ndExperimentId, listId, pageable);
 	}
 
 	@Override
 	public long countFilter(final String obsUnitId, final Integer listId) {
+
+		Integer ndExperimentId = null;
 		final ExperimentModel experiment = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
-		return this.daoFactory.getSampleDao().countFilter(experiment.getNdExperimentId(), listId);
+		if (experiment != null) {
+			ndExperimentId = experiment.getNdExperimentId();
+		}
+		return this.daoFactory.getSampleDao().countFilter(ndExperimentId, listId);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
