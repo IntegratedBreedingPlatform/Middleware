@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -28,8 +23,14 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link GeolocationProperty}.
@@ -122,9 +123,9 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
-			executeDeleteStatement(studyId, termId, "pr.object_project_id");
-			executeDeleteStatement(studyId, termId, "pr.subject_project_id");
+
+			this.executeDeleteStatement(studyId, termId, "pr.object_project_id");
+			this.executeDeleteStatement(studyId, termId, "pr.subject_project_id");
 
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error at deleteGeolocationPropertyValueInProject=" + studyId + ", " + termId
@@ -168,5 +169,41 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			GeolocationPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public Map<String, String> getGeoLocationValues(final Integer datasetId) {
+		Preconditions.checkNotNull(datasetId);
+		final String sql = "SELECT "
+			+ "    l.lname as locValue, "
+			+ "    gp.type_id as variable, "
+			+ "	   gp.value as geoValue "
+			+ "FROM "
+			+ "    nd_experiment e "
+			+ "        INNER JOIN "
+			+ "    nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
+			+ " INNER JOIN "
+			+ " location l ON l.locid = gp.value "
+			+ "WHERE "
+			+ "    e.project_id = :datasetId "
+			+ "ORDER BY e.nd_geolocation_id ";
+
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.addScalar("locValue").addScalar("variable").addScalar("geoValue").setParameter("datasetId", datasetId);
+		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+		final List<Map<String, Object>> results = query.list();
+		final Map<String, String> geoProperties = new HashMap<>();
+		for (final Map<String, Object> result : results) {
+			final Integer variable = (Integer) result.get("variable");
+			final String value;
+			if (TermId.LOCATION_ID.getId() == variable.intValue()) {
+				value = (String) result.get("locValue");
+			} else {
+				value = (String) result.get("geoValue");
+			}
+
+			geoProperties.put(String.valueOf(variable), value);
+		}
+		return geoProperties;
 	}
 }

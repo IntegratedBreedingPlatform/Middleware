@@ -1046,7 +1046,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId, final List<Integer> variableTypes) {
 
 		try {
-			final String query = " SELECT "  //
+			final String query = " SELECT distinct "  //
 				+ "   pp.variable_id AS variableId, "  //
 				+ "   variable.name AS variableName, "  //
 				+ "   variable.definition AS description, "  //
@@ -1173,12 +1173,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setScaleMaxRange(scaleMaxRange);
 					measurementVariable.setVariableMinRange(expectedMin);
 					measurementVariable.setVariableMaxRange(expectedMax);
-					measurementVariable.setValue((String) result.get("variableValue"));
 					measurementVariable.setCropOntology((String) result.get("cropOntologyId"));
-
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
+
+				if (measurementVariable.getValue() == null || measurementVariable.getValue().isEmpty()) {
+					measurementVariable.setValue((String) result.get("variableValue"));
+				}
 
 				final Object categoryId = result.get("categoryId");
 				if (categoryId != null) {
