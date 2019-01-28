@@ -174,7 +174,6 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 	public Map<String, String> getGeoLocationValues(final Integer datasetId) {
 		Preconditions.checkNotNull(datasetId);
 		final String sql = "SELECT "
-			+ "    l.lname as locValue, "
 			+ "    gp.type_id as variable, "
 			+ "	   gp.value as geoValue "
 			+ "FROM "
@@ -188,20 +187,14 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			+ "ORDER BY e.nd_geolocation_id ";
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
-		query.addScalar("locValue").addScalar("variable").addScalar("geoValue").setParameter("datasetId", datasetId);
+		query.addScalar("variable").addScalar("geoValue").setParameter("datasetId", datasetId);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 
 		final List<Map<String, Object>> results = query.list();
 		final Map<String, String> geoProperties = new HashMap<>();
 		for (final Map<String, Object> result : results) {
 			final Integer variable = (Integer) result.get("variable");
-			final String value;
-			if (TermId.LOCATION_ID.getId() == variable.intValue()) {
-				value = (String) result.get("locValue");
-			} else {
-				value = (String) result.get("geoValue");
-			}
-
+			final String value = (String) result.get("geoValue");
 			geoProperties.put(String.valueOf(variable), value);
 		}
 		return geoProperties;
