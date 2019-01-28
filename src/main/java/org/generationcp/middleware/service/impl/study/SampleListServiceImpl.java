@@ -84,7 +84,7 @@ public class SampleListServiceImpl implements SampleListService {
 			final SampleList uniqueSampleListName = this.daoFactory.getSampleListDao()
 					.getSampleListByParentAndName(sampleListDTO.getListName(), parent.getId(), sampleListDTO.getProgramUUID());
 
-			Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
+			Preconditions.checkArgument(uniqueSampleListName == null, "List name should be unique within the same directory");
 
 			sampleList.setHierarchy(parent);
 
