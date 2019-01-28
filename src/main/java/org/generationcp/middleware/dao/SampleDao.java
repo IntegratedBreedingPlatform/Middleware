@@ -59,6 +59,12 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		+ " INNER JOIN sample s ON s.nd_experiment_id = nde.nd_experiment_id WHERE st.dbxref_id IN (:gids)"
 		+ " GROUP BY st.dbxref_id;";
 
+	private static final String MAX_SAMPLE_NUMBER_QUERY =
+		"select nde.nd_experiment_id  as nd_experiment_id,  max(sp.sample_no) as max_sample_no from nd_experiment nde"
+			+ " inner join sample sp on sp.nd_experiment_id = nde.nd_experiment_id"
+			+ " where nde.nd_experiment_id in (:experimentIds)  group by nde.nd_experiment_id";
+
+
 
 	private static final String SAMPLE = "sample";
 	private static final String SAMPLE_EXPERIMENT = "sample.experiment";
@@ -221,6 +227,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.alias(Projections.property("sample.sampleId"), "sampleId"))
 				.add(Projections.alias(Projections.property("germplasm.gid"), "gid"))
 				.add(Projections.alias(Projections.property("stock.name"), "designation"))
+				.add(Projections.alias(Projections.property("sample.sampleNumber"), "sampleNumber"))
 				.add(Projections.alias(Projections.property("sample.sampleName"), "sampleName"))
 				.add(Projections.alias(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey"))
 				.add(Projections.alias(Projections.property("person.firstName"), "takenByFirstName"))
@@ -273,6 +280,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				sampleDTO.setSampleId(sampleDetail.getSampleId());
 				sampleDTO.setGid(sampleDetail.getGid());
 				sampleDTO.setDesignation(sampleDetail.getDesignation());
+				sampleDTO.setSampleNumber(sampleDetail.getSampleNumber());
 				sampleDTO.setSampleName(sampleDetail.getSampleName());
 				sampleDTO.setSampleBusinessKey(sampleDetail.getSampleBusinessKey());
 				if (sampleDetail.getTakenByFirstName() != null && sampleDetail.getTakenByLastName() != null) {
@@ -387,6 +395,26 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return queryResults.isEmpty() ? false : true;
 	}
 
+	public Map<Integer, Integer> getMaxSampleNumber(final Collection<Integer> experimentIds) {
+		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(MAX_SAMPLE_NUMBER_QUERY);
+		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
+		createSQLQuery.addScalar("max_sample_no", new IntegerType());
+		createSQLQuery.setParameterList("experimentIds", experimentIds);
+		return this.mapResults(createSQLQuery.list());
+
+	}
+
+	private Map<Integer, Integer> mapResults(final List<Object[]> results) {
+
+		final Map<Integer, Integer> map = new HashMap<>();
+		if (results != null && !results.isEmpty()) {
+			for (final Object[] row : results) {
+				map.put((Integer) row[0], (Integer) row[1]);
+			}
+		}
+		return map;
+	}
+
 	public Map<Integer, Integer> getMaxSequenceNumber(final Collection<Integer> gids) {
 		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(SampleDao.MAX_SEQUENCE_NUMBER_QUERY);
 		createSQLQuery.addScalar("gid", new StringType());
@@ -405,6 +433,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return map;
 	}
+	
+	
 
 
 }

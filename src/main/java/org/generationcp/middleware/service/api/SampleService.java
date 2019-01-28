@@ -18,7 +18,7 @@ public interface SampleService {
 
 	Sample buildSample(final String cropName, final String cropPrefix, final Integer entryNumber,
 		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
-		Date createdDate, User takenBy);
+		Date createdDate, User takenBy, Integer sampleNumber);
 
 	List<SampleDTO> filter(final String obsUnitId, Integer listId, Pageable pageable);
 

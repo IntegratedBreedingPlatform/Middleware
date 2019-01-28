@@ -551,7 +551,7 @@ public class SampleListServiceImplTest {
 		final CropType cropType = new CropType();
 		cropType.setCropName(SampleListServiceImplTest.MAIZE);
 		cropType.setPlotCodePrefix(SampleListServiceImplTest.PLOT_CODE_PREFIX);
-		final Map<Integer, Integer> mapPlantNumbers = new HashMap<>();
+		final Map<Integer, Integer> mapSampleNumbers = new HashMap<>();
 		final Sample sample = new Sample();
 		final Integer selectionVariableId = 2;
 		final List<Integer> instanceIds = new ArrayList<>();
@@ -581,16 +581,16 @@ public class SampleListServiceImplTest {
 			}
 		});
 
-		mapPlantNumbers.put(1, 5);
+		mapSampleNumbers.put(1, 5);
 
 		when(this.studyService.getStudy(studyId)).thenReturn(this.study);
 		when(this.studyMeasurements.getSampleObservations(studyId, instanceIds, selectionVariableId)).thenReturn(observationDtos);
 		when(this.study.getName()).thenReturn("Maizing_Study");
 		when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
-		// when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
+		when(this.sampleDao.getMaxSampleNumber(experimentIds)).thenReturn(mapSampleNumbers);
 		when(this.sampleService
 				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX , 1, preferredNameGid,
-						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
+						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user, 6)).thenReturn(sample);
 		when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleList);
 		final SampleList rootSampleList = new SampleList();
 		rootSampleList.setType(SampleListType.FOLDER);

@@ -145,6 +145,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		projectionList.add(Projections.property("stock.name"), "designation");
 		projectionList.add(Projections.property("properties.value"), "plotNumber");
+		projectionList.add(Projections.property("sample.sampleNumber"), "sampleNumber");
 		projectionList.add(Projections.property("sample.sampleName"), "sampleName");
 		projectionList.add(Projections.property("sample.entryNumber"), "entryNumber");
 		projectionList.add(CustomProjections.concatProperties(" ","person.firstName", "person.lastName"), "takenBy");

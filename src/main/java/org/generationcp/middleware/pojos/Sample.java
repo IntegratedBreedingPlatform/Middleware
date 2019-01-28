@@ -95,6 +95,10 @@ public class Sample implements Serializable {
 	@Column(name = "well")
 	private String well;
 
+	@Basic(optional = false)
+	@Column(name = "sample_no")
+	private Integer sampleNumber;
+
 	public Sample() {
 
 	}
@@ -193,6 +197,14 @@ public class Sample implements Serializable {
 
 	public void setExperiment(final ExperimentModel experiment) {
 		this.experiment = experiment;
+	}
+
+	public Integer getSampleNumber() {
+		return sampleNumber;
+	}
+
+	public void setSampleNumber(final Integer sampleNumber) {
+		this.sampleNumber = sampleNumber;
 	}
 
 	@Override

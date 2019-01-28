@@ -112,6 +112,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
 			final Collection<Integer> gids = this.getGids(observationDtos);
+			final Collection<Integer> experimentIds = this.getExperimentIds(observationDtos);
+			final Map<Integer, Integer> maxSampleNumbers = this.getMaxSampleNumber(experimentIds);
 			final Map<Integer, Integer> maxSequenceNumberByGID = this.getMaxSequenceNumberByGID(gids);
 			final List<Sample> samples = new ArrayList<>();
 			int entryNumber = 0;
@@ -129,11 +131,17 @@ public class SampleListServiceImpl implements SampleListService {
 					maxSequenceNumberByGID.put(gid, maxSequence);
 				}
 
-				final int sampleNumber =
+				final int selectionVariateValue =
 					(Double.valueOf(observationDto.getVariableMeasurements().get(0).getVariableValue())).intValue();
 
+				Integer sampleNumber = maxSampleNumbers.get(observationDto.getMeasurementId());
+				if (sampleNumber == null) {
+					sampleNumber = 0;
+				}
 
-				for (int i = 0; i < sampleNumber; i++) {
+				for (int i = 0; i < selectionVariateValue; i++) {
+
+					sampleNumber++;
 					maxSequence++;
 					entryNumber++;
 
@@ -142,7 +150,7 @@ public class SampleListServiceImpl implements SampleListService {
 					final Sample sample = this.sampleService
 							.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
 									sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user,
-									sampleListDTO.getCreatedDate(), takenBy);
+									sampleListDTO.getCreatedDate(), takenBy, sampleNumber);
 					samples.add(sample);
 				}
 
@@ -178,6 +186,10 @@ public class SampleListServiceImpl implements SampleListService {
 				return observationDto.getGid();
 			}
 		});
+	}
+
+	private Map<Integer, Integer> getMaxSampleNumber(final Collection<Integer> experimentIds) {
+		return this.daoFactory.getSampleDao().getMaxSampleNumber(experimentIds);
 	}
 
 	private Map<Integer, Integer> getMaxSequenceNumberByGID(final Collection<Integer> gids) {

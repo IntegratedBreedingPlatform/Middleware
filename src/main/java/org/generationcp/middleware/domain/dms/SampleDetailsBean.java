@@ -11,6 +11,7 @@ public class SampleDetailsBean {
 	private Integer sampleId;
 	private Integer gid;
 	private String designation;
+	private Integer sampleNumber;
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenByFirstName;
@@ -197,6 +198,14 @@ public class SampleDetailsBean {
 
 	public void setGdmsDatasetName(final String gdmsDatasetName) {
 		this.gdmsDatasetName = gdmsDatasetName;
+	}
+
+	public Integer getSampleNumber() {
+		return sampleNumber;
+	}
+
+	public void setSampleNumber(final Integer sampleNumber) {
+		this.sampleNumber = sampleNumber;
 	}
 
 }

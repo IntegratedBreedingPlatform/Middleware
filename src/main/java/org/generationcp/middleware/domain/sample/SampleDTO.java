@@ -13,6 +13,7 @@ import java.util.TimeZone;
 public class SampleDTO {
 
 	private Integer sampleId;
+	private Integer sampleNumber;
 	private Integer entryNo;
 	private Integer gid;
 	private String designation;
@@ -241,6 +242,14 @@ public class SampleDTO {
 
 	public void setStudyId(final Integer studyId) {
 		this.studyId = studyId;
+	}
+
+	public Integer getSampleNumber() {
+		return sampleNumber;
+	}
+
+	public void setSampleNumber(final Integer sampleNumber) {
+		this.sampleNumber = sampleNumber;
 	}
 
 	@Override

@@ -51,7 +51,7 @@ public class SampleServiceImpl implements SampleService {
 	@Override
 	public Sample buildSample(final String cropName, final String cropPrefix, final Integer entryNumber,
 		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
-		final Date createdDate, final User takenBy) {
+		final Date createdDate, final User takenBy, final Integer sampleNumber) {
 
 		final Sample sample = new Sample();
 		sample.setTakenBy(takenBy);
@@ -64,6 +64,7 @@ public class SampleServiceImpl implements SampleService {
 		sample.setCreatedDate(createdDate);
 		sample.setCreatedBy(createdBy);
 		sample.setExperiment(daoFactory.getExperimentDao().getById(experimentId));
+		sample.setSampleNumber(sampleNumber);
 
 		return sample;
 	}
