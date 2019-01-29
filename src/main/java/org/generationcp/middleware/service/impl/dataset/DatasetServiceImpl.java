@@ -687,7 +687,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return instanceMap;
 	}
 
-	private void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
+	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
 		for(ObservationUnitRow observationUnitRow: observationUnits) {
 			for(MeasurementVariable measurementVariable: studyVariables) {
 				observationUnitRow.getVariables().put(measurementVariable.getName(), new ObservationUnitData(measurementVariable.getValue()));
