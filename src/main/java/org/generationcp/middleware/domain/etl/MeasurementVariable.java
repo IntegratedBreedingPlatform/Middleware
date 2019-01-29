@@ -82,6 +82,8 @@ public class MeasurementVariable {
 
 	private FormulaDto formula;
 
+	private String cropOntology;
+
 	public MeasurementVariable() {
 	}
 
@@ -172,7 +174,7 @@ public class MeasurementVariable {
 	}
 
 	public String getAlias() {
-		return alias;
+		return this.alias;
 	}
 
 	public void setAlias(final String alias) {
@@ -388,7 +390,7 @@ public class MeasurementVariable {
 	}
 
 	public Double getScaleMinRange() {
-		return scaleMinRange;
+		return this.scaleMinRange;
 	}
 
 	public void setScaleMinRange(final Double scaleMinRange) {
@@ -396,7 +398,7 @@ public class MeasurementVariable {
 	}
 
 	public Double getScaleMaxRange() {
-		return scaleMaxRange;
+		return this.scaleMaxRange;
 	}
 
 	public void setScaleMaxRange(final Double scaleMaxRange) {
@@ -404,7 +406,7 @@ public class MeasurementVariable {
 	}
 
 	public Double getVariableMinRange() {
-		return variableMinRange;
+		return this.variableMinRange;
 	}
 
 	public void setVariableMinRange(final Double variableMinRange) {
@@ -412,7 +414,7 @@ public class MeasurementVariable {
 	}
 
 	public Double getVariableMaxRange() {
-		return variableMaxRange;
+		return this.variableMaxRange;
 	}
 
 	public void setVariableMaxRange(final Double variableMaxRange) {
@@ -560,5 +562,13 @@ public class MeasurementVariable {
 
 	public FormulaDto getFormula() {
 		return this.formula;
+	}
+
+	public String getCropOntology() {
+		return this.cropOntology;
+	}
+
+	public void setCropOntology(final String cropOntology) {
+		this.cropOntology = cropOntology;
 	}
 }
