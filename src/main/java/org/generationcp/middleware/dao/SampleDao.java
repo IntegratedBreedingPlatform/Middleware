@@ -254,7 +254,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		if (sampleDetailsBeans.isEmpty()) {
 			return Collections.<SampleDTO>emptyList();
 		}
-		final HashMap<Integer, SampleDTO> samplesMap = new HashMap<>();
+		final HashMap<Integer, SampleDTO> samplesMap = new LinkedHashMap<>();
 
 		for (final SampleDetailsBean sampleDetail : sampleDetailsBeans) {
 			if (samplesMap.containsKey(sampleDetail.getSampleId())) {
