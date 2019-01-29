@@ -5,17 +5,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -27,6 +29,8 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,11 +56,13 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private PersonDAO personDAO;
 	private DmsProjectDao dmsProjectDao;
 	private GermplasmDAO germplasmDao;
+	private ProjectRelationshipDao projectRelationshipDao;
+	private ProjectPropertyDao projectPropertyDao;
 
 	private Integer listId;
 
 	private DaoFactory daoFactory;
-	
+
 	private Integer ndExperimentId;
 
 	@Before
@@ -81,9 +87,15 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.germplasmDao = new GermplasmDAO();
 		this.germplasmDao.setSession(this.sessionProvder.getSession());
+
+		this.projectRelationshipDao = new ProjectRelationshipDao();
+		this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
+
+		this.projectPropertyDao = new ProjectPropertyDao();
+		this.projectPropertyDao.setSession(this.sessionProvder.getSession());
 
 		this.listId = this.createSampleListForFilter(LIST_NAME, false, TEST_SAMPLE_RECORD_COUNT);
 	}
@@ -231,9 +243,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(TEST_SAMPLE_RECORD_COUNT.intValue(), count.intValue());
 
 	}
-	
+
 	@Test
-	public void testGetBySampleBks(){
+	public void testGetBySampleBks() {
 		final Set<String> sampleUIDs = new HashSet<>();
 		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
 			sampleUIDs.add("BUSINESS-KEY-" + LIST_NAME + i);
@@ -245,11 +257,33 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 	private Integer createSampleListForFilter(final String listName, final boolean takenByIsNull, final int sampleSize) {
 		this.ndExperimentId = null;
-		
-		final DmsProject project = new DmsProject();
-		project.setName("Test Project");
-		project.setDescription("Test Project");
-		this.dmsProjectDao.save(project);
+
+		final DmsProject study = new DmsProject();
+		study.setName("Study1");
+		study.setDescription("Study Project");
+
+		final DmsProject plotDmsProject = new DmsProject();
+		plotDmsProject.setName("PLOT DATASET");
+		plotDmsProject.setDescription("PLOT DATASET DESCRIPTION");
+
+		this.dmsProjectDao.save(study);
+		this.dmsProjectDao.save(plotDmsProject);
+
+		final ProjectRelationship plotDmsProjectToStudyProjectRelationship = new ProjectRelationship();
+		plotDmsProjectToStudyProjectRelationship.setSubjectProject(plotDmsProject);
+		plotDmsProjectToStudyProjectRelationship.setObjectProject(study);
+		plotDmsProjectToStudyProjectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
+		this.projectRelationshipDao.save(plotDmsProjectToStudyProjectRelationship);
+
+		final ProjectRelationship studyDmsProjectToRootFolderProjectRelationship = new ProjectRelationship();
+		studyDmsProjectToRootFolderProjectRelationship.setSubjectProject(study);
+		studyDmsProjectToRootFolderProjectRelationship.setObjectProject(this.dmsProjectDao.getById(1));
+		studyDmsProjectToRootFolderProjectRelationship.setTypeId(TermId.STUDY_HAS_FOLDER.getId());
+		this.projectRelationshipDao.save(studyDmsProjectToRootFolderProjectRelationship);
+
+		final ProjectProperty datasetTypeProperty =
+			new ProjectProperty(plotDmsProject, 1805, String.valueOf(DataSetType.PLOT_DATA.getId()), 1, TermId.DATASET_TYPE.getId(), "");
+		this.projectPropertyDao.save(datasetTypeProperty);
 
 		User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
 		if (user == null) {
@@ -272,12 +306,11 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 
-
 		for (int i = 1; i < sampleSize + 1; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
 			this.germplasmDao.save(germplasm);
-			
+
 			final StockModel stockModel = new StockModel();
 			stockModel.setName("Germplasm " + i);
 			stockModel.setIsObsolete(false);
@@ -285,11 +318,11 @@ public class SampleDaoTest extends IntegrationTestBase {
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);
 			this.stockDao.saveOrUpdate(stockModel);
-			
+
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setGeoLocation(geolocation);
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setProject(project);
+			experimentModel.setProject(plotDmsProject);
 			experimentModel.setStock(stockModel);
 			final ExperimentModel savedExperiment = this.experimentDao.saveOrUpdate(experimentModel);
 			if (this.ndExperimentId == null) {
@@ -303,6 +336,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 			sample.setPlateId("PLATEID-" + i);
 			sample.setWell("WELL-" + i);
 			sample.setExperiment(experimentModel);
+			sample.setSampleNumber(i);
 			if (takenByIsNull)
 				sample.setTakenBy(null);
 			this.sampleDao.saveOrUpdate(sample);
