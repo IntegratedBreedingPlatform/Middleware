@@ -77,6 +77,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	public static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
+	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
 			" experiment.nd_experiment_id, " + //
 			" plant.plant_id," + //
@@ -668,7 +669,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL,  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
-			+ "    nde.obs_unit_id as OBS_UNIT_ID,  ");
+			+ "    nde.obs_unit_id as OBS_UNIT_ID,  "
+			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
 
 		final String traitClauseFormat =
 			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', ";
@@ -808,6 +810,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		createSQLQuery.addScalar(ExperimentDao.ROW);
 		createSQLQuery.addScalar(ExperimentDao.COL);
 		createSQLQuery.addScalar(ExperimentDao.OBS_UNIT_ID, new StringType());
+		createSQLQuery.addScalar(ExperimentDao.SUM_OF_SAMPLES);
 	}
 
 	private void addScalarForTraits(
@@ -1057,6 +1060,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
 		observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
 		observationUnitRow.setObsUnitId((String) row.get(OBS_UNIT_ID));
+		observationUnitRow.setSamplesCount((String) row.get(SUM_OF_SAMPLES));
 		final Integer gid = (Integer) row.get(GID);
 		observationUnitRow.setGid(gid);
 		variables.put(GID, new ObservationUnitData(gid.toString()));
