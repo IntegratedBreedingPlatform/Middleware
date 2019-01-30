@@ -385,16 +385,6 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testRemoveTreatmentFactorsFromPlotDatasetColumns() {
-		final List<MeasurementVariable> treatmentFactors = new ArrayList<>(Arrays.asList(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TREATMENT_MEAN.getId(), TermId.TREATMENT_MEAN.name(), ".55")));
-		final List<MeasurementVariable> plotDatasetVariables = new ArrayList<>();
-		plotDatasetVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(),"1"));
-		plotDatasetVariables.addAll(treatmentFactors);
-		this.datasetService.removeTreatmentFactorsFromPlotDatasetColumns(treatmentFactors, plotDatasetVariables);
-		Assert.assertEquals(1, plotDatasetVariables.size());
-	}
-
-	@Test
 	public void testaddStudyVariablesToUnitRows() {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();

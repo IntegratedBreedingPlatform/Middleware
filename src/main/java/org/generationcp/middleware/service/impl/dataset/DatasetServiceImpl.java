@@ -51,6 +51,8 @@ import org.generationcp.middleware.service.impl.study.MeasurementVariableService
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +67,7 @@ import com.google.common.collect.Table;
  */
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
+	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
@@ -158,7 +161,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds,
 		final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits, final Integer parentId) {
-
+		LOG.error("DATASET TYPE:" + datasetTypeId + " obserUVID: " + observationUnitVariableId + " NUM: " + numberOfSubObservationUnits + " PID: " + parentId + " SID: " +studyId);
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
 		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO()
@@ -329,7 +332,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.resolveObservationStatus(variableId, phenotype);
 
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
-
+		System.out.println("PHENOTYPE: " + phenotype);
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
 
@@ -642,7 +645,7 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
 		final List<MeasurementVariable> treatmentFactors =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
-		this.removeTreatmentFactorsFromPlotDatasetColumns(treatmentFactors, plotDataSetColumns);
+		 plotDataSetColumns.removeAll(treatmentFactors);
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(studyVariables);
 		allVariables.addAll(environmentDetailsVariables);
@@ -651,21 +654,6 @@ public class DatasetServiceImpl implements DatasetService {
 		allVariables.addAll(plotDataSetColumns);
 		allVariables.addAll(subObservationSetColumns);
 		return allVariables;
-	}
-
-	void removeTreatmentFactorsFromPlotDatasetColumns(final List<MeasurementVariable> treatmentFactors, final List<MeasurementVariable> plotDataSetColumns) {
-		if(!treatmentFactors.isEmpty()) {
-			Iterator<MeasurementVariable> itr = plotDataSetColumns.iterator();
-			while (itr.hasNext()) {
-				MeasurementVariable duplicate = (MeasurementVariable) itr.next();
-				for(MeasurementVariable treatmentFactor: treatmentFactors) {
-					if(duplicate.getTermId() == treatmentFactor.getTermId()) {
-						itr.remove();
-						break;
-					}
-				}
-			}
-		}
 	}
 	
 	@Override
