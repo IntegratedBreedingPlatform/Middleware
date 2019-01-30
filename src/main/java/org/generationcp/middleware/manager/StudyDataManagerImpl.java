@@ -1215,7 +1215,28 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<String, String> getGeolocationValues(final Integer datasetId) {
-		return this.getGeolocationPropertyDao().getGeoLocationValues(datasetId);
+	public Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId) {
+		final Geolocation geoLocation = this.getGeolocationDao().getById(instanceDbId);
+		final Map<Integer, String> geoLocationMap = this.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
+
+		geoLocationMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), geoLocation.getDescription());
+		if (geoLocation.getLatitude() != null) {
+			geoLocationMap.put(TermId.LATITUDE.getId(), geoLocation.getLatitude().toString());
+		}
+
+		if (geoLocation.getLongitude() != null) {
+			geoLocationMap.put(TermId.LONGITUDE.getId(), geoLocation.getLongitude().toString());
+		}
+
+		if (geoLocation.getGeodeticDatum() != null) {
+			geoLocationMap.put(TermId.GEODETIC_DATUM.getId(), geoLocation.getGeodeticDatum());
+		}
+
+		if (geoLocation.getAltitude() != null) {
+			geoLocationMap.put(TermId.ALTITUDE.getId(), geoLocation.getAltitude().toString());
+		}
+
+		return geoLocationMap;
 	}
+
 }
