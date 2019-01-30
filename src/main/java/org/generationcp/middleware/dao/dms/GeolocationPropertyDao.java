@@ -171,7 +171,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public Map<String, String> getGeoLocationValues(final Integer datasetId) {
+	public Map<Integer, String> getGeoLocationPropertyByVariableId(final Integer datasetId, final Integer instanceDbId) {
 		Preconditions.checkNotNull(datasetId);
 		final String sql = "SELECT "
 			+ "    gp.type_id as variableId, "
