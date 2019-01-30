@@ -271,7 +271,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		final User user = this.userDao.getUserByUserName(ADMIN);
 		final Person person = user.getPerson();
-
 		Assert.assertEquals("BUSINESS-KEY-TEST-LIST-1", sampleDetailsDTO.getSampleBusinessKey());
 		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), sampleDetailsDTO.getTakenBy());
 		Assert.assertEquals("SAMPLE-TEST-LIST-1", sampleDetailsDTO.getSampleName());
@@ -280,6 +279,12 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sampleDetailsDTO.getEntryNumber().intValue());
 		Assert.assertEquals("1", sampleDetailsDTO.getPlotNumber());
 		Assert.assertNotNull(sampleDetailsDTO.getGid());
+		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
+		Assert.assertNotNull(sampleDetailsDTO.getObsUnitId());
+		Assert.assertEquals(1, sampleDetailsDTO.getObservationUnitNumber().intValue());
+		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
+		Assert.assertEquals("PLATEID", sampleDetailsDTO.getPlateId());
+		Assert.assertEquals("WELLID", sampleDetailsDTO.getWell());
 	}
 
 	private void createSampleListForSearch(final String listName) {
@@ -315,6 +320,8 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		sample.setEntryNumber(1);
 		sample.setExperiment(experimentModel);
 		sample.setSampleNumber(1);
+		sample.setPlateId("PLATEID");
+		sample.setWell("WELLID");
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		this.sampleDao.saveOrUpdate(sample);
@@ -350,6 +357,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(project);
+		experimentModel.setObservationUnitNo(1);
 		experimentDao.saveOrUpdate(experimentModel);
 
 		final ExperimentProperty experimentProperty = new ExperimentProperty();
