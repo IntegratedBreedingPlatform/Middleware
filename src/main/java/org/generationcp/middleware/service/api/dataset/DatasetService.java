@@ -14,7 +14,7 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	long countPhenotypes(final Integer datasetId, final List<Integer> traitIds);
+	long countPhenotypes(final Integer datasetId, final List<Integer> variableIds);
 
 	long countPhenotypesByInstance(Integer datasetId, Integer instanceId);
 
@@ -49,7 +49,6 @@ public interface DatasetService {
 
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 
-	//TODO It can be removed
 	Integer getNumberOfChildren (final Integer parentId);
 
 	List<StudyInstance> getDatasetInstances(Integer datasetId);
