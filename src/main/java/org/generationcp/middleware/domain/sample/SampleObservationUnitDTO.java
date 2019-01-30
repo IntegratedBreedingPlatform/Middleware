@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by clarysabel on 1/19/18.
  */
 @AutoProperty
-public class PlantDTO {
+public class SampleObservationUnitDTO {
 
 	private Integer id;
 

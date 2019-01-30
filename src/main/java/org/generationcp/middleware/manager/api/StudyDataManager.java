@@ -34,7 +34,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.sample.PlantDTO;
+import org.generationcp.middleware.domain.sample.SampleObservationUnitDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -697,7 +697,7 @@ public interface StudyDataManager {
 	 * @param studyId
 	 * @return a map of experiments ids with a list of it sampled plants
 	 */
-	Map<Integer, List<PlantDTO>> getSampledPlants(final Integer studyId);
+	Map<Integer, List<SampleObservationUnitDTO>> getSampledObservationUnit(final Integer studyId);
 
 	/**
 	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
