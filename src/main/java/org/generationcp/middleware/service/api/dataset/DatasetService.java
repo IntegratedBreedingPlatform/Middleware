@@ -69,4 +69,6 @@ public interface DatasetService {
 	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
 			final int studyId, final int datasetId, final List<Integer> instanceIds);
 
+	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+
 }

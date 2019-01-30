@@ -755,4 +755,6 @@ public interface StudyDataManager {
 	FieldmapBlockInfo getBlockInformation(int blockId);
 
 	Boolean existInstances(final Set<Integer> instanceIds);
+
+	Map<String, String> getGeolocationValues(final Integer datasetId);
 }

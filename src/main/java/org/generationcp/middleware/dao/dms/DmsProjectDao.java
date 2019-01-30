@@ -1046,7 +1046,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId, final List<Integer> variableTypes) {
 
 		try {
-			final String query = " SELECT "  //
+			final String query = " SELECT distinct "  //
 				+ "   pp.variable_id AS variableId, "  //
 				+ "   variable.name AS variableName, "  //
 				+ "   variable.definition AS description, "  //
@@ -1064,7 +1064,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   scaleMinRange.value AS scaleMinRange, "  //
 				+ "   scaleMaxRange.value AS scaleMaxRange, "  //
 				+ "   vo.expected_min AS expectedMin, "  //
-				+ "   vo.expected_max AS expectedMax "  //
+				+ "   vo.expected_max AS expectedMax, "  //
+				+ "   cropOntology.value AS cropOntologyId,"
+				+ "   pp.value as variableValue"
 				+ " FROM project dataset "  //
 				+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "  //
 				+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "  //
@@ -1090,6 +1092,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "                                         AND scaleMinRange.type_id = " + TermId.MIN_VALUE.getId() //
 				+ "   LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id "  //
 				+ "                                      AND dataset.program_uuid = vo.program_uuid " //
+				+ "   LEFT JOIN cvtermprop cropOntology ON cropOntology.cvterm_id = variable.cvterm_id" //
+				+ "        AND cropOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
 				+ " WHERE " //
 				+ "   dataset.project_id = :observationSetId " //
 				+ "   AND pp.type_id in (:variableTypes) "
@@ -1117,8 +1121,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar("scaleMaxRange", new DoubleType())
 				.addScalar("expectedMin", new DoubleType())
 				.addScalar("expectedMax", new DoubleType())
-				.addScalar("formulaId", new IntegerType());
-			;
+				.addScalar("formulaId", new IntegerType())
+				.addScalar("cropOntologyId")
+				.addScalar("variableValue");
+
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
 
@@ -1174,9 +1180,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setScaleMaxRange(scaleMaxRange);
 					measurementVariable.setVariableMinRange(expectedMin);
 					measurementVariable.setVariableMaxRange(expectedMax);
+					measurementVariable.setCropOntology((String) result.get("cropOntologyId"));
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
+
+				if (measurementVariable.getValue() == null || measurementVariable.getValue().isEmpty()) {
+					measurementVariable.setValue((String) result.get("variableValue"));
+				}
 
 				final Object categoryId = result.get("categoryId");
 				if (categoryId != null) {
@@ -1313,14 +1324,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public long countByVariable(int variableId) throws MiddlewareQueryException {
+	public long countByVariable(final int variableId) throws MiddlewareQueryException {
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
 			query.setParameter("variableId", variableId);
 
 			return ((BigInteger) query.uniqueResult()).longValue();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			final String errorMessage = "Error at countByVariable=" + variableId + " in DmsProjectDao: " + e.getMessage();
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
