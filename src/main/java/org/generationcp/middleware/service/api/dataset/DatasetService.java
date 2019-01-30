@@ -66,4 +66,7 @@ public interface DatasetService {
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 
 	void deleteDataset(int datasetId);
+
+	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+
 }

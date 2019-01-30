@@ -24,8 +24,9 @@ import java.util.List;
  */
 public enum DataSetType {
 
-	STUDY_CONDITIONS(10060, "Study Conditions"), MEANS_DATA(10070, "Means Data"), SUMMARY_DATA(10080, "Summary Data"), PLOT_DATA(10090, "Plots"), PLANT_SUBOBSERVATIONS(
-			10094, "Plants"), QUADRAT_SUBOBSERVATIONS(10095, "Quadrats"), TIME_SERIES_SUBOBSERVATIONS(10096, "Time Series"), CUSTOM_SUBOBSERVATIONS(10097, "Sub-Observation Units");
+
+	STUDY_CONDITIONS(10060, "STUDY"), MEANS_DATA(10070, "MEANS"), SUMMARY_DATA(10080, "SUMMARY"), PLOT_DATA(10090, "PLOT"), PLANT_SUBOBSERVATIONS(
+			10094, "PLANT"), QUADRAT_SUBOBSERVATIONS(10095, "QUADRAT"), TIME_SERIES_SUBOBSERVATIONS(10096, "TIMESERIES"), CUSTOM_SUBOBSERVATIONS(10097, "CUSTOM");
 
 	public static final List<DataSetType> SUBOBSERVATIONS =
 		Arrays.asList(PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
@@ -44,18 +45,20 @@ public enum DataSetType {
 	}
 
 	private int id;
-	private String description;
 
-	private DataSetType(int id, String description) {
+	private String readableName;
+
+	private DataSetType(int id, String readableName) {
 		this.id = id;
-		this.description = description;
+		this.readableName = readableName;
 	}
 
 	public int getId() {
 		return this.id;
 	}
-	public String getDescription() {
-		return this.description;
+
+	public String getReadableName() {
+		return this.readableName;
 	}
 
 	public static DataSetType findById(int id) {

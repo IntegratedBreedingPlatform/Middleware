@@ -290,7 +290,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				sampleDTO.setSamplingDate(sampleDetail.getSamplingDate());
 				sampleDTO.setPlateId(sampleDetail.getPlateId());
 				sampleDTO.setWell(sampleDetail.getWell());
-				sampleDTO.setDatasetType(dataSetType.getDescription());
+				sampleDTO.setDatasetType(dataSetType.getReadableName());
 
 				// Enumerator (a.k.a Observation Unit Number) is null if the sample was created from observation dataset, in that case,
 				// we should use PlotNo
