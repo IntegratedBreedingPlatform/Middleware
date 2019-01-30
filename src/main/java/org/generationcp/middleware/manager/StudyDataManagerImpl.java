@@ -1239,4 +1239,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return geoLocationMap;
 	}
 
+	@Override
+	public Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId) {
+		final Map<Integer, String> phenotypeMap = new HashMap<>();
+		List<Phenotype> phenotypes = this.getPhenotypeDao().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
+		for (final Phenotype phenotype : phenotypes) {
+				phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
+		}
+		return phenotypeMap;
+	}
 }
