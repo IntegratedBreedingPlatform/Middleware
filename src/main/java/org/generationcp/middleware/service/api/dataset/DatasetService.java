@@ -66,7 +66,7 @@ public interface DatasetService {
 
 	void deleteDataset(int datasetId);
 	
-	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
+	Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
 			final int studyId, final int datasetId, final List<Integer> instanceIds);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);

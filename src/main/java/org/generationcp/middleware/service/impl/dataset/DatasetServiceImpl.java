@@ -657,7 +657,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 	
 	@Override
-	public Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, final int datasetId,
+	public Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(final int studyId, final int datasetId,
 			final List<Integer> instanceIds) {
 		final Map<Integer, List<ObservationUnitRow>> instanceMap = new HashMap<>();
 		final StudyDatasetVariables datasetVariables = new StudyDatasetVariables();
