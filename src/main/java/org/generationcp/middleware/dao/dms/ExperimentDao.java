@@ -751,7 +751,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final StudyDatasetVariables datasetVariables, final Integer instanceId) {
 			try {
 				final String observationVariableName = this.getObservationVariableName(datasetId);
-			final List<Map<String, Object>> results = this.getObservationUnitsAllVariablesResult(datasetId, datasetEnvironmentId, datasetVariables, instanceId, observationVariableName);
+			final List<Map<String, Object>> results = this.getObservationUnitsAllVariablesResult(datasetId, datasetEnvironmentId, datasetVariables, instanceId);
 			return this.mapAllVariableResults(results, datasetVariables, observationVariableName);
 			} catch (final HibernateException e) {
 				ExperimentDao.LOG.error(e.getMessage());
@@ -981,9 +981,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 	
 	private List<Map<String, Object>> getObservationUnitsAllVariablesResult(final int datasetId, final Integer datasetEnvironmentId,
-			final StudyDatasetVariables datasetVariables, final Integer instanceId, final String observationVariableName) {
+			final StudyDatasetVariables datasetVariables, final Integer instanceId) {
 		try {
-			final String observationUnitTableQuery = this.getObservationUnitAllVariablesQuery(datasetVariables, observationVariableName);
+			final String observationUnitTableQuery = this.getObservationUnitAllVariablesQuery(datasetVariables);
 			final SQLQuery query = this.createQueryAndAddScalar(datasetVariables, observationUnitTableQuery);
 			if(!datasetVariables.getEnvironmentConditions().isEmpty()) query.setParameter("datasetEnvironmentId", String.valueOf(datasetEnvironmentId));
 			query.setParameter("datasetId", datasetId);
@@ -1000,7 +1000,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 	
-	private String getObservationUnitAllVariablesQuery(final StudyDatasetVariables datasetVariables, final String observationUnitNoName) {
+	private String getObservationUnitAllVariablesQuery(final StudyDatasetVariables datasetVariables) {
 
 			// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 			// same for columns -> DatasetServiceImpl.getSubObservationSetColumns
