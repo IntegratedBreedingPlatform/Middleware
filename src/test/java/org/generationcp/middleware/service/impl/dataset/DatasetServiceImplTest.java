@@ -357,34 +357,6 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testGetAllDatasetVariables() {
-		final DmsProject project = DMSProjectTestDataInitializer.testCreateDMSProject(1, "Project", "Description", "1001");
-		when(projectRelationshipDao.getObjectBySubjectIdAndTypeId(1, TermId.BELONGS_TO_STUDY.getId())).thenReturn(project);
-		when(this.dmsProjectDao.getDataSetsByStudyAndProjectProperty(1, TermId.DATASET_TYPE.getId(),
-			String.valueOf(DataSetType.SUMMARY_DATA.getId()))).thenReturn(Arrays.asList(project));
-		final List<MeasurementVariable> mockedDatasetVariables = this.mockDatasetVariables();
-
-		final List<MeasurementVariable> datasetVariables = this.datasetService.getAllDatasetVariables(1,1);
-
-		Assert.assertEquals(mockedDatasetVariables.size(), datasetVariables.size());
-		Mockito.verify(this.daoFactory.getProjectRelationshipDao()).getObjectBySubjectIdAndTypeId(1, TermId.BELONGS_TO_STUDY.getId());
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(1,
-			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(1, TermId.DATASET_TYPE.getId(),
-			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(1,
-			DatasetServiceImpl.ENVIRONMENT_VARIABLE_TYPES);
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(1,
-			Lists.newArrayList(VariableType.TRAIT.getId()));
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(1,
-			Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(1,
-			DatasetServiceImpl.PLOT_COLUMNS_VARIABLE_TYPES);
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(1,
-			DatasetServiceImpl.SUBOBS_COLUMNS_VARIABLE_TYPES);
-	}
-
-	@Test
 	public void testaddStudyVariablesToUnitRows() {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();

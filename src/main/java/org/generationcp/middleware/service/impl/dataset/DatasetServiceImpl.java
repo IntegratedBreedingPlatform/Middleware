@@ -4,12 +4,9 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -611,49 +608,6 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getDatasetMeasurementVariables(final Integer datasetId) {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, MEASUREMENT_VARIABLE_TYPES);
-	}
-	
-	@Override
-	public List<MeasurementVariable> getAllDatasetVariables(final Integer studyId, final Integer datasetId) {
-		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
-		
-		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(studyId,
-				Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-
-		final DmsProject trialDataset = this.daoFactory.getDmsProjectDAO().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
-				String.valueOf(DataSetType.SUMMARY_DATA.getId())).get(0);
-		final List<MeasurementVariable> environmentDetailsVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(trialDataset.getProjectId(), ENVIRONMENT_VARIABLE_TYPES);
-		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
-		Collections.sort(environmentDetailsVariables, new Comparator<MeasurementVariable>() {
-			@Override
-			public int compare(MeasurementVariable var1, MeasurementVariable var2) {
-				final String value1 = var1.getValue();
-				final String value2 = var2.getValue();
-		        if (value1 != null && value2 != null)
-		            return value1.compareTo(value2);
-		        return (value1 == null) ? 1 : -1;
-		    }
-		});
-		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-				.getObservationSetVariables(trialDataset.getProjectId(), Lists.newArrayList(VariableType.TRAIT.getId()));
-		
-		final List<MeasurementVariable> plotDataSetColumns =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
-		final List<MeasurementVariable> subObservationSetColumns =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
-		final List<MeasurementVariable> treatmentFactors =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
-		 plotDataSetColumns.removeAll(treatmentFactors);
-		final List<MeasurementVariable> allVariables = new ArrayList<>();
-		allVariables.addAll(studyVariables);
-		allVariables.addAll(environmentDetailsVariables);
-		allVariables.addAll(environmentConditions);
-		allVariables.addAll(treatmentFactors);
-		allVariables.addAll(plotDataSetColumns);
-		allVariables.addAll(subObservationSetColumns);
-		return allVariables;
 	}
 	
 	@Override

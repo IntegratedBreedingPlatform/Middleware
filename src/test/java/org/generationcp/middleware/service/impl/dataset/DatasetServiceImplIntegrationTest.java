@@ -98,36 +98,12 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 		final String selectionVarName  = "NPSEL";
 		this.datasetService.addVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, selectionVarName);
 
-		Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceObservationUnitRowsMap(nurseryId, datasetDTO.getDatasetId(), instanceIds);
+		Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(nurseryId, datasetDTO.getDatasetId(), instanceIds);
 		List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(instanceIds.get(0));
 		Assert.assertNotNull(instanceObsUnitRowMap.get(instanceIds.get(0)));
 		Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
 		Assert.assertNotNull(observationUnitRows.get(0).getVariables().get(traitName));
 		Assert.assertNotNull(observationUnitRows.get(0).getVariables().get(selectionVarName));
-	}
-
-	@Test
-	public void testGetAllDatasetVariables() {
-		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
-		final Integer[] gids = this.germplasmTestDataGenerator
-			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
-
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD", false);
-		final List<Integer> instanceIds = new ArrayList<>(this.studyDataManager.getInstanceGeolocationIdsMap(nurseryId).values());
-
-		final DatasetDTO datasetDTO = this.datasetService.generateSubObservationDataset(nurseryId, "TEST NURSERY SUB OBS", 10094, instanceIds,8206, 2,nurseryId+2);
-		final List<MeasurementVariable> measurementVariables = this.datasetService.getAllDatasetVariables(nurseryId, datasetDTO.getDatasetId());
-
-		final String traitName = "GW_DW_g1000grn";
-		this.datasetService.addVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, traitName);
-		final String selectionVarName  = "NPSEL";
-		this.datasetService.addVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, selectionVarName);
-
-		final List<MeasurementVariable> measurementVariablesWithAddedTraitAndSelectionVariables = this.datasetService.getAllDatasetVariables(nurseryId, datasetDTO.getDatasetId());
-		Assert.assertEquals(measurementVariables.size(), measurementVariablesWithAddedTraitAndSelectionVariables.size()-2);
-		final List<String> variableNames = this.getVariableNames(measurementVariablesWithAddedTraitAndSelectionVariables);
-		Assert.assertTrue(variableNames.contains(traitName));
-		Assert.assertTrue(variableNames.contains(selectionVarName));
 	}
 
 	public List<String> getVariableNames(final List<MeasurementVariable> measurementVariables) {
