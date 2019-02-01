@@ -6,7 +6,6 @@ import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
-import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
@@ -52,12 +51,6 @@ public class DaoFactory {
 		final SampleDao sampleDao = new SampleDao();
 		sampleDao.setSession(this.sessionProvider.getSession());
 		return sampleDao;
-	}
-
-	public PlantDao getPlantDao() {
-		final PlantDao plantDao = new PlantDao();
-		plantDao.setSession(this.sessionProvider.getSession());
-		return plantDao;
 	}
 
 	public UserDAO getUserDao() {

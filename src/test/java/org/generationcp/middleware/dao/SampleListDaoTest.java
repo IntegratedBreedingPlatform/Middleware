@@ -9,19 +9,19 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PlantTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,6 +62,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private StockDao stockDao;
 	private ExperimentPropertyDao experimentPropertyDao;
 	private GermplasmDAO germplasmDao;
+	private ProjectPropertyDao projectPropertyDao;
 
 	private DaoFactory daoFactory;
 
@@ -95,6 +97,9 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.germplasmDao = new GermplasmDAO();
 		this.germplasmDao.setSession(this.sessionProvder.getSession());
 
+		this.projectPropertyDao = new ProjectPropertyDao();
+		this.projectPropertyDao.setSession(this.sessionProvder.getSession());
+
 		// Create three sample lists test data for search
 		this.createSampleListForSearch("TEST-LIST-1");
 		this.createSampleListForSearch("TEST-LIST-2");
@@ -106,8 +111,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		final User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 
-		final Plant plant = PlantTestDataInitializer.createPlant();
-		final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, user);
+		final Sample sample = SampleTestDataInitializer.createSample(sampleList, user);
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		Assert.assertNotNull(sampleList.getId());
@@ -116,9 +120,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(sampleList.getDescription(), SampleListDaoTest.DESCRIPTION);
 		Assert.assertEquals(SampleListDaoTest.SAMPLE_LIST_NAME, sampleList.getListName());
 		Assert.assertEquals(sampleList.getNotes(), SampleListDaoTest.NOTES);
-		Assert.assertEquals(plant.getPlantBusinessKey(), SampleListDaoTest.P + SampleListDaoTest.CROP_PREFIX);
-		Assert.assertEquals(plant.getPlantNumber(), new Integer(0));
-		Assert.assertEquals(sample.getPlant(), plant);
 		// Assert.assertEquals(sample.getTakenBy().getName(), user.getName());
 		Assert.assertEquals(sample.getSampleName(), SampleListDaoTest.GID);
 		Assert.assertEquals(sample.getSampleBusinessKey(), SampleListDaoTest.S + SampleListDaoTest.CROP_PREFIX);
@@ -270,8 +271,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		final User user = this.userDao.getUserByUserName(ADMIN);
 		final Person person = user.getPerson();
-
-		Assert.assertEquals("PABCD", sampleDetailsDTO.getPlantBusinessKey());
 		Assert.assertEquals("BUSINESS-KEY-TEST-LIST-1", sampleDetailsDTO.getSampleBusinessKey());
 		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), sampleDetailsDTO.getTakenBy());
 		Assert.assertEquals("SAMPLE-TEST-LIST-1", sampleDetailsDTO.getSampleName());
@@ -280,18 +279,28 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sampleDetailsDTO.getEntryNumber().intValue());
 		Assert.assertEquals("1", sampleDetailsDTO.getPlotNumber());
 		Assert.assertNotNull(sampleDetailsDTO.getGid());
+		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
+		Assert.assertNotNull(sampleDetailsDTO.getObsUnitId());
+		Assert.assertEquals(1, sampleDetailsDTO.getObservationUnitNumber().intValue());
+		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
+		Assert.assertEquals("PLATEID", sampleDetailsDTO.getPlateId());
+		Assert.assertEquals("WELLID", sampleDetailsDTO.getWell());
 	}
 
 	private void createSampleListForSearch(final String listName) {
 
-		final DmsProject project = new DmsProject();
-		project.setName("Test Project");
-		project.setDescription("Test Project");
-		dmsProjectDao.save(project);
+		final DmsProject plotDmsProject = new DmsProject();
+		plotDmsProject.setName("Plot Dataset");
+		plotDmsProject.setDescription("Plot Dataset");
+		dmsProjectDao.save(plotDmsProject);
+
+		final ProjectProperty datasetTypeProperty =
+			new ProjectProperty(plotDmsProject, 1805, String.valueOf(DataSetType.PLOT_DATA.getId()), 1, TermId.DATASET_TYPE.getId(), "");
+		this.projectPropertyDao.save(datasetTypeProperty);
 
 		final User user = this.createTestUser();
 
-		final ExperimentModel experimentModel = this.createTestExperiment(project);
+		final ExperimentModel experimentModel = this.createTestExperiment(plotDmsProject);
 		this.createTestStock(experimentModel);
 
 		this.createTestSampleList(listName, user, experimentModel);
@@ -301,17 +310,18 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	private void createTestSampleList(final String listName, final User user, final ExperimentModel experimentModel) {
 
-		final Plant plant = PlantTestDataInitializer.createPlant();
-		plant.setExperiment(experimentModel);
-
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 		sampleList.setListName(listName);
 		sampleList.setDescription("DESCRIPTION-" + listName);
 
-		final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, user);
+		final Sample sample = SampleTestDataInitializer.createSample(sampleList, user);
 		sample.setSampleName("SAMPLE-" + listName);
 		sample.setSampleBusinessKey("BUSINESS-KEY-" + listName);
 		sample.setEntryNumber(1);
+		sample.setExperiment(experimentModel);
+		sample.setSampleNumber(1);
+		sample.setPlateId("PLATEID");
+		sample.setWell("WELLID");
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		this.sampleDao.saveOrUpdate(sample);
@@ -347,6 +357,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(project);
+		experimentModel.setObservationUnitNo(1);
 		experimentDao.saveOrUpdate(experimentModel);
 
 		final ExperimentProperty experimentProperty = new ExperimentProperty();

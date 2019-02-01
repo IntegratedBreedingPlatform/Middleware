@@ -50,19 +50,19 @@ import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
+import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
-import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
+import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
@@ -165,6 +165,14 @@ public class ManagerFactory implements Serializable {
 
 	public StudyDataManager getNewStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
+	}
+
+	public org.generationcp.middleware.service.api.dataset.DatasetService getDatasetMiddlewareService() {
+		return new org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl(this.sessionProvider);
+	}
+
+	public MeasurementVariableService getMeasurementVariableService() {
+		return new MeasurementVariableServiceImpl(this.sessionProvider.getSession());
 	}
 
 	public OntologyDataManager getNewOntologyDataManager() {
@@ -292,10 +300,6 @@ public class ManagerFactory implements Serializable {
 
 	public SampleService getSampleService() {
 		return new SampleServiceImpl(this.sessionProvider);
-	}
-
-	public PlantService getPlantService() {
-		return new PlantServiceImpl(this.sessionProvider);
 	}
 
 	public FormulaService getFormulaService() {

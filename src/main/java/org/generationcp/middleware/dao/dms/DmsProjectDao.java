@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -1358,4 +1359,37 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return datasetDTO;
 
 	}
+
+	public DatasetDTO getDatasetOfSampleList(final Integer sampleListId) {
+
+		final DatasetDTO datasetDTO;
+		try {
+
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("project.projectId"), "datasetId");
+			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
+			projectionList.add(Projections.property("project.name"), "name");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+
+			final Criteria criteria = this.getSession().createCriteria(SampleList.class);
+			criteria.createAlias("samples", "sample")
+				.createAlias("samples.experiment", "experiment")
+				.createAlias("experiment.project", "project")
+				.createAlias("project.relatedTos", "pr")
+				.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()))
+				.add(Restrictions.eq("id", sampleListId));
+			criteria.setProjection(Projections.distinct(projectionList));
+			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
+			datasetDTO = (DatasetDTO) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error getting getDatasetOfSampleList for sampleListId =" + sampleListId + ":" + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+
+		return datasetDTO;
+
+	}
+
 }

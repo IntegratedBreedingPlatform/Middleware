@@ -19,6 +19,8 @@ public class SampleListDTO implements Serializable {
 
 	private Integer listId;
 
+	private Integer datasetId;
+
 	private String description;
 
 	private String notes;
@@ -32,8 +34,6 @@ public class SampleListDTO implements Serializable {
 	private String takenBy;
 
 	private Date samplingDate;
-
-	private Integer studyId;
 
 	private String cropName;
 
@@ -60,14 +60,6 @@ public class SampleListDTO implements Serializable {
 
 	public void setCropName(final String cropName) {
 		this.cropName = cropName;
-	}
-
-	public Integer getStudyId() {
-		return this.studyId;
-	}
-
-	public void setStudyId(final Integer studyId) {
-		this.studyId = studyId;
 	}
 
 	public Integer getSelectionVariableId() {
@@ -133,6 +125,14 @@ public class SampleListDTO implements Serializable {
 
 	public void setNotes(final String notes) {
 		this.notes = notes;
+	}
+
+	public Integer getDatasetId() {
+		return datasetId;
+	}
+
+	public void setDatasetId(final Integer datasetId) {
+		this.datasetId = datasetId;
 	}
 
 	@Override
