@@ -18,7 +18,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.sample.SampleObservationUnitDTO;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -380,8 +380,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	}
 
-	public Map<Integer, List<SampleObservationUnitDTO>> getSampledObservationUnit(final Integer studyId) {
-		final Map<Integer, List<SampleObservationUnitDTO>> map = new HashMap<>();
+	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
+		final Map<Integer, List<SampleDTO>> map = new HashMap<>();
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(SQL_GET_SAMPLED_OBSERVATION_BY_STUDY);
 			query.setParameter("studyId", studyId);
@@ -390,15 +390,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			for (final Object o : results) {
 				final Object[] result = (Object[]) o;
 				if (result != null) {
-					final SampleObservationUnitDTO sampleObservationUnitDTO = new SampleObservationUnitDTO();
-					sampleObservationUnitDTO.setId((Integer) result[1]);
-					sampleObservationUnitDTO.setPlantNo(String.valueOf(result[2]));
+					final SampleDTO sampleDTO = new SampleDTO();
+					sampleDTO.setSampleId((Integer) result[1]);
+					sampleDTO.setSampleNumber((Integer) result[2]);
 					final Integer experimentId = (Integer) result[0];
 					if (map.containsKey(experimentId)) {
-						map.get(experimentId).add(sampleObservationUnitDTO);
+						map.get(experimentId).add(sampleDTO);
 					} else {
-						final List<SampleObservationUnitDTO> sampleObservationUnitDTOS = new ArrayList<>();
-						sampleObservationUnitDTOS.add(sampleObservationUnitDTO);
+						final List<SampleDTO> sampleObservationUnitDTOS = new ArrayList<>();
+						sampleObservationUnitDTOS.add(sampleDTO);
 						map.put(experimentId, sampleObservationUnitDTOS);
 					}
 				}

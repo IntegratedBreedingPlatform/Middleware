@@ -3,7 +3,7 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.sample.SampleObservationUnitDTO;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.hibernate.Criteria;
@@ -84,7 +84,7 @@ public class ExperimentDaoTest {
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
 
-		final Map<Integer, List<SampleObservationUnitDTO>> result = experimentDao.getSampledObservationUnit(1);
+		final Map<Integer, List<SampleDTO>> result = experimentDao.getExperimentSamplesDTOMap(1);
 		assertThat(result.size(), equalTo(3));
 		assertThat(result.get(1).size(), equalTo(2));
 		assertThat(result.get(2).size(), equalTo(1));
@@ -95,7 +95,7 @@ public class ExperimentDaoTest {
 	public void testGetSampledPlants_ThrowsException() {
 		Mockito.when(this.mockSession.createSQLQuery(ExperimentDao.SQL_GET_SAMPLED_OBSERVATION_BY_STUDY))
 				.thenThrow(MiddlewareQueryException.class);
-		experimentDao.getSampledObservationUnit(1);
+		experimentDao.getExperimentSamplesDTOMap(1);
 	}
 
 	@Test

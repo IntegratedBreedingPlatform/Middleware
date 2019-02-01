@@ -35,6 +35,9 @@
 		<preConditions onFail="MARK_RAN">
 				<tableExists tableName="plant"/>
 		</preConditions>
+		<comment>
+			Delete the plant table because it is not needed anymore.
+		</comment>
 		<dropTable tableName="plant"/>
 	</changeSet>
 </databaseChangeLog>
