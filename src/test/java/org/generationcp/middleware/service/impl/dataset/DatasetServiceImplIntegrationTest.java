@@ -1,5 +1,9 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -7,7 +11,6 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -22,14 +25,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by clarysabel on 11/13/17.
  */
 public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
+
+	private static final String SELECTION_NAME = "NPSEL";
+
+	private static final String TRAIT_NAME = "GW_DW_g1000grn";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -49,18 +52,19 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private FieldbookService middlewareFieldbookService;
 
-	private DaoFactory daoFactory;
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private DataSetupTest dataSetupTest;
 
 	private DatasetServiceImpl datasetService;
+	private Integer studyId;
+	private List<Integer> instanceIds;
+	private Integer subObsDatasetId;
 
 
 	@Before
 	public void setUp() {
-		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.datasetService = new DatasetServiceImpl(this.sessionProvder);
 
 		this.dataSetupTest = new DataSetupTest();
@@ -80,30 +84,65 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager);
 		}
+		
+		if (this.studyId == null) {
+			this.createTestStudyWithSubObservations();
+		}
 	}
 
 	@Test
 	public void testGetInstanceObservationUnitRowsMap() {
+		Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
+		List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(instanceIds.get(0));
+		Assert.assertNotNull(observationUnitRows);
+		Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+		final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);
+		this.verifyObservationUnitRowValues(observationUnitRow);
+		// Check for study and environment values
+		Assert.assertNotNull(observationUnitRow.getVariables().get("STUDY_INSTITUTE"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("STUDY_BM_CODE"));
+	}
+	
+	@Test
+	public void testGetObservationUnitRows() {
+		final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId, this.instanceIds.get(0), 1, 100, null, null);
+		Assert.assertNotNull(observationUnitRows);
+		Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
+		final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);
+		this.verifyObservationUnitRowValues(observationUnitRow);
+	}
+
+	private void verifyObservationUnitRowValues(final ObservationUnitRow observationUnitRow) {
+		Assert.assertNotNull(observationUnitRow.getVariables().get(TRAIT_NAME));
+		Assert.assertNotNull(observationUnitRow.getVariables().get(SELECTION_NAME));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("LOCATION_ID"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("TRIAL_INSTANCE"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("ENTRY_NO"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("ENTRY_CODE"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("GID"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("DESIGNATION"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("CROSS"));
+		Assert.assertNotNull(observationUnitRow.getVariables().get("PLOT_NO"));
+		Assert.assertNotNull(observationUnitRow.getObsUnitId());
+		Assert.assertNotNull(observationUnitRow.getObservationUnitId());
+		Assert.assertNotNull(observationUnitRow.getAction());
+		Assert.assertNotNull(observationUnitRow.getGid());
+		Assert.assertNotNull(observationUnitRow.getDesignation());
+	}
+
+	private void createTestStudyWithSubObservations() {
 		Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
 		final Integer[] gids = this.germplasmTestDataGenerator
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD", false);
-		final List<Integer> instanceIds = new ArrayList<>(this.studyDataManager.getInstanceGeolocationIdsMap(nurseryId).values());
+		this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD", false);
+		this.instanceIds = new ArrayList<>(this.studyDataManager.getInstanceGeolocationIdsMap(this.studyId).values());
 
-		final DatasetDTO datasetDTO = this.datasetService.generateSubObservationDataset(nurseryId, "TEST NURSERY SUB OBS", 10094, instanceIds,8206, 2,nurseryId+2);
-		final String traitName = "GW_DW_g1000grn";
-		this.datasetService.addVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, traitName);
-		final String selectionVarName  = "NPSEL";
-		this.datasetService.addVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, selectionVarName);
-
-		Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(nurseryId, datasetDTO.getDatasetId(), instanceIds);
-		List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(instanceIds.get(0));
-		Assert.assertNotNull(instanceObsUnitRowMap.get(instanceIds.get(0)));
-		Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
-		Assert.assertNotNull(observationUnitRows.get(0).getVariables().get(traitName));
-		Assert.assertNotNull(observationUnitRows.get(0).getVariables().get(selectionVarName));
+		final DatasetDTO datasetDTO = this.datasetService.generateSubObservationDataset(this.studyId, "TEST NURSERY SUB OBS", 10094, instanceIds,8206, 2, this.studyId+2);
+		this.subObsDatasetId = datasetDTO.getDatasetId();
+		this.datasetService.addVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, TRAIT_NAME);
+		this.datasetService.addVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, SELECTION_NAME);
 	}
 
 	public List<String> getVariableNames(final List<MeasurementVariable> measurementVariables) {
