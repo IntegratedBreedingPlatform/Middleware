@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.SortedPageRequest;
@@ -26,6 +27,8 @@ public class ObservationUnitsSearchDTO {
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 		this.datasetId = datasetId;
 		this.instanceId = instanceId;
+		this.environmentDetails = new ArrayList<>();
+		this.environmentConditions = new ArrayList<>();
 	}
 
 	public List<String> getEnvironmentDetails() {

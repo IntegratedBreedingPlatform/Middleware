@@ -47,6 +47,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -690,7 +691,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				measurementVariable.getName() + "_CvalueId"));
 		}
 
-		if (!searchDto.getGenericGermplasmDescriptors().isEmpty()) {
+		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
 			final String germplasmDescriptorClauseFormat =
 				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s', \n";
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
@@ -698,7 +699,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		if (!searchDto.getAdditionalDesignFactors().isEmpty()) {
+		if (!CollectionUtils.isEmpty(searchDto.getAdditionalDesignFactors())) {
 			final String designFactorClauseFormat =
 				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = parent.nd_experiment_id AND xpropcvt.name = '%s') '%s', \n";
 			for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
@@ -706,7 +707,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 		
-		if (!searchDto.getEnvironmentDetails().isEmpty()) {
+		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
 			final String envFactorFormat =
 				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s', \n";
 			for (final String envFactor : searchDto.getEnvironmentDetails()) {
@@ -714,7 +715,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		if (!searchDto.getEnvironmentConditions().isEmpty()) {
+		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
 			final String envConditionFormat =
 				"    (SELECT pheno.value from phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
@@ -983,7 +984,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
 			}
 			
-			if(!searchDto.getEnvironmentConditions().isEmpty()){
+			if(!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())){
 				query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
 			}	
 
@@ -1001,7 +1002,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();
 			ExperimentDao.LOG.error(error);
-			throw new MiddlewareException(error);
+			throw new MiddlewareException(error, e);
 		}
 	}
 
@@ -1104,10 +1105,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			variables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
 		}
 		for (final String envFactor : searchDto.getEnvironmentDetails()) {
-			observationUnitRow.getVariables().put(envFactor, new ObservationUnitData((String) row.get(envFactor)));
+			variables.put(envFactor, new ObservationUnitData((String) row.get(envFactor)));
 		}
 		for (final String envCondition : searchDto.getEnvironmentConditions()) {
-			observationUnitRow.getVariables().put(envCondition, new ObservationUnitData((String) row.get(envCondition)));
+			variables.put(envCondition, new ObservationUnitData((String) row.get(envCondition)));
 		}
 		
 		observationUnitRow.setVariables(variables);
