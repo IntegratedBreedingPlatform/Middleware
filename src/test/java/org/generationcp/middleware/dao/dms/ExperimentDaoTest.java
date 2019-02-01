@@ -70,16 +70,16 @@ public class ExperimentDaoTest {
 
 		List<Object[]> mockQueryResult = new ArrayList<Object[]>();
 
-		Object[] mockDBRow1 = new Object[] {1, 1, "1"};
+		Object[] mockDBRow1 = new Object[] {1, 1, 1};
 		mockQueryResult.add(mockDBRow1);
 
-		Object[] mockDBRow2 = new Object[] {1, 2, "2"};
+		Object[] mockDBRow2 = new Object[] {1, 2, 2};
 		mockQueryResult.add(mockDBRow2);
 
-		Object[] mockDBRow3 = new Object[] {2, 3, "1"};
+		Object[] mockDBRow3 = new Object[] {2, 3, 1};
 		mockQueryResult.add(mockDBRow3);
 
-		Object[] mockDBRow4 = new Object[] {3, 3, "1"};
+		Object[] mockDBRow4 = new Object[] {3, 3, 1};
 		mockQueryResult.add(mockDBRow4);
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
