@@ -180,8 +180,6 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			+ "    nd_experiment e "
 			+ "        INNER JOIN "
 			+ "    nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
-			+ " INNER JOIN "
-			+ " location l ON l.locid = gp.value "
 			+ "WHERE "
 			+ "		e.project_id = :datasetId "
 			+ "		and e.nd_geolocation_id = :instanceDbId";
