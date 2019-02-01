@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
