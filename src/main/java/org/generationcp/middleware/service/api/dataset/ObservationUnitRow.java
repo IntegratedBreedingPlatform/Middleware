@@ -20,6 +20,8 @@ public class ObservationUnitRow {
 
 	private String obsUnitId;
 
+	private String samplesCount;
+
 	public ObservationUnitRow() {
 
 	}
@@ -70,6 +72,14 @@ public class ObservationUnitRow {
 
 	public void setVariables(final Map<String, ObservationUnitData> variables) {
 		this.variables = variables;
+	}
+
+	public String getSamplesCount() {
+		return samplesCount;
+	}
+
+	public void setSamplesCount(final String samplesCount) {
+		this.samplesCount = samplesCount;
 	}
 
 	@Override
