@@ -756,5 +756,7 @@ public interface StudyDataManager {
 
 	Boolean existInstances(final Set<Integer> instanceIds);
 
-	Map<String, String> getGeolocationValues(final Integer datasetId);
+	Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId);
+
+	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
 }
