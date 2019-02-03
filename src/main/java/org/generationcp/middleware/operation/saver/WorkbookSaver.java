@@ -514,15 +514,24 @@ public class WorkbookSaver extends Saver {
 	}
 
 	protected void assignLocationVariableWithUnspecifiedLocationIfEmpty(final VariableList variableList, final LocationDAO locationDAO) {
-
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
-		if (locationIdVariable != null && StringUtils.isEmpty(locationIdVariable.getValue())) {
-			String unspecifiedLocationLocId = "";
-			final List<Location> locations = locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
-			if (!locations.isEmpty()) {
-				unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
+
+		if(locationIdVariable != null){
+			final List<Integer> locationId = new ArrayList<>(); 
+			boolean locationIdExists = false;
+
+			if(!StringUtils.isEmpty(locationIdVariable.getValue())){
+				locationId.add(Integer.valueOf(locationIdVariable.getValue()));
+        		locationIdExists = (locationDAO.getByIds(locationId).size() > 0) ? true : false;	
 			}
-			locationIdVariable.setValue(unspecifiedLocationLocId);
+			if (StringUtils.isEmpty(locationIdVariable.getValue()) || !locationIdExists) {
+				String unspecifiedLocationLocId = "";
+				final List<Location> locations = locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+				if (!locations.isEmpty()) {
+					unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
+				}
+				locationIdVariable.setValue(unspecifiedLocationLocId);
+			}
 		}
 
 	}
