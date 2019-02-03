@@ -339,7 +339,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final List<Location> locations = Arrays.asList(unspecifiedLocation);
 		Mockito.when(locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
 
-		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
 
 		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
 	}
@@ -358,7 +358,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		Mockito.verify(locationDAO, Mockito.times(0)).getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
 
-		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
 
 		Assert.assertEquals(String.valueOf(locationIdVariableValue), locationVariable.getValue());
 
