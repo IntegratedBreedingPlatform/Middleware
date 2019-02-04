@@ -59,7 +59,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
-
 /**
  * Created by clarysabel on 10/22/18.
  */
@@ -500,6 +499,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<MeasurementVariableDto> getVariables(final Integer datasetId, final VariableType variableType) {
+		return measurementVariableService.getVariablesForDataset(datasetId, variableType.getId());
 	}
 
 	@Override

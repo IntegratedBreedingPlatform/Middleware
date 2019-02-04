@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import java.util.List;
@@ -54,6 +55,8 @@ public interface DatasetService {
 	List<StudyInstance> getDatasetInstances(Integer datasetId);
 
 	void deletePhenotype(final Integer phenotypeId);
+
+	List<MeasurementVariableDto> getVariables(Integer datasetId, VariableType variableType);
 
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);

@@ -26,7 +26,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.sample.PlantDTO;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -82,24 +82,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	public static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
-	public static final String SQL_GET_SAMPLED_PLANTS_BY_STUDY = " SELECT " + //
-			" experiment.nd_experiment_id, " + //
-			" plant.plant_id," + //
-			" plant.plant_no " + //
-			" FROM nd_experiment experiment " + //
-			" INNER JOIN project_relationship pr ON (pr.subject_project_id = experiment.project_id) " + //
-			" INNER JOIN project p ON (p.project_id = pr.subject_project_id) " + //
-			" INNER JOIN plant plant ON (plant.nd_experiment_id = experiment.nd_experiment_id) " + //
-			" INNER JOIN (SELECT " + //
-			" plant_id, " + //
-			" count(*) q " + //
-			" FROM sample " + //
-			" GROUP BY plant_id " + //
-			" HAVING count(*) > 0) sbp " + //
-			" ON (sbp.plant_id = plant.plant_id) " + //
-			" WHERE p.project_id = (SELECT p.project_id " + //
-			" FROM project_relationship pr " + //
-			" INNER JOIN project p ON p.project_id = pr.subject_project_id " + //
+	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	public static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
+			" experiment.nd_experiment_id, " +
+			" sample.sample_id," +
+			" sample.sample_no " +
+			" FROM nd_experiment experiment " +
+			" INNER JOIN project_relationship pr ON (pr.subject_project_id = experiment.project_id) " +
+			" INNER JOIN project p ON (p.project_id = pr.subject_project_id) " +
+			" INNER JOIN sample sample ON (sample.nd_experiment_id = experiment.nd_experiment_id) " +
+			" WHERE p.project_id = (SELECT p.project_id " +
+			" FROM project_relationship pr " +
+			" INNER JOIN project p ON p.project_id = pr.subject_project_id " +
 			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
@@ -391,26 +385,26 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	}
 
-	public Map<Integer, List<PlantDTO>> getSampledPlants (final Integer studyId) {
-		final Map<Integer, List<PlantDTO>> map = new HashMap<>();
+	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
+		final Map<Integer, List<SampleDTO>> map = new HashMap<>();
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(SQL_GET_SAMPLED_PLANTS_BY_STUDY);
+			final SQLQuery query = this.getSession().createSQLQuery(SQL_GET_SAMPLED_OBSERVATION_BY_STUDY);
 			query.setParameter("studyId", studyId);
 			final List results = query.list();
 
 			for (final Object o : results) {
 				final Object[] result = (Object[]) o;
 				if (result != null) {
-					final PlantDTO plantDTO = new PlantDTO();
-					plantDTO.setId((Integer) result[1]);
-					plantDTO.setPlantNo(String.valueOf(result[2]));
+					final SampleDTO sampleDTO = new SampleDTO();
+					sampleDTO.setSampleId((Integer) result[1]);
+					sampleDTO.setSampleNumber((Integer) result[2]);
 					final Integer experimentId = (Integer) result[0];
 					if (map.containsKey(experimentId)) {
-						map.get(experimentId).add(plantDTO);
+						map.get(experimentId).add(sampleDTO);
 					} else {
-						final List<PlantDTO> plantDTOs = new ArrayList<>();
-						plantDTOs.add(plantDTO);
-						map.put(experimentId, plantDTOs);
+						final List<SampleDTO> sampleObservationUnitDTOS = new ArrayList<>();
+						sampleObservationUnitDTOS.add(sampleDTO);
+						map.put(experimentId, sampleObservationUnitDTOS);
 					}
 				}
 			}
@@ -673,7 +667,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL,  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
-			+ "    nde.obs_unit_id as OBS_UNIT_ID,  ");
+			+ "    nde.obs_unit_id as OBS_UNIT_ID,  "
+			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
 
 		final String traitClauseFormat =
 			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', ";
@@ -830,6 +825,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		createSQLQuery.addScalar(ExperimentDao.ROW);
 		createSQLQuery.addScalar(ExperimentDao.COL);
 		createSQLQuery.addScalar(ExperimentDao.OBS_UNIT_ID, new StringType());
+		createSQLQuery.addScalar(ExperimentDao.SUM_OF_SAMPLES);
 	}
 
 	private void addScalarForTraits(
@@ -1072,6 +1068,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
 		observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
 		observationUnitRow.setObsUnitId((String) row.get(OBS_UNIT_ID));
+		observationUnitRow.setSamplesCount((String) row.get(SUM_OF_SAMPLES));
 		final Integer gid = (Integer) row.get(GID);
 		observationUnitRow.setGid(gid);
 		variables.put(GID, new ObservationUnitData(gid.toString()));

@@ -171,31 +171,29 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public Map<String, String> getGeoLocationValues(final Integer datasetId) {
+	public Map<Integer, String> getGeoLocationPropertyByVariableId(final Integer datasetId, final Integer instanceDbId) {
 		Preconditions.checkNotNull(datasetId);
 		final String sql = "SELECT "
-			+ "    gp.type_id as variable, "
-			+ "	   gp.value as geoValue "
+			+ "    gp.type_id as variableId, "
+			+ "	   gp.value as value "
 			+ "FROM "
 			+ "    nd_experiment e "
 			+ "        INNER JOIN "
 			+ "    nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
-			+ " INNER JOIN "
-			+ " location l ON l.locid = gp.value "
 			+ "WHERE "
-			+ "    e.project_id = :datasetId "
-			+ "ORDER BY e.nd_geolocation_id ";
+			+ "		e.project_id = :datasetId "
+			+ "		and e.nd_geolocation_id = :instanceDbId";
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
-		query.addScalar("variable").addScalar("geoValue").setParameter("datasetId", datasetId);
+		query.addScalar("variableId").addScalar("value").setParameter("datasetId", datasetId).setParameter("instanceDbId", instanceDbId);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 
 		final List<Map<String, Object>> results = query.list();
-		final Map<String, String> geoProperties = new HashMap<>();
+		final Map<Integer, String> geoProperties = new HashMap<>();
 		for (final Map<String, Object> result : results) {
-			final Integer variable = (Integer) result.get("variable");
-			final String value = (String) result.get("geoValue");
-			geoProperties.put(String.valueOf(variable), value);
+			final Integer variableId = (Integer) result.get("variableId");
+			final String value = (String) result.get("value");
+			geoProperties.put(variableId, value);
 		}
 		return geoProperties;
 	}
