@@ -330,6 +330,7 @@ public class StandardVariableBuilder extends Builder {
 		// Trim all header names
 		final List<String> headerNamesTrimmed = Lists.transform(headerNames, new Function<String, String>() {
 			public String apply(String s) {
+				// Transform header names to uppercase; header names can be in lowercase or combination when defined in file
 				return s.toUpperCase().trim();
 			}
 		});
