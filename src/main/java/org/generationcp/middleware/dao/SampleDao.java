@@ -225,6 +225,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
 				.add(Projections.alias(Projections.property("sample.sampleId"), "sampleId"))
+				.add(Projections.alias(Projections.property("sample.entryNumber"), "entryNumber"))
 				.add(Projections.alias(Projections.property("germplasm.gid"), "gid"))
 				.add(Projections.alias(Projections.property("stock.name"), "designation"))
 				.add(Projections.alias(Projections.property("sample.sampleNumber"), "sampleNumber"))
@@ -278,6 +279,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				}
 
 				sampleDTO.setSampleId(sampleDetail.getSampleId());
+				sampleDTO.setEntryNo(sampleDetail.getEntryNumber());
 				sampleDTO.setGid(sampleDetail.getGid());
 				sampleDTO.setDesignation(sampleDetail.getDesignation());
 				sampleDTO.setSampleNumber(sampleDetail.getSampleNumber());

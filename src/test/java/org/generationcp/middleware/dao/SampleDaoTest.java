@@ -179,6 +179,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(1, result.size());
 		final SampleDTO sample = result.get(0);
 		Assert.assertNotNull(sample.getSampleId());
+		Assert.assertEquals(1, sample.getEntryNo().intValue());
 		Assert.assertEquals("SAMPLE-" + SAMPLE_LIST_NAME_FOR_PLOT_DATA + ":" + 1, sample.getSampleName());
 		Assert.assertEquals("BUSINESS-KEY-" + SAMPLE_LIST_NAME_FOR_PLOT_DATA + 1, sample.getSampleBusinessKey());
 		Assert.assertEquals(SAMPLE_LIST_NAME_FOR_PLOT_DATA, sample.getSampleList());
@@ -207,6 +208,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(1, result.size());
 		final SampleDTO sample = result.get(0);
 		Assert.assertNotNull(sample.getSampleId());
+		Assert.assertEquals(1, sample.getEntryNo().intValue());
 		Assert.assertEquals("SAMPLE-" + SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA + ":" + 1, sample.getSampleName());
 		Assert.assertEquals("BUSINESS-KEY-" + SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA + 1, sample.getSampleBusinessKey());
 		Assert.assertEquals(SAMPLE_LIST_NAME_FOR_SUBOBSERVATION_DATA, sample.getSampleList());
