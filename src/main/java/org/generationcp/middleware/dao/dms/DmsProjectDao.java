@@ -1052,6 +1052,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   variable.name AS variableName, "  //
 				+ "   variable.definition AS description, "  //
 				+ "   pp.alias AS alias, "  //
+				+ "   pp.value as value, "
 				+ "   variableType.cvterm_id AS variableTypeId, "  //
 				+ "   scale.name AS scale, "  //
 				+ "   method.name AS method, "  //
@@ -1108,6 +1109,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar("variableName")
 				.addScalar("description")
 				.addScalar("alias")
+				.addScalar("value")
 				.addScalar("variableTypeId")
 				.addScalar("scale")
 				.addScalar("method")
@@ -1140,13 +1142,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setTermId(variableId);
 					measurementVariable.setName((String) result.get("variableName"));
 					measurementVariable.setAlias((String) result.get("alias"));
+					measurementVariable.setValue((String) result.get("value"));
 					measurementVariable.setDescription((String) result.get("description"));
 					measurementVariable.setScale((String) result.get("scale"));
 					measurementVariable.setMethod((String) result.get("method"));
 					measurementVariable.setProperty((String) result.get("property"));
 					final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
 					measurementVariable.setVariableType(variableType);
-					measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+					//TODO: fix the saving of Treatment Factor Variables in the projectprop table.
+					// Right now, the saved typeid is 1100. It should be 1809(VariableType.TREATMENT_FACTOR.getid())
+					if(variableType != null) {
+						measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+					}
 					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
