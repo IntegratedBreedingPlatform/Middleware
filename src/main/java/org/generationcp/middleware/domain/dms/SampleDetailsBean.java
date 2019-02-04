@@ -9,6 +9,7 @@ public class SampleDetailsBean {
 	}
 
 	private Integer sampleId;
+	private Integer entryNumber;
 	private Integer gid;
 	private String designation;
 	private Integer sampleNumber;
@@ -206,6 +207,14 @@ public class SampleDetailsBean {
 
 	public void setSampleNumber(final Integer sampleNumber) {
 		this.sampleNumber = sampleNumber;
+	}
+
+	public Integer getEntryNumber() {
+		return entryNumber;
+	}
+
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 }
