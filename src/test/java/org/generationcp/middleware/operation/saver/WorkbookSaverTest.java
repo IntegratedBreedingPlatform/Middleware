@@ -342,6 +342,17 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
 
 		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
+
+		// Invalid Location
+		final List<Integer> invalidLocationId = new ArrayList<>();
+		final int invalidLocationIdValue = 9016;
+		invalidLocationId.add(invalidLocationIdValue);
+
+		final List<Location> nullLocation = new ArrayList<>();
+		Mockito.when(locationDAO.getByIds(invalidLocationId)).thenReturn(nullLocation);
+
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
+		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
 	}
 
 	@Test
