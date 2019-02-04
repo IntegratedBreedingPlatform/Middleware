@@ -345,7 +345,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@Test
-	public void testAssignLocationVariableWithUnspecifiedLocationIfEmptyValueIsNotEmpty() {
+	public void testAssignLocationVariableWithUnspecifiedLocationIfLocationIdExists() {
 
 		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
 		final VariableList variableList = new VariableList();
@@ -356,11 +356,21 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		locationVariable.setValue(locationIdVariableValue);
 		variableList.add(locationVariable);
 
-		Mockito.verify(locationDAO, Mockito.times(0)).getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+		// Existing Location
+		final Location existingLocation = new Location();
+		final int existingLocationIdValue = Integer.valueOf(locationIdVariableValue);
+		existingLocation.setLocid(existingLocationIdValue);
 
+		final List<Integer> existingLocationId = new ArrayList<>();
+		existingLocationId.add(Integer.valueOf(locationIdVariableValue));
+
+		final List<Location> retrievedLocation = new ArrayList<>();
+		retrievedLocation.add(existingLocation);
+
+		Mockito.when(locationDAO.getByIds(existingLocationId)).thenReturn(retrievedLocation);
 		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
 
-		Assert.assertEquals(String.valueOf(locationIdVariableValue), locationVariable.getValue());
+		Assert.assertEquals(Integer.valueOf(locationIdVariableValue), retrievedLocation.get(0).getLocid());
 
 	}
 
