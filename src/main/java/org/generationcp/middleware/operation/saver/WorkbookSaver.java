@@ -407,7 +407,7 @@ public class WorkbookSaver extends Saver {
 
 		watch.restart("save geolocation");
 
-		this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
+		this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, daoFactory.getLocationDAO());
 
 		final Geolocation g = this.getGeolocationSaver()
 				.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
@@ -471,7 +471,7 @@ public class WorkbookSaver extends Saver {
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
 
-							this.assignLocationVariableWithUnspecifiedLocationIfEmpty(geolocation, daoFactory.getLocationDAO());
+							this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, daoFactory.getLocationDAO());
 
 							final Geolocation g = this.getGeolocationSaver()
 									.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
@@ -513,16 +513,25 @@ public class WorkbookSaver extends Saver {
 		return 0;
 	}
 
-	protected void assignLocationVariableWithUnspecifiedLocationIfEmpty(final VariableList variableList, final LocationDAO locationDAO) {
-
+	protected void assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(final VariableList variableList, final LocationDAO locationDAO) {
 		final Variable locationIdVariable = variableList.findById(TermId.LOCATION_ID);
-		if (locationIdVariable != null && StringUtils.isEmpty(locationIdVariable.getValue())) {
-			String unspecifiedLocationLocId = "";
-			final List<Location> locations = locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
-			if (!locations.isEmpty()) {
-				unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
+
+		if(locationIdVariable != null){
+			final List<Integer> locationId = new ArrayList<>(); 
+			boolean locationIdExists = false;
+
+			if(!StringUtils.isEmpty(locationIdVariable.getValue())){
+				locationId.add(Integer.valueOf(locationIdVariable.getValue()));
+        		locationIdExists = (locationDAO.getByIds(locationId).size() > 0) ? true : false;	
 			}
-			locationIdVariable.setValue(unspecifiedLocationLocId);
+			if (StringUtils.isEmpty(locationIdVariable.getValue()) || !locationIdExists) {
+				String unspecifiedLocationLocId = "";
+				final List<Location> locations = locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+				if (!locations.isEmpty()) {
+					unspecifiedLocationLocId = String.valueOf(locations.get(0).getLocid());
+				}
+				locationIdVariable.setValue(unspecifiedLocationLocId);
+			}
 		}
 
 	}

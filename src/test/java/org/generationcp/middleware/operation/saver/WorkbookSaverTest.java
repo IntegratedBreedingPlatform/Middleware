@@ -339,13 +339,24 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		final List<Location> locations = Arrays.asList(unspecifiedLocation);
 		Mockito.when(locationDAO.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL)).thenReturn(locations);
 
-		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
 
+		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
+
+		// Invalid Location
+		final List<Integer> invalidLocationId = new ArrayList<>();
+		final int invalidLocationIdValue = 9016;
+		invalidLocationId.add(invalidLocationIdValue);
+
+		final List<Location> nullLocation = new ArrayList<>();
+		Mockito.when(locationDAO.getByIds(invalidLocationId)).thenReturn(nullLocation);
+
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
 		Assert.assertEquals(String.valueOf(unspecifiedLocationlocid), locationVariable.getValue());
 	}
 
 	@Test
-	public void testAssignLocationVariableWithUnspecifiedLocationIfEmptyValueIsNotEmpty() {
+	public void testAssignLocationVariableWithUnspecifiedLocationIfLocationIdExists() {
 
 		final LocationDAO locationDAO = Mockito.mock(LocationDAO.class);
 		final VariableList variableList = new VariableList();
@@ -356,11 +367,21 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		locationVariable.setValue(locationIdVariableValue);
 		variableList.add(locationVariable);
 
-		Mockito.verify(locationDAO, Mockito.times(0)).getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+		// Existing Location
+		final Location existingLocation = new Location();
+		final int existingLocationIdValue = Integer.valueOf(locationIdVariableValue);
+		existingLocation.setLocid(existingLocationIdValue);
 
-		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmpty(variableList, locationDAO);
+		final List<Integer> existingLocationId = new ArrayList<>();
+		existingLocationId.add(Integer.valueOf(locationIdVariableValue));
 
-		Assert.assertEquals(String.valueOf(locationIdVariableValue), locationVariable.getValue());
+		final List<Location> retrievedLocation = new ArrayList<>();
+		retrievedLocation.add(existingLocation);
+
+		Mockito.when(locationDAO.getByIds(existingLocationId)).thenReturn(retrievedLocation);
+		workbookSaver.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(variableList, locationDAO);
+
+		Assert.assertEquals(Integer.valueOf(locationIdVariableValue), retrievedLocation.get(0).getLocid());
 
 	}
 

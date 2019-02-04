@@ -46,7 +46,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.sample.PlantDTO;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
@@ -1072,8 +1072,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<Integer, List<PlantDTO>> getSampledPlants(final Integer studyId) {
-		return this.getExperimentDao().getSampledPlants(studyId);
+	public Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId) {
+		return this.getExperimentDao().getExperimentSamplesDTOMap(studyId);
 	}
 
 	@Override
@@ -1215,7 +1215,37 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<String, String> getGeolocationValues(final Integer datasetId) {
-		return this.getGeolocationPropertyDao().getGeoLocationValues(datasetId);
+	public Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId) {
+		final Geolocation geoLocation = this.getGeolocationDao().getById(instanceDbId);
+		final Map<Integer, String> geoLocationMap = this.getGeolocationPropertyDao().getGeoLocationPropertyByVariableId(datasetId, instanceDbId);
+
+		geoLocationMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), geoLocation.getDescription());
+		if (geoLocation.getLatitude() != null) {
+			geoLocationMap.put(TermId.LATITUDE.getId(), geoLocation.getLatitude().toString());
+		}
+
+		if (geoLocation.getLongitude() != null) {
+			geoLocationMap.put(TermId.LONGITUDE.getId(), geoLocation.getLongitude().toString());
+		}
+
+		if (geoLocation.getGeodeticDatum() != null) {
+			geoLocationMap.put(TermId.GEODETIC_DATUM.getId(), geoLocation.getGeodeticDatum());
+		}
+
+		if (geoLocation.getAltitude() != null) {
+			geoLocationMap.put(TermId.ALTITUDE.getId(), geoLocation.getAltitude().toString());
+		}
+
+		return geoLocationMap;
+	}
+
+	@Override
+	public Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId) {
+		final Map<Integer, String> phenotypeMap = new HashMap<>();
+		List<Phenotype> phenotypes = this.getPhenotypeDao().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
+		for (final Phenotype phenotype : phenotypes) {
+				phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
+		}
+		return phenotypeMap;
 	}
 }

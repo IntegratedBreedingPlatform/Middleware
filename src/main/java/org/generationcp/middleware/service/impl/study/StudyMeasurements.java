@@ -226,7 +226,7 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ObservationDto> getSampleObservations(final int studyId, final List<Integer> instanceIds,
+	public List<ObservationDto> getSampleObservations(final int datasetId, final List<Integer> instanceIds,
 			final Integer selectionVariableId) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(this.measurementQuery.getSampleObservationQuery());
 
@@ -235,7 +235,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("value", new StringType());
 		createSQLQuery.addScalar("gid", new IntegerType());
 
-		createSQLQuery.setParameter("studyId", studyId);
+		createSQLQuery.setParameter("datasetId", datasetId);
 		createSQLQuery.setParameter("selectionVariableId", selectionVariableId);
 		createSQLQuery.setParameterList("instanceIds", instanceIds);
 		return this.mapSampleObservations(createSQLQuery.list());

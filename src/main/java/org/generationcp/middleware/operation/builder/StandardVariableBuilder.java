@@ -53,6 +53,7 @@ public class StandardVariableBuilder extends Builder {
 
 	private static final String DATA_TYPE_NUMERIC = "N";
 	private static final String DATA_TYPE_CHARACTER = "C";
+	private static final String LOCATION_NAME = "LOCATION_NAME";
 
 	private DaoFactory daoFactory;
 
@@ -329,10 +330,14 @@ public class StandardVariableBuilder extends Builder {
 		// Trim all header names
 		final List<String> headerNamesTrimmed = Lists.transform(headerNames, new Function<String, String>() {
 			public String apply(String s) {
-				return s.trim();
+				// Transform header names to uppercase; header names can be in lowercase or combination when defined in file
+				return s.toUpperCase().trim();
 			}
 		});
 
+		if(headerNamesTrimmed.contains(StandardVariableBuilder.LOCATION_NAME)){
+			headerNamesTrimmed.remove(StandardVariableBuilder.LOCATION_NAME);
+		}
 		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<>();
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<>();
 
