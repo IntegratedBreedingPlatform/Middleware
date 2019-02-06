@@ -823,7 +823,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			this.getSession().flush();
 			final StringBuilder sql = new StringBuilder()
-				.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id, p.status ")
+				.append(
+					" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id, p.status, p.draft_value, p.draft_cvalue_id ")
 				.append(" FROM phenotype p ")
 				.append(" WHERE p.observable_id = ").append(observableId)
 				.append(" AND p.nd_experiment_id = ").append(experimentId);
@@ -834,9 +835,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			if (list != null && !list.isEmpty()) {
 				for (final Object[] row : list) {
 					phenotype = new Phenotype((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3], (Integer) row[4],
-							(String) row[5], (Integer) row[6], (Integer) row[7]);
-					final String status = (String)row[8];
-					if (status != null) {						
+						(String) row[5], (Integer) row[6], (Integer) row[7], (String) row[9], (Integer) row[10]);
+					final String status = (String) row[8];
+					if (status != null) {
 						phenotype.setValueStatus(ValueStatus.valueOf(status));
 					}
 
