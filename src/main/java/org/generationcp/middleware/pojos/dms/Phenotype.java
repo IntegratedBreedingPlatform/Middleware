@@ -109,6 +109,13 @@ public class Phenotype implements Serializable {
 	@Column(name = "updated_date", updatable = false, insertable = false)
 	private Date updatedDate;
 
+	@Column(name = "draft_value")
+	private String draftValue;
+
+	// References cvterm
+	@Column(name = "draft_cvalue_id")
+	private Integer draftCValueId;
+
 	@Transient
 	private boolean changed = false;
 
@@ -231,6 +238,22 @@ public class Phenotype implements Serializable {
 		this.changed = changed;
 	}
 
+	public String getDraftValue() {
+		return this.draftValue;
+	}
+
+	public void setDraftValue(final String draftValue) {
+		this.draftValue = draftValue;
+	}
+
+	public Integer getDraftCValueId() {
+		return this.draftCValueId;
+	}
+
+	public void setDraftCValueId(final Integer draftCValueId) {
+		this.draftCValueId = draftCValueId;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -256,18 +279,21 @@ public class Phenotype implements Serializable {
 	@Override
 	public String toString() {
 		return "Phenotype{" +
-			"phenotypeId=" + this.phenotypeId +
-			", uniqueName='" + this.uniqueName + '\'' +
-			", name='" + this.name + '\'' +
-			", observableId=" + this.observableId +
-			", attributeId=" + this.attributeId +
-			", value='" + this.value + '\'' +
-			", cValueId=" + this.cValueId +
-			", valueStatus=" + this.valueStatus +
-			", assayId=" + this.assayId +
-			", experiment=" + this.experiment +
-			", createdDate=" + this.createdDate +
-			", updatedDate=" + this.updatedDate +
+			"phenotypeId=" + phenotypeId +
+			", uniqueName='" + uniqueName + '\'' +
+			", name='" + name + '\'' +
+			", observableId=" + observableId +
+			", attributeId=" + attributeId +
+			", value='" + value + '\'' +
+			", cValueId=" + cValueId +
+			", valueStatus=" + valueStatus +
+			", assayId=" + assayId +
+			", experiment=" + experiment +
+			", createdDate=" + createdDate +
+			", updatedDate=" + updatedDate +
+			", draftValue='" + draftValue + '\'' +
+			", draftCValueId=" + draftCValueId +
+			", changed=" + changed +
 			'}';
 	}
 }
