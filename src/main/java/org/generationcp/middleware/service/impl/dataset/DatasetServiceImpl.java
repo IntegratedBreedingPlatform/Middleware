@@ -1,16 +1,8 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -55,9 +47,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Table;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -67,9 +66,6 @@ public class DatasetServiceImpl implements DatasetService {
 	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
-
-	protected static final String[] FIXED_DESIGN_FACTORS =
-		{"REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE"};
 
 	protected static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
@@ -276,6 +272,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			if (datasetTypeIds.isEmpty() || datasetTypeIds.contains(datasetDTO.getDatasetTypeId())) {
+				datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetDTO.getDatasetId()) > 0);
 				filtered.add(datasetDTO);
 			}
 			this.filterDatasets(filtered, datasetDTO.getDatasetId(), datasetTypeIds);
@@ -414,6 +411,7 @@ public class DatasetServiceImpl implements DatasetService {
 			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 			datasetDTO.setVariables(
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
+			datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetId) > 0);
 		}
 
 		return datasetDTO;
@@ -503,7 +501,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<MeasurementVariableDto> getVariables(final Integer datasetId, final VariableType variableType) {
-		return measurementVariableService.getVariablesForDataset(datasetId, variableType.getId());
+		return this.measurementVariableService.getVariablesForDataset(datasetId, variableType.getId());
 	}
 
 	@Override
@@ -645,8 +643,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
-		for(ObservationUnitRow observationUnitRow: observationUnits) {
-			for(MeasurementVariable measurementVariable: studyVariables) {
+		for(final ObservationUnitRow observationUnitRow: observationUnits) {
+			for(final MeasurementVariable measurementVariable: studyVariables) {
 				observationUnitRow.getVariables().put(measurementVariable.getName(), new ObservationUnitData(measurementVariable.getValue()));
 			}
 		}
