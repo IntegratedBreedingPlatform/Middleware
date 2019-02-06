@@ -52,15 +52,12 @@ public class Phenotype implements Serializable {
 			this.name = name;
 		}
 
-		private String name;
+		private final String name;
 
 		public String getName() {
 			return this.name;
 		}
 
-		public void setName(final String description) {
-			this.name = this.name;
-		}
 	}
 
 	@Id
@@ -109,6 +106,13 @@ public class Phenotype implements Serializable {
 	@Column(name = "updated_date", updatable = false, insertable = false)
 	private Date updatedDate;
 
+	@Column(name = "draft_value")
+	private String draftValue;
+
+	// References cvterm
+	@Column(name = "draft_cvalue_id")
+	private Integer draftCValueId;
+
 	@Transient
 	private boolean changed = false;
 
@@ -116,7 +120,8 @@ public class Phenotype implements Serializable {
 	}
 
 	public Phenotype(final Integer phenotypeId, final String uniqueName, final String name, final Integer observableId,
-		final Integer attributeId, final String value, final Integer cValueId, final Integer assayId) {
+		final Integer attributeId, final String value, final Integer cValueId, final Integer assayId, final String draftValue,
+		final Integer draftCValueId) {
 		this.phenotypeId = phenotypeId;
 		this.uniqueName = uniqueName;
 		this.name = name;
@@ -125,6 +130,8 @@ public class Phenotype implements Serializable {
 		this.value = value;
 		this.cValueId = cValueId;
 		this.assayId = assayId;
+		this.draftCValueId = draftCValueId;
+		this.draftValue = draftValue;
 	}
 
 	public Integer getPhenotypeId() {
@@ -137,10 +144,6 @@ public class Phenotype implements Serializable {
 
 	public String getUniqueName() {
 		return this.uniqueName;
-	}
-
-	public void setUniqueName(final String uniqueName) {
-		this.uniqueName = uniqueName;
 	}
 
 	public String getName() {
@@ -163,10 +166,6 @@ public class Phenotype implements Serializable {
 		return this.attributeId;
 	}
 
-	public void setAttributeId(final Integer attributeId) {
-		this.attributeId = attributeId;
-	}
-
 	public String getValue() {
 		return this.value;
 	}
@@ -185,10 +184,6 @@ public class Phenotype implements Serializable {
 
 	public Integer getAssayId() {
 		return this.assayId;
-	}
-
-	public void setAssayId(final Integer assayId) {
-		this.assayId = assayId;
 	}
 
 	public ExperimentModel getExperiment() {
@@ -231,6 +226,14 @@ public class Phenotype implements Serializable {
 		this.changed = changed;
 	}
 
+	public String getDraftValue() {
+		return this.draftValue;
+	}
+
+	public Integer getDraftCValueId() {
+		return this.draftCValueId;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -238,20 +241,38 @@ public class Phenotype implements Serializable {
 		if (!(o instanceof Phenotype))
 			return false;
 		final Phenotype phenotype = (Phenotype) o;
-		return Objects.equals(this.getPhenotypeId(), phenotype.getPhenotypeId()) && Objects.equals(this.getUniqueName(), phenotype.getUniqueName())
-			&& Objects.equals(this.getName(), phenotype.getName()) && Objects.equals(this.getObservableId(), phenotype.getObservableId()) && Objects
-			.equals(this.getAttributeId(), phenotype.getAttributeId()) && Objects.equals(this.getValue(), phenotype.getValue()) && Objects
-			.equals(this.getcValueId(), phenotype.getcValueId()) && Objects.equals(this.getAssayId(), phenotype.getAssayId()) && Objects
-			.equals(this.getExperiment(), phenotype.getExperiment());
+		return Objects.equals(this.getPhenotypeId(), phenotype.getPhenotypeId())
+			&& Objects.equals(this.getUniqueName(), phenotype.getUniqueName())
+			&& Objects.equals(this.getName(), phenotype.getName())
+			&& Objects.equals(this.getObservableId(), phenotype.getObservableId())
+			&& Objects.equals(this.getAttributeId(), phenotype.getAttributeId())
+			&& Objects.equals(this.getValue(), phenotype.getValue())
+			&& Objects.equals(this.getcValueId(), phenotype.getcValueId())
+			&& Objects.equals(this.getAssayId(), phenotype.getAssayId())
+			&& Objects.equals(this.getExperiment(), phenotype.getExperiment())
+			&& Objects.equals(this.getDraftValue(), phenotype.getDraftValue())
+			&& Objects.equals(this.getDraftCValueId(), phenotype.getDraftCValueId());
 	}
 
 	@Override
 	public int hashCode() {
 
 		return Objects.hash(
-			this.getPhenotypeId(), this.getUniqueName(), this.getName(), this.getObservableId(), this.getAttributeId(), this.getValue(), this.getcValueId(),
-			this.getValueStatus(), this.getAssayId(), this.getExperiment());
+			this.getPhenotypeId(),
+			this.getUniqueName(),
+			this.getName(),
+			this.getObservableId(),
+			this.getAttributeId(),
+			this.getValue(),
+			this.getcValueId(),
+			this.getValueStatus(),
+			this.getAssayId(),
+			this.getExperiment(),
+			this.getDraftValue(),
+			this.getDraftCValueId());
 	}
+
+
 
 	@Override
 	public String toString() {
@@ -268,6 +289,9 @@ public class Phenotype implements Serializable {
 			", experiment=" + this.experiment +
 			", createdDate=" + this.createdDate +
 			", updatedDate=" + this.updatedDate +
+			", draftValue='" + this.draftValue + '\'' +
+			", draftCValueId=" + this.draftCValueId +
+			", changed=" + this.changed +
 			'}';
 	}
 }

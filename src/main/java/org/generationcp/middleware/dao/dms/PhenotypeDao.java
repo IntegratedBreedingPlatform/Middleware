@@ -646,33 +646,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(
-		final Integer projectId, final Integer locationId, final List<Integer> plotNos,
-		final List<Integer> cvTermIds) {
-		try {
-			// get the phenotype_id
-			final String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM nd_experiment e "
-				+ "INNER JOIN nd_experiment exp ON e.nd_experiment_id = exp.nd_experiment_id "
-				+ "INNER JOIN nd_experimentprop expprop ON expprop.nd_experiment_id = exp.nd_experiment_id "
-				+ "INNER JOIN phenotype pheno ON  exp.nd_experiment_id = pheno.nd_experiment_id " + "WHERE ep.project_id = :projectId "
-				+ "AND exp.nd_geolocation_id = :locationId " + "AND pheno.observable_id IN (:cvTermIds) "
-				+ "AND expprop.value IN (:plotNos) " + "AND exp.type_id = 1155 " + "AND expprop.type_id in (8200, 8380)";
-
-			final SQLQuery statement = this.getSession().createSQLQuery(sql);
-			statement.setParameter(PROJECT_ID, projectId);
-			statement.setParameter("locationId", locationId);
-			statement.setParameterList(CV_TERM_IDS, cvTermIds);
-			statement.setParameterList("plotNos", plotNos);
-
-			return statement.list();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getPhenotypeIdsByLocationAndPlotNo=" + projectId + ", " + locationId + IN_PHENOTYPE_DAO + e.getMessage(),
-				e);
-		}
-	}
-
-	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(
 		final Integer projectId, final Integer locationId, final Integer plotNo,
 		final List<Integer> cvTermIds) {
 		try {
@@ -850,7 +823,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			this.getSession().flush();
 			final StringBuilder sql = new StringBuilder()
-				.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id, p.status ")
+				.append(
+					" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id, p.status, p.draft_value, p.draft_cvalue_id ")
 				.append(" FROM phenotype p ")
 				.append(" WHERE p.observable_id = ").append(observableId)
 				.append(" AND p.nd_experiment_id = ").append(experimentId);
@@ -861,9 +835,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			if (list != null && !list.isEmpty()) {
 				for (final Object[] row : list) {
 					phenotype = new Phenotype((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3], (Integer) row[4],
-							(String) row[5], (Integer) row[6], (Integer) row[7]);
-					final String status = (String)row[8];
-					if (status != null) {						
+						(String) row[5], (Integer) row[6], (Integer) row[7], (String) row[9], (Integer) row[10]);
+					final String status = (String) row[8];
+					if (status != null) {
 						phenotype.setValueStatus(ValueStatus.valueOf(status));
 					}
 
@@ -903,31 +877,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
 		return !query.list().isEmpty();
-	}
-
-	public List<Phenotype> getByProjectAndType(final int projectId, final int typeId) {
-		final List<Phenotype> phenotypes = new ArrayList<>();
-		try {
-			final StringBuilder sql = new StringBuilder()
-				.append(" SELECT p.phenotype_id, p.uniquename, p.name, p.observable_id, p.attr_id, p.value, p.cvalue_id, p.assay_id ")
-				.append(" FROM phenotype p ")
-				.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id ")
-				.append("   AND e.project_id = ").append(projectId).append(" WHERE p.observable_id = ").append(typeId);
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-
-			final List<Object[]> list = query.list();
-			if (list != null && !list.isEmpty()) {
-				for (final Object[] row : list) {
-					phenotypes.add(new Phenotype((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3], (Integer) row[4],
-						(String) row[5], (Integer) row[6], (Integer) row[7]));
-				}
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getByProjectAndType(" + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(), e);
-		}
-		return phenotypes;
 	}
 
 	public List<PhenotypeSearchDTO> searchPhenotypes(
