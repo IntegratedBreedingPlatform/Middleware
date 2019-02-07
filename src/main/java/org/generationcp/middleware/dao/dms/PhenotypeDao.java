@@ -37,6 +37,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
@@ -1107,5 +1108,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
 		criteria.add(Restrictions.eq("experiment.geoLocation.locationId", instanceDbId));
 		return criteria.list();
+	}
+
+	public Long countPendingDataOfDataset(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
+		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
+		final Criterion draftValue = Restrictions.isNotNull("draftValue");
+		final Criterion draftCValueId = Restrictions.isNotNull("draftCValueId");
+		criteria.add(Restrictions.or(draftValue, draftCValueId));
+		criteria.setProjection(Projections.rowCount());
+		final Long count = (Long) criteria.uniqueResult();
+		return count;
 	}
 }

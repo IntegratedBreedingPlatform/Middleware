@@ -19,6 +19,7 @@ public class DatasetDTO implements Serializable {
 	private Integer parentDatasetId;
 	private List<StudyInstance> instances;
 	private List<MeasurementVariable> variables;
+	private Boolean hasPendingData;
 
 	public DatasetDTO(){
 
@@ -30,7 +31,7 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public Integer getDatasetId() {
-		return datasetId;
+		return this.datasetId;
 	}
 
 	public void setDatasetId(final Integer datasetId) {
@@ -38,7 +39,7 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public Integer getDatasetTypeId() {
-		return datasetTypeId;
+		return this.datasetTypeId;
 	}
 
 	public void setDatasetTypeId(final Integer datasetTypeId) {
@@ -46,7 +47,7 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -54,7 +55,7 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public Integer getParentDatasetId() {
-		return parentDatasetId;
+		return this.parentDatasetId;
 	}
 
 	public void setParentDatasetId(final Integer parentDatasetId) {
@@ -62,7 +63,7 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public List<StudyInstance> getInstances() {
-		return instances;
+		return this.instances;
 	}
 
 	public void setInstances(final List<StudyInstance> instances) {
@@ -70,11 +71,15 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public List<MeasurementVariable> getVariables() {
-		return variables;
+		return this.variables;
 	}
 
 	public void setVariables(final List<MeasurementVariable> variables) {
 		this.variables = variables;
+	}
+
+	public void setHasPendingData(final Boolean hasPendingData) {
+		this.hasPendingData = hasPendingData;
 	}
 
 	@Override
