@@ -78,6 +78,10 @@ public class DatasetDTO implements Serializable {
 		this.variables = variables;
 	}
 
+	public Boolean getHasPendingData() {
+		return this.hasPendingData;
+	}
+
 	public void setHasPendingData(final Boolean hasPendingData) {
 		this.hasPendingData = hasPendingData;
 	}
