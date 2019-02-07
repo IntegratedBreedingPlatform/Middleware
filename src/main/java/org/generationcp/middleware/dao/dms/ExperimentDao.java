@@ -670,20 +670,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    nde.obs_unit_id as OBS_UNIT_ID,  "
 			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
 
-		final String traitClauseFormat =
-			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', ";
+		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', " //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s', " //
+			;
 
 		for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraits()) {
-			sql.append(String.format(
-				traitClauseFormat,
-				measurementVariable.getName(),
-				measurementVariable.getName(),
-				measurementVariable.getName(),
-				measurementVariable.getName() + "_PhenotypeId",
-				measurementVariable.getName(),
-				measurementVariable.getName() + "_Status",
-				measurementVariable.getName(),
-				measurementVariable.getName() + "_CvalueId"));
+			sql.append(String.format( //
+				traitClauseFormat, //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_Value", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_PhenotypeId", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_Status", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_CvalueId", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_DraftValue", //
+				measurementVariable.getName(), //
+				measurementVariable.getName() + "_DraftCvalueId" //
+			));
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
@@ -831,12 +841,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	private void addScalarForTraits(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final SQLQuery createSQLQuery, final Boolean addStatus) {
 		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
-			createSQLQuery.addScalar(measurementVariable.getName());
+			createSQLQuery.addScalar(measurementVariable.getName() + "_Value");
 			createSQLQuery.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
 			if (addStatus) {
 				createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
 			}
 			createSQLQuery.addScalar(measurementVariable.getName() + "_CvalueId", new IntegerType());
+			createSQLQuery.addScalar(measurementVariable.getName() + "_DraftValue");
+			createSQLQuery.addScalar(measurementVariable.getName() + "_DraftCvalueId", new IntegerType());
 		}
 	}
 	
@@ -940,20 +952,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			final StringBuilder sql = new StringBuilder("SELECT nde.obs_unit_id as OBS_UNIT_ID,  ");
 
-			final String traitClauseFormat =
-				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', ";
+			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
+				+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
+				+ " MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s'," //
+				+ " MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', " //
+				+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s'," //
+				+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s', " //
+				;
 
 			for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
-				sql.append(String.format(
-					traitClauseFormat,
-					measurementVariable.getName(),
-					measurementVariable.getName(),
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_PhenotypeId",
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_Status",
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_CvalueId"));
+				sql.append(String.format( //
+					traitClauseFormat, //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_Value", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_PhenotypeId", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_Status", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_CvalueId", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_DraftValue", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_DraftCvalueId" //
+				));
 			}
 
 			sql.append(" 1=1 FROM " //
@@ -1015,13 +1037,16 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
 					final String status = (String) row.get(variable.getName() + "_Status");
-					final Integer categoricalValueId = (Integer) row.get(variable.getName() + "_CvalueId");
-					variables.put(variable.getName(), new ObservationUnitData(
-						(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
-						categoricalValueId != null ? categoricalValueId : null, //categoricalValue
-						(String) row.get(variable.getName()), //variableValue
-						(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
-						), variable.getId()));
+					final ObservationUnitData observationUnitData = new ObservationUnitData( //
+						(Integer) row.get(variable.getName() + "_PhenotypeId"), //
+						(Integer) row.get(variable.getName() + "_CvalueId"), //
+						(String) row.get(variable.getName() + "_Value"), //
+						(status != null ? Phenotype.ValueStatus.valueOf(status) : null), //
+						variable.getId());
+					observationUnitData.setDraftValue((String) row.get(variable.getName() + "_DraftValue"));
+					observationUnitData.setDraftCategoricalValueId((Integer) row.get(variable.getName() + "_DraftCvalueId"));
+
+					variables.put(variable.getName(), observationUnitData);
 				}
 
 				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
@@ -1055,13 +1080,16 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraits()) {
 			final String status = (String) row.get(variable.getName() + "_Status");
-			final Integer categoricalValueId = (Integer) row.get(variable.getName() + "_CvalueId");
-			variables.put(variable.getName(), new ObservationUnitData(
-				(Integer) row.get(variable.getName() + "_PhenotypeId"), //phenotypeId
-				categoricalValueId != null ? categoricalValueId : null, //categoricalValue
-				(String) row.get(variable.getName()), //variableValue
-				(status != null ? Phenotype.ValueStatus.valueOf(status) : null //valueStatus
-				), variable.getId()));
+			final ObservationUnitData observationUnitData = new ObservationUnitData( //
+				(Integer) row.get(variable.getName() + "_PhenotypeId"), //
+				(Integer) row.get(variable.getName() + "_CvalueId"), //
+				(String) row.get(variable.getName() + "_Value"), //
+				(status != null ? Phenotype.ValueStatus.valueOf(status) : null), //
+				variable.getId());
+			observationUnitData.setDraftValue((String) row.get(variable.getName() + "_DraftValue"));
+			observationUnitData.setDraftCategoricalValueId((Integer) row.get(variable.getName() + "_DraftCvalueId"));
+
+			variables.put(variable.getName(), observationUnitData);
 		}
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 
