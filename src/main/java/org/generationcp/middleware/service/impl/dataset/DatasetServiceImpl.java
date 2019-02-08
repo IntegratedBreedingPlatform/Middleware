@@ -471,7 +471,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
+	public Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId) {
 		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
 	
