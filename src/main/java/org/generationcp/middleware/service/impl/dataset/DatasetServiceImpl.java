@@ -348,6 +348,9 @@ public class DatasetServiceImpl implements DatasetService {
 		phenotype.setValue(observationDto.getValue());
 		phenotype.setcValue(Integer.valueOf(0).equals(observationDto.getCategoricalValueId()) ?
 			null : observationDto.getCategoricalValueId());
+		phenotype.setDraftValue(observationDto.getDraftValue());
+		phenotype.setDraftCValueId(Integer.valueOf(0).equals(observationDto.getDraftCategoricalValueId()) ?
+			null : observationDto.getDraftCategoricalValueId());
 		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(observableId, phenotype);
 
