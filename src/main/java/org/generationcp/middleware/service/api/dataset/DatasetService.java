@@ -42,7 +42,7 @@ public interface DatasetService {
 
 	DatasetDTO getDataset(final Integer datasetId);
 
-	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
+	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId);
 
 	List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
