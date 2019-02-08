@@ -235,6 +235,11 @@ public class DatasetServiceImplTest {
 		final Integer categoricalValueId = ran.nextInt();
 		final Integer observableId = ran.nextInt();
 		final String value = ran.toString();
+		final ObservationDto observationDto = new ObservationDto();
+		observationDto.setObservationId(observationId);
+		observationDto.setObservationUnitId(observationUnitId);
+		observationDto.setValue(value);
+		observationDto.setCategoricalValueId(categoricalValueId);
 
 		final Phenotype existingPhenotype = new Phenotype();
 		existingPhenotype.setPhenotypeId(observationId);
@@ -247,7 +252,7 @@ public class DatasetServiceImplTest {
 		when(this.phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
 		final ObservationDto savedObservation =
-			this.datasetService.updatePhenotype(observationUnitId, observationId, categoricalValueId, value);
+			this.datasetService.updatePhenotype(observationUnitId, observationId, observationDto);
 
 		Mockito.verify(this.phenotypeDao).update(existingPhenotype);
 
