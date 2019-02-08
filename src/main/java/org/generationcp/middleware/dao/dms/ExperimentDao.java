@@ -11,16 +11,8 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -49,8 +41,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * DAO class for {@link ExperimentModel}.
@@ -60,13 +59,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
-	public static final String PROJECT_NAME = "PROJECT_NAME";
-	public static final String LOCATION_DB_ID = "locationDbId";
-	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
-	public static final String FIELD_MAP_ROW = "FieldMapRow";
 	public static final String FIELD_MAP_COLUMN = "FIELDMAP COLUMN";
-	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
-	public static final String LOCATION_NAME = "LocationName";
 	public static final String LOCATION_ID = "LOCATION_ID";
 	public static final String EXPT_DESIGN = "EXPT_DESIGN";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
@@ -147,26 +140,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return new ArrayList<>();
-	}
-
-	// Not used, we could poteantially detele it
-	public long countByTrialEnvironmentAndVariate(final int trialEnvironmentId, final int variateVariableId) {
-		try {
-			final SQLQuery query =
-					this.getSession().createSQLQuery(
-							"select count(distinct e.nd_experiment_id) " + "from nd_experiment e, phenotype p "
-									+ "where e.nd_experiment_id = p.nd_experiment_id "
-									+ "   and e.nd_geolocation_id = " + trialEnvironmentId + "   and p.observable_id = "
-									+ variateVariableId);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			final String message = "Error at countByTrialEnvironmentAndVariate=" + trialEnvironmentId + ", " + variateVariableId
-					+ " query at ExperimentDao: " + e.getMessage();
-			ExperimentDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
 	}
 
 	public ExperimentModel getExperimentByProjectIdAndLocation(final Integer projectId, final Integer locationId) {
@@ -851,20 +824,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			createSQLQuery.addScalar(measurementVariable.getName() + "_DraftCvalueId", new IntegerType());
 		}
 	}
-	
-	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
+
+	public Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId) {
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery("select count(*) as totalObservationUnits from "
+			String sqlString = "select count(*) as totalObservationUnits from "
 				+ "nd_experiment nde \n"
 				+ "    inner join project proj on proj.project_id = nde.project_id \n"
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 				+ " where \n"
-				+ "	proj.project_id = :datasetId \n"
-				+ "    and gl.nd_geolocation_id = :instanceId ");
+				+ "	proj.project_id = :datasetId \n";
+
+			if (instanceId != null) {
+				sqlString = sqlString + "    and gl.nd_geolocation_id = :instanceId ";
+			}
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString);
+
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("datasetId", datasetId);
-			query.setParameter("instanceId", instanceId);
-			return (int) query.uniqueResult();
+
+			if (instanceId != null) {
+				query.setParameter("instanceId", instanceId);
+			}
+
+			return (Integer) query.uniqueResult();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
@@ -872,6 +855,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				he);
 		}
 	}
+
 	public List<ExperimentModel> getObservationUnits(final Integer projectId, final List<Integer> instanceIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -1153,7 +1137,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public long countByObservedVariable(int variableId, int variableTypeId) throws MiddlewareQueryException {
+	public long countByObservedVariable(final int variableId, final int variableTypeId) throws MiddlewareQueryException {
 		try {
 			String sql = null;
 			if (VariableType.STUDY_DETAIL.getId() == variableTypeId) {
@@ -1178,14 +1162,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			if (sql != null) {
-				SQLQuery query = this.getSession().createSQLQuery(sql);
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				if (sql.indexOf(":variableId") > -1) {
 					query.setParameter("variableId", variableId);
 				}
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			final String message = "Error at countByObservationVariable query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
