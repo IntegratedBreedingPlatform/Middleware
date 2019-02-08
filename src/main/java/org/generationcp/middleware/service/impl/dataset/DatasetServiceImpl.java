@@ -341,19 +341,23 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public ObservationDto updatePhenotype(
-		final Integer observationUnitId, final Integer observationId, final Integer categoricalValueId, final String value) {
+		final Integer observationUnitId, final Integer observationId, final ObservationDto observationDto) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
-		phenotype.setValue(value);
-		phenotype.setcValue(categoricalValueId != null && categoricalValueId != 0 ? categoricalValueId : null);
+		phenotype.setValue(observationDto.getValue());
+		phenotype.setcValue(Integer.valueOf(0).equals(observationDto.getCategoricalValueId()) ?
+			null : observationDto.getCategoricalValueId());
+		phenotype.setDraftValue(observationDto.getDraftValue());
+		phenotype.setDraftCValueId(Integer.valueOf(0).equals(observationDto.getDraftCategoricalValueId()) ?
+			null : observationDto.getDraftCategoricalValueId());
 		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(observableId, phenotype);
 
 		phenotypeDao.update(phenotype);
 
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
-		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+		this.updateDependentPhenotypesStatus(observableId, observationDto.getObservationUnitId());
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		final ObservationDto observation = new ObservationDto();
