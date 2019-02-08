@@ -234,6 +234,14 @@ public class Phenotype implements Serializable {
 		return this.draftCValueId;
 	}
 
+	public void setDraftValue(final String draftValue) {
+		this.draftValue = draftValue;
+	}
+
+	public void setDraftCValueId(final Integer draftCValueId) {
+		this.draftCValueId = draftCValueId;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
