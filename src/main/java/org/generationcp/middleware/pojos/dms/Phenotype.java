@@ -230,12 +230,12 @@ public class Phenotype implements Serializable {
 		return this.draftValue;
 	}
 
-	public Integer getDraftCValueId() {
-		return this.draftCValueId;
-	}
-
 	public void setDraftValue(final String draftValue) {
 		this.draftValue = draftValue;
+	}
+
+	public Integer getDraftCValueId() {
+		return this.draftCValueId;
 	}
 
 	public void setDraftCValueId(final Integer draftCValueId) {

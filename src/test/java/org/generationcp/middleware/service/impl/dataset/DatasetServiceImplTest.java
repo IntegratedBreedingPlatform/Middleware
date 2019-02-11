@@ -9,10 +9,8 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
-import org.generationcp.middleware.data.initializer.DMSProjectTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -21,7 +19,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -235,6 +232,11 @@ public class DatasetServiceImplTest {
 		final Integer categoricalValueId = ran.nextInt();
 		final Integer observableId = ran.nextInt();
 		final String value = ran.toString();
+		final ObservationDto observationDto = new ObservationDto();
+		observationDto.setObservationId(observationId);
+		observationDto.setObservationUnitId(observationUnitId);
+		observationDto.setValue(value);
+		observationDto.setCategoricalValueId(categoricalValueId);
 
 		final Phenotype existingPhenotype = new Phenotype();
 		existingPhenotype.setPhenotypeId(observationId);
@@ -247,7 +249,7 @@ public class DatasetServiceImplTest {
 		when(this.phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
 		final ObservationDto savedObservation =
-			this.datasetService.updatePhenotype(observationUnitId, observationId, categoricalValueId, value);
+			this.datasetService.updatePhenotype(observationUnitId, observationId, observationDto);
 
 		Mockito.verify(this.phenotypeDao).update(existingPhenotype);
 

@@ -3,24 +3,15 @@ package org.generationcp.middleware.domain.dataset;
 public class ObservationDto {
 	
 	private Integer observationId;
-
 	private Integer variableId;
-
 	private String value;
-
 	private Integer categoricalValueId;
-
 	private String status;
-
 	private String createdDate;
-
 	private String updatedDate;
-
 	private Integer observationUnitId;
-
-	private String draftValue;
-
 	private Integer draftCategoricalValueId;
+	private String draftValue;
 
 	public Integer getObservationId() {
 		return this.observationId;
@@ -86,19 +77,19 @@ public class ObservationDto {
 		this.observationUnitId = observationUnitId;
 	}
 
-	public String getDraftValue() {
-		return this.draftValue;
-	}
-
-	public void setDraftValue(final String draftValue) {
-		this.draftValue = draftValue;
-	}
-
 	public Integer getDraftCategoricalValueId() {
 		return this.draftCategoricalValueId;
 	}
 
 	public void setDraftCategoricalValueId(final Integer draftCategoricalValueId) {
 		this.draftCategoricalValueId = draftCategoricalValueId;
+	}
+
+	public String getDraftValue() {
+		return this.draftValue;
+	}
+
+	public void setDraftValue(final String draftValue) {
+		this.draftValue = draftValue;
 	}
 }
