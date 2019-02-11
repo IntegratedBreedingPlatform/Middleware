@@ -73,4 +73,5 @@ public interface DatasetService {
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 
+	Phenotype updatePhenotype(Integer observationId, Integer categoricalValueId, String value);
 }

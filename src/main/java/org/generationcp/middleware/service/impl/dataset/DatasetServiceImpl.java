@@ -715,7 +715,8 @@ public class DatasetServiceImpl implements DatasetService {
 		return result;
 	}
 
-	private Phenotype updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
+	@Override
+	public Phenotype updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
