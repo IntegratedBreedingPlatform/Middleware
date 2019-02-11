@@ -536,6 +536,7 @@ public class DatasetServiceImplTest {
 			1,
 			10,
 			null,
+			null,
 			null);
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
