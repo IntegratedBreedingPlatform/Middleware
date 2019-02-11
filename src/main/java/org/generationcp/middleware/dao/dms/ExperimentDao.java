@@ -680,7 +680,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
 			+ "    nde.obs_unit_id as OBS_UNIT_ID,  "
-			+ "    nde.obs_unit_id as PARENT_OBS_UNIT_ID,  "
+			+ "    parent.obs_unit_id as PARENT_OBS_UNIT_ID,  "
 			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
 
 		final String traitClauseFormat =
@@ -837,6 +837,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		createSQLQuery.addScalar(ExperimentDao.BLOCK_NO);
 		createSQLQuery.addScalar(ExperimentDao.ROW);
 		createSQLQuery.addScalar(ExperimentDao.COL);
+		createSQLQuery.addScalar(ExperimentDao.PARENT_OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ExperimentDao.OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ExperimentDao.SUM_OF_SAMPLES);
 	}
