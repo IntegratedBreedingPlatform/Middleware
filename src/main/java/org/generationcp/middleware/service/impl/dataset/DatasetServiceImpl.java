@@ -154,7 +154,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds,
 		final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits, final Integer parentId) {
-		LOG.error("DATASET TYPE:" + datasetTypeId + " obserUVID: " + observationUnitVariableId + " NUM: " + numberOfSubObservationUnits + " PID: " + parentId + " SID: " +studyId);
+
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
 		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO()
@@ -326,7 +326,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.resolveObservationStatus(variableId, phenotype);
 
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
-		System.out.println("PHENOTYPE: " + phenotype);
+
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
 
@@ -360,17 +360,13 @@ public class DatasetServiceImpl implements DatasetService {
 		this.updateDependentPhenotypesStatus(observableId, observationDto.getObservationUnitId());
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-		final ObservationDto observation = new ObservationDto();
-		observation.setObservationId(phenotype.getPhenotypeId());
-		observation.setCategoricalValueId(phenotype.getcValueId());
-		observation.setStatus(phenotype.getValueStatus() != null ? phenotype.getValueStatus().getName() : null);
-		observation.setUpdatedDate(dateFormat.format(phenotype.getUpdatedDate()));
-		observation.setCreatedDate(dateFormat.format(phenotype.getCreatedDate()));
-		observation.setValue(phenotype.getValue());
-		observation.setObservationUnitId(phenotype.getExperiment().getNdExperimentId());
-		observation.setVariableId(phenotype.getObservableId());
+		observationDto.setObservationId(phenotype.getPhenotypeId());
+		observationDto.setUpdatedDate(dateFormat.format(phenotype.getUpdatedDate()));
+		observationDto.setCreatedDate(dateFormat.format(phenotype.getCreatedDate()));
+		observationDto.setStatus(phenotype.getValueStatus() != null ? phenotype.getValueStatus().getName() : null);
+		observationDto.setVariableId(phenotype.getObservableId());
 
-		return observation;
+		return observationDto;
 
 	}
 
