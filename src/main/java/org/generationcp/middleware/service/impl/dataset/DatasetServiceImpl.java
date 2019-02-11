@@ -425,7 +425,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
-		final String sortedColumnTermId, final String sortOrder) {
+		final String sortedColumnTermId, final String sortOrder, final Boolean draftMode) {
+
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		String sortBy = sortedColumnTermId;
@@ -436,6 +437,8 @@ public class DatasetServiceImpl implements DatasetService {
 		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(datasetId, instanceId,
 				this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), selectionMethodsAndTraits);
 		searchDto.setSortedRequest(new SortedPageRequest(pageNumber, pageSize, sortBy, sortOrder));
+		searchDto.setDraftMode(draftMode);
+
 		return this.daoFactory.getExperimentDao().getObservationUnitTable(searchDto);
 	}
 
@@ -471,8 +474,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId) {
-		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId);
+	public Integer countTotalObservationUnitsForDataset(
+		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
+		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId, draftMode);
 	}
 	
 	@Override

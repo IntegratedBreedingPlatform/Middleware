@@ -41,11 +41,11 @@ public interface DatasetService {
 
 	DatasetDTO getDataset(final Integer datasetId);
 
-	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId);
+	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
 	List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
-		final String sortBy, final String sortOrder);
+		final String sortBy, final String sortOrder, final Boolean draftMode);
 
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 

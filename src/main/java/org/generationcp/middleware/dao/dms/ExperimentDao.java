@@ -720,6 +720,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
 		}
 
+		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
+			sql.append(" AND ph.draft_value is not null or ph.draft_cvalue_id is not null "); //
+		}
+
 		sql.append(" GROUP BY observationUnitId ");
 
 		String orderColumn;
@@ -825,17 +829,27 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId) {
+	public Integer countTotalObservationUnitsForDataset(
+		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
 		try {
-			String sqlString = "select count(*) as totalObservationUnits from "
-				+ "nd_experiment nde \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-				+ " where \n"
-				+ "	proj.project_id = :datasetId \n";
+			String sqlString = "select count(*) as totalObservationUnits from " //
+				+ "nd_experiment nde " //
+				+ "    inner join project proj on proj.project_id = nde.project_id " //
+				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+				+ " where " //
+				+ "	proj.project_id = :datasetId ";
 
 			if (instanceId != null) {
-				sqlString = sqlString + "    and gl.nd_geolocation_id = :instanceId ";
+				sqlString = sqlString + " and gl.nd_geolocation_id = :instanceId ";
+			}
+
+			if (Boolean.TRUE.equals(draftMode)) {
+				sqlString = sqlString  //
+					+ " and exists(select 1" //
+					+ "   from phenotype p" //
+					+ "   where p.nd_experiment_id = nde.nd_experiment_id " //
+					+ "         and (p.draft_value is not null " //
+					+ "                or p.draft_cvalue_id is not null)) ";
 			}
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString);
