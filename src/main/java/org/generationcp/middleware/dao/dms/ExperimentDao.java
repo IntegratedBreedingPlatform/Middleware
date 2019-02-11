@@ -81,6 +81,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String LOCATION_ID = "LOCATION_ID";
 	public static final String EXPT_DESIGN = "EXPT_DESIGN";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	public static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
 	public static final String COL = "COL";
 	public static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
@@ -679,6 +680,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
 			+ "    nde.obs_unit_id as OBS_UNIT_ID,  "
+			+ "    nde.obs_unit_id as PARENT_OBS_UNIT_ID,  "
 			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
 
 		final String traitClauseFormat =
@@ -1098,6 +1100,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		variables.put(ROW, new ObservationUnitData((String) row.get(ROW)));
 		variables.put(COL, new ObservationUnitData((String) row.get(COL)));
 		variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
+		variables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
 		variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
 		variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
 		variables.put(LOCATION_ID,  new ObservationUnitData((String) row.get(LOCATION_ID)));
