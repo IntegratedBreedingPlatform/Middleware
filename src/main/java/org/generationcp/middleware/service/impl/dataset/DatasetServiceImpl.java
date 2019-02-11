@@ -609,7 +609,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				phenotypes.addAll(experimentModel.getPhenotypes());
-				if (draftMode) {
+				if (!draftMode) {
 					this.setMeasurementDataAsOutOfSync(formulasMap, phenotypes);
 				}
 			}
@@ -727,10 +727,10 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		if (draftMode) {
 			phenotype.setDraftValue(value);
-			phenotype.setDraftCValueId(categoricalValueId == null || categoricalValueId == 0 ? null : categoricalValueId);
+			phenotype.setDraftCValueId(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
 		} else {
 			phenotype.setValue(value);
-			phenotype.setcValue(categoricalValueId == null || categoricalValueId == 0 ? null : categoricalValueId);
+			phenotype.setcValue(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
 		}
 		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(observableId, phenotype);
