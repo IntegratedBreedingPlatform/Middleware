@@ -60,7 +60,7 @@ public interface DatasetService {
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
-	void importDataset(final Integer datasetId, final Table<String, String, String> table);
+	void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 	
