@@ -599,7 +599,7 @@ public class DatasetServiceImpl implements DatasetService {
 						final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
 						Phenotype phenotype = null;
 						if (observationUnitData != null && observationUnitData.getObservationId() != null && !importedVariableValue
-							.equalsIgnoreCase(observationUnitData.getValue())) {
+							.equalsIgnoreCase(observationUnitData.getDraftValue())) {
 							phenotype =
 								this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue, draftMode);
 						} else if (observationUnitData == null || observationUnitData.getObservationId() == null) {
