@@ -729,7 +729,8 @@ public class DatasetServiceImpl implements DatasetService {
 		return phenotype;
 	}
 
-	private Phenotype createPhenotype(final ObservationDto observation) {
+	@Override
+	public Phenotype createPhenotype(final ObservationDto observation) {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
