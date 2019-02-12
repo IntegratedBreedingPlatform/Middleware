@@ -57,6 +57,8 @@ public interface DatasetService {
 
 	List<MeasurementVariableDto> getVariables(Integer datasetId, VariableType variableType);
 
+	void acceptDraftData(Integer datasetId);
+
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
@@ -71,5 +73,4 @@ public interface DatasetService {
 			final int studyId, final int datasetId, final List<Integer> instanceIds);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
-
 }

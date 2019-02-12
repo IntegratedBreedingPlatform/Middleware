@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -509,6 +510,29 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectId, variableTypes);
 	}
 
+	@Override
+	public void acceptDraftData(final Integer datasetId) {
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		for (final Phenotype phenotype : phenotypes) {
+			if (phenotype.getDraftValue() == null || phenotype.getDraftValue().isEmpty()) {
+				this.deletePhenotype(phenotype.getPhenotypeId());
+			}
+			else {
+				this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+			}
+		}
+
+		final List<MeasurementVariable>
+			measurementVariableList =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
+
+		if (measurementVariableList.size() > 0) {
+			final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap =
+				this.getVariatesMapUsedInFormulas(measurementVariableList);
+			this.setMeasurementDataAsOutOfSync(formulasMap, Sets.newHashSet(phenotypes));
+		}
+	}
+
 	/**
 	 *
 	 * @param datasetId
@@ -727,6 +751,8 @@ public class DatasetServiceImpl implements DatasetService {
 		} else {
 			phenotype.setValue(value);
 			phenotype.setcValue(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
+			phenotype.setDraftValue(null);
+			phenotype.setDraftCValueId(null);
 		}
 		final Integer observableId = phenotype.getObservableId();
 		this.resolveObservationStatus(observableId, phenotype);
