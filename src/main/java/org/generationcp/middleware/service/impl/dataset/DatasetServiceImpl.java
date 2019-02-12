@@ -41,8 +41,6 @@ import org.generationcp.middleware.service.impl.study.MeasurementVariableService
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,8 +61,6 @@ import java.util.Set;
  */
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
-	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
-
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
 	protected static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
