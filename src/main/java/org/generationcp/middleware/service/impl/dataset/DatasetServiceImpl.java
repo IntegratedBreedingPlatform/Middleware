@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
@@ -47,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -133,20 +135,33 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId) {
+	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
 			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
-		final List<MeasurementVariable> subObservationSetColumns =
+		List<MeasurementVariable> subObservationSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(subObservationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
 
 		// TODO get immediate parent columns
 		// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
 
+		if (Boolean.TRUE.equals(draftMode)) {
+			final Set<Integer> pendingVariableIds = this.daoFactory.getPhenotypeDAO().getPendingVariableIds(subObservationSetId);
+			subObservationSetColumns =
+				Lists.newArrayList(Iterables.filter(subObservationSetColumns, new com.google.common.base.Predicate<MeasurementVariable>() {
+
+					@Override
+					public boolean apply(@Nullable final MeasurementVariable input) {
+						return pendingVariableIds.contains(input.getTermId());
+					}
+				}));
+		}
+
 		plotDataSetColumns.addAll(subObservationSetColumns);
+
 		return plotDataSetColumns;
 	}
 
