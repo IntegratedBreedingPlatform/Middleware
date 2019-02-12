@@ -31,7 +31,7 @@ public interface DatasetService {
 
 	ObservationDto updatePhenotype(final Integer observationUnitId, final Integer observationId, ObservationDto observationDto);
 
-	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
+	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
 
 	DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds, final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits,
