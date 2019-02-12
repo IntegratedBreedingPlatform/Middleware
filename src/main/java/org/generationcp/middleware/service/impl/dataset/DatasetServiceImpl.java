@@ -600,25 +600,31 @@ public class DatasetServiceImpl implements DatasetService {
 						Phenotype phenotype = null;
 						if (observationUnitData != null && observationUnitData.getObservationId() != null && !importedVariableValue
 							.equalsIgnoreCase(observationUnitData.getDraftValue())) {
+							/*Si archivo es igual a draft no pasa nada
+							Si archivo = value y draft no existe entonces draft no se crea
+							Si archivo igual value y draft existe no se*/
 							phenotype =
-								this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue, importedVariableValue, draftMode);
-						} else if (observationUnitData == null || observationUnitData.getObservationId() == null) {
-							final ObservationDto observationDto = new ObservationDto();
-							observationDto.setVariableId(measurementVariable.getTermId());
-							observationDto.setDraftCategoricalValueId(categoricalValue);
-							observationDto.setCategoricalValueId(categoricalValue);
-							observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
-							observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
-							observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
-							observationDto.setValue(importedVariableValue);
-							observationDto.setDraftValue(importedVariableValue);
-							if (measurementVariable.getFormula() != null) {
-								observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
-							} else {
-								observationDto.setStatus(null);
-							}
+								this.updatePhenotype(
+									observationUnitData.getObservationId(), categoricalValue, importedVariableValue, draftMode);
+						} else if ((observationUnitData == null || observationUnitData.getObservationId() == null) && !importedVariableValue
+							.equalsIgnoreCase(observationUnitData.getValue()) && !importedVariableValue
+							.equalsIgnoreCase(observationUnitData.getDraftValue())) {
+								final ObservationDto observationDto = new ObservationDto();
+								observationDto.setVariableId(measurementVariable.getTermId());
+								observationDto.setDraftCategoricalValueId(categoricalValue);
+								observationDto.setCategoricalValueId(categoricalValue);
+								observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
+								observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
+								observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
+								observationDto.setValue(importedVariableValue);
+								observationDto.setDraftValue(importedVariableValue);
+								if (measurementVariable.getFormula() != null) {
+									observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
+								} else {
+									observationDto.setStatus(null);
+								}
 
-							phenotype = this.createPhenotype(observationDto, draftMode);
+								phenotype = this.createPhenotype(observationDto, draftMode);
 
 						}
 
