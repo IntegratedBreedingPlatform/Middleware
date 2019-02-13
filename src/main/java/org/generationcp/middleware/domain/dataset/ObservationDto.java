@@ -100,15 +100,8 @@ public class ObservationDto {
 		return this.draftCategoricalValueId;
 	}
 
-	public void setDraftCategoricalValueId(final Integer draftCategoricalValueId) {
-		this.draftCategoricalValueId = draftCategoricalValueId;
-	}
-
 	public String getDraftValue() {
 		return this.draftValue;
 	}
 
-	public void setDraftValue(final String draftValue) {
-		this.draftValue = draftValue;
-	}
 }

@@ -339,7 +339,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public ObservationDto updatePhenotype(
-		final Integer observationUnitId, final Integer observationId, final ObservationDto observationDto) {
+		final Integer observationId, final ObservationDto observationDto) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
@@ -572,7 +572,7 @@ public class DatasetServiceImpl implements DatasetService {
 				for (final String variableName : table.columnKeySet()) {
 					final String importedVariableValue = table.get(observationUnitId, variableName);
 
-					if (importedVariableValue != null && !importedVariableValue.isEmpty()) {
+					if (StringUtils.isNotBlank(importedVariableValue)) {
 						final MeasurementVariable measurementVariable =
 							(MeasurementVariable) CollectionUtils.find(measurementVariableList, new Predicate() {
 
@@ -585,14 +585,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 						BigInteger categoricalValueId = null;
 						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-							if (importedVariableValue != null) {
-								for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
-									if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
-										categoricalValueId = BigInteger.valueOf(possibleValue.getId());
-										break;
-									}
+							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
+								if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
+									categoricalValueId = BigInteger.valueOf(possibleValue.getId());
+									break;
 								}
 							}
+
 						}
 
 						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());

@@ -29,7 +29,7 @@ public interface DatasetService {
 
 	ObservationDto addPhenotype(ObservationDto observation);
 
-	ObservationDto updatePhenotype(final Integer observationUnitId, final Integer observationId, ObservationDto observationDto);
+	ObservationDto updatePhenotype(final Integer observationId, ObservationDto observationDto);
 
 	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
 
