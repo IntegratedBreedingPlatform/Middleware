@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
-    private GermplasmDataManager germplasmDataManager;
+    protected static final String UNKNOWN = "UNKNOWN";
+	private GermplasmDataManager germplasmDataManager;
     private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
 
@@ -210,54 +212,73 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * @param node
      * @param level
      * @return the given GermplasmPedigreeTreeNode with its parents added to it
-     * @throws MiddlewareQueryException
      */
-    private GermplasmPedigreeTreeNode addParents(GermplasmPedigreeTreeNode node, int level) throws MiddlewareQueryException {
+    private GermplasmPedigreeTreeNode addParents(GermplasmPedigreeTreeNode node, int level) {
         if (level == 1) {
             return node;
         } else {
             // get parents of node
             Germplasm germplasmOfNode = node.getGermplasm();
-            if (germplasmOfNode.getGnpgs() == -1) {
-                // get and add the source germplasm
-                Germplasm parent = germplasmDataManager.getGermplasmWithPrefName(germplasmOfNode.getGpid2());
-                if (parent != null) {
-                    GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
-                    nodeForParent.setGermplasm(parent);
-                    node.getLinkedNodes().add(addParents(nodeForParent, level - 1));
-                }
+            final Integer maleGid = germplasmOfNode.getGpid2();
+			final boolean excludeDerivativeLines = false;
+			if (germplasmOfNode.getGnpgs() == -1) {
+                // Get and add the source germplasm
+				this.addNodeForKnownParent(node, level, maleGid, excludeDerivativeLines);
+                
             } else if (germplasmOfNode.getGnpgs() >= 2) {
-                // get and add female parent
-                Germplasm femaleParent = germplasmDataManager.getGermplasmWithPrefName(germplasmOfNode.getGpid1());
-                if (femaleParent != null) {
-                    GermplasmPedigreeTreeNode nodeForFemaleParent = new GermplasmPedigreeTreeNode();
-                    nodeForFemaleParent.setGermplasm(femaleParent);
-                    node.getLinkedNodes().add(addParents(nodeForFemaleParent, level - 1));
-                }
+                // Get and add female and male parents
+                final Integer femaleGid = germplasmOfNode.getGpid1();
+				this.addNodeForParent(node, level, femaleGid, excludeDerivativeLines);
+				this.addNodeForParent(node, level, maleGid, excludeDerivativeLines);
 
-                // get and add male parent
-                Germplasm maleParent = germplasmDataManager.getGermplasmWithPrefName(germplasmOfNode.getGpid2());
-                if (maleParent != null) {
-                    GermplasmPedigreeTreeNode nodeForMaleParent = new GermplasmPedigreeTreeNode();
-                    nodeForMaleParent.setGermplasm(maleParent);
-                    node.getLinkedNodes().add(addParents(nodeForMaleParent, level - 1));
-                }
-
+				// IF there are more parents, get and add each of them
                 if (germplasmOfNode.getGnpgs() > 2) {
-                    // if there are more parents, get and add each of them
                 	List<Germplasm> otherParents = germplasmDataManager.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                	if(otherParents!=null) {
-	                    for (Germplasm otherParent : otherParents) {
-	                        GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
-	                        nodeForOtherParent.setGermplasm(otherParent);
-	                        node.getLinkedNodes().add(addParents(nodeForOtherParent, level - 1));
-	                    }
+                    for (Germplasm otherParent : otherParents) {
+                        GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
+                        nodeForOtherParent.setGermplasm(otherParent);
+                        node.getLinkedNodes().add(addParents(nodeForOtherParent, level - 1));
                     }
                 }
             }
             return node;
         }
     }
+
+	void addNodeForParent(GermplasmPedigreeTreeNode node, int level, final Integer parentGid,
+			final boolean excludeDerivativeLines) {
+		if (parentGid == 0) {
+			this.addUnknownParent(node);
+
+		} else {
+			this.addNodeForKnownParent(node, level, parentGid, excludeDerivativeLines);
+		}
+	}
+
+	private void addNodeForKnownParent(GermplasmPedigreeTreeNode node, int level, final Integer parentGid,
+			final boolean excludeDerivativeLines) {
+		Germplasm parent = germplasmDataManager.getGermplasmWithPrefName(parentGid);
+		if (parent != null) {
+			GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
+			nodeForParent.setGermplasm(parent);
+			if (excludeDerivativeLines) {
+				node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForParent, level - 1));
+			} else {
+				node.getLinkedNodes().add(addParents(nodeForParent, level - 1));
+			}
+		}
+	}
+
+	private void addUnknownParent(GermplasmPedigreeTreeNode node) {
+		final Germplasm germplasm = new Germplasm();
+		germplasm.setGid(0);
+		final Name preferredName = new Name();
+		preferredName.setNval(UNKNOWN);
+		germplasm.setPreferredName(preferredName);
+		GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
+		nodeForParent.setGermplasm(germplasm);
+		node.getLinkedNodes().add(nodeForParent);
+	}
     
 
     /**
@@ -268,64 +289,36 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * @param node
      * @param level
      * @return the given GermplasmPedigreeTreeNode with its parents added to it
-     * @throws MiddlewareQueryException
      */
-    private GermplasmPedigreeTreeNode addParentsExcludeDerivativeLines(GermplasmPedigreeTreeNode node, int level) throws MiddlewareQueryException {
+    private GermplasmPedigreeTreeNode addParentsExcludeDerivativeLines(GermplasmPedigreeTreeNode node, int level) {
         if (level == 1) {
             return node;
         } else {
             // get parents of node
             Germplasm germplasmOfNode = node.getGermplasm();
             
-            if (germplasmOfNode.getGnpgs() == -1) {
+            final Integer femaleGid = germplasmOfNode.getGpid1();
+			final boolean excludeDerivativeLines = true;
+			if (germplasmOfNode.getGnpgs() == -1) {
                 // get and add the source germplasm
                 
-                Germplasm parent = germplasmDataManager.getGermplasmWithPrefName(germplasmOfNode.getGpid1());
-                
-                
+                Germplasm parent = germplasmDataManager.getGermplasmWithPrefName(femaleGid);
                 if (parent != null) {
-
-                    Germplasm grandParent1 = germplasmDataManager.getGermplasmWithPrefName(parent.getGpid1());   
-                    if(grandParent1 != null){
-                    	GermplasmPedigreeTreeNode nodeForGrandParent1 = new GermplasmPedigreeTreeNode();
-                    	nodeForGrandParent1.setGermplasm(grandParent1);
-                    	node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent1, level - 1));
-                    }
-                    
-                    Germplasm grandParent2 = germplasmDataManager.getGermplasmWithPrefName(parent.getGpid2());   
-                    if(grandParent2 != null){
-                        GermplasmPedigreeTreeNode nodeForGrandParent2 = new GermplasmPedigreeTreeNode();
-                        nodeForGrandParent2.setGermplasm(grandParent2);
-                        node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent2, level - 1));
-                    }
-                        
+                	this.addNodeForKnownParent(node, level, parent.getGpid1(), excludeDerivativeLines);
+                	this.addNodeForKnownParent(node, level, parent.getGpid2(), excludeDerivativeLines);
                 }
             } else if (germplasmOfNode.getGnpgs() >= 2) {
-                // get and add female parent
-                Germplasm femaleParent = germplasmDataManager.getGermplasmWithPrefName(germplasmOfNode.getGpid1());
-                if (femaleParent != null) {
-                    GermplasmPedigreeTreeNode nodeForFemaleParent = new GermplasmPedigreeTreeNode();
-                    nodeForFemaleParent.setGermplasm(femaleParent);
-                    node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForFemaleParent, level - 1));
-                }
-
-                // get and add male parent
-                Germplasm maleParent = germplasmDataManager.getGermplasmWithPrefName(germplasmOfNode.getGpid2());
-                if (maleParent != null) {
-                    GermplasmPedigreeTreeNode nodeForMaleParent = new GermplasmPedigreeTreeNode();
-                    nodeForMaleParent.setGermplasm(maleParent);
-                    node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForMaleParent, level - 1));
-                }
+                // Get and add female and male parents
+            	this.addNodeForParent(node, level, femaleGid, excludeDerivativeLines);
+            	this.addNodeForParent(node, level, germplasmOfNode.getGpid2(), excludeDerivativeLines);
 
                 if (germplasmOfNode.getGnpgs() > 2) {
                     // if there are more parents, get and add each of them
                     List<Germplasm> otherParents = germplasmDataManager.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                    if(otherParents!=null) {
-	                    for (Germplasm otherParent : otherParents) {
-	                        GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
-	                        nodeForOtherParent.setGermplasm(otherParent);
-	                        node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForOtherParent, level - 1));
-	                    }
+                    for (Germplasm otherParent : otherParents) {
+                        GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
+                        nodeForOtherParent.setGermplasm(otherParent);
+                        node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForOtherParent, level - 1));
                     }
                 }           
             }
