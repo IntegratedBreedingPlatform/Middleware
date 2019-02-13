@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -514,10 +515,9 @@ public class DatasetServiceImpl implements DatasetService {
 	public void acceptDraftData(final Integer datasetId) {
 		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
 		for (final Phenotype phenotype : phenotypes) {
-			if (phenotype.getDraftValue() == null || phenotype.getDraftValue().isEmpty()) {
+			if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 				this.deletePhenotype(phenotype.getPhenotypeId());
-			}
-			else {
+			} else {
 				this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
 			}
 		}
@@ -598,34 +598,34 @@ public class DatasetServiceImpl implements DatasetService {
 						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
 						final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
 						Phenotype phenotype = null;
-						if (observationUnitData != null && observationUnitData.getObservationId() != null &&
-							!importedVariableValue.equalsIgnoreCase(observationUnitData.getDraftValue()) ||
-							(observationUnitData.getDraftValue() != null && !importedVariableValue
-								.equalsIgnoreCase(observationUnitData.getValue()))) {
-							/*draft is different to imported value OR draft does not exist and imported value is different to stored
-							planes personvalue*/
-							phenotype =
-								this.updatePhenotype(
-									observationUnitData.getObservationId(), categoricalValue, importedVariableValue, draftMode);
-						} else if ((observationUnitData == null || observationUnitData.getObservationId() == null)) {
+						if ((observationUnitData == null || observationUnitData.getObservationId() == null)) {
 							/*Phenotype does not exist*/
-							final ObservationDto observationDto = new ObservationDto();
-							observationDto.setVariableId(measurementVariable.getTermId());
-							observationDto.setDraftCategoricalValueId(categoricalValue);
-							observationDto.setCategoricalValueId(categoricalValue);
-							observationDto.setCreatedDate(Util.getCurrentDateAsStringValue());
-							observationDto.setObservationUnitId(experimentModel.getNdExperimentId());
-							observationDto.setUpdatedDate(Util.getCurrentDateAsStringValue());
-							observationDto.setValue(importedVariableValue);
-							observationDto.setDraftValue(importedVariableValue);
+
+							String status = null;
 							if (measurementVariable.getFormula() != null) {
-								observationDto.setStatus(Phenotype.ValueStatus.MANUALLY_EDITED.getName());
-							} else {
-								observationDto.setStatus(null);
+								status = Phenotype.ValueStatus.MANUALLY_EDITED.getName();
 							}
+
+							final ObservationDto observationDto =
+								new ObservationDto(measurementVariable.getTermId(), importedVariableValue, categoricalValue, status,
+									Util.getCurrentDateAsStringValue(), Util.getCurrentDateAsStringValue(),
+									experimentModel.getNdExperimentId(), categoricalValue, importedVariableValue);
 
 							phenotype = this.createPhenotype(observationDto, draftMode);
 
+						} else if (observationUnitData != null && observationUnitData.getObservationId() != null && importedVariableValue
+							.equalsIgnoreCase(observationUnitData.getValue())) {
+							/*Phenotype exists and imported value is equal to value*/
+							phenotype =
+								this.updatePhenotype(
+									observationUnitData.getObservationId(), null, null, draftMode);
+						}
+						else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
+							!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
+							/*imported value is different to stored value*/
+							phenotype =
+								this.updatePhenotype(
+									observationUnitData.getObservationId(), categoricalValue, importedVariableValue, draftMode);
 						}
 
 						if (phenotype != null) {
