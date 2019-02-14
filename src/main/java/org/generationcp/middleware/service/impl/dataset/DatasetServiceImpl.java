@@ -527,6 +527,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void rejectDraftData(final Integer datasetId) {
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		for (final Phenotype phenotype : phenotypes) {
+				this.updatePhenotype(phenotype.getPhenotypeId(), null, null, true);
+		}
+	}
+
+	@Override
 	public void acceptDraftData(final Integer datasetId) {
 		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
 		for (final Phenotype phenotype : phenotypes) {
