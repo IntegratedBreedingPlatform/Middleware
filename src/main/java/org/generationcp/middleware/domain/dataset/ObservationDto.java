@@ -13,6 +13,24 @@ public class ObservationDto {
 	private Integer draftCategoricalValueId;
 	private String draftValue;
 
+	public ObservationDto(
+		final Integer variableId, final String value, final Integer categoricalValueId, final String status,
+		final String createdDate,
+		final String updatedDate, final Integer observationUnitId, final Integer draftCategoricalValueId, final String draftValue) {
+		this.variableId = variableId;
+		this.value = value;
+		this.categoricalValueId = categoricalValueId;
+		this.status = status;
+		this.createdDate = createdDate;
+		this.updatedDate = updatedDate;
+		this.observationUnitId = observationUnitId;
+		this.draftCategoricalValueId = draftCategoricalValueId;
+		this.draftValue = draftValue;
+	}
+
+	public ObservationDto() {
+	}
+
 	public Integer getObservationId() {
 		return this.observationId;
 	}
@@ -81,15 +99,8 @@ public class ObservationDto {
 		return this.draftCategoricalValueId;
 	}
 
-	public void setDraftCategoricalValueId(final Integer draftCategoricalValueId) {
-		this.draftCategoricalValueId = draftCategoricalValueId;
-	}
-
 	public String getDraftValue() {
 		return this.draftValue;
 	}
 
-	public void setDraftValue(final String draftValue) {
-		this.draftValue = draftValue;
-	}
 }
