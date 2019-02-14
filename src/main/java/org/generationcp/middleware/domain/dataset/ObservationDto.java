@@ -29,7 +29,6 @@ public class ObservationDto {
 	}
 
 	public ObservationDto() {
-		super();
 	}
 
 	public Integer getObservationId() {
