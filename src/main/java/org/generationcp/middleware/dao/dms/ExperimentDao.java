@@ -640,7 +640,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL,  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
-			+ "    nde.obs_unit_id as OBS_UNIT_ID,  "
+			+ "    nde.obs_unit_id as OBS_UNIT_ID,  " //
 			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
 
 		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
@@ -655,7 +655,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(String.format( //
 				traitClauseFormat, //
 				measurementVariable.getName(), //
-				measurementVariable.getName() + "_Value", //
+				measurementVariable.getName(), // Value
 				measurementVariable.getName(), //
 				measurementVariable.getName() + "_PhenotypeId", //
 				measurementVariable.getName(), //
@@ -818,7 +818,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	private void addScalarForTraits(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final SQLQuery createSQLQuery, final Boolean addStatus) {
 		for (final MeasurementVariableDto measurementVariable : selectionMethodsAndTraits) {
-			createSQLQuery.addScalar(measurementVariable.getName() + "_Value");
+			createSQLQuery.addScalar(measurementVariable.getName()); // Value
 			createSQLQuery.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
 			if (addStatus) {
 				createSQLQuery.addScalar(measurementVariable.getName() + "_Status");
@@ -962,7 +962,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				sql.append(String.format( //
 					traitClauseFormat, //
 					measurementVariable.getName(), //
-					measurementVariable.getName() + "_Value", //
+					measurementVariable.getName(), // Value
 					measurementVariable.getName(), //
 					measurementVariable.getName() + "_PhenotypeId", //
 					measurementVariable.getName(), //
@@ -1038,7 +1038,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					final ObservationUnitData observationUnitData = new ObservationUnitData( //
 						(Integer) row.get(variable.getName() + "_PhenotypeId"), //
 						(Integer) row.get(variable.getName() + "_CvalueId"), //
-						(String) row.get(variable.getName() + "_Value"), //
+						(String) row.get(variable.getName()), // Value
 						(status != null ? Phenotype.ValueStatus.valueOf(status) : null), //
 						variable.getId());
 					observationUnitData.setDraftValue((String) row.get(variable.getName() + "_DraftValue"));
@@ -1081,7 +1081,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final ObservationUnitData observationUnitData = new ObservationUnitData( //
 				(Integer) row.get(variable.getName() + "_PhenotypeId"), //
 				(Integer) row.get(variable.getName() + "_CvalueId"), //
-				(String) row.get(variable.getName() + "_Value"), //
+				(String) row.get(variable.getName()), // Value
 				(status != null ? Phenotype.ValueStatus.valueOf(status) : null), //
 				variable.getId());
 			observationUnitData.setDraftValue((String) row.get(variable.getName() + "_DraftValue"));
