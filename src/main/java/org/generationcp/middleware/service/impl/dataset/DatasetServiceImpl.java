@@ -146,6 +146,7 @@ public class DatasetServiceImpl implements DatasetService {
 		// TODO get immediate parent columns
 		// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
 
+		// Filter columns with draft data
 		if (Boolean.TRUE.equals(draftMode)) {
 			final Set<Integer> pendingVariableIds = this.daoFactory.getPhenotypeDAO().getPendingVariableIds(subObservationSetId);
 			subObservationSetColumns =
@@ -157,6 +158,35 @@ public class DatasetServiceImpl implements DatasetService {
 					}
 				}));
 		}
+
+		// Virtual columns
+		if (this.daoFactory.getSampleDao().countByDatasetId(subObservationSetId) > 0) {
+			final MeasurementVariable sampleColumn = new MeasurementVariable();
+			sampleColumn.setName(TermId.SAMPLES.name());
+			sampleColumn.setAlias(TermId.SAMPLES.name());
+			sampleColumn.setTermId(TermId.SAMPLES.getId());
+			sampleColumn.setFactor(true);
+			plotDataSetColumns.add(sampleColumn);
+		}
+
+		plotDataSetColumns.addAll(subObservationSetColumns);
+
+		return plotDataSetColumns;
+	}
+
+	@Override
+	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
+		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
+		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
+			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+
+		final List<MeasurementVariable> plotDataSetColumns =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
+		List<MeasurementVariable> subObservationSetColumns =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(subObservationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
+
+		// TODO get immediate parent columns
+		// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
 
 		plotDataSetColumns.addAll(subObservationSetColumns);
 

@@ -33,6 +33,8 @@ public interface DatasetService {
 
 	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
 
+	List<MeasurementVariable> getSubObservationSetVariables(Integer subObservationSetId);
+
 	DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds, final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits,
 		final Integer parentId);
