@@ -15,7 +15,6 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -34,6 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
+	
+	public static final int MAX_PEDIGREE_LEVEL = 5;
+	public static final int NONE = 0;
+	public static final int MALE_RECURRENT = 1;
+	public static final int FEMALE_RECURRENT = 2;
 
     protected static final String UNKNOWN = "UNKNOWN";
 	private GermplasmDataManager germplasmDataManager;
@@ -49,18 +53,18 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
         
     @Override
-    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException {
+    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) {
         return generatePedigreeTree(gid, level, false);
     }
 
     @Override
-    public Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException,MaxPedigreeLevelReachedException {
+    public Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MaxPedigreeLevelReachedException {
         return countPedigreeLevel(gid, includeDerivativeLine, false);
     }
 
     @Override
     public Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine, boolean calculateFullPedigree)
-            throws MiddlewareQueryException,MaxPedigreeLevelReachedException {
+            throws MaxPedigreeLevelReachedException {
         try {
             PEDIGREE_COUNTER.set(1);
             CALCULATE_FULL.set(calculateFullPedigree);
@@ -71,7 +75,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         }
     }
 
-    public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException {
+    public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) {
     	Integer maxPedigreeLevel = 0;
 
         if(gid==null || gid==0) {
@@ -97,8 +101,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
     
     private Integer getMaxPedigreeLevelFromProgenitor(
-    		Integer gid, Integer gnpgs, boolean includeDerivativeLine, Integer maxPedigreeLevel) 
-    		throws MiddlewareQueryException {
+    		Integer gid, Integer gnpgs, boolean includeDerivativeLine, Integer maxPedigreeLevel) {
     	Germplasm parentGermplasm = getParentByGIDAndProgenitorNumber(gid, gnpgs);
 
 		if(parentGermplasm!=null) {
@@ -131,7 +134,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
 
 	private Integer getMaxPedigreeLevelFromParent(
-    		Integer gid, Integer parentNo, boolean includeDerivativeLine) throws MiddlewareQueryException {
+    		Integer gid, Integer parentNo, boolean includeDerivativeLine) {
     	Integer parentId = getGermplasmProgenitorID(gid,parentNo);
     	if(!includeDerivativeLine && parentId!=null) {
     		return getMaxPedigreeLevelFromBothParents(parentId,includeDerivativeLine);
@@ -143,7 +146,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
     
     private Integer getMaxPedigreeLevelFromBothParents(
-    		Integer gid, boolean includeDerivativeLine) throws MiddlewareQueryException {
+    		Integer gid, boolean includeDerivativeLine) {
         int currentPedigreeCount = PEDIGREE_COUNTER.get();
 
     	Integer numOfPedigreeFromParent1 = getPedigreeLevel(gid,1,includeDerivativeLine);
@@ -157,8 +160,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		return numOfPedigreeFromParent1;
 	}
 
-	private Integer getPedigreeLevel(Integer gid, Integer parentNo, boolean includeDerivativeLine) 
-			throws MiddlewareQueryException {
+	private Integer getPedigreeLevel(Integer gid, Integer parentNo, boolean includeDerivativeLine) {
 		Integer parentId = getGermplasmProgenitorID(gid, parentNo);
 		if(parentId!=null) {
             incrementPedigreeLevelCounter();
@@ -167,8 +169,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		return 0;
 	}
 
-	private Integer getGermplasmProgenitorID(Integer gid, Integer proNo) 
-			throws MiddlewareQueryException {
+	private Integer getGermplasmProgenitorID(Integer gid, Integer proNo) {
 		if(gid==null) {
 			return null;
 		}
@@ -182,7 +183,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
-    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException {
+    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) {
         GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
         // set root node
         Germplasm root = germplasmDataManager.getGermplasmWithPrefName(gid);
@@ -327,23 +328,20 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
     
     @Override
-    public GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
-            throws MiddlewareQueryException {
+    public GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward) {
         
         return getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'M');
     }
     
     @Override
-    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
-            throws MiddlewareQueryException {
+    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward) {
         
         return getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'D');
     }
 
 
 
-    private GermplasmPedigreeTree getNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward, char methodType)
-            throws MiddlewareQueryException {
+    private GermplasmPedigreeTree getNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward, char methodType) {
         GermplasmPedigreeTree neighborhood = new GermplasmPedigreeTree();
 
         // get the root of the neighborhood
@@ -380,9 +378,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * @param steps
      * @return Object[] - first element is the Germplasm POJO, second is an
      *         Integer which is the number of steps left to take
-     * @throws MiddlewareQueryException
      */
-    private Object[] traceRoot(Integer gid, int steps, char methodType) throws MiddlewareQueryException {
+    private Object[] traceRoot(Integer gid, int steps, char methodType) {
         Germplasm germplasm = germplasmDataManager.getGermplasmWithPrefName(gid);
         
         if (germplasm == null) {
@@ -421,15 +418,13 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * @param node
      * @param steps
      * @return
-     * @throws MiddlewareQueryException
      */
-    private GermplasmPedigreeTreeNode getDerivedLines(GermplasmPedigreeTreeNode node, int steps, char methodType) throws MiddlewareQueryException {
+    private GermplasmPedigreeTreeNode getDerivedLines(GermplasmPedigreeTreeNode node, int steps, char methodType) {
         if (steps <= 0) {
             return node;
         } else {
-            List<Germplasm> derivedGermplasms = new ArrayList<Germplasm>();
             Integer gid = node.getGermplasm().getGid();
-            derivedGermplasms = getChildren(gid, methodType);
+            List<Germplasm> derivedGermplasms = getChildren(gid, methodType);
             for (Germplasm g : derivedGermplasms) {
                 GermplasmPedigreeTreeNode derivedNode = new GermplasmPedigreeTreeNode();
                 derivedNode.setGermplasm(g);
@@ -441,18 +436,18 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
 
 
-    private List<Germplasm> getChildren(Integer gid, char methodType) throws MiddlewareQueryException {
+    private List<Germplasm> getChildren(Integer gid, char methodType) {
     	return getGermplasmDao().getChildren(gid, methodType);
 	}
 
 	@Override
-    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException {
+    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) {
 		return getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
     }
 
     @Override
-    public List<Object[]> getDescendants(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Object[]> result = new ArrayList<Object[]>();
+    public List<Object[]> getDescendants(Integer gid, int start, int numOfRows) {
+        List<Object[]> result = new ArrayList<>();
         Object[] germplasmList;
 
         List<Germplasm> germplasmDescendant = getGermplasmDescendantByGID(gid, start, numOfRows);
@@ -475,38 +470,38 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
 
     private List<Germplasm> getGermplasmDescendantByGID(Integer gid, int start,
-			int numOfRows) throws MiddlewareQueryException {
+			int numOfRows) {
     	return getGermplasmDao().getGermplasmDescendantByGID(gid, start, numOfRows);
 	}
 
 	@Override
-    public long countDescendants(Integer gid) throws MiddlewareQueryException {
+    public long countDescendants(Integer gid) {
 		 return getGermplasmDao().countGermplasmDescendantByGID(gid);
     }
 
     @Override
-    public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) {
     	return getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
     }
 
     @Override
-    public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
+    public long countManagementNeighbors(Integer gid) {
     	return getGermplasmDao().countManagementNeighbors(gid);
     }
 
     @Override
-    public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
+    public long countGroupRelatives(Integer gid) {
     	return getGermplasmDao().countGroupRelatives(gid);
     }
 
     @Override
-    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
+    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) {
     	return getGermplasmDao().getGroupRelatives(gid, start, numRows);
     }
 
     @Override
-    public List<Germplasm> getGenerationHistory(Integer gid) throws MiddlewareQueryException {
-        List<Germplasm> toreturn = new ArrayList<Germplasm>();
+    public List<Germplasm> getGenerationHistory(Integer gid) {
+        List<Germplasm> toreturn = new ArrayList<>();
 
         Germplasm currentGermplasm = germplasmDataManager.getGermplasmWithPrefName(gid);
         if (currentGermplasm != null) {
@@ -535,7 +530,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		this.germplasmDataManager = germplasmDataManager;
 	}
 
-    public int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException{
+    public int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) {
         Germplasm maleParent = getGermplasmDataManager().getGermplasmByGID(maleParentGID);
         Germplasm femaleParent = getGermplasmDataManager().getGermplasmByGID(femaleParentGID);
 
