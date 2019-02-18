@@ -721,7 +721,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
-			sql.append(" AND ph.draft_value is not null or ph.draft_cvalue_id is not null "); //
+			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
 		}
 
 		sql.append(" GROUP BY observationUnitId ");
