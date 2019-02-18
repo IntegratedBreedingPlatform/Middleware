@@ -154,7 +154,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 					@Override
 					public boolean apply(@Nullable final MeasurementVariable input) {
-						return pendingVariableIds.contains(input.getTermId());
+						return pendingVariableIds.contains(input.getTermId())
+							|| VariableType.OBSERVATION_UNIT.equals(input.getVariableType());
 					}
 				}));
 		}
