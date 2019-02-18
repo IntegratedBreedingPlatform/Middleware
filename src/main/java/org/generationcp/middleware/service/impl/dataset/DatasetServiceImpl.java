@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -513,25 +514,80 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void acceptDraftData(final Integer datasetId) {
+
 		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
-		for (final Phenotype phenotype : phenotypes) {
-			if (StringUtils.isEmpty(phenotype.getDraftValue())) {
-				this.deletePhenotype(phenotype.getPhenotypeId());
-			} else {
-				this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+
+		if (phenotypes.size() > 0) {
+
+			for (final Phenotype phenotype : phenotypes) {
+				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
+					this.deletePhenotype(phenotype.getPhenotypeId());
+				} else {
+					this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+				}
+			}
+
+			final List<MeasurementVariable>
+				measurementVariableList =
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
+
+			if (measurementVariableList.size() > 0) {
+				final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap =
+					this.getVariatesMapUsedInFormulas(measurementVariableList);
+				this.setMeasurementDataAsOutOfSync(formulasMap, Sets.newHashSet(phenotypes));
+			}
+		}
+	}
+
+	@Override
+	public Boolean checkOutOfBoundDraftData(final Integer datasetId) {
+
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+
+		if (phenotypes.size() > 0) {
+			final List<MeasurementVariable>
+				measurementVariableList =
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
+
+			for (final MeasurementVariable measurementVariable : measurementVariableList) {
+				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(phenotypes, new Predicate() {
+
+					@Override
+					public boolean evaluate(final Object o) {
+						final Phenotype phenotype = (Phenotype) o;
+						return phenotype.getObservableId().equals(measurementVariable.getTermId());
+					}
+				});
+
+				Collection<Phenotype> possibleValues = null;
+				if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues().isEmpty()) {
+					possibleValues =
+						CollectionUtils.collect(measurementVariable.getPossibleValues(), new Transformer() {
+
+							@Override
+							public String transform(final Object input) {
+								final ValueReference variable = (ValueReference) input;
+								return variable.getName();
+							}
+
+						});
+
+				}
+
+				for (final Phenotype phenotype : selectedPhenotypes) {
+					if (!ExportImportUtils
+						.isValidValue(measurementVariable, phenotype.getDraftValue(), possibleValues)) {
+						return Boolean.TRUE;
+					}
+				}
+
 			}
 		}
 
-		final List<MeasurementVariable>
-			measurementVariableList =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
-
-		if (measurementVariableList.size() > 0) {
-			final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap =
-				this.getVariatesMapUsedInFormulas(measurementVariableList);
-			this.setMeasurementDataAsOutOfSync(formulasMap, Sets.newHashSet(phenotypes));
-		}
+		return Boolean.FALSE;
 	}
+
+
 
 	/**
 	 *
