@@ -31,7 +31,9 @@ public interface DatasetService {
 
 	ObservationDto updatePhenotype(final Integer observationId, ObservationDto observationDto);
 
-	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
+	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
+
+	List<MeasurementVariable> getSubObservationSetVariables(Integer subObservationSetId);
 
 	DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds, final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits,
@@ -73,6 +75,8 @@ public interface DatasetService {
 			final int studyId, final int datasetId, final List<Integer> instanceIds);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+
+	void rejectDraftData(Integer datasetId);
 
 	Boolean checkOutOfBoundDraftData(final Integer datasetId);
 }

@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -918,6 +919,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType());
 
+		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
 
 		final Map<Integer, PhenotypeSearchDTO> observationUnitsByNdExpId = new LinkedHashMap<>();
@@ -1111,6 +1113,23 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
+	@SuppressWarnings("Duplicates")
+	public Set<Integer> getPendingVariableIds(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+
+		criteria.createAlias("experiment", "experiment");
+		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
+
+		final Criterion draftValue = Restrictions.isNotNull("draftValue");
+		final Criterion draftCValueId = Restrictions.isNotNull("draftCValueId");
+		criteria.add(Restrictions.or(draftValue, draftCValueId));
+
+		criteria.setProjection(Projections.distinct(Projections.property("observableId")));
+
+		return new HashSet<>(criteria.list());
+	}
+
+	@SuppressWarnings("Duplicates")
 	public Long countPendingDataOfDataset(final Integer datasetId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("experiment", "experiment");
