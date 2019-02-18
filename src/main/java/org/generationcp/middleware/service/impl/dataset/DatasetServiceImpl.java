@@ -527,9 +527,15 @@ public class DatasetServiceImpl implements DatasetService {
 	public void deletePhenotype(final Integer phenotypeId) {
 		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
 		final Integer observableId = phenotype.getObservableId();
-		final Integer observationUnitId = phenotype.getExperiment().getNdExperimentId();
+		final ExperimentModel experiment = phenotype.getExperiment();
+		final Integer observationUnitId = experiment.getNdExperimentId();
+
+		final List<Phenotype> experimentPhenotypes = experiment.getPhenotypes();
+		experimentPhenotypes.remove(phenotype);
+		experiment.setPhenotypes(experimentPhenotypes);
+		this.daoFactory.getExperimentDao().merge(experiment);
+
 		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
-		
 		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
 		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
 	}
@@ -555,6 +561,18 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes) {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectId, variableTypes);
+	}
+
+	@Override
+	public void rejectDraftData(final Integer datasetId) {
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		for (final Phenotype phenotype : phenotypes) {
+			if (StringUtils.isEmpty(phenotype.getValue())) {
+				this.deletePhenotype(phenotype.getPhenotypeId());
+			} else {
+				this.updatePhenotype(phenotype.getPhenotypeId(), null, null, true);
+			}
+		}
 	}
 
 	@Override

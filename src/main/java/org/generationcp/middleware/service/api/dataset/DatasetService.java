@@ -75,4 +75,6 @@ public interface DatasetService {
 			final int studyId, final int datasetId, final List<Integer> instanceIds);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+
+	void rejectDraftData(Integer datasetId);
 }
