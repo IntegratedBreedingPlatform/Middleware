@@ -499,17 +499,14 @@ public class DatasetServiceImpl implements DatasetService {
 		final ExperimentModel experiment = phenotype.getExperiment();
 		final Integer observationUnitId = experiment.getNdExperimentId();
 
-		this.updateExperimentModel(phenotype, experiment);
-		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
-		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
-		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
-	}
-
-	private void updateExperimentModel(final Phenotype phenotype, final ExperimentModel experiment) {
 		final List<Phenotype> experimentPhenotypes = experiment.getPhenotypes();
 		experimentPhenotypes.remove(phenotype);
 		experiment.setPhenotypes(experimentPhenotypes);
 		this.daoFactory.getExperimentDao().merge(experiment);
+
+		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
+		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
+		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
 	}
 
 	@Override
