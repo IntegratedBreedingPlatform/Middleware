@@ -1630,4 +1630,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.daoFactory.getGermplasmDao().countGermplasmDTOs(germplasmSearchRequestDTO);
 	}
 
+	@Override
+	public Germplasm getUnknownGermplasmWithPreferredName() {
+		final Germplasm germplasm = new Germplasm();
+		germplasm.setGid(0);
+		final Name preferredName = new Name();
+		preferredName.setNval(Name.UNKNOWN);
+		germplasm.setPreferredName(preferredName);
+		return germplasm;
+	}
+
 }

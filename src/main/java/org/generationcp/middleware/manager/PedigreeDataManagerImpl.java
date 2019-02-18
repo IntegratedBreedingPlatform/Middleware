@@ -39,7 +39,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	public static final int MALE_RECURRENT = 1;
 	public static final int FEMALE_RECURRENT = 2;
 
-    protected static final String UNKNOWN = "UNKNOWN";
 	private GermplasmDataManager germplasmDataManager;
     private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
@@ -271,13 +270,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	private void addUnknownParent(GermplasmPedigreeTreeNode node) {
-		final Germplasm germplasm = new Germplasm();
-		germplasm.setGid(0);
-		final Name preferredName = new Name();
-		preferredName.setNval(UNKNOWN);
-		germplasm.setPreferredName(preferredName);
 		GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
-		nodeForParent.setGermplasm(germplasm);
+		nodeForParent.setGermplasm(this.germplasmDataManager.getUnknownGermplasmWithPreferredName());
 		node.getLinkedNodes().add(nodeForParent);
 	}
     
