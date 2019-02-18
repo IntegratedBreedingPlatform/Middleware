@@ -76,4 +76,6 @@ public interface DatasetService {
 	Phenotype updatePhenotype(Integer observationId, Integer categoricalValueId, String value);
 
 	Phenotype createPhenotype(ObservationDto observation);
+
+	Boolean isAnyDatasetContainsCalculatedTraits(final Set<Integer> datasetIds);
 }

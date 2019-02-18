@@ -69,6 +69,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -956,6 +957,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		query.setParameter("variableValue", variableValue);
 		query.setParameter("programUUID", programUUID);
 
+		return ((BigInteger) query.uniqueResult()).intValue() != 0;
+
+	}
+
+	/***
+	 * Check if any of the specified projectIds (dataset) contains one or more calculated traits.
+	 * @param projectIds
+	 * @return
+	 */
+	public boolean isAnyProjectContainsCalculatedTraits(final Set<Integer> projectIds) {
+		// Check if the variable is used in trial level and/or environment level of studies except for the specified programUUID.
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM projectprop pp\n"
+			+ "INNER JOIN formula f ON pp.variable_id = f.target_variable_id\n"
+			+ "where project_id in (:projectIds) and type_id = " + VariableType.TRAIT.getId());
+		query.setParameterList("projectIds", projectIds);
 		return ((BigInteger) query.uniqueResult()).intValue() != 0;
 
 	}

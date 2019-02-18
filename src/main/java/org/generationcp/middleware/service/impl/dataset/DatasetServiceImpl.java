@@ -758,6 +758,11 @@ public class DatasetServiceImpl implements DatasetService {
 		return phenotype;
 	}
 
+	@Override
+	public Boolean isAnyDatasetContainsCalculatedTraits(final Set<Integer> datasetIds) {
+		return this.daoFactory.getDmsProjectDAO().isAnyProjectContainsCalculatedTraits(datasetIds);
+	}
+
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
 	}
