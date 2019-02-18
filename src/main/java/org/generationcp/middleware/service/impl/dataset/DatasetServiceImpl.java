@@ -523,7 +523,7 @@ public class DatasetServiceImpl implements DatasetService {
 				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 					this.deletePhenotype(phenotype.getPhenotypeId());
 				} else {
-					this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+					this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
 				}
 			}
 
@@ -802,10 +802,23 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private Phenotype updatePhenotype(
+		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Boolean draftMode) {
+		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
+
+		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype);
+	}
+
+	private Phenotype updatePhenotype(
 		final Integer observationId, final Integer categoricalValueId, final String value, final Boolean draftMode) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype);
+	}
+
+	private Phenotype updatePhenotypeValues(
+		final Integer categoricalValueId, final String value, final Boolean draftMode, final PhenotypeDao phenotypeDao,
+		final Phenotype phenotype) {
 		if (draftMode) {
 			phenotype.setDraftValue(value);
 			phenotype.setDraftCValueId(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
