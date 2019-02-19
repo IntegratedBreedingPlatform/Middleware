@@ -8,6 +8,7 @@ import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
@@ -132,6 +133,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
@@ -170,11 +172,21 @@ public class DatasetServiceImpl implements DatasetService {
 			plotDataSetColumns.add(sampleColumn);
 		}
 
+		// Other edge cases
+		// Let's consider it as a special case instead of getting ENVIRONMENT_DETAILS for plot dataset
+		final MeasurementVariable trialInstanceCol = new MeasurementVariable();
+		trialInstanceCol.setName(ColumnLabels.TRIAL_INSTANCE.getName());
+		trialInstanceCol.setAlias(ColumnLabels.TRIAL_INSTANCE.getName());
+		trialInstanceCol.setTermId(ColumnLabels.TRIAL_INSTANCE.getTermId().getId());
+		trialInstanceCol.setFactor(true);
+		plotDataSetColumns.add(0, trialInstanceCol);
+
 		plotDataSetColumns.addAll(subObservationSetColumns);
 
 		return plotDataSetColumns;
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
@@ -183,7 +195,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
-		List<MeasurementVariable> subObservationSetColumns =
+		final List<MeasurementVariable> subObservationSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(subObservationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
 
 		// TODO get immediate parent columns
@@ -480,6 +492,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(datasetId, instanceId,
 				this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), selectionMethodsAndTraits);
+		// TODO replace with Pageable
 		searchDto.setSortedRequest(new SortedPageRequest(pageNumber, pageSize, sortBy, sortOrder));
 		searchDto.setDraftMode(draftMode);
 
