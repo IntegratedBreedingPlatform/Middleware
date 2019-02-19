@@ -77,5 +77,5 @@ public interface DatasetService {
 
 	Phenotype createPhenotype(ObservationDto observation);
 
-	Boolean isAnyDatasetContainsCalculatedTraits(final Set<Integer> datasetIds);
+	int countCalculatedVariablesInDatasets(final Set<Integer> datasetIds);
 }

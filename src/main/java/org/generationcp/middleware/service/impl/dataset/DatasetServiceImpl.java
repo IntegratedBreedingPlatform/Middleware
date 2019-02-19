@@ -759,8 +759,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean isAnyDatasetContainsCalculatedTraits(final Set<Integer> datasetIds) {
-		return this.daoFactory.getDmsProjectDAO().isAnyProjectContainsCalculatedTraits(datasetIds);
+	public int countCalculatedVariablesInDatasets(final Set<Integer> datasetIds) {
+		return this.daoFactory.getDmsProjectDAO().countCalculatedVariablesInDatasets(datasetIds);
 	}
 
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
