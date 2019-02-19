@@ -550,7 +550,9 @@ public class DatasetServiceImplTest {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setPhenotypeId(phenotypeId);
 		phenotype.setObservableId(observableId);
-		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		final ExperimentModel experiment = new ExperimentModel(observationUnitId);
+		phenotype.setExperiment(experiment);
+		experiment.setPhenotypes(Lists.newArrayList(phenotype));
 		when(this.phenotypeDao.getById(phenotypeId)).thenReturn(phenotype);
 		
 		final Formula formula1 = new Formula();
@@ -562,7 +564,7 @@ public class DatasetServiceImplTest {
 		term2.setCvTermId(random.nextInt());
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(observableId);
-		
+
 		
 		this.datasetService.deletePhenotype(phenotypeId);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
