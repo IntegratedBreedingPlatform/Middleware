@@ -61,4 +61,14 @@ public class PresetServiceImpl implements PresetService {
 	public void deleteProgramPreset(int programPresetId) throws MiddlewareQueryException {
 		daoFactory.getProgramPresetDAO().deleteProgramPreset(programPresetId);
 	}
+
+	@Override
+	public ProgramPreset saveProgramPreset(final ProgramPreset programPreset) throws MiddlewareQueryException {
+		return daoFactory.getProgramPresetDAO().save(programPreset);
+	}
+
+	@Override
+	public ProgramPreset updateProgramPreset(final ProgramPreset programPreset) throws MiddlewareQueryException {
+		return daoFactory.getProgramPresetDAO().update(programPreset);
+	}
 }

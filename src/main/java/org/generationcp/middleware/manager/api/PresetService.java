@@ -20,6 +20,25 @@ public interface PresetService {
 	ProgramPreset getProgramPresetById(int id) throws MiddlewareQueryException;
 
 	/**
+	 * Save a program preset
+	 *
+	 * @param programPreset
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	ProgramPreset saveProgramPreset(ProgramPreset programPreset) throws MiddlewareQueryException;
+
+	/**
+	 * Update a program preset
+	 *
+	 * @param programPreset
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	ProgramPreset updateProgramPreset(ProgramPreset programPreset) throws MiddlewareQueryException;
+
+
+	/**
 	 * save or update a progam preset
 	 *
 	 * @param programPreset
