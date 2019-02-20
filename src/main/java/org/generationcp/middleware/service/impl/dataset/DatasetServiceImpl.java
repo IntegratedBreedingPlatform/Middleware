@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -593,6 +594,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void acceptDraftData(final Integer datasetId) {
 
 		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
 
 		if (phenotypes.size() > 0) {
 
@@ -604,14 +606,14 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 
-			final List<MeasurementVariable>
-				measurementVariableList =
+			final List<MeasurementVariable> measurementVariableList =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 			if (measurementVariableList.size() > 0) {
-				final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap =
-					this.getVariatesMapUsedInFormulas(measurementVariableList);
-				this.setMeasurementDataAsOutOfSync(formulasMap, Sets.newHashSet(phenotypes));
+				final Map<Integer, List<Integer>> formulasMap = this.getTargetsByInput(measurementVariableList);
+				this.setMeasurementDataAsOutOfSync(formulasMap,  //
+					Sets.newHashSet(phenotypes), //
+					Sets.newHashSet(allPhenotypes));
 			}
 		}
 	}
@@ -696,7 +698,8 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
 					observationUnitIds);
 
-			final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap = this.getVariatesMapUsedInFormulas(measurementVariableList);
+			final Map<Integer, List<Integer>> formulasMap = this.getTargetsByInput(measurementVariableList);
+
 			for (final Object observationUnitId : table.rowKeySet()) {
 				final Set<Phenotype> phenotypes = new HashSet<>();
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
@@ -768,9 +771,12 @@ public class DatasetServiceImpl implements DatasetService {
 					}
 				}
 
-				phenotypes.addAll(experimentModel.getPhenotypes());
 				if (!draftMode) {
-					this.setMeasurementDataAsOutOfSync(formulasMap, phenotypes);
+					final ArrayList<Phenotype> datasetPhenotypes = new ArrayList<>(experimentModel.getPhenotypes());
+					datasetPhenotypes.addAll(phenotypes);
+					this.setMeasurementDataAsOutOfSync(formulasMap, //
+						Sets.newHashSet(phenotypes), //
+						Sets.newHashSet(datasetPhenotypes));
 				}
 			}
 		}
@@ -818,66 +824,49 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void setMeasurementDataAsOutOfSync(
-		final Map<MeasurementVariable, List<MeasurementVariable>> formulasMap,
-		final Set<Phenotype> phenotypes) {
-		for (final MeasurementVariable measurementVariable : formulasMap.keySet()) {
-			final Phenotype key = this.findPhenotypeByTermId(measurementVariable.getTermId(), phenotypes);
-			final List<MeasurementVariable> formulas = formulasMap.get(measurementVariable);
-			for (final MeasurementVariable formula : formulas) {
-				final Phenotype value = this.findPhenotypeByTermId(formula.getTermId(), phenotypes);
-				if (key != null && key.isChanged() && value != null) {
-					value.setValueStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
-					this.daoFactory.getPhenotypeDAO().saveOrUpdate(value);
-				}
+		final Map<Integer, List<Integer>> targetsByInput,
+		final Set<Phenotype> phenotypes,
+		final Set<Phenotype> datasetPhenotypes) {
+
+		final Set<Integer> observationUnitIdOutOfSync = new HashSet<>();
+		final Set<Integer> targetVariableIdOutOfSync = new HashSet<>();
+
+		for (final Phenotype phenotype : phenotypes) {
+			if (phenotype.isChanged()) {
+				observationUnitIdOutOfSync.add(phenotype.getExperiment().getNdExperimentId());
+				targetVariableIdOutOfSync.addAll(targetsByInput.get(phenotype.getObservableId()));
 			}
+		}
+
+		for (final Phenotype datasetPhenotype : datasetPhenotypes) {
+            if (targetVariableIdOutOfSync.contains(datasetPhenotype.getObservableId())
+				&& observationUnitIdOutOfSync.contains(datasetPhenotype.getExperiment().getNdExperimentId())) {
+
+				datasetPhenotype.setValueStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
+				this.daoFactory.getPhenotypeDAO().saveOrUpdate(datasetPhenotype);
+			}
+
 		}
 	}
 
-	private Phenotype findPhenotypeByTermId(final Integer termId, final Set<Phenotype> phenotypes) {
-		return (Phenotype) CollectionUtils.find(phenotypes, new Predicate() {
-
-			@Override
-			public boolean evaluate(final Object object) {
-				final Phenotype dto = (Phenotype) object;
-				return dto.getObservableId().equals(termId);
-			}
-		});
-	}
-
-	private Map<MeasurementVariable, List<MeasurementVariable>> getVariatesMapUsedInFormulas(
+	private Map<Integer, List<Integer>> getTargetsByInput(
 		final List<MeasurementVariable> measurementVariables) {
-		final Map<MeasurementVariable, List<MeasurementVariable>> map = new HashMap<>();
 
-		final Collection<MeasurementVariable> formulas = CollectionUtils.select(measurementVariables, new Predicate() {
+		final Map<Integer, List<Integer>> targetByInput = new HashMap<>();
 
-			@Override
-			public boolean evaluate(final Object o) {
-				final MeasurementVariable measurementVariable = (MeasurementVariable) o;
-				return measurementVariable.getFormula() != null;
-			}
-		});
-
-		if (!formulas.isEmpty()) {
-			for (final MeasurementVariable row : measurementVariables) {
-				final List<MeasurementVariable> formulasFromCVTermId = this.getFormulasFromCVTermId(row, formulas);
-				if (!formulasFromCVTermId.isEmpty()) {
-					map.put(row, formulasFromCVTermId);
+		for (final MeasurementVariable input : measurementVariables) {
+			for (final MeasurementVariable target : measurementVariables) {
+				final FormulaDto formula = target.getFormula();
+				if (formula != null && formula.isInputVariablePresent(input.getTermId())) {
+					if (!targetByInput.containsKey(input.getTermId())) {
+						targetByInput.put(input.getTermId(), new ArrayList<Integer>());
+					}
+					targetByInput.get(input.getTermId()).add(target.getTermId());
 				}
 			}
 		}
-		return map;
-	}
 
-	private List<MeasurementVariable> getFormulasFromCVTermId(
-		final MeasurementVariable variable,
-		final Collection<MeasurementVariable> measurementVariables) {
-		final List<MeasurementVariable> result = new ArrayList<>();
-		for (final MeasurementVariable measurementVariable : measurementVariables) {
-			if (measurementVariable.getFormula().isInputVariablePresent(variable.getTermId())) {
-				result.add(measurementVariable);
-			}
-		}
-		return result;
+		return targetByInput;
 	}
 
 	private Phenotype updatePhenotype(
