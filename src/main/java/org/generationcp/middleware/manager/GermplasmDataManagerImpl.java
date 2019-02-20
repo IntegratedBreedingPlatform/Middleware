@@ -1104,6 +1104,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			for (final Integer gid : results.keySet()) {
 				toreturn.put(gid, results.get(gid));
 			}
+			if (gids.contains(0)) {
+				toreturn.put(0, Name.UNKNOWN);
+			}
 		}
 
 		return toreturn;
