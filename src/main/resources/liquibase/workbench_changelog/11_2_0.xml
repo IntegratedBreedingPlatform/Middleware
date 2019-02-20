@@ -1,0 +1,242 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet author="clarissa" id="v11.2.0-1">
+        <preConditions onFail="MARK_RAN">
+        	<not>
+				<columnExists tableName="metrics" columnName="nursery"/>
+			</not>
+			
+        </preConditions>
+        <comment>Add nursery column into metrics table if it doesn't exist yet</comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE metrics 
+				add COLUMN nursery int(11) DEFAULT NULL AFTER delStudy;
+        </sql>
+    </changeSet>
+	
+	<changeSet author="clarissa" id="v11.2.0-2">
+        <preConditions onFail="MARK_RAN">
+        	<not>
+				<columnExists tableName="metrics" columnName="trial"/>
+			</not>
+			
+        </preConditions>
+        <comment>Add trial column into metrics table if it doesn't exist yet</comment>
+        <sql dbms="mysql" splitStatements="true">
+            ALTER TABLE metrics 
+				add COLUMN trial int(11) DEFAULT NULL AFTER nursery;
+        </sql>
+    </changeSet>
+	
+	<changeSet author="clarissa" id="v11.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'getMetrics';
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop getMetrics procedure to update with modified version</comment>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE getMetrics;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="clarissa" id="v11.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'getMetrics';
+			</sqlCheck>
+		</preConditions>
+		<comment>Re-create getMetrics procedure</comment>
+		<sql dbms="mysql" splitStatements="false">
+			<![CDATA[
+				CREATE PROCEDURE getMetrics()
+					BEGIN
+
+					DECLARE cropName VARCHAR(255);
+					DECLARE cropDB VARCHAR(255);
+					DECLARE program INT;
+					DECLARE userNo INT;
+					DECLARE germplasm INT;
+					DECLARE delGermplasm INT;
+					DECLARE study INT;
+					DECLARE delStudy INT;
+					DECLARE phenotypes INT;
+					DECLARE plots INT;
+					DECLARE list INT;
+					DECLARE location INT;
+					DECLARE newVariable INT;
+					DECLARE lot INT;
+					DECLARE gdmsDSet INT;
+					DECLARE gdmsDSetEntries INT;
+					DECLARE sample INT;
+					DECLARE nursery INT;
+					DECLARE trial INT;
+					DECLARE dateExec DATETIME;
+
+					DECLARE loop0_eof BOOLEAN DEFAULT FALSE;	
+					DECLARE cur0 CURSOR FOR select crop_name, db_name from workbench.workbench_crop;
+					DECLARE CONTINUE HANDLER FOR NOT FOUND SET loop0_eof = TRUE; 
+					
+					/* loop for each crop */
+					IF((SELECT COUNT(*) FROM workbench.workbench_crop) != 0) THEN
+						
+						OPEN cur0;
+						loop0: LOOP 
+						FETCH cur0 INTO cropName, cropDB;
+						IF loop0_eof THEN 
+							LEAVE loop0;
+						END IF;
+						
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM workbench.workbench_project WHERE crop_type = "',cropName,'" INTO @program;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.users INTO @userNo;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.germplsm g WHERE g.deleted = 0 INTO @germplasm;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.germplsm g WHERE g.deleted = 1 INTO @delGermplasm;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.project prog WHERE (prog.name LIKE "%PLOTDATA") and (prog.deleted=0) INTO @study;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.project prog WHERE (prog.name LIKE "%PLOTDATA%") and (prog.deleted=1) INTO @delStudy;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM  ',cropDB,'.project p , ',cropDB,'.project_relationship pr, ',cropDB,'.study_type s
+							WHERE s.study_type_id = p.study_type_id AND pr.subject_project_id = p.project_id
+							AND visible  = 1
+							AND label LIKE "%nursery%"
+							AND p.deleted=0 
+							AND p.name NOT LIKE "%template%"
+							AND pr.type_id = 1145 INTO @nursery;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM  ',cropDB,'.project p , ',cropDB,'.project_relationship pr, ',cropDB,'.study_type s
+							WHERE s.study_type_id = p.study_type_id AND pr.subject_project_id = p.project_id
+							AND visible  = 1
+							AND label LIKE "%trial%"
+							AND p.deleted=0 
+							AND p.name NOT LIKE "%template%"
+							AND pr.type_id = 1145 INTO @trial;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+
+
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.phenotype INTO @phenotypes;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.nd_experiment INTO @plots;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.listnms l WHERE l.liststatus <> 9 INTO @list;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;	
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.location loc WHERE loc.locid > 9015 INTO @location;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM (',cropDB,'.cvterm cvt JOIN ',cropDB,'.cvtermprop cvProp ON ((cvt.cvterm_id=cvProp.cvterm_id) AND (cvt.cvterm_id > 100000) AND (cvt.cv_id=1040) AND (cvProp.value="Trait"))) INTO @newVariable;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;	
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.ims_lot INTO @lot;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;	
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.gdms_dataset INTO @gdmsDSet;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;	
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.gdms_acc_metadataset INTO @gdmsDSetEntries;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+						
+						SET @s = CONCAT('SELECT COUNT(*) FROM ',cropDB,'.sample INTO @sample;');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;	
+						
+						SET @s = CONCAT('INSERT INTO metrics (crop_name, program, user, germplasm, delGermplasm, study, delStudy, nursery, trial, phenotypes, plots, list, location, newVariable, lot, gdmsDSet, gdmsDSetEntries, sample, dateExec) VALUES ("',cropName,'",@program, @userNo, @germplasm, @delGermplasm, @study, @delStudy, @nursery, @trial, @phenotypes, @plots, @list, @location, @newVariable, @lot, @gdmsDSet, @gdmsDSetEntries, @sample, now());');
+						SELECT @s; 
+						PREPARE stmt FROM @s;
+						EXECUTE stmt;	
+						DEALLOCATE PREPARE stmt;
+						
+
+						END LOOP loop0; 
+						CLOSE cur0; 
+
+					END IF;
+				END;
+					
+			  ]]>
+		</sql>
+	</changeSet>
+	
+
+</databaseChangeLog>
