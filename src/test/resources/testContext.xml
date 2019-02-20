@@ -106,8 +106,8 @@
         <constructor-arg ref="cropSessionProvider"/>
     </bean>
 
-    <bean id="presetDataManager" class="org.generationcp.middleware.manager.PresetDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+    <bean id="presetService" class="org.generationcp.middleware.manager.PresetServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="studyDataManager" class="org.generationcp.middleware.manager.StudyDataManagerImpl">

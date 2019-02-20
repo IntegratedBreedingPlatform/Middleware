@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import org.generationcp.middleware.pojos.presets.ProgramPreset;
 /**
  * Created by cyrus on 12/16/14.
  */
-public interface PresetDataManager {
+public interface PresetService {
 
 	/**
 	 * Returns the programPreset given its primary key id
