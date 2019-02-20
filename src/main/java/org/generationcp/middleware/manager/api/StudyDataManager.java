@@ -34,15 +34,13 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.sample.PlantDTO;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -276,16 +274,6 @@ public interface StudyDataManager {
 	List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType);
 
 	/**
-	 * Returns the number of experiments matching the given trial environment and variate. Counts from central if the given ID is positive,
-	 * otherwise counts from local.
-	 *
-	 * @param trialEnvironmentId the trial environment id
-	 * @param variateVariableId  the variate variable id
-	 * @return The count
-	 */
-	long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId);
-
-	/**
 	 * Retrieves the trial environments belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise
 	 * retrieves from local.
 	 *
@@ -313,17 +301,6 @@ public interface StudyDataManager {
 	 * @return The count
 	 */
 	long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId);
-
-	/**
-	 * Returns the number of observations with value, matching the given dataset ID, trial environment ID and variate ID. Counts from
-	 * central if the given ID is positive, otherwise counts from local.
-	 *
-	 * @param datasetId          the dataset id
-	 * @param trialEnvironmentId the trial environment id
-	 * @param variateStdVarId    the variate std var id
-	 * @return The count
-	 */
-	long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId);
 
 	/**
 	 * Returns a single dataset belonging to the study with the given type. If there is more than one matching dataset, only one is
@@ -356,16 +333,6 @@ public interface StudyDataManager {
 	 * @return The local name
 	 */
 	String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId);
-
-	/**
-	 * Retrieves the details of nursery and trial studies from the currently selected program. Returns the id, name, description, start
-	 * date, start year, season and study type of a Nursery or Trial Study. Returns in sorted order of the following: Year (Descending),
-	 * Season (Dry/Wet/General), Study Type(Nursery/Trial), Name(Ascending)
-	 *
-	 * @param programUUID of the currently selected program
-	 * @return The list of study details having the given study type from local and central
-	 */
-	List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID);
 
 	/**
 	 * Checks if the name specified is an already existing project name.
@@ -527,15 +494,6 @@ public interface StudyDataManager {
 	List<StudyDetails> getAllStudyDetails(StudyTypeDto studyType, String programUUID);
 
 	/**
-	 * Count all studies of the given study type from selected DB instance.
-	 *
-	 * @param studyType   Can be any of the types defined in {@link StudyType}
-	 * @param programUUID unique ID of the currently selected program
-	 * @return The list of study details having the given study type
-	 */
-	long countStudyDetails(StudyTypeDto studyType, String programUUID);
-
-	/**
 	 * Count all studies of the given study type from both central and local.
 	 *
 	 * @param studyType   Can be any of the types defined in {@link StudyType}
@@ -543,14 +501,6 @@ public interface StudyDataManager {
 	 * @return The list of study details having the given study type
 	 */
 	long countAllStudyDetails(StudyTypeDto studyType, String programUUID);
-
-	/**
-	 * Retrieves the study details of the all nurseries and trials from both central and local ordered by db instance then study name.
-	 *
-	 * @param programUUID unique ID of the currently selected program
-	 * @return The list of study details of Nurseries and Trials
-	 */
-	List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID);
 
 	/**
 	 * Count all nurseries and trials
@@ -629,17 +579,6 @@ public interface StudyDataManager {
 	 *
 	 * @param projectId  the project id
 	 * @param locationId the location id
-	 * @param plotNos    list of plotNos
-	 * @param cvTermIds  list of std var Ids
-	 * @return list of plotNo, stdVarId and phenoTypeId
-	 */
-	List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, List<Integer> plotNos, List<Integer> cvTermIds);
-
-	/**
-	 * Check if study has measurement data.
-	 *
-	 * @param projectId  the project id
-	 * @param locationId the location id
 	 * @param plotNo
 	 * @param cvTermIds  list of std var Ids
 	 * @return list of plotNo, stdVarId and phenoTypeId
@@ -697,14 +636,6 @@ public interface StudyDataManager {
 	 */
 	public String getTrialInstanceNumberByGeolocationId(int geolocationId);
 
-	/**
-	 * Save the geolocation property given the geolocation id, type id and value
-	 *
-	 * @param geolocationId
-	 * @param typeId
-	 * @param value
-	 */
-	public void saveGeolocationProperty(int geolocationId, int typeId, String value);
 
 	/**
 	 * Retrieves all DMS project names with no program uuid.
@@ -763,19 +694,10 @@ public interface StudyDataManager {
 	Map<Integer, String> getExperimentSampleMap(final Integer studyDbId);
 
 	/**
-	 * Retrieves a ProjectProperty given a project and a variable
-	 *
-	 * @param project
-	 * @param variableId
-	 * @return ProjectProperty
-	 */
-	ProjectProperty getByVariableIdAndProjectID(final DmsProject project, final int variableId);
-
-	/**
 	 * @param studyId
 	 * @return a map of experiments ids with a list of it sampled plants
 	 */
-	Map<Integer, List<PlantDTO>> getSampledPlants(final Integer studyId);
+	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId);
 
 	/**
 	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
@@ -821,20 +743,6 @@ public interface StudyDataManager {
 	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
 	 */
 	List<Reference> getChildrenOfFolderByStudyType(int folderId, String programUUID, Integer studyTypeId);
-
-	/**
-	 *
-	 * @param experimentId
-	 * @param termId
-	 * @return
-	 */
-	Phenotype getPhenotype (Integer experimentId, Integer termId);
-
-	/**
-	 *
-	 * @param phenotype
-	 */
-	void updatePhenotype (Phenotype phenotype);
 	
 	StudyReference getStudyReference(final Integer studyId);
 	
@@ -845,4 +753,10 @@ public interface StudyDataManager {
 	String getBlockId(int datasetId, String trialInstance);
 
 	FieldmapBlockInfo getBlockInformation(int blockId);
+
+	Boolean existInstances(final Set<Integer> instanceIds);
+
+	Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId);
+
+	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
 }

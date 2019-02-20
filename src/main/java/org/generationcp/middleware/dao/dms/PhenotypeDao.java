@@ -1063,11 +1063,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public long countPhenotypesForDataset(final Integer datasetId, final List<Integer> traitIds) {
+	public long countPhenotypesForDataset(final Integer datasetId, final List<Integer> variableIds) {
 		final Criteria criteria = this.getSession().createCriteria(Phenotype.class);
 		criteria.createAlias("experiment", "experiment");
 		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
-		criteria.add(Restrictions.in("observableId", traitIds));
+		criteria.add(Restrictions.in("observableId", variableIds));
 		criteria.setProjection(Projections.rowCount());
 
 		return (Long) criteria.uniqueResult();
@@ -1150,5 +1150,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		criteria.add(Restrictions.eq("phenotypeId", phenotypeId));
 		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
 		return (Phenotype) criteria.uniqueResult();
+	}
+
+	public List<Phenotype> getPhenotypeByDatasetIdAndInstanceDbId(final Integer datasetId, final Integer instanceDbId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
+		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
+		criteria.add(Restrictions.eq("experiment.geoLocation.locationId", instanceDbId));
+		return criteria.list();
 	}
 }

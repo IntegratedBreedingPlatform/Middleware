@@ -8,24 +8,31 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
+import org.generationcp.middleware.data.initializer.DMSProjectTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
-import org.generationcp.middleware.service.impl.study.DesignFactors;
-import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -76,13 +83,13 @@ public class DatasetServiceImplTest {
 	private ExperimentDao experimentDao;
 
 	@Mock
-	private GermplasmDescriptors germplasmDescriptors;
-
-	@Mock
-	private DesignFactors designFactors;
-
-	@Mock
 	private MeasurementVariableService measurementVariableService;
+
+	@Mock
+	private ProjectRelationshipDao projectRelationshipDao;
+
+	@Mock
+	private StudyService studyService;
 
 	private static final int STUDY_ID = 1234;
 	private static final String FACT1 = "FACT1";
@@ -130,6 +137,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
+		when(this.daoFactory.getProjectRelationshipDao()).thenReturn(this.projectRelationshipDao);
 	}
 
 	@Test
@@ -235,8 +243,8 @@ public class DatasetServiceImplTest {
 		existingPhenotype.setExperiment(new ExperimentModel(observationUnitId));
 		existingPhenotype.setObservableId(observableId);
 
-		when(formulaDao.getByTargetVariableId(observableId)).thenReturn(new Formula());
-		when(phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
+		when(this.formulaDao.getByTargetVariableId(observableId)).thenReturn(new Formula());
+		when(this.phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
 		final ObservationDto savedObservation =
 			this.datasetService.updatePhenotype(observationUnitId, observationId, categoricalValueId, value);
@@ -261,7 +269,7 @@ public class DatasetServiceImplTest {
 	public void testResolveObservationStatusVaribleHasFormula() {
 		final Random ran = new Random();
 		final int variableId = ran.nextInt();
-		when(formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
+		when(this.formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
 
 		final Phenotype phenotype = new Phenotype();
 		this.datasetService.resolveObservationStatus(variableId, phenotype);
@@ -275,7 +283,7 @@ public class DatasetServiceImplTest {
 		final int variableId = ran.nextInt();
 
 		final Phenotype phenotype = new Phenotype();
-		when(formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
+		when(this.formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
 
 		Assert.assertNull(phenotype.getValueStatus());
 	}
@@ -336,7 +344,8 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetDataset() {
 		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(null);
-		final DatasetDTO result = this.datasetService.getDataset(25019,datasetDTOList.get(4).getDatasetId());
+		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTOList.get(4));
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
 	}
 
@@ -347,6 +356,46 @@ public class DatasetServiceImplTest {
 		datasetTypeIds.add(10094);
 		final List<DatasetDTO> result = this.datasetService.getDatasets(25019, datasetTypeIds);
 		assertThat(datasetDTOList, equalTo(result));
+	}
+
+	@Test
+	public void testaddStudyVariablesToUnitRows() {
+		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
+		observationUnitRow.setVariables(variables);
+		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(),"1");
+		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
+		Assert.assertNotNull(observationUnitRow.getVariables().get(trialInstanceVariable.getName()));
+	}
+
+	private List<MeasurementVariable> mockDatasetVariables() {
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(),"1"));
+		when(this.dmsProjectDao.getObservationSetVariables(1,
+			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()))).thenReturn(Arrays.asList(measurementVariables.get(0)));
+
+		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.LOCATION_ID.getId(), TermId.LOCATION_ID.name(), "1001"));
+		when(this.dmsProjectDao.getObservationSetVariables(1,
+			DatasetServiceImpl.ENVIRONMENT_VARIABLE_TYPES)).thenReturn(Arrays.asList(measurementVariables.get(1)));
+
+		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.SITE_NAME.getId(), TermId.SITE_NAME.name(), "SITE NAME"));
+		when(this.dmsProjectDao.getObservationSetVariables(1,
+			Lists.newArrayList(VariableType.TRAIT.getId()))).thenReturn(Arrays.asList(measurementVariables.get(2)));
+
+		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TREATMENT_MEAN.getId(), TermId.TREATMENT_MEAN.name(), ".55"));
+		when(this.dmsProjectDao.getObservationSetVariables(1,
+			Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()))).thenReturn(new ArrayList<>(Arrays.asList(measurementVariables.get(3))));
+
+		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(),"1"));
+		when(this.dmsProjectDao.getObservationSetVariables(1,
+			DatasetServiceImpl.PLOT_COLUMNS_VARIABLE_TYPES)).thenReturn(new ArrayList<>(Arrays.asList(measurementVariables.get(4), measurementVariables.get(3))));
+
+		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(),"1"));
+		when(this.dmsProjectDao.getObservationSetVariables(1,
+			DatasetServiceImpl.SUBOBS_COLUMNS_VARIABLE_TYPES)).thenReturn(Arrays.asList(measurementVariables.get(5)));
+
+		return measurementVariables;
 	}
 
 	private  List<DatasetDTO> setUpDatasets(final Integer datasetTypeId){
@@ -417,14 +466,13 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testGetObservations() throws Exception {
 		this.datasetService = new DatasetServiceImpl(this.mockSessionProvider);
-		this.datasetService.setGermplasmDescriptors(this.germplasmDescriptors);
-		this.datasetService.setDesignFactors(this.designFactors);
 		this.datasetService.setMeasurementVariableService(this.measurementVariableService);
+		this.datasetService.setStudyService(this.studyService);
 
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
-		Mockito.when(this.germplasmDescriptors.find(DatasetServiceImplTest.STUDY_ID))
+		Mockito.when(this.studyService.getGenericGermplasmDescriptors(DatasetServiceImplTest.STUDY_ID))
 			.thenReturn(GERMPLASM_DESCRIPTORS);
-		Mockito.when(this.designFactors.find(DatasetServiceImplTest.STUDY_ID))
+		Mockito.when(this.studyService.getAdditionalDesignFactors(DatasetServiceImplTest.STUDY_ID))
 			.thenReturn(DESING_FACTORS);
 
 		final MeasurementVariableService mockTraits = Mockito.mock(MeasurementVariableService.class);
@@ -461,7 +509,9 @@ public class DatasetServiceImplTest {
 
 		final List<ObservationUnitRow> testMeasurements = Collections.<ObservationUnitRow>singletonList(observationUnitRow);
 		Mockito.when(this.experimentDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
-		Mockito.when(this.experimentDao.getObservationUnitTable(DATASET_ID, projectTraits, GERMPLASM_DESCRIPTORS, DESING_FACTORS, INSTANCE_ID, 1, 100,null, null)).thenReturn(testMeasurements);
+		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
+		searchDto.setSortedRequest(new SortedPageRequest(1, 100, null, null));
+		Mockito.when(this.experimentDao.getObservationUnitTable(searchDto)).thenReturn(testMeasurements);
 
 		Mockito.when(this.mockSession.createSQLQuery(Mockito.anyString())).thenReturn(mockQuery);
 		final List<Map<String, Object>> results = new ArrayList<>();
@@ -520,7 +570,7 @@ public class DatasetServiceImplTest {
     @Test
     public void testGetDatasetInstances() {
         final Random random = new Random();
-        final Integer datasetId = random.nextInt();
+        final int datasetId = random.nextInt();
         this.datasetService.getDatasetInstances(datasetId);
         Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
     }

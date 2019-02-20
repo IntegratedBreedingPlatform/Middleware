@@ -2,7 +2,6 @@ package org.generationcp.middleware.service.impl.sampleList;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
-import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
@@ -16,7 +15,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -40,6 +38,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,9 +77,6 @@ public class SampleListServiceImplTest {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Mock
-	private PlantDao plantDao;
-
-	@Mock
 	private Study study;
 
 	@Mock
@@ -101,7 +97,6 @@ public class SampleListServiceImplTest {
 		when(daoFactory.getUserDao()).thenReturn(this.userDAO);
 		when(daoFactory.getSampleDao()).thenReturn(this.sampleDao);
 		when(daoFactory.getSampleListDao()).thenReturn(this.sampleListDao);
-		when(daoFactory.getPlantDao()).thenReturn(this.plantDao);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -556,7 +551,7 @@ public class SampleListServiceImplTest {
 		final CropType cropType = new CropType();
 		cropType.setCropName(SampleListServiceImplTest.MAIZE);
 		cropType.setPlotCodePrefix(SampleListServiceImplTest.PLOT_CODE_PREFIX);
-		final Map<Integer, Integer> mapPlantNumbers = new HashMap<>();
+		final Map<Integer, Integer> mapSampleNumbers = new HashMap<>();
 		final Sample sample = new Sample();
 		final Integer selectionVariableId = 2;
 		final List<Integer> instanceIds = new ArrayList<>();
@@ -586,16 +581,16 @@ public class SampleListServiceImplTest {
 			}
 		});
 
-		mapPlantNumbers.put(1, 5);
+		mapSampleNumbers.put(1, 5);
 
 		when(this.studyService.getStudy(studyId)).thenReturn(this.study);
 		when(this.studyMeasurements.getSampleObservations(studyId, instanceIds, selectionVariableId)).thenReturn(observationDtos);
 		when(this.study.getName()).thenReturn("Maizing_Study");
 		when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
-		when(this.plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
+		when(this.sampleDao.getMaxSampleNumber(experimentIds)).thenReturn(mapSampleNumbers);
 		when(this.sampleService
-				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, 1, preferredNameGid,
-						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
+				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX , 1, preferredNameGid,
+						Util.getCurrentDate(), ndExperimentId, sampleList, user, Util.getCurrentDate(), user, 6)).thenReturn(sample);
 		when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleList);
 		final SampleList rootSampleList = new SampleList();
 		rootSampleList.setType(SampleListType.FOLDER);
@@ -611,7 +606,7 @@ public class SampleListServiceImplTest {
 		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
 	}
 
-	private SampleListDTO createSampleListDTO(final int studyId, final Integer selectionVariableId, final List<Integer> instanceIds) {
+	private SampleListDTO createSampleListDTO(final int datasetId, final Integer selectionVariableId, final List<Integer> instanceIds) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
 		sampleListDTO.setCreatedBy(SampleListServiceImplTest.ADMIN);
@@ -623,7 +618,7 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setSamplingDate(Util.getCurrentDate());
 
 		sampleListDTO.setSelectionVariableId(selectionVariableId);
-		sampleListDTO.setStudyId(studyId);
+		sampleListDTO.setDatasetId(datasetId);
 		sampleListDTO.setTakenBy(SampleListServiceImplTest.ADMIN);
 		sampleListDTO.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 		sampleListDTO.setCreatedDate(Util.getCurrentDate());
@@ -642,8 +637,8 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setListName("Test");
 		list.add(sampleListDTO);
 
-		when(this.sampleListService.getSampleLists(studyId)).thenReturn(list);
-		final List<SampleListDTO> result = this.sampleListService.getSampleLists(studyId);
+		when(this.sampleListService.getSampleLists(Arrays.asList(studyId))).thenReturn(list);
+		final List<SampleListDTO> result = this.sampleListService.getSampleLists(Arrays.asList(studyId));
 		final SampleListDTO dto = result.get(0);
 		Assert.assertEquals(1, result.size());
 		Assert.assertNotNull(dto);
@@ -702,10 +697,10 @@ public class SampleListServiceImplTest {
 	public void testCountSamplesByUIDs() {
 
 		final int sampleListId = 1;
-		when(sampleDao.countBySampleUIDs(Mockito.anySet(), Mockito.eq(sampleListId))).thenReturn(1l);
+		when(sampleDao.countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId))).thenReturn(1l);
 
 		final long count = this.sampleListService.countSamplesByUIDs(new HashSet<String>(), sampleListId);
-		Mockito.verify(sampleDao).countBySampleUIDs(Mockito.anySet(), Mockito.eq(sampleListId));
+		Mockito.verify(sampleDao).countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId));
 
 		Assert.assertEquals(1l, count);
 
@@ -784,9 +779,7 @@ public class SampleListServiceImplTest {
 
 	private Sample createSample(final SampleList sampleList, final String businessKey) {
 		final User createdBy = new User();
-		final Plant plant = new Plant();
-		plant.setPlantBusinessKey(businessKey);
-		final Sample sample = SampleTestDataInitializer.createSample(sampleList, plant, createdBy);
+		final Sample sample = SampleTestDataInitializer.createSample(sampleList, createdBy);
 		sample.setSampleBusinessKey(businessKey);
 		return sample;
 	}

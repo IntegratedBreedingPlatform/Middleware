@@ -204,10 +204,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
 
-		if (conditionsTermIds.contains(TermId.TRIAL_LOCATION.getId()) && !conditionsTermIds.contains(TermId.LOCATION_ID.getId())) {
-			messages.add(new Message(DataImportServiceImpl.LOCATION_ID_DOESNT_EXISTS));
-		}
-
 		if (factorsTermIds.contains(TermId.TRIAL_LOCATION.getId()) && !factorsTermIds.contains(TermId.LOCATION_ID.getId())) {
 			messages.add(new Message(DataImportServiceImpl.LOCATION_ID_DOESNT_EXISTS));
 		}

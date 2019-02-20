@@ -61,7 +61,7 @@ public interface SampleListService {
 
 	long countSamplesByUIDs(Set<String> sampleUIDs, Integer listId);
 
-	List<SampleListDTO> getSampleLists(final Integer trialId);
+	List<SampleListDTO> getSampleLists(final List<Integer> datasetIds);
 
 	SampleList getSampleList(final Integer sampleListId);
 
@@ -134,4 +134,6 @@ public interface SampleListService {
 	List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
 
 	void updateSamplePlateInfo(Integer sampleListId, Map<String, SamplePlateInfo> plateInfoMap);
+
+	String getObservationVariableName(Integer sampleListId);
 }

@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -1046,11 +1047,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId, final List<Integer> variableTypes) {
 
 		try {
-			final String query = " SELECT "  //
+			final String query = " SELECT distinct "  //
 				+ "   pp.variable_id AS variableId, "  //
 				+ "   variable.name AS variableName, "  //
 				+ "   variable.definition AS description, "  //
 				+ "   pp.alias AS alias, "  //
+				+ "   pp.value as value, "
 				+ "   variableType.cvterm_id AS variableTypeId, "  //
 				+ "   scale.name AS scale, "  //
 				+ "   method.name AS method, "  //
@@ -1063,7 +1065,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   scaleMinRange.value AS scaleMinRange, "  //
 				+ "   scaleMaxRange.value AS scaleMaxRange, "  //
 				+ "   vo.expected_min AS expectedMin, "  //
-				+ "   vo.expected_max AS expectedMax "  //
+				+ "   vo.expected_max AS expectedMax, "  //
+				+ "   cropOntology.value AS cropOntologyId,"
+				+ "   pp.value as variableValue"
 				+ " FROM project dataset "  //
 				+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "  //
 				+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "  //
@@ -1089,6 +1093,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "                                         AND scaleMinRange.type_id = " + TermId.MIN_VALUE.getId() //
 				+ "   LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id "  //
 				+ "                                      AND dataset.program_uuid = vo.program_uuid " //
+				+ "   LEFT JOIN cvtermprop cropOntology ON cropOntology.cvterm_id = variable.cvterm_id" //
+				+ "        AND cropOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
 				+ " WHERE " //
 				+ "   dataset.project_id = :observationSetId " //
 				+ "   AND pp.type_id in (:variableTypes) "
@@ -1103,6 +1109,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar("variableName")
 				.addScalar("description")
 				.addScalar("alias")
+				.addScalar("value")
 				.addScalar("variableTypeId")
 				.addScalar("scale")
 				.addScalar("method")
@@ -1115,8 +1122,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar("scaleMaxRange", new DoubleType())
 				.addScalar("expectedMin", new DoubleType())
 				.addScalar("expectedMax", new DoubleType())
-				.addScalar("formulaId", new IntegerType());
-			;
+				.addScalar("formulaId", new IntegerType())
+				.addScalar("cropOntologyId")
+				.addScalar("variableValue");
+
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
 
@@ -1133,13 +1142,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setTermId(variableId);
 					measurementVariable.setName((String) result.get("variableName"));
 					measurementVariable.setAlias((String) result.get("alias"));
+					measurementVariable.setValue((String) result.get("value"));
 					measurementVariable.setDescription((String) result.get("description"));
 					measurementVariable.setScale((String) result.get("scale"));
 					measurementVariable.setMethod((String) result.get("method"));
 					measurementVariable.setProperty((String) result.get("property"));
 					final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
 					measurementVariable.setVariableType(variableType);
-					measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+					//TODO: fix the saving of Treatment Factor Variables in the projectprop table.
+					// Right now, the saved typeid is 1100. It should be 1809(VariableType.TREATMENT_FACTOR.getid())
+					if(variableType != null) {
+						measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
+					}
 					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
@@ -1167,9 +1181,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setScaleMaxRange(scaleMaxRange);
 					measurementVariable.setVariableMinRange(expectedMin);
 					measurementVariable.setVariableMaxRange(expectedMax);
+					measurementVariable.setCropOntology((String) result.get("cropOntologyId"));
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
+
+				if (measurementVariable.getValue() == null || measurementVariable.getValue().isEmpty()) {
+					measurementVariable.setValue((String) result.get("variableValue"));
+				}
 
 				final Object categoryId = result.get("categoryId");
 				if (categoryId != null) {
@@ -1306,18 +1325,78 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public long countByVariable(int variableId) throws MiddlewareQueryException {
+	public long countByVariable(final int variableId) throws MiddlewareQueryException {
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
 			query.setParameter("variableId", variableId);
 
 			return ((BigInteger) query.uniqueResult()).longValue();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			final String errorMessage = "Error at countByVariable=" + variableId + " in DmsProjectDao: " + e.getMessage();
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
+	}
+
+
+	public DatasetDTO getDataset(final Integer datasetId) {
+		final DatasetDTO datasetDTO;
+		try {
+
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("project.projectId"), "datasetId");
+			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
+			projectionList.add(Projections.property("project.name"), "name");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			criteria.createAlias("project.relatedTos", "pr");
+			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.add(Restrictions.eq("project.projectId", datasetId));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.setProjection(projectionList);
+			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
+			datasetDTO = (DatasetDTO) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error getting getDataset for datasetId =" + datasetId + ":" + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+		return datasetDTO;
+
+	}
+
+	public DatasetDTO getDatasetOfSampleList(final Integer sampleListId) {
+
+		final DatasetDTO datasetDTO;
+		try {
+
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("project.projectId"), "datasetId");
+			projectionList.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {Hibernate.INTEGER}),"datasetTypeId");
+			projectionList.add(Projections.property("project.name"), "name");
+			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+
+			final Criteria criteria = this.getSession().createCriteria(SampleList.class);
+			criteria.createAlias("samples", "sample")
+				.createAlias("samples.experiment", "experiment")
+				.createAlias("experiment.project", "project")
+				.createAlias("project.relatedTos", "pr")
+				.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()))
+				.add(Restrictions.eq("id", sampleListId));
+			criteria.setProjection(Projections.distinct(projectionList));
+			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
+			datasetDTO = (DatasetDTO) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error getting getDatasetOfSampleList for sampleListId =" + sampleListId + ":" + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+
+		return datasetDTO;
+
 	}
 
 }

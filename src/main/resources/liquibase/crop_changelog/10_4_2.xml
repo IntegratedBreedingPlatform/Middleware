@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="vanina" id="v10.4.2-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+			<sqlCheck expectedResult="0">select count(1)
+										from project
+										where start_date is null and program_uuid is not null and study_type_id is not null;
+			</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Added start date for empty cases in project table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE project
+			SET
+				start_date = (SELECT
+						IFNULL(l.listdate, DATE_FORMAT(NOW(), '%Y%m%d'))
+					FROM
+						(SELECT
+							*
+						FROM
+							project) p
+							LEFT JOIN
+						listnms l ON (l.projectid = p.project_id
+							AND l.listtype = 'STUDY')
+					WHERE
+						project.project_id = p.project_id)
+			WHERE
+				start_date IS NULL
+					AND program_uuid IS NOT NULL
+        			AND study_type_id IS NOT NULL;
+		</sql>
+	</changeSet>
+</databaseChangeLog>

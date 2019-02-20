@@ -18,4 +18,24 @@
         </sql>
     </changeSet>
 
+	<changeSet author="mderamos" id="v10.4.1-2">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM workbench_ibdb_user_map WHERE NOT EXISTS
+						(SELECT * FROM workbench_project_user_info WHERE
+							project_id = workbench_ibdb_user_map.project_id
+							AND user_id = workbench_ibdb_user_map.workbench_user_id)
+				</sqlCheck>
+			</not>
+        </preConditions>
+        <comment>Clean up workbench_ibdb_user_map table, delete the removed users from a program</comment>
+        <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_ibdb_user_map WHERE NOT EXISTS
+				(SELECT * FROM workbench_project_user_info WHERE
+					project_id = workbench_ibdb_user_map.project_id
+					AND user_id = workbench_ibdb_user_map.workbench_user_id)
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

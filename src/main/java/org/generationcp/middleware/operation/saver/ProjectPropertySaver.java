@@ -276,7 +276,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void insertVariable(final DmsProject project, final MeasurementVariable variable, final int rank) {
+	protected void insertVariable(final DmsProject project, final MeasurementVariable variable, final int rank) {
 		if (project.getProperties() == null) {
 			project.setProperties(new ArrayList<ProjectProperty>());
 		}
@@ -393,15 +393,16 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void deleteVariable(final DmsProject project, final int termId) {
+	public void deleteVariable(final DmsProject project, final int termId) {
 		if (project.getProperties() != null) {
+			final List<ProjectProperty> deletedProjectProperties = new ArrayList<>();
 			for (final ProjectProperty property : project.getProperties()) {
 				if (property.getVariableId().equals(termId)) {
 					this.saver.getProjectPropertyDao().makeTransient(property);
-					project.getProperties().remove(property);
-					break;
+					deletedProjectProperties.add(property);
 				}
 			}
+			project.getProperties().removeAll(deletedProjectProperties);
 		}
 	}
 

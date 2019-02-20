@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -28,8 +23,14 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link GeolocationProperty}.
@@ -122,9 +123,9 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
-			executeDeleteStatement(studyId, termId, "pr.object_project_id");
-			executeDeleteStatement(studyId, termId, "pr.subject_project_id");
+
+			this.executeDeleteStatement(studyId, termId, "pr.object_project_id");
+			this.executeDeleteStatement(studyId, termId, "pr.subject_project_id");
 
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error at deleteGeolocationPropertyValueInProject=" + studyId + ", " + termId
@@ -168,5 +169,32 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			GeolocationPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public Map<Integer, String> getGeoLocationPropertyByVariableId(final Integer datasetId, final Integer instanceDbId) {
+		Preconditions.checkNotNull(datasetId);
+		final String sql = "SELECT "
+			+ "    gp.type_id as variableId, "
+			+ "	   gp.value as value "
+			+ "FROM "
+			+ "    nd_experiment e "
+			+ "        INNER JOIN "
+			+ "    nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
+			+ "WHERE "
+			+ "		e.project_id = :datasetId "
+			+ "		and e.nd_geolocation_id = :instanceDbId";
+
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.addScalar("variableId").addScalar("value").setParameter("datasetId", datasetId).setParameter("instanceDbId", instanceDbId);
+		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+		final List<Map<String, Object>> results = query.list();
+		final Map<Integer, String> geoProperties = new HashMap<>();
+		for (final Map<String, Object> result : results) {
+			final Integer variableId = (Integer) result.get("variableId");
+			final String value = (String) result.get("value");
+			geoProperties.put(variableId, value);
+		}
+		return geoProperties;
 	}
 }

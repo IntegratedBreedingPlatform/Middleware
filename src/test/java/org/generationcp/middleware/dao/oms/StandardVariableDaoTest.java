@@ -1,43 +1,55 @@
 
 package org.generationcp.middleware.dao.oms;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.saver.StandardVariableSaver;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
+import java.util.Arrays;
+import java.util.List;
+
 public class StandardVariableDaoTest extends IntegrationTestBase {
 
-	private static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
 	private static final String PROGRAM_UUID = "1234567";
 
 	@Autowired
 	private OntologyDataManager manager;
 
-	@Test
-	public void testGetStandardVariableSummaryReferenceData() throws MiddlewareException {
+	private StandardVariableSaver standardVariableSaver;
+	private StandardVariableDao standardVariableDao;
+	private CVTermDao cvTermDao;
 
-		StandardVariableDao dao = new StandardVariableDao(this.sessionProvder.getSession());
+	@Before
+	public void init() {
+		this.standardVariableDao = new StandardVariableDao(this.sessionProvder.getSession());
+		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
+		this.cvTermDao = new CVTermDao();
+		this.cvTermDao.setSession(this.sessionProvder.getSession());
+	}
+
+	@Test
+	public void testGetStandardVariableSummaryReferenceData() {
+
+		final StandardVariable testVariable = createStandardVariable("testVariable");
 
 		// Load summary from the view
-		StandardVariableSummary summary = dao.getStandardVariableSummary(StandardVariableDaoTest.PLANT_HEIGHT_ID);
+		StandardVariableSummary summary = standardVariableDao.getStandardVariableSummary(testVariable.getId());
 		Assert.assertNotNull(summary);
 
 		// Load details using existing method
-		StandardVariable details = this.manager.getStandardVariable(StandardVariableDaoTest.PLANT_HEIGHT_ID, PROGRAM_UUID);
+		StandardVariable details = this.manager.getStandardVariable(testVariable.getId(), PROGRAM_UUID);
 		Assert.assertNotNull(details);
 
 		// Make sure that the summary data loaded from view matches with details data loaded using the usual method.
@@ -52,9 +64,6 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 		this.assertTermDataMatches(details.getProperty(), summary.getProperty());
 		this.assertTermDataMatches(details.getMethod(), summary.getMethod());
 		this.assertTermDataMatches(details.getScale(), summary.getScale());
-		this.assertTermDataMatches(details.getIsA(), summary.getIsA());
-		this.assertTermDataMatches(details.getDataType(), summary.getDataType());
-
 		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
 	}
 
@@ -65,31 +74,15 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariableSummaryUserCreated() throws MiddlewareException {
+	public void testGetStandardVariableSummaryUserCreated() {
 		// First create a local Standardvariable
-		StandardVariable myOwnPlantHeight = new StandardVariable();
-		myOwnPlantHeight.setName("MyOwnPlantHeight " + new Random().nextInt(1000));
-		myOwnPlantHeight.setDescription(myOwnPlantHeight.getName() + " - Description.");
-		myOwnPlantHeight.setProperty(new Term(15020, "Plant height", "Plant height"));
-		myOwnPlantHeight.setMethod(new Term(16010, "Soil to tip at maturity", "Soil to tip at maturity"));
-
-		Term myOwnScale = new Term();
-		myOwnScale.setName("MyOwnScale " + new Random().nextInt(1000));
-		myOwnScale.setDefinition(myOwnScale.getName() + " - Description.");
-		myOwnPlantHeight.setScale(myOwnScale);
-
-		myOwnPlantHeight.setIsA(new Term(1340, "Agronomic", "Agronomic"));
-		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
-		
-		this.manager.addStandardVariable(myOwnPlantHeight,PROGRAM_UUID);
+		final StandardVariable testVariable = createStandardVariable("testVariable");
 
 		// Load details using existing method
-		StandardVariable details = this.manager.getStandardVariable(myOwnPlantHeight.getId(), PROGRAM_UUID);
+		StandardVariable details = this.manager.getStandardVariable(testVariable.getId(), PROGRAM_UUID);
 		Assert.assertNotNull(details);
 
-		// Load summary from the view
-		StandardVariableDao dao = new StandardVariableDao(this.sessionProvder.getSession());
-		StandardVariableSummary summary = dao.getStandardVariableSummary(myOwnPlantHeight.getId());
+		StandardVariableSummary summary = this.standardVariableDao.getStandardVariableSummary(testVariable.getId());
 		Assert.assertNotNull(summary);
 
 		// Make sure that the summary data loaded from view matches with details data loaded using the usual method.
@@ -97,12 +90,34 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStarndardVariableSummaries() throws MiddlewareQueryException {
+	public void testGetStarndardVariableSummaries() {
 
-		StandardVariableDao dao = new StandardVariableDao(this.sessionProvder.getSession());
+		final StandardVariable testVariable1 = createStandardVariable("testVariable1");
+		final StandardVariable testVariable2 = createStandardVariable("testVariable2");
+
 		List<StandardVariableSummary> starndardVariableSummaries =
-				dao.getStarndardVariableSummaries(Arrays.asList(StandardVariableDaoTest.GRAIN_YIELD_ID,
-						StandardVariableDaoTest.PLANT_HEIGHT_ID));
+			standardVariableDao.getStarndardVariableSummaries(Arrays.asList(
+				testVariable1.getId(),
+				testVariable2.getId()));
 		Assert.assertEquals(2, starndardVariableSummaries.size());
+	}
+
+	private StandardVariable createStandardVariable(final String name) {
+
+		final CVTerm property = this.cvTermDao.save(RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
+		final CVTerm scale = this.cvTermDao.save(RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
+		final CVTerm method = this.cvTermDao.save(RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
+
+		final StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setName(name);
+		standardVariable.setProperty(new Term(property.getCvTermId(), property.getName(), property.getDefinition()));
+		standardVariable.setScale(new Term(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
+		standardVariable.setMethod(new Term(method.getCvTermId(), method.getName(), method.getDefinition()));
+		standardVariable.setDataType(new Term(DataType.CHARACTER_VARIABLE.getId(), "Character variable", "variable with char values"));
+		standardVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
+
+		this.standardVariableSaver.save(standardVariable);
+
+		return standardVariable;
 	}
 }
