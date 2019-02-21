@@ -226,6 +226,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id)  FROM projectprop pp inner join project p on (p.project_id = pp.project_id)\n"
 			+ "WHERE pp.variable_id = :variableId and p.deleted = 0";
+	public static final String COUNT_CALCULATED_VARIABLES_IN_DATASETS = "SELECT COUNT(1) FROM projectprop pp\n"
+		+ "INNER JOIN formula f ON pp.variable_id = f.target_variable_id\n"
+		+ "where project_id in (:projectIds) and type_id = " + VariableType.TRAIT.getId();
 
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();
@@ -968,9 +971,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 */
 	public int countCalculatedVariablesInDatasets(final Set<Integer> projectIds) {
 		// Check if the variable is used in trial level and/or environment level of studies except for the specified programUUID.
-		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM projectprop pp\n"
-			+ "INNER JOIN formula f ON pp.variable_id = f.target_variable_id\n"
-			+ "where project_id in (:projectIds) and type_id = " + VariableType.TRAIT.getId());
+		final SQLQuery query = this.getSession().createSQLQuery(COUNT_CALCULATED_VARIABLES_IN_DATASETS);
 		query.setParameterList("projectIds", projectIds);
 		return ((BigInteger) query.uniqueResult()).intValue();
 

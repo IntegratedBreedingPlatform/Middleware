@@ -163,4 +163,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.daoFactory.getPhenotypeDAO().save(phenotype);
 	}
 
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+
+	public DaoFactory getDaoFactory() {
+		return daoFactory;
+	}
 }
