@@ -3,7 +3,6 @@ package org.generationcp.middleware.service;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.data.initializer.MethodTestDataInitializer;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.Project;
