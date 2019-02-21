@@ -918,10 +918,7 @@ public class DatasetServiceImpl implements DatasetService {
 			phenotype.setValue(observation.getValue());
 			phenotype.setcValue(observation.getCategoricalValueId());
 			this.resolveObservationStatus(variableId, phenotype);
-
-			if (Phenotype.ValueStatus.MANUALLY_EDITED.equals(phenotype.getValueStatus())) {
-				phenotype.setChanged(true);
-			}
+			phenotype.setChanged(true);
 		}
 
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
