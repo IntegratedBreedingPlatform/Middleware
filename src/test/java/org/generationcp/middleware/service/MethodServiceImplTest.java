@@ -48,7 +48,7 @@ public class MethodServiceImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(methodList);
 		Assert.assertFalse(methodList.isEmpty());
 
-		final Method method = new Method();
+		Method method = new Method();
 		method.setUniqueID(this.commonTestProject.getUniqueID());
 		method.setMname("NEW METHOD NAME");
 		method.setMdesc("NEW METHOD DESC");
@@ -63,11 +63,12 @@ public class MethodServiceImplTest extends IntegrationTestBase {
 		method.setUser(0);
 		method.setLmid(0);
 		method.setMdate(0);
-		this.methodDAO.save(method);
+		method = this.methodDAO.save(method);
 
 		final List<Method> newMethodList = this.methodService.getAllBreedingMethods();
 		Assert.assertNotNull(newMethodList);
 		Assert.assertFalse(newMethodList.isEmpty());
 		Assert.assertEquals(newMethodList.size()-1, methodList.size());
+		Assert.assertTrue(newMethodList.contains(method));
 	}
 }
