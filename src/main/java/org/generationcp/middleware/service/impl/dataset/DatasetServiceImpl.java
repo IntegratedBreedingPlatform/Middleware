@@ -750,7 +750,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 							phenotype = this.createPhenotype(observationDto, draftMode);
 
-						} else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
+						} else if (observationUnitData != null && observationUnitData.getObservationId() != null
+							&& importedVariableValue .equalsIgnoreCase(observationUnitData.getValue())
+							&& Boolean.TRUE.equals(draftMode)) {
+							/*Phenotype exists and imported value is equal to value => Erase draft data*/
+							phenotype = this.updatePhenotype(observationUnitData.getObservationId(), null, null, draftMode);
+						}
+						else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
 							!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
 							/*imported value is different to stored value*/
 							phenotype =
