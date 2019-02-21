@@ -834,7 +834,10 @@ public class DatasetServiceImpl implements DatasetService {
 		for (final Phenotype phenotype : phenotypes) {
 			if (phenotype.isChanged()) {
 				observationUnitIdOutOfSync.add(phenotype.getExperiment().getNdExperimentId());
-				targetVariableIdOutOfSync.addAll(targetsByInput.get(phenotype.getObservableId()));
+				final List<Integer> targetsOutOfSync = targetsByInput.get(phenotype.getObservableId());
+				if (targetsOutOfSync != null) {
+					targetVariableIdOutOfSync.addAll(targetsOutOfSync);
+				}
 			}
 		}
 
