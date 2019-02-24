@@ -342,7 +342,7 @@ public class StandardVariableBuilder extends Builder {
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<>();
 
 		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.alias equals input name (eg. REP)
-		standardVariableIdsWithTypeInProjects = this.getStandardVariableIdsWithTypeForProjectProperties(headerNamesTrimmed);
+		standardVariableIdsWithTypeInProjects = this.getStandardVariableIdsWithTypeForProjectProperties(headerNamesTrimmed, programUUID);
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
 		// Exclude header items with result from step 1
@@ -404,8 +404,8 @@ public class StandardVariableBuilder extends Builder {
 	 * @param variableNames
 	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
 	 */
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> variableNames) {
-		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByAlias(variableNames);
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> variableNames, final String programUUID) {
+		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {
