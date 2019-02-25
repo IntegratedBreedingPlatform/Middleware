@@ -56,7 +56,7 @@ public class DerivedVariableServiceImplTest {
 	private DaoFactory factory;
 
 	@InjectMocks
-	private DerivedVariableServiceImpl derivedVariableService = new DerivedVariableServiceImpl();
+	private final DerivedVariableServiceImpl derivedVariableService = new DerivedVariableServiceImpl();
 
 	private final Random random = new Random();
 
