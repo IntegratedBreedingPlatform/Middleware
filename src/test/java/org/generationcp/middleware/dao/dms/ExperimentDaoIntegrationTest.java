@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.dms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -22,7 +23,9 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	private static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 
 	private static final int NO_OF_GERMPLASM = 5;
-	
+
+	private static final String GEOLOCATION_DESCRIPTION = "1";
+
 	private DmsProjectDao dmsProjectDao;
 	
 	private ExperimentDao experimentDao;
@@ -99,7 +102,9 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		// Verify that new experiment has auto-generated UUIDs as value for obs_unit_id
 		Assert.assertNotNull(experimentModel.getObsUnitId());
 		Assert.assertTrue(experimentModel.getObsUnitId().matches(UUID_REGEX));
-	} 
+	}
+
+
 	
 	@Test
 	public void testIsValidExperiment() {
@@ -110,11 +115,19 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertFalse(this.experimentDao.isValidExperiment(datasetId, validExperimentId + 10));
 		Assert.assertTrue(this.experimentDao.isValidExperiment(datasetId, validExperimentId));
 	}
+
+	@Test
+	public void testCountObservationsPerInstance() {
+		this.createExperiments();
+		final Map<String, Long> result = experimentDao.countObservationsPerInstance(this.study.getProjectId());
+		Assert.assertEquals(result.get(GEOLOCATION_DESCRIPTION), Long.valueOf(NO_OF_GERMPLASM));
+	}
 	
 	private Integer createExperiments() {
 		this.experiments = new ArrayList<>();
 		
 		final Geolocation geolocation = new Geolocation();
+		geolocation.setDescription(GEOLOCATION_DESCRIPTION);
 		this.geolocationDao.saveOrUpdate(geolocation);
 
 		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {

@@ -445,7 +445,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId) {
 
 		final List<String> designFactors = this.findAdditionalDesignFactors(studyId);
-		final List<String> gerplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
+		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
 
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
@@ -455,7 +455,7 @@ public class DatasetServiceImpl implements DatasetService {
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		final ObservationUnitsSearchDTO searchDto =
-			new ObservationUnitsSearchDTO(datasetId, null, gerplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
+			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
 		searchDto.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDto.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDto.setEnvironmentDatasetId(environmentDataset.getProjectId());

@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 	
-	<changeSet author="nahuel" id="v11.1.0-1">
+	<changeSet author="nahuel" id="v11.2.0-1">
 		<preConditions onFail="CONTINUE">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) FROM workbench_tool where name = "sample_manager";

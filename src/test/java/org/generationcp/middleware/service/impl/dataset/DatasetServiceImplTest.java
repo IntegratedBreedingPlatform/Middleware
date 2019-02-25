@@ -45,6 +45,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,33 +64,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 public class DatasetServiceImplTest {
-
-	@Mock
-	private DaoFactory daoFactory;
-
-	@Mock
-	private HibernateSessionProvider mockSessionProvider;
-
-	@Mock
-	private Session mockSession;
-
-	@Mock
-	private PhenotypeDao phenotypeDao;
-
-	@Mock
-	private DmsProjectDao dmsProjectDao;
-
-	@Mock
-	private ExperimentDao experimentDao;
-
-	@Mock
-	private MeasurementVariableService measurementVariableService;
-
-	@Mock
-	private ProjectRelationshipDao projectRelationshipDao;
-
-	@Mock
-	private StudyService studyService;
 
 	private static final int STUDY_ID = 1234;
 	private static final String FACT1 = "FACT1";
@@ -119,6 +93,33 @@ public class DatasetServiceImplTest {
 	public static final String REP_NO = "REP_NO";
 
 	@Mock
+	private DaoFactory daoFactory;
+
+	@Mock
+	private HibernateSessionProvider mockSessionProvider;
+
+	@Mock
+	private Session mockSession;
+
+	@Mock
+	private PhenotypeDao phenotypeDao;
+
+	@Mock
+	private DmsProjectDao dmsProjectDao;
+
+	@Mock
+	private ExperimentDao experimentDao;
+
+	@Mock
+	private MeasurementVariableService measurementVariableService;
+
+	@Mock
+	private ProjectRelationshipDao projectRelationshipDao;
+
+	@Mock
+	private StudyService studyService;
+
+	@Mock
 	private ProjectPropertyDao projectPropertyDao;
 
 	@Mock
@@ -132,6 +133,7 @@ public class DatasetServiceImplTest {
 		MockitoAnnotations.initMocks(this);
 
 		this.datasetService.setDaoFactory(this.daoFactory);
+		this.datasetService.setStudyService(studyService);
 		when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
@@ -321,10 +323,10 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testIsValidObservation() {
 		final Random ran = new Random();
-		final int pbservationUnitId = ran.nextInt();
+		final int observationUnitId = ran.nextInt();
 		final int observationId = ran.nextInt();
-		this.datasetService.getPhenotype(pbservationUnitId, observationId);
-		Mockito.verify(this.phenotypeDao).getPhenotype(pbservationUnitId, observationId);
+		this.datasetService.getPhenotype(observationUnitId, observationId);
+		Mockito.verify(this.phenotypeDao).getPhenotype(observationUnitId, observationId);
 	}
 
 	@Test
@@ -575,5 +577,33 @@ public class DatasetServiceImplTest {
         Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
     }
 
+    @Test
+	public void countObservationsGroupedByInstance_Verified_ExperimentCountObservationsPerInstance(){
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		this.datasetService.countObservationsGroupedByInstance(datasetId);
+		Mockito.verify(this.experimentDao).countObservationsPerInstance(datasetId);
+	}
+
+	@Test
+	public void getAllObservationUnitRows_Verified_DAOInteractions(){
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final int studyId = random.nextInt();
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(datasetId);
+
+		Mockito.doReturn(new ArrayList<>()).when(studyService).getGenericGermplasmDescriptors(studyId);
+		Mockito.doReturn(new ArrayList<>()).when(studyService).getAdditionalDesignFactors(studyId);
+		Mockito.doReturn(Arrays.asList(dmsProject)).when(dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
+			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+
+		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
+		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
+			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
+
+	}
 
 }
