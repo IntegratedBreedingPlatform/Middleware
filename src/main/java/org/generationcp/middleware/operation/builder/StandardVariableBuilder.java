@@ -356,8 +356,26 @@ public class StandardVariableBuilder extends Builder {
 
 		}
 
-		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsWithTypeForTerms(headerNamesNotFoundInProjectProperty));
-		// Step 3. If no variable still found for steps 1 and 2, treat the
+		// Step 3: Find variable aliases in ontology level, variable_overrides table
+		if (headerNamesNotFoundInProjectProperty != null && !headerNamesNotFoundInProjectProperty.isEmpty()) {
+			standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsWithTypeByAliasInOntologyLevel(headerNamesNotFoundInProjectProperty, programUUID));
+		}
+
+
+		// Step 4: If no variable found, search for cvterm (standard variables) with given name.
+		// Exclude header items with result from step 1
+		final List<String> headerNamesNotFoundInVariableOverrides = new ArrayList<>();
+		for (final String name : headerNamesTrimmed) {
+
+			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
+					.get(name.toUpperCase()).keySet().isEmpty()) {
+				headerNamesNotFoundInVariableOverrides.add(name);
+			}
+
+		}
+
+		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsWithTypeForTerms(headerNamesNotFoundInVariableOverrides));
+		// Step 5. If no variable still found for steps 1 and 2, treat the
 		// header as a trait / property name.
 		// Search for trait with given name and return the standard variables
 		// using that trait (if any)
@@ -406,6 +424,10 @@ public class StandardVariableBuilder extends Builder {
 	 */
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> variableNames, final String programUUID) {
 		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
+	}
+
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAliasInOntologyLevel(final List<String> variableNames, final String programUUID) {
+		return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIdsAndProgram(variableNames, programUUID);
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {
