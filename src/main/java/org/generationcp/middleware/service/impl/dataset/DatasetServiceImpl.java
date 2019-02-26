@@ -392,7 +392,8 @@ public class DatasetServiceImpl implements DatasetService {
 	/*
 	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
 	 */
-	void updateDependentPhenotypesStatus(final Integer variableId, final Integer observationUnitId) {
+	@Override
+	public void updateDependentPhenotypesStatus(final Integer variableId, final Integer observationUnitId) {
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
 		if (!formulaList.isEmpty()) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {

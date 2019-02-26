@@ -125,6 +125,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			this.createPhenotype(observationDto);
 		}
 
+		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
+		// In case the derived trait is also input of another formula (no recursion, just mark the target of that formula).
+		this.datasetService.updateDependentPhenotypesStatus(measurementVariable.getTermId(), observationUnitId);
+
 	}
 
 	@Override
@@ -138,7 +142,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return variableIdMeasurementVariableMap;
 	}
 
-	protected Phenotype updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
+	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		phenotype.setValue(value);
@@ -146,7 +150,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		phenotype.setChanged(true);
 		phenotype.setValueStatus(null);
 		phenotypeDao.update(phenotype);
-		return phenotype;
 	}
 
 	protected void createPhenotype(final ObservationDto observation) {
