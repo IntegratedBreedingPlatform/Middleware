@@ -168,7 +168,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	 * its preferred name which is indicated by name record with nstat = 1
 	 */
 	public List<GermplasmListData> getListDataWithParents(final Integer listID) {
-		final List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
+		final List<GermplasmListData> germplasmListData = new ArrayList<>();
 
 		if (listID == null) {
 			return germplasmListData;
@@ -177,10 +177,10 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 
 			final String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
-				+ " femaleParentName.nval as fnval,  g.gpid1 as fpgid,  maleParentName.nval as mnval,  g.gpid2 as mpgid,  "
+				+ " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', femaleParentName.nval) as fnval,  g.gpid1 as fpgid,  if(g.gpid2 = 0, '" + Name.UNKNOWN + "', maleParentName.nval) as mnval,  g.gpid2 as mpgid,  "
 				+ " g.gid as gid,  lp.source as source,  m.mname as mname, "
-				+ " (select nMale.grpName from listdata nMale where nMale.gid = maleParentName.gid limit 1) as malePedigree, "
-				+ "(select nFemale.grpName from listdata nFemale where nFemale.gid = femaleParentName.gid limit 1) as femalePedigree "
+				+ " if(g.gpid2 = 0, '" + Name.UNKNOWN + "', (select nMale.grpName from listdata nMale where nMale.gid = maleParentName.gid limit 1)) as malePedigree, "
+				+ " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', (select nFemale.grpName from listdata nFemale where nFemale.gid = femaleParentName.gid limit 1)) as femalePedigree "
 				+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
 				+ "left outer join names maleParentName on g.gpid2 = maleParentName.gid and maleParentName.nstat = :preferredNameNstat  "
 				+ "left outer join names femaleParentName on g.gpid1 = femaleParentName.gid and femaleParentName.nstat = :preferredNameNstat  "
