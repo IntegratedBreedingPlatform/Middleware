@@ -20,7 +20,7 @@ public class ObservationUnitsSearchDTO {
 	private int datasetId;
 	private Integer instanceId;
 	private Integer environmentDatasetId;
-	
+	private Boolean draftMode;
 	
 	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
@@ -74,32 +74,25 @@ public class ObservationUnitsSearchDTO {
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 	}
 
-	
-	
 	public int getDatasetId() {
 		return datasetId;
 	}
-
 	
 	public void setDatasetId(int datasetId) {
 		this.datasetId = datasetId;
 	}
-
 	
 	public Integer getInstanceId() {
 		return instanceId;
 	}
-
 	
 	public void setInstanceId(Integer instanceId) {
 		this.instanceId = instanceId;
 	}
-
 	
 	public Integer getEnvironmentDatasetId() {
 		return environmentDatasetId;
 	}
-
 	
 	public void setEnvironmentDatasetId(Integer environmentDatasetId) {
 		this.environmentDatasetId = environmentDatasetId;
@@ -108,10 +101,17 @@ public class ObservationUnitsSearchDTO {
 	public SortedPageRequest getSortedRequest() {
 		return sortedRequest;
 	}
-
 	
 	public void setSortedRequest(SortedPageRequest sortedRequest) {
 		this.sortedRequest = sortedRequest;
+	}
+
+	public Boolean getDraftMode() {
+		return this.draftMode;
+	}
+
+	public void setDraftMode(final Boolean draftMode) {
+		this.draftMode = draftMode;
 	}
 
 	@Override

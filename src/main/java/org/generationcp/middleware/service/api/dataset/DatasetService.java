@@ -29,10 +29,11 @@ public interface DatasetService {
 
 	ObservationDto addPhenotype(ObservationDto observation);
 
-	ObservationDto updatePhenotype(
-		Integer observationUnitId, Integer observationId, Integer categoricalValueId, String value);
+	ObservationDto updatePhenotype(final Integer observationId, ObservationDto observationDto);
 
-	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
+	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
+
+	List<MeasurementVariable> getSubObservationSetVariables(Integer subObservationSetId);
 
 	DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds, final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits,
@@ -47,11 +48,11 @@ public interface DatasetService {
 
 	DatasetDTO getDataset(final Integer datasetId);
 
-	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
+	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
 	List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
-		final String sortBy, final String sortOrder);
+		final String sortBy, final String sortOrder, final Boolean draftMode);
 
 	List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId);
 
@@ -65,10 +66,12 @@ public interface DatasetService {
 
 	List<MeasurementVariableDto> getVariables(Integer datasetId, VariableType variableType);
 
+	void acceptDraftData(Integer datasetId);
+
 	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
 			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
 
-	void importDataset(final Integer datasetId, final Table<String, String, String> table);
+	void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 
@@ -81,4 +84,7 @@ public interface DatasetService {
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 
+	void rejectDraftData(Integer datasetId);
+
+	Boolean checkOutOfBoundDraftData(final Integer datasetId);
 }
