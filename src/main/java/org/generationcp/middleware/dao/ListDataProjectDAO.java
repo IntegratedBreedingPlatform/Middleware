@@ -250,8 +250,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			final String queryStr = "select lp.listdata_project_id as listdata_project_id, "
 					+ " lp.entry_id as entry_id, " + " lp.designation as designation, "
-					+ " lp.group_name as group_name, " + " femaleParentName.nval as fnval, " + " g.gpid1 as fpgid, "
-					+ " maleParentName.nval as mnval, " + " g.gpid2 as mpgid, " + " g.mgid as mgid, "
+					+ " lp.group_name as group_name, " + " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', femaleParentName.nval) as fnval, " + " g.gpid1 as fpgid, "
+					+ " if(g.gpid2 = 0, '" + Name.UNKNOWN + "', maleParentName.nval) as mnval, " + " g.gpid2 as mpgid, " + " g.mgid as mgid, "
 					+ " g.gid as gid, " + " lp.seed_source as seed_source, "
 					+ " lp.duplicate_notes as duplicate_notes, " + " lp.check_type as check_type, "
 					+ " lp.entry_code as entry_code" + " from listdata_project lp "
