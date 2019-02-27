@@ -31,6 +31,12 @@ public class MethodTestDataInitializer {
 		return method;
 	}
 
+	public static Method createMethod(final int methodId, final String methodType, final String mcode) {
+		final Method method = MethodTestDataInitializer.createMethod(methodId, methodType);
+		method.setMcode(mcode);
+		return method;
+	}
+
 	public static List<Method> createMethodList() {
 		final List<Method> methodList = new ArrayList<>();
 		methodList.add(MethodTestDataInitializer.createMethod());
