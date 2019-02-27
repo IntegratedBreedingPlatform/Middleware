@@ -5,7 +5,10 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class ObservationUnitsSearchDTO {
 	
 	private List<String> environmentDetails;
@@ -110,5 +113,20 @@ public class ObservationUnitsSearchDTO {
 	public void setSortedRequest(SortedPageRequest sortedRequest) {
 		this.sortedRequest = sortedRequest;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 }
