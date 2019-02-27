@@ -21,7 +21,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.MBDTDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.manager.api.PresetDataManager;
+import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
@@ -155,8 +155,8 @@ public class ManagerFactory implements Serializable {
 				this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
 	}
 
-	public PresetDataManager getPresetDataManager() {
-		return new PresetDataManagerImpl(this.sessionProvider);
+	public PresetService getPresetService() {
+		return new PresetServiceImpl(this.sessionProvider);
 	}
 
 	public StudyDataManager getStudyDataManager() {

@@ -32,6 +32,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -50,6 +51,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * DAO class for {@link ExperimentModel}.
@@ -63,6 +74,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String LOCATION_ID = "LOCATION_ID";
 	public static final String EXPT_DESIGN = "EXPT_DESIGN";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	public static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
 	public static final String COL = "COL";
 	public static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
@@ -627,7 +639,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    nde.nd_experiment_id as observationUnitId, " //
 			+ "    gl.description AS TRIAL_INSTANCE, " //
 			+ "    (SELECT loc.lname FROM nd_geolocationprop gprop INNER JOIN location loc on loc.locid = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8190) 'LOCATION_ID', "
-			+ "    (SELECT edesign.name FROM nd_geolocationprop gprop INNER JOIN cvterm edesign on edesign.cvterm_id = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8135) 'EXPT_DESIGN',  "	
+			+ "    (SELECT edesign.name FROM nd_geolocationprop gprop INNER JOIN cvterm edesign on edesign.cvterm_id = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8135) 'EXPT_DESIGN',  "
 			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  "
 			+ "    s.dbxref_id AS GID, " //
 			+ "    s.name DESIGNATION, " //
@@ -641,6 +653,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
 			+ "    nde.obs_unit_id as OBS_UNIT_ID,  " //
+			+ "    parent.obs_unit_id as PARENT_OBS_UNIT_ID,  " //
 			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
 
 		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
@@ -684,7 +697,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				sql.append(String.format(designFactorClauseFormat, designFactor, designFactor));
 			}
 		}
-		
+
 		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
 			final String envFactorFormat =
 				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s', \n";
@@ -785,7 +798,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
 			query.addScalar(designFactor, new StringType());
 		}
-		
+
 		for (final String envFactor : searchDto.getEnvironmentDetails()) {
 			query.addScalar(envFactor, new StringType());
 		}
@@ -796,7 +809,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		query.addScalar(OBSERVATION_UNIT_NO);
 		return query;
 	}
-	
+
 
 	private void addScalar(final SQLQuery createSQLQuery) {
 		createSQLQuery.addScalar(ExperimentDao.OBSERVATION_UNIT_ID);
@@ -811,6 +824,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		createSQLQuery.addScalar(ExperimentDao.BLOCK_NO);
 		createSQLQuery.addScalar(ExperimentDao.ROW);
 		createSQLQuery.addScalar(ExperimentDao.COL);
+		createSQLQuery.addScalar(ExperimentDao.PARENT_OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ExperimentDao.OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ExperimentDao.SUM_OF_SAMPLES);
 	}
@@ -988,7 +1002,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return sql.toString();
 		}
 	}
-	
+
 	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto, final String observationVariableName) {
 		try {
 
@@ -999,10 +1013,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (searchDto.getInstanceId() != null) {
 				query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
 			}
-			
+
 			if(!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())){
 				query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
-			}	
+			}
 
 			final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
 			final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
@@ -1113,6 +1127,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		variables.put(ROW, new ObservationUnitData((String) row.get(ROW)));
 		variables.put(COL, new ObservationUnitData((String) row.get(COL)));
 		variables.put(OBS_UNIT_ID, new ObservationUnitData((String) row.get(OBS_UNIT_ID)));
+		variables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
 		variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
 		variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
 		variables.put(LOCATION_ID,  new ObservationUnitData((String) row.get(LOCATION_ID)));
@@ -1133,7 +1148,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		for (final String envCondition : searchDto.getEnvironmentConditions()) {
 			variables.put(envCondition, new ObservationUnitData((String) row.get(envCondition)));
 		}
-		
+
 		observationUnitRow.setVariables(variables);
 		return observationUnitRow;
 	}
@@ -1213,4 +1228,33 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		this.generateObsUnitId(entity);
 		return super.save(entity);
 	}
+
+	public Map<String, Long> countObservationsPerInstance(final Integer datasetId) {
+
+		try {
+			ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.groupProperty("g.description"))
+				.add(Projections.rowCount());
+
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("geoLocation", "g");
+			criteria.setProjection(projectionList);
+			criteria.add(Restrictions.eq("project.projectId", datasetId));
+			final List<Object[]> rows = criteria.list();
+
+			final Map<String, Long> results = new LinkedHashMap<>();
+			for (Object[] row : rows) {
+				results.put((String) row[0], (Long) row[1]);
+			}
+			return results;
+
+		} catch (
+			final HibernateException e) {
+			final String message =
+				"Error at countObservationsPerInstance=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }

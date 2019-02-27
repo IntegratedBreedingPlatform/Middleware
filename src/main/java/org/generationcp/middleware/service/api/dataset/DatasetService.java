@@ -54,6 +54,8 @@ public interface DatasetService {
 		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
 		final String sortBy, final String sortOrder, final Boolean draftMode);
 
+	List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId);
+
 	Boolean isDatasetNameAvailable(final String name, final String programUUID);
 
 	Integer getNumberOfChildren (final Integer parentId);
@@ -72,12 +74,13 @@ public interface DatasetService {
 	void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
-	
 
 	void deleteDataset(int datasetId);
 	
 	Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
 			final int studyId, final int datasetId, final List<Integer> instanceIds);
+
+	Map<String, Long> countObservationsGroupedByInstance(Integer datasetId);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 
