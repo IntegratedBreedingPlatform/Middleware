@@ -40,6 +40,11 @@ public interface DatasetService {
 
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 
+	/*
+	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
+	 */
+	void updateDependentPhenotypesStatus(Integer variableId, Integer observationUnitId);
+
 	DatasetDTO getDataset(final Integer datasetId);
 
 	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
