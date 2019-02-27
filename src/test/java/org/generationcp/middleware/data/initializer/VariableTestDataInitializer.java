@@ -30,4 +30,20 @@ public class VariableTestDataInitializer {
 		variable.setMethod(method);
 		return variable;
 	}
+
+	public static Variable createVariable(final String name, final String propertyName, final String scaleName, final String methodName) {
+		final Variable variable = new Variable();
+		variable.setName(name);
+		final Scale scale = new Scale();
+		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
+		scale.setName(scaleName);
+		variable.setScale(scale);
+		final Property property = new Property();
+		property.setName(propertyName);
+		variable.setProperty(property);
+		final Method method = new Method();
+		method.setName(methodName);
+		variable.setMethod(method);
+		return variable;
+	}
 }
