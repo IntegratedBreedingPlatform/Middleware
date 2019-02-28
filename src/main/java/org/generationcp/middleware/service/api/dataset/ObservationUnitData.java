@@ -8,14 +8,12 @@ import org.pojomatic.annotations.AutoProperty;
 public class ObservationUnitData {
 
 	private Integer observationId;
-
 	private Integer categoricalValueId;
-
 	private String value;
-
 	private Phenotype.ValueStatus status;
-
 	private Integer variableId;
+	private Integer draftCategoricalValueId;
+	private String draftValue;
 
 	public ObservationUnitData(final Integer observationId, final Integer categoricalValueId, final String value,
 		final Phenotype.ValueStatus status, final Integer variableId) {
@@ -71,6 +69,22 @@ public class ObservationUnitData {
 
 	public void setVariableId(final Integer variableId) {
 		this.variableId = variableId;
+	}
+
+	public Integer getDraftCategoricalValueId() {
+		return this.draftCategoricalValueId;
+	}
+
+	public void setDraftCategoricalValueId(final Integer draftCategoricalValueId) {
+		this.draftCategoricalValueId = draftCategoricalValueId;
+	}
+
+	public String getDraftValue() {
+		return this.draftValue;
+	}
+
+	public void setDraftValue(final String draftValue) {
+		this.draftValue = draftValue;
 	}
 
 	@Override

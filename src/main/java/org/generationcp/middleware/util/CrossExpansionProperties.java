@@ -103,6 +103,7 @@ public class CrossExpansionProperties {
 								return CrossExpansionProperties.this.getBackcrossNotationByCrop(cropName);
 							}
 						});
+
 	}
 
 	private int getGenerationLevelStoppingRulesByCrop(final String cropName) {

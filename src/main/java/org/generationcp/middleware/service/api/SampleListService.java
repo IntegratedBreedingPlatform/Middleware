@@ -61,6 +61,8 @@ public interface SampleListService {
 
 	long countSamplesByUIDs(Set<String> sampleUIDs, Integer listId);
 
+	long countSamplesByDatasetId(Integer datasetId);
+
 	List<SampleListDTO> getSampleLists(final List<Integer> datasetIds);
 
 	SampleList getSampleList(final Integer sampleListId);

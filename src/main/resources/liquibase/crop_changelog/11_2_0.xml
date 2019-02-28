@@ -1,0 +1,41 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="vanina" id="v11.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="phenotype" columnName="draft_value"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add draft_value to phenotype table
+		</comment>
+		<addColumn tableName="phenotype">
+			<column name="draft_value" type="VARCHAR(255)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+
+	</changeSet>
+
+	<changeSet author="vanina" id="v11.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="phenotype" columnName="draft_cvalue_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add draft_cvalue_id to phenotype table
+		</comment>
+		<addColumn tableName="phenotype">
+			<column name="draft_cvalue_id" type="INT(255)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+
+	</changeSet>
+
+</databaseChangeLog>

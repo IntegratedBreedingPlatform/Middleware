@@ -105,7 +105,8 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetObservationUnitRows() {
-		final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId, this.instanceIds.get(0), 1, 100, null, null);
+		final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId,
+			this.instanceIds.get(0), 1, 100, null, null, null);
 		Assert.assertNotNull(observationUnitRows);
 		Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
 		final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);
