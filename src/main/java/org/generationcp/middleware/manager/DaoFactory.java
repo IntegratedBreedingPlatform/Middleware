@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
@@ -162,5 +163,11 @@ public class DaoFactory {
 		final GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
 		geolocationPropertyDao.setSession(this.sessionProvider.getSession());
 		return geolocationPropertyDao;
+	}
+
+	public ProgramPresetDAO getProgramPresetDAO(){
+		final ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
+		programPresetDAO.setSession(this.sessionProvider.getSession());
+		return programPresetDAO;
 	}
 }

@@ -3,23 +3,36 @@ package org.generationcp.middleware.domain.dataset;
 public class ObservationDto {
 	
 	private Integer observationId;
-
 	private Integer variableId;
-
 	private String value;
-
 	private Integer categoricalValueId;
-
 	private String status;
-
 	private String createdDate;
-
 	private String updatedDate;
-
 	private Integer observationUnitId;
+	private Integer draftCategoricalValueId;
+	private String draftValue;
+
+	public ObservationDto(
+		final Integer variableId, final String value, final Integer categoricalValueId, final String status,
+		final String createdDate,
+		final String updatedDate, final Integer observationUnitId, final Integer draftCategoricalValueId, final String draftValue) {
+		this.variableId = variableId;
+		this.value = value;
+		this.categoricalValueId = categoricalValueId;
+		this.status = status;
+		this.createdDate = createdDate;
+		this.updatedDate = updatedDate;
+		this.observationUnitId = observationUnitId;
+		this.draftCategoricalValueId = draftCategoricalValueId;
+		this.draftValue = draftValue;
+	}
+
+	public ObservationDto() {
+	}
 
 	public Integer getObservationId() {
-		return observationId;
+		return this.observationId;
 	}
 
 	public void setObservationId(final Integer observationId) {
@@ -27,7 +40,7 @@ public class ObservationDto {
 	}
 
 	public Integer getVariableId() {
-		return variableId;
+		return this.variableId;
 	}
 
 	public void setVariableId(final Integer variableId) {
@@ -35,7 +48,7 @@ public class ObservationDto {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(final String value) {
@@ -43,7 +56,7 @@ public class ObservationDto {
 	}
 
 	public Integer getCategoricalValueId() {
-		return categoricalValueId;
+		return this.categoricalValueId;
 	}
 
 	public void setCategoricalValueId(final Integer categoricalValueId) {
@@ -51,7 +64,7 @@ public class ObservationDto {
 	}
 
 	public String getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public void setStatus(final String status) {
@@ -59,7 +72,7 @@ public class ObservationDto {
 	}
 
 	public String getUpdatedDate() {
-		return updatedDate;
+		return this.updatedDate;
 	}
 
 	public void setUpdatedDate(final String updatedDate) {
@@ -67,7 +80,7 @@ public class ObservationDto {
 	}
 
 	public String getCreatedDate() {
-		return createdDate;
+		return this.createdDate;
 	}
 
 	public void setCreatedDate(final String createdDate) {
@@ -75,12 +88,19 @@ public class ObservationDto {
 	}
 
 	public Integer getObservationUnitId() {
-		return observationUnitId;
+		return this.observationUnitId;
 	}
 
 	public void setObservationUnitId(final Integer observationUnitId) {
 		this.observationUnitId = observationUnitId;
 	}
 
+	public Integer getDraftCategoricalValueId() {
+		return this.draftCategoricalValueId;
+	}
+
+	public String getDraftValue() {
+		return this.draftValue;
+	}
 
 }

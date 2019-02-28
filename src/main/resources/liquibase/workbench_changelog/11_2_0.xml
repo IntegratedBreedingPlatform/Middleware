@@ -6,7 +6,20 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
-	<changeSet author="clarissa" id="v11.2.0-1">
+	<changeSet author="nahuel" id="v11.2.0-1">
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM workbench_tool where name = "sample_manager";
+			</sqlCheck>
+		</preConditions>
+		<comment>Update Sample Manager URL - Add angular route hash</comment>
+		<update tableName="workbench_tool">
+			<column name="path" value="/ibpworkbench/controller/jhipster#sample-manager" />
+			<where> name = 'sample_manager'</where>
+		</update>
+    </changeSet>
+    
+    <changeSet author="clarissa" id="v11.2.0-2">
         <preConditions onFail="MARK_RAN">
         	<not>
 				<columnExists tableName="metrics" columnName="nursery"/>
@@ -20,7 +33,7 @@
         </sql>
     </changeSet>
 	
-	<changeSet author="clarissa" id="v11.2.0-2">
+	<changeSet author="clarissa" id="v11.2.0-3">
         <preConditions onFail="MARK_RAN">
         	<not>
 				<columnExists tableName="metrics" columnName="trial"/>
@@ -34,7 +47,7 @@
         </sql>
     </changeSet>
 	
-	<changeSet author="clarissa" id="v11.2.0-3">
+	<changeSet author="clarissa" id="v11.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -52,7 +65,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="clarissa" id="v11.2.0-4">
+	<changeSet author="clarissa" id="v11.2.0-5">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -237,6 +250,6 @@
 			  ]]>
 		</sql>
 	</changeSet>
-	
+
 
 </databaseChangeLog>

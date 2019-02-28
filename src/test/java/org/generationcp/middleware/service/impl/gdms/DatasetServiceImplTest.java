@@ -1,9 +1,7 @@
 package org.generationcp.middleware.service.impl.gdms;
 
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.CoreMatchers.equalTo;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -20,7 +18,6 @@ import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.gdms.DatasetRetrieveDto;
 import org.generationcp.middleware.service.api.gdms.DatasetUploadDto;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

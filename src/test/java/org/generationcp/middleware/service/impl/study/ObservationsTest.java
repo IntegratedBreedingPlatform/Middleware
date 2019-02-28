@@ -47,8 +47,8 @@ public class ObservationsTest {
 	@Before
 	public void setup() {
 		this.mockSession = Mockito.mock(Session.class);
-		mockOntologyVariableDataManager = Mockito.mock(OntologyVariableDataManager.class);
-		this.observation = new Observations(this.mockSession, mockOntologyVariableDataManager);
+		this.mockOntologyVariableDataManager = Mockito.mock(OntologyVariableDataManager.class);
+		this.observation = new Observations(this.mockSession, this.mockOntologyVariableDataManager);
 		final List<MeasurementDto> traitMeasurements = new ArrayList<MeasurementDto>();
 		this.measurementDto = Mockito.mock(MeasurementDto.class);
 		traitMeasurements.add(this.measurementDto);
@@ -91,7 +91,7 @@ public class ObservationsTest {
 		verify(this.mockSession, times(1)).save(isA(Phenotype.class));
 		verify(this.mockSession, times(1)).save(
 				new Phenotype(new Integer(GENERATED_PHENOTYPE_ID), null, Integer.toString(TEST_TRAIT_ID), new Integer(TEST_TRAIT_ID), null,
-						CHARACTER_TEST_VALUE, null, null));
+						CHARACTER_TEST_VALUE, null, null, null, null));
 		// add additional test code here
 	}
 
@@ -130,7 +130,7 @@ public class ObservationsTest {
 
 		verify(this.mockSession, times(1)).save(
 				new Phenotype(new Integer(GENERATED_PHENOTYPE_ID), null, Integer.toString(TEST_TRAIT_ID), new Integer(TEST_TRAIT_ID), null,
-						TEST_TERM_NAME, new Integer(1234), null));
+						TEST_TERM_NAME, new Integer(1234), null, null, null));
 		// add additional test code here
 	}
 

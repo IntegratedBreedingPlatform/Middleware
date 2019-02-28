@@ -369,6 +369,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		builder.append(this.femalePedigree);
 		builder.append(", malePedigree=");
 		builder.append(this.malePedigree);
+		builder.append(", femaleParent=");
+		builder.append(this.femaleParent);
+		builder.append(", maleParent=");
+		builder.append(this.maleParent);
 		builder.append("]");
 		return builder.toString();
 	}

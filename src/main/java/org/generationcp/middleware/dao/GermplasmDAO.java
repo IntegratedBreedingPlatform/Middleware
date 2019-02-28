@@ -1115,6 +1115,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			for (final Object[] result : results) {
 				pedigreeMap.put((Integer) result[0], new String[] {(String) result[1], (String) result[2]});
 			}
+			if (gidList.contains(0)) {
+				pedigreeMap.put(0, new String[] {Name.UNKNOWN, Name.UNKNOWN});
+			}
 			return pedigreeMap;
 		} catch (final HibernateException e) {
 			final String message = "Error with getPedigreeByGIDList(GIDS=" + gidList + ") : " + e.getMessage();

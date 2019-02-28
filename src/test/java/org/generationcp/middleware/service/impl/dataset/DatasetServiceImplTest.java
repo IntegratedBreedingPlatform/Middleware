@@ -9,7 +9,6 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
-import org.generationcp.middleware.data.initializer.DMSProjectTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -64,6 +63,32 @@ import static org.mockito.Mockito.when;
 
 public class DatasetServiceImplTest {
 
+	private static final int STUDY_ID = 1234;
+	private static final String FACT1 = "FACT1";
+	public static final ArrayList<String> DESING_FACTORS =
+		Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), DatasetServiceImplTest.FACT1);
+	private static final String STOCK_ID = "STOCK_ID";
+	public static final ArrayList<String> GERMPLASM_DESCRIPTORS = Lists.newArrayList(
+		TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
+		TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), DatasetServiceImplTest.STOCK_ID);
+	private static final int DATASET_ID = 567;
+	private static final int INSTANCE_ID = 30;
+	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
+	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	public static final String ENTRY_CODE = "ENTRY_CODE";
+	public static final String ENTRY_NO = "ENTRY_NO";
+	public static final String DESIGNATION = "DESIGNATION";
+	public static final String GID = "GID";
+	public static final String ENTRY_TYPE = "ENTRY_TYPE";
+	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
+	public static final String COL = "COL";
+	public static final String ROW = "ROW";
+	public static final String BLOCK_NO = "BLOCK_NO";
+	public static final String PLOT_NO = "PLOT_NO";
+	public static final String REP_NO = "REP_NO";
+
 	@Mock
 	private DaoFactory daoFactory;
 
@@ -91,33 +116,6 @@ public class DatasetServiceImplTest {
 	@Mock
 	private StudyService studyService;
 
-	private static final int STUDY_ID = 1234;
-	private static final String FACT1 = "FACT1";
-	public static final ArrayList<String> DESING_FACTORS =
-		Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), DatasetServiceImplTest.FACT1);
-	private static final String STOCK_ID = "STOCK_ID";
-	public static final ArrayList<String> GERMPLASM_DESCRIPTORS = Lists.newArrayList(
-		TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
-		TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), DatasetServiceImplTest.STOCK_ID);
-	private static final int DATASET_ID = 567;
-	private static final int INSTANCE_ID = 30;
-	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
-	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	public static final String ENTRY_CODE = "ENTRY_CODE";
-	public static final String ENTRY_NO = "ENTRY_NO";
-	public static final String DESIGNATION = "DESIGNATION";
-	public static final String GID = "GID";
-	public static final String ENTRY_TYPE = "ENTRY_TYPE";
-	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
-	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
-	public static final String LOCATION_NAME = "LocationName";
-	public static final String COL = "COL";
-	public static final String ROW = "ROW";
-	public static final String BLOCK_NO = "BLOCK_NO";
-	public static final String PLOT_NO = "PLOT_NO";
-	public static final String REP_NO = "REP_NO";
-
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
 
@@ -132,6 +130,7 @@ public class DatasetServiceImplTest {
 		MockitoAnnotations.initMocks(this);
 
 		this.datasetService.setDaoFactory(this.daoFactory);
+		this.datasetService.setStudyService(studyService);
 		when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
@@ -235,6 +234,11 @@ public class DatasetServiceImplTest {
 		final Integer categoricalValueId = ran.nextInt();
 		final Integer observableId = ran.nextInt();
 		final String value = ran.toString();
+		final ObservationDto observationDto = new ObservationDto();
+		observationDto.setObservationId(observationId);
+		observationDto.setObservationUnitId(observationUnitId);
+		observationDto.setValue(value);
+		observationDto.setCategoricalValueId(categoricalValueId);
 
 		final Phenotype existingPhenotype = new Phenotype();
 		existingPhenotype.setPhenotypeId(observationId);
@@ -247,7 +251,7 @@ public class DatasetServiceImplTest {
 		when(this.phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
 		final ObservationDto savedObservation =
-			this.datasetService.updatePhenotype(observationUnitId, observationId, categoricalValueId, value);
+			this.datasetService.updatePhenotype(observationId, observationDto);
 
 		Mockito.verify(this.phenotypeDao).update(existingPhenotype);
 
@@ -321,10 +325,10 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testIsValidObservation() {
 		final Random ran = new Random();
-		final int pbservationUnitId = ran.nextInt();
+		final int observationUnitId = ran.nextInt();
 		final int observationId = ran.nextInt();
-		this.datasetService.getPhenotype(pbservationUnitId, observationId);
-		Mockito.verify(this.phenotypeDao).getPhenotype(pbservationUnitId, observationId);
+		this.datasetService.getPhenotype(observationUnitId, observationId);
+		Mockito.verify(this.phenotypeDao).getPhenotype(observationUnitId, observationId);
 	}
 
 	@Test
@@ -367,35 +371,6 @@ public class DatasetServiceImplTest {
 		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(),"1");
 		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
 		Assert.assertNotNull(observationUnitRow.getVariables().get(trialInstanceVariable.getName()));
-	}
-
-	private List<MeasurementVariable> mockDatasetVariables() {
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(),"1"));
-		when(this.dmsProjectDao.getObservationSetVariables(1,
-			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()))).thenReturn(Arrays.asList(measurementVariables.get(0)));
-
-		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.LOCATION_ID.getId(), TermId.LOCATION_ID.name(), "1001"));
-		when(this.dmsProjectDao.getObservationSetVariables(1,
-			DatasetServiceImpl.ENVIRONMENT_VARIABLE_TYPES)).thenReturn(Arrays.asList(measurementVariables.get(1)));
-
-		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.SITE_NAME.getId(), TermId.SITE_NAME.name(), "SITE NAME"));
-		when(this.dmsProjectDao.getObservationSetVariables(1,
-			Lists.newArrayList(VariableType.TRAIT.getId()))).thenReturn(Arrays.asList(measurementVariables.get(2)));
-
-		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TREATMENT_MEAN.getId(), TermId.TREATMENT_MEAN.name(), ".55"));
-		when(this.dmsProjectDao.getObservationSetVariables(1,
-			Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()))).thenReturn(new ArrayList<>(Arrays.asList(measurementVariables.get(3))));
-
-		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(),"1"));
-		when(this.dmsProjectDao.getObservationSetVariables(1,
-			DatasetServiceImpl.PLOT_COLUMNS_VARIABLE_TYPES)).thenReturn(new ArrayList<>(Arrays.asList(measurementVariables.get(4), measurementVariables.get(3))));
-
-		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(),"1"));
-		when(this.dmsProjectDao.getObservationSetVariables(1,
-			DatasetServiceImpl.SUBOBS_COLUMNS_VARIABLE_TYPES)).thenReturn(Arrays.asList(measurementVariables.get(5)));
-
-		return measurementVariables;
 	}
 
 	private  List<DatasetDTO> setUpDatasets(final Integer datasetTypeId){
@@ -534,6 +509,7 @@ public class DatasetServiceImplTest {
 			1,
 			10,
 			null,
+			null,
 			null);
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
@@ -548,7 +524,9 @@ public class DatasetServiceImplTest {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setPhenotypeId(phenotypeId);
 		phenotype.setObservableId(observableId);
-		phenotype.setExperiment(new ExperimentModel(observationUnitId));
+		final ExperimentModel experiment = new ExperimentModel(observationUnitId);
+		phenotype.setExperiment(experiment);
+		experiment.setPhenotypes(Lists.newArrayList(phenotype));
 		when(this.phenotypeDao.getById(phenotypeId)).thenReturn(phenotype);
 		
 		final Formula formula1 = new Formula();
@@ -560,7 +538,7 @@ public class DatasetServiceImplTest {
 		term2.setCvTermId(random.nextInt());
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(observableId);
-		
+
 		
 		this.datasetService.deletePhenotype(phenotypeId);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
@@ -575,5 +553,248 @@ public class DatasetServiceImplTest {
         Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
     }
 
+    @Test
+	public void countObservationsGroupedByInstance_Verified_ExperimentCountObservationsPerInstance(){
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		this.datasetService.countObservationsGroupedByInstance(datasetId);
+		Mockito.verify(this.experimentDao).countObservationsPerInstance(datasetId);
+	}
 
+	@Test
+	public void getAllObservationUnitRows_Verified_DAOInteractions(){
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final int studyId = random.nextInt();
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(datasetId);
+
+		Mockito.doReturn(new ArrayList<>()).when(studyService).getGenericGermplasmDescriptors(studyId);
+		Mockito.doReturn(new ArrayList<>()).when(studyService).getAdditionalDesignFactors(studyId);
+		Mockito.doReturn(Arrays.asList(dmsProject)).when(dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
+			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+
+		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
+		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
+			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
+
+	}
+
+	@Test
+	public void testAcceptDraftData() throws Exception {
+		final Integer datasetId = 3;
+
+		final DmsProject project = new DmsProject();
+		project.setProjectId(datasetId);
+
+		final Integer observationUnitId = 333;
+		final ExperimentModel experimentModel = new ExperimentModel(observationUnitId);
+		experimentModel.setProject(project);
+
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(123);
+		final Integer variableId = 12;
+		phenotype.setObservableId(variableId);
+		phenotype.setValue("55");
+		phenotype.setDraftValue("8");
+		phenotype.setExperiment(experimentModel);
+		phenotype.setName(String.valueOf(variableId));
+
+		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
+
+		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+
+		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		this.datasetService.acceptDraftData(datasetId);
+
+		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
+		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
+		final Phenotype phenotypeArgumentCaptorValue = phenotypeArgumentCaptor.getValue();
+		Assert.assertEquals(phenotype.getValue(), phenotypeArgumentCaptorValue.getValue());
+		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
+	}
+
+	@Test
+	public void testDiscardDraftData() throws Exception {
+		final Integer datasetId = 3;
+
+		final DmsProject project = new DmsProject();
+		project.setProjectId(datasetId);
+
+		final Integer observationUnitId = 333;
+		final ExperimentModel experimentModel = new ExperimentModel(observationUnitId);
+		experimentModel.setProject(project);
+
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(123);
+		final Integer variableId = 12;
+		phenotype.setObservableId(variableId);
+		phenotype.setValue("55");
+		phenotype.setDraftValue("8");
+		phenotype.setExperiment(experimentModel);
+		phenotype.setName(String.valueOf(variableId));
+		phenotype.setPhenotypeId(12345);
+
+		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
+
+		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+
+		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
+		this.datasetService.rejectDraftData(datasetId);
+
+		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
+		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
+		final Phenotype phenotypeArgumentCaptorValue = phenotypeArgumentCaptor.getValue();
+		Assert.assertEquals(phenotype.getValue(), phenotypeArgumentCaptorValue.getValue());
+		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
+	}
+
+	@Test
+	public void testAcceptDraftDataDeletingRow() throws Exception {
+		final Integer datasetId = 3;
+
+		final DmsProject project = new DmsProject();
+		project.setProjectId(datasetId);
+
+		final Integer observationUnitId = 333;
+		final ExperimentModel experimentModel = new ExperimentModel(observationUnitId);
+		experimentModel.setProject(project);
+
+		final Phenotype phenotype = new Phenotype();
+		final Integer phenotypeId = 999;
+		phenotype.setPhenotypeId(phenotypeId);
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(123);
+		final Integer variableId = 12;
+		phenotype.setObservableId(variableId);
+		phenotype.setValue("55");
+		phenotype.setDraftValue(null);
+		phenotype.setExperiment(experimentModel);
+		phenotype.setName(String.valueOf(variableId));
+
+		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
+
+		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+
+		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.daoFactory.getPhenotypeDAO().getById(phenotypeId)).thenReturn(phenotype);
+		this.datasetService.acceptDraftData(datasetId);
+
+		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
+		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+	}
+
+	@Test
+	public void testDiscardDraftDataDeletingRow() throws Exception {
+		final Integer datasetId = 3;
+
+		final DmsProject project = new DmsProject();
+		project.setProjectId(datasetId);
+
+		final Integer observationUnitId = 333;
+		final ExperimentModel experimentModel = new ExperimentModel(observationUnitId);
+		experimentModel.setProject(project);
+
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(null);
+		final Integer variableId = 12;
+		phenotype.setObservableId(variableId);
+		phenotype.setValue(null);
+		phenotype.setDraftValue("8");
+		phenotype.setExperiment(experimentModel);
+		phenotype.setName(String.valueOf(variableId));
+		phenotype.setPhenotypeId(12345);
+
+		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
+
+		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+
+		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
+		this.datasetService.rejectDraftData(datasetId);
+
+		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
+		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+	}
+
+	@Test
+	public void testDiscardDraftDataDeletingRowWithEmpty() throws Exception {
+		final Integer datasetId = 3;
+
+		final DmsProject project = new DmsProject();
+		project.setProjectId(datasetId);
+
+		final Integer observationUnitId = 333;
+		final ExperimentModel experimentModel = new ExperimentModel(observationUnitId);
+		experimentModel.setProject(project);
+
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(null);
+		final Integer variableId = 12;
+		phenotype.setObservableId(variableId);
+		phenotype.setValue("");
+		phenotype.setDraftValue("8");
+		phenotype.setExperiment(experimentModel);
+		phenotype.setName(String.valueOf(variableId));
+		phenotype.setPhenotypeId(12345);
+
+		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
+
+		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+
+		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
+		this.datasetService.rejectDraftData(datasetId);
+
+		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
+		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+	}
+
+	@Test
+	public void testAcceptDraftDataDeletingRowWithEmpty() throws Exception {
+		final Integer datasetId = 3;
+
+		final DmsProject project = new DmsProject();
+		project.setProjectId(datasetId);
+
+		final Integer observationUnitId = 333;
+		final ExperimentModel experimentModel = new ExperimentModel(observationUnitId);
+		experimentModel.setProject(project);
+
+		final Phenotype phenotype = new Phenotype();
+		final Integer phenotypeId = 999;
+		phenotype.setPhenotypeId(phenotypeId);
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(123);
+		final Integer variableId = 12;
+		phenotype.setObservableId(variableId);
+		phenotype.setValue("55");
+		phenotype.setDraftValue("");
+		phenotype.setExperiment(experimentModel);
+		phenotype.setName(String.valueOf(variableId));
+
+		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
+
+		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+
+		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.daoFactory.getPhenotypeDAO().getById(phenotypeId)).thenReturn(phenotype);
+		this.datasetService.acceptDraftData(datasetId);
+
+		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
+		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
+	}
 }

@@ -5,7 +5,10 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class ObservationUnitsSearchDTO {
 	
 	private List<String> environmentDetails;
@@ -17,7 +20,7 @@ public class ObservationUnitsSearchDTO {
 	private int datasetId;
 	private Integer instanceId;
 	private Integer environmentDatasetId;
-	
+	private Boolean draftMode;
 	
 	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
@@ -71,32 +74,25 @@ public class ObservationUnitsSearchDTO {
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 	}
 
-	
-	
 	public int getDatasetId() {
 		return datasetId;
 	}
-
 	
 	public void setDatasetId(int datasetId) {
 		this.datasetId = datasetId;
 	}
-
 	
 	public Integer getInstanceId() {
 		return instanceId;
 	}
-
 	
 	public void setInstanceId(Integer instanceId) {
 		this.instanceId = instanceId;
 	}
-
 	
 	public Integer getEnvironmentDatasetId() {
 		return environmentDatasetId;
 	}
-
 	
 	public void setEnvironmentDatasetId(Integer environmentDatasetId) {
 		this.environmentDatasetId = environmentDatasetId;
@@ -105,10 +101,32 @@ public class ObservationUnitsSearchDTO {
 	public SortedPageRequest getSortedRequest() {
 		return sortedRequest;
 	}
-
 	
 	public void setSortedRequest(SortedPageRequest sortedRequest) {
 		this.sortedRequest = sortedRequest;
 	}
-	
+
+	public Boolean getDraftMode() {
+		return this.draftMode;
+	}
+
+	public void setDraftMode(final Boolean draftMode) {
+		this.draftMode = draftMode;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 }

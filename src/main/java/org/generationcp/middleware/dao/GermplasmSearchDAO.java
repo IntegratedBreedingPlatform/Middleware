@@ -18,6 +18,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -104,12 +105,12 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 						+ "              AND g.gpid1 <> 0 THEN nameOfFemaleParent.nval \n" + "         ELSE '-' \n"
 						+ "       END                         AS `%s` \n", GermplasmSearchDAO.FEMALE_PARENT_PREFERRED_NAME));
 		GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.MALE_PARENT_ID,
-				String.format("        CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n"
-						+ "              AND g.gpid2 <> 0 THEN g.gpid2 \n" + "         ELSE '-' \n"
+				String.format("        CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 = 0 THEN '" + Name.UNKNOWN +  " ' \n"
+						+ " WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n THEN g.gpid2 \n" + "         ELSE '-' \n"
 						+ "       END                         AS `%s` \n", GermplasmSearchDAO.MALE_PARENT_ID));
 		GermplasmSearchDAO.selectClauseColumnsMap.put(GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME,
-				String.format("       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n"
-						+ "              AND g.gpid2 <> 0 THEN nameOfMaleParent.nval \n" + "         ELSE '-' \n"
+				String.format("        CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 = 0 THEN '" + Name.UNKNOWN +  " ' \n"
+						+ " WHEN g.gnpgs >= 2 \n" + "              AND g.gpid2 IS NOT NULL \n THEN nameOfMaleParent.nval \n" + "         ELSE '-' \n"
 						+ "       END                         AS `%s` \n", GermplasmSearchDAO.MALE_PARENT_PREFERRED_NAME));
 		GermplasmSearchDAO.selectClauseColumnsMap
 				.put(GermplasmSearchDAO.GROUP_SOURCE_GID,

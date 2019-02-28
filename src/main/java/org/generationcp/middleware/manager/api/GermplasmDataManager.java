@@ -1206,5 +1206,7 @@ public interface GermplasmDataManager {
 	List<GermplasmDTO> searchGermplasmDTO (GermplasmSearchRequestDTO germplasmSearchRequestDTO);
 
 	long countGermplasmDTOs(GermplasmSearchRequestDTO germplasmSearchRequestDTO);
+	
+	Germplasm getUnknownGermplasmWithPreferredName();
 
 }
