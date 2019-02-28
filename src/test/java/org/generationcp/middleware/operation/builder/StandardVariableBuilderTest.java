@@ -58,7 +58,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	private VariableOverridesDao variableOverridesDao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		this.standardVariableBuilder = new StandardVariableBuilder(this.sessionProvder);
 		this.projectPropertySaver = new ProjectPropertySaver(this.sessionProvder);
 		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
@@ -69,7 +69,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreate() throws MiddlewareException {
+	public void testCreate() {
 		final StandardVariable standardVariable = standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
@@ -79,7 +79,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateObsoleteVariable() throws MiddlewareException {
+	public void testCreateObsoleteVariable() {
 		final CVTermDao cvtermDao = new CVTermDao();
 		cvtermDao.setSession(this.sessionProvder.getSession());
 
@@ -102,7 +102,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateList() throws MiddlewareException {
+	public void testCreateList() {
 
 		final List<Integer> standardVariableIds = new ArrayList<Integer>();
 		standardVariableIds.add(TermId.ENTRY_NO.getId());
@@ -126,7 +126,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateEmptyList() throws MiddlewareException {
+	public void testCreateEmptyList() {
 		final List<Integer> standardVariableIds = new ArrayList<Integer>();
 
 		final List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
@@ -135,7 +135,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateNullList() throws MiddlewareException {
+	public void testCreateNullList() {
 		final List<Integer> standardVariableIds = null;
 
 		final List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
@@ -144,7 +144,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindOrSaveFindExisting() throws MiddlewareException {
+	public void testFindOrSaveFindExisting() {
 		final String name = "TRIAL_INSTANCE";
 		final String description = "Trial instance - enumerated (number)";
 		final String property = "Trial instance";
@@ -171,7 +171,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindOrSaveSaveNewStandardVariable() throws MiddlewareException {
+	public void testFindOrSaveSaveNewStandardVariable() {
 		final String name = "Test Variable Name";
 		final String description = "Test Variable Name Description";
 		final String property = "Test Property";
@@ -194,7 +194,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByName() throws MiddlewareException {
+	public void testGetByName() {
 		final String name = "TRIAL_INSTANCE";
 		final StandardVariable standardVariable = standardVariableBuilder.getByName(name, null);
 		assertNotNull(standardVariable);
@@ -206,14 +206,14 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByNameNotFound() throws MiddlewareException {
+	public void testGetByNameNotFound() {
 		final String name = "VAR_123456";
 		final StandardVariable standardVariable = standardVariableBuilder.getByName(name, null);
 		assertNull(standardVariable);
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethod() throws MiddlewareException {
+	public void testGetByPropertyScaleMethod() {
 		final int propertyId = TRIAL_INSTANCE_PROPERTY_ID;
 		final int scaleId = TRIAL_INSTANCE_SCALE_ID;
 		final int methodId = TRIAL_INSTANCE_METHOD_ID;
@@ -225,7 +225,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethodNotFound() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodNotFound() {
 		final int propertyId = 1;
 		final int scaleId = 2;
 		final int methodId = 3;
@@ -234,7 +234,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethodRole() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodRole() {
 		final int propertyId = TRIAL_INSTANCE_PROPERTY_ID;
 		final int scaleId = TRIAL_INSTANCE_SCALE_ID;
 		final int methodId = TRIAL_INSTANCE_METHOD_ID;
@@ -248,7 +248,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethodRoleNotFound() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodRoleNotFound() {
 		final int propertyId = 1;
 		final int scaleId = 2;
 		final int methodId = 3;
