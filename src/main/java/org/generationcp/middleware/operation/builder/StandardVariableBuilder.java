@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -330,75 +331,49 @@ public class StandardVariableBuilder extends Builder {
 	 */
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headerNames, final String programUUID) {
 		// Trim all header names
-		final List<String> headerNamesTrimmed = Lists.transform(headerNames, new Function<String, String>() {
+		final List<String> headerNamesTrimmed = new ArrayList<>(Lists.transform(headerNames, new Function<String, String>() {
 
 			public String apply(String s) {
 				// Transform header names to uppercase; header names can be in lowercase or combination when defined in file
 				return s.toUpperCase().trim();
 			}
-		});
+		}));
 
-		if (headerNamesTrimmed.contains(StandardVariableBuilder.LOCATION_NAME)) {
-			headerNamesTrimmed.remove(StandardVariableBuilder.LOCATION_NAME);
-		}
+		headerNamesTrimmed.remove(StandardVariableBuilder.LOCATION_NAME);
+
 		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<>();
 
 		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.alias equals input name (eg. REP)
 		final Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects =
 			this.getStandardVariableIdsWithTypeForProjectProperties(headerNamesTrimmed, programUUID);
 
-		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
 		// Exclude header items with result from step 1
-		final List<String> headerNamesNotFoundInProjectProperty = new ArrayList<>();
-		for (final String name : headerNamesTrimmed) {
+		this.removeHeaderNamesWithMatch(headerNamesTrimmed, standardVariableIdsWithTypeInProjects);
 
-			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
-				.get(name.toUpperCase()).keySet().isEmpty()) {
-				headerNamesNotFoundInProjectProperty.add(name);
-			}
+		// Step 2: Search variables that match the standard variable's ALIAS (Ontology Level)
+		standardVariableIdsWithTypeInProjects
+			.putAll(this.getStandardVariableIdsWithTypeByAliasInVariableOverrideTable(headerNamesTrimmed, programUUID));
 
-		}
+		// Exclude header items with result from step 2
+		this.removeHeaderNamesWithMatch(headerNamesTrimmed, standardVariableIdsWithTypeInProjects);
 
-		// Step 3: Find variable aliases in ontology level, variable_overrides table
-		if (headerNamesNotFoundInProjectProperty != null && !headerNamesNotFoundInProjectProperty.isEmpty()) {
-			standardVariableIdsWithTypeInProjects
-				.putAll(this.getStandardVariableIdsWithTypeByAliasInOntologyLevel(headerNamesNotFoundInProjectProperty, programUUID));
-		}
+		// Step 3: Search variables that match the standard variable's NAME (Ontology Level)
+		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsWithTypeForTerms(headerNamesTrimmed));
 
-		// Step 4: If no variable found, search for cvterm (standard variables) with given name.
-		// Exclude header items with result from step 1
-		final List<String> headerNamesNotFoundInVariableOverrides = new ArrayList<>();
-		for (final String name : headerNamesTrimmed) {
+		// Exclude header items with result from step 3
+		this.removeHeaderNamesWithMatch(headerNamesTrimmed, standardVariableIdsWithTypeInProjects);
 
-			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
-				.get(name.toUpperCase()).keySet().isEmpty()) {
-				headerNamesNotFoundInVariableOverrides.add(name);
-			}
-
-		}
-
-		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsWithTypeForTerms(headerNamesNotFoundInVariableOverrides));
-		// Step 5. If no variable still found for steps 1 and 2, treat the
+		// Step 4. If no variable still found from steps 1 to 3, treat the
 		// header as a trait / property name.
 		// Search for trait with given name and return the standard variables
 		// using that trait (if any)
+		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsForTraits(headerNamesTrimmed));
 
-		// Exclude header items with result from step 2
-		final List<String> headerNamesNotFoundInProjectPropAndTerms = new ArrayList<>();
-		for (final String name : headerNamesTrimmed) {
+		// Exclude header items with result from step 4
+		this.removeHeaderNamesWithMatch(headerNamesTrimmed, standardVariableIdsWithTypeInProjects);
 
-			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
-				.get(name.toUpperCase()).keySet().isEmpty()) {
-				headerNamesNotFoundInProjectPropAndTerms.add(name);
-			}
-
-		}
-
-		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsForTraits(headerNamesNotFoundInProjectPropAndTerms));
-
-		for (final String name : headerNamesTrimmed) {
-			final String upperName = name.toUpperCase();
-			final Map<Integer, VariableType> varIdsWithType = standardVariableIdsWithTypeInProjects.get(upperName);
+		for (final Map.Entry<String, Map<Integer, VariableType>> entry : standardVariableIdsWithTypeInProjects.entrySet()) {
+			final Map<Integer, VariableType> varIdsWithType = entry.getValue();
 
 			List<StandardVariable> variables = new ArrayList<>();
 			if (varIdsWithType != null) {
@@ -406,9 +381,27 @@ public class StandardVariableBuilder extends Builder {
 				variables = this.create(standardVariableIds, programUUID);
 				this.setRoleOfVariables(variables, varIdsWithType);
 			}
-			standardVariablesInProjects.put(upperName, variables);
+			standardVariablesInProjects.put(entry.getKey(), variables);
 		}
+
+		// For headers with no match, just assign an empty list.
+		for (final String name : headerNamesTrimmed) {
+			standardVariablesInProjects.put(name, new ArrayList<StandardVariable>());
+		}
+
 		return standardVariablesInProjects;
+	}
+
+	private void removeHeaderNamesWithMatch(
+		final List<String> headerNames, final Map<String, Map<Integer, VariableType>> headerNametoStandardVariableIdMap) {
+		for (final Iterator<String> iterator = headerNames.iterator(); iterator.hasNext(); ) {
+			final String name = iterator.next();
+			if (headerNametoStandardVariableIdMap.containsKey(name.toUpperCase()) && !headerNametoStandardVariableIdMap
+				.get(name).keySet().isEmpty()) {
+				// remove from header name if it already has a match
+				iterator.remove();
+			}
+		}
 	}
 
 	protected void setRoleOfVariables(final List<StandardVariable> variables, final Map<Integer, VariableType> varIdsWithType) {
@@ -426,21 +419,32 @@ public class StandardVariableBuilder extends Builder {
 	 */
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(
 		final List<String> variableNames, final String programUUID) {
-		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
+		if (!variableNames.isEmpty()) {
+			return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByAlias(variableNames, programUUID);
+		}
+		return new HashMap<>();
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAliasInOntologyLevel(
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAliasInVariableOverrideTable(
 		final List<String> variableNames, final String programUUID) {
-		return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIdsAndProgram(variableNames, programUUID);
+		if (!variableNames.isEmpty()) {
+			return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIdsAndProgram(variableNames, programUUID);
+		}
+		return new HashMap<>();
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {
-		return daoFactory.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
-
+		if (!termNames.isEmpty()) {
+			return daoFactory.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
+		}
+		return new HashMap<>();
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(final List<String> traitNames) {
-		return daoFactory.getCvTermDao().getStandardVariableIdsWithTypeByProperties(traitNames);
+		if (!traitNames.isEmpty()) {
+			return daoFactory.getCvTermDao().getStandardVariableIdsWithTypeByProperties(traitNames);
+		}
+		return new HashMap<>();
 	}
 
 	public Integer getIdByTermId(final int cvTermId, final TermId termId) {
