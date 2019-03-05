@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 public interface PedigreeDataManager {
@@ -191,4 +192,19 @@ public interface PedigreeDataManager {
 	Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber);
 
 	int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID);
+
+	/**
+	 * Given the gid of the child germplasm, the gid of the parent germplasm and the progenitor number, this method makes the necessary
+	 * changes to save the relationship on the database.
+	 *
+	 * This method will either update the Germplasm record, to change the gpid1 or gpid2 fields (if the progenitor number given is 1 or 2),
+	 * or will either add or update the Progenitor record which represents this relationship. A new Progenitor record will be stored when
+	 * necessary.
+	 *
+	 * @param gid the gid
+	 * @param progenitorId the progenitor id
+	 * @param progenitorNumber the progenitor number
+	 * @return Returns the id of the updated Progenitor
+	 */
+	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber);
 }

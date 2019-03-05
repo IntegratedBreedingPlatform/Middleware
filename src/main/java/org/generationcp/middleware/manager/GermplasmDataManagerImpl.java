@@ -26,13 +26,12 @@ import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -48,8 +47,6 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
@@ -723,77 +720,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Attribute getAttributeById(final Integer id) {
 		return this.getAttributeDao().getById(id, false);
 	}
-
+	
 	@Override
-	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {
-
-		// check if the germplasm record identified by gid exists
-		final Germplasm child = this.getGermplasmByGID(gid);
-		if (child == null) {
-			throw new MiddlewareQueryException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId="
-					+ progenitorId + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with gid: " + gid,
-					new Throwable());
-		}
-
-		// check if the germplasm record identified by progenitorId exists
-		final Germplasm parent = this.getGermplasmByGID(progenitorId);
-		if (parent == null) {
-			throw new MiddlewareQueryException(
-					"Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId + ", progenitorNumber="
-							+ progenitorNumber + "): There is no germplasm record with progenitorId: " + progenitorId,
-					new Throwable());
-		}
-
-		// check progenitor number
-		if (progenitorNumber == 1 || progenitorNumber == 2) {
-			if (progenitorNumber == 1) {
-				child.setGpid1(progenitorId);
-			} else {
-				child.setGpid2(progenitorId);
-			}
-
-			final List<Germplasm> germplasms = new ArrayList<>();
-			germplasms.add(child);
-			this.addOrUpdateGermplasms(germplasms, Operation.UPDATE);
-		} else if (progenitorNumber > 2) {
-			final ProgenitorDAO dao = this.getProgenitorDao();
-
-			// check if there is an existing Progenitor record
-			final ProgenitorPK id = new ProgenitorPK(gid, progenitorNumber);
-			final Progenitor p = dao.getById(id, false);
-
-			if (p != null) {
-				// update the existing record
-				p.setPid(progenitorId);
-
-				final List<Progenitor> progenitors = new ArrayList<>();
-				progenitors.add(p);
-				final int updated = this.addOrUpdateProgenitors(progenitors);
-				if (updated == 1) {
-					return progenitorId;
-				}
-			} else {
-				// create new Progenitor record
-				final Progenitor newRecord = new Progenitor(id);
-				newRecord.setPid(progenitorId);
-
-				final List<Progenitor> progenitors = new ArrayList<>();
-				progenitors.add(newRecord);
-				final int added = this.addOrUpdateProgenitors(progenitors);
-				if (added == 1) {
-					return progenitorId;
-				}
-			}
-		} else {
-			throw new MiddlewareQueryException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId="
-					+ progenitorId + ", progenitorNumber=" + progenitorNumber + "): Invalid progenitor number: " + progenitorNumber,
-					new Throwable());
-		}
-
-		return progenitorId;
-	}
-
-	private List<Integer> addOrUpdateGermplasms(final List<Germplasm> germplasms, final Operation operation) {
+	public List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation) {
 		final List<Integer> idGermplasmsSaved = new ArrayList<>();
 		try {
 			final GermplasmDAO dao = this.getGermplasmDao();
@@ -812,28 +741,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		return idGermplasmsSaved;
-	}
-
-	private int addOrUpdateProgenitors(final List<Progenitor> progenitors) {
-
-		int progenitorsSaved = 0;
-		try {
-
-			final ProgenitorDAO dao = this.getProgenitorDao();
-
-			for (final Progenitor progenitor : progenitors) {
-				dao.saveOrUpdate(progenitor);
-				progenitorsSaved++;
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-					"Error encountered while saving Progenitor: GermplasmDataManager.addOrUpdateProgenitors(progenitors=" + progenitors
-							+ "): " + e.getMessage(),
-					e);
-		}
-		return progenitorsSaved;
 	}
 
 	@Override
@@ -857,7 +764,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				this.daoFactory.getTransactionDAO().cancelUnconfirmedTransactionsForGermplasms(gids);
 			}
 		}
-		return this.addOrUpdateGermplasms(germplasms, Operation.UPDATE);
+		return this.addOrUpdateGermplasm(germplasms, Operation.UPDATE);
 	}
 
 	@Override
