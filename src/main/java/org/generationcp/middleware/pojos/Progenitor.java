@@ -15,8 +15,12 @@ import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -30,75 +34,79 @@ public class Progenitor implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	protected ProgenitorPK progntrsPK;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "id")
+	private Integer id;
+	
+	@ManyToOne(targetEntity = Germplasm.class)
+	@JoinColumn(name = "gid", nullable = true)
+	private Germplasm germplasm;
+	
+	@Basic(optional = false)
+	@Column(name = "pno")
+	private Integer progenitorNumber;
 
 	@Basic(optional = false)
 	@Column(name = "pid")
-	private Integer pid;
-
-	public Progenitor() {
+	private Integer progenitorGid;
+	
+	
+	public Progenitor(Integer id) {
+		super();
+		this.id = id;
 	}
 
-	public Progenitor(ProgenitorPK progntrsPK) {
-		this.progntrsPK = progntrsPK;
+
+	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid) {
+		super();
+		this.germplasm = germplasm;
+		this.progenitorNumber = progenitorNumber;
+		this.progenitorGid = progenitorGid;
 	}
 
-	public Progenitor(ProgenitorPK progntrsPK, Integer pid) {
-		this.progntrsPK = progntrsPK;
-		this.pid = pid;
+	public Integer getId() {
+		return id;
 	}
 
-	public Progenitor(Germplasm germplasm, Integer pno) {
-		this.progntrsPK = new ProgenitorPK(germplasm.getGid(), pno);
+	
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
-	public ProgenitorPK getProgntrsPK() {
-		return this.progntrsPK;
+	
+	
+	public Germplasm getGermplasm() {
+		return germplasm;
 	}
 
-	public void setProgntrsPK(ProgenitorPK progntrsPK) {
-		this.progntrsPK = progntrsPK;
+
+	
+	public void setGermplasm(Germplasm germplasm) {
+		this.germplasm = germplasm;
 	}
 
-	public Integer getPid() {
-		return this.pid;
+
+	public Integer getProgenitorNumber() {
+		return progenitorNumber;
 	}
 
-	public void setPid(Integer pid) {
-		this.pid = pid;
+	
+	public void setProgenitorNumber(Integer progenitorNumber) {
+		this.progenitorNumber = progenitorNumber;
 	}
 
-	@Override
-	public int hashCode() {
-		return this.getProgntrsPK().hashCode();
+	public Integer getProgenitorGid() {
+		return this.progenitorGid;
+	}
+	
+	public void setProgenitorGid(Integer progenitorGid) {
+		this.progenitorGid = progenitorGid;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
 
-		if (obj instanceof Progenitor) {
-			Progenitor param = (Progenitor) obj;
-			if (this.getProgntrsPK().equals(param.getProgntrsPK())) {
-				return true;
-			}
-		}
 
-		return false;
-	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Progenitor [progntrsPK=");
-		builder.append(this.progntrsPK);
-		builder.append(", pid=");
-		builder.append(this.pid);
-		builder.append("]");
-		return builder.toString();
-	}
 
 }

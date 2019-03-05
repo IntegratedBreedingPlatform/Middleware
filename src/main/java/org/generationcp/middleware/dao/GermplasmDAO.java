@@ -602,12 +602,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			// Find additional children via progenitor linkage
 			final DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
-			otherChildrenCriteria.add(Restrictions.eq("pid", gid));
+			otherChildrenCriteria.add(Restrictions.eq("progenitorGid", gid));
 
 			final List<Progenitor> otherChildren = otherChildrenCriteria.getExecutableCriteria(this.getSession()).list();
 			final Set<Integer> otherChildrenGids = new HashSet<>();
 			for (final Progenitor progenitor : otherChildren) {
-				otherChildrenGids.add(progenitor.getProgntrsPK().getGid());
+				otherChildrenGids.add(progenitor.getGermplasm().getGid());
 			}
 
 			if (!otherChildrenGids.isEmpty()) {

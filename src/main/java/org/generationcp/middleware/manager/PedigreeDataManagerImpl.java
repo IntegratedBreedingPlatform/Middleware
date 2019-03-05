@@ -453,7 +453,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
                 germplasmList[0] = 2;
             } else {
                 germplasmList[0] = 
-                		getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgntrsPK().getPno().intValue();
+                		getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgenitorNumber();
             }
             germplasmList[1] = g;
 
