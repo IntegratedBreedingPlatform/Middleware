@@ -585,7 +585,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 			final ProgenitorDAO dao = this.getProgenitorDao();
 
 			// check if there is an existing Progenitor record
-			final Progenitor p = dao.getByGIDAndPID(gid, progenitorId);
+			final Progenitor p = dao.getByGIDAndProgenitorNumber(gid, progenitorNumber);
 
 			if (p != null) {
 				// update the existing record
