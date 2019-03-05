@@ -544,6 +544,11 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
         return NONE;
     }
+    
+    @Override
+	public void addProgenitors(final List<Progenitor> progenitors) {
+		this.addOrUpdateProgenitors(progenitors);
+	}
 
 	@Override
 	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {

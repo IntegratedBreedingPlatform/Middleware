@@ -192,6 +192,8 @@ public interface PedigreeDataManager {
 	Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber);
 
 	int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID);
+	
+	void addProgenitors(List<Progenitor> progenitors);
 
 	/**
 	 * Given the gid of the child germplasm, the gid of the parent germplasm and the progenitor number, this method makes the necessary
