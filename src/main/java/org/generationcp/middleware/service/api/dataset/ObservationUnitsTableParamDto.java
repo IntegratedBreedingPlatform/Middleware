@@ -6,7 +6,9 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class ObservationUnitsTableParamDto {
@@ -21,7 +23,7 @@ public class ObservationUnitsTableParamDto {
 	private Integer instanceId;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
-	private Filter filter;
+	private final Filter filter;
 
 
 	public class Filter {
@@ -31,8 +33,7 @@ public class ObservationUnitsTableParamDto {
 		private Boolean byOverwritten;
 		private Boolean byOutOfSync;
 		private Boolean byMissing;
-		private String observationId;
-		private List<String> filteredValues;
+		private Map<String, List<String>> filteredValues;
 
 		public Filter() {
 			this.byMissing = false;
@@ -40,6 +41,7 @@ public class ObservationUnitsTableParamDto {
 			this.byOutOfSync =  false;
 			this.byOverwritten = false;
 			this.byValue = false;
+			this.filteredValues = new HashMap<>();
 		}
 
 		public void setByOutOfBound(final Boolean byOutOfBound) {
@@ -62,14 +64,6 @@ public class ObservationUnitsTableParamDto {
 			this.byMissing = byMissing;
 		}
 
-		public void setObservationId(final String observationId) {
-			this.observationId = observationId;
-		}
-
-		public void setFilteredValues(final List<String> filteredValues) {
-			this.filteredValues = filteredValues;
-		}
-
 		public Boolean getByOutOfBound() {
 			return this.byOutOfBound;
 		}
@@ -90,12 +84,12 @@ public class ObservationUnitsTableParamDto {
 			return this.byMissing;
 		}
 
-		public String getObservationId() {
-			return this.observationId;
+		public Map<String, List<String>> getFilteredValues() {
+			return this.filteredValues;
 		}
 
-		public List<String> getFilteredValues() {
-			return this.filteredValues;
+		public void setFilteredValues(final Map<String, List<String>> filteredValues) {
+			this.filteredValues = filteredValues;
 		}
 	}
 
@@ -114,74 +108,74 @@ public class ObservationUnitsTableParamDto {
 	}
 
 	public List<String> getEnvironmentDetails() {
-		return environmentDetails;
+		return this.environmentDetails;
 	}
 	
-	public void setEnvironmentDetails(List<String> environmentFactors) {
+	public void setEnvironmentDetails(final List<String> environmentFactors) {
 		this.environmentDetails = environmentFactors;
 	}
 	
 	public List<String> getEnvironmentConditions() {
-		return environmentConditions;
+		return this.environmentConditions;
 	}
 	
-	public void setEnvironmentConditions(List<String> environmentConditions) {
+	public void setEnvironmentConditions(final List<String> environmentConditions) {
 		this.environmentConditions = environmentConditions;
 	}
 	
 	public List<String> getGenericGermplasmDescriptors() {
-		return genericGermplasmDescriptors;
+		return this.genericGermplasmDescriptors;
 	}
 	
-	public void setGenericGermplasmDescriptors(List<String> genericGermplasmDescriptors) {
+	public void setGenericGermplasmDescriptors(final List<String> genericGermplasmDescriptors) {
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 	}
 	
 	public List<String> getAdditionalDesignFactors() {
-		return additionalDesignFactors;
+		return this.additionalDesignFactors;
 	}
 	
-	public void setAdditionalDesignFactors(List<String> additionalDesignFactors) {
+	public void setAdditionalDesignFactors(final List<String> additionalDesignFactors) {
 		this.additionalDesignFactors = additionalDesignFactors;
 	}
 	
 	public List<MeasurementVariableDto> getSelectionMethodsAndTraits() {
-		return selectionMethodsAndTraits;
+		return this.selectionMethodsAndTraits;
 	}
 	
-	public void setSelectionMethodsAndTraits(List<MeasurementVariableDto> selectionMethodsAndTraits) {
+	public void setSelectionMethodsAndTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 	}
 
 	public int getDatasetId() {
-		return datasetId;
+		return this.datasetId;
 	}
 	
-	public void setDatasetId(int datasetId) {
+	public void setDatasetId(final int datasetId) {
 		this.datasetId = datasetId;
 	}
 	
 	public Integer getInstanceId() {
-		return instanceId;
+		return this.instanceId;
 	}
 	
-	public void setInstanceId(Integer instanceId) {
+	public void setInstanceId(final Integer instanceId) {
 		this.instanceId = instanceId;
 	}
 	
 	public Integer getEnvironmentDatasetId() {
-		return environmentDatasetId;
+		return this.environmentDatasetId;
 	}
 	
-	public void setEnvironmentDatasetId(Integer environmentDatasetId) {
+	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
 		this.environmentDatasetId = environmentDatasetId;
 	}
 
 	public SortedPageRequest getSortedRequest() {
-		return sortedRequest;
+		return this.sortedRequest;
 	}
 	
-	public void setSortedRequest(SortedPageRequest sortedRequest) {
+	public void setSortedRequest(final SortedPageRequest sortedRequest) {
 		this.sortedRequest = sortedRequest;
 	}
 

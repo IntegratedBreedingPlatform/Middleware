@@ -724,7 +724,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
 		}
 
+		String filterByDraftOrValue = "value";
+
 		if (searchDto.getDraftMode()) {
+			filterByDraftOrValue = "draft_value";
 			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
 		}
 
@@ -732,135 +735,90 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			/* filter by status (this set of filters won't happen at the same time) out-of-bound data
 			use value/draftValue based on draftMode (pending view)
 			there's categorical or numeric out-of-bound values*/
-			if (searchDto.getDraftMode()) {
-					sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id "
-					+ "      from cvterm_relationship cvtrscale "
-					+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id "
-					+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = "
-					+ TermId.HAS_TYPE.getId()
-					+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id "
-					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = "
-					+ TermId.MAX_VALUE.getId()
-					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = "
-					+ TermId.MIN_VALUE.getId()
-					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id "
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-					+ "      where ph2.draft_value is not null "
-					+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId()
-					+ "        and case "
-					+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId()
-				/* get the categoricals whose value != category value (out-of-bound)
+			sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
+					+ "      from cvterm_relationship cvtrscale " //
+					+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id " //
+					+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = " //
+					+ TermId.HAS_TYPE.getId() //
+					+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
+					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = " //
+					+ TermId.MAX_VALUE.getId() //
+					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = " //
+					+ TermId.MIN_VALUE.getId() //
+					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
+					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+					+ "      where ph2." + filterByDraftOrValue + " is not null " //
+					+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
+					+ "        and case " //
+					+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId() //
+					/* get the categoricals whose value != category value (out-of-bound)
 					in other words, the set where ph.value = category value NOT exists*/
-					+ "          then not exists( "
-					+ "          select 1 "
-					+ "            from cvterm_relationship cvtrcategory "
-					+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id "
-					+ "            where scale.cvterm_id = cvtrcategory.subject_id "
-					+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId()
-					+ "              and ph2.draft_value = category.name "
-					+ "          ) "
-					+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId()
+					+ "          then not exists( " //
+					+ "          select 1 " //
+					+ "            from cvterm_relationship cvtrcategory " //
+					+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id " //
+					+ "            where scale.cvterm_id = cvtrcategory.subject_id " //
+					+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
+					+ "              and ph2." + filterByDraftOrValue + " = category.name " //
+					+ "          ) " //
+					+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
 					// get the numericals whose value is not within bounds
-					+ "          then ph2.draft_value < scaleMinRange.value or ph2.draft_value > scaleMaxRange.value "
-					+ "        else false "
-					+ "        end "
+					+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue + " > scaleMaxRange.value " //
+					+ "        else false " //
+					+ "        end " //
 					+ "    )"); //
-			}
-			else {
-				sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id "
-					+ "      from cvterm_relationship cvtrscale "
-					+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id "
-					+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = "
-					+ TermId.HAS_TYPE.getId()
-					+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id "
-					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = "
-					+ TermId.MAX_VALUE.getId()
-					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = "
-					+ TermId.MIN_VALUE.getId()
-					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id "
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-					+ "      where ph2.a huevalue is not null "
-					+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId()
-					+ "        and case "
-					+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId()
-				/* get the categoricals whose value != category value (out-of-bound)
-					in other words, the set where ph.value = category value NOT exists*/
-					+ "          then not exists( "
-					+ "          select 1 "
-					+ "            from cvterm_relationship cvtrcategory "
-					+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id "
-					+ "            where scale.cvterm_id = cvtrcategory.subject_id "
-					+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId()
-					+ "              and ph2.value = category.name "
-					+ "          ) "
-					+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId()
-					// get the numericals whose value is not within bounds
-					+ "          then ph2.value < scaleMinRange.value or ph2.value > scaleMaxRange.value "
-					+ "        else false "
-					+ "        end "
-					+ "    )"); //
-			}
 		}
 
 		if (searchDto.getFilter().getByValue()) {
 			// filter by column value
-			if (searchDto.getDraftMode()) {
+			final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
 
+			for (final String observationId : filteredValues.keySet()) {
 				sql.append(
-					" and nde.nd_experiment_id in ( "
-						+ "    select ph2.nd_experiment_id "
-						+ "    from phenotype ph2 "
-						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-						+ "    where ph2.observable_id = :observationId "
-						+ "    and nde2.project_id = p.project_id "
-						+ "    and ph2.draft_value in (:values))");
-			} else {
-				sql.append(
-					" and nde.nd_experiment_id in ( "
-						+ "    select ph2.nd_experiment_id "
-						+ "    from phenotype ph2 "
-						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-						+ "    where ph2.observable_id = :observationId "
-						+ "    and nde2.project_id = p.project_id "
-						+ "    and ph2.value in (:values))");
+					" and nde.nd_experiment_id in ( " //
+						+ "    select ph2.nd_experiment_id " //
+						+ "    from phenotype ph2 " //
+						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+						+ "    where ph2.observable_id = :" + observationId + "_Id" //
+						+ "    and nde2.project_id = p.project_id " //
+						+ "    and ph2." + filterByDraftOrValue + " in (:" + observationId + "_values ))"); //
 			}
 		}
 
 		if (searchDto.getFilter().getByOverwritten()) {
 			//overwritten
 			sql.append(
-					" and nde.nd_experiment_id in ( "
-						+ "    select ph2.nd_experiment_id "
-						+ "    from phenotype ph2 "
-						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-						+ "    where nde2.project_id = p.project_id "
-						+ "    and ph2.value is not null and ph2.draft_value is not null )");
+					" and nde.nd_experiment_id in ( " //
+						+ "    select ph2.nd_experiment_id " //
+						+ "    from phenotype ph2 " //
+						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+						+ "    where nde2.project_id = p.project_id " //
+						+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
 		}
 
 		if (searchDto.getFilter().getByOutOfSync()) {
 			//out-of-sync
-
 			sql.append(
-				" and nde.nd_experiment_id in ( "
-					+ "    select ph2.nd_experiment_id "
-					+ "    from phenotype ph2 "
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-					+ "    where nde2.project_id = p.project_id "
-					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )" );
+				" and nde.nd_experiment_id in ( " //
+					+ "    select ph2.nd_experiment_id " //
+					+ "    from phenotype ph2 " //
+					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+					+ "    where nde2.project_id = p.project_id " //
+					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )" ); //
 		}
 
 		if (searchDto.getFilter().getByMissing()) {
 			//missing
 			sql.append(
-				" and nde.nd_experiment_id in ( "
-					+ "    select ph2.nd_experiment_id "
-					+ "    from phenotype ph2 "
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-					+ "    where nde2.project_id = p.project_id "
-					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )" );
+				" and nde.nd_experiment_id in ( " //
+					+ "    select ph2.nd_experiment_id " //
+					+ "    from phenotype ph2 " //
+					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+					+ "    where nde2.project_id = p.project_id " //
+					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )" ); //
 		}
 
-		sql.append(" GROUP BY observationUnitId ");
+		sql.append(" GROUP BY observationUnitId "); //
 
 		String orderColumn;
 		final String sortBy = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortBy() : "";
@@ -1142,8 +1100,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			if (searchDto.getFilter().getByValue()) {
-				query.setParameter("observationId", searchDto.getFilter().getObservationId());
-				query.setParameterList("values", searchDto.getFilter().getFilteredValues());
+				final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
+
+				for (final String observationId : filteredValues.keySet()) {
+					query.setParameter(observationId + "_Id", observationId);
+					query.setParameterList(observationId + "_values", searchDto.getFilter().getFilteredValues().get(observationId));
+				}
 			}
 
 			final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
@@ -1360,7 +1322,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public Map<String, Long> countObservationsPerInstance(final Integer datasetId) {
 
 		try {
-			ProjectionList projectionList = Projections.projectionList();
+			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.groupProperty("g.description"))
 				.add(Projections.rowCount());
 
@@ -1371,7 +1333,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final List<Object[]> rows = criteria.list();
 
 			final Map<String, Long> results = new LinkedHashMap<>();
-			for (Object[] row : rows) {
+			for (final Object[] row : rows) {
 				results.put((String) row[0], (Long) row[1]);
 			}
 			return results;
