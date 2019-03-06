@@ -27,7 +27,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -484,7 +484,8 @@ public class DatasetServiceImplTest {
 
 		final List<ObservationUnitRow> testMeasurements = Collections.<ObservationUnitRow>singletonList(observationUnitRow);
 		Mockito.when(this.experimentDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
-		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
+		final ObservationUnitsTableParamDto
+			searchDto = new ObservationUnitsTableParamDto(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
 		searchDto.setSortedRequest(new SortedPageRequest(1, 100, null, null));
 		Mockito.when(this.experimentDao.getObservationUnitTable(searchDto)).thenReturn(testMeasurements);
 
@@ -578,7 +579,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
 			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
+		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsTableParamDto.class));
 
 	}
 

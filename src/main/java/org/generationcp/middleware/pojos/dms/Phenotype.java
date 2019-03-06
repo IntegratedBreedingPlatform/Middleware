@@ -42,6 +42,7 @@ import java.util.Objects;
 public class Phenotype implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	public static final String MISSING_VALUE = "missing";
 
 	public enum ValueStatus {
 

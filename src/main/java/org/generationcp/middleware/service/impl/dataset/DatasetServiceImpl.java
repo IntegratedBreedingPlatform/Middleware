@@ -39,7 +39,7 @@ import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -493,7 +493,7 @@ public class DatasetServiceImpl implements DatasetService {
 			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
 		}
 
-		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(datasetId, instanceId,
+		final ObservationUnitsTableParamDto searchDto = new ObservationUnitsTableParamDto(datasetId, instanceId,
 				this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), selectionMethodsAndTraits);
 		// TODO replace with Pageable
 		searchDto.setSortedRequest(new SortedPageRequest(pageNumber, pageSize, sortBy, sortOrder));
@@ -515,8 +515,8 @@ public class DatasetServiceImpl implements DatasetService {
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final ObservationUnitsSearchDTO searchDto =
-			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
+		final ObservationUnitsTableParamDto searchDto =
+			new ObservationUnitsTableParamDto(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
 		searchDto.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDto.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDto.setEnvironmentDatasetId(environmentDataset.getProjectId());
@@ -829,7 +829,8 @@ public class DatasetServiceImpl implements DatasetService {
 				Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		for (final Integer instanceId : instanceIds) {
-			final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(datasetId, instanceId, germplasmDescriptors, designFactors, selectionMethodsAndTraits);
+			final ObservationUnitsTableParamDto
+				searchDto = new ObservationUnitsTableParamDto(datasetId, instanceId, germplasmDescriptors, designFactors, selectionMethodsAndTraits);
 			searchDto.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 			searchDto.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 			searchDto.setEnvironmentDatasetId(environmentDataset.getProjectId());

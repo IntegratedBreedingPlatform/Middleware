@@ -1,15 +1,15 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AutoProperty
-public class ObservationUnitsSearchDTO {
+public class ObservationUnitsTableParamDto {
 	
 	private List<String> environmentDetails;
 	private List<String> environmentConditions;
@@ -21,10 +21,88 @@ public class ObservationUnitsSearchDTO {
 	private Integer instanceId;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
-	
-	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
+	private Filter filter;
+
+
+	public class Filter {
+
+		private Boolean byOutOfBound;
+		private Boolean byValue;
+		private Boolean byOverwritten;
+		private Boolean byOutOfSync;
+		private Boolean byMissing;
+		private String observationId;
+		private List<String> filteredValues;
+
+		public Filter() {
+			this.byMissing = false;
+			this.byOutOfBound = false;
+			this.byOutOfSync =  false;
+			this.byOverwritten = false;
+			this.byValue = false;
+		}
+
+		public void setByOutOfBound(final Boolean byOutOfBound) {
+			this.byOutOfBound = byOutOfBound;
+		}
+
+		public void setByValue(final Boolean byValue) {
+			this.byValue = byValue;
+		}
+
+		public void setByOverwritten(final Boolean byOverwritten) {
+			this.byOverwritten = byOverwritten;
+		}
+
+		public void setByOutOfSync(final Boolean byOutOfSync) {
+			this.byOutOfSync = byOutOfSync;
+		}
+
+		public void setByMissing(final Boolean byMissing) {
+			this.byMissing = byMissing;
+		}
+
+		public void setObservationId(final String observationId) {
+			this.observationId = observationId;
+		}
+
+		public void setFilteredValues(final List<String> filteredValues) {
+			this.filteredValues = filteredValues;
+		}
+
+		public Boolean getByOutOfBound() {
+			return this.byOutOfBound;
+		}
+
+		public Boolean getByValue() {
+			return this.byValue;
+		}
+
+		public Boolean getByOverwritten() {
+			return this.byOverwritten;
+		}
+
+		public Boolean getByOutOfSync() {
+			return this.byOutOfSync;
+		}
+
+		public Boolean getByMissing() {
+			return this.byMissing;
+		}
+
+		public String getObservationId() {
+			return this.observationId;
+		}
+
+		public List<String> getFilteredValues() {
+			return this.filteredValues;
+		}
+	}
+
+	public ObservationUnitsTableParamDto(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		super();
+		this.filter = new Filter();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
@@ -32,6 +110,7 @@ public class ObservationUnitsSearchDTO {
 		this.instanceId = instanceId;
 		this.environmentDetails = new ArrayList<>();
 		this.environmentConditions = new ArrayList<>();
+		this.draftMode = false;
 	}
 
 	public List<String> getEnvironmentDetails() {
@@ -112,6 +191,10 @@ public class ObservationUnitsSearchDTO {
 
 	public void setDraftMode(final Boolean draftMode) {
 		this.draftMode = draftMode;
+	}
+
+	public Filter getFilter() {
+		return this.filter;
 	}
 
 	@Override
