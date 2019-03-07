@@ -23,8 +23,9 @@ public class ObservationUnitsTableParamDto {
 	private Integer instanceId;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
-	private final Filter filter;
+	private String draw;
 
+	private Filter filter;
 
 	public class Filter {
 
@@ -93,18 +94,22 @@ public class ObservationUnitsTableParamDto {
 		}
 	}
 
+	@SuppressWarnings("unused")
+	public ObservationUnitsTableParamDto() {
+		this.filter = new Filter();
+		this.environmentDetails = new ArrayList<>();
+		this.environmentConditions = new ArrayList<>();
+		this.draftMode = false;
+	}
+
 	public ObservationUnitsTableParamDto(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
-		super();
-		this.filter = new Filter();
+		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 		this.datasetId = datasetId;
 		this.instanceId = instanceId;
-		this.environmentDetails = new ArrayList<>();
-		this.environmentConditions = new ArrayList<>();
-		this.draftMode = false;
 	}
 
 	public List<String> getEnvironmentDetails() {
@@ -187,8 +192,20 @@ public class ObservationUnitsTableParamDto {
 		this.draftMode = draftMode;
 	}
 
+	public String getDraw() {
+		return draw;
+	}
+
+	public void setDraw(final String draw) {
+		this.draw = draw;
+	}
+
 	public Filter getFilter() {
 		return this.filter;
+	}
+
+	public void setFilter(final Filter filter) {
+		this.filter = filter;
 	}
 
 	@Override

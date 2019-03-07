@@ -50,9 +50,7 @@ public interface DatasetService {
 
 	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
-	List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
-		final String sortBy, final String sortOrder, final Boolean draftMode);
+	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsTableParamDto params);
 
 	List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId);
 

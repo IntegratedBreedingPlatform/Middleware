@@ -732,19 +732,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getFilter().getByOutOfBound())) {
-			/* filter by status (this set of filters won't happen at the same time) out-of-bound data
-			use value/draftValue based on draftMode (pending view)
-			there's categorical or numeric out-of-bound values*/
 			sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
 					+ "      from cvterm_relationship cvtrscale " //
 					+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id " //
-					+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = " //
-					+ TermId.HAS_TYPE.getId() //
+					+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = " + TermId.HAS_TYPE.getId()
 					+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
-					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = " //
-					+ TermId.MAX_VALUE.getId() //
-					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = " //
-					+ TermId.MIN_VALUE.getId() //
+					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId()
+					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = " + TermId.MIN_VALUE.getId()
 					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
 					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "      where ph2." + filterByDraftOrValue + " is not null " //
@@ -770,7 +764,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getFilter().getByValue())) {
-			// filter by column value
 			final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
 
 			for (final String observationId : filteredValues.keySet()) {
@@ -786,7 +779,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getFilter().getByOverwritten())) {
-			//overwritten
 			sql.append(
 					" and nde.nd_experiment_id in ( " //
 						+ "    select ph2.nd_experiment_id " //
@@ -797,7 +789,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getFilter().getByOutOfSync())) {
-			//out-of-sync
 			sql.append(
 				" and nde.nd_experiment_id in ( " //
 					+ "    select ph2.nd_experiment_id " //
@@ -808,7 +799,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getFilter().getByMissing())) {
-			//missing
+			// filter by missing
 			sql.append(
 				" and nde.nd_experiment_id in ( " //
 					+ "    select ph2.nd_experiment_id " //
@@ -1084,32 +1075,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsTableParamDto searchDto, final String observationVariableName) {
+	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsTableParamDto params, final String observationVariableName) {
 		try {
 
-			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName);
-			final SQLQuery query = this.createQueryAndAddScalar(searchDto, observationUnitTableQuery);
-			query.setParameter("datasetId", searchDto.getDatasetId());
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(params, observationVariableName);
+			final SQLQuery query = this.createQueryAndAddScalar(params, observationUnitTableQuery);
+			query.setParameter("datasetId", params.getDatasetId());
 
-			if (searchDto.getInstanceId() != null) {
-				query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
+			if (params.getInstanceId() != null) {
+				query.setParameter("instanceId", String.valueOf(params.getInstanceId()));
 			}
 
-			if(!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())){
-				query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
+			if(!CollectionUtils.isEmpty(params.getEnvironmentConditions())){
+				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
 			}
 
-			if (searchDto.getFilter().getByValue()) {
-				final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
+			if (params.getFilter().getByValue()) {
+				final Map<String, List<String>> filteredValues = params.getFilter().getFilteredValues();
 
 				for (final String observationId : filteredValues.keySet()) {
 					query.setParameter(observationId + "_Id", observationId);
-					query.setParameterList(observationId + "_values", searchDto.getFilter().getFilteredValues().get(observationId));
+					query.setParameterList(observationId + "_values", params.getFilter().getFilteredValues().get(observationId));
 				}
 			}
 
-			final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
-			final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
+			final Integer pageNumber = params.getSortedRequest() != null ? params.getSortedRequest().getPageNumber() : null;
+			final Integer pageSize = params.getSortedRequest() != null ? params.getSortedRequest().getPageSize() : null;
 			if (pageNumber != null && pageSize != null) {
 				query.setFirstResult(pageSize * (pageNumber - 1));
 				query.setMaxResults(pageSize);
