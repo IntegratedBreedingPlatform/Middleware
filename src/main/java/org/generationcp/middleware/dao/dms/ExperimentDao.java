@@ -726,12 +726,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		String filterByDraftOrValue = "value";
 
-		if (searchDto.getDraftMode()) {
+		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
 			filterByDraftOrValue = "draft_value";
 			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
 		}
 
-		if (searchDto.getFilter().getByOutOfBound()) {
+		if (Boolean.TRUE.equals(searchDto.getFilter().getByOutOfBound())) {
 			/* filter by status (this set of filters won't happen at the same time) out-of-bound data
 			use value/draftValue based on draftMode (pending view)
 			there's categorical or numeric out-of-bound values*/
@@ -769,7 +769,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    )"); //
 		}
 
-		if (searchDto.getFilter().getByValue()) {
+		if (Boolean.TRUE.equals(searchDto.getFilter().getByValue())) {
 			// filter by column value
 			final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
 
@@ -785,7 +785,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		if (searchDto.getFilter().getByOverwritten()) {
+		if (Boolean.TRUE.equals(searchDto.getFilter().getByOverwritten())) {
 			//overwritten
 			sql.append(
 					" and nde.nd_experiment_id in ( " //
@@ -796,7 +796,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
 		}
 
-		if (searchDto.getFilter().getByOutOfSync()) {
+		if (Boolean.TRUE.equals(searchDto.getFilter().getByOutOfSync())) {
 			//out-of-sync
 			sql.append(
 				" and nde.nd_experiment_id in ( " //
@@ -807,7 +807,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )" ); //
 		}
 
-		if (searchDto.getFilter().getByMissing()) {
+		if (Boolean.TRUE.equals(searchDto.getFilter().getByMissing())) {
 			//missing
 			sql.append(
 				" and nde.nd_experiment_id in ( " //
