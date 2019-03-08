@@ -6,14 +6,18 @@ public class GermplasmParent implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Integer gid;
-	private String name;
-	private String pedigree;
+	protected Integer gid;
+	protected String designation;
+	protected String pedigree;
 	
-	public GermplasmParent(Integer gid, String name, String pedigree) {
+	public GermplasmParent() {
+		// Declare empty consructor for child class
+	}
+	
+	public GermplasmParent(Integer gid, final String designation, String pedigree) {
 		super();
 		this.gid = gid;
-		this.name = name;
+		this.designation = designation;
 		this.pedigree = pedigree;
 	}
 
@@ -25,12 +29,12 @@ public class GermplasmParent implements Serializable {
 		this.gid = gid;
 	}
 	
-	public String getName() {
-		return name;
+	public String getDesignation() {
+		return designation;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void setDesignations(String name) {
+		this.designation = name;
 	}
 	
 	public String getPedigree() {
