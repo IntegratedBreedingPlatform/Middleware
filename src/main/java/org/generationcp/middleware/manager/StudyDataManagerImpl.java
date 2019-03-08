@@ -560,6 +560,29 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public boolean renameStudy(final String newStudyName, final int studyId, final String programUUID) {
+
+		// check for existing study name
+		final boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(newStudyName, programUUID);
+		if (isExisting) {
+			throw new MiddlewareQueryException("Study name is not unique");
+		}
+
+		try {
+
+			final DmsProject currentStudy = this.getDmsProjectDao().getById(studyId);
+			currentStudy.setName(newStudyName);
+			this.getDmsProjectDao().saveOrUpdate(currentStudy);
+
+			return true;
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException(
+					"Error encountered with renameStudy(studyId=" + studyId + ", label=" + newStudyName + ": " + e.getMessage(), e);
+		}
+	}
+
+	@Override
 	public int addSubFolder(final int parentFolderId, final String name, final String description, final String programUUID,
 			final String objective) {
 		final DmsProject parentProject = this.getDmsProjectDao().getById(parentFolderId);
