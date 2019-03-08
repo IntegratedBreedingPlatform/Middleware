@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.germplasm.CrossListData;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -426,7 +427,7 @@ public interface GermplasmListManager {
 	 * @param listID
 	 * @return
 	 */
-	List<GermplasmListData> retrieveListDataWithParents(Integer listID);
+	List<CrossListData> retrieveCrossListData(Integer listID);
 
 	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID);
 

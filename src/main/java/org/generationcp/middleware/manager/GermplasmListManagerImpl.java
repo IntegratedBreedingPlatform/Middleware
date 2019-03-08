@@ -42,6 +42,8 @@ import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.germplasm.CrossListData;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -597,8 +600,23 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmListData> retrieveListDataWithParents(final Integer listID) {
-		return daoFactory.getGermplasmListDataDAO().getListDataWithParents(listID);
+	public List<CrossListData> retrieveCrossListData(final Integer listID) {
+		// Retrieve each cross with gpid1 and gpid2 parents info
+		final List<CrossListData> dataList = daoFactory.getGermplasmListDataDAO().retrieveCrossListDataWithImmediateParents(listID);
+		Iterable<Integer> gidList = Iterables.transform(dataList, new Function<CrossListData, Integer>() {
+		    public Integer apply(CrossListData data) { 
+		    	return data.getGid();
+	    	};
+		});
+		// Append to maleParents of CrossListData other progenitors of GIDs from the list, if any
+		final Map<Integer, List<GermplasmParent>> progenitorsMap = daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
+		for (final CrossListData data : dataList) {
+			final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGid());
+			for (final GermplasmParent parent : progenitors) {
+				data.addProgenitor(parent);
+			}
+		}
+		return dataList;
 	}
 
 	@Override

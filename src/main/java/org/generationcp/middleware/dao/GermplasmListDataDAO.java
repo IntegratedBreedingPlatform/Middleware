@@ -13,11 +13,16 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.germplasm.CrossListData;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -163,16 +168,12 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	/**
-	 * This will return all germplasm list data including the details of their
-	 * parent germplasm. Note that we're getting the name of the parents from
-	 * its preferred name which is indicated by name record with nstat = 1
+	 * This will return all items of a cross list along with data of parents. 
+	 * Note that we're getting the name of the parents from its preferred name which is indicated by name record with nstat = 1
 	 */
-	public List<GermplasmListData> getListDataWithParents(final Integer listID) {
-		final List<GermplasmListData> germplasmListData = new ArrayList<>();
-
-		if (listID == null) {
-			return germplasmListData;
-		}
+	public List<CrossListData> retrieveCrossListDataWithImmediateParents(final Integer listID) {
+		Preconditions.checkNotNull(listID, "List id passed cannot be null.");
+		final List<CrossListData> germplasmListData = new ArrayList<>();
 
 		try {
 
@@ -204,25 +205,23 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			query.addScalar("malePedigree");
 			query.addScalar("femalePedigree");
 
-			this.createGermplasmListDataRows(germplasmListData, query);
+			this.createCrossListDataRows(germplasmListData, query);
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getListDataWithParents=" + listID + " in GermplasmListDataDAO: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in retrieveCrossListData=" + listID + " in GermplasmListDataDAO: " + e.getMessage(), e);
 		}
 
 		return germplasmListData;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createGermplasmListDataRows(final List<GermplasmListData> germplasmListDataList,
-			final SQLQuery query) {
+	private void createCrossListDataRows(final List<CrossListData> dataList, final SQLQuery query) {
 		final List<Object[]> result = query.list();
 
 		for (final Object[] row : result) {
 			final Integer id = (Integer) row[0];
 			final Integer entryId = (Integer) row[1];
 			final String designation = (String) row[2];
-			final String parentage = (String) row[3];
 			final String femaleParent = (String) row[4];
 			final Integer fgid = (Integer) row[5];
 			final String maleParent = (String) row[6];
@@ -232,23 +231,20 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			final String methodName = (String) row[10];
 		  	final String malePedigree = (String) row[11];
 		  	final String femalePedigree = (String) row[12];
-
-			final GermplasmListData germplasmListData = new GermplasmListData();
-			germplasmListData.setId(id);
-			germplasmListData.setEntryId(entryId);
-			germplasmListData.setDesignation(designation);
-			germplasmListData.setGroupName(parentage);
-			germplasmListData.setFemaleParent(femaleParent);
-			germplasmListData.setFgid(fgid);
-			germplasmListData.setMaleParent(maleParent);
-			germplasmListData.setMgid(mgid);
-			germplasmListData.setGid(gid);
-			germplasmListData.setSeedSource(seedSource);
-			germplasmListData.setBreedingMethodName(methodName);
-		  	germplasmListData.setFemalePedigree(femalePedigree);
-			germplasmListData.setMalePedigree(malePedigree);
-
-			germplasmListDataList.add(germplasmListData);
+		  	
+		  	final CrossListData data = new CrossListData();
+		  	data.setId(id);
+		  	data.setEntryId(entryId);
+		  	data.setGid(gid);
+		  	data.setDesignation(designation);
+		  	data.setFemaleParent(new GermplasmParent(fgid, femaleParent, femalePedigree));
+		  	data.setSeedSource(seedSource);
+		  	data.setBreedingMethodName(methodName);
+		  	final List<GermplasmParent> maleParents = new ArrayList<>();
+		  	maleParents.add(new GermplasmParent(mgid, maleParent, malePedigree));
+		 	data.setMaleParents(maleParents);
+		  	
+			dataList.add(data);
 		}
 	}
 
