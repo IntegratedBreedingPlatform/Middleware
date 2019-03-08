@@ -67,7 +67,7 @@ public class DatasetRetrieveDtoBuilder {
 		charValueDto.setAccession(charValueElement.getAccessionId());
 		charValueDto.setDesignation(charValueElement.getDesignation());
 		charValueDto.setGid(charValueElement.getGid());
-		charValueDto.setPlantNumber(charValueElement.getPlantNo());
+		charValueDto.setSampleNumber(charValueElement.getSampleNo());
 		charValueDto.setSampleName(charValueElement.getSampleName());
 		charValueDto.setSampleUID(charValueElement.getSampleUID());
 		return charValueDto;
