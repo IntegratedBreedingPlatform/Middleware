@@ -763,7 +763,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    )"); //
 		}
 
-		if (Boolean.TRUE.equals(searchDto.getFilter().getByValue())) {
+		if (!searchDto.getFilter().getFilteredValues().isEmpty()) {
 			final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
 
 			for (final String observationId : filteredValues.keySet()) {
@@ -775,6 +775,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						+ "    where ph2.observable_id = :" + observationId + "_Id" //
 						+ "    and nde2.project_id = p.project_id " //
 						+ "    and ph2." + filterByDraftOrValue + " in (:" + observationId + "_values ))"); //
+			}
+		}
+
+		if (!searchDto.getFilter().getFilteredTextValues().isEmpty()) {
+			// filter by column value (text)
+			final Map<String, String> filteredTextValues = searchDto.getFilter().getFilteredTextValues();
+
+			for (final String observationId : filteredTextValues.keySet()) {
+				sql.append(
+					" and nde.nd_experiment_id in ( " //
+						+ "    select ph2.nd_experiment_id " //
+						+ "    from phenotype ph2 " //
+						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+						+ "    where ph2.observable_id = " + observationId //
+						+ "    and nde2.project_id = p.project_id " //
+					); //
+				sql.append(" and ph2." + filterByDraftOrValue + " like '%").append(filteredTextValues.get(observationId)).append("%')");
 			}
 		}
 
@@ -1090,7 +1107,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
 			}
 
-			if (params.getFilter().getByValue()) {
+			if (!params.getFilter().getFilteredValues().isEmpty()) {
 				final Map<String, List<String>> filteredValues = params.getFilter().getFilteredValues();
 
 				for (final String observationId : filteredValues.keySet()) {

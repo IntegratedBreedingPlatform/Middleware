@@ -30,27 +30,31 @@ public class ObservationUnitsTableParamDto {
 	public class Filter {
 
 		private Boolean byOutOfBound;
-		private Boolean byValue;
 		private Boolean byOverwritten;
 		private Boolean byOutOfSync;
 		private Boolean byMissing;
 		private Map<String, List<String>> filteredValues;
+		private Map<String, String> filteredTextValues;
 
 		public Filter() {
 			this.byMissing = false;
 			this.byOutOfBound = false;
 			this.byOutOfSync =  false;
 			this.byOverwritten = false;
-			this.byValue = false;
 			this.filteredValues = new HashMap<>();
+			this.filteredTextValues = new HashMap<>();
+		}
+
+		public Map<String, String> getFilteredTextValues() {
+			return this.filteredTextValues;
+		}
+
+		public void setFilteredTextValues(final Map<String, String> filteredTextValues) {
+			this.filteredTextValues = filteredTextValues;
 		}
 
 		public void setByOutOfBound(final Boolean byOutOfBound) {
 			this.byOutOfBound = byOutOfBound;
-		}
-
-		public void setByValue(final Boolean byValue) {
-			this.byValue = byValue;
 		}
 
 		public void setByOverwritten(final Boolean byOverwritten) {
@@ -67,10 +71,6 @@ public class ObservationUnitsTableParamDto {
 
 		public Boolean getByOutOfBound() {
 			return this.byOutOfBound;
-		}
-
-		public Boolean getByValue() {
-			return this.byValue;
 		}
 
 		public Boolean getByOverwritten() {
@@ -193,7 +193,7 @@ public class ObservationUnitsTableParamDto {
 	}
 
 	public String getDraw() {
-		return draw;
+		return this.draw;
 	}
 
 	public void setDraw(final String draw) {
