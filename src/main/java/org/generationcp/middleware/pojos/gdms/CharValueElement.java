@@ -19,7 +19,7 @@ public class CharValueElement {
 
 	private String designation;
 
-	private Integer plantNo;
+	private Integer sampleNo;
 
 	private Integer markerId;
 
@@ -69,12 +69,12 @@ public class CharValueElement {
 		this.designation = designation;
 	}
 
-	public Integer getPlantNo() {
-		return plantNo;
+	public Integer getSampleNo() {
+		return sampleNo;
 	}
 
-	public void setPlantNo(final Integer plantNo) {
-		this.plantNo = plantNo;
+	public void setSampleNo(final Integer sampleNo) {
+		this.sampleNo = sampleNo;
 	}
 
 	public String getMarkerName() {
