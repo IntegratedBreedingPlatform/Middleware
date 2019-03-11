@@ -10,31 +10,40 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import junit.framework.Assert;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
+import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
+import org.generationcp.middleware.operation.saver.StandardVariableSaver;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class StandardVariableBuilderTest extends IntegrationTestBase {
 
@@ -42,15 +51,25 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	private static final int TRIAL_INSTANCE_SCALE_ID = 6040;
 	private static final int TRIAL_INSTANCE_METHOD_ID = 4040;
 
-	private static StandardVariableBuilder standardVariableBuilder;
+	private StandardVariableBuilder standardVariableBuilder;
+	private ProjectPropertySaver projectPropertySaver;
+	private StandardVariableSaver standardVariableSaver;
+	private CVTermDao cvTermDao;
+	private VariableOverridesDao variableOverridesDao;
 
 	@Before
-	public void setUp() throws Exception {
-		standardVariableBuilder = new StandardVariableBuilder(this.sessionProvder);
+	public void setUp() {
+		this.standardVariableBuilder = new StandardVariableBuilder(this.sessionProvder);
+		this.projectPropertySaver = new ProjectPropertySaver(this.sessionProvder);
+		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
+		this.cvTermDao = new CVTermDao();
+		this.cvTermDao.setSession(this.sessionProvder.getSession());
+		this.variableOverridesDao = new VariableOverridesDao();
+		this.variableOverridesDao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
-	public void testCreate() throws MiddlewareException {
+	public void testCreate() {
 		final StandardVariable standardVariable = standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
@@ -60,7 +79,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateObsoleteVariable() throws MiddlewareException {
+	public void testCreateObsoleteVariable() {
 		final CVTermDao cvtermDao = new CVTermDao();
 		cvtermDao.setSession(this.sessionProvder.getSession());
 
@@ -83,7 +102,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateList() throws MiddlewareException {
+	public void testCreateList() {
 
 		final List<Integer> standardVariableIds = new ArrayList<Integer>();
 		standardVariableIds.add(TermId.ENTRY_NO.getId());
@@ -107,7 +126,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateEmptyList() throws MiddlewareException {
+	public void testCreateEmptyList() {
 		final List<Integer> standardVariableIds = new ArrayList<Integer>();
 
 		final List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
@@ -116,7 +135,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateNullList() throws MiddlewareException {
+	public void testCreateNullList() {
 		final List<Integer> standardVariableIds = null;
 
 		final List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
@@ -125,7 +144,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindOrSaveFindExisting() throws MiddlewareException {
+	public void testFindOrSaveFindExisting() {
 		final String name = "TRIAL_INSTANCE";
 		final String description = "Trial instance - enumerated (number)";
 		final String property = "Trial instance";
@@ -134,7 +153,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final String datatype = "N";
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		final StandardVariable standardVariable =
-				standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
+			standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
@@ -152,7 +171,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindOrSaveSaveNewStandardVariable() throws MiddlewareException {
+	public void testFindOrSaveSaveNewStandardVariable() {
 		final String name = "Test Variable Name";
 		final String description = "Test Variable Name Description";
 		final String property = "Test Property";
@@ -161,7 +180,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		final String datatype = "N";
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		final StandardVariable standardVariable =
-				standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
+			standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
 		assertNotNull(standardVariable);
 		assertEquals(name, standardVariable.getName());
 		assertEquals(description, standardVariable.getDescription());
@@ -175,7 +194,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByName() throws MiddlewareException {
+	public void testGetByName() {
 		final String name = "TRIAL_INSTANCE";
 		final StandardVariable standardVariable = standardVariableBuilder.getByName(name, null);
 		assertNotNull(standardVariable);
@@ -187,14 +206,14 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByNameNotFound() throws MiddlewareException {
+	public void testGetByNameNotFound() {
 		final String name = "VAR_123456";
 		final StandardVariable standardVariable = standardVariableBuilder.getByName(name, null);
 		assertNull(standardVariable);
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethod() throws MiddlewareException {
+	public void testGetByPropertyScaleMethod() {
 		final int propertyId = TRIAL_INSTANCE_PROPERTY_ID;
 		final int scaleId = TRIAL_INSTANCE_SCALE_ID;
 		final int methodId = TRIAL_INSTANCE_METHOD_ID;
@@ -206,7 +225,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethodNotFound() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodNotFound() {
 		final int propertyId = 1;
 		final int scaleId = 2;
 		final int methodId = 3;
@@ -215,12 +234,13 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethodRole() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodRole() {
 		final int propertyId = TRIAL_INSTANCE_PROPERTY_ID;
 		final int scaleId = TRIAL_INSTANCE_SCALE_ID;
 		final int methodId = TRIAL_INSTANCE_METHOD_ID;
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
-		final StandardVariable standardVariable = standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
+		final StandardVariable standardVariable =
+			standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
 		assertNotNull(standardVariable);
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
 		assertEquals(TRIAL_INSTANCE_SCALE_ID, standardVariable.getScale().getId());
@@ -228,63 +248,110 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethodRoleNotFound() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodRoleNotFound() {
 		final int propertyId = 1;
 		final int scaleId = 2;
 		final int methodId = 3;
 		final PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
-		final StandardVariable standardVariable = standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
+		final StandardVariable standardVariable =
+			standardVariableBuilder.getByPropertyScaleMethodRole(propertyId, scaleId, methodId, role, null);
 		assertNull(standardVariable);
 	}
 
 	@Test
-	public void testGetStandardVariablesInProjects() {
-		final List<String> headers = this.createLocalVariableNamesOfProjectTestData();
-		final Map<String, List<StandardVariable>> stdVars = standardVariableBuilder.getStandardVariablesInProjects(headers, null);
-		assertNotNull(stdVars);
-		
-		final List<String> headerNamesTrimmed = Lists.transform(headers, new Function<String, String>() {
-			public String apply(String s) {
-				return s.trim();
-			}
-		});
-		assertEquals(headerNamesTrimmed.size(), stdVars.size());
-		for (final String header : stdVars.keySet()) {
-			assertTrue(headerNamesTrimmed.contains(header));
-			final List<StandardVariable> headerStandardVariables = stdVars.get(header);
-			assertNotNull(headerStandardVariables);
-			assertTrue(!headerStandardVariables.isEmpty());
-			for (final StandardVariable standardVariable : headerStandardVariables) {
-				if ("TRIAL_INSTANCE".equals(header)) {
-					assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
-					assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, standardVariable.getPhenotypicType());
-				} else if ("ENTRY_NO".equals(header)) {
-					assertEquals(TermId.ENTRY_NO.getId(), standardVariable.getId());
-					assertEquals(PhenotypicType.GERMPLASM, standardVariable.getPhenotypicType());
-				} else if ("PLOT_NO".equals(header)) {
-					assertEquals(TermId.PLOT_NO.getId(), standardVariable.getId());
-					assertEquals(PhenotypicType.TRIAL_DESIGN, standardVariable.getPhenotypicType());
-				}
-			}
-		}
+	public void testGetStandardVariablesInProjects_HeaderHasNoMatch() {
+
+		final String headerNameToMatch = RandomStringUtils.randomAlphabetic(10);
+		final List<String> headers = Arrays.asList(headerNameToMatch);
+
+		final DmsProject dmsProject = this.createDMSProject();
+
+		final Map<String, List<StandardVariable>> result =
+			this.standardVariableBuilder.getStandardVariablesInProjects(headers, dmsProject.getProgramUUID());
+
+		Assert.assertTrue(result.get(headerNameToMatch.toUpperCase()).isEmpty());
+
 	}
 
 	@Test
-	public void testGetStandardVariablesInProjectsHeaderNoMatchFromTheOntology() {
-		final List<String> headers = new ArrayList<>();
-		headers.add("UNKNOWN_TRAIT_NAME1");
+	public void testGetStandardVariablesInProjects_HeaderHasMatchInProjectProperty() {
 
-		final Map<String, List<StandardVariable>> stdVars = standardVariableBuilder.getStandardVariablesInProjects(headers, null);
-		assertNotNull(stdVars);
-		assertEquals(headers.size(), stdVars.size());
-		for (final String header : stdVars.keySet()) {
+		final String headerNameToMatch = RandomStringUtils.randomAlphabetic(10);
+		final List<String> headers = Arrays.asList(headerNameToMatch);
 
-			assertTrue(headers.contains(header));
+		final DmsProject dmsProject = this.createDMSProject();
+		final VariableTypeList variableTypeList = new VariableTypeList();
+		variableTypeList.add(
+			this.createDMSVariableType(headerNameToMatch, RandomStringUtils.randomAlphabetic(10), 1, PhenotypicType.VARIATE,
+				VariableType.TRAIT));
+		this.projectPropertySaver.saveProjectProperties(dmsProject, variableTypeList, null);
 
-			final List<StandardVariable> headerStandardVariables = stdVars.get(header);
-			assertTrue("If the header name doesn't match any Standard Variables, the variable list must be empty",
-					headerStandardVariables.isEmpty());
-		}
+		final Map<String, List<StandardVariable>> result =
+			this.standardVariableBuilder.getStandardVariablesInProjects(headers, dmsProject.getProgramUUID());
+
+		Assert.assertEquals(headerNameToMatch, result.get(headerNameToMatch.toUpperCase()).iterator().next().getName());
+
+	}
+
+	@Test
+	public void testGetStandardVariablesInProjects_HeaderHasMatchWithOntologyVariableAlias() {
+
+		final String headerNameToMatch = RandomStringUtils.randomAlphabetic(10);
+		final List<String> headers = Arrays.asList(headerNameToMatch);
+
+		final DmsProject dmsProject = this.createDMSProject();
+
+		// Create a standard variable with name different from header name, but has alias same as header name
+		final StandardVariable standardVariable =
+			this.createStandardVariable(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10),
+				RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10));
+		this.variableOverridesDao.save(standardVariable.getId(), dmsProject.getProgramUUID(), headerNameToMatch, null, null);
+
+		final Map<String, List<StandardVariable>> result =
+			this.standardVariableBuilder.getStandardVariablesInProjects(headers, dmsProject.getProgramUUID());
+
+		Assert.assertEquals(standardVariable.getName(), result.get(headerNameToMatch.toUpperCase()).iterator().next().getName());
+
+	}
+
+	@Test
+	public void testGetStandardVariablesInProjects_HeaderHasMatchWithOntologyVariableName() {
+
+		final String headerNameToMatch = RandomStringUtils.randomAlphabetic(10);
+		final List<String> headers = Arrays.asList(headerNameToMatch);
+
+		final DmsProject dmsProject = this.createDMSProject();
+
+		// Create a standard variable with name same as as the header name.
+		this.createStandardVariable(
+			headerNameToMatch, RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10));
+
+		final Map<String, List<StandardVariable>> result =
+			this.standardVariableBuilder.getStandardVariablesInProjects(headers, dmsProject.getProgramUUID());
+
+		Assert.assertEquals(headerNameToMatch, result.get(headerNameToMatch.toUpperCase()).iterator().next().getName());
+
+	}
+
+	@Test
+	public void testGetStandardVariablesInProjects_HeaderHasMatchWithOntologyVariableProperty() {
+
+		final String headerNameToMatch = RandomStringUtils.randomAlphabetic(10);
+		final List<String> headers = Arrays.asList(headerNameToMatch);
+
+		final DmsProject dmsProject = this.createDMSProject();
+
+		// Create a standard variable with property name same as as the header name.
+		final StandardVariable standardVariable = this.createStandardVariable(
+			RandomStringUtils.randomAlphabetic(10), headerNameToMatch, RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10));
+
+		final Map<String, List<StandardVariable>> result =
+			this.standardVariableBuilder.getStandardVariablesInProjects(headers, dmsProject.getProgramUUID());
+
+		Assert.assertEquals(standardVariable.getName(), result.get(headerNameToMatch.toUpperCase()).iterator().next().getName());
+
 	}
 
 	@Test
@@ -323,12 +390,53 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 
 	}
 
-	private List<String> createLocalVariableNamesOfProjectTestData() {
-		final List<String> headers = new ArrayList<>();
-		// Put a trailing space at the end. Should still be retrieved
-		headers.add("TRIAL_INSTANCE ");
-		headers.add("ENTRY_NO");
-		headers.add("PLOT_NO");
-		return headers;
+	private DmsProject createDMSProject() {
+
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(1);
+		dmsProject.setName("ProjectName");
+		dmsProject.setDescription("ProjectDescription");
+		dmsProject.setProgramUUID(UUID.randomUUID().toString());
+
+		return dmsProject;
 	}
+
+	private DMSVariableType createDMSVariableType(
+		final String localName, final String localDescription, final int rank,
+		final PhenotypicType role, final VariableType variableType) {
+		final DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setLocalName(localName);
+		dmsVariableType.setLocalDescription(localDescription);
+		dmsVariableType.setRank(rank);
+		dmsVariableType.setRole(role);
+		dmsVariableType.setVariableType(variableType);
+		if (variableType != null && variableType.getId().intValue() == VariableType.TREATMENT_FACTOR.getId()) {
+			dmsVariableType.setTreatmentLabel("TEST TREATMENT LABEL");
+		}
+		dmsVariableType.setStandardVariable(
+			this.createStandardVariable(localName, RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10),
+				RandomStringUtils.randomAlphanumeric(10)));
+		return dmsVariableType;
+	}
+
+	private StandardVariable createStandardVariable(
+		final String name, final String propertyName, final String scaleName, final String methodName) {
+
+		final CVTerm property = this.cvTermDao.save(propertyName, "", CvId.PROPERTIES);
+		final CVTerm scale = this.cvTermDao.save(scaleName, "", CvId.SCALES);
+		final CVTerm method = this.cvTermDao.save(methodName, "", CvId.METHODS);
+
+		final StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setName(name);
+		standardVariable.setProperty(new Term(property.getCvTermId(), property.getName(), property.getDefinition()));
+		standardVariable.setScale(new Term(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
+		standardVariable.setMethod(new Term(method.getCvTermId(), method.getName(), method.getDefinition()));
+		standardVariable.setDataType(new Term(DataType.CHARACTER_VARIABLE.getId(), "Character variable", "variable with char values"));
+		standardVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
+
+		this.standardVariableSaver.save(standardVariable);
+
+		return standardVariable;
+	}
+
 }
