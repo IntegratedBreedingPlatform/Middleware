@@ -20,7 +20,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,10 +106,10 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetObservationUnitRows() {
-		final ObservationUnitsTableParamDto params = new ObservationUnitsTableParamDto();
-		params.setInstanceId(this.instanceIds.get(0));
+		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
+		searchDto.setInstanceId(this.instanceIds.get(0));
 		final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId,
-			params);
+			searchDto);
 		Assert.assertNotNull(observationUnitRows);
 		Assert.assertEquals(40, observationUnitRows.size()); //The number of germplasm in the study(20) multiplied by numberOfSubObservationUnits(2)
 		final ObservationUnitRow observationUnitRow = observationUnitRows.get(0);

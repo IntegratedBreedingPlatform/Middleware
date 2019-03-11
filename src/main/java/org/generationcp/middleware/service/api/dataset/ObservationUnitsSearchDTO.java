@@ -10,8 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused") // Used in POST body
 @AutoProperty
-public class ObservationUnitsTableParamDto {
+public class ObservationUnitsSearchDTO {
 	
 	private List<String> environmentDetails;
 	private List<String> environmentConditions;
@@ -94,15 +95,14 @@ public class ObservationUnitsTableParamDto {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	public ObservationUnitsTableParamDto() {
+	public ObservationUnitsSearchDTO() {
 		this.filter = new Filter();
 		this.environmentDetails = new ArrayList<>();
 		this.environmentConditions = new ArrayList<>();
 		this.draftMode = false;
 	}
 
-	public ObservationUnitsTableParamDto(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
+	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;

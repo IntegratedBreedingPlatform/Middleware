@@ -26,7 +26,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -622,7 +622,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private String getObservationUnitTableQuery(
-			final ObservationUnitsTableParamDto searchDto, final String observationUnitNoName) {
+			final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 		// same for columns -> DatasetServiceImpl.getSubObservationSetColumns
@@ -869,7 +869,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private SQLQuery createQueryAndAddScalar(
-		final ObservationUnitsTableParamDto searchDto, final String generateQuery) {
+		final ObservationUnitsSearchDTO searchDto, final String generateQuery) {
 		final SQLQuery query = this.getSession().createSQLQuery(generateQuery);
 
 		this.addScalar(query);
@@ -1092,7 +1092,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsTableParamDto params, final String observationVariableName) {
+	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO params, final String observationVariableName) {
 		try {
 
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(params, observationVariableName);
@@ -1170,7 +1170,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return observationUnitRows;
 	}
 
-	private List<ObservationUnitRow> mapResults(final List<Map<String, Object>> results, final ObservationUnitsTableParamDto searchDto,
+	private List<ObservationUnitRow> mapResults(final List<Map<String, Object>> results, final ObservationUnitsSearchDTO searchDto,
 			final String observationVariableName) {
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 
@@ -1184,7 +1184,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return observationUnitRows;
 	}
 
-	private ObservationUnitRow getObservationUnitRow(final ObservationUnitsTableParamDto searchDto, final String observationVariableName,
+	private ObservationUnitRow getObservationUnitRow(final ObservationUnitsSearchDTO searchDto, final String observationVariableName,
 		final Map<String, Object> row) {
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
 
