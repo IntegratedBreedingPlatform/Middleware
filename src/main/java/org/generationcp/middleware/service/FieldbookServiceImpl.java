@@ -1142,9 +1142,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public ListDataProject getListDataProjectByStudy(final int projectId, final GermplasmListType type, final int obsUnitId,
+	public List<ListDataProject> getListDataProjectByStudy(final int projectId, final GermplasmListType type, final List<Integer> plotNumbers,
 			final String instanceNumber) {
-		return this.getListDataProjectDAO().getByStudy(projectId, type, obsUnitId, instanceNumber);
+		return this.getListDataProjectDAO().getByStudy(projectId, type, plotNumbers, instanceNumber);
 	}
 
 	@Override
