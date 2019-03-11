@@ -50,7 +50,10 @@ public interface DatasetService {
 
 	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
-	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsTableParamDto params);
+	long countFilteredObservationUnitsForDataset(Integer datasetId, Integer instanceId, final Boolean draftMode,
+		ObservationUnitsSearchDTO.Filter filter);
+
+	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId);
 

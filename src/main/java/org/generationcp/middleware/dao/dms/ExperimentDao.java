@@ -724,14 +724,50 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
 		}
 
-		String filterByDraftOrValue = "value";
-
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
-			filterByDraftOrValue = "draft_value";
 			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
 		}
 
-		if (Boolean.TRUE.equals(searchDto.getFilter().getByOutOfBound())) {
+		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
+		addFilters(sql, filter, searchDto.getDraftMode());
+
+		sql.append(" GROUP BY observationUnitId "); //
+
+		String orderColumn;
+		final String sortBy = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortBy() : "";
+		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
+			orderColumn = OBSERVATION_UNIT_NO;
+		} else {
+			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
+		}
+
+		final String sortOrder = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortOrder() : "";
+		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+		/**
+		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
+		 * with 1 so that they turn into number and are sorted as numbers rather than strings.
+		 */
+		final List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW", "COL", "BLOCK_NO");
+		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
+			orderColumn = "(1 * " + orderColumn + ")";
+		}
+		else {
+			orderColumn = "`" + orderColumn + "`";
+		}
+
+		sql.append(" ORDER BY " + orderColumn + " " + direction);
+		return sql.toString();
+	}
+
+	private void addFilters(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter, final Boolean draftMode) {
+		
+		if (filter == null) {
+			return;
+		}
+
+		final String filterByDraftOrValue = Boolean.TRUE.equals(draftMode) ? "draft_value" : "value";
+		
+		if (Boolean.TRUE.equals(filter.getByOutOfBound())) {
 			sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
 					+ "      from cvterm_relationship cvtrscale " //
 					+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id " //
@@ -763,8 +799,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    )"); //
 		}
 
-		if (!searchDto.getFilter().getFilteredValues().isEmpty()) {
-			final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
+		if (!filter.getFilteredValues().isEmpty()) {
+			final Map<String, List<String>> filteredValues = filter.getFilteredValues();
 
 			for (final String observationId : filteredValues.keySet()) {
 				sql.append(
@@ -778,9 +814,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		if (!searchDto.getFilter().getFilteredTextValues().isEmpty()) {
+		if (!filter.getFilteredTextValues().isEmpty()) {
 			// filter by column value (text)
-			final Map<String, String> filteredTextValues = searchDto.getFilter().getFilteredTextValues();
+			final Map<String, String> filteredTextValues = filter.getFilteredTextValues();
 
 			for (final String observationId : filteredTextValues.keySet()) {
 				sql.append(
@@ -795,7 +831,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		if (Boolean.TRUE.equals(searchDto.getFilter().getByOverwritten())) {
+		if (Boolean.TRUE.equals(filter.getByOverwritten())) {
 			sql.append(
 					" and nde.nd_experiment_id in ( " //
 						+ "    select ph2.nd_experiment_id " //
@@ -805,7 +841,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
 		}
 
-		if (Boolean.TRUE.equals(searchDto.getFilter().getByOutOfSync())) {
+		if (Boolean.TRUE.equals(filter.getByOutOfSync())) {
 			sql.append(
 				" and nde.nd_experiment_id in ( " //
 					+ "    select ph2.nd_experiment_id " //
@@ -815,7 +851,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )" ); //
 		}
 
-		if (Boolean.TRUE.equals(searchDto.getFilter().getByMissing())) {
+		if (Boolean.TRUE.equals(filter.getByMissing())) {
 			// filter by missing
 			sql.append(
 				" and nde.nd_experiment_id in ( " //
@@ -825,36 +861,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    where nde2.project_id = p.project_id " //
 					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )" ); //
 		}
-
-		sql.append(" GROUP BY observationUnitId "); //
-
-		String orderColumn;
-		final String sortBy = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortBy() : "";
-		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
-			orderColumn = OBSERVATION_UNIT_NO;
-		} else {
-			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
-		}
-
-		final String sortOrder = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortOrder() : "";
-		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
-		/**
-		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
-		 * with 1 so that they turn into number and are sorted as numbers rather than strings.
-		 */
-		final List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW", "COL", "BLOCK_NO");
-		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
-			orderColumn = "(1 * " + orderColumn + ")";
-		}
-		else {
-			orderColumn = "`" + orderColumn + "`";
-		}
-
-		sql.append(" ORDER BY " + orderColumn + " " + direction);
-		return sql.toString();
 	}
 
-	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsTableParamDto searchDto) {
+	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto) {
 		try {
 			final String observationVariableName = this.getObservationVariableName(searchDto.getDatasetId());
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
@@ -932,30 +941,43 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public Integer countTotalObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
+	public Integer countObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+		final ObservationUnitsSearchDTO.Filter filter) {
+
 		try {
-			String sqlString = "select count(*) as totalObservationUnits from " //
+			StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits from " //
 				+ "nd_experiment nde " //
-				+ "    inner join project proj on proj.project_id = nde.project_id " //
+				+ "    inner join project p on p.project_id = nde.project_id " //
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 				+ " where " //
-				+ "	proj.project_id = :datasetId ";
+				+ "	p.project_id = :datasetId ");
 
 			if (instanceId != null) {
-				sqlString = sqlString + " and gl.nd_geolocation_id = :instanceId ";
+				sql.append(" and gl.nd_geolocation_id = :instanceId ");
 			}
 
 			if (Boolean.TRUE.equals(draftMode)) {
-				sqlString = sqlString  //
-					+ " and exists(select 1" //
-					+ "   from phenotype p" //
-					+ "   where p.nd_experiment_id = nde.nd_experiment_id " //
-					+ "         and (p.draft_value is not null " //
-					+ "                or p.draft_cvalue_id is not null)) ";
+				sql.append(" and exists(select 1" //
+					+ "   from phenotype ph" //
+					+ "   where ph.nd_experiment_id = nde.nd_experiment_id " //
+					+ "         and (ph.draft_value is not null " //
+					+ "                or ph.draft_cvalue_id is not null)) ");
 			}
 
-			final SQLQuery query = this.getSession().createSQLQuery(sqlString);
+			if (filter != null) {
+				addFilters(sql, filter, draftMode);
+			}
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+
+			if (filter != null && !filter.getFilteredValues().isEmpty()) {
+				final Map<String, List<String>> filteredValues = filter.getFilteredValues();
+
+				for (final String observationId : filteredValues.keySet()) {
+					query.setParameter(observationId + "_Id", observationId);
+					query.setParameterList(observationId + "_values", filter.getFilteredValues().get(observationId));
+				}
+			}
 
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("datasetId", datasetId);
