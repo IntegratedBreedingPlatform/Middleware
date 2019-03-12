@@ -932,6 +932,8 @@ public class DatasetServiceImpl implements DatasetService {
 			phenotype.setDraftCValueId(null);
 		}
 		final Integer observableId = phenotype.getObservableId();
+		// TODO Review performance IBP-2230
+		//  Can we leverage measurementVariable.getFormula() as in importDataset() ?
 		this.resolveObservationStatus(observableId, phenotype);
 		phenotype.setChanged(true);
 		phenotypeDao.update(phenotype);
