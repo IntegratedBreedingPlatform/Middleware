@@ -87,15 +87,14 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					+ "  stock.dbxref_id as gid, " //
 					+ "  (SELECT na.nval FROM names na " //
 					+ "  WHERE na.gid = stock.dbxref_id AND na.nstat = 1 LIMIT 1) AS designation, " //
-					+ "  plant.plant_no as plantNo, " //
+					+ "  sample.sample_no as sampleNo, " //
 					+ "  marker.marker_id as markerId, " //
 					+ "  marker.marker_name as markerName, " //
 					+ "  charvalues.char_value as charValue, " //
 					+ "  charvalues.dataset_id as datasetId " //
 					+ "  FROM gdms_char_values charvalues " //
 					+ "  INNER JOIN sample sample ON (sample.sample_id = charvalues.sample_id) " //
-					+ "  INNER JOIN plant plant ON (sample.plant_id = plant.plant_id) " //
-					+ "  INNER JOIN nd_experiment experiment ON (plant.nd_experiment_id = experiment.nd_experiment_id) " //
+					+ "  INNER JOIN nd_experiment experiment ON (sample.nd_experiment_id = experiment.nd_experiment_id) " //
 					+ "  INNER JOIN stock stock ON (stock.stock_id = experiment.stock_id) " //
 					+ "  INNER JOIN gdms_marker marker ON (marker.marker_id = charvalues.marker_id) " //
 					+ "  WHERE charvalues.dataset_id = :datasetId "; //
@@ -261,7 +260,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					.addScalar("sampleName", new StringType())
 					.addScalar("gid", new IntegerType())
 					.addScalar("designation", new StringType())
-					.addScalar("plantNo", new IntegerType())
+					.addScalar("sampleNo", new IntegerType())
 					.addScalar("markerId", new IntegerType())
 					.addScalar("markerName", new StringType())
 					.addScalar("charValue", new StringType())
@@ -269,7 +268,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					.setParameter("datasetId", datasetId)
 					.setResultTransformer(Transformers.aliasToBean(CharValueElement.class))
 					.list();
-
+			
 		} catch (HibernateException e) {
 			final String errorMessage = "Error with getCharValueElementsByDatasetId(datasetId=" + datasetId + ") query from CharValuesDAO " + e.getMessage();
 			CharValuesDAO.LOG.error(errorMessage, e);

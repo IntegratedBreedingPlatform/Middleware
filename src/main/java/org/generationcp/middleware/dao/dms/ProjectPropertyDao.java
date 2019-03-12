@@ -50,7 +50,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames)
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames, final String programUUID)
 			 {
 
 		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, new Function<String, String>() {
@@ -77,6 +77,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 				
 				criteria.add(Restrictions.in("alias", variableNames));
 				criteria.createAlias("property.variable", "variable").add(Restrictions.eq("variable.isObsolete", 0));
+				criteria.createAlias("property.project", "project").add(Restrictions.eq("project.programUUID", programUUID));
 				final List<Object[]> results = criteria.list();
 				return this.convertToVariablestandardVariableIdsWithTypeMap(results);
 			}

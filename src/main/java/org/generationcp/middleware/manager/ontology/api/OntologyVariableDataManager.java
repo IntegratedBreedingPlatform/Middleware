@@ -93,6 +93,8 @@ public interface OntologyVariableDataManager {
 	
 	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
 
+	public VariableOverrides getVariableOverridesByVariableIdAndProgram(final Integer variableId, final String programUuid);
+
 	public List<VariableType> getVariableTypes(Integer variableId);
 
 	Optional<DataType> getDataType(Integer variableId);

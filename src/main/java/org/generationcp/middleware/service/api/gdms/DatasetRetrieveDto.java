@@ -28,7 +28,7 @@ public class DatasetRetrieveDto {
 
 		private String designation;
 
-		private Integer plantNumber;
+		private Integer sampleNumber;
 
 		private Map<String, String> charValues = new HashMap<>();
 
@@ -72,12 +72,12 @@ public class DatasetRetrieveDto {
 			this.designation = designation;
 		}
 
-		public Integer getPlantNumber() {
-			return plantNumber;
+		public Integer getSampleNumber() {
+			return sampleNumber;
 		}
 
-		public void setPlantNumber(final Integer plantNumber) {
-			this.plantNumber = plantNumber;
+		public void setSampleNumber(final Integer sampleNumber) {
+			this.sampleNumber = sampleNumber;
 		}
 
 		public Map<String, String> getCharValues() {
