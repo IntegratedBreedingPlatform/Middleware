@@ -729,7 +729,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
-		addFilters(sql, filter, searchDto.getDraftMode());
+		this.addFilters(sql, filter, searchDto.getDraftMode());
 
 		sql.append(" GROUP BY observationUnitId "); //
 
