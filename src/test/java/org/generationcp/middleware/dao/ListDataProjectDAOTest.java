@@ -301,7 +301,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 				.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, ListDataProjectDAOTest.GERMPLASM_PREFERRED_NAME_PREFIX,
 						this.parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix, false);
+		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 
 		return nurseryId;
 	}
