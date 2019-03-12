@@ -135,7 +135,6 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
@@ -188,7 +187,6 @@ public class DatasetServiceImpl implements DatasetService {
 		return plotDataSetColumns;
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
@@ -693,7 +691,13 @@ public class DatasetServiceImpl implements DatasetService {
 		return Boolean.FALSE;
 	}
 
-
+	@Override
+	public void setValuesToMissing(final Integer datasetId) {
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		for (final Phenotype phenotype : phenotypes) {
+			this.updatePhenotype(phenotype.getPhenotypeId(), null, Phenotype.MISSING, false);
+		}
+	}
 
 	/**
 	 *
@@ -974,7 +978,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Map<String, Long> countObservationsGroupedByInstance(final Integer datasetId) {
-		return daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
+		return this.daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
 	}
 
 }
