@@ -257,9 +257,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean isDatasetNameAvailable(final String name, final String projectUUID) {
-		final Integer dmsProjectId = this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(name, projectUUID);
-		return (dmsProjectId == null);
+	public Boolean isDatasetNameAvailable(final String name, final int StudyId) {
+		final List<DatasetDTO> datasetDTOs = this.getDatasets(StudyId, new HashSet<Integer>());
+		for (final DatasetDTO datasetDTO : datasetDTOs) {
+			if (datasetDTO.getName().equals(name)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
