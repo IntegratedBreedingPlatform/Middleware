@@ -51,6 +51,7 @@ public class DataSetupTest extends IntegrationTestBase {
 	private static final String LOCATION = "LOCATION";
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetupTest.class);
+	public static final String STUDY_INSTITUTE = "STUDY_INSTITUTE";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -205,10 +206,10 @@ public class DataSetupTest extends IntegrationTestBase {
 		final Integer[] gids = this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM,
 				DataSetupTest.GERMPLSM_PREFIX);
 
-		this.createNurseryForGermplasm(programUUID, gids, cropPrefix, false);
+		this.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 	}
 
-	public int createNurseryForGermplasm(final String programUUID, final Integer[] gids, final String cropPrefix, final boolean locationIsStudyDetail) {
+	public int createNurseryForGermplasm(final String programUUID, final Integer[] gids, final String cropPrefix) {
 		final int randomInt = new Random().nextInt(100);
 
 		// Germplasm list
@@ -250,19 +251,14 @@ public class DataSetupTest extends IntegrationTestBase {
 				DataSetupTest.APPLIED, "BMETH_CODE", DataSetupTest.CHAR, null, DataSetupTest.STUDY,
 				PhenotypicType.STUDY, true));
 
-		conditions.add(this.createMeasurementVariable(8080, "STUDY_INSTITUTE", "Study institute - conducted (DBCV)",
+		conditions.add(this.createMeasurementVariable(8080, STUDY_INSTITUTE, "Study institute - conducted (DBCV)",
 				DataSetupTest.PROP_INSTITUTE, DataSetupTest.CONDUCTED, DataSetupTest.DBCV, DataSetupTest.CHAR, "CIMMYT",
 				DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
-		if (locationIsStudyDetail) {
-			conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
-					LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
-					"Default Breeding Location",  DataSetupTest.STUDY, PhenotypicType.STUDY, true));
-		} else {
-			conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
-					LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
-					"Default Breeding Location", DataSetupTest.STUDY, PhenotypicType.TRIAL_ENVIRONMENT, true));
-		}
+		conditions.add(this.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), LOCATION_NAME, LOCATION_NAME + " - description",
+			LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
+			"Default Breeding Location", DataSetupTest.STUDY, PhenotypicType.TRIAL_ENVIRONMENT, true));
+
 
 		workbook.setConditions(conditions);
 

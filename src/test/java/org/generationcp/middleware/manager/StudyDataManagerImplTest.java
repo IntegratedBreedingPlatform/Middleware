@@ -966,6 +966,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Mockito.verify(mockManager, Mockito.times(2)).updateDependentPhenotypesStatus(Matchers.eq(variableId), Matchers.eq(experimentId));
 	}
 	
-	
+	@Test
+	public void testRenameStudy() {
+		// Create project record
+		final DmsProject project = new DmsProject();
+		final String programUUID = "74364-9075-asdhaskj-74825";
+		project.setProjectId(1);
+		project.setName("projectName");
+		project.setDescription("ProjectDescription");
+		project.setProgramUUID(programUUID);
+		this.manager.getDmsProjectDao().save(project);
+
+		final String newStudyName = "newStudyName";
+		this.manager.renameStudy(newStudyName, project.getProjectId(), programUUID);
+		
+		Assert.assertEquals(newStudyName, project.getName());
+
+	}
 
 }
