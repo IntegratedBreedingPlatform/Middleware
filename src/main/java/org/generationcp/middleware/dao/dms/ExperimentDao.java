@@ -626,7 +626,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 		// same for columns -> DatasetServiceImpl.getSubObservationSetColumns
-		final StringBuilder sql = new StringBuilder("SELECT  " //
+		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, " //
 			+ "    gl.description AS TRIAL_INSTANCE, " //
 			+ "    (SELECT loc.lname FROM nd_geolocationprop gprop INNER JOIN location loc on loc.locid = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8190) 'LOCATION_ID', "
@@ -734,14 +734,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		sql.append(" GROUP BY observationUnitId "); //
 
 		String orderColumn;
-		final String sortBy = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortBy() : "";
+		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
 			orderColumn = OBSERVATION_UNIT_NO;
 		} else {
 			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
 		}
 
-		final String sortOrder = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortOrder() : "";
+		final String sortOrder = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortOrder() : "";
 		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
@@ -754,18 +754,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		/**
-		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
-		 * with 1 so that they turn into number and are sorted as numbers rather than strings.
+		 * Since we are using MAX(IF(, NULL)) to group the different phenotypes
+		 * we can't order by these colunms
+		 * https://bugs.mysql.com/bug.php?id=80802
+		 * Workaround: use a derived table and order the outer one
+		 * 		select * from (...) T order by ...
+		 *
+		 * Sort first numeric data casting string values to numbers
+		 * and then text data (which casts to 0)
 		 */
-		final List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW", "COL", "BLOCK_NO");
-		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
-			orderColumn = "(1 * " + orderColumn + ")";
-		}
-		else {
-			orderColumn = "`" + orderColumn + "`";
-		}
+		sql.append(" ) T ORDER BY " + "(1 * `" + orderColumn + "`) " + direction
+			+ ", `" + orderColumn + "` " + direction);
 
-		sql.append(" ORDER BY " + orderColumn + " " + direction);
 		return sql.toString();
 	}
 
