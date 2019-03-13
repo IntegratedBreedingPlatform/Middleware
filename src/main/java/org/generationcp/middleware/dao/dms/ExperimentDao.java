@@ -743,6 +743,16 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		final String sortOrder = searchDto.getSortedRequest() != null? searchDto.getSortedRequest().getSortOrder() : "";
 		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
+
+		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
+			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getSelectionMethodsAndTraits()) {
+				if (orderColumn.equals(selectionMethodsAndTrait.getName())) {
+					orderColumn = orderColumn + "_DraftValue";
+					break;
+				}
+			}
+		}
+
 		/**
 		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
 		 * with 1 so that they turn into number and are sorted as numbers rather than strings.
