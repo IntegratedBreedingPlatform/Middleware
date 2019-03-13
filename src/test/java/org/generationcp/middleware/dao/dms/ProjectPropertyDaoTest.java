@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
@@ -55,19 +56,19 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	private static CVTermDao cvTermDao;
 
 	private DaoFactory daoFactory;
-	
+
 	@Autowired
 	private GermplasmDataManager germplasmManager;
-	
+
 	@Autowired
 	private DataImportService dataImportService;
-	
+
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 
 	@Autowired
 	private FieldbookService middlewareFieldbookService;
-	
+
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private DataSetupTest dataSetupTest;
 
@@ -78,7 +79,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		projectPropDao = new ProjectPropertyDao();
 		projectPropDao.setSession(this.sessionProvder.getSession());
-		
+
 		projectDao = new DmsProjectDao();
 		projectDao.setSession(this.sessionProvder.getSession());
 		if (this.germplasmTestDataGenerator == null) {
@@ -95,12 +96,16 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	public void testGetStandardVariableIdsWithTypeByPropertyNames() throws Exception {
 
 		final List<String> propertyNames = new ArrayList<String>();
-		propertyNames.add(TRIAL_INSTANCE);
+		propertyNames.add(DataSetupTest.LOCATION_NAME);
 
-		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(propertyNames);
+		final String programUUID = UUID.randomUUID().toString();
+		this.createNurseryTestData(programUUID);
 
-		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsValue(VariableType.ENVIRONMENT_DETAIL));
-		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsKey(TermId.TRIAL_INSTANCE_FACTOR.getId()));
+		final Map<String, Map<Integer, VariableType>> results =
+			projectPropDao.getStandardVariableIdsWithTypeByAlias(propertyNames, programUUID);
+
+		Assert.assertTrue(results.get(DataSetupTest.LOCATION_NAME).containsValue(VariableType.ENVIRONMENT_DETAIL));
+		Assert.assertTrue(results.get(DataSetupTest.LOCATION_NAME).containsKey(TermId.TRIAL_LOCATION.getId()));
 	}
 
 	@Test
@@ -108,7 +113,8 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final List<Object[]> objectToConvert = this.createObjectToConvert();
 
-		final Map<String, Map<Integer, VariableType>> results = projectPropDao.convertToVariablestandardVariableIdsWithTypeMap(objectToConvert);
+		final Map<String, Map<Integer, VariableType>> results =
+			projectPropDao.convertToVariablestandardVariableIdsWithTypeMap(objectToConvert);
 
 		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsValue(VariableType.ENVIRONMENT_DETAIL));
 		Assert.assertTrue(results.get(TRIAL_INSTANCE).containsKey(TermId.TRIAL_INSTANCE_FACTOR.getId()));
@@ -132,40 +138,47 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStandardVariableIdsWithTypeByAliasWhenVariableIsObsolete() throws Exception {
 
-		final List<String> aliases = Arrays.asList(TRIAL_INSTANCE);
-
-		final CVTerm trialInstanceTerm = cvTermDao.getByName(TRIAL_INSTANCE);
-		trialInstanceTerm.setIsObsolete(true);
-		cvTermDao.saveOrUpdate(trialInstanceTerm);
-		this.sessionProvder.getSession().flush();
-
-		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(aliases);
-
-		// The TRIAL_INSTANCE variable is obsolete so the result should be empty
-		Assert.assertTrue(results.isEmpty());
-	}
-	
-	@Test
-	public void testGetStandardVariableIdsWithTypeByAliasExcludeStudyDetail() throws Exception {
-		// Seed two nurseries: 1)with LOCATION_NAME used as "Study Detail" and 2) with LOCATION_NAME used as "Environment Detail"
-		this.createNurseryTestData(true);
-		this.createNurseryTestData(false);
-		
 		final List<String> aliases = Arrays.asList(DataSetupTest.LOCATION_NAME);
-		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(aliases);
+
+		final String programUUID = UUID.randomUUID().toString();
+		this.createNurseryTestData(programUUID);
+
+		// Check first if the location name variable exists in the program
+		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(aliases, programUUID);
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
-		for (final String alias : aliases) {
-			final Map<Integer, VariableType> variableMap = results.get(alias);
-			for (final VariableType variableType : variableMap.values()) {
-				Assert.assertFalse(VariableType.STUDY_DETAIL.equals(variableType));
-				if (DataSetupTest.LOCATION_NAME.equals(alias)) {
-					Assert.assertTrue(VariableType.ENVIRONMENT_DETAIL.equals(variableType));
-				}
-			}
-		}
+
+		// Then mark the location name variable as obsolete to test if we can still retrieve it
+		final CVTerm locationName = cvTermDao.getByName(DataSetupTest.LOCATION_NAME);
+		locationName.setIsObsolete(true);
+		cvTermDao.merge(locationName);
+		this.sessionProvder.getSession().flush();
+
+		final Map<String, Map<Integer, VariableType>> results2 = projectPropDao.getStandardVariableIdsWithTypeByAlias(aliases, programUUID);
+
+		// The LOCATION_NAME variable is obsolete so the result should be empty
+		Assert.assertTrue(results2.isEmpty());
 	}
-	
+
+	@Test
+	public void testGetStandardVariableIdsWithTypeByAliasExcludeStudyDetail() throws Exception {
+
+		final String programUUID = UUID.randomUUID().toString();
+		this.createNurseryTestData(programUUID);
+
+		final List<String> aliases = Arrays.asList(DataSetupTest.LOCATION_NAME, DataSetupTest.STUDY_INSTITUTE);
+
+		final Map<String, Map<Integer, VariableType>> results = projectPropDao.getStandardVariableIdsWithTypeByAlias(aliases, programUUID);
+		Assert.assertNotNull(results);
+		Assert.assertFalse(results.isEmpty());
+		Assert.assertFalse(results.containsKey(DataSetupTest.STUDY_INSTITUTE));
+		Assert.assertTrue(results.containsKey(DataSetupTest.LOCATION_NAME));
+		Assert.assertEquals(
+			VariableType.ENVIRONMENT_DETAIL,
+			results.get(DataSetupTest.LOCATION_NAME).entrySet().iterator().next().getValue());
+
+	}
+
 	@Test
 	public void testDeleteProjectVariables() {
 		final DmsProject project = new DmsProject();
@@ -177,7 +190,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		final CVTerm trait2 = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 		cvTermDao.save(trait1);
 		cvTermDao.save(trait2);
-		
+
 		final ProjectProperty property1 = new ProjectProperty();
 		property1.setAlias(RandomStringUtils.randomAlphabetic(20));
 		property1.setRank(1);
@@ -185,7 +198,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		property1.setProject(project);
 		property1.setVariableId(trait1.getCvTermId());
 		projectPropDao.save(property1);
-		
+
 		final ProjectProperty property2 = new ProjectProperty();
 		property2.setAlias(RandomStringUtils.randomAlphabetic(20));
 		property2.setRank(2);
@@ -193,7 +206,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		property2.setProject(project);
 		property2.setVariableId(trait2.getCvTermId());
 		projectPropDao.save(property2);
-		
+
 		final Integer projectId = project.getProjectId();
 		Assert.assertEquals(2, projectPropDao.getByProjectId(projectId).size());
 		projectPropDao.deleteProjectVariables(projectId, Arrays.asList(trait1.getCvTermId(), trait2.getCvTermId()));
@@ -215,17 +228,16 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		return objectToConvert;
 	}
-	
-	private int createNurseryTestData(final boolean locationIsStudyDetail) {
-		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
+
+	private int createNurseryTestData(final String programUUID) {
 		final String cropPrefix = "BJ06";
-		Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
 		final Integer[] gids = this.germplasmTestDataGenerator
-				.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX,
-						parentGermplasm);
+			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX,
+				parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix, locationIsStudyDetail);
+		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 
 		return nurseryId;
 	}

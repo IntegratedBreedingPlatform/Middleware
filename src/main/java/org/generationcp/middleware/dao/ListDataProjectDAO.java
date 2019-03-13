@@ -127,7 +127,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return result;
 	}
 
-	public ListDataProject getByStudy(final int studyId, final GermplasmListType listType, final int plotNo, final String instanceNumber) {
+	public List<ListDataProject> getByStudy(final int studyId, final GermplasmListType listType, final List<Integer> plotNumbers, final String instanceNumber) {
 		try {
 
 			final String queryStr = "select ldp.* FROM nd_experiment e,"
@@ -139,7 +139,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				+ " AND e.project_id = pr.subject_project_id"
 				+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
 				+ " AND stock.stock_id = e.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
-				+ " AND nd_ep.value = :PLOT_NO"
+				+ " AND nd_ep.value in (:PLOT_NO)"
 				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
 				+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"
 				+ " AND geo.description = :INSTANCE_NUMBER"
@@ -153,23 +153,18 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.addEntity("ldp", ListDataProject.class);
 			query.setParameter("LIST_TYPE", listType.name());
 			query.setParameter("STUDY_ID", studyId);
-			query.setParameter("PLOT_NO", plotNo);
+			query.setParameterList("PLOT_NO", plotNumbers);
 			query.setParameter("INSTANCE_NUMBER", instanceNumber);
 			query.setParameter("DATASET_TYPE", DataSetType.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
 				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
 
-			final List resultList = query.list();
-			if (!resultList.isEmpty()) {
-				return (ListDataProject) resultList.get(0);
-			}
+			return query.list();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				"Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}
-
-		return null;
 
 	}
 

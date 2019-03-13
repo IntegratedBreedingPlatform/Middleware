@@ -759,4 +759,6 @@ public interface StudyDataManager {
 	Map<Integer, String> getGeolocationByVariableId(final Integer datasetId, final Integer instanceDbId);
 
 	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
+
+	boolean renameStudy(final String newStudyName, final int studyId, final String programUUID);
 }
