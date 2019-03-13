@@ -756,6 +756,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
+			criteria.add(Restrictions.isNotNull("studyType"));
 			criteria.add(Restrictions.eq("programUUID", programUUID));
 
 			final List list = criteria.list();
@@ -815,7 +816,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID) {
 		try {
-			final String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid";
+			final String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid and study_type_id is not null";
 			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameter("name", name);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
