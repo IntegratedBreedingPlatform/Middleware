@@ -612,8 +612,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		final Map<Integer, List<GermplasmParent>> progenitorsMap = daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
 		for (final CrossListData data : dataList) {
 			final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGid());
-			for (final GermplasmParent parent : progenitors) {
-				data.addProgenitor(parent);
+			if (progenitors != null){				
+				for (final GermplasmParent parent : progenitors) {
+					data.addProgenitor(parent);
+				}
 			}
 		}
 		return dataList;
