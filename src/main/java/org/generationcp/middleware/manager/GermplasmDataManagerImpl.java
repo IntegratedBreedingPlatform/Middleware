@@ -20,12 +20,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
@@ -47,6 +50,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
@@ -720,7 +724,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Attribute getAttributeById(final Integer id) {
 		return this.getAttributeDao().getById(id, false);
 	}
-	
+
 	@Override
 	public List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation) {
 		final List<Integer> idGermplasmsSaved = new ArrayList<>();
@@ -769,34 +773,38 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName) {
-		final List<Pair<Germplasm, Name>> pairList = new ArrayList<>();
-		pairList.add(new ImmutablePair<>(germplasm, preferredName));
-		final List<Integer> ids = this.addGermplasm(pairList);
+		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
+		final List<Progenitor> progenitors = new ArrayList<>();
+		final Triple<Germplasm, Name, List<Progenitor>> triple = new ImmutableTriple<>(germplasm, preferredName, progenitors);
+		tripleList.add(triple);
+		final List<Integer> ids = this.addGermplasm(tripleList);
 		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
 	@Override
 	public List<Integer> addGermplasm(final Map<Germplasm, Name> germplasmNameMap) {
-		final List<Pair<Germplasm, Name>> pairList = new ArrayList<>();
+		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
+		final List<Progenitor> progenitors = new ArrayList<>();
 		for (final Map.Entry<Germplasm, Name> entry : germplasmNameMap.entrySet()) {
-			final Pair<Germplasm, Name> pair = new ImmutablePair<>(entry.getKey(), entry.getValue());
-			pairList.add(pair);
+			final Triple<Germplasm, Name, List<Progenitor>> triple = new ImmutableTriple<>(entry.getKey(), entry.getValue(), progenitors);
+			tripleList.add(triple);
 		}
-
-		return this.addGermplasm(pairList);
+		return this.addGermplasm(tripleList);
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final List<Pair<Germplasm, Name>> germplasms) {
+	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples) {
 		final List<Integer> isGermplasmsSaved = new ArrayList<>();
 		try {
 
-			final GermplasmDAO dao = this.getGermplasmDao();
-			final NameDAO nameDao = this.getNameDao();
+			final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
+			final NameDAO nameDao = this.daoFactory.getNameDao();
+			final ProgenitorDAO progenitorDao = this.daoFactory.getProgenitorDao();
 
-			for (final Pair<Germplasm, Name> pair : germplasms) {
-				final Germplasm germplasm = pair.getLeft();
-				final Name name = pair.getRight();
+			for (final Triple<Germplasm, Name, List<Progenitor>> triple : germplasmTriples) {
+				final Germplasm germplasm = triple.getLeft();
+				final Name name = triple.getMiddle();
+				final List<Progenitor> progenitors = triple.getRight();
 
 				if (name.getNstat() == null) {
 					name.setNstat(1);
@@ -806,6 +814,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				isGermplasmsSaved.add(germplasmSaved.getGid());
 				name.setGermplasmId(germplasmSaved.getGid());
 				nameDao.save(name);
+
+				for (final Progenitor progenitor : progenitors) {
+					progenitor.setGermplasm(germplasmSaved);
+					progenitorDao.save(progenitor);
+				}
+
 			}
 
 		} catch (final Exception e) {
