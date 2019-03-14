@@ -219,7 +219,7 @@ public class GermplasmListTestDataInitializer {
 		listEntry.setSeedSource("SeedSource " + listDataId);
 		listEntry.setGid(gid);
 		// Default MGID(GROUP ID) is 0
-		listEntry.setMgid(0);
+		listEntry.setGroupId(0);;
 		return listEntry;
 	}
 

@@ -13,15 +13,12 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.germplasm.CrossListData;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -171,9 +168,9 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	 * This will return all items of a cross list along with data of parents. 
 	 * Note that we're getting the name of the parents from its preferred name which is indicated by name record with nstat = 1
 	 */
-	public List<CrossListData> retrieveCrossListDataWithImmediateParents(final Integer listID) {
+	public List<GermplasmListData> retrieveGermplasmListDataWithImmediateParents(final Integer listID) {
 		Preconditions.checkNotNull(listID, "List id passed cannot be null.");
-		final List<CrossListData> germplasmListData = new ArrayList<>();
+		final List<GermplasmListData> germplasmListData = new ArrayList<>();
 
 		try {
 
@@ -215,7 +212,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createCrossListDataRows(final List<CrossListData> dataList, final SQLQuery query) {
+	private void createCrossListDataRows(final List<GermplasmListData> dataList, final SQLQuery query) {
 		final List<Object[]> result = query.list();
 
 		for (final Object[] row : result) {
@@ -232,7 +229,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		  	final String malePedigree = (String) row[11];
 		  	final String femalePedigree = (String) row[12];
 		  	
-		  	final CrossListData data = new CrossListData();
+		  	final GermplasmListData data = new GermplasmListData();
 		  	data.setId(id);
 		  	data.setEntryId(entryId);
 		  	data.setGid(gid);
@@ -240,9 +237,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		  	data.setFemaleParent(new GermplasmParent(fgid, femaleParent, femalePedigree));
 		  	data.setSeedSource(seedSource);
 		  	data.setBreedingMethodName(methodName);
-		  	final List<GermplasmParent> maleParents = new ArrayList<>();
-		  	maleParents.add(new GermplasmParent(mgid, maleParent, malePedigree));
-		 	data.setMaleParents(maleParents);
+		  	data.addMaleParent(new GermplasmParent(mgid, maleParent, malePedigree));
 		  	
 			dataList.add(data);
 		}

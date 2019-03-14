@@ -14,7 +14,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.germplasm.CrossListData;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -175,12 +175,12 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final Germplasm childGermplasm = this.germplasmTestDataGenerator.createChildGermplasm(parentGermplasm,
 				"VARIETY");
 		final GermplasmListData listData = this.createTestListWithListData(childGermplasm);
-		final List<CrossListData> listDataList = this.germplasmListDataDAO
-				.retrieveCrossListDataWithImmediateParents(listData.getList().getId());
+		final List<GermplasmListData> listDataList = this.germplasmListDataDAO
+				.retrieveGermplasmListDataWithImmediateParents(listData.getList().getId());
 		Assert.assertEquals("There should be only 1 list data under the list with id" + listData.getList().getId(), 1,
 				listDataList.size());
 
-		for (final CrossListData currentGermplasmListData : listDataList) {
+		for (final GermplasmListData currentGermplasmListData : listDataList) {
 			Assert.assertEquals("List data id should be " + listData.getId(), listData.getId(),
 					currentGermplasmListData.getId());
 			Assert.assertEquals("Entry id should be " + listData.getEntryId(), listData.getEntryId(),
@@ -195,12 +195,12 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 					GermplasmTestDataGenerator.TEST_METHOD_NAME, currentGermplasmListData.getBreedingMethodName());
 
 			// Check parent germplasm values
-			Assert.assertEquals("Female Parent GID should be " + listData.getFgid(), listData.getFgid(),
-					currentGermplasmListData.getFemaleParent().getGid());
-			Assert.assertEquals("Male Parent GID should be " + listData.getMgid(), listData.getMgid(),
-					currentGermplasmListData.getMaleParents().get(0).getGid());
+			Assert.assertEquals("Female Parent GID should be " + listData.getFemaleGid(), listData.getFemaleGid(),
+					currentGermplasmListData.getFemaleParentDesignation());
+			Assert.assertEquals("Male Parent GID should be " + listData.getMaleGid(), listData.getMaleParentDesignation(),
+					currentGermplasmListData.getMaleGid());
 			Assert.assertEquals("Female Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
-					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getFemaleParent().getDesignation());
+					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getFemaleParentDesignation());
 			Assert.assertEquals("Male Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
 					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getMaleParents().get(0).getDesignation());
 		}
@@ -228,8 +228,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 			final GermplasmList listDataGermplasmList) {
 		final GermplasmListData listData = GermplasmListDataTestDataInitializer.createGermplasmListData(
 				listDataGermplasmList, listDataGermplasm.getGid(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
-		listData.setFgid(listDataGermplasm.getGpid1());
-		listData.setMgid(listDataGermplasm.getGpid2());
+		listData.setFemaleParent(new GermplasmParent(listDataGermplasm.getGpid1(), "", ""));
+		listData.addMaleParent(new GermplasmParent(listDataGermplasm.getGpid2(), "", ""));
 		this.germplasmListDataDAO.save(listData);
 
 		return listData;
