@@ -756,7 +756,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
-			criteria.add(Restrictions.isNotNull("studyType"));
 			criteria.add(Restrictions.eq("programUUID", programUUID));
 
 			final List list = criteria.list();
