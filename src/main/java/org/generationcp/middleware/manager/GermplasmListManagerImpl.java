@@ -595,7 +595,21 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public List<ListDataProject> retrieveSnapshotListDataWithParents(final Integer listID) {
-		return this.getListDataProjectDAO().getListDataProjectWithParents(listID);
+		final List<ListDataProject> dataList = this.getListDataProjectDAO().getListDataProjectWithParents(listID);
+		Iterable<Integer> gidList = Iterables.transform(dataList, new Function<ListDataProject, Integer>() {
+		    public Integer apply(ListDataProject data) { 
+		    	return data.getGermplasmId();
+	    	};
+		});
+		// Append to maleParents of ListDataProject other progenitors of GIDs from the list, if any
+		final Map<Integer, List<GermplasmParent>> progenitorsMap = daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
+		for (final ListDataProject data : dataList) {
+			final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGermplasmId());
+			if (progenitors != null){				
+				data.addMaleParents(progenitors);
+			}
+		}
+		return dataList;
 	}
 
 	@Override
