@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -68,6 +69,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -1007,8 +1009,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final List<Pair<Germplasm, Name>> germplasmPairs) {
-		return this.getGermplasmDataManager().addGermplasm(germplasmPairs);
+	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples) {
+		return this.getGermplasmDataManager().addGermplasm(germplasmTriples);
 	}
 
 	@Override

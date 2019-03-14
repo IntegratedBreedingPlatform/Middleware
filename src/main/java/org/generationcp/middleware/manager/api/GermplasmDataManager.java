@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
@@ -693,7 +695,7 @@ public interface GermplasmDataManager {
 	 */
 	List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap);
 
-	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasms);
+	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples);
 
 	/**
 	 * Given a UserDefinedField object, add new record for the given parameter.
