@@ -9,7 +9,7 @@
 				<indexExists tableName="project" indexName="project_idx1"/>
 		</preConditions>
 		<comment>
-			remove project_idx1 to allow save projects with the same name. IBP-2211
+			remove project_idx1 to to allow saving projects with the same name. IBP-2211
 		</comment>
 		<dropIndex tableName="project" indexName="project_idx1"></dropIndex>
 	</changeSet>
