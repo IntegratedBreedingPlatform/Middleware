@@ -56,7 +56,7 @@ public interface DatasetService {
 
 	List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId);
 
-	Boolean isDatasetNameAvailable(final String name, final int StudyId);
+	Boolean isDatasetNameAvailable(final String name, final int studyId);
 
 	Integer getNumberOfChildren (final Integer parentId);
 

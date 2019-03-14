@@ -257,8 +257,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean isDatasetNameAvailable(final String name, final int StudyId) {
-		final List<DatasetDTO> datasetDTOs = this.getDatasets(StudyId, new HashSet<Integer>());
+	public Boolean isDatasetNameAvailable(final String name, final int studyId) {
+		final List<DatasetDTO> datasetDTOs = this.getDatasets(studyId, new HashSet<Integer>());
 		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			if (datasetDTO.getName().equals(name)) {
 				return false;
