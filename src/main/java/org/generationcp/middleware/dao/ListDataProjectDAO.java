@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -26,6 +27,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
@@ -310,10 +312,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setEntryId(entryId);
 			listDataProject.setDesignation(designation);
 			listDataProject.setGroupName(parentage);
-			listDataProject.setFemaleParent(femaleParent);
-			listDataProject.setFgid(fgid);
-			listDataProject.setMaleParent(maleParent);
-			listDataProject.setMgid(mpgid);
+			listDataProject.setFemaleParent(new GermplasmParent(fgid, femaleParent, ""));
+			listDataProject.addMaleParent(new GermplasmParent(mpgid, maleParent, ""));
 			listDataProject.setGroupId(mgid);
 			listDataProject.setGermplasmId(gid);
 			listDataProject.setSeedSource(seedSource);

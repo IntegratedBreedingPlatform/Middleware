@@ -149,13 +149,13 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 				// check parent germplasm values
 				final String parentPreferredName = this.parentGermplasm.getPreferredName().getNval();
 				Assert.assertEquals("The Female Parent Designation must be " + parentPreferredName, parentPreferredName,
-					listDataProject.getFemaleParent());
+					listDataProject.getFemaleParentDesignation());
 				Assert.assertEquals("The Female Parent GID must be " + this.parentGermplasm.getGid(), this.parentGermplasm.getGid(),
-					listDataProject.getFgid());
+					listDataProject.getFemaleGid());
 				Assert.assertEquals("The Male Parent Designation must be " + parentPreferredName, parentPreferredName,
-					listDataProject.getMaleParent());
+					listDataProject.getMaleParentDesignation());
 				Assert.assertEquals("The Male Parent GID must be " + this.parentGermplasm.getGid(), this.parentGermplasm.getGid(),
-					listDataProject.getMgid());
+					listDataProject.getMaleGid());
 			}
 		}
 
