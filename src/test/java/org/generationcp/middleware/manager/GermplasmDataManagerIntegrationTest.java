@@ -13,11 +13,14 @@ package org.generationcp.middleware.manager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -35,6 +38,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -97,7 +101,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	private TransactionDAO transactionDAO;
 
+	private ProgenitorDAO progenitorDAO;
+
 	private Project commonTestProject;
+
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
@@ -109,6 +116,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.programFavoriteTestDataInitializer = new ProgramFavoriteTestDataInitializer();
+
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -145,6 +153,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		if (this.userDefinedFieldDAO == null) {
 			this.userDefinedFieldDAO = new UserDefinedFieldDAO();
 			this.userDefinedFieldDAO.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.progenitorDAO == null) {
+			this.progenitorDAO = new ProgenitorDAO();
+			this.progenitorDAO.setSession(this.sessionProvder.getSession());
 		}
 
 		// Make sure a seed User(1) is present in the crop db otherwise add one
@@ -660,6 +673,33 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			Debug.println(IntegrationTestBase.INDENT,
 				"testUpdateGermplasmAttribute(" + attributeId + "): " + "\ntBEFORE: " + attributeString + "\ntAFTER: " + attribute);
 		}
+	}
+
+	@Test
+	public void testAddGermplasmWithNameAndProgenitors() {
+
+		final UserDefinedField nameType = createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		germplasm.getPreferredName().setTypeId(nameType.getFldno());
+
+		final Germplasm maleParent1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Germplasm maleParent2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDAO.save(maleParent1);
+		this.germplasmDAO.save(maleParent2);
+
+		final Progenitor progenitor1 = new Progenitor(null, 3, maleParent1.getGid());
+		final Progenitor progenitor2 = new Progenitor(null, 4, maleParent2.getGid());
+
+		final Triple<Germplasm, Name, List<Progenitor>>
+			germplasmTriple = ImmutableTriple.of(germplasm, germplasm.getPreferredName(), Arrays.asList(progenitor1, progenitor2));
+		final List<Integer> gids = this.germplasmDataManager.addGermplasm(Arrays.asList(germplasmTriple));
+
+		final int savedGermplasmGid = gids.get(0);
+		Assert.assertNotNull(this.germplasmDAO.getById(savedGermplasmGid));
+		Assert.assertNotNull(this.nameDAO.getNamesByGids(Arrays.asList(savedGermplasmGid)));
+		Assert.assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor1.getProgenitorGid()));
+		Assert.assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor2.getProgenitorGid()));
+
 	}
 
 	@Test
