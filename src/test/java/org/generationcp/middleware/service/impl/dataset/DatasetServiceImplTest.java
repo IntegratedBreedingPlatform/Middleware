@@ -13,6 +13,7 @@ import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataI
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -799,7 +800,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testSetAsMissingDraftData() throws Exception {
+	public void testSetAsMissingDraftDataAcceptingValue() throws Exception {
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -812,10 +813,10 @@ public class DatasetServiceImplTest {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
-		phenotype.setcValue(123);
+		phenotype.setcValue(1);
 		final Integer variableId = 12;
 		phenotype.setObservableId(variableId);
-		phenotype.setValue("55");
+		phenotype.setValue("5");
 		phenotype.setDraftValue("8");
 		phenotype.setExperiment(experimentModel);
 		phenotype.setName(String.valueOf(variableId));
@@ -823,9 +824,73 @@ public class DatasetServiceImplTest {
 		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+		final MeasurementVariable variable = new MeasurementVariable();
+		variable.setTermId(12);
+		final ValueReference valueReference = new ValueReference();
+		valueReference.setKey("5");
+		valueReference.setName("5");
+		valueReference.setId(5);
+		valueReference.setId(5);
+		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
+		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
+
 
 		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getPhenotypes(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
+		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
+		this.datasetService.setValuesToMissing(datasetId);
+
+		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
+		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
+		final Phenotype phenotypeArgumentCaptorValue = phenotypeArgumentCaptor.getValue();
+		Assert.assertEquals("8", phenotypeArgumentCaptorValue.getValue());
+		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
+	}
+
+	@Test
+	public void testSetAsMissingDraftDataMissingValue() throws Exception {
+		final Integer datasetId = 3;
+
+		final DmsProject project = new DmsProject();
+		project.setProjectId(datasetId);
+
+		final Integer observationUnitId = 333;
+		final ExperimentModel experimentModel = new ExperimentModel(observationUnitId);
+		experimentModel.setProject(project);
+
+		final Phenotype phenotype = new Phenotype();
+		phenotype.setCreatedDate(new Date());
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setcValue(1);
+		final Integer variableId = 12;
+		phenotype.setObservableId(variableId);
+		phenotype.setValue("5");
+		phenotype.setDraftValue("8");
+		phenotype.setExperiment(experimentModel);
+		phenotype.setName(String.valueOf(variableId));
+
+		experimentModel.setPhenotypes(Lists.newArrayList(phenotype));
+
+		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
+		final MeasurementVariable variable = new MeasurementVariable();
+		variable.setTermId(12);
+		final ValueReference valueReference = new ValueReference();
+		valueReference.setKey("5");
+		valueReference.setName("5");
+		valueReference.setId(5);
+		valueReference.setId(5);
+		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
+		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
+
+
+		Mockito.when(this.phenotypeDao.getDraftDataOfDataset(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getPhenotypes(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
+		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
+		final ExportImportUtils exportImportUtils = Mockito.mock(ExportImportUtils.class);
+
+		Mockito.when(exportImportUtils.isValidValue(variable, phenotype.getDraftValue(), phenotypes)).thenReturn(Boolean.FALSE);
 		this.datasetService.setValuesToMissing(datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
