@@ -95,7 +95,9 @@ public class DatasetServiceImpl implements DatasetService {
 			VariableType.SELECTION_METHOD.getId());
 
 	protected static final List<Integer> STANDARD_ENVIRONMENT_FACTORS = Lists.newArrayList( //
-			TermId.LOCATION_ID.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		TermId.LOCATION_ID.getId(), //
+		TermId.TRIAL_INSTANCE_FACTOR.getId(), //
+		TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 
 	private DaoFactory daoFactory;
 

@@ -625,7 +625,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
-		// same for columns -> DatasetServiceImpl.getSubObservationSetColumns
+		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
+
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, " //
 			+ "    gl.description AS TRIAL_INSTANCE, " //
