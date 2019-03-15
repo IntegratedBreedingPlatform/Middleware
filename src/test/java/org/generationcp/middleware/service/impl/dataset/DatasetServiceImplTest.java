@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -89,6 +90,7 @@ public class DatasetServiceImplTest {
 	public static final String BLOCK_NO = "BLOCK_NO";
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String REP_NO = "REP_NO";
+	public static final String EXPECTED = "5";
 
 	@Mock
 	private DaoFactory daoFactory;
@@ -800,7 +802,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testSetAsMissingDraftDataAcceptingValue() throws Exception {
+	public void testSetAsMissingDraftDataValidValue() throws Exception {
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -816,8 +818,8 @@ public class DatasetServiceImplTest {
 		phenotype.setcValue(1);
 		final Integer variableId = 12;
 		phenotype.setObservableId(variableId);
-		phenotype.setValue("5");
-		phenotype.setDraftValue("8");
+		phenotype.setValue("1");
+		phenotype.setDraftValue(EXPECTED);
 		phenotype.setExperiment(experimentModel);
 		phenotype.setName(String.valueOf(variableId));
 
@@ -826,9 +828,10 @@ public class DatasetServiceImplTest {
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 		final MeasurementVariable variable = new MeasurementVariable();
 		variable.setTermId(12);
+		variable.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
 		final ValueReference valueReference = new ValueReference();
-		valueReference.setKey("5");
-		valueReference.setName("5");
+		valueReference.setKey(EXPECTED);
+		valueReference.setName(EXPECTED);
 		valueReference.setId(5);
 		valueReference.setId(5);
 		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
@@ -844,12 +847,12 @@ public class DatasetServiceImplTest {
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
 		final Phenotype phenotypeArgumentCaptorValue = phenotypeArgumentCaptor.getValue();
-		Assert.assertEquals("8", phenotypeArgumentCaptorValue.getValue());
+		Assert.assertEquals(EXPECTED, phenotypeArgumentCaptorValue.getValue());
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
 	}
 
 	@Test
-	public void testSetAsMissingDraftDataMissingValue() throws Exception {
+	public void testSetAsMissingDraftDataInvalidValue() throws Exception {
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -865,7 +868,7 @@ public class DatasetServiceImplTest {
 		phenotype.setcValue(1);
 		final Integer variableId = 12;
 		phenotype.setObservableId(variableId);
-		phenotype.setValue("5");
+		phenotype.setValue("10");
 		phenotype.setDraftValue("8");
 		phenotype.setExperiment(experimentModel);
 		phenotype.setName(String.valueOf(variableId));
@@ -875,11 +878,12 @@ public class DatasetServiceImplTest {
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 		final MeasurementVariable variable = new MeasurementVariable();
 		variable.setTermId(12);
+		variable.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
 		final ValueReference valueReference = new ValueReference();
-		valueReference.setKey("5");
-		valueReference.setName("5");
-		valueReference.setId(5);
-		valueReference.setId(5);
+		valueReference.setKey("50");
+		valueReference.setName("50");
+		valueReference.setId(50);
+		valueReference.setId(50);
 		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
 		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
 
@@ -888,9 +892,6 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.phenotypeDao.getPhenotypes(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
 		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
-		final ExportImportUtils exportImportUtils = Mockito.mock(ExportImportUtils.class);
-
-		Mockito.when(exportImportUtils.isValidValue(variable, phenotype.getDraftValue(), phenotypes)).thenReturn(Boolean.FALSE);
 		this.datasetService.setValuesToMissing(datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
