@@ -51,13 +51,15 @@ public class Progenitor implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "pid")
 	private Integer progenitorGid;
-	
-	
+
+	public Progenitor() {
+		super();
+	}
+
 	public Progenitor(Integer id) {
 		super();
 		this.id = id;
 	}
-
 
 	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid) {
 		super();

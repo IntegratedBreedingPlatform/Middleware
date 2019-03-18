@@ -816,8 +816,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				nameDao.save(name);
 
 				for (final Progenitor progenitor : progenitors) {
-					progenitor.setGermplasm(germplasmSaved);
-					progenitorDao.save(progenitor);
+					if(progenitorDao.getByGIDAndProgenitorNumber(germplasmSaved.getGid(), progenitor.getProgenitorNumber()) == null) {
+						progenitor.setGermplasm(germplasmSaved);
+						progenitorDao.save(progenitor);
+					}
 				}
 
 			}
