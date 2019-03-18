@@ -794,7 +794,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples) {
-		final List<Integer> isGermplasmsSaved = new ArrayList<>();
+		final List<Integer> listOfGermplasm = new ArrayList<>();
 		try {
 
 			final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
@@ -811,17 +811,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
-				isGermplasmsSaved.add(germplasmSaved.getGid());
+				listOfGermplasm.add(germplasmSaved.getGid());
 				name.setGermplasmId(germplasmSaved.getGid());
 				nameDao.save(name);
 
 				for (final Progenitor progenitor : progenitors) {
-					if(progenitorDao.getByGIDAndProgenitorNumber(germplasmSaved.getGid(), progenitor.getProgenitorNumber()) == null) {
-						progenitor.setGermplasm(germplasmSaved);
-						progenitorDao.save(progenitor);
-					}
+					progenitor.setGermplasm(germplasmSaved);
+					progenitorDao.save(progenitor);
 				}
-
 			}
 
 		} catch (final Exception e) {
@@ -829,7 +826,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			throw new MiddlewareQueryException(
 					"Error encountered while saving Germplasm: GermplasmDataManager.addGermplasm(): " + e.getMessage(), e);
 		}
-		return isGermplasmsSaved;
+		return listOfGermplasm;
 	}
 
 	@Override

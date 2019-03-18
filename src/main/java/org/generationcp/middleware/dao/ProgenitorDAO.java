@@ -41,7 +41,21 @@ public class ProgenitorDAO extends GenericDAO<Progenitor, Integer> {
 		}
 		return null;
 	}
-	
+
+	public List<Progenitor> getByGID(final Integer gid) {
+		try {
+			List<Criterion> criterions = new ArrayList<>();
+			criterions.add(Restrictions.eq("germplasm.gid", gid));
+			List<Progenitor> progenitors = this.getByCriteria(criterions);
+			if (!progenitors.isEmpty()) {
+				return progenitors;
+			}
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getByGIDAndPID(gid=" + gid + ") query from Progenitor: " + e.getMessage(), e);
+		}
+		return null;
+	}
 
 	public Progenitor getByGIDAndProgenitorNumber(final Integer gid, final Integer progenitorNumber) {
 		try {

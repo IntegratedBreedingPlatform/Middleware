@@ -551,6 +551,11 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
+	public List<Progenitor> getProgenitorsByGID(final Integer gid) {
+		return this.getProgenitorDao().getByGID(gid);
+	}
+
+	@Override
 	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {
 
 		// check if the germplasm record identified by gid exists

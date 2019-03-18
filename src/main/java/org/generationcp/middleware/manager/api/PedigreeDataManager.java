@@ -195,6 +195,8 @@ public interface PedigreeDataManager {
 	
 	void addProgenitors(List<Progenitor> progenitors);
 
+	List<Progenitor> getProgenitorsByGID(final Integer gid);
+
 	/**
 	 * Given the gid of the child germplasm, the gid of the parent germplasm and the progenitor number, this method makes the necessary
 	 * changes to save the relationship on the database.
