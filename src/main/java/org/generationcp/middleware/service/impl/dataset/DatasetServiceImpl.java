@@ -559,7 +559,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer countTotalObservationUnitsForDataset(
+	public Integer countAllObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
 		return this.daoFactory.getExperimentDao().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
 	}

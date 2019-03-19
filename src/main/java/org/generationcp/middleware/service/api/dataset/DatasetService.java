@@ -48,7 +48,7 @@ public interface DatasetService {
 
 	DatasetDTO getDataset(final Integer datasetId);
 
-	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
 	long countFilteredObservationUnitsForDataset(Integer datasetId, Integer instanceId, final Boolean draftMode,
 		ObservationUnitsSearchDTO.Filter filter);
