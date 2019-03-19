@@ -27,24 +27,24 @@ public abstract class ExportImportUtils {
 
 			final Double currentValue = Double.valueOf(value);
 
-			Double minValue = var.getMinRange();
+			Double minValue = var.getVariableMinRange();
 			if (minValue != null) {
 				if (currentValue < minValue) {
 					return false;
 				} else if (var.getScaleMinRange() != null) {
-					minValue = Double.valueOf(var.getScaleMinRange());
+					minValue = var.getScaleMinRange();
 					if (currentValue < minValue) {
 						return false;
 					}
 				}
 			}
 
-			Double maxValue = var.getMaxRange();
+			Double maxValue = var.getVariableMaxRange();
 			if (maxValue != null) {
 				if (currentValue > maxValue) {
 					return false;
 				} else if (var.getScaleMaxRange() != null) {
-					maxValue = Double.valueOf(var.getScaleMaxRange());
+					maxValue = var.getScaleMaxRange();
 					if (currentValue > maxValue) {
 						return false;
 					}
