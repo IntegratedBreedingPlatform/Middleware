@@ -806,10 +806,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				final Name name = triple.getMiddle();
 				final List<Progenitor> progenitors = triple.getRight();
 
-				// If germplasm has multiple male parents, automatically set gnpgs (number of progenitors) to 3.
-				// to indicate that there are other parents in progenitors table other than gpid1 and gpid2.
+				// If germplasm has multiple male parents, automatically set the value of gnpgs to (<count of progenitors> + 2). We need to add 2
+				// to take into account the gpid1 and gpid2 parents.
+				// Setting gnpgs to >2 will indicate that there are other parents in progenitors table other than gpid1 and gpid2.
 				if (!progenitors.isEmpty()) {
-					germplasm.setGnpgs(3);
+					germplasm.setGnpgs(progenitors.size()+2);
 				}
 
 				if (name.getNstat() == null) {

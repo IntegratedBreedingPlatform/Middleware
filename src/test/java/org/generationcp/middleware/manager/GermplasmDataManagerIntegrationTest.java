@@ -698,7 +698,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Germplasm savedGermplasm = this.germplasmDAO.getById(savedGermplasmGid);
 		final Name savedName = this.nameDAO.getNamesByGids(Arrays.asList(savedGermplasmGid)).get(0);
 		Assert.assertNotNull(savedGermplasm);
-		Assert.assertEquals(3, savedGermplasm.getGnpgs().intValue());
+		Assert.assertEquals(4, savedGermplasm.getGnpgs().intValue());
 		Assert.assertNotNull(savedName);
 		Assert.assertEquals(1, savedName.getNstat().intValue());
 		Assert.assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor1.getProgenitorGid()));
