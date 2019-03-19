@@ -25,23 +25,33 @@ public abstract class ExportImportUtils {
 				return false;
 			}
 
-			boolean withinValidRange = true;
 			final Double currentValue = Double.valueOf(value);
 
-			if (var.getMinRange() != null) {
-				final Double minValue = Double.valueOf(var.getMinRange());
+			Double minValue = var.getMinRange();
+			if (minValue != null) {
 				if (currentValue < minValue) {
-					withinValidRange = false;
+					return false;
+				} else if (var.getScaleMinRange() != null) {
+					minValue = Double.valueOf(var.getScaleMinRange());
+					if (currentValue < minValue) {
+						return false;
+					}
 				}
 			}
 
-			if (var.getMaxRange() != null) {
-				final Double maxValue = Double.valueOf(var.getMaxRange());
+			Double maxValue = var.getMaxRange();
+			if (maxValue != null) {
 				if (currentValue > maxValue) {
-					withinValidRange = false;
+					return false;
+				} else if (var.getScaleMaxRange() != null) {
+					maxValue = Double.valueOf(var.getScaleMaxRange());
+					if (currentValue > maxValue) {
+						return false;
+					}
 				}
 			}
-			return withinValidRange;
+
+			return true;
 		} else if (var.getDataTypeId() == DataType.DATE_TIME_VARIABLE.getId()) {
 			return new DateValidator().isValid(value, "yyyyMMdd");
 		} else if (var.getDataTypeId() == DataType.CATEGORICAL_VARIABLE.getId()) {
