@@ -89,6 +89,28 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public static final String DELETED = "deleted";
 	private static final int DELETED_STUDY = 1;
 
+	// getObservationSetVariables scalars
+	private static final String OBS_SET_VARIABLE_ID = "variableId";
+	private static final String OBS_SET_VARIABLE_NAME = "variableName";
+	private static final String OBS_SET_DESCRIPTION = "description";
+	private static final String OBS_SET_ALIAS = "alias";
+	private static final String OBS_SET_VALUE = "value";
+	private static final String OBS_SET_VARIABLE_TYPE_ID = "variableTypeId";
+	private static final String OBS_SET_SCALE = "scale";
+	private static final String OBS_SET_METHOD = "method";
+	private static final String OBS_SET_PROPERTY = "property";
+	private static final String OBS_SET_DATA_TYPE_ID = "dataTypeId";
+	private static final String OBS_SET_CATEGORY_ID = "categoryId";
+	private static final String OBS_SET_CATEGORY_NAME = "categoryName";
+	private static final String OBS_SET_CATEGORY_DESCRIPTION = "categoryDescription";
+	private static final String OBS_SET_FORMULA_ID = "formulaId";
+	private static final String OBS_SET_SCALE_MIN_RANGE = "scaleMinRange";
+	private static final String OBS_SET_SCALE_MAX_RANGE = "scaleMaxRange";
+	private static final String OBS_SET_EXPECTED_MIN = "expectedMin";
+	private static final String OBS_SET_EXPECTED_MAX = "expectedMax";
+	private static final String OBS_SET_CROP_ONTOLOGY_ID = "cropOntologyId";
+	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
+
 	/**
 	 * Type of study is stored in projectprops table.
 	 * Which folder the study is in, is defined in the project_relationship table.
@@ -1078,26 +1100,26 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		try {
 			final String query = " SELECT distinct "  //
-				+ "   pp.variable_id AS variableId, "  //
-				+ "   variable.name AS variableName, "  //
-				+ "   variable.definition AS description, "  //
-				+ "   pp.alias AS alias, "  //
-				+ "   pp.value as value, "
-				+ "   variableType.cvterm_id AS variableTypeId, "  //
-				+ "   scale.name AS scale, "  //
-				+ "   method.name AS method, "  //
-				+ "   property.name AS property, "  //
-				+ "   dataType.cvterm_id AS dataTypeId, "  //
-				+ "   category.cvterm_id AS categoryId, "  //
-				+ "   category.name AS categoryName, "  //
-				+ "   category.definition AS categoryDescription, "  //
-				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id LIMIT 1) AS formulaId, "  //
-				+ "   scaleMinRange.value AS scaleMinRange, "  //
-				+ "   scaleMaxRange.value AS scaleMaxRange, "  //
-				+ "   vo.expected_min AS expectedMin, "  //
-				+ "   vo.expected_max AS expectedMax, "  //
-				+ "   cropOntology.value AS cropOntologyId,"
-				+ "   pp.value as variableValue"
+				+ "   pp.variable_id AS " + OBS_SET_VARIABLE_ID + ", "  //
+				+ "   variable.name AS " + OBS_SET_VARIABLE_NAME + ", "  //
+				+ "   variable.definition AS " + OBS_SET_DESCRIPTION + ", "  //
+				+ "   pp.alias AS " + OBS_SET_ALIAS + ", "  //
+				+ "   pp.value as " + OBS_SET_VALUE + ", "
+				+ "   variableType.cvterm_id AS " + OBS_SET_VARIABLE_TYPE_ID + ", "  //
+				+ "   scale.name AS " + OBS_SET_SCALE + ", "  //
+				+ "   method.name AS " + OBS_SET_METHOD + ", "  //
+				+ "   property.name AS " + OBS_SET_PROPERTY + ", "  //
+				+ "   dataType.cvterm_id AS " + OBS_SET_DATA_TYPE_ID + ", "  //
+				+ "   category.cvterm_id AS " + OBS_SET_CATEGORY_ID + ", "  //
+				+ "   category.name AS " + OBS_SET_CATEGORY_NAME + ", "  //
+				+ "   category.definition AS " + OBS_SET_CATEGORY_DESCRIPTION + ", "  //
+				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id LIMIT 1) AS " + OBS_SET_FORMULA_ID + ", "
+				+ "   scaleMinRange.value AS " + OBS_SET_SCALE_MIN_RANGE + ", "  //
+				+ "   scaleMaxRange.value AS " + OBS_SET_SCALE_MAX_RANGE + ", "  //
+				+ "   vo.expected_min AS " + OBS_SET_EXPECTED_MIN + ", "  //
+				+ "   vo.expected_max AS " + OBS_SET_EXPECTED_MAX + ", "  //
+				+ "   cropOntology.value AS " + OBS_SET_CROP_ONTOLOGY_ID + ","
+				+ "   pp.value as " + OBS_SET_VARIABLE_VALUE
 				+ " FROM project dataset "  //
 				+ "   INNER JOIN projectprop pp ON dataset.project_id = pp.project_id "  //
 				+ "   INNER JOIN cvterm variable ON pp.variable_id = variable.cvterm_id "  //
@@ -1134,26 +1156,26 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sqlQuery.setParameter("observationSetId", observationSetId);
 			sqlQuery.setParameterList("variableTypes", variableTypes);
 			sqlQuery
-				.addScalar("variableId")
-				.addScalar("variableName")
-				.addScalar("description")
-				.addScalar("alias")
-				.addScalar("value")
-				.addScalar("variableTypeId")
-				.addScalar("scale")
-				.addScalar("method")
-				.addScalar("property")
-				.addScalar("dataTypeId")
-				.addScalar("categoryId")
-				.addScalar("categoryName")
-				.addScalar("categoryDescription")
-				.addScalar("scaleMinRange", new DoubleType())
-				.addScalar("scaleMaxRange", new DoubleType())
-				.addScalar("expectedMin", new DoubleType())
-				.addScalar("expectedMax", new DoubleType())
-				.addScalar("formulaId", new IntegerType())
-				.addScalar("cropOntologyId")
-				.addScalar("variableValue");
+				.addScalar(OBS_SET_VARIABLE_ID)
+				.addScalar(OBS_SET_VARIABLE_NAME)
+				.addScalar(OBS_SET_DESCRIPTION)
+				.addScalar(OBS_SET_ALIAS)
+				.addScalar(OBS_SET_VALUE)
+				.addScalar(OBS_SET_VARIABLE_TYPE_ID)
+				.addScalar(OBS_SET_SCALE)
+				.addScalar(OBS_SET_METHOD)
+				.addScalar(OBS_SET_PROPERTY)
+				.addScalar(OBS_SET_DATA_TYPE_ID)
+				.addScalar(OBS_SET_CATEGORY_ID)
+				.addScalar(OBS_SET_CATEGORY_NAME)
+				.addScalar(OBS_SET_CATEGORY_DESCRIPTION)
+				.addScalar(OBS_SET_SCALE_MIN_RANGE, new DoubleType())
+				.addScalar(OBS_SET_SCALE_MAX_RANGE, new DoubleType())
+				.addScalar(OBS_SET_EXPECTED_MIN, new DoubleType())
+				.addScalar(OBS_SET_EXPECTED_MAX, new DoubleType())
+				.addScalar(OBS_SET_FORMULA_ID, new IntegerType())
+				.addScalar(OBS_SET_CROP_ONTOLOGY_ID)
+				.addScalar(OBS_SET_VARIABLE_VALUE);
 
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = sqlQuery.list();
@@ -1169,25 +1191,25 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final MeasurementVariable measurementVariable = variables.get(variableId);
 
 					measurementVariable.setTermId(variableId);
-					measurementVariable.setName((String) result.get("variableName"));
-					measurementVariable.setAlias((String) result.get("alias"));
-					measurementVariable.setValue((String) result.get("value"));
-					measurementVariable.setDescription((String) result.get("description"));
-					measurementVariable.setScale((String) result.get("scale"));
-					measurementVariable.setMethod((String) result.get("method"));
-					measurementVariable.setProperty((String) result.get("property"));
-					final VariableType variableType = VariableType.getById((Integer) result.get("variableTypeId"));
+					measurementVariable.setName((String) result.get(OBS_SET_VARIABLE_NAME));
+					measurementVariable.setAlias((String) result.get(OBS_SET_ALIAS));
+					measurementVariable.setValue((String) result.get(OBS_SET_VALUE));
+					measurementVariable.setDescription((String) result.get(OBS_SET_DESCRIPTION));
+					measurementVariable.setScale((String) result.get(OBS_SET_SCALE));
+					measurementVariable.setMethod((String) result.get(OBS_SET_METHOD));
+					measurementVariable.setProperty((String) result.get(OBS_SET_PROPERTY));
+					final VariableType variableType = VariableType.getById((Integer) result.get(OBS_SET_VARIABLE_TYPE_ID));
 					measurementVariable.setVariableType(variableType);
 					//TODO: fix the saving of Treatment Factor Variables in the projectprop table.
 					// Right now, the saved typeid is 1100. It should be 1809(VariableType.TREATMENT_FACTOR.getid())
 					if (variableType != null) {
 						measurementVariable.setFactor(!variableType.getRole().equals(PhenotypicType.VARIATE));
 					}
-					final DataType dataType = DataType.getById((Integer) result.get("dataTypeId"));
+					final DataType dataType = DataType.getById((Integer) result.get(OBS_SET_DATA_TYPE_ID));
 					measurementVariable.setDataType(dataType.getName());
 					measurementVariable.setDataTypeId(dataType.getId());
 
-					final Integer formulaId = (Integer) result.get("formulaId");
+					final Integer formulaId = (Integer) result.get(OBS_SET_FORMULA_ID);
 					if (formulaId != null) {
 						final Formula formula = (Formula) this.getSession()
 							.createCriteria(Formula.class)
@@ -1199,10 +1221,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 						}
 					}
 
-					final Double scaleMinRange = (Double) result.get("scaleMinRange");
-					final Double scaleMaxRange = (Double) result.get("scaleMaxRange");
-					final Double expectedMin = (Double) result.get("expectedMin");
-					final Double expectedMax = (Double) result.get("expectedMax");
+					final Double scaleMinRange = (Double) result.get(OBS_SET_SCALE_MIN_RANGE);
+					final Double scaleMaxRange = (Double) result.get(OBS_SET_SCALE_MAX_RANGE);
+					final Double expectedMin = (Double) result.get(OBS_SET_EXPECTED_MIN);
+					final Double expectedMax = (Double) result.get(OBS_SET_EXPECTED_MAX);
 
 					measurementVariable.setMinRange(expectedMin != null ? expectedMin : scaleMinRange);
 					measurementVariable.setMaxRange(expectedMax != null ? expectedMax : scaleMaxRange);
@@ -1210,16 +1232,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setScaleMaxRange(scaleMaxRange);
 					measurementVariable.setVariableMinRange(expectedMin);
 					measurementVariable.setVariableMaxRange(expectedMax);
-					measurementVariable.setCropOntology((String) result.get("cropOntologyId"));
+					measurementVariable.setCropOntology((String) result.get(OBS_SET_CROP_ONTOLOGY_ID));
 				}
 
 				final MeasurementVariable measurementVariable = variables.get(variableId);
 
 				if (measurementVariable.getValue() == null || measurementVariable.getValue().isEmpty()) {
-					measurementVariable.setValue((String) result.get("variableValue"));
+					measurementVariable.setValue((String) result.get(OBS_SET_VARIABLE_VALUE));
 				}
 
-				final Object categoryId = result.get("categoryId");
+				final Object categoryId = result.get(OBS_SET_CATEGORY_ID);
 				if (categoryId != null) {
 					if (measurementVariable.getPossibleValues() == null || measurementVariable.getPossibleValues().isEmpty()) {
 						measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
@@ -1227,8 +1249,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final ValueReference valueReference = //
 						new ValueReference(
 							(Integer) categoryId, //
-							Objects.toString(result.get("categoryName")), //
-							Objects.toString(result.get("categoryDescription")));
+							Objects.toString(result.get(OBS_SET_CATEGORY_NAME)), //
+							Objects.toString(result.get(OBS_SET_CATEGORY_DESCRIPTION)));
 					if (!measurementVariable.getPossibleValues().contains(valueReference)) {
 						measurementVariable.getPossibleValues().add(valueReference);
 					}
