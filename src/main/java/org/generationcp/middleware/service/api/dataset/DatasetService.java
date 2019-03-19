@@ -48,11 +48,12 @@ public interface DatasetService {
 
 	DatasetDTO getDataset(final Integer datasetId);
 
-	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
-	List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
-		final String sortBy, final String sortOrder, final Boolean draftMode);
+	long countFilteredObservationUnitsForDataset(Integer datasetId, Integer instanceId, final Boolean draftMode,
+		ObservationUnitsSearchDTO.Filter filter);
+
+	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId);
 
