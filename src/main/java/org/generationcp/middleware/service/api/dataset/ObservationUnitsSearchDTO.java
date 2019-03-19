@@ -24,6 +24,9 @@ public class ObservationUnitsSearchDTO {
 	private Integer instanceId;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
+	/**
+	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
+	 */
 	private String draw;
 
 	private Filter filter;
