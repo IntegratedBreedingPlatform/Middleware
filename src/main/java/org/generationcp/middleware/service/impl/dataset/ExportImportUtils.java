@@ -28,15 +28,15 @@ public abstract class ExportImportUtils {
 			boolean withinValidRange = true;
 			final Double currentValue = Double.valueOf(value);
 
-			if (var.getScaleMinRange() != null) {
-				final Double minValue = Double.valueOf(var.getScaleMinRange());
+			if (var.getMinRange() != null) {
+				final Double minValue = Double.valueOf(var.getMinRange());
 				if (currentValue < minValue) {
 					withinValidRange = false;
 				}
 			}
 
-			if (var.getScaleMaxRange() != null) {
-				final Double maxValue = Double.valueOf(var.getScaleMaxRange());
+			if (var.getMaxRange() != null) {
+				final Double maxValue = Double.valueOf(var.getMaxRange());
 				if (currentValue > maxValue) {
 					withinValidRange = false;
 				}
