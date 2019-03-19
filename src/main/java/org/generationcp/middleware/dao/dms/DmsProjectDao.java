@@ -1204,8 +1204,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final Double expectedMin = (Double) result.get("expectedMin");
 					final Double expectedMax = (Double) result.get("expectedMax");
 
-					measurementVariable.setMinRange(scaleMinRange != null ? scaleMinRange : expectedMin);
-					measurementVariable.setMaxRange(scaleMaxRange != null ? scaleMaxRange : expectedMax);
+					measurementVariable.setMinRange(expectedMin != null ? expectedMin : scaleMinRange);
+					measurementVariable.setMaxRange(expectedMax != null ? expectedMax : scaleMaxRange);
 					measurementVariable.setScaleMinRange(scaleMinRange);
 					measurementVariable.setScaleMaxRange(scaleMaxRange);
 					measurementVariable.setVariableMinRange(expectedMin);
