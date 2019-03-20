@@ -4,8 +4,17 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<changeSet author="cuenyad" id="v11.3.0-1">
+		<preConditions onFail="MARK_RAN">
+				<indexExists tableName="project" indexName="project_idx1"/>
+		</preConditions>
+		<comment>
+			remove project_idx1 to to allow saving projects with the same name. IBP-2211
+		</comment>
+		<dropIndex tableName="project" indexName="project_idx1"></dropIndex>
+	</changeSet>
 	
-	<changeSet author="darla" id="v11.3.0-1">
+	<changeSet author="darla" id="v11.3.0-2">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="progntrs" columnName="id"/>
@@ -22,7 +31,7 @@
 		</addColumn>
 	</changeSet>
 	
-	<changeSet author="darla" id="v11.3.0-2">
+	<changeSet author="darla" id="v11.3.0-3">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="progntrs" columnName="id"/>
@@ -40,7 +49,7 @@
 		</createIndex>
 	</changeSet>
 	
-	<changeSet author="darla" id="v11.3.0-3">
+	<changeSet author="darla" id="v11.3.0-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="progntrs" columnName="id"/>
@@ -61,6 +70,5 @@
 			onDelete="NO ACTION"
 			onUpdate="NO ACTION"/>
 	</changeSet>
-	
 
 </databaseChangeLog>

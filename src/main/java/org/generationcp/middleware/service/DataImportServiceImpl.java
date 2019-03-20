@@ -599,8 +599,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 		} else {
 			final boolean isExisting = this.checkIfProjectNameIsExistingInProgram(studyName, programUUID);
-			// existing and is not a valid study
-			if (isExisting && this.getStudyId(studyName, programUUID) == null) {
+			// existing and is study or folder.
+			if (isExisting && (this.isStudy(studyName, programUUID) || this.isFolder(studyName, programUUID))) {
 				messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 			}
 			// else we will create a new study or append the data sets to the
@@ -769,8 +769,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return "1";
 	}
 
-	private Integer getStudyId(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.IS_STUDY);
+	private boolean isStudy(final String name, final String programUUID) {
+		return this.getProjectId(name, programUUID, TermId.IS_STUDY) != null;
+	}
+
+	private boolean isFolder(final String name, final String programUUID) {
+		return this.getProjectId(name, programUUID, TermId.HAS_PARENT_FOLDER) != null;
 	}
 
 	private Integer getProjectId(final String name, final String programUUID, final TermId relationship) {
