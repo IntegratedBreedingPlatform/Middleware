@@ -1113,7 +1113,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   category.cvterm_id AS " + OBS_SET_CATEGORY_ID + ", "  //
 				+ "   category.name AS " + OBS_SET_CATEGORY_NAME + ", "  //
 				+ "   category.definition AS " + OBS_SET_CATEGORY_DESCRIPTION + ", "  //
-				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id LIMIT 1) AS " + OBS_SET_FORMULA_ID + ", "
+				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id and active = 1 LIMIT 1) AS " + OBS_SET_FORMULA_ID + ", "
 				+ "   scaleMinRange.value AS " + OBS_SET_SCALE_MIN_RANGE + ", "  //
 				+ "   scaleMaxRange.value AS " + OBS_SET_SCALE_MAX_RANGE + ", "  //
 				+ "   vo.expected_min AS " + OBS_SET_EXPECTED_MIN + ", "  //
