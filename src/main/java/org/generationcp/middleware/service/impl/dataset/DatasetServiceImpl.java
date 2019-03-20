@@ -618,12 +618,11 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void acceptDraftData(final Integer datasetId) {
 
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
-		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+		final List<Phenotype> draftDataOfDataset = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
 
-		if (phenotypes.size() > 0) {
+		if (draftDataOfDataset.size() > 0) {
 
-			for (final Phenotype phenotype : phenotypes) {
+			for (final Phenotype phenotype : draftDataOfDataset) {
 				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 					this.deletePhenotype(phenotype.getPhenotypeId());
 				} else {
@@ -631,11 +630,12 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 
-			this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
+			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+			this.reorganizePhenotypesStatus(datasetId, draftDataOfDataset, allPhenotypes);
 		}
 	}
 
-	public void reorganizePhenotypesStatus(
+	private void reorganizePhenotypesStatus(
 		final Integer datasetId, final List<Phenotype> phenotypes, final List<Phenotype> allPhenotypes) {
 		final List<MeasurementVariable> measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
@@ -698,16 +698,16 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void setValuesToMissing(final Integer datasetId) {
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		final List<Phenotype> draftDataOfDataset = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
 
-		if (phenotypes.size() > 0) {
+		if (draftDataOfDataset.size() > 0) {
 			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
 			final List<MeasurementVariable>
 				measurementVariableList =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 			for (final MeasurementVariable measurementVariable : measurementVariableList) {
-				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(phenotypes, new Predicate() {
+				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(draftDataOfDataset, new Predicate() {
 					@Override
 					public boolean evaluate(final Object o) {
 						final Phenotype phenotype = (Phenotype) o;
@@ -736,7 +736,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (!selectedPhenotypes.isEmpty()) {
-					this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
+					this.reorganizePhenotypesStatus(datasetId, draftDataOfDataset, allPhenotypes);
 				}
 			}
 		}
