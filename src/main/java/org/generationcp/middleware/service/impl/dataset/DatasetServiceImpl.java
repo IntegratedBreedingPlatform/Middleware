@@ -631,11 +631,11 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 
-			this.reorganizeStatusOfPehnotypes(datasetId, phenotypes, allPhenotypes);
+			this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
 		}
 	}
 
-	public void reorganizeStatusOfPehnotypes(
+	public void reorganizePhenotypesStatus(
 		final Integer datasetId, final List<Phenotype> phenotypes, final List<Phenotype> allPhenotypes) {
 		final List<MeasurementVariable> measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
@@ -736,7 +736,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (!selectedPhenotypes.isEmpty()) {
-					this.reorganizeStatusOfPehnotypes(datasetId, phenotypes, allPhenotypes);
+					this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
 				}
 			}
 		}
