@@ -487,9 +487,10 @@ public class DatasetServiceImplTest {
 
 		final List<ObservationUnitRow> testMeasurements = Collections.<ObservationUnitRow>singletonList(observationUnitRow);
 		Mockito.when(this.experimentDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
-		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
-		searchDto.setSortedRequest(new SortedPageRequest(1, 100, null, null));
-		Mockito.when(this.experimentDao.getObservationUnitTable(searchDto)).thenReturn(testMeasurements);
+		final ObservationUnitsSearchDTO
+			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
+		searchDTO.setSortedRequest(new SortedPageRequest(1, 100, null, null));
+		Mockito.when(this.experimentDao.getObservationUnitTable(searchDTO)).thenReturn(testMeasurements);
 
 		Mockito.when(this.mockSession.createSQLQuery(Mockito.anyString())).thenReturn(mockQuery);
 		final List<Map<String, Object>> results = new ArrayList<>();
@@ -508,12 +509,7 @@ public class DatasetServiceImplTest {
 		// Method to test
 		final List<ObservationUnitRow> actualMeasurements = this.datasetService.getObservationUnitRows(DatasetServiceImplTest.STUDY_ID,
 			DatasetServiceImplTest.DATASET_ID,
-			DatasetServiceImplTest.INSTANCE_ID,
-			1,
-			10,
-			null,
-			null,
-			null);
+			new ObservationUnitsSearchDTO());
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
 	}

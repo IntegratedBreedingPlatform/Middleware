@@ -49,15 +49,16 @@ public interface DatasetService {
 
 	DatasetDTO getDataset(Integer datasetId);
 
-	Integer countTotalObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
-	List<ObservationUnitRow> getObservationUnitRows(
-		int studyId, int datasetId, Integer instanceId, Integer pageNumber, Integer pageSize,
-		String sortBy, String sortOrder, Boolean draftMode);
+	long countFilteredObservationUnitsForDataset(Integer datasetId, Integer instanceId, final Boolean draftMode,
+		ObservationUnitsSearchDTO.Filter filter);
+
+	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	List<ObservationUnitRow> getAllObservationUnitRows(int studyId, int datasetId);
 
-	Boolean isDatasetNameAvailable(String name, String programUUID);
+	Boolean isDatasetNameAvailable(final String name, final int studyId);
 
 	Integer getNumberOfChildren(Integer parentId);
 

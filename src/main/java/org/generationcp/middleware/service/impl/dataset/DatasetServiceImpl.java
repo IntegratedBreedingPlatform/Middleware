@@ -29,7 +29,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -96,7 +95,9 @@ public class DatasetServiceImpl implements DatasetService {
 			VariableType.SELECTION_METHOD.getId());
 
 	protected static final List<Integer> STANDARD_ENVIRONMENT_FACTORS = Lists.newArrayList( //
-			TermId.LOCATION_ID.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		TermId.LOCATION_ID.getId(), //
+		TermId.TRIAL_INSTANCE_FACTOR.getId(), //
+		TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 
 	private DaoFactory daoFactory;
 
@@ -255,9 +256,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean isDatasetNameAvailable(final String name, final String projectUUID) {
-		final Integer dmsProjectId = this.daoFactory.getDmsProjectDAO().getProjectIdByNameAndProgramUUID(name, projectUUID);
-		return (dmsProjectId == null);
+	public Boolean isDatasetNameAvailable(final String name, final int studyId) {
+		final List<DatasetDTO> datasetDTOs = this.getDatasets(studyId, new HashSet<Integer>());
+		for (final DatasetDTO datasetDTO : datasetDTOs) {
+			if (datasetDTO.getName().equals(name)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -481,23 +487,22 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final Integer instanceId, final Integer pageNumber, final Integer pageSize,
-		final String sortedColumnTermId, final String sortOrder, final Boolean draftMode) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+
+		if (searchDTO.getSortedRequest() != null && searchDTO.getSortedRequest().getSortBy() != null) {
+			searchDTO.getSortedRequest()
+				.setSortBy(this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy())).getName());
+		}
+
+		searchDTO.setDatasetId(datasetId);
+        searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
+		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-		String sortBy = sortedColumnTermId;
-		if (sortedColumnTermId != null) {
-			sortBy = this.ontologyDataManager.getTermById(Integer.valueOf(sortedColumnTermId)).getName();
-		}
+		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
 
-		final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(datasetId, instanceId,
-				this.findGenericGermplasmDescriptors(studyId), this.findAdditionalDesignFactors(studyId), selectionMethodsAndTraits);
-		// TODO replace with Pageable
-		searchDto.setSortedRequest(new SortedPageRequest(pageNumber, pageSize, sortBy, sortOrder));
-		searchDto.setDraftMode(draftMode);
-
-		return this.daoFactory.getExperimentDao().getObservationUnitTable(searchDto);
+		return this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
 	}
 
 	@Override
@@ -513,13 +518,13 @@ public class DatasetServiceImpl implements DatasetService {
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final ObservationUnitsSearchDTO searchDto =
+		final ObservationUnitsSearchDTO searchDTO =
 			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<MeasurementVariableDto>());
-		searchDto.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
-		searchDto.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
-		searchDto.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
+		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
+		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 
-		final List<ObservationUnitRow> observationUnits = this.daoFactory.getExperimentDao().getObservationUnitTable(searchDto);
+		final List<ObservationUnitRow> observationUnits = this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
 		return observationUnits;
@@ -557,9 +562,16 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer countTotalObservationUnitsForDataset(
+	public Integer countAllObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.daoFactory.getExperimentDao().countTotalObservationUnitsForDataset(datasetId, instanceId, draftMode);
+		return this.daoFactory.getExperimentDao().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
+	}
+
+	@Override
+	public long countFilteredObservationUnitsForDataset(
+		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+		final ObservationUnitsSearchDTO.Filter filter) {
+		return this.daoFactory.getExperimentDao().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
 	}
 
 	@Override
@@ -884,12 +896,13 @@ public class DatasetServiceImpl implements DatasetService {
 				Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		for (final Integer instanceId : instanceIds) {
-			final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO(datasetId, instanceId, germplasmDescriptors, designFactors, selectionMethodsAndTraits);
-			searchDto.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
-			searchDto.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
-			searchDto.setEnvironmentDatasetId(environmentDataset.getProjectId());
+			final ObservationUnitsSearchDTO
+				searchDTO = new ObservationUnitsSearchDTO(datasetId, instanceId, germplasmDescriptors, designFactors, selectionMethodsAndTraits);
+			searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
+			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
+			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 
-			final List<ObservationUnitRow> observationUnits = this.daoFactory.getExperimentDao().getObservationUnitTable(searchDto);
+			final List<ObservationUnitRow> observationUnits = this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
 			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 			instanceMap.put(instanceId, observationUnits);
 		}
@@ -983,6 +996,8 @@ public class DatasetServiceImpl implements DatasetService {
 			phenotype.setDraftCValueId(null);
 		}
 		final Integer observableId = phenotype.getObservableId();
+		// TODO Review performance IBP-2230
+		//  Can we leverage measurementVariable.getFormula() as in importDataset() ?
 		this.resolveObservationStatus(observableId, phenotype);
 		phenotype.setChanged(true);
 		phenotypeDao.update(phenotype);
