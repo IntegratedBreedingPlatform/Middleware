@@ -1,16 +1,18 @@
 package org.generationcp.middleware.pojos;
 
-
+// TODO migrate to Pageable?
 public class SortedPageRequest {
 	
 	private Integer pageNumber;
 	private Integer pageSize;
 	private String sortBy; 
 	private String sortOrder;
-	
-	
+
+	@SuppressWarnings("unused")
+	public SortedPageRequest() {
+	}
+
 	public SortedPageRequest(final Integer pageNumber, final Integer pageSize, final String sortBy, final String sortOrder) {
-		super();
 		this.pageNumber = pageNumber;
 		this.pageSize = pageSize;
 		this.sortBy = sortBy;

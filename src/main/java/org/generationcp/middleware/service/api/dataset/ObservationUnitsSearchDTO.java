@@ -1,13 +1,16 @@
 package org.generationcp.middleware.service.api.dataset;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings("unused") // Used in POST body
 @AutoProperty
 public class ObservationUnitsSearchDTO {
 	
@@ -21,88 +24,166 @@ public class ObservationUnitsSearchDTO {
 	private Integer instanceId;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
-	
+	/**
+	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
+	 */
+	private String draw;
+
+	private Filter filter;
+
+	public class Filter {
+
+		private Boolean byOutOfBound;
+		private Boolean byOverwritten;
+		private Boolean byOutOfSync;
+		private Boolean byMissing;
+		private Map<String, List<String>> filteredValues;
+		private Map<String, String> filteredTextValues;
+
+		public Filter() {
+			this.byMissing = false;
+			this.byOutOfBound = false;
+			this.byOutOfSync =  false;
+			this.byOverwritten = false;
+			this.filteredValues = new HashMap<>();
+			this.filteredTextValues = new HashMap<>();
+		}
+
+		public Map<String, String> getFilteredTextValues() {
+			return this.filteredTextValues;
+		}
+
+		public void setFilteredTextValues(final Map<String, String> filteredTextValues) {
+			this.filteredTextValues = filteredTextValues;
+		}
+
+		public void setByOutOfBound(final Boolean byOutOfBound) {
+			this.byOutOfBound = byOutOfBound;
+		}
+
+		public void setByOverwritten(final Boolean byOverwritten) {
+			this.byOverwritten = byOverwritten;
+		}
+
+		public void setByOutOfSync(final Boolean byOutOfSync) {
+			this.byOutOfSync = byOutOfSync;
+		}
+
+		public void setByMissing(final Boolean byMissing) {
+			this.byMissing = byMissing;
+		}
+
+		public Boolean getByOutOfBound() {
+			return this.byOutOfBound;
+		}
+
+		public Boolean getByOverwritten() {
+			return this.byOverwritten;
+		}
+
+		public Boolean getByOutOfSync() {
+			return this.byOutOfSync;
+		}
+
+		public Boolean getByMissing() {
+			return this.byMissing;
+		}
+
+		public Map<String, List<String>> getFilteredValues() {
+			return this.filteredValues;
+		}
+
+		public void setFilteredValues(final Map<String, List<String>> filteredValues) {
+			this.filteredValues = filteredValues;
+		}
+	}
+
+	public ObservationUnitsSearchDTO() {
+		this.filter = new Filter();
+		this.environmentDetails = new ArrayList<>();
+		this.environmentConditions = new ArrayList<>();
+		this.draftMode = false;
+	}
+
 	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors, final List<String> additionalDesignFactors,
 			final List<MeasurementVariableDto> selectionMethodsAndTraits) {
-		super();
+		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 		this.datasetId = datasetId;
 		this.instanceId = instanceId;
-		this.environmentDetails = new ArrayList<>();
-		this.environmentConditions = new ArrayList<>();
 	}
 
 	public List<String> getEnvironmentDetails() {
-		return environmentDetails;
+		return this.environmentDetails;
 	}
 	
-	public void setEnvironmentDetails(List<String> environmentFactors) {
+	public void setEnvironmentDetails(final List<String> environmentFactors) {
 		this.environmentDetails = environmentFactors;
 	}
 	
 	public List<String> getEnvironmentConditions() {
-		return environmentConditions;
+		return this.environmentConditions;
 	}
 	
-	public void setEnvironmentConditions(List<String> environmentConditions) {
+	public void setEnvironmentConditions(final List<String> environmentConditions) {
 		this.environmentConditions = environmentConditions;
 	}
 	
 	public List<String> getGenericGermplasmDescriptors() {
-		return genericGermplasmDescriptors;
+		return this.genericGermplasmDescriptors;
 	}
 	
-	public void setGenericGermplasmDescriptors(List<String> genericGermplasmDescriptors) {
+	public void setGenericGermplasmDescriptors(final List<String> genericGermplasmDescriptors) {
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 	}
 	
 	public List<String> getAdditionalDesignFactors() {
-		return additionalDesignFactors;
+		return this.additionalDesignFactors;
 	}
 	
-	public void setAdditionalDesignFactors(List<String> additionalDesignFactors) {
+	public void setAdditionalDesignFactors(final List<String> additionalDesignFactors) {
 		this.additionalDesignFactors = additionalDesignFactors;
 	}
 	
 	public List<MeasurementVariableDto> getSelectionMethodsAndTraits() {
-		return selectionMethodsAndTraits;
+		return this.selectionMethodsAndTraits;
 	}
 	
-	public void setSelectionMethodsAndTraits(List<MeasurementVariableDto> selectionMethodsAndTraits) {
+	public void setSelectionMethodsAndTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
 	}
 
 	public int getDatasetId() {
-		return datasetId;
+		return this.datasetId;
 	}
 	
-	public void setDatasetId(int datasetId) {
+	public void setDatasetId(final int datasetId) {
 		this.datasetId = datasetId;
 	}
 	
 	public Integer getInstanceId() {
-		return instanceId;
+		return this.instanceId;
 	}
 	
-	public void setInstanceId(Integer instanceId) {
+	public void setInstanceId(final Integer instanceId) {
 		this.instanceId = instanceId;
 	}
 	
 	public Integer getEnvironmentDatasetId() {
-		return environmentDatasetId;
+		return this.environmentDatasetId;
 	}
 	
-	public void setEnvironmentDatasetId(Integer environmentDatasetId) {
+	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
 		this.environmentDatasetId = environmentDatasetId;
 	}
 
 	public SortedPageRequest getSortedRequest() {
-		return sortedRequest;
+		return this.sortedRequest;
 	}
 	
-	public void setSortedRequest(SortedPageRequest sortedRequest) {
+	public void setSortedRequest(final SortedPageRequest sortedRequest) {
 		this.sortedRequest = sortedRequest;
 	}
 
@@ -112,6 +193,22 @@ public class ObservationUnitsSearchDTO {
 
 	public void setDraftMode(final Boolean draftMode) {
 		this.draftMode = draftMode;
+	}
+
+	public String getDraw() {
+		return this.draw;
+	}
+
+	public void setDraw(final String draw) {
+		this.draw = draw;
+	}
+
+	public Filter getFilter() {
+		return this.filter;
+	}
+
+	public void setFilter(final Filter filter) {
+		this.filter = filter;
 	}
 
 	@Override
