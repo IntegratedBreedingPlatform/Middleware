@@ -136,7 +136,6 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
@@ -189,7 +188,6 @@ public class DatasetServiceImpl implements DatasetService {
 		return plotDataSetColumns;
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
@@ -619,7 +617,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void rejectDraftData(final Integer datasetId) {
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 		for (final Phenotype phenotype : phenotypes) {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
 				this.deletePhenotype(phenotype.getPhenotypeId());
@@ -632,12 +630,11 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void acceptDraftData(final Integer datasetId) {
 
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
-		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
-		if (phenotypes.size() > 0) {
+		if (!draftPhenotypes.isEmpty()) {
 
-			for (final Phenotype phenotype : phenotypes) {
+			for (final Phenotype phenotype : draftPhenotypes) {
 				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 					this.deletePhenotype(phenotype.getPhenotypeId());
 				} else {
@@ -645,24 +642,30 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 
-			final List<MeasurementVariable> measurementVariableList =
-				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
+			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+			this.reorganizePhenotypesStatus(datasetId, draftPhenotypes, allPhenotypes);
+		}
+	}
 
-			if (measurementVariableList.size() > 0) {
-				final Map<Integer, List<Integer>> formulasMap = this.getTargetsByInput(measurementVariableList);
-				this.setMeasurementDataAsOutOfSync(formulasMap,  //
-					Sets.newHashSet(phenotypes), //
-					Sets.newHashSet(allPhenotypes));
-			}
+	private void reorganizePhenotypesStatus(
+		final Integer datasetId, final List<Phenotype> inputPhenotypes, final List<Phenotype> allPhenotypes) {
+		final List<MeasurementVariable> measurementVariableList =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
+
+		if (!measurementVariableList.isEmpty()) {
+			final Map<Integer, List<Integer>> formulasMap = this.getTargetsByInput(measurementVariableList);
+			this.setMeasurementDataAsOutOfSync(formulasMap,  //
+				Sets.newHashSet(inputPhenotypes), //
+				Sets.newHashSet(allPhenotypes));
 		}
 	}
 
 	@Override
 	public Boolean checkOutOfBoundDraftData(final Integer datasetId) {
 
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDraftDataOfDataset(datasetId);
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
-		if (phenotypes.size() > 0) {
+		if (!phenotypes.isEmpty()) {
 			final List<MeasurementVariable>
 				measurementVariableList =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
@@ -705,7 +708,59 @@ public class DatasetServiceImpl implements DatasetService {
 		return Boolean.FALSE;
 	}
 
+	@Override
+	public void setValuesToMissing(final Integer datasetId) {
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
+		if (!draftPhenotypes.isEmpty()) {
+			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+			final List<MeasurementVariable>
+				measurementVariableList =
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
+
+			for (final MeasurementVariable measurementVariable : measurementVariableList) {
+				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(draftPhenotypes, new Predicate() {
+					@Override
+					public boolean evaluate(final Object o) {
+						final Phenotype phenotype = (Phenotype) o;
+						return phenotype.getObservableId().equals(measurementVariable.getTermId());
+					}
+				});
+
+				Collection<Phenotype> possibleValues = null;
+				if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues().isEmpty()) {
+					possibleValues =
+						CollectionUtils.collect(measurementVariable.getPossibleValues(), new Transformer() {
+							@Override
+							public String transform(final Object input) {
+								final ValueReference variable = (ValueReference) input;
+								return variable.getName();
+							}
+						});
+				}
+
+				for (final Phenotype phenotype : selectedPhenotypes) {
+					if (!ExportImportUtils.isValidValue(measurementVariable, phenotype.getDraftValue(), possibleValues)) {
+						this.updatePhenotype(phenotype.getPhenotypeId(), null, Phenotype.MISSING, false);
+					} else {
+						this.acceptDraftData(phenotype);
+					}
+				}
+
+				if (!selectedPhenotypes.isEmpty()) {
+					this.reorganizePhenotypesStatus(datasetId, draftPhenotypes, allPhenotypes);
+				}
+			}
+		}
+	}
+
+	private void acceptDraftData(final Phenotype phenotype) {
+		if (StringUtils.isEmpty(phenotype.getDraftValue())) {
+			this.deletePhenotype(phenotype.getPhenotypeId());
+		} else {
+			this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+		}
+	}
 
 	/**
 	 *
@@ -729,7 +784,7 @@ public class DatasetServiceImpl implements DatasetService {
 			measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
-		if (measurementVariableList.size() > 0) {
+		if (!measurementVariableList.isEmpty()) {
 
 			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 
@@ -864,30 +919,32 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void setMeasurementDataAsOutOfSync(
 		final Map<Integer, List<Integer>> targetsByInput,
-		final Set<Phenotype> phenotypes,
+		final Set<Phenotype> inputPhenotypes,
 		final Set<Phenotype> datasetPhenotypes) {
 
-		final Set<Integer> observationUnitIdOutOfSync = new HashSet<>();
-		final Set<Integer> targetVariableIdOutOfSync = new HashSet<>();
+		if (!targetsByInput.isEmpty()){
+			final Set<Integer> observationUnitIdOutOfSync = new HashSet<>();
+			final Set<Integer> targetVariableIdOutOfSync = new HashSet<>();
 
-		for (final Phenotype phenotype : phenotypes) {
-			if (phenotype.isChanged()) {
-				observationUnitIdOutOfSync.add(phenotype.getExperiment().getNdExperimentId());
-				final List<Integer> targetsOutOfSync = targetsByInput.get(phenotype.getObservableId());
-				if (targetsOutOfSync != null) {
-					targetVariableIdOutOfSync.addAll(targetsOutOfSync);
+			for (final Phenotype phenotype : inputPhenotypes) {
+				if (phenotype.isChanged()) {
+					observationUnitIdOutOfSync.add(phenotype.getExperiment().getNdExperimentId());
+					final List<Integer> targetsOutOfSync = targetsByInput.get(phenotype.getObservableId());
+					if (targetsOutOfSync != null) {
+						targetVariableIdOutOfSync.addAll(targetsOutOfSync);
+					}
 				}
 			}
-		}
 
-		for (final Phenotype datasetPhenotype : datasetPhenotypes) {
-            if (targetVariableIdOutOfSync.contains(datasetPhenotype.getObservableId())
-				&& observationUnitIdOutOfSync.contains(datasetPhenotype.getExperiment().getNdExperimentId())) {
+			for (final Phenotype datasetPhenotype : datasetPhenotypes) {
+				if (targetVariableIdOutOfSync.contains(datasetPhenotype.getObservableId())
+					&& observationUnitIdOutOfSync.contains(datasetPhenotype.getExperiment().getNdExperimentId())) {
 
-				datasetPhenotype.setValueStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
-				this.daoFactory.getPhenotypeDAO().saveOrUpdate(datasetPhenotype);
+					datasetPhenotype.setValueStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
+					this.daoFactory.getPhenotypeDAO().saveOrUpdate(datasetPhenotype);
+				}
+
 			}
-
 		}
 	}
 
@@ -989,7 +1046,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Map<String, Long> countObservationsGroupedByInstance(final Integer datasetId) {
-		return daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
+		return this.daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
 	}
-
 }

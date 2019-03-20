@@ -41,6 +41,7 @@ import java.util.Objects;
 @Table(name = "phenotype")
 public class Phenotype implements Serializable {
 
+	public static final String MISSING = "missing";
 	private static final long serialVersionUID = 1L;
 	public static final String MISSING_VALUE = "missing";
 

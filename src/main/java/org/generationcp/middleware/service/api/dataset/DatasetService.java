@@ -15,7 +15,7 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	long countPhenotypes(final Integer datasetId, final List<Integer> variableIds);
+	long countPhenotypes(Integer datasetId, List<Integer> variableIds);
 
 	long countPhenotypesByInstance(Integer datasetId, Integer instanceId);
 
@@ -29,24 +29,25 @@ public interface DatasetService {
 
 	ObservationDto addPhenotype(ObservationDto observation);
 
-	ObservationDto updatePhenotype(final Integer observationId, ObservationDto observationDto);
+	ObservationDto updatePhenotype(Integer observationId, ObservationDto observationDto);
 
 	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
 
 	List<MeasurementVariable> getSubObservationSetVariables(Integer subObservationSetId);
 
-	DatasetDTO generateSubObservationDataset(final Integer studyId, final String datasetName, final Integer datasetTypeId,
-		final List<Integer> instanceIds, final Integer observationUnitVariableId, final Integer numberOfSubObservationUnits,
-		final Integer parentId);
+	DatasetDTO generateSubObservationDataset(
+		Integer studyId, String datasetName, Integer datasetTypeId,
+		List<Integer> instanceIds, Integer observationUnitVariableId, Integer numberOfSubObservationUnits,
+		Integer parentId);
 
-	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
+	List<DatasetDTO> getDatasets(Integer studyId, Set<Integer> datasetTypeIds);
 
 	/*
 	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
 	 */
 	void updateDependentPhenotypesStatus(Integer variableId, Integer observationUnitId);
 
-	DatasetDTO getDataset(final Integer datasetId);
+	DatasetDTO getDataset(Integer datasetId);
 
 	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
@@ -55,37 +56,40 @@ public interface DatasetService {
 
 	List<ObservationUnitRow> getObservationUnitRows(int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
-	List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId);
+	List<ObservationUnitRow> getAllObservationUnitRows(int studyId, int datasetId);
 
 	Boolean isDatasetNameAvailable(final String name, final int studyId);
 
-	Integer getNumberOfChildren (final Integer parentId);
+	Integer getNumberOfChildren(Integer parentId);
 
 	List<StudyInstance> getDatasetInstances(Integer datasetId);
 
-	void deletePhenotype(final Integer phenotypeId);
+	void deletePhenotype(Integer phenotypeId);
 
 	List<MeasurementVariableDto> getVariables(Integer datasetId, VariableType variableType);
 
 	void acceptDraftData(Integer datasetId);
 
-	Map<String, ObservationUnitRow> getObservationUnitsAsMap(final int datasetId,
-			final List<MeasurementVariable> selectionMethodsAndTraits, final List<String> observationUnitIds);
+	Map<String, ObservationUnitRow> getObservationUnitsAsMap(
+		int datasetId,
+		List<MeasurementVariable> selectionMethodsAndTraits, List<String> observationUnitIds);
 
-	void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode);
+	void importDataset(Integer datasetId, Table<String, String, String> table, Boolean draftMode);
 
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 
 	void deleteDataset(int datasetId);
-	
+
 	Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
-			final int studyId, final int datasetId, final List<Integer> instanceIds);
+		int studyId, int datasetId, List<Integer> instanceIds);
 
 	Map<String, Long> countObservationsGroupedByInstance(Integer datasetId);
 
-	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+	List<MeasurementVariable> getMeasurementVariables(Integer projectId, List<Integer> variableTypes);
 
 	void rejectDraftData(Integer datasetId);
 
-	Boolean checkOutOfBoundDraftData(final Integer datasetId);
+	Boolean checkOutOfBoundDraftData(Integer datasetId);
+
+	void setValuesToMissing(Integer datasetId);
 }
