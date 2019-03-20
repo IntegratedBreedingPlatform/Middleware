@@ -1142,7 +1142,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return count;
 	}
 
-	public List<Phenotype> getDraftDataOfDataset(final Integer datasetId) {
+	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("experiment", "experiment");
 		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
