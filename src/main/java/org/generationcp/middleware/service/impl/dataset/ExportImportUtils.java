@@ -28,20 +28,21 @@ public abstract class ExportImportUtils {
 			boolean withinValidRange = true;
 			final Double currentValue = Double.valueOf(value);
 
-			if (var.getScaleMinRange() != null) {
-				final Double minValue = Double.valueOf(var.getScaleMinRange());
-				if (currentValue < minValue) {
-					withinValidRange = false;
+			final Double minRange = var.getMinRange();
+			if (minRange != null) {
+				if (currentValue < minRange) {
+					return false;
 				}
 			}
 
-			if (var.getScaleMaxRange() != null) {
-				final Double maxValue = Double.valueOf(var.getScaleMaxRange());
-				if (currentValue > maxValue) {
-					withinValidRange = false;
+			final Double maxRange = var.getMaxRange();
+			if (maxRange != null) {
+				if (currentValue > maxRange) {
+					return false;
 				}
 			}
 			return withinValidRange;
+
 		} else if (var.getDataTypeId() == DataType.DATE_TIME_VARIABLE.getId()) {
 			return new DateValidator().isValid(value, "yyyyMMdd");
 		} else if (var.getDataTypeId() == DataType.CATEGORICAL_VARIABLE.getId()) {
