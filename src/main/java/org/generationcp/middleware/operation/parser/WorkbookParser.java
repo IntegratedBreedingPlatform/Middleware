@@ -372,6 +372,13 @@ public class WorkbookParser {
 
 		try {
 
+			// Skip checking description sheet if it is not present in file
+			for (final Message error : this.getErrorMessages()) {
+				if ("error.missing.sheet.description".equalsIgnoreCase(error.getMessageKey())) {
+					return Collections.<MeasurementVariable>emptyList();
+				}
+			}
+
 			// Cannot have more than one empty row in the description worksheet.
 			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
 				this.currentRowZeroBased++;
