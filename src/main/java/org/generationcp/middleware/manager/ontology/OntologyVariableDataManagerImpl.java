@@ -609,9 +609,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			daoFactory.getCvTermPropertyDao().save(property);
 		}
 
-		// Saving min max values
-		if (variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
-			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), null,
+		// Saving alias, min, max values
+		if (!Strings.isNullOrEmpty(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
+			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 		}
 
