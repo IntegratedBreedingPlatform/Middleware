@@ -54,20 +54,6 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testAddProgenitors() {
-		this.germplasmWithPolyCrosses = GermplasmTestDataInitializer.createGermplasm(1);
-		this.germplasmManager.save(this.germplasmWithPolyCrosses);
-		final Integer gid = this.germplasmWithPolyCrosses.getGid();
-		Assert.assertTrue(this.germplasmManager.getProgenitorsByGIDWithPrefName(gid).isEmpty());
-		
-		final Progenitor progenitor3 = new Progenitor(this.germplasmWithPolyCrosses, 3, 13);
-		final Progenitor progenitor4 = new Progenitor(this.germplasmWithPolyCrosses, 4, 14);
-		final Progenitor progenitor5 = new Progenitor(this.germplasmWithPolyCrosses, 5, 15);
-		this.pedigreeManager.addProgenitors(Arrays.asList(progenitor3, progenitor4, progenitor5));
-		Assert.assertEquals(3, this.germplasmManager.getProgenitorsByGIDWithPrefName(gid).size());
-	}
-	
-	@Test
 	public void tesUpdateProgenitor() {
 		this.germplasmWithPolyCrosses = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(this.germplasmWithPolyCrosses);
