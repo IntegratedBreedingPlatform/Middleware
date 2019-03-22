@@ -1,6 +1,5 @@
 package org.generationcp.middleware.manager;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -11,7 +10,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +28,18 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	
 	private Germplasm germplasmWithPolyCrosses;
 	
+	private Germplasm femaleParent;
+	
 	@Before
 	public void setup() {
 		if (this.germplasmWithUnknownParent == null) {
+			this.femaleParent = GermplasmTestDataInitializer.createGermplasm(1);
+			this.germplasmManager.save(this.femaleParent);
+			this.femaleParent.getPreferredName().setGermplasmId(this.femaleParent.getGid());
+			this.germplasmManager.addGermplasmName(this.femaleParent.getPreferredName());
+			
 			this.germplasmWithUnknownParent = GermplasmTestDataInitializer.createGermplasm(1);
+			this.germplasmWithUnknownParent.setGpid1(this.femaleParent.getGid());
 			// Set male parent as Unknown
 			this.germplasmWithUnknownParent.setGpid2(0);
 			this.germplasmManager.save(this.germplasmWithUnknownParent);
@@ -48,6 +54,9 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		final List<GermplasmPedigreeTreeNode> nodes = tree.getRoot().getLinkedNodes();
 		Assert.assertEquals(2, nodes.size());
 		Assert.assertEquals(this.germplasmWithUnknownParent.getGpid1(), nodes.get(0).getGermplasm().getGid());
+		final Germplasm femaleGermplasm = nodes.get(0).getGermplasm();
+		Assert.assertEquals(this.femaleParent.getGid(), femaleGermplasm.getGid());
+		Assert.assertEquals(this.femaleParent.getPreferredName().getNval(), femaleGermplasm.getPreferredName().getNval());
 		final Germplasm unknownGermplasm = nodes.get(1).getGermplasm();
 		Assert.assertEquals(0, unknownGermplasm.getGid().intValue());
 		Assert.assertEquals(Name.UNKNOWN, unknownGermplasm.getPreferredName().getNval());
