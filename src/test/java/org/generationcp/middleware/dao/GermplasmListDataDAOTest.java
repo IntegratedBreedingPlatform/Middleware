@@ -196,8 +196,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 			// Check parent germplasm values
 			Assert.assertEquals("Female Parent GID should be " + listData.getFemaleGid(), listData.getFemaleGid(),
-					currentGermplasmListData.getFemaleParentDesignation());
-			Assert.assertEquals("Male Parent GID should be " + listData.getMaleGid(), listData.getMaleParentDesignation(),
+					currentGermplasmListData.getFemaleGid());
+			Assert.assertEquals("Male Parent GID should be " + listData.getMaleGid(), listData.getMaleGid(),
 					currentGermplasmListData.getMaleGid());
 			Assert.assertEquals("Female Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
 					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getFemaleParentDesignation());
