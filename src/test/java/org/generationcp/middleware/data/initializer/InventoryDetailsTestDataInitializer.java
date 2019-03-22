@@ -191,7 +191,6 @@ public class InventoryDetailsTestDataInitializer {
 		listEntry.setStatus(0);
 		listEntry.setSeedSource("SeedSource");
 		listEntry.setGid(28);
-		listEntry.setMgid(0);
 
 		final List<ListEntryLotDetails> lots = new ArrayList<ListEntryLotDetails>();
 

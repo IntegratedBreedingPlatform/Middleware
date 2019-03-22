@@ -15,6 +15,8 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -22,7 +24,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -453,7 +455,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
                 germplasmList[0] = 2;
             } else {
                 germplasmList[0] = 
-                		getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgntrsPK().getPno().intValue();
+                		getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgenitorNumber();
             }
             germplasmList[1] = g;
 
@@ -542,6 +544,104 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
         return NONE;
     }
+    
+    @Override
+	public void addProgenitors(final List<Progenitor> progenitors) {
+		this.addOrUpdateProgenitors(progenitors);
+	}
+
+	@Override
+	public List<Progenitor> getProgenitorsByGID(final Integer gid) {
+		return this.getProgenitorDao().getByGID(gid);
+	}
+
+	@Override
+	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {
+
+		// check if the germplasm record identified by gid exists
+		final Germplasm child = this.germplasmDataManager.getGermplasmByGID(gid);
+		if (child == null) {
+			throw new MiddlewareQueryException("Error in PedigreeDataManager.updateProgenitor(gid=" + gid + ", progenitorId="
+					+ progenitorId + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with gid: " + gid,
+					new Throwable());
+		}
+
+		// check if the germplasm record identified by progenitorId exists
+		final Germplasm parent = this.germplasmDataManager.getGermplasmByGID(progenitorId);
+		if (parent == null) {
+			throw new MiddlewareQueryException(
+					"Error in PedigreeDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId + ", progenitorNumber="
+							+ progenitorNumber + "): There is no germplasm record with progenitorId: " + progenitorId,
+					new Throwable());
+		}
+
+		// check progenitor number
+		if (progenitorNumber == 1 || progenitorNumber == 2) {
+			if (progenitorNumber == 1) {
+				child.setGpid1(progenitorId);
+			} else {
+				child.setGpid2(progenitorId);
+			}
+
+			final List<Germplasm> germplasm = new ArrayList<>();
+			germplasm.add(child);
+			this.germplasmDataManager.addOrUpdateGermplasm(germplasm, Operation.UPDATE);
+		} else if (progenitorNumber > 2) {
+			final ProgenitorDAO dao = this.getProgenitorDao();
+
+			// check if there is an existing Progenitor record
+			final Progenitor p = dao.getByGIDAndProgenitorNumber(gid, progenitorNumber);
+
+			if (p != null) {
+				// update the existing record
+				p.setProgenitorGid(progenitorId);
+
+				final List<Progenitor> progenitors = new ArrayList<>();
+				progenitors.add(p);
+				final int updated = this.addOrUpdateProgenitors(progenitors);
+				if (updated == 1) {
+					return progenitorId;
+				}
+			} else {
+				// create new Progenitor record
+				final Progenitor newRecord = new Progenitor(new Germplasm(gid), progenitorNumber, progenitorId);
+				final List<Progenitor> progenitors = new ArrayList<>();
+				progenitors.add(newRecord);
+				final int added = this.addOrUpdateProgenitors(progenitors);
+				if (added == 1) {
+					return progenitorId;
+				}
+			}
+		} else {
+			throw new MiddlewareQueryException("Error in PedigreeDataManager.updateProgenitor(gid=" + gid + ", progenitorId="
+					+ progenitorId + ", progenitorNumber=" + progenitorNumber + "): Invalid progenitor number: " + progenitorNumber,
+					new Throwable());
+		}
+
+		return progenitorId;
+	}
+	
+	private int addOrUpdateProgenitors(final List<Progenitor> progenitors) {
+
+		int progenitorsSaved = 0;
+		try {
+
+			final ProgenitorDAO dao = this.getProgenitorDao();
+
+			for (final Progenitor progenitor : progenitors) {
+				dao.saveOrUpdate(progenitor);
+				progenitorsSaved++;
+			}
+
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException(
+					"Error encountered while saving Progenitor: PedigreeDataManager.addOrUpdateProgenitors(progenitors=" + progenitors
+							+ "): " + e.getMessage(),
+					e);
+		}
+		return progenitorsSaved;
+	}
 
     
 }

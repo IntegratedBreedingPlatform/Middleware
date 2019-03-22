@@ -5,7 +5,9 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
@@ -23,6 +25,7 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.Progenitor;
 
 public class DaoFactory {
 
@@ -169,5 +172,17 @@ public class DaoFactory {
 		final ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
 		programPresetDAO.setSession(this.sessionProvider.getSession());
 		return programPresetDAO;
+	}
+
+	public NameDAO getNameDao() {
+		final NameDAO nameDAO = new NameDAO();
+		nameDAO.setSession(this.sessionProvider.getSession());
+		return nameDAO;
+	}
+
+	public ProgenitorDAO getProgenitorDao() {
+		final ProgenitorDAO progenitorDao = new ProgenitorDAO();
+		progenitorDao.setSession(this.sessionProvider.getSession());
+		return progenitorDao;
 	}
 }

@@ -16,7 +16,6 @@
         <mapping class="org.generationcp.middleware.pojos.Method"/>
         <mapping class="org.generationcp.middleware.pojos.Name"/>
         <mapping class="org.generationcp.middleware.pojos.Progenitor"/>
-        <mapping class="org.generationcp.middleware.pojos.ProgenitorPK"/>
         <mapping class="org.generationcp.middleware.pojos.User"/>
         <mapping class="org.generationcp.middleware.pojos.UserDefinedField"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
