@@ -545,11 +545,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         return NONE;
     }
     
-    @Override
-	public void addProgenitors(final List<Progenitor> progenitors) {
-		this.addOrUpdateProgenitors(progenitors);
-	}
-
 	@Override
 	public List<Progenitor> getProgenitorsByGID(final Integer gid) {
 		return this.getProgenitorDao().getByGID(gid);

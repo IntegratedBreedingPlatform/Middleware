@@ -193,8 +193,6 @@ public interface PedigreeDataManager {
 
 	int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID);
 	
-	void addProgenitors(List<Progenitor> progenitors);
-
 	List<Progenitor> getProgenitorsByGID(final Integer gid);
 
 	/**
