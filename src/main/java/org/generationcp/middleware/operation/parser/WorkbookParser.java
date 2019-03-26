@@ -219,6 +219,15 @@ public class WorkbookParser {
 		return this.currentWorkbook;
 	}
 
+	protected boolean isDescriptionSheetExists(final Workbook wb) throws WorkbookParserException {
+		final Sheet sheet1 = wb.getSheetAt(WorkbookParser.DESCRIPTION_SHEET);
+
+		if (sheet1 == null || sheet1.getSheetName() == null || !"Description".equals(sheet1.getSheetName())) {
+			return false;
+		}
+		return true;
+	}
+
 	protected void validateExistenceOfSheets(final Workbook wb) throws WorkbookParserException {
 		try {
 			final Sheet sheet1 = wb.getSheetAt(WorkbookParser.DESCRIPTION_SHEET);
@@ -373,10 +382,8 @@ public class WorkbookParser {
 		try {
 
 			// Skip checking description sheet if it is not present in file
-			for (final Message error : this.getErrorMessages()) {
-				if ("error.missing.sheet.description".equalsIgnoreCase(error.getMessageKey())) {
-					return Collections.<MeasurementVariable>emptyList();
-				}
+			if(!this.isDescriptionSheetExists(wb)){
+				return Collections.<MeasurementVariable>emptyList();
 			}
 
 			// Cannot have more than one empty row in the description worksheet.
