@@ -445,14 +445,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testRetrieveSnapshotListDataWithParents() throws Exception {
-		final Integer listId = 1;
-
-		final List<ListDataProject> listData = this.manager.retrieveSnapshotListDataWithParents(listId);
-		Assert.assertNotNull("It should not be null", listData);
-	}
-
-	@Test
 	public void testGetAllGermplasmListsByProgramUUID() {
 		final List<GermplasmList> germplasmLists =
 			this.manager.getAllGermplasmListsByProgramUUID(GermplasmListManagerImplTest.LIST_PROGRAM_UUID);

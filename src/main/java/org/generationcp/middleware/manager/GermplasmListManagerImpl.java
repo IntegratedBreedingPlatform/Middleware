@@ -35,13 +35,14 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -593,12 +595,41 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public List<ListDataProject> retrieveSnapshotListDataWithParents(final Integer listID) {
-		return this.getListDataProjectDAO().getListDataProjectWithParents(listID);
+		final List<ListDataProject> dataList = this.getListDataProjectDAO().getListDataProjectWithParents(listID);
+		Iterable<Integer> gidList = Iterables.transform(dataList, new Function<ListDataProject, Integer>() {
+		    public Integer apply(ListDataProject data) { 
+		    	return data.getGermplasmId();
+	    	};
+		});
+		// Append to maleParents of ListDataProject other progenitors of GIDs from the list, if any
+		final Map<Integer, List<GermplasmParent>> progenitorsMap = daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
+		for (final ListDataProject data : dataList) {
+			final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGermplasmId());
+			if (progenitors != null){				
+				data.addMaleParents(progenitors);
+			}
+		}
+		return dataList;
 	}
 
 	@Override
-	public List<GermplasmListData> retrieveListDataWithParents(final Integer listID) {
-		return daoFactory.getGermplasmListDataDAO().getListDataWithParents(listID);
+	public List<GermplasmListData> retrieveGermplasmListDataWithParents(final Integer listID) {
+		// Retrieve each cross with gpid1 and gpid2 parents info
+		final List<GermplasmListData> dataList = daoFactory.getGermplasmListDataDAO().retrieveGermplasmListDataWithImmediateParents(listID);
+		Iterable<Integer> gidList = Iterables.transform(dataList, new Function<GermplasmListData, Integer>() {
+		    public Integer apply(GermplasmListData data) { 
+		    	return data.getGid();
+	    	};
+		});
+		// Append to maleParents of CrossListData other progenitors of GIDs from the list, if any
+		final Map<Integer, List<GermplasmParent>> progenitorsMap = daoFactory.getGermplasmDao().getParentsFromProgenitorsForGIDsMap(Lists.newArrayList(gidList));
+		for (final GermplasmListData data : dataList) {
+			final List<GermplasmParent> progenitors = progenitorsMap.get(data.getGid());
+			if (progenitors != null){				
+				data.addMaleParents(progenitors);
+			}
+		}
+		return dataList;
 	}
 
 	@Override

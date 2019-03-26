@@ -145,9 +145,12 @@ public class Germplasm implements Serializable {
 	public static final String GET_PROGENITOR2 = "getProgenitor2";
 	public static final String GET_PROGENITOR = "getProgenitor";
 
-	public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME =
-			"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-					+ "JOIN progntrs p ON p.pid = g.gid " + "WHERE p.gid = :gid and  g.deleted = 0  and g.grplce = 0";
+	public static final String GET_PROGENITORS_BY_GIDS_WITH_PREF_NAME =
+			"SELECT p.gid, {g.*}, {n.*}, (select pMale.grpName from listdata pMale where pMale.gid = g.gid limit 1) as malePedigree " 
+					+ "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
+					+ "JOIN progntrs p ON p.pid = g.gid " 
+					+ "WHERE p.gid in (:gidList) and  g.deleted = 0  and g.grplce = 0 "
+					+ "ORDER BY p.gid, p.pno";
 
 	public static final String GET_MANAGEMENT_NEIGHBORS =
 			"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "

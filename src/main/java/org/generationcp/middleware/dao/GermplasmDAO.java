@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -45,6 +46,9 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -356,33 +360,76 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Germplasm> getProgenitorsByGIDWithPrefName(final Integer gid) {
+		Preconditions.checkNotNull(gid);
 		try {
-			if (gid != null) {
-				final List<Germplasm> progenitors = new ArrayList<>();
+			final List<Germplasm> progenitors = new ArrayList<>();
 
-				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PROGENITORS_BY_GID_WITH_PREF_NAME);
-				query.addEntity("g", Germplasm.class);
-				query.addEntity("n", Name.class);
-				query.setParameter("gid", gid);
-				final List<Object[]> results = query.list();
-				for (final Object[] result : results) {
-					final Germplasm germplasm = (Germplasm) result[0];
-					final Name prefName = (Name) result[1];
-					germplasm.setPreferredName(prefName);
-					progenitors.add(germplasm);
-				}
-
-				return progenitors;
+			final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PROGENITORS_BY_GIDS_WITH_PREF_NAME);
+			query.addScalar("gid");
+			query.addEntity("g", Germplasm.class);
+			query.addEntity("n", Name.class);
+			query.addScalar("malePedigree");
+			query.setParameterList("gidList", Lists.newArrayList(gid));
+			final List<Object[]> results = query.list();
+			for (final Object[] result : results) {
+				final Germplasm germplasm = (Germplasm) result[1];
+				final Name prefName = (Name) result[2];
+				germplasm.setPreferredName(prefName);
+				progenitors.add(germplasm);
 			}
+
+			return progenitors;
 		} catch (final HibernateException e) {
 			final String errorMessage =
 					"Error with getProgenitorsByGIDWithPrefName(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return new ArrayList<>();
+	}
+	
+	public Map<Integer, List<GermplasmParent>> getParentsFromProgenitorsForGIDsMap(final List<Integer> gids) {
+		Preconditions.checkNotNull(gids);
+		Preconditions.checkArgument(!gids.isEmpty());
+		
+		final Map<Integer, List<GermplasmParent>> map = new HashMap<>();
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PROGENITORS_BY_GIDS_WITH_PREF_NAME);
+			query.addScalar("gid");
+			query.addEntity("g", Germplasm.class);
+			query.addEntity("n", Name.class);
+			query.addScalar("malePedigree");
+			query.setParameterList("gidList", gids);
+			final List<Object[]> results = query.list();
+			
+			List<GermplasmParent> progenitors = new ArrayList<>();
+			Integer lastGid = 0;
+			for (final Object[] result : results) {
+				final Integer crossGid = (Integer) result[0];
+				if (lastGid == 0) {
+					lastGid = crossGid;
+				}
+				if (!crossGid.equals(lastGid)){
+					map.put(lastGid, progenitors);
+					lastGid = crossGid;
+					progenitors = new ArrayList<>();
+				}
+				final Germplasm germplasm = (Germplasm) result[1];
+				final Name prefName = (Name) result[2];
+				final String pedigree = (String) result[3];
+				germplasm.setPreferredName(prefName);
+				progenitors.add(new GermplasmParent(germplasm.getGid(), prefName.getNval(), pedigree));
+			}
+			// Set last cross GID to map
+			map.put(lastGid, progenitors);
+
+			return map;
+		} catch (final HibernateException e) {
+			final String errorMessage =
+					"Error with getProgenitorsForGIDsMap(gids=" + gids + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
+			GermplasmDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -602,12 +649,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			// Find additional children via progenitor linkage
 			final DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
-			otherChildrenCriteria.add(Restrictions.eq("pid", gid));
+			otherChildrenCriteria.add(Restrictions.eq("progenitorGid", gid));
 
 			final List<Progenitor> otherChildren = otherChildrenCriteria.getExecutableCriteria(this.getSession()).list();
 			final Set<Integer> otherChildrenGids = new HashSet<>();
 			for (final Progenitor progenitor : otherChildren) {
-				otherChildrenGids.add(progenitor.getProgntrsPK().getGid());
+				otherChildrenGids.add(progenitor.getGermplasm().getGid());
 			}
 
 			if (!otherChildrenGids.isEmpty()) {
