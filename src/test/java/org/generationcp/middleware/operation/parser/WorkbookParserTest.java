@@ -1000,16 +1000,8 @@ public class WorkbookParserTest {
 		final Workbook excelWorkbook = new HSSFWorkbook();
 		excelWorkbook.createSheet("Observation");
 
-		final List<Message> errorMessages = new ArrayList<>();
-		final Message message = new Message("error.missing.sheet.description");
-		errorMessages.add(message);
-
 		final WorkbookParser workbookParser = new WorkbookParser();
-
 		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(excelWorkbook, "CONDITION");
-
-		Assert.assertEquals("error.missing.sheet.description", errorMessages.get(0).getMessageKey());
-
 		Assert.assertTrue("Since the work book has no description sheet, measurement variables should be empty",
 				readMeasurementVariables.isEmpty());
 	}
