@@ -78,6 +78,8 @@ public class WorkbookParser {
 	private static final String DATA_TYPE = "DATA TYPE";
 	private static final String METHOD = "METHOD";
 	private static final String SCALE = "SCALE";
+	private static final String DESCRIPTION_SHEET_NAME = "Description";
+	private static final String OBSERVATION_SHEET_NAME = "Observation";
 
 	public static final int DEFAULT_MAX_ROW_LIMIT = 10000;
 
@@ -219,11 +221,20 @@ public class WorkbookParser {
 		return this.currentWorkbook;
 	}
 
+	protected boolean isDescriptionSheetExists(final Workbook wb) throws WorkbookParserException {
+		final Sheet sheet1 = wb.getSheetAt(WorkbookParser.DESCRIPTION_SHEET);
+
+		if (sheet1 == null || sheet1.getSheetName() == null || !WorkbookParser.DESCRIPTION_SHEET_NAME.equals(sheet1.getSheetName())) {
+			return false;
+		}
+		return true;
+	}
+
 	protected void validateExistenceOfSheets(final Workbook wb) throws WorkbookParserException {
 		try {
 			final Sheet sheet1 = wb.getSheetAt(WorkbookParser.DESCRIPTION_SHEET);
 
-			if (sheet1 == null || sheet1.getSheetName() == null || !"Description".equals(sheet1.getSheetName())) {
+			if (sheet1 == null || sheet1.getSheetName() == null || !WorkbookParser.DESCRIPTION_SHEET_NAME.equals(sheet1.getSheetName())) {
 				this.errorMessages.add(new Message("error.missing.sheet.description"));
 			}
 		} catch (final IllegalArgumentException e) {
@@ -236,7 +247,7 @@ public class WorkbookParser {
 		try {
 			final Sheet sheet2 = wb.getSheetAt(WorkbookParser.OBSERVATION_SHEET);
 
-			if (sheet2 == null || sheet2.getSheetName() == null || !"Observation".equals(sheet2.getSheetName())) {
+			if (sheet2 == null || sheet2.getSheetName() == null || !WorkbookParser.OBSERVATION_SHEET_NAME.equals(sheet2.getSheetName())) {
 				this.errorMessages.add(new Message("error.missing.sheet.observation"));
 			}
 		} catch (final IllegalArgumentException e) {
@@ -371,6 +382,11 @@ public class WorkbookParser {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		try {
+
+			// Skip checking description sheet if it is not present in file
+			if(!this.isDescriptionSheetExists(wb)){
+				return Collections.<MeasurementVariable>emptyList();
+			}
 
 			// Cannot have more than one empty row in the description worksheet.
 			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
