@@ -56,7 +56,7 @@ public class CrossExpansionProperties {
 
 	public CrossExpansionProperties() {
 		try {
-			final Resource resource = new ClassPathResource("naming.properties");
+			final Resource resource = new ClassPathResource("crossing.properties");
 			this.props = PropertiesLoaderUtils.loadProperties(resource);
 		} catch (final IOException e) {
 			final String errorMessage = "Unable to access crossing.properties. Please contact your administrator for further assistance.";
