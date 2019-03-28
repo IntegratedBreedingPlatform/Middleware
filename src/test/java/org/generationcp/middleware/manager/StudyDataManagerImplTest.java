@@ -709,7 +709,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
-		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
+		this.manager.getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
 			locationNameIdValue, programUUID));
@@ -749,7 +749,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setProject(project);
-		this.manager.getExperimentModelSaver().getExperimentDao().save(experimentModel);
+		this.manager.getExperimentDao().save(experimentModel);
 
 		Assert.assertFalse(this.manager.isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String.valueOf(TermId.LOCATION_ID.getId()),
 			locationNameIdValue, ""));

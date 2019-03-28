@@ -30,15 +30,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PhenotypeSaver extends Saver {
+public class PhenotypeSaver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeSaver.class);
 
 	private DaoFactory daoFactory;
 
-	public PhenotypeSaver(final HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
-		this.daoFactory = new DaoFactory(sessionProviderForLocal);
+	public PhenotypeSaver(final HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public void savePhenotypes(final ExperimentModel experimentModel, final VariableList variates) throws MiddlewareQueryException {
@@ -66,7 +65,7 @@ public class PhenotypeSaver extends Saver {
 	public void save(final int experimentId, final Variable variable) throws MiddlewareQueryException {
 		Phenotype phenotype = this.createPhenotype(variable, experimentId);
 		if (phenotype != null) {
-			phenotype = this.getPhenotypeDao().save(phenotype);
+			phenotype = this.daoFactory.getPhenotypeDAO().save(phenotype);
 			variable.setPhenotypeId(phenotype.getPhenotypeId());
 		}
 	}
@@ -80,7 +79,7 @@ public class PhenotypeSaver extends Saver {
 	public void savePhenotype(final int experimentId, final Variable variable) throws MiddlewareQueryException {
 		final Phenotype phenotype = this.createPhenotype(variable, experimentId);
 		if (phenotype != null) {
-			this.getPhenotypeDao().save(phenotype);
+			this.daoFactory.getPhenotypeDAO().save(phenotype);
 		}
 	}
 
@@ -101,7 +100,7 @@ public class PhenotypeSaver extends Saver {
 				}
 				phenotype.setObservableId(variable.getVariableType().getId());
 				phenotype.setName(String.valueOf(variable.getVariableType().getId()));
-			    phenotype.setExperiment(this.getExperimentDao().getById(experimentId));
+			    phenotype.setExperiment(this.daoFactory.getExperimentDao().getById(experimentId));
 
 			    if (dataType != null && dataType.getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 
@@ -130,7 +129,7 @@ public class PhenotypeSaver extends Saver {
 			final ExperimentModel experiment = new ExperimentModel();
 			experiment.setNdExperimentId(experimentId);
 			phenotype.setExperiment(experiment);
-			this.getPhenotypeDao().merge(phenotype);
+			this.daoFactory.getPhenotypeDAO().merge(phenotype);
 		}
 	}
 
@@ -204,7 +203,7 @@ public class PhenotypeSaver extends Saver {
 	public void saveOrUpdatePhenotypeValue(final int projectId, final int variableId, final String value, final int dataTypeId) throws MiddlewareQueryException {
 		if (value != null) {
 			boolean isInsert = false;
-			Integer phenotypeId = this.getPhenotypeDao().getPhenotypeIdByProjectAndType(projectId, variableId);
+			Integer phenotypeId = this.daoFactory.getPhenotypeDAO().getPhenotypeIdByProjectAndType(projectId, variableId);
 			final Phenotype phenotype;
 			if (phenotypeId == null) {
 				phenotype = new Phenotype();
@@ -213,17 +212,17 @@ public class PhenotypeSaver extends Saver {
 				phenotype.setName(String.valueOf(variableId));
 				isInsert = true;
 			} else {
-				phenotype = this.getPhenotypeDao().getById(phenotypeId);
+				phenotype = this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
 			}
 			if (dataTypeId == TermId.CATEGORICAL_VARIABLE.getId() && NumberUtils.isNumber(value)) {
 				phenotype.setcValue(Double.valueOf(value).intValue());
 			} else {
 				phenotype.setValue(value);
 			}
-			this.getPhenotypeDao().saveOrUpdate(phenotype);
+			this.daoFactory.getPhenotypeDAO().saveOrUpdate(phenotype);
 			if (isInsert) {
-				final int experimentId = this.getExperimentDao().getExperimentIdByProjectId(projectId);
-				final ExperimentModel experimentModel = this.getExperimentDao().getById(experimentId);
+				final int experimentId = this.daoFactory.getExperimentDao().getExperimentIdByProjectId(projectId);
+				final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getById(experimentId);
 				phenotype.setExperiment(experimentModel);
 			}
 		}

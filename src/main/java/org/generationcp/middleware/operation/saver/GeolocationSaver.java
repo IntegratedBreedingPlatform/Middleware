@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import java.util.ArrayList;
+
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -19,16 +21,25 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
+import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.util.StringUtil;
 
-import java.util.ArrayList;
+public class GeolocationSaver {
+	
+	private DaoFactory daoFactory;
+	private PhenotypeSaver phenotypeSaver;
+	private VariableTypeListTransformer variableTypeListTransformer;
+	private VariableListTransformer variableListTransformer; 
 
-public class GeolocationSaver extends Saver {
-
-	public GeolocationSaver(HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	public GeolocationSaver(final HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new DaoFactory(sessionProvider);
+		this.phenotypeSaver = new PhenotypeSaver(sessionProvider);
+		this.variableTypeListTransformer = new VariableTypeListTransformer(sessionProvider);
+		this.variableListTransformer = new VariableListTransformer(sessionProvider);
 	}
 
 	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row) {
@@ -43,18 +54,18 @@ public class GeolocationSaver extends Saver {
 		final Geolocation geolocation = this.createOrUpdate(variableList, row, locationId);
 		if (geolocation != null) {
 			if (isCreate) {
-				this.getGeolocationDao().save(geolocation);
+				this.daoFactory.getGeolocationDao().save(geolocation);
 			} else {
-				this.getGeolocationDao().saveOrUpdate(geolocation);
+				this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
 			}
 			if (null != geolocation.getVariates()) {
 				for (final Variable var : geolocation.getVariates().getVariables()) {
 					if (null == var.getPhenotypeId()) {
-						this.getPhenotypeSaver().save(row.getExperimentId(), var);
+						this.phenotypeSaver.save(row.getExperimentId(), var);
 					} else {
-						this.getPhenotypeSaver()
+						this.phenotypeSaver
 							.saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(), var.getValue(),
-								this.getPhenotypeDao().getById(var.getPhenotypeId()),
+								this.daoFactory.getPhenotypeDAO().getById(var.getPhenotypeId()),
 								var.getVariableType().getStandardVariable().getDataType().getId(), null);
 					}
 				}
@@ -121,7 +132,7 @@ public class GeolocationSaver extends Saver {
 	}
 
 	protected Geolocation getGeolocationById(Integer locationId) {
-		return this.getGeolocationDao().getById(locationId);
+		return this.daoFactory.getGeolocationDao().getById(locationId);
 	}
 
 	private GeolocationProperty createOrUpdateProperty(Variable variable, Geolocation geolocation) {
@@ -166,14 +177,14 @@ public class GeolocationSaver extends Saver {
 	public Geolocation createMinimumGeolocation() {
 		Geolocation geolocation = this.getGeolocationObject(null, null);
 		geolocation.setDescription("1");
-		this.getGeolocationDao().save(geolocation);
+		this.daoFactory.getGeolocationDao().save(geolocation);
 
 		return geolocation;
 	}
 
 	public Geolocation updateGeolocationInformation(MeasurementRow row, String programUUID) {
-		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(row.getMeasurementVariables(), programUUID);
-		VariableList variableList = this.getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
+		VariableTypeList variableTypes = this.variableTypeListTransformer.transform(row.getMeasurementVariables(), programUUID);
+		VariableList variableList = this.variableListTransformer.transformTrialEnvironment(row, variableTypes);
 
 		return this.saveGeolocation(variableList, row, false);
 	}
@@ -210,14 +221,14 @@ public class GeolocationSaver extends Saver {
 			}
 			// check if existing
 			Integer locationId =
-					this.getGeolocationDao().getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber,
+					this.daoFactory.getGeolocationDao().getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber,
 							programUUID);
 			if (isDeleteTrialObservations) {
 				locationId = null;
 			}
 			geolocation = this.createOrUpdate(variableList, row, locationId);
 			geolocation.setDescription(trialInstanceNumber);
-			this.getGeolocationDao().saveOrUpdate(geolocation);
+			this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
 			return geolocation;
 		}
 		return null;
