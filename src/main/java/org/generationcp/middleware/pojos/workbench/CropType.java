@@ -17,6 +17,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * POJO for workbench_crop table.
@@ -50,6 +51,10 @@ public class CropType implements Serializable {
 
 	@Column(name = "plot_code_prefix")
 	private String plotCodePrefix;
+	
+	// FIXME link to actual table column
+	@Transient
+	private boolean useUUID = true;
 
 	public CropType() {
 	}
@@ -118,6 +123,16 @@ public class CropType implements Serializable {
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	
+	public boolean isUseUUID() {
+		return useUUID;
+	}
+
+	
+	public void setUseUUID(boolean useUUID) {
+		this.useUUID = useUUID;
 	}
 
 	@Override
