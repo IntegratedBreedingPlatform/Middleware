@@ -24,6 +24,7 @@ public class ObservationUnitsSearchDTO {
 	private Integer instanceId;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
+
 	/**
 	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
 	 */
@@ -100,7 +101,7 @@ public class ObservationUnitsSearchDTO {
 		}
 
 		public Integer getVariableId() {
-			return variableId;
+			return this.variableId;
 		}
 
 		public void setVariableId(final Integer variableId) {

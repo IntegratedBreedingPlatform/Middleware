@@ -489,20 +489,24 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 
+		this.fillSearchDTO(studyId, datasetId, searchDTO);
+
+		return this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
+	}
+
+	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 		if (searchDTO.getSortedRequest() != null && searchDTO.getSortedRequest().getSortBy() != null) {
 			searchDTO.getSortedRequest()
 				.setSortBy(this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy())).getName());
 		}
 
 		searchDTO.setDatasetId(datasetId);
-        searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
+		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
 		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariablesForDataset(datasetId,
 			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
-
-		return this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
 	}
 
 	@Override
@@ -752,6 +756,34 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void acceptDraftDataByVariable(
+		final Integer datasetId, final Integer variableId,
+		final ObservationUnitsSearchDTO searchDTO, final int studyId) {
+
+		final List<Phenotype> phenotypes = new ArrayList<>();
+		this.fillSearchDTO(studyId, datasetId, searchDTO);
+
+		final List<Integer> phenotypeIds =
+			this.daoFactory.getExperimentDao().getDraftsByVariableQueryResult(searchDTO);
+
+		if (!phenotypeIds.isEmpty()) {
+
+			for (final Integer phenotypeId : phenotypeIds) {
+				final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
+				phenotypes.add(phenotype);
+				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
+					this.deletePhenotype(phenotype.getPhenotypeId());
+				} else {
+					this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+				}
+			}
+		}
+
+		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+		this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
 	}
 
 	private void acceptDraftData(final Phenotype phenotype) {

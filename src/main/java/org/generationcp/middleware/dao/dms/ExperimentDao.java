@@ -965,7 +965,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final ObservationUnitsSearchDTO.Filter filter) {
 
 		try {
-			StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits from " //
+			final StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits from " //
 				+ "nd_experiment nde " //
 				+ "    inner join project p on p.project_id = nde.project_id " //
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
@@ -985,7 +985,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			if (filter != null) {
-				addFilters(sql, filter, draftMode);
+				this.addFilters(sql, filter, draftMode);
 			}
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
@@ -1398,4 +1398,139 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	private String getDraftsByVariableQuery(final ObservationUnitsSearchDTO searchDto) {
+
+		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
+		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
+
+		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  " //
+			+ "    nde.nd_experiment_id as observationUnitId, "); //
+
+		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', " //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s'," //
+			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s', " //
+			;
+
+		for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraits()) {
+			if (measurementVariable.getId().equals(searchDto.getFilter().getVariableId())) {
+				sql.append(String.format( //
+					traitClauseFormat, //
+					measurementVariable.getName(), //
+					measurementVariable.getName(), // Value
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_PhenotypeId", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_Status", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_CvalueId", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_DraftValue", //
+					measurementVariable.getName(), //
+					measurementVariable.getName() + "_DraftCvalueId" //
+				));
+				break;
+			}
+		}
+
+		sql.append(" 1=1 FROM " //
+			+ "	project p " //
+			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id " //
+			+ "	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id " //
+			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
+			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
+			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
+			+ "   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
+			+ " WHERE p.project_id = :datasetId "); //
+
+		if (searchDto.getInstanceId() != null) {
+			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
+		}
+
+		sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
+
+		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
+		this.addFilters(sql, filter, searchDto.getDraftMode());
+
+		sql.append(" GROUP BY observationUnitId ) T  "); //
+
+		return sql.toString();
+	}
+
+	public List<Integer> getDraftsByVariableQueryResult(final ObservationUnitsSearchDTO params) {
+		try {
+
+			final String generateQuery = this.getDraftsByVariableQuery(params);
+			final SQLQuery query = this.getSession().createSQLQuery(generateQuery);
+
+			query.addScalar(ExperimentDao.OBSERVATION_UNIT_ID);
+
+			this.addScalarForSpecificTrait(params, query);
+
+			query.setParameter("datasetId", params.getDatasetId());
+
+			if (params.getInstanceId() != null) {
+				query.setParameter("instanceId", String.valueOf(params.getInstanceId()));
+			}
+
+			if (!CollectionUtils.isEmpty(params.getEnvironmentConditions())) {
+				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
+			}
+
+			if (!params.getFilter().getFilteredValues().isEmpty()) {
+				final Map<String, List<String>> filteredValues = params.getFilter().getFilteredValues();
+
+				for (final String observationId : filteredValues.keySet()) {
+					query.setParameter(observationId + "_Id", observationId);
+					query.setParameterList(observationId + "_values", params.getFilter().getFilteredValues().get(observationId));
+				}
+			}
+
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = query.list();
+
+			return this.mapToObservationUnitData(results, params);
+
+		} catch (final Exception e) {
+			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareException(error, e);
+		}
+	}
+
+	private void addScalarForSpecificTrait(final ObservationUnitsSearchDTO params, final SQLQuery query) {
+		for (final MeasurementVariableDto measurementVariable : params.getSelectionMethodsAndTraits()) {
+			if (measurementVariable.getId().equals(params.getFilter().getVariableId())) {
+				query.addScalar(measurementVariable.getName()); // Value
+				query.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
+				query.addScalar(measurementVariable.getName() + "_Status");
+				query.addScalar(measurementVariable.getName() + "_CvalueId", new IntegerType());
+				query.addScalar(measurementVariable.getName() + "_DraftValue");
+				query.addScalar(measurementVariable.getName() + "_DraftCvalueId", new IntegerType());
+				break;
+			}
+		}
+	}
+
+	private List<Integer> mapToObservationUnitData(
+		final List<Map<String, Object>> results, final ObservationUnitsSearchDTO searchDto) {
+		final List<Integer> dataList = new ArrayList<>();
+
+		if (results != null && !results.isEmpty()) {
+			for (final Map<String, Object> row : results) {
+				for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraits()) {
+					final String value = (String) row.get(variable.getName());
+					if (variable.getId().equals(searchDto.getFilter().getVariableId()) && value != null) {
+						dataList.add((Integer) row.get(variable.getName() + "_PhenotypeId"));
+						break;
+					}
+				}
+			}
+		}
+
+		return dataList;
+	}
 }
