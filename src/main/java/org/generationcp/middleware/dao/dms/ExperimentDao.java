@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -777,7 +778,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		final String filterByDraftOrValue = Boolean.TRUE.equals(draftMode) ? "draft_value" : "value";
-		
+
+		final String filterByVariableSQL = (filter.getVariableId() == null) ? StringUtils.EMPTY : "and ph2.observable_id = " + filter.getVariableId() + " ";
+
 		if (Boolean.TRUE.equals(filter.getByOutOfBound())) {
 			sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
 					+ "      from cvterm_relationship cvtrscale " //
@@ -789,6 +792,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
 					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "      where ph2." + filterByDraftOrValue + " is not null " //
+					+ filterByVariableSQL
 					+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
 					+ "        and case " //
 					+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId() //
@@ -811,7 +815,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (!filter.getFilteredValues().isEmpty()) {
-			final Map<String, List<String>> filteredValues = filter.getFilteredValues();
+			final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
+				ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(filter.getVariableId()));
 
 			for (final String observationId : filteredValues.keySet()) {
 				sql.append(
@@ -827,7 +832,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (!filter.getFilteredTextValues().isEmpty()) {
 			// filter by column value (text)
-			final Map<String, String> filteredTextValues = filter.getFilteredTextValues();
+			final Map<String, String> filteredTextValues = (filter.getVariableId() == null) ? filter.getFilteredTextValues() :
+				ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredTextValues().get(filter.getVariableId()));
 
 			for (final String observationId : filteredTextValues.keySet()) {
 				sql.append(
@@ -849,6 +855,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						+ "    from phenotype ph2 " //
 						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 						+ "    where nde2.project_id = p.project_id " //
+						+ filterByVariableSQL
 						+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
 		}
 
@@ -859,6 +866,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    from phenotype ph2 " //
 					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "    where nde2.project_id = p.project_id " //
+					+ filterByVariableSQL
 					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )" ); //
 		}
 
@@ -870,6 +878,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    from phenotype ph2 " //
 					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "    where nde2.project_id = p.project_id " //
+					+ filterByVariableSQL
 					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )" ); //
 		}
 	}
@@ -982,7 +991,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
 			if (filter != null && !filter.getFilteredValues().isEmpty()) {
-				final Map<String, List<String>> filteredValues = filter.getFilteredValues();
+				final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
+					ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(filter.getVariableId()));
 
 				for (final String observationId : filteredValues.keySet()) {
 					query.setParameter(observationId + "_Id", observationId);
