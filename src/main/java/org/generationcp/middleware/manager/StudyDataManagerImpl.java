@@ -71,6 +71,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -185,14 +186,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
+	public StudyReference addStudy(final CropType crop, final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
 			final String programUUID, final StudyTypeDto studyType, final String description,
 			final String startDate, final String endDate, final String objective, final String name, final String createdBy) {
 
 		try {
-
 			final DmsProject project = this.getStudySaver()
-					.saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, studyType, description,
+					.saveStudy(crop, parentFolderId, variableTypeList, studyValues, true, programUUID, studyType, description,
 							startDate, endDate, objective, name, createdBy);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), programUUID, studyType);
@@ -269,8 +269,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues) {
 
 		try {
-
-			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues);
+			//FIXME resolve crop of given datasetId
+			this.getExperimentModelSaver().addExperiment(new CropType(), dataSetId, experimentType, experimentValues);
 
 		} catch (final Exception e) {
 
@@ -283,9 +283,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final List<ExperimentValues> experimentValuesList) {
 
 		try {
-
+			//FIXME resolve crop of given datasetId
+			final CropType crop = new CropType();
 			for (final ExperimentValues experimentValues : experimentValuesList) {
-				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
+				this.getExperimentModelSaver().addOrUpdateExperiment(crop, dataSetId, experimentType, experimentValues);
 			}
 
 		} catch (final Exception e) {

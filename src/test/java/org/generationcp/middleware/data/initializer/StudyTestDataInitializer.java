@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 
 /*
@@ -90,7 +91,8 @@ public class StudyTestDataInitializer {
 		
 		final Integer userId = addTestUser();
 
-		final StudyReference addedStudy = this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, 
+		final CropType crop = new CropType();
+		final StudyReference addedStudy = this.studyDataManager.addStudy(crop, StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId,
 			studyType, description, startDate, endDate, objective, studyName, String.valueOf(userId));
 		addedStudy.setOwnerId(userId);
 		return addedStudy;
@@ -121,7 +123,7 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = this.createStudyValues(variableList);
 		final Integer userId = addTestUser();
 
-		final StudyReference addedStudy = this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
+		final StudyReference addedStudy = this.studyDataManager.addStudy(new CropType(), StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
 				.END_DATE, StudyTestDataInitializer.OBJECTIVE, studyName, String.valueOf(userId));
 		addedStudy.setOwnerId(userId);
 		return addedStudy;

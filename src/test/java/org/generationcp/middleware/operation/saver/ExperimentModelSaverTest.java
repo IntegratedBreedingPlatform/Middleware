@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,7 +121,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.experimentModelSaver.addOrUpdateExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.experimentModelSaver.addOrUpdateExperiment(new CropType(), 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());

@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,7 +99,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.experimentModelSaver.addOrUpdateExperiment(1, ExperimentType.STUDY_INFORMATION, values);
+		this.experimentModelSaver.addOrUpdateExperiment(new CropType(), 1, ExperimentType.STUDY_INFORMATION, values);
 		final List<String> treatmentFactorValues = this.experimentPropertyDao.getTreatmentFactorValues(1001, 1002, 1);
 		Assert.assertEquals(1, treatmentFactorValues.size());
 		Assert.assertEquals("Value", treatmentFactorValues.get(0));

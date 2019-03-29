@@ -42,6 +42,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -202,7 +203,7 @@ public interface StudyDataManager {
 	 * @param createdBy
 	 * @return StudyReference corresponding to the newly-created Study
 	 */
-	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
+	StudyReference addStudy(CropType crop, int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
 		final StudyTypeDto studyType, final String description, final String startDate, final String endDate,
 		final String objective, final String name, final String createdBy);
 
@@ -347,7 +348,6 @@ public interface StudyDataManager {
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
 	 *
 	 * @param studyIdList the study id list
-	 * @param studyType   Can be either StudyType.T (Trial) or StudyType.N (Nursery)
 	 * @return the FieldMapCount object containing the counts
 	 */
 

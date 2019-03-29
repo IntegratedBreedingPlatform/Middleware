@@ -11,6 +11,7 @@
 package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -28,6 +29,9 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
+import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -37,23 +41,25 @@ public class ExperimentModelSaver {
 	private PhenotypeSaver phenotypeSaver;
 	private GeolocationSaver geolocationSaver;
 	private StockModelBuilder stockModelBuilder;
+	private ObservationUnitIDGenerator observationUnitIDGenerator;
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.phenotypeSaver = new PhenotypeSaver(sessionProvider);
 		this.geolocationSaver = new GeolocationSaver(sessionProvider);
 		this.stockModelBuilder = new StockModelBuilder(sessionProvider);
+		this.observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl(sessionProvider);
 	}
 
-	public void addExperiment(final int projectId, final ExperimentType experimentType, final Values values) {
+	public void addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
 		final TermId myExperimentType = this.mapExperimentType(experimentType);
-		final ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
+		final ExperimentModel experimentModel = this.create(crop, projectId, values, myExperimentType);
 
 		this.daoFactory.getExperimentDao().save(experimentModel);
 		this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
 	}
 
-	public void addOrUpdateExperiment(final int projectId, final ExperimentType experimentType, final Values values) {
+	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
 		final int experimentId =
 				this.daoFactory.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
@@ -73,7 +79,7 @@ public class ExperimentModelSaver {
 				myExperimentType = this.mapExperimentType(experimentType);
 			}
 
-			final ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
+			final ExperimentModel experimentModel = this.create(crop, projectId, values, myExperimentType);
 
 			this.daoFactory.getExperimentDao().save(experimentModel);
 			this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
@@ -98,7 +104,7 @@ public class ExperimentModelSaver {
 		return null;
 	}
 
-	private ExperimentModel create(final int projectId, final Values values, final TermId expType) {
+	private ExperimentModel create(final CropType crop, final int projectId, final Values values, final TermId expType) {
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final DmsProject project = new DmsProject();
 		project.setProjectId(projectId);
@@ -114,7 +120,7 @@ public class ExperimentModelSaver {
 		if (values.getGermplasmId() != null) {
 			experimentModel.setStock(this.stockModelBuilder.get(values.getGermplasmId()));
 		}
-
+		this.observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 		return experimentModel;
 	}
 
