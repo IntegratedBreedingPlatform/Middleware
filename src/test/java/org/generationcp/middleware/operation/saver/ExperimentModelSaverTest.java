@@ -1,6 +1,8 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -17,10 +19,16 @@ import java.util.List;
 
 public class ExperimentModelSaverTest extends IntegrationTestBase {
 	private ExperimentModelSaver experimentModelSaver;
-
+	private ExperimentDao experimentDao;
+	private PhenotypeDao phenotypeDao;
+	
 	@Before
 	public void setUp() throws Exception {
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
+		this.experimentDao =  new ExperimentDao();
+		this.experimentDao.setSession(this.sessionProvder.getSession());
+		this.phenotypeDao = new PhenotypeDao();
+		this.phenotypeDao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -113,8 +121,8 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		values.setGermplasmId(1);
 		//Save the experiment
 		this.experimentModelSaver.addOrUpdateExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
-		final ExperimentModel experiment = this.experimentModelSaver.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
-		final Phenotype phenotype = this.experimentModelSaver.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 	}
 }
