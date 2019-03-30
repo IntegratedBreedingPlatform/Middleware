@@ -41,14 +41,12 @@ public class ExperimentModelSaver {
 	private PhenotypeSaver phenotypeSaver;
 	private GeolocationSaver geolocationSaver;
 	private StockModelBuilder stockModelBuilder;
-	private ObservationUnitIDGenerator observationUnitIDGenerator;
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.phenotypeSaver = new PhenotypeSaver(sessionProvider);
 		this.geolocationSaver = new GeolocationSaver(sessionProvider);
 		this.stockModelBuilder = new StockModelBuilder(sessionProvider);
-		this.observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl(sessionProvider);
 	}
 
 	public void addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
@@ -120,7 +118,8 @@ public class ExperimentModelSaver {
 		if (values.getGermplasmId() != null) {
 			experimentModel.setStock(this.stockModelBuilder.get(values.getGermplasmId()));
 		}
-		this.observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
+		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
+		observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 		return experimentModel;
 	}
 

@@ -8,8 +8,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 
 public interface ObservationUnitIDGenerator {
 
-	CropType getCropForProjectId(final Integer projectId);
-
 	void generateObservationUnitIds(final CropType crop, final List<ExperimentModel> experiments);
 
 }

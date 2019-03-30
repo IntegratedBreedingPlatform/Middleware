@@ -1,19 +1,10 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
@@ -35,15 +26,15 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -62,11 +53,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
+import javax.annotation.Nullable;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -120,9 +110,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyService studyService;
-	
+
 	@Autowired
-	private ObservationUnitIDGenerator observationUnitIdGenerator;
+	private WorkbenchDataManager workbenchDataManager;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -133,7 +123,6 @@ public class DatasetServiceImpl implements DatasetService {
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 		this.measurementVariableService = new MeasurementVariableServiceImpl(sessionProvider.getSession());
 		this.studyService = new StudyServiceImpl(sessionProvider);
-		this.observationUnitIdGenerator = new ObservationUnitIDGeneratorImpl(sessionProvider);
 	}
 
 	@Override
@@ -264,12 +253,14 @@ public class DatasetServiceImpl implements DatasetService {
 			final DmsProject plotDataset, final DmsProject subObservationDataset) {
 		final List<ExperimentModel> plotObservationUnits =
 				this.daoFactory.getExperimentDao().getObservationUnits(plotDataset.getProjectId(), instanceIds);
-		final CropType crop = this.observationUnitIdGenerator.getCropForProjectId(studyId);
+		final DmsProject dmsProject = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		final CropType crop = this.workbenchDataManager.getProjectByUuid(dmsProject.getProgramUUID()).getCropType();
+		final ObservationUnitIDGenerator observationUnitIdGenerator = new ObservationUnitIDGeneratorImpl();
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
 				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(),
 						plotObservationUnit.getTypeId(), subObservationDataset, plotObservationUnit.getStock(), plotObservationUnit, i);
-				this.observationUnitIdGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
+				observationUnitIdGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}
@@ -1062,6 +1053,10 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public void setStudyService(final StudyService studyService) {
 		this.studyService = studyService;
+	}
+
+	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
 	}
 
 	@Override
