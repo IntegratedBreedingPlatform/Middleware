@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -814,7 +816,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    )"); //
 		}
 
-		if (!filter.getFilteredValues().isEmpty()) {
+		if (filter.getFilteredValues() != null && !filter.getFilteredValues().isEmpty()) {
 			final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
 				ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(filter.getVariableId()));
 
@@ -830,7 +832,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		if (!filter.getFilteredTextValues().isEmpty()) {
+		if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
 			// filter by column value (text)
 			final Map<String, String> filteredTextValues = (filter.getVariableId() == null) ? filter.getFilteredTextValues() :
 				ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredTextValues().get(filter.getVariableId()));
@@ -1012,6 +1014,72 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(
 				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
 					datasetId, instanceId) + he.getMessage(),
+				he);
+		}
+	}
+
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer datasetId,
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
+
+		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.getFilter();
+
+		Preconditions.checkNotNull(filter.getVariableId());
+
+		try {
+			final StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits, count(distinct(gl.nd_geolocation_id)) as totalInstances from " //
+				+ "nd_experiment nde " //
+				+ "    inner join project p on p.project_id = nde.project_id " //
+				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+				+ " where " //
+				+ "	p.project_id = :datasetId ");
+
+			if (observationUnitsSearchDTO.getInstanceId() != null) {
+				sql.append(" and gl.nd_geolocation_id = :instanceId ");
+			}
+
+			if (Boolean.TRUE.equals(observationUnitsSearchDTO.getDraftMode())) {
+				sql.append(" and exists(select 1" //
+					+ "   from phenotype ph" //
+					+ "   where ph.nd_experiment_id = nde.nd_experiment_id " //
+					+ "         and (ph.draft_value is not null " //
+					+ "                or ph.draft_cvalue_id is not null)) ");
+			}
+
+			if (filter != null) {
+				this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
+			}
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+
+			if (filter != null && !filter.getFilteredValues().isEmpty()) {
+				final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
+					ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(filter.getVariableId()));
+
+				for (final String observationId : filteredValues.keySet()) {
+					query.setParameter(observationId + "_Id", observationId);
+					query.setParameterList(observationId + "_values", filter.getFilteredValues().get(observationId));
+				}
+			}
+
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.addScalar("totalInstances", new IntegerType());
+
+			query.setParameter("datasetId", datasetId);
+
+			if (observationUnitsSearchDTO.getInstanceId() != null) {
+				query.setParameter("instanceId", observationUnitsSearchDTO.getInstanceId());
+			}
+
+			final Object[] result = (Object[]) query.uniqueResult();
+
+			final FilteredPhenotypesInstancesCountDTO response = new FilteredPhenotypesInstancesCountDTO((Integer) result[0], (Integer) result[1]);
+
+			return response;
+
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+					datasetId, observationUnitsSearchDTO.getInstanceId()) + he.getMessage(),
 				he);
 		}
 	}

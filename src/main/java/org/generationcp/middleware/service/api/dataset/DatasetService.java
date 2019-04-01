@@ -94,4 +94,8 @@ public interface DatasetService {
 	void setValuesToMissing(Integer datasetId);
 
 	void acceptDraftDataByVariable(Integer datasetId, Integer variableId,ObservationUnitsSearchDTO searchDTO, int studyId);
+
+	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+		Integer datasetId, ObservationUnitsSearchDTO filter);
+
 }

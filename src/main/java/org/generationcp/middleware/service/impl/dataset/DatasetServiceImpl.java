@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -1079,5 +1080,11 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Map<String, Long> countObservationsGroupedByInstance(final Integer datasetId) {
 		return this.daoFactory.getExperimentDao().countObservationsPerInstance(datasetId);
+	}
+
+	@Override
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+		final Integer datasetId, final ObservationUnitsSearchDTO filter) {
+		return this.daoFactory.getExperimentDao().countFilteredInstancesAndPhenotypes(datasetId, filter);
 	}
 }
