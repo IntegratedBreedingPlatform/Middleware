@@ -818,7 +818,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (filter.getFilteredValues() != null && !filter.getFilteredValues().isEmpty()) {
 			final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
-				ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(filter.getVariableId()));
+				(filter.getFilteredValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, List<String>>();
 
 			for (final String observationId : filteredValues.keySet()) {
 				sql.append(
@@ -835,7 +835,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
 			// filter by column value (text)
 			final Map<String, String> filteredTextValues = (filter.getVariableId() == null) ? filter.getFilteredTextValues() :
-				ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredTextValues().get(filter.getVariableId()));
+				(filter.getFilteredTextValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredTextValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, String>();
 
 			for (final String observationId : filteredTextValues.keySet()) {
 				sql.append(
@@ -994,7 +994,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			if (filter != null && !filter.getFilteredValues().isEmpty()) {
 				final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
-					ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(filter.getVariableId()));
+					(filter.getFilteredValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, List<String>>();
 
 				for (final String observationId : filteredValues.keySet()) {
 					query.setParameter(observationId + "_Id", observationId);
@@ -1053,7 +1053,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			if (filter != null && !filter.getFilteredValues().isEmpty()) {
 				final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
-					ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(filter.getVariableId()));
+					(filter.getFilteredValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, List<String>>();
 
 				for (final String observationId : filteredValues.keySet()) {
 					query.setParameter(observationId + "_Id", observationId);
@@ -1219,7 +1219,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			if (!params.getFilter().getFilteredValues().isEmpty()) {
-				final Map<String, List<String>> filteredValues = params.getFilter().getFilteredValues();
+				final Map<String, List<String>> filteredValues = (params.getFilter().getVariableId() == null) ? params.getFilter().getFilteredValues() :
+					(params.getFilter().getFilteredValues().get(String.valueOf(params.getFilter().getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(params.getFilter().getVariableId()), params.getFilter().getFilteredValues().get(String.valueOf(params.getFilter().getVariableId()))) : new HashMap<String, List<String>>();
+
 
 				for (final String observationId : filteredValues.keySet()) {
 					query.setParameter(observationId + "_Id", observationId);
