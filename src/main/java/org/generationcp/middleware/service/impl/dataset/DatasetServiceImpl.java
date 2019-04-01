@@ -761,14 +761,14 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void acceptDraftDataByVariable(
-		final Integer datasetId, final Integer variableId,
+		final Integer datasetId,
 		final ObservationUnitsSearchDTO searchDTO, final int studyId) {
 
 		final List<Phenotype> phenotypes = new ArrayList<>();
 		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
 		final List<Integer> phenotypeIds =
-			this.daoFactory.getExperimentDao().getDraftsByVariableQueryResult(searchDTO);
+			this.daoFactory.getExperimentDao().getDraftsByVariable(searchDTO);
 
 		if (!phenotypeIds.isEmpty()) {
 
