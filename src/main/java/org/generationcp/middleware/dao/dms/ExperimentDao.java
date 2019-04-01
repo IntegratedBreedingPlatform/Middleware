@@ -1528,7 +1528,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return sql.toString();
 	}
 
-	public List<Integer> getDraftsByVariableQueryResult(final ObservationUnitsSearchDTO params) {
+	public List<Integer> getDraftsByVariable(final ObservationUnitsSearchDTO params) {
 		try {
 
 			final String generateQuery = this.getDraftsByVariableQuery(params);
