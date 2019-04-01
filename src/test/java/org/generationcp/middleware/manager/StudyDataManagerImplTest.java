@@ -67,6 +67,7 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
@@ -111,6 +112,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
+	private CropType crop;
 
 	@Before
 	public void setUp() throws Exception {
@@ -122,6 +124,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
+			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
@@ -583,7 +586,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetTrialInstanceNumberByGeolocationId() throws Exception {
 		final Integer studyId = this.studyReference.getId();
-		final Integer dataSetId = this.studyTDI.addEnvironmentDataset(studyId, "1", "1");
+		final Integer dataSetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, "1", "1");
 		final TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(dataSetId);
 		Assert.assertNotNull(trialEnvironments.getTrialEnvironments());
 		Assert.assertFalse(trialEnvironments.getTrialEnvironments().isEmpty());
@@ -794,9 +797,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
 
-		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), afghanistanLocationId, "1");
-		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), albaniaLocationId, "1");
-		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), algeriaLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), afghanistanLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), albaniaLocationId, "1");
+		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), algeriaLocationId, "1");
 
 		this.sessionProvder.getSession().flush();
 		final Map<String, String> result = this.manager.createInstanceLocationIdToNameMapFromStudy(this.studyReference.getId());
@@ -865,7 +868,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
@@ -883,7 +886,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
@@ -901,7 +904,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
 		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(studyId, String.valueOf(random.nextInt()), "1");
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		Assert.assertFalse(this.manager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(999)));
 
@@ -914,7 +917,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		values.setLocationId(manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
-		this.manager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.manager.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype updatedPhenotype =
 			this.manager.getPhenotypeDao().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
@@ -944,7 +947,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final ExperimentValues values = new ExperimentValues();
 		values.setLocationId(mockManager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
-		mockManager.addExperiment(this.studyReference.getId(), ExperimentType.TRIAL_ENVIRONMENT, values);
+		mockManager.addExperiment(this.crop, this.studyReference.getId(), ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = mockManager.getExperimentDao().getExperimentByProjectIdAndLocation(this.studyReference.getId(), values.getLocationId());
 		
 		// Create phenotype

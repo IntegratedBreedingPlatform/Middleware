@@ -35,6 +35,7 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +68,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private List<Phenotype> phenotypes;
 
 	private ExperimentModelSaver experimentModelSaver;
+	private CropType crop;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -124,7 +126,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		if (this.experimentModelSaver == null) {
 			this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
 		}
-
+		this.crop = new CropType();
+		this.crop.setUseUUID(true);
 	}
 
 	@Test
@@ -152,7 +155,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
@@ -168,7 +171,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setGermplasmId(1);
 
 		//Save the experiment
-		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());

@@ -251,7 +251,7 @@ public class StudyTestDataInitializer {
 
 	}
 	
-	public Integer addEnvironmentDataset(final int studyId, final String locationId, final String seasonId) throws Exception {
+	public Integer addEnvironmentDataset(final CropType crop, final int studyId, final String locationId, final String seasonId) throws Exception {
 		final VariableList locationVariableList = this.createEnvironmentWithLocationAndSeason("1", "RCBD", "SOME SITE NAME", locationId, seasonId);
 		final int geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
 
@@ -263,7 +263,7 @@ public class StudyTestDataInitializer {
 		
 		final ExperimentValues experimentValue = new ExperimentValues();
 		experimentValue.setLocationId(geolocationId);
-		this.studyDataManager.addExperiment(dataSet.getId(), ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
+		this.studyDataManager.addExperiment(crop, dataSet.getId(), ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
 
 		return dataSet.getId();
 	}

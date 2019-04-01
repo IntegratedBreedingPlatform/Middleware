@@ -13,24 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import com.google.common.collect.BiMap;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.Stocks;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -229,22 +212,26 @@ public interface StudyDataManager {
 	/**
 	 * Adds an experiment row to the dataset.
 	 *
+	 * @param crop	           Crop to which dataset is stored in
 	 * @param dataSetId        The ID of the dataset to add the experiment into
 	 * @param experimentType   The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *                         ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
 	 */
-	void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues);
+	void addExperiment(final CropType crop, final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues);
+
+
 
 	/**
 	 * Adds or updates experiment rows to the dataset.
 	 *
+	 * @param crop	           Crop to which dataset is stored in
 	 * @param dataSetId        The ID of the dataset to add the experiment into
 	 * @param experimentType   The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *                         ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
 	 */
-	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues);
+	void addOrUpdateExperiment(final CropType crop, int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues);
 
 	/**
 	 * Adds a Trial Environment. Accepts a variable list and sets up the trial environment data in the local database. It will throw an
