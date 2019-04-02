@@ -11,13 +11,11 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
+import org.hibernate.annotations.Type;
+
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 /**
  * POJO for workbench_crop table.
@@ -51,10 +49,11 @@ public class CropType implements Serializable {
 
 	@Column(name = "plot_code_prefix")
 	private String plotCodePrefix;
-	
-	// FIXME link to actual table column
-	@Transient
-	private boolean useUUID = true;
+
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Basic(optional = false)
+	@Column(name = "use_uuid", columnDefinition = "TINYINT")
+	private boolean useUUID;
 
 	public CropType() {
 	}
