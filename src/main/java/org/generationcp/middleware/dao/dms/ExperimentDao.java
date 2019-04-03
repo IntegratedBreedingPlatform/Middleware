@@ -1348,8 +1348,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	/*
+		Generate UUIDs (default format) for new experiments when observation unit ID has not been set before
+	 */
 	private void generateObsUnitId(final ExperimentModel experiment) {
-		if (experiment.getNdExperimentId() == null) {
+		if (experiment.getNdExperimentId() == null && StringUtils.isBlank(experiment.getObsUnitId())) {
 			experiment.setObsUnitId(UUID.randomUUID().toString());
 		}
 	}
