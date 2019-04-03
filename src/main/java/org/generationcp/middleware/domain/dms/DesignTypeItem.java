@@ -20,6 +20,9 @@ public class DesignTypeItem {
 	public static final DesignTypeItem ENTRY_LIST_ORDER = new DesignTypeItem(5, "Entry list order",
 			"entryListOrderParams.html", 0, 0, false);
 
+	public static final DesignTypeItem P_REP = new DesignTypeItem(6, "P-Rep Design",
+		"pRepParams.html", 0, 0, false);
+
 	public static final String ALPHA_LATTICE = "Alpha Lattice";
 
 	private Integer id;

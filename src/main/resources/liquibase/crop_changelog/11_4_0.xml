@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet id="v11.4.0-1" author="aldrin">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm where cvterm_id = 10164;
+			</sqlCheck>
+		</preConditions>
+		<comment>Create P-rep experimental design</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (10164, 2040, 'PREPD', 'Partially Replicated Design', null, 0, 0);
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id)
+			VALUES (1190, 17265, 10164);
+		</sql>
+	</changeSet>
+
+	<changeSet id="v11.4.0-2" author="aldrin">
+		<preConditions onFail="MARK_RAN">
+	    	<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8841</sqlCheck>
+	   	</preConditions>
+		<comment>Create PREP (% of test entries to replicate) variable</comment>
+	    <sql dbms="mysql" splitStatements="true">
+
+			-- Create property (ED - % of test entries to replicate)
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`)
+					VALUES (8841, 1010, 'ED - % of test entries to replicate', 'Experimental design parameter - % of test entries to replicate', NULL, 0, 0);
+
+			-- Create Standard Variable (Experimental design - % of test entries to replicate)
+	        INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`)
+					VALUES (8842, 1040, 'PREP', 'Percentage of test entries to replicate for P-Rep Design', NULL, 0, 0);
+
+			-- Assign Property, Method, Scale ("ED - % of test entries to replicate", "Assigned", "Number")
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id) VALUES (1200, 8842, 8841), (1210, 8842, 4030), (1220, 8842, 6040);
+
+			-- Assign Variable Type
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES (8842, 1800, 'Experimental Design', 0);
+
+	    </sql>
+	</changeSet>
+
+</databaseChangeLog>
