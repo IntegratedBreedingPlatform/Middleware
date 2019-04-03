@@ -610,8 +610,17 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.measurementVariableService.getVariablesForDataset(datasetId, variableType.getId());
 	}
 
+	/**
+	 * @deprecated use {@link DatasetService#getObservationSetVariables(Integer, List)}
+	 */
+	@Deprecated
 	@Override
 	public List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes) {
+		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectId, variableTypes);
+	}
+
+	@Override
+	public List<MeasurementVariable> getObservationSetVariables(final Integer projectId, final List<Integer> variableTypes) {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectId, variableTypes);
 	}
 

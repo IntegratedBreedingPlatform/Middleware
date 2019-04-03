@@ -85,7 +85,13 @@ public interface DatasetService {
 
 	Map<String, Long> countObservationsGroupedByInstance(Integer datasetId);
 
+	/**
+	 * @deprecated use {@link DatasetService#getObservationSetVariables(Integer, List)}
+	 */
+	@Deprecated
 	List<MeasurementVariable> getMeasurementVariables(Integer projectId, List<Integer> variableTypes);
+
+	List<MeasurementVariable> getObservationSetVariables(Integer projectId, List<Integer> variableTypes);
 
 	void rejectDraftData(Integer datasetId);
 
