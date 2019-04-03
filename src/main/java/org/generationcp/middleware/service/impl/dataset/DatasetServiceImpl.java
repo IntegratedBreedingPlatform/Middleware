@@ -128,12 +128,12 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public long countPhenotypes(final Integer datasetId, final List<Integer> variableIds) {
+	public long countObservationsByVariables(final Integer datasetId, final List<Integer> variableIds) {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDataset(datasetId, variableIds);
 	}
 
 	@Override
-	public long countPhenotypesByInstance(final Integer datasetId, final Integer instanceId) {
+	public long countObservationsByInstance(final Integer datasetId, final Integer instanceId) {
 		return this.daoFactory.getPhenotypeDAO().countPhenotypesForDatasetAndInstance(datasetId, instanceId);
 	}
 
@@ -343,7 +343,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void addVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias) {
+	public void addDatasetVariable(final Integer datasetId, final Integer variableId, final VariableType type, final String alias) {
 		final ProjectPropertyDao projectPropertyDAO = this.daoFactory.getProjectPropertyDAO();
 		final ProjectProperty projectProperty = new ProjectProperty();
 		projectProperty.setAlias(alias);
@@ -357,7 +357,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void removeVariables(final Integer datasetId, final List<Integer> variableIds) {
+	public void removeDatasetVariables(final Integer datasetId, final List<Integer> variableIds) {
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, variableIds);
 		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 	}
@@ -373,7 +373,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationDto addPhenotype(final ObservationDto observation) {
+	public ObservationDto createObservation(final ObservationDto observation) {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
@@ -611,7 +611,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariableDto> getVariables(final Integer datasetId, final VariableType variableType) {
+	public List<MeasurementVariableDto> getDatasetVariablesByType(final Integer datasetId, final VariableType variableType) {
 		return this.measurementVariableService.getVariablesForDataset(datasetId, variableType.getId());
 	}
 
@@ -621,7 +621,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void rejectDraftData(final Integer datasetId) {
+	public void rejectDatasetDraftData(final Integer datasetId) {
 		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 		for (final Phenotype phenotype : phenotypes) {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
@@ -633,7 +633,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptDraftData(final Integer datasetId) {
+	public void acceptAllDatasetDraftData(final Integer datasetId) {
 
 		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
@@ -666,7 +666,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean checkOutOfBoundDraftData(final Integer datasetId) {
+	public Boolean hasDatasetDraftDataOutOfBounds(final Integer datasetId) {
 
 		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
@@ -714,7 +714,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void setValuesToMissing(final Integer datasetId) {
+	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer datasetId) {
 		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
 		if (!draftPhenotypes.isEmpty()) {
@@ -760,7 +760,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptDraftDataByVariable(
+	public void acceptDraftDataFilteredByVariable(
 		final Integer datasetId,
 		final ObservationUnitsSearchDTO searchDTO, final int studyId) {
 

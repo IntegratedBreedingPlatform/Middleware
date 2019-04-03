@@ -145,8 +145,8 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final DatasetDTO datasetDTO = this.datasetService.generateSubObservationDataset(this.studyId, "TEST NURSERY SUB OBS", 10094, instanceIds,8206, 2, this.studyId+2);
 		this.subObsDatasetId = datasetDTO.getDatasetId();
-		this.datasetService.addVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, TRAIT_NAME);
-		this.datasetService.addVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, SELECTION_NAME);
+		this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, TRAIT_NAME);
+		this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, SELECTION_NAME);
 	}
 
 	public List<String> getVariableNames(final List<MeasurementVariable> measurementVariables) {
