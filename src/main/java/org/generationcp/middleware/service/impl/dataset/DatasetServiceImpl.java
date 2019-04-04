@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
@@ -140,39 +139,46 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getObservationSetColumns(final Integer observationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		List<MeasurementVariable> plotDataSetColumns;
+		final List<MeasurementVariable> factorColumns;
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
 
 		if (DataSetType.PLOT_DATA.getId() == datasetDTO.getDatasetTypeId()) {
 			//PLOTDATA
-			plotDataSetColumns =
-				this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(observationSetId, ListUtils.union(PLOT_COLUMNS_VARIABLE_TYPES, MEASUREMENT_VARIABLE_TYPES));
-
-			// Filter columns with draft data
-			if (Boolean.TRUE.equals(draftMode)) {
-				plotDataSetColumns = this.filterColumnsWithDraftData(observationSetId, plotDataSetColumns);
-			}
-		}
-		else {
+			factorColumns = this.daoFactory.getDmsProjectDAO()
+				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_VARIABLE_TYPES);
+		} else {
 			//SUBOBS
 			final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
 				.getObjectBySubjectIdAndTypeId(observationSetId, TermId.BELONGS_TO_STUDY.getId());
-
-			plotDataSetColumns =
+			// TODO get immediate parent columns
+			// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
+			factorColumns =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
-
-			List<MeasurementVariable> subObservationSetColumns =
-				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
-
-			// Filter columns with draft data
-			if (Boolean.TRUE.equals(draftMode)) {
-				subObservationSetColumns = this.filterColumnsWithDraftData(observationSetId, subObservationSetColumns);
-			}
-			plotDataSetColumns.addAll(subObservationSetColumns);
 		}
-		// TODO get immediate parent columns
-		// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
+
+		List<MeasurementVariable> variateColumns;
+		if (DataSetType.PLOT_DATA.getId() == datasetDTO.getDatasetTypeId()) {
+			//PLOTDATA
+			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, MEASUREMENT_VARIABLE_TYPES);
+		} else {
+			//SUBOBS
+			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
+		}
+
+		// Filter columns with draft data
+		if (Boolean.TRUE.equals(draftMode)) {
+			final Set<Integer> pendingVariableIds = this.daoFactory.getPhenotypeDAO().getPendingVariableIds(observationSetId);
+			variateColumns =
+				Lists.newArrayList(Iterables.filter(variateColumns, new com.google.common.base.Predicate<MeasurementVariable>() {
+
+					@Override
+					public boolean apply(@Nullable final MeasurementVariable input) {
+						return pendingVariableIds.contains(input.getTermId())
+							|| VariableType.OBSERVATION_UNIT.equals(input.getVariableType());
+					}
+				}));
+		}
+
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
 			final MeasurementVariable sampleColumn = new MeasurementVariable();
@@ -180,7 +186,7 @@ public class DatasetServiceImpl implements DatasetService {
 			sampleColumn.setAlias(TermId.SAMPLES.name());
 			sampleColumn.setTermId(TermId.SAMPLES.getId());
 			sampleColumn.setFactor(true);
-			plotDataSetColumns.add(sampleColumn);
+			factorColumns.add(sampleColumn);
 		}
 
 		// Other edge cases
@@ -190,24 +196,11 @@ public class DatasetServiceImpl implements DatasetService {
 		trialInstanceCol.setAlias(ColumnLabels.TRIAL_INSTANCE.getName());
 		trialInstanceCol.setTermId(ColumnLabels.TRIAL_INSTANCE.getTermId().getId());
 		trialInstanceCol.setFactor(true);
-		plotDataSetColumns.add(0, trialInstanceCol);
+		factorColumns.add(0, trialInstanceCol);
 
-		return plotDataSetColumns;
-	}
+		factorColumns.addAll(variateColumns);
 
-	private List<MeasurementVariable> filterColumnsWithDraftData(
-		final Integer observationSetId, List<MeasurementVariable> subObservationSetColumns) {
-		final Set<Integer> pendingVariableIds = this.daoFactory.getPhenotypeDAO().getPendingVariableIds(observationSetId);
-		subObservationSetColumns =
-			Lists.newArrayList(Iterables.filter(subObservationSetColumns, new com.google.common.base.Predicate<MeasurementVariable>() {
-
-				@Override
-				public boolean apply(@Nullable final MeasurementVariable input) {
-					return pendingVariableIds.contains(input.getTermId())
-						|| VariableType.OBSERVATION_UNIT.equals(input.getVariableType());
-				}
-			}));
-		return subObservationSetColumns;
+		return factorColumns;
 	}
 
 	@Override
