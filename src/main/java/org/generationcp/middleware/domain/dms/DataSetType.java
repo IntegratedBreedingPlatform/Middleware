@@ -31,10 +31,15 @@ public enum DataSetType {
 	public static final List<DataSetType> SUBOBSERVATIONS =
 		Arrays.asList(PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
 
-	public static final Integer[] SUBOBSERVATION_IDS;
+	public static final List<DataSetType> OBSERVATIONS =
+			Arrays.asList(PLOT_DATA, PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
+
+	public static final Integer[] SUB_OBSERVATION_IDS;
+
+	public static final Integer[] OBSERVATION_IDS;
 
 	static {
-		SUBOBSERVATION_IDS = Lists.transform(SUBOBSERVATIONS, new Function<DataSetType, Integer>() {
+		SUB_OBSERVATION_IDS = Lists.transform(SUBOBSERVATIONS, new Function<DataSetType, Integer>() {
 
 			@Nullable
 			@Override
@@ -42,6 +47,16 @@ public enum DataSetType {
 				return dataSetType.getId();
 			}
 		}).toArray(new Integer[0]);
+
+		OBSERVATION_IDS = Lists.transform(OBSERVATIONS, new Function<DataSetType, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final DataSetType dataSetType) {
+				return dataSetType.getId();
+			}
+		}).toArray(new Integer[0]);
+
 	}
 
 	private int id;
