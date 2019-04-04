@@ -31,7 +31,7 @@ public interface DatasetService {
 
 	ObservationDto updatePhenotype(Integer observationId, ObservationDto observationDto);
 
-	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
+	List<MeasurementVariable> getObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
 
 	List<MeasurementVariable> getSubObservationSetVariables(Integer subObservationSetId);
 
