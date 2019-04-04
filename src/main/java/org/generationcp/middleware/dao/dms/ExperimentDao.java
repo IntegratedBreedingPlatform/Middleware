@@ -1593,7 +1593,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			for (final Map<String, Object> row : results) {
 				for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraits()) {
 					final String value = (String) row.get(variable.getName());
-					if (variable.getId().equals(searchDto.getFilter().getVariableId()) && value != null) {
+					final String draftValue = (String) row.get(variable.getName() + "_DraftValue");
+					if (variable.getId().equals(searchDto.getFilter().getVariableId()) && (value != null || draftValue != null)) {
 						dataList.add((Integer) row.get(variable.getName() + "_PhenotypeId"));
 						break;
 					}
