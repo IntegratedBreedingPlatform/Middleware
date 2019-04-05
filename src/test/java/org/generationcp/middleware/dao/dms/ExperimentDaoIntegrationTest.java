@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -85,6 +86,26 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 			Assert.assertTrue(experiment.getObsUnitId().matches(UUID_REGEX));
 		}
 	}
+
+	@Test
+	public void testSaveOrUpdateWithCustomObsUnitId() {
+		this.createExperiments();
+		final ExperimentModel existingExperiment = this.experiments.get(0);
+
+		// Save a new experiment
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
+		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+		experimentModel.setProject(this.study);
+		experimentModel.setStock(existingExperiment.getStock());
+		final String customUnitID = RandomStringUtils.randomAlphabetic(10);
+		experimentModel.setObsUnitId(customUnitID);
+		this.experimentDao.saveOrUpdate(experimentModel);
+
+		// Verify that custom observation unit IDs are preserved
+		Assert.assertNotNull(experimentModel.getObsUnitId());
+		Assert.assertEquals(customUnitID, experimentModel.getObsUnitId());
+	}
 	
 	@Test
 	public void testSave() {
@@ -102,6 +123,26 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		// Verify that new experiment has auto-generated UUIDs as value for obs_unit_id
 		Assert.assertNotNull(experimentModel.getObsUnitId());
 		Assert.assertTrue(experimentModel.getObsUnitId().matches(UUID_REGEX));
+	}
+
+	@Test
+	public void testSaveWithCustomObsUnitId() {
+		this.createExperiments();
+		final ExperimentModel existingExperiment = this.experiments.get(0);
+
+		// Save a new experiment
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setGeoLocation(existingExperiment.getGeoLocation());
+		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+		experimentModel.setProject(this.study);
+		experimentModel.setStock(existingExperiment.getStock());
+		final String customUnitID = RandomStringUtils.randomAlphabetic(10);
+		experimentModel.setObsUnitId(customUnitID);
+		this.experimentDao.save(experimentModel);
+
+		// Verify that custom observation unit IDs are preserved
+		Assert.assertNotNull(experimentModel.getObsUnitId());
+		Assert.assertEquals(customUnitID, experimentModel.getObsUnitId());
 	}
 
 

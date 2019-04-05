@@ -64,7 +64,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveMultiLocationDataset() throws MiddlewareQueryException {
+	public void testSaveMultiLocationDataset() {
 		final List<Workbook> workbooks = WorkbookTestDataInitializer.getTestWorkbooks(5, 10);
 		int id = 0;
 		for (final Workbook workbook : workbooks) {
@@ -85,7 +85,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudyDataset() throws MiddlewareException {
+	public void testSaveStudyDataset() {
 		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("T"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
@@ -112,7 +112,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveNurseryDataset() throws MiddlewareException {
+	public void testSaveNurseryDataset() {
 		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
@@ -139,7 +139,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddStudyEnvironmentToStudy() throws MiddlewareException {
+	public void testAddStudyEnvironmentToStudy() {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(4, new StudyTypeDto("T"));
 
 		final int id = this.dataImportService.saveDataset(workbook, true, false,
@@ -162,7 +162,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareException {
+	public void testDeletionOfExperimentPropAndStockProp() {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, new StudyTypeDto("N"));
 
 		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID,
@@ -180,7 +180,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException {
+	public void testParseWorkbook() throws WorkbookParserException {
 		// Dan V : changed implem so that template path is located in
 		// src/test/resources. no need to change per user to reflect file
 		// location
@@ -335,7 +335,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void getLocationIdByProjectNameAndDescription() throws MiddlewareQueryException {
+	public void getLocationIdByProjectNameAndDescription() {
 		// try to save first then use the name of the saved study
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
@@ -353,7 +353,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveProjectOntology() throws MiddlewareQueryException {
+	public void testSaveProjectOntology() {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
 		final int id = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID,
@@ -364,7 +364,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveProjectData() throws MiddlewareQueryException {
+	public void testSaveProjectData() {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
 		final int studyId = this.dataImportService.saveProjectOntology(workbook,
@@ -379,7 +379,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testValidateProjectOntology() throws MiddlewareException {
+	public void testValidateProjectOntology() {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookWithErrors();
 		workbook.print(IntegrationTestBase.INDENT);
 		final Map<String, List<Message>> errors = this.dataImportService.validateProjectOntology(workbook,
@@ -400,7 +400,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testValidateProjectData() throws MiddlewareException {
+	public void testValidateProjectData() {
 		final String studyName = "validateProjectData_" + new Random().nextInt(10000);
 		final int studyNo = 1;
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookForWizard(studyName, studyNo);

@@ -1,5 +1,6 @@
 package org.generationcp.middleware.operation.saver;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -12,6 +13,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImplTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import org.junit.Test;
 import java.util.List;
 
 public class ExperimentModelSaverTest extends IntegrationTestBase {
+	private static final String CROP_PREFIX =  RandomStringUtils.randomAlphanumeric(5);
 	private ExperimentModelSaver experimentModelSaver;
 	private ExperimentDao experimentDao;
 	private PhenotypeDao phenotypeDao;
@@ -120,9 +123,36 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
+
 		//Save the experiment
-		this.experimentModelSaver.addOrUpdateExperiment(new CropType(), 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		final CropType crop = new CropType();
+		crop.setUseUUID(false);
+		crop.setPlotCodePrefix(CROP_PREFIX);
+		this.experimentModelSaver.addOrUpdateExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		Assert.assertNotNull(experiment.getObsUnitId());
+		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
+		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
+		Assert.assertEquals("999", phenotype.getValue());
+	}
+
+	@Test
+	public void testAddExperiment() {
+		final VariableList factors = new VariableList();
+		factors.add(DMSVariableTestDataInitializer.createVariable(1001, "999", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
+		final ExperimentValues values = new ExperimentValues();
+		values.setVariableList(factors);
+		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
+		values.setGermplasmId(1);
+
+		//Save the experiment
+		final CropType crop = new CropType();
+		crop.setUseUUID(false);
+		crop.setPlotCodePrefix(CROP_PREFIX);
+		this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
+		Assert.assertNotNull(experiment.getObsUnitId());
+		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 	}
