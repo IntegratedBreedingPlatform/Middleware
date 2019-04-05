@@ -72,6 +72,8 @@ public enum TermId {
 
 	// Stock Plot / Fieldmap
 	, PLOT_NO(8200), PLOT_NNO(8380), PLOT_CODE(8350), REP_NO(8210), BLOCK_NO(8220), COLUMN_NO(8400), OBS_UNIT_ID(8201) //
+	// variable type of variables that enumerate the observation units
+	, OBSERVATION_UNIT(1812)
 	// (32769)
 	, RANGE_NO(8410)
 	// (32770)
