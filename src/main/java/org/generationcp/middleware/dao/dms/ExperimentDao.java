@@ -1125,32 +1125,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO params, final String observationVariableName) {
+	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto, final String observationVariableName) {
 		try {
 
-			final String observationUnitTableQuery = this.getObservationUnitTableQuery(params, observationVariableName);
-			final SQLQuery query = this.createQueryAndAddScalar(params, observationUnitTableQuery);
-			query.setParameter("datasetId", params.getDatasetId());
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName);
+			final SQLQuery query = this.createQueryAndAddScalar(searchDto, observationUnitTableQuery);
+			query.setParameter("datasetId", searchDto.getDatasetId());
 
-			if (params.getInstanceId() != null) {
-				query.setParameter("instanceId", String.valueOf(params.getInstanceId()));
+			if (searchDto.getInstanceId() != null) {
+				query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
 			}
 
-			if(!CollectionUtils.isEmpty(params.getEnvironmentConditions())){
-				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
+			if(!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())){
+				query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
 			}
 
-			if (!params.getFilter().getFilteredValues().isEmpty()) {
-				final Map<String, List<String>> filteredValues = params.getFilter().getFilteredValues();
+			if (!searchDto.getFilter().getFilteredValues().isEmpty()) {
+				final Map<String, List<String>> filteredValues = searchDto.getFilter().getFilteredValues();
 
 				for (final String observationId : filteredValues.keySet()) {
 					query.setParameter(observationId + "_Id", observationId);
-					query.setParameterList(observationId + "_values", params.getFilter().getFilteredValues().get(observationId));
+					query.setParameterList(observationId + "_values", searchDto.getFilter().getFilteredValues().get(observationId));
 				}
 			}
 
-			final Integer pageNumber = params.getSortedRequest() != null ? params.getSortedRequest().getPageNumber() : null;
-			final Integer pageSize = params.getSortedRequest() != null ? params.getSortedRequest().getPageSize() : null;
+			final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
+			final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
 			if (pageNumber != null && pageSize != null) {
 				query.setFirstResult(pageSize * (pageNumber - 1));
 				query.setMaxResults(pageSize);
