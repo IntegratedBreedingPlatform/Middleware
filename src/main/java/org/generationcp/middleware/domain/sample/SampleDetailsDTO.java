@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.util.Util;
 
 import java.io.Serializable;
@@ -37,7 +38,6 @@ public class SampleDetailsDTO implements Serializable {
 	private String designation;
 	private String displayDate;
 	private Integer entryNumber;
-	private String plotNumber;
 	private Integer sampleEntryNo;
 	private String plateId;
 	private String well;
@@ -52,14 +52,6 @@ public class SampleDetailsDTO implements Serializable {
 		this.setStudyDbId(studyDbId);
 		this.setObsUnitId(obsUnitId);
 		this.setSampleBusinessKey(sampleBusinessKey);
-	}
-
-	public String getPlotNumber() {
-		return this.plotNumber;
-	}
-
-	public void setPlotNumber(final String plotNumber) {
-		this.plotNumber = plotNumber;
 	}
 
 	public Integer getEntryNumber() {
@@ -212,8 +204,16 @@ public class SampleDetailsDTO implements Serializable {
 		return observationUnitNumber;
 	}
 
-	public void setObservationUnitNumber(final Integer observationUnitNumber) {
-		this.observationUnitNumber = observationUnitNumber;
+	// TODO move PLOT_NO to nd_exp observation_unit_no
+	//  for now we accept string values from nd_exp_prop
+	public void setObservationUnitNumber(final Object observationUnitNumber) {
+		if (observationUnitNumber instanceof Number) {
+			this.observationUnitNumber = (Integer) observationUnitNumber;
+		} else if (observationUnitNumber instanceof String) {
+            this.observationUnitNumber = Integer.valueOf((String) observationUnitNumber);
+		} else {
+			throw new MiddlewareException("Invalid observationUnitNumber: " + observationUnitNumber);
+		}
 	}
 
 	@Override

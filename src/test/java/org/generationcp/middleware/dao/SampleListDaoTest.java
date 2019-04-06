@@ -277,7 +277,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("Germplasm 1", sampleDetailsDTO.getDesignation());
 		Assert.assertEquals(sampleDetailsDTO.getDateFormat().format(new Date()), sampleDetailsDTO.getDisplayDate());
 		Assert.assertEquals(1, sampleDetailsDTO.getEntryNumber().intValue());
-		Assert.assertEquals("1", sampleDetailsDTO.getPlotNumber());
+		Assert.assertEquals(1, sampleDetailsDTO.getObservationUnitNumber().intValue());
 		Assert.assertNotNull(sampleDetailsDTO.getGid());
 		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
 		Assert.assertNotNull(sampleDetailsDTO.getObsUnitId());
