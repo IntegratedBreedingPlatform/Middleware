@@ -1037,17 +1037,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				sql.append(" and gl.nd_geolocation_id = :instanceId ");
 			}
 
+			final String filterByVariableSQL =
+				(filter.getVariableId() == null) ? StringUtils.EMPTY : "and ph.observable_id = " + filter.getVariableId() + " ";
+
 			if (Boolean.TRUE.equals(observationUnitsSearchDTO.getDraftMode())) {
 				sql.append(" and exists(select 1" //
 					+ "   from phenotype ph" //
 					+ "   where ph.nd_experiment_id = nde.nd_experiment_id " //
+					+ filterByVariableSQL //
 					+ "         and (ph.draft_value is not null " //
 					+ "                or ph.draft_cvalue_id is not null)) ");
 			}
 
-			if (filter != null) {
-				this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
-			}
+			this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
