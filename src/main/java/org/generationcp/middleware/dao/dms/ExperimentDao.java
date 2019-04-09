@@ -1470,12 +1470,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private String getDraftsByVariableQuery(final ObservationUnitsSearchDTO searchDto) {
+	private String getObservationUnitsByVariableQuery(final ObservationUnitsSearchDTO searchDto) {
 
-		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
-		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
-
-		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  " //
+		final StringBuilder sql = new StringBuilder("SELECT  " //
 			+ "    nde.nd_experiment_id as observationUnitId, "); //
 
 		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
@@ -1507,7 +1504,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		}
 
-		sql.append(" 1=1 FROM " //
+		sql.append(" 1 FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id " //
@@ -1522,12 +1519,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
 		}
 
-		sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
+        if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
+			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
+		}
 
 		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
 		this.addFilters(sql, filter, searchDto.getDraftMode());
 
-		sql.append(" GROUP BY observationUnitId ) T  "); //
+		sql.append(" GROUP BY observationUnitId "); //
 
 		return sql.toString();
 	}
@@ -1535,7 +1534,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<Integer> getDraftsByVariable(final ObservationUnitsSearchDTO params) {
 		try {
 
-			final String generateQuery = this.getDraftsByVariableQuery(params);
+			final String generateQuery = this.getObservationUnitsByVariableQuery(params);
 			final SQLQuery query = this.getSession().createSQLQuery(generateQuery);
 
 			query.addScalar(ExperimentDao.OBSERVATION_UNIT_ID);
@@ -1564,6 +1563,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = query.list();
 
+			// TODO return observation unit data instead of phenotype id
+			//  to be able to create phenotypes for "Set values in batch"
 			return this.mapToObservationUnitData(results, params);
 
 		} catch (final Exception e) {
