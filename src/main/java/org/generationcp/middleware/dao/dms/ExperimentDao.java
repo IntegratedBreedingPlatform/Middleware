@@ -842,6 +842,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
 					continue;
 				}
+				// TODO Add hibernate parameters as in filteredValues
 				sql.append(
 					" and nde.nd_experiment_id in ( " //
 						+ "    select ph2.nd_experiment_id " //
@@ -998,18 +999,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-
-			if (filter != null && !filter.getFilteredValues().isEmpty()) {
-				final Integer variableId = filter.getVariableId();
-
-				for (final String observationId : filter.getFilteredValues().keySet()) {
-					if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
-						continue;
-					}
-					query.setParameter(observationId + "_Id", observationId);
-					query.setParameterList(observationId + "_values", filter.getFilteredValues().get(observationId));
-				}
-			}
+			addFilteredValueParams(query, filter);
 
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("datasetId", datasetId);
@@ -1024,6 +1014,26 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
 					datasetId, instanceId) + he.getMessage(),
 				he);
+		}
+	}
+
+	private static void addFilteredValueParams(final SQLQuery query, final ObservationUnitsSearchDTO.Filter filter) {
+		if (filter == null) {
+			return;
+		}
+
+		final Map<String, List<String>> filteredValues = filter.getFilteredValues();
+
+		if (filteredValues != null && !filteredValues.isEmpty()) {
+			final Integer variableId = filter.getVariableId();
+
+			for (final String observationId : filteredValues.keySet()) {
+				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+					continue;
+				}
+				query.setParameter(observationId + "_Id", observationId);
+				query.setParameterList(observationId + "_values", filteredValues.get(observationId));
+			}
 		}
 	}
 
@@ -1061,18 +1071,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-
-			if (filter != null && !filter.getFilteredValues().isEmpty()) {
-				final Integer variableId = filter.getVariableId();
-
-				for (final String observationId : filter.getFilteredValues().keySet()) {
-					if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
-						continue;
-					}
-					query.setParameter(observationId + "_Id", observationId);
-					query.setParameterList(observationId + "_values", filter.getFilteredValues().get(observationId));
-				}
-			}
+			addFilteredValueParams(query, filter);
 
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.addScalar("totalInstances", new IntegerType());
@@ -1231,17 +1230,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
 			}
 
-			if (!params.getFilter().getFilteredValues().isEmpty()) {
-				final Integer variableId = params.getFilter().getVariableId();
-
-				for (final String observationId : params.getFilter().getFilteredValues().keySet()) {
-					if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
-						continue;
-					}
-					query.setParameter(observationId + "_Id", observationId);
-					query.setParameterList(observationId + "_values", params.getFilter().getFilteredValues().get(observationId));
-				}
-			}
+			addFilteredValueParams(query, params.getFilter());
 
 			final Integer pageNumber = params.getSortedRequest() != null ? params.getSortedRequest().getPageNumber() : null;
 			final Integer pageSize = params.getSortedRequest() != null ? params.getSortedRequest().getPageSize() : null;
@@ -1563,14 +1552,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
 			}
 
-			if (!params.getFilter().getFilteredValues().isEmpty()) {
-				final Map<String, List<String>> filteredValues = params.getFilter().getFilteredValues();
-
-				for (final String observationId : filteredValues.keySet()) {
-					query.setParameter(observationId + "_Id", observationId);
-					query.setParameterList(observationId + "_values", params.getFilter().getFilteredValues().get(observationId));
-				}
-			}
+			addFilteredValueParams(query, params.getFilter());
 
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = query.list();
