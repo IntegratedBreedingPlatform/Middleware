@@ -781,7 +781,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		final String filterByDraftOrValue = Boolean.TRUE.equals(draftMode) ? "draft_value" : "value";
 
-		final String filterByVariableSQL = (filter.getVariableId() == null) ? StringUtils.EMPTY : "and ph2.observable_id = " + filter.getVariableId() + " ";
+		Integer variableId = filter.getVariableId();
+		String filterByVariableSQL = StringUtils.EMPTY;
+		if (variableId != null) {
+			filterByVariableSQL = "and ph2.observable_id = " + variableId + " ";
+		}
 
 		if (Boolean.TRUE.equals(filter.getByOutOfBound())) {
 			sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
@@ -817,10 +821,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (filter.getFilteredValues() != null && !filter.getFilteredValues().isEmpty()) {
-			final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
-				(filter.getFilteredValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, List<String>>();
-
-			for (final String observationId : filteredValues.keySet()) {
+			for (final String observationId : filter.getFilteredValues().keySet()) {
+				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+					continue;
+				}
 				sql.append(
 					" and nde.nd_experiment_id in ( " //
 						+ "    select ph2.nd_experiment_id " //
@@ -834,10 +838,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
 			// filter by column value (text)
-			final Map<String, String> filteredTextValues = (filter.getVariableId() == null) ? filter.getFilteredTextValues() :
-				(filter.getFilteredTextValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredTextValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, String>();
-
-			for (final String observationId : filteredTextValues.keySet()) {
+			for (final String observationId : filter.getFilteredTextValues().keySet()) {
+				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+					continue;
+				}
 				sql.append(
 					" and nde.nd_experiment_id in ( " //
 						+ "    select ph2.nd_experiment_id " //
@@ -845,8 +849,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 						+ "    where ph2.observable_id = " + observationId //
 						+ "    and nde2.project_id = p.project_id " //
-					); //
-				sql.append(" and ph2." + filterByDraftOrValue + " like '%").append(filteredTextValues.get(observationId)).append("%')");
+						+ "    and nde2.project_id = p.project_id " //
+						+ "    and ph2." + filterByDraftOrValue + " like '%" //
+						+ filter.getFilteredTextValues().get(observationId) //
+						+ "%')" //
+					);
 			}
 		}
 
@@ -993,10 +1000,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
 			if (filter != null && !filter.getFilteredValues().isEmpty()) {
-				final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
-					(filter.getFilteredValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, List<String>>();
+				final Integer variableId = filter.getVariableId();
 
-				for (final String observationId : filteredValues.keySet()) {
+				for (final String observationId : filter.getFilteredValues().keySet()) {
+					if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+						continue;
+					}
 					query.setParameter(observationId + "_Id", observationId);
 					query.setParameterList(observationId + "_values", filter.getFilteredValues().get(observationId));
 				}
@@ -1054,10 +1063,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
 			if (filter != null && !filter.getFilteredValues().isEmpty()) {
-				final Map<String, List<String>> filteredValues = (filter.getVariableId() == null) ? filter.getFilteredValues() :
-					(filter.getFilteredValues().get(String.valueOf(filter.getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(filter.getVariableId()), filter.getFilteredValues().get(String.valueOf(filter.getVariableId()))) : new HashMap<String, List<String>>();
+				final Integer variableId = filter.getVariableId();
 
-				for (final String observationId : filteredValues.keySet()) {
+				for (final String observationId : filter.getFilteredValues().keySet()) {
+					if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+						continue;
+					}
 					query.setParameter(observationId + "_Id", observationId);
 					query.setParameterList(observationId + "_values", filter.getFilteredValues().get(observationId));
 				}
@@ -1221,11 +1232,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 			if (!params.getFilter().getFilteredValues().isEmpty()) {
-				final Map<String, List<String>> filteredValues = (params.getFilter().getVariableId() == null) ? params.getFilter().getFilteredValues() :
-					(params.getFilter().getFilteredValues().get(String.valueOf(params.getFilter().getVariableId())) != null ) ? ImmutableMap.of(String.valueOf(params.getFilter().getVariableId()), params.getFilter().getFilteredValues().get(String.valueOf(params.getFilter().getVariableId()))) : new HashMap<String, List<String>>();
+				final Integer variableId = params.getFilter().getVariableId();
 
-
-				for (final String observationId : filteredValues.keySet()) {
+				for (final String observationId : params.getFilter().getFilteredValues().keySet()) {
+					if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+						continue;
+					}
 					query.setParameter(observationId + "_Id", observationId);
 					query.setParameterList(observationId + "_values", params.getFilter().getFilteredValues().get(observationId));
 				}
