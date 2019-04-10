@@ -39,6 +39,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -764,22 +765,74 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer datasetId,
 		final ObservationUnitsSearchDTO searchDTO, final int studyId) {
 
+		final String variableId = searchDTO.getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
 		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
-		final List<Integer> phenotypeIds =
-			this.daoFactory.getExperimentDao().getDraftsByVariable(searchDTO);
+		final List<ObservationUnitRow> observationUnitsByVariable =
+			this.daoFactory.getExperimentDao().getObservationUnitsByVariable(searchDTO);
 
-		if (!phenotypeIds.isEmpty()) {
+		if (!observationUnitsByVariable.isEmpty()) {
 
-			for (final Integer phenotypeId : phenotypeIds) {
-				final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
-				phenotypes.add(phenotype);
-				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
-					this.deletePhenotype(phenotype.getPhenotypeId());
-				} else {
-					this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
+
+				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(
+					variableId);
+				Phenotype phenotype = null;
+				if (observationUnitData != null) {
+					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
+
+				if (phenotype != null) {
+					phenotypes.add(phenotype);
+					if (StringUtils.isEmpty(phenotype.getDraftValue())) {
+						this.deletePhenotype(phenotype.getPhenotypeId());
+					} else {
+						this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+					}
+				}
+			}
+		}
+
+		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+		this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
+	}
+
+	@Override
+	public void setValueToVariable(final Integer datasetId, final ObservationUnitsParamDTO paramDTO, final Integer studyId) {
+
+		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
+		final List<Phenotype> phenotypes = new ArrayList<>();
+		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
+		final List<ObservationUnitRow> observationUnitsByVariable =
+			this.daoFactory.getExperimentDao().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
+
+		if (!observationUnitsByVariable.isEmpty()) {
+
+			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
+				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(variableId);
+				Phenotype phenotype = null;
+				if (observationUnitData != null) {
+					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
+				}
+
+				if (phenotype != null) {
+					if (StringUtils.isEmpty(phenotype.getDraftValue())) {
+						this.deletePhenotype(phenotype.getPhenotypeId());
+					} else {
+						this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+					}
+				} else {
+					final String newValue = paramDTO.getNewValue();
+					final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
+					final ObservationDto observationDto =
+						new ObservationDto(observationUnitData.getVariableId(), newValue, newCategoricalValueId, null,
+							Util.getCurrentDateAsStringValue(), Util.getCurrentDateAsStringValue(),
+							observationUnitRow.getObservationUnitId(), newCategoricalValueId, newValue);
+					phenotype = this.createPhenotype(observationDto, paramDTO.getObservationUnitsSearchDTO().getDraftMode());
+				}
+
+				phenotypes.add(phenotype);
 			}
 		}
 

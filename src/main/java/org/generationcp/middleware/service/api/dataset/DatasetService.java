@@ -322,4 +322,6 @@ public interface DatasetService {
 	 * @param searchDTO searchDTO
 	 */
 	void acceptDraftDataFilteredByVariable(Integer datasetId, ObservationUnitsSearchDTO searchDTO, int studyId);
+
+	void setValueToVariable(Integer datasetId, ObservationUnitsParamDTO searchDTO, Integer studyId);
 }

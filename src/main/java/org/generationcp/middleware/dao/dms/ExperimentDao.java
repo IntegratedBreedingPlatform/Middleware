@@ -13,7 +13,6 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -781,7 +780,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		final String filterByDraftOrValue = Boolean.TRUE.equals(draftMode) ? "draft_value" : "value";
 
-		Integer variableId = filter.getVariableId();
+		final Integer variableId = filter.getVariableId();
 		String filterByVariableSQL = StringUtils.EMPTY;
 		if (variableId != null) {
 			filterByVariableSQL = "and ph2.observable_id = " + variableId + " ";
@@ -1520,19 +1519,24 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			sql.append(" AND gl.nd_geolocation_id = :instanceId"); //
 		}
 
-        if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
-			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
-		}
-
 		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
 		this.addFilters(sql, filter, searchDto.getDraftMode());
+
+		final String filterByVariableSQL =
+			(filter.getVariableId() == null) ? StringUtils.EMPTY : "and ph.observable_id = " + filter.getVariableId() + " ";
+
+		sql.append(filterByVariableSQL);
+
+		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
+			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) "); //
+		}
 
 		sql.append(" GROUP BY observationUnitId "); //
 
 		return sql.toString();
 	}
 
-	public List<Integer> getDraftsByVariable(final ObservationUnitsSearchDTO params) {
+	public List<ObservationUnitRow> getObservationUnitsByVariable(final ObservationUnitsSearchDTO params) {
 		try {
 
 			final String generateQuery = this.getObservationUnitsByVariableQuery(params);
@@ -1540,7 +1544,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			query.addScalar(ExperimentDao.OBSERVATION_UNIT_ID);
 
-			this.addScalarForSpecificTrait(params, query);
+			final String measurementVariableName = this.addScalarForSpecificTrait(params, query);
 
 			query.setParameter("datasetId", params.getDatasetId());
 
@@ -1557,9 +1561,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			final List<Map<String, Object>> results = query.list();
 
-			// TODO return observation unit data instead of phenotype id
-			//  to be able to create phenotypes for "Set values in batch"
-			return this.mapToObservationUnitData(results, params);
+			return this.mapToObservationUnitRow(results, params, measurementVariableName);
 
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();
@@ -1568,7 +1570,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private void addScalarForSpecificTrait(final ObservationUnitsSearchDTO params, final SQLQuery query) {
+	private String addScalarForSpecificTrait(final ObservationUnitsSearchDTO params, final SQLQuery query) {
 		for (final MeasurementVariableDto measurementVariable : params.getSelectionMethodsAndTraits()) {
 			if (measurementVariable.getId().equals(params.getFilter().getVariableId())) {
 				query.addScalar(measurementVariable.getName()); // Value
@@ -1577,25 +1579,41 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				query.addScalar(measurementVariable.getName() + "_CvalueId", new IntegerType());
 				query.addScalar(measurementVariable.getName() + "_DraftValue");
 				query.addScalar(measurementVariable.getName() + "_DraftCvalueId", new IntegerType());
-				break;
+				return measurementVariable.getName();
 			}
 		}
+		return StringUtils.EMPTY;
 	}
 
-	private List<Integer> mapToObservationUnitData(
-		final List<Map<String, Object>> results, final ObservationUnitsSearchDTO searchDto) {
-		final List<Integer> dataList = new ArrayList<>();
+	private List<ObservationUnitRow> mapToObservationUnitRow(
+		final List<Map<String, Object>> results, final ObservationUnitsSearchDTO searchDto, final String measurementVariableName) {
+		final List<ObservationUnitRow> dataList = new ArrayList<>();
 
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
-				for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraits()) {
-					final String value = (String) row.get(variable.getName());
-					final String draftValue = (String) row.get(variable.getName() + "_DraftValue");
-					if (variable.getId().equals(searchDto.getFilter().getVariableId()) && (value != null || draftValue != null)) {
-						dataList.add((Integer) row.get(variable.getName() + "_PhenotypeId"));
-						break;
-					}
-				}
+				final Map<String, ObservationUnitData> variables = new HashMap<>();
+				final String value = (String) row.get(measurementVariableName);
+				final String draftValue = (String) row.get(measurementVariableName + "_DraftValue");
+				final String status = (String) row.get(measurementVariableName + "_Status");
+				final Integer variableId = searchDto.getFilter().getVariableId();
+				final Integer categoricalValueId = (Integer) row.get(measurementVariableName + "_CvalueId");
+				final Integer observationId = (Integer) row.get(measurementVariableName + "_PhenotypeId");
+				final Phenotype.ValueStatus valueStatus = status != null ? Phenotype.ValueStatus.valueOf(status) : null;
+				final Integer draftCategoricalValueId = (Integer) row.get(measurementVariableName + "_DraftCvalueId");
+				final Integer observationUnitId = (Integer) row.get(OBSERVATION_UNIT_ID);
+
+				final ObservationUnitData observationUnitData = new ObservationUnitData( //
+					observationId, //
+					categoricalValueId, //
+					value, // Value
+					valueStatus, //
+					variableId, draftCategoricalValueId, draftValue);
+
+				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+				observationUnitRow.setObservationUnitId(observationUnitId);
+				variables.put(variableId.toString(), observationUnitData);
+				observationUnitRow.setVariables(variables);
+				dataList.add(observationUnitRow);
 			}
 		}
 
