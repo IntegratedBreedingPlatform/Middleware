@@ -1,5 +1,8 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import org.pojomatic.annotations.AutoProperty;
+
+@AutoProperty
 public class ObservationUnitsParamDTO {
 
 	private String newValue;
@@ -12,6 +15,9 @@ public class ObservationUnitsParamDTO {
 		this.newValue = newValue;
 		this.newCategoricalValueId = newCategoricalValueId;
 		this.observationUnitsSearchDTO = observationUnitsSearchDTO;
+	}
+
+	public ObservationUnitsParamDTO() {
 	}
 
 	public String getNewValue() {

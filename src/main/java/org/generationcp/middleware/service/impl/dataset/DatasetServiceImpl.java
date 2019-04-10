@@ -804,6 +804,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
 		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
+		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getExperimentDao().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
 
@@ -812,24 +813,22 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
 				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(variableId);
 				Phenotype phenotype = null;
+				final String newValue = paramDTO.getNewValue();
+				final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
+
 				if (observationUnitData != null) {
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
 				if (phenotype != null) {
-					if (StringUtils.isEmpty(phenotype.getDraftValue())) {
-						this.deletePhenotype(phenotype.getPhenotypeId());
-					} else {
-						this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
-					}
+					this.updatePhenotype(
+						phenotype, newCategoricalValueId, newValue, draftMode);
 				} else {
-					final String newValue = paramDTO.getNewValue();
-					final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
 					final ObservationDto observationDto =
 						new ObservationDto(observationUnitData.getVariableId(), newValue, newCategoricalValueId, null,
 							Util.getCurrentDateAsStringValue(), Util.getCurrentDateAsStringValue(),
 							observationUnitRow.getObservationUnitId(), newCategoricalValueId, newValue);
-					phenotype = this.createPhenotype(observationDto, paramDTO.getObservationUnitsSearchDTO().getDraftMode());
+					phenotype = this.createPhenotype(observationDto, draftMode);
 				}
 
 				phenotypes.add(phenotype);
