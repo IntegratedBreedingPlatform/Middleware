@@ -69,7 +69,7 @@ import java.util.Set;
 public class DatasetServiceImpl implements DatasetService {
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
-	protected static final List<Integer> SUBOBS_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> SUBOBS_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
@@ -79,11 +79,19 @@ public class DatasetServiceImpl implements DatasetService {
 			VariableType.ENVIRONMENT_DETAIL.getId(),
 			VariableType.STUDY_CONDITION.getId());
 
-	protected static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
+	protected static final List<Integer> PLOT_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.EXPERIMENTAL_DESIGN.getId(), //
 		VariableType.TREATMENT_FACTOR.getId(), //
-		VariableType.OBSERVATION_UNIT.getId());
+		VariableType.OBSERVATION_UNIT.getId(), //
+		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId());
+
+	protected static final List<Integer> PLOT_COLUMNS_FACTOR_VARIABLE_TYPES = Lists.newArrayList( //
+			VariableType.GERMPLASM_DESCRIPTOR.getId(), //
+			VariableType.EXPERIMENTAL_DESIGN.getId(), //
+			VariableType.TREATMENT_FACTOR.getId(), //
+			VariableType.OBSERVATION_UNIT.getId());
 
 	protected static final List<Integer> DATASET_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.OBSERVATION_UNIT.getId(), //
@@ -145,7 +153,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (DataSetType.PLOT_DATA.getId() == datasetDTO.getDatasetTypeId()) {
 			//PLOTDATA
 			factorColumns = this.daoFactory.getDmsProjectDAO()
-				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_VARIABLE_TYPES);
+				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 		} else {
 			//SUBOBS
 			final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
@@ -153,7 +161,8 @@ public class DatasetServiceImpl implements DatasetService {
 			// TODO get immediate parent columns
 			// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
 			factorColumns =
-				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(),
+						PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 		}
 
 		List<MeasurementVariable> variateColumns;
@@ -162,7 +171,8 @@ public class DatasetServiceImpl implements DatasetService {
 			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, MEASUREMENT_VARIABLE_TYPES);
 		} else {
 			//SUBOBS
-			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
+			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
+					SUBOBS_COLUMNS_ALL_VARIABLE_TYPES);
 		}
 
 		// Filter columns with draft data
@@ -204,22 +214,29 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
-		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId) {
 
-		final List<MeasurementVariable> plotDataSetColumns =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
-		final List<MeasurementVariable> subObservationSetColumns =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(subObservationSetId, SUBOBS_COLUMNS_VARIABLE_TYPES);
+		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
+
+		final List<MeasurementVariable> plotDataSetColumns;
+		if (DataSetType.PLOT_DATA.getId() == datasetDTO.getDatasetTypeId()) {
+			plotDataSetColumns =
+					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetDTO.getDatasetId(), PLOT_COLUMNS_ALL_VARIABLE_TYPES);
+
+		} else {
+			final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
+					.getObjectBySubjectIdAndTypeId(observationSetId, TermId.BELONGS_TO_STUDY.getId());
+			plotDataSetColumns =
+					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
+			final List<MeasurementVariable> subObservationSetColumns =
+					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, SUBOBS_COLUMNS_ALL_VARIABLE_TYPES);
+			plotDataSetColumns.addAll(subObservationSetColumns);
+		}
 
 		// TODO get immediate parent columns
 		// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
-
-		plotDataSetColumns.addAll(subObservationSetColumns);
-
 		return plotDataSetColumns;
+
 	}
 
 	@Override
