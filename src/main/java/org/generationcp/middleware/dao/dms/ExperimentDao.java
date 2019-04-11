@@ -786,8 +786,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
 					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId()
 					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = " + TermId.MIN_VALUE.getId()
-					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+					+ "           inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
+					+ "           inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+					+ "           inner join project p2 on nde2.project_id = p2.project_id " //
+					+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid " //
 					+ "      where ph2." + filterByDraftOrValue + " is not null " //
 					+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
 					+ "        and case " //
@@ -805,6 +807,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
 					// get the numericals whose value is not within bounds
 					+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue + " > scaleMaxRange.value " //
+					+ "            or ph2." + filterByDraftOrValue + " < vo.expected_min or ph2." + filterByDraftOrValue + " > vo.expected_max " //
 					+ "        else false " //
 					+ "        end " //
 					+ "    )"); //
