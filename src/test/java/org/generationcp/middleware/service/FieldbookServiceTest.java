@@ -1,13 +1,11 @@
 
 package org.generationcp.middleware.service;
 
-import javax.annotation.Resource;
-
+import com.google.common.base.Optional;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.GermplasmListDAOTest;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -17,22 +15,16 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.base.Optional;
 
 public class FieldbookServiceTest extends IntegrationTestBase {
 
@@ -58,6 +50,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	private StudyDataManagerImpl manager;
 	private Project commonTestProject;
 	private GermplasmListDAO germplasmListDAO;
+	private CropType crop;
 
 	private final String cropPrefix = "ABCD";
 	private static final String TEST_LIST_DESCRIPTION = "Test List Description";
@@ -79,6 +72,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
+			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 
 		this.germplasmListDAO = new GermplasmListDAO();
@@ -88,7 +82,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 				this.locationManager, this.userDataManager);
 
 		this.studyReference = this.studyTDI.addTestStudy();
-		this.studyTDI.addEnvironmentDataset(this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
+		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
 		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.PLOT_DATA);
 	}
 
