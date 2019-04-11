@@ -41,6 +41,7 @@ import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTra
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -356,9 +357,10 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		workbook.setFactors(testdata.createFactors(1));
 		workbook.setTrialObservations(testdata.createTrialObservations(1, workbook.getFactors()));
 
+		final CropType crop = new CropType();
+		crop.setPlotCodePrefix(WorkbookBuilderTest.CROP_PREFIX);
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
-			WorkbookBuilderTest.CROP_PREFIX);
-
+			crop);
 		final List<MeasurementRow> result = this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(),
 			workbook.getFactors(), new ArrayList<MeasurementVariable>());
 
@@ -377,8 +379,10 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		workbook.setFactors(testdata.createFactors(1));
 		workbook.setTrialObservations(testdata.createTrialObservations(1, workbook.getFactors()));
 
+		final CropType crop = new CropType();
+		crop.setPlotCodePrefix(WorkbookBuilderTest.CROP_PREFIX);
 		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID,
-			WorkbookBuilderTest.CROP_PREFIX);
+			crop);
 
 		// create measurement variables of condition types
 		final List<MeasurementVariable> conditionMeasurementVariableList = workbook.getStudyConditions();

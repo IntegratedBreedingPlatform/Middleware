@@ -20,13 +20,18 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -34,6 +39,7 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImplTest;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -75,6 +81,7 @@ public class DatasetServiceImplTest {
 		TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), DatasetServiceImplTest.STOCK_ID);
 	private static final int DATASET_ID = 567;
 	private static final int INSTANCE_ID = 30;
+	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(20);
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	public static final String ENTRY_CODE = "ENTRY_CODE";
@@ -125,6 +132,9 @@ public class DatasetServiceImplTest {
 	@Mock
 	private FormulaDAO formulaDao;
 
+	@Mock
+	private WorkbenchDataManager workbenchDataManager;
+
 	@InjectMocks
 	private DatasetServiceImpl datasetService;
 
@@ -134,6 +144,7 @@ public class DatasetServiceImplTest {
 
 		this.datasetService.setDaoFactory(this.daoFactory);
 		this.datasetService.setStudyService(this.studyService);
+		this.datasetService.setWorkbenchDataManager(this.workbenchDataManager);
 		when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
@@ -895,5 +906,66 @@ public class DatasetServiceImplTest {
 		final Phenotype phenotypeArgumentCaptorValue = phenotypeArgumentCaptor.getValue();
 		Assert.assertEquals(Phenotype.MISSING, phenotypeArgumentCaptorValue.getValue());
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
+	}
+
+	@Test
+	public void testSaveSubObservationUnits() {
+		final DmsProject study = new DmsProject();
+		study.setProjectId(DatasetServiceImplTest.STUDY_ID);
+		study.setProgramUUID(DatasetServiceImplTest.PROGRAM_UUID);
+		Mockito.doReturn(study).when(this.dmsProjectDao).getById(DatasetServiceImplTest.STUDY_ID);
+		final CropType crop = new CropType();
+		crop.setCropName("maize");
+		crop.setUseUUID(false);
+		final Project project = new Project();
+		project.setCropType(crop);
+		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
+
+		final int plotCount = 3;
+		final List<ExperimentModel> plotExperiments = getPlotExperiments(plotCount);
+		final int plotDatasetId = new Random().nextInt();
+		final List<Integer> instanceIds = Arrays.asList(11, 12, 13);
+		Mockito.doReturn(plotExperiments).when(this.experimentDao).getObservationUnits(plotDatasetId, instanceIds);
+
+		final DmsProject plotDataset = new DmsProject();
+		plotDataset.setProjectId(plotDatasetId);
+		final DmsProject subobsDataset = new DmsProject();
+		final int subObsDatasetId = new Random().nextInt();
+		subobsDataset.setProjectId(subObsDatasetId);
+		final Integer numberOfSubObsUnits = 5;
+		this.datasetService
+			.saveSubObservationUnits(DatasetServiceImplTest.STUDY_ID, instanceIds, numberOfSubObsUnits, plotDataset, subobsDataset);
+		final ArgumentCaptor<ExperimentModel> experimentCaptor = ArgumentCaptor.forClass(ExperimentModel.class);
+		Mockito.verify(this.experimentDao, Mockito.times(plotCount * numberOfSubObsUnits)).save(experimentCaptor.capture());
+		final List<ExperimentModel> subObsExperiments = experimentCaptor.getAllValues();
+		for (int i=0; i<plotCount; i++){
+			final ExperimentModel plotExperiment = plotExperiments.get(i);
+			final List<ExperimentModel> plotSubObsUnits = subObsExperiments.subList(i * numberOfSubObsUnits, (i + 1) * numberOfSubObsUnits);
+			for (final ExperimentModel subObsUnit : plotSubObsUnits) {
+				Assert.assertEquals(plotExperiment, subObsUnit.getParent());
+				Assert.assertEquals(plotExperiment.getGeoLocation(), subObsUnit.getGeoLocation());
+				Assert.assertEquals(plotExperiment.getStock(), subObsUnit.getStock());
+				Assert.assertEquals(plotExperiment.getTypeId(), subObsUnit.getTypeId());
+				Assert.assertNotNull(subObsUnit.getObsUnitId());
+				Assert.assertFalse(subObsUnit.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
+			}
+		}
+	}
+
+	private  List<ExperimentModel> getPlotExperiments(final Integer count) {
+		final List<ExperimentModel> plotUnits = new ArrayList<>();
+		for (int i=0; i<count; i++) {
+			final Random random = new Random();
+			final ExperimentModel plot= new ExperimentModel();
+			final Geolocation geoLocation = new Geolocation();
+			geoLocation.setLocationId(random.nextInt());
+			plot.setGeoLocation(geoLocation);
+			final StockModel stock = new StockModel();
+			stock.setStockId(random.nextInt());
+			plot.setStock(stock);
+			plot.setTypeId(random.nextInt());
+			plotUnits.add(plot);
+		}
+		return plotUnits;
 	}
 }
