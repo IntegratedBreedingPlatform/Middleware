@@ -648,7 +648,7 @@ public class DatasetServiceImpl implements DatasetService {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
 				this.deletePhenotype(phenotype.getPhenotypeId());
 			} else {
-				this.updatePhenotype(phenotype.getPhenotypeId(), null, null, true);
+				this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getcValueId(), phenotype.getValue(), null, null);
 			}
 		}
 	}
@@ -664,7 +664,8 @@ public class DatasetServiceImpl implements DatasetService {
 				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 					this.deletePhenotype(phenotype.getPhenotypeId());
 				} else {
-					this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+					this.updatePhenotype(
+						phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null);
 				}
 			}
 
@@ -767,7 +768,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 				for (final Phenotype phenotype : selectedPhenotypes) {
 					if (!ExportImportUtils.isValidValue(measurementVariable, phenotype.getDraftValue(), possibleValues)) {
-						this.updatePhenotype(phenotype.getPhenotypeId(), null, Phenotype.MISSING, false);
+						this.updatePhenotype(phenotype.getPhenotypeId(), null, Phenotype.MISSING, null, null);
 					} else {
 						this.acceptDraftData(phenotype);
 					}
@@ -808,7 +809,7 @@ public class DatasetServiceImpl implements DatasetService {
 					if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 						this.deletePhenotype(phenotype.getPhenotypeId());
 					} else {
-						this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+						this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null);
 					}
 				}
 			}
@@ -842,8 +843,12 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (phenotype != null) {
-					this.setValueToPhenotype(
-						phenotype, newCategoricalValueId, newValue, draftMode);
+					if (draftMode) {
+						this.updatePhenotype(phenotype, phenotype.getcValueId(), phenotype.getValue(), newCategoricalValueId, newValue);
+					} else {
+						this.updatePhenotype(
+							phenotype, newCategoricalValueId, newValue, phenotype.getDraftCValueId(), phenotype.getDraftValue());
+					}
 				} else {
 					final ObservationDto observationDto =
 						new ObservationDto(observationUnitData.getVariableId(), newValue, newCategoricalValueId, null,
@@ -864,7 +869,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (StringUtils.isEmpty(phenotype.getDraftValue())) {
 			this.deletePhenotype(phenotype.getPhenotypeId());
 		} else {
-			this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+			this.updatePhenotype(phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null);
 		}
 	}
 
@@ -954,14 +959,17 @@ public class DatasetServiceImpl implements DatasetService {
 							&& importedVariableValue .equalsIgnoreCase(observationUnitData.getValue())
 							&& Boolean.TRUE.equals(draftMode)) {
 							/*Phenotype exists and imported value is equal to value => Erase draft data*/
-							phenotype = this.updatePhenotype(observationUnitData.getObservationId(), null, null, draftMode);
+							phenotype =
+								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
+									observationUnitData.getValue(), null, null);
 						}
 						else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
 							!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
 							/*imported value is different to stored value*/
 							phenotype =
 								this.updatePhenotype(
-									observationUnitData.getObservationId(), categoricalValue, importedVariableValue, draftMode);
+									observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
+									observationUnitData.getValue(), categoricalValue, importedVariableValue);
 						}
 
 						if (phenotype != null) {
@@ -1075,43 +1083,40 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private Phenotype updatePhenotype(
-		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Boolean draftMode) {
+		final Phenotype phenotype, final Integer categoricalValueId, final String value,final Integer draftCategoricalValueId,
+		final String draftvalue) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
-		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype, false);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotypeDao, phenotype);
 	}
 
 	private Phenotype setValueToPhenotype(
-		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Boolean draftMode) {
+		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId,
+		final String draftvalue) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
-		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype, true);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotypeDao, phenotype);
 	}
 
 	private Phenotype updatePhenotype(
-		final Integer observationId, final Integer categoricalValueId, final String value, final Boolean draftMode) {
+		final Integer observationId, final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId,
+		final String draftvalue) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
-		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype, false);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotypeDao, phenotype);
 	}
 
 	private Phenotype updatePhenotypeValues(
-		final Integer categoricalValueId, final String value, final Boolean draftMode, final PhenotypeDao phenotypeDao,
-		final Phenotype phenotype, final boolean settingMode) {
-		if (draftMode) {
-			phenotype.setDraftValue(value);
-			phenotype.setDraftCValueId(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
-		} else {
-			phenotype.setValue(value);
-			phenotype.setcValue(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
-			if (!settingMode) {
-				// If you are setting new value to a phenotype and you are in accepted view, then you must'n
-				// set null to draft value
-				phenotype.setDraftValue(null);
-				phenotype.setDraftCValueId(null);
-			}
-		}
+		final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId, final String draftvalue,
+		final PhenotypeDao phenotypeDao,
+		final Phenotype phenotype) {
+
+		phenotype.setDraftValue(draftvalue);
+		phenotype.setDraftCValueId(Integer.valueOf(0).equals(draftCategoricalValueId) ? null : draftCategoricalValueId);
+		phenotype.setValue(value);
+		phenotype.setcValue(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
+
 		final Integer observableId = phenotype.getObservableId();
 		// TODO Review performance IBP-2230
 		//  Can we leverage measurementVariable.getFormula() as in importDataset() ?
