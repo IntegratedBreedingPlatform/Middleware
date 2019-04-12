@@ -26,15 +26,16 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -58,7 +59,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -812,6 +821,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void setValueToVariable(final Integer datasetId, final ObservationUnitsParamDTO paramDTO, final Integer studyId) {
 
+		final String newValue = paramDTO.getNewValue();
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
 		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
@@ -824,15 +834,15 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
 				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(variableId);
 				Phenotype phenotype = null;
-				final String newValue = paramDTO.getNewValue();
+
 				final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
 
 				if (observationUnitData != null) {
-					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
+ 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
 				if (phenotype != null) {
-					this.updatePhenotype(
+					this.setValueToPhenotype(
 						phenotype, newCategoricalValueId, newValue, draftMode);
 				} else {
 					final ObservationDto observationDto =
@@ -1068,7 +1078,14 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Boolean draftMode) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
-		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype, false);
+	}
+
+	private Phenotype setValueToPhenotype(
+		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Boolean draftMode) {
+		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
+
+		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype, true);
 	}
 
 	private Phenotype updatePhenotype(
@@ -1076,20 +1093,24 @@ public class DatasetServiceImpl implements DatasetService {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
-		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftMode, phenotypeDao, phenotype, false);
 	}
 
 	private Phenotype updatePhenotypeValues(
 		final Integer categoricalValueId, final String value, final Boolean draftMode, final PhenotypeDao phenotypeDao,
-		final Phenotype phenotype) {
+		final Phenotype phenotype, final boolean settingMode) {
 		if (draftMode) {
 			phenotype.setDraftValue(value);
 			phenotype.setDraftCValueId(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
 		} else {
 			phenotype.setValue(value);
 			phenotype.setcValue(Integer.valueOf(0).equals(categoricalValueId) ? null : categoricalValueId);
-			phenotype.setDraftValue(null);
-			phenotype.setDraftCValueId(null);
+			if (!settingMode) {
+				// If you are setting new value to a phenotype and you are in accepted view, then you must'n
+				// set null to draft value
+				phenotype.setDraftValue(null);
+				phenotype.setDraftCValueId(null);
+			}
 		}
 		final Integer observableId = phenotype.getObservableId();
 		// TODO Review performance IBP-2230
@@ -1140,7 +1161,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyService = studyService;
 	}
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
