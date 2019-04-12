@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -200,7 +201,9 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		this.setUpNursery();
 
 		// Save the workbook
-		final int studyId = this.dataImportService.saveDataset(this.workbook, true, false, this.programUUID, "9CVR");
+		final CropType crop = new CropType();
+		crop.setPlotCodePrefix("9CVR");
+		final int studyId = this.dataImportService.saveDataset(this.workbook, true, false, this.programUUID, crop);
 		WorkbookBuilderIntegrationTest.LOG.info("Study " + this.studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
@@ -235,7 +238,9 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		this.setUpStudy();
 
 		// Save the workbook
-		final int studyId = this.dataImportService.saveDataset(this.workbook, true, false, this.programUUID, "9CVR");
+		final CropType crop = new CropType();
+		crop.setPlotCodePrefix("9CVR");
+		final int studyId = this.dataImportService.saveDataset(this.workbook, true, false, this.programUUID, crop);
 		WorkbookBuilderIntegrationTest.LOG.info("Study " + this.studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.

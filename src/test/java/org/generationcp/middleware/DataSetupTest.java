@@ -349,7 +349,9 @@ public class DataSetupTest extends IntegrationTestBase {
 		workbook.setObservations(observations);
 
 		// Save the workbook
-		final int nurseryStudyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
+		final CropType crop = new CropType();
+		crop.setPlotCodePrefix(cropPrefix);
+		final int nurseryStudyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, crop);
 		DataSetupTest.LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + nurseryStudyId);
 
 		// Convert germplasm list we created into ListDataProject entries
