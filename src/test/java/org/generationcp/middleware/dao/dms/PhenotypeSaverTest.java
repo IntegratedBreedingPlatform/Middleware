@@ -9,6 +9,7 @@ import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +58,9 @@ public class PhenotypeSaverTest extends IntegrationTestBase {
 		values.setGermplasmId(1);
 
 		//Save the experiment
-		this.studyDataManager.addExperiment(1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		final CropType crop = new CropType();
+		crop.setUseUUID(true);
+		this.studyDataManager.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 
 		final Phenotype toBeSaved = new Phenotype();

@@ -14,10 +14,12 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -92,6 +94,12 @@ public class DaoFactory {
 		transactionDao.setSession(this.sessionProvider.getSession());
 		return transactionDao;
 	}
+	
+	public StockDao getStockDao() {
+		final StockDao stockDao = new StockDao();
+		stockDao.setSession(this.sessionProvider.getSession());
+		return stockDao;
+	}
 
 	public StockTransactionDAO getStockTransactionDAO() {
 		final StockTransactionDAO stockTransactionDao = new StockTransactionDAO();
@@ -160,6 +168,12 @@ public class DaoFactory {
 		experimentDao.setSession(this.sessionProvider.getSession());
 		return experimentDao;
 
+	}
+	
+	public GeolocationDao getGeolocationDao() {
+		final GeolocationDao geolocationDao = new GeolocationDao();
+		geolocationDao.setSession(this.sessionProvider.getSession());
+		return geolocationDao;
 	}
 
 	public GeolocationPropertyDao getGeolocationPropertyDao() {

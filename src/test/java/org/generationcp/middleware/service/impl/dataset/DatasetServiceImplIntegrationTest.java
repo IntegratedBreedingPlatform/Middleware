@@ -67,6 +67,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		this.datasetService = new DatasetServiceImpl(this.sessionProvder);
+		this.datasetService.setWorkbenchDataManager(this.workbenchDataManager);
 
 		this.dataSetupTest = new DataSetupTest();
 		this.dataSetupTest.setDataImportService(this.dataImportService);
