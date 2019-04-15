@@ -1085,17 +1085,8 @@ public class DatasetServiceImpl implements DatasetService {
 	private Phenotype updatePhenotype(
 		final Phenotype phenotype, final Integer categoricalValueId, final String value,final Integer draftCategoricalValueId,
 		final String draftvalue) {
-		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
-		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotypeDao, phenotype);
-	}
-
-	private Phenotype setValueToPhenotype(
-		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId,
-		final String draftvalue) {
-		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
-
-		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotypeDao, phenotype);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotype);
 	}
 
 	private Phenotype updatePhenotype(
@@ -1104,14 +1095,14 @@ public class DatasetServiceImpl implements DatasetService {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
-		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotypeDao, phenotype);
+		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotype);
 	}
 
 	private Phenotype updatePhenotypeValues(
 		final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId, final String draftvalue,
-		final PhenotypeDao phenotypeDao,
 		final Phenotype phenotype) {
 
+		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		phenotype.setDraftValue(draftvalue);
 		phenotype.setDraftCValueId(Integer.valueOf(0).equals(draftCategoricalValueId) ? null : draftCategoricalValueId);
 		phenotype.setValue(value);
