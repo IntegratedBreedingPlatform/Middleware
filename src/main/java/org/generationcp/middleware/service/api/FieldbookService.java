@@ -889,7 +889,7 @@ public interface FieldbookService {
 	 * @param systemDefinedEntryType
 	 * @return
 	 */
-	long countListDataProjectByListIdAndEntryType(int listId, SystemDefinedEntryType systemDefinedEntryType);
+	long countListDataProjectByListIdAndEntryType(int listId, List<Integer> systemDefinedEntryTypeIds);
 
 	List<ListDataProject> getListDataProjectByStudy(int projectId, GermplasmListType type, List<Integer> plotNumbers, final String instanceNumber);
 
