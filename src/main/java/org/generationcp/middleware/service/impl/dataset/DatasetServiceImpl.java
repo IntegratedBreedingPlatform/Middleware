@@ -861,8 +861,10 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 
-		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
-		this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
+		if (!draftMode) {
+			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
+			this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
+		}
 	}
 
 	private void acceptDraftData(final Phenotype phenotype) {
