@@ -1139,7 +1139,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public long countListDataProjectByListIdAndEntryType(final int listId, final List<Integer> systemDefinedEntryTypeIds) {
+	public long countListDataProjectByListIdAndEntryTypeIds(final int listId, final List<Integer> systemDefinedEntryTypeIds) {
 		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryTypeIds);
 	}
 

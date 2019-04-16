@@ -1,56 +1,121 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.domain.oms.TermId;
+
 public class DesignTypeItem {
-	
+
 	// Constants for well known (e.g. BreedingView) design types.
 	public static final DesignTypeItem RANDOMIZED_COMPLETE_BLOCK = new DesignTypeItem(0, "Randomized Complete Block Design",
-			"randomizedCompleteBlockParams.html", 0, 0, false);
+		TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), 0,
+		"randomizedCompleteBlockParams.html", 0, 0);
 
-	public static final DesignTypeItem RESOLVABLE_INCOMPLETE_BLOCK = new DesignTypeItem(1, "Resolvable Incomplete Block Design",
-			"incompleteBlockParams.html", 0, 0, false);
-	
-	public static final DesignTypeItem ROW_COL = new DesignTypeItem(2, "Row-and-Column", "rowAndColumnParams.html", 0, 0, false);
-	
-	public static final DesignTypeItem CUSTOM_IMPORT = new DesignTypeItem(3, "Custom Import Design", null, 0, 0, false);
+	public static final DesignTypeItem RESOLVABLE_INCOMPLETE_BLOCK =
+		new DesignTypeItem(1, "Resolvable Incomplete Block Design", TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId(),
+			TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId(),
+			"incompleteBlockParams.html", 0, 0);
 
-	public static final DesignTypeItem AUGMENTED_RANDOMIZED_BLOCK = new DesignTypeItem(4, "Augmented Randomized Block design",
-			"augmentedRandomizedBlockParams.html", 0, 0, false);
+	public static final DesignTypeItem ROW_COL = new DesignTypeItem(2, "Row-and-Column", TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId(),
+		TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId(), "rowAndColumnParams.html", 0, 0);
 
-	public static final DesignTypeItem ENTRY_LIST_ORDER = new DesignTypeItem(5, "Entry list order",
-			"entryListOrderParams.html", 0, 0, false);
+	public static final DesignTypeItem CUSTOM_IMPORT = new DesignTypeItem(3, "Custom Import Design", TermId.OTHER_DESIGN.getId(), 0, null, 0, 0);
 
-	public static final DesignTypeItem P_REP = new DesignTypeItem(6, "P-Rep Design",
-		"pRepParams.html", 0, 0, false);
+	public static final DesignTypeItem AUGMENTED_RANDOMIZED_BLOCK =
+		new DesignTypeItem(4, "Augmented Randomized Block design", TermId.AUGMENTED_RANDOMIZED_BLOCK.getId(), 0,
+			"augmentedRandomizedBlockParams.html", 0, 0);
+
+	public static final DesignTypeItem ENTRY_LIST_ORDER = new DesignTypeItem(5, "Entry list order", TermId.ENTRY_LIST_ORDER.getId(), 0,
+		"entryListOrderParams.html", 0, 0);
+
+	public static final DesignTypeItem P_REP = new DesignTypeItem(6, "P-Rep Design", TermId.P_REP.getId(), 0,
+		"pRepParams.html", 0, 0);
 
 	public static final String ALPHA_LATTICE = "Alpha Lattice";
 
 	private Integer id;
 	private String name;
+	private Integer termId;
+	private Integer termIdLatinized;
 
 	// this is an html file that contains the specific fields under design type
 	private String params;
 	private Integer repNo;
 	private Integer totalNoOfEntries;
-	private Boolean isDisabled;
 	private String templateName;
 
 	public DesignTypeItem() {
 		// do nothing
 	}
 
+	public static int getTermIdByDesignTypeId(final int designTypeId, final Boolean isLatinized) {
+		if (designTypeId == 0) {
+			return RANDOMIZED_COMPLETE_BLOCK.getTermId();
+		}
+		if (designTypeId == 1) {
+			return isLatinized ? RESOLVABLE_INCOMPLETE_BLOCK.getTermIdLatinized() : RESOLVABLE_INCOMPLETE_BLOCK.getTermId();
+		}
+		if (designTypeId == 2) {
+			return isLatinized ? ROW_COL.getTermIdLatinized() : ROW_COL.getTermId();
+		}
+		if (designTypeId == 3) {
+			return CUSTOM_IMPORT.getTermId();
+		}
+		if (designTypeId == 4) {
+			return AUGMENTED_RANDOMIZED_BLOCK.getTermId();
+		}
+		if (designTypeId == 5) {
+			return ENTRY_LIST_ORDER.getTermId();
+		}
+		if (designTypeId == 6) {
+			return P_REP.getTermId();
+		}
+		return 0;
+	}
+
+	public static DesignTypeItem getDesignTypeItemByTermId(final int termId) {
+		if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == termId) {
+			return RANDOMIZED_COMPLETE_BLOCK;
+		}
+		if (TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() == termId || TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId() == termId) {
+			return RESOLVABLE_INCOMPLETE_BLOCK;
+		}
+		if (TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId() == termId || TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId() == termId) {
+			return ROW_COL;
+		}
+		if (TermId.OTHER_DESIGN.getId() == termId) {
+			return CUSTOM_IMPORT;
+		}
+		if (TermId.AUGMENTED_RANDOMIZED_BLOCK.getId() == termId) {
+			return AUGMENTED_RANDOMIZED_BLOCK;
+		}
+		if (TermId.ENTRY_LIST_ORDER.getId() == termId) {
+			return ENTRY_LIST_ORDER;
+		}
+		if (TermId.P_REP.getId() == termId) {
+			return P_REP;
+		}
+		return null;
+	}
+
+	public static boolean isLatinized(final int termId) {
+		return TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId() == termId ||
+			TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId() == termId;
+	}
+
 	public DesignTypeItem(final int id) {
 		this.id = id;
 	}
 
-	public DesignTypeItem(final Integer id, final String name, final String params,
-			final Integer noOfReps, final Integer noOfEntries, final Boolean isDisabled) {
+	public DesignTypeItem(
+		final Integer id, final String name, final Integer termId, final Integer termIdLatinized, final String params,
+		final Integer noOfReps, final Integer noOfEntries) {
 		this.id = id;
 		this.name = name;
+		this.termId = termId;
+		this.termIdLatinized = termIdLatinized;
 		this.params = params;
 		this.repNo = noOfReps;
 		this.totalNoOfEntries = noOfEntries;
-		this.isDisabled = isDisabled;
 		this.templateName = name.concat(".csv");
 	}
 
@@ -98,12 +163,20 @@ public class DesignTypeItem {
 		this.totalNoOfEntries = totalNoOfEntries;
 	}
 
-	public Boolean getIsDisabled() {
-		return this.isDisabled;
+	public Integer getTermId() {
+		return this.termId;
 	}
 
-	public void setIsDisabled(final Boolean isDisabled) {
-		this.isDisabled = isDisabled;
+	public void setTermId(final Integer termId) {
+		this.termId = termId;
+	}
+
+	public Integer getTermIdLatinized() {
+		return this.termIdLatinized;
+	}
+
+	public void setTermIdLatinized(final Integer termIdLatinized) {
+		this.termIdLatinized = termIdLatinized;
 	}
 
 }
