@@ -4,7 +4,7 @@ package org.generationcp.middleware.domain.etl;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.dms.DesignType;
+import org.generationcp.middleware.domain.dms.DesignTypeItem;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 
@@ -35,7 +35,7 @@ public class ExperimentalDesignVariable {
 		final MeasurementVariable variable = this.getExperimentalDesign();
 		final MeasurementVariable exptDesignSource = this.getExperimentalDesignSource();
 		if (NumberUtils.toInt(variable.getValue()) == TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() && exptDesignSource != null) {
-			return DesignType.ALPHA_LATTICE;
+			return DesignTypeItem.ALPHA_LATTICE;
 		} else if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
 			for (final ValueReference ref : variable.getPossibleValues()) {
@@ -44,7 +44,7 @@ public class ExperimentalDesignVariable {
 				}
 			}
 			if (exptDesignSource != null) {
-				return DesignType.CUSTOM_IMPORT.getName();
+				return DesignTypeItem.CUSTOM_IMPORT.getName();
 			}
 		}
 		return "";

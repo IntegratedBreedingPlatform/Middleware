@@ -3,7 +3,7 @@ package org.generationcp.middleware.domain.dms;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
-public enum DesignType {
+public enum DesignTypeItem {
 
 	// Constants for well known (e.g. BreedingView) design types.
 	RANDOMIZED_COMPLETE_BLOCK(0, "Randomized Complete Block Design",
@@ -42,7 +42,7 @@ public enum DesignType {
 	private String templateName;
 
 	public static int getTermIdByDesignTypeId(final int designTypeId, final Boolean isLatinized) {
-		for (final DesignType item : DesignType.values()) {
+		for (final DesignTypeItem item : DesignTypeItem.values()) {
 			if (item.getId() == designTypeId) {
 				return isLatinized ? item.getTermIdLatinized() : item.getTermId();
 			}
@@ -50,8 +50,8 @@ public enum DesignType {
 		return 0;
 	}
 
-	public static DesignType getDesignTypeItemByTermId(final int termId) {
-		for (final DesignType item : DesignType.values()) {
+	public static DesignTypeItem getDesignTypeItemByTermId(final int termId) {
+		for (final DesignTypeItem item : DesignTypeItem.values()) {
 			if (item.getTermId().intValue() == termId || item.getTermIdLatinized().intValue() == termId) {
 				return item;
 			}
@@ -64,7 +64,7 @@ public enum DesignType {
 			TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId() == termId;
 	}
 
-	DesignType(
+	DesignTypeItem(
 		final Integer id, final String name, final Integer termId, final Integer termIdLatinized, final String params,
 		final Integer noOfReps, final Integer noOfEntries) {
 		this.id = id;
