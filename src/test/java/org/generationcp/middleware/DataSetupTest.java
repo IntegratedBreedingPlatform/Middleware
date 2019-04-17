@@ -1,12 +1,6 @@
 
 package org.generationcp.middleware;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -41,6 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TransactionConfiguration;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 @Ignore("This is just for seeding some test data. Not intended to run regularly on CI.")
 @TransactionConfiguration(defaultRollback = false)
@@ -91,6 +91,7 @@ public class DataSetupTest extends IntegrationTestBase {
 	private static final String APPLIED = "APPLIED";
 
 	private static final String STUDY = "STUDY";
+	private static final String TRIAL = "TRIAL";
 	private static final String ENTRY = "ENTRY";
 	private static final String PLOT = "PLOT";
 
@@ -259,6 +260,13 @@ public class DataSetupTest extends IntegrationTestBase {
 			LOCATION, DataSetupTest.ASSIGNED, LOCATION_NAME_PROP, DataSetupTest.CHAR,
 			"Default Breeding Location", DataSetupTest.STUDY, PhenotypicType.TRIAL_ENVIRONMENT, true));
 
+		// Need to set TRIAL_INSTANCE # manually since we're adding other environment level conditions
+		conditions.add(this.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), "SITE_ALT", "Altitude of site observed",
+			"Trial Instance", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER, DataSetupTest.NUMERIC,
+			"1", DataSetupTest.TRIAL, PhenotypicType.TRIAL_ENVIRONMENT, true));
+		conditions.add(this.createMeasurementVariable(TermId.ALTITUDE.getId(), "SITE_ALT", "Altitude of site observed",
+			"Altitude", "Observed", "m", DataSetupTest.NUMERIC,
+			"143", DataSetupTest.TRIAL, PhenotypicType.TRIAL_ENVIRONMENT, true));
 
 		workbook.setConditions(conditions);
 
