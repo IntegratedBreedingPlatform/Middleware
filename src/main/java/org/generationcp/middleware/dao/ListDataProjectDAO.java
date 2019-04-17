@@ -217,13 +217,13 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return 0;
 	}
 
-	public long countByListIdAndEntryType(final Integer id, final SystemDefinedEntryType systemDefinedEntryType) {
+	public long countByListIdAndEntryType(final Integer id, final List<Integer> systemDefinedEntryTypeIds) {
 		try {
 			if (id != null) {
 				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
 				criteria.createAlias("list", "l");
 				criteria.add(Restrictions.eq("l.id", id));
-				criteria.add(Restrictions.eq("checkType", systemDefinedEntryType.getEntryTypeCategoricalId()));
+				criteria.add(Restrictions.in("checkType", systemDefinedEntryTypeIds));
 				criteria.setProjection(Projections.rowCount());
 				return ((Long) criteria.uniqueResult()).longValue(); // count
 			}
