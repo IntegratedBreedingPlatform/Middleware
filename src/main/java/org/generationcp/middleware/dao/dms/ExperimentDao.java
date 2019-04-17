@@ -701,7 +701,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final String envFactorFormat =
 				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s',  ";
 			final String geolocEnvFactorFormat =
-				"    (SELECT %s FROM nd_geolocation where nd_geolocation_id = :instanceId) '%s',  ";
+					" %s AS '%s',  ";
 			for (final String envFactor : searchDto.getEnvironmentDetails()) {
 				if(geolocSpecialFactorsMap.containsKey(envFactor)) {
 					final String column = geolocSpecialFactorsMap.get(envFactor);
