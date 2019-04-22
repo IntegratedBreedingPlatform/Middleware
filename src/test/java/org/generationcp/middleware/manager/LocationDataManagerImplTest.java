@@ -125,6 +125,28 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testCountByLocationAbbreviation() {
+		final String labbr = "LABBRR";
+		final long count =  this.manager.countByLocationAbbreviation(labbr);
+
+		final Location location = new Location();
+		location.setCntryid(1);
+		location.setLabbr(labbr);
+		location.setLname("ADDED LOCATION");
+		location.setLrplce(1);
+		location.setLtype(1);
+		location.setNllp(1);
+		location.setSnl1id(1);
+		location.setSnl2id(1);
+		location.setSnl3id(1);
+
+		// add the location
+		this.manager.addLocation(location);
+		final long newCount = this.manager.countByLocationAbbreviation(labbr);
+		Assert.assertEquals(count+1, newCount);
+	}
+
+	@Test
 	public void testHandlingOfNullOrEmptyLocationIdsInGetLocationsByIDs() throws Exception {
 
 		final List<Location> locationsByIdEmptyTest = this.manager.getLocationsByIDs(Collections.<Integer>emptyList());
