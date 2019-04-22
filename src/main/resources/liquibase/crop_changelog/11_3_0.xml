@@ -70,37 +70,4 @@
 			onDelete="NO ACTION"
 			onUpdate="NO ACTION"/>
 	</changeSet>
-
-	<changeSet author="aldrin" id="v11.3.0-5">
-		<preConditions onFail="MARK_RAN">
-			<not>
-			<sqlCheck expectedResult="0">
-				SELECT Count(1)
-				FROM   projectprop pp
-					   INNER JOIN project p
-							   ON pp.project_id = p.project_id
-					   INNER JOIN projectprop pp_datasettype
-							   ON p.project_id = pp_datasettype.project_id
-								  AND pp_datasettype.variable_id = 8160
-								  AND pp_datasettype.value = 10080
-				WHERE  pp.type_id = 1808;
-			</sqlCheck>
-			</not>
-		</preConditions>
-		<comment>
-			Correct the type_id (from TRAIT(1808) to STUDY_CONDITION(1802)) of variables added to Study Environment dataset
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE projectprop pp
-				   INNER JOIN project p
-						   ON pp.project_id = p.project_id
-				   INNER JOIN projectprop pp_datasettype
-						   ON p.project_id = pp_datasettype.project_id
-							  AND pp_datasettype.variable_id = 8160
-							  AND pp_datasettype.value = 10080
-			SET    pp.type_id = 1802
-			WHERE  pp.type_id = 1808;
-		</sql>
-	</changeSet>
-
 </databaseChangeLog>
