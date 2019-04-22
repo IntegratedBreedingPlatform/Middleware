@@ -230,8 +230,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             } else if (germplasmOfNode.getGnpgs() >= 2) {
                 // Get and add female and male parents
                 final Integer femaleGid = germplasmOfNode.getGpid1();
-				this.addNodeForParent(node, level, femaleGid, excludeDerivativeLines);
-				this.addNodeForParent(node, level, maleGid, excludeDerivativeLines);
+				this.addNodesForParents(node, level, femaleGid, maleGid, excludeDerivativeLines);
 
 				// IF there are more parents, get and add each of them
                 if (germplasmOfNode.getGnpgs() > 2) {
@@ -306,8 +305,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
                 }
             } else if (germplasmOfNode.getGnpgs() >= 2) {
                 // Get and add female and male parents
-            	this.addNodeForParent(node, level, femaleGid, excludeDerivativeLines);
-            	this.addNodeForParent(node, level, germplasmOfNode.getGpid2(), excludeDerivativeLines);
+				final Integer maleGid = germplasmOfNode.getGpid2();
+				this.addNodesForParents(node, level, femaleGid, maleGid, excludeDerivativeLines);
 
                 if (germplasmOfNode.getGnpgs() > 2) {
                     // if there are more parents, get and add each of them
@@ -322,8 +321,17 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             return node;
         }
     }
-    
-    @Override
+
+	private void addNodesForParents(final GermplasmPedigreeTreeNode node, final int level, final Integer femaleGid, final Integer maleGid,
+		final boolean excludeDerivativeLines) {
+    	// Do not add any node if both parents are UNKNOWN (GID=0)
+		if (!(maleGid == 0 && femaleGid == 0)) {
+			this.addNodeForParent(node, level, femaleGid, excludeDerivativeLines);
+			this.addNodeForParent(node, level, maleGid, excludeDerivativeLines);
+		}
+	}
+
+	@Override
     public GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward) {
         
         return getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'M');
