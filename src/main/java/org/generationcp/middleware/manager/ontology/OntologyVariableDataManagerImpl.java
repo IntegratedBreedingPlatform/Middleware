@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -609,9 +610,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			daoFactory.getCvTermPropertyDao().save(property);
 		}
 
-		// Saving min max values
-		if (variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
-			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), null,
+		// Saving alias, min, max values
+		if (!StringUtils.isBlank(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
+			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 		}
 

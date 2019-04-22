@@ -24,6 +24,19 @@ public class ObservationUnitData {
 		this.variableId = variableId;
 	}
 
+	public ObservationUnitData(
+		final Integer observationId, final Integer categoricalValueId, final String value, final Phenotype.ValueStatus status,
+		final Integer variableId,
+		final Integer draftCategoricalValueId, final String draftValue) {
+		this.observationId = observationId;
+		this.categoricalValueId = categoricalValueId;
+		this.value = value;
+		this.status = status;
+		this.variableId = variableId;
+		this.draftCategoricalValueId = draftCategoricalValueId;
+		this.draftValue = draftValue;
+	}
+
 	public ObservationUnitData() {
 	}
 

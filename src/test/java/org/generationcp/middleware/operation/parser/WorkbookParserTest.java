@@ -213,6 +213,7 @@ public class WorkbookParserTest {
 
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
+		Mockito.when(moleWorkbookParser.isDescriptionSheetExists(sampleWorkbook)).thenReturn(true);
 		moleWorkbookParser.parseFile(sampleWorkbook, true, CREATED_BY);
 		Mockito.verify(moleWorkbookParser).checkHeadersValid(sampleWorkbook, 0, 0, headerArray);
 	}
@@ -224,6 +225,7 @@ public class WorkbookParserTest {
 		final String sectionName = section.toString();
 		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(sectionName, headerArray);
 
+		Mockito.when(moleWorkbookParser.isDescriptionSheetExists(sampleWorkbook)).thenReturn(true);
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
 		try {
@@ -670,9 +672,10 @@ public class WorkbookParserTest {
 	 */
 	@Test
 	public void testReadMeasurementVariablesEmptyRowValidation() throws Exception {
-		final Workbook mockWorkbook = Mockito.mock(Workbook.class);
-		final WorkbookParser workbookParser = new WorkbookParser();
-		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(mockWorkbook, "CONDITION");
+		final Workbook workbook = new HSSFWorkbook();
+		workbook.createSheet("Description");
+		final WorkbookParser workbookParser =  new WorkbookParser();
+		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(workbook, "CONDITION");
 
 		Assert.assertTrue("Since the work book is empty we should have an empty list of measurement variables.",
 				readMeasurementVariables.isEmpty());
@@ -992,6 +995,34 @@ public class WorkbookParserTest {
 		Assert.assertNull("No cell should be on the fourth column", dataRow.getCell(3));
 		Assert.assertNull("No cell should be on the fifth column", dataRow.getCell(4));
 
+	}
+
+	@Test
+	public void testReadMeasurementVariablesNoDescriptionSheet() throws Exception {
+
+		final Workbook excelWorkbook = new HSSFWorkbook();
+		excelWorkbook.createSheet("Observation");
+
+		final WorkbookParser workbookParser = new WorkbookParser();
+		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(excelWorkbook, "CONDITION");
+		Assert.assertTrue("Since the work book has no description sheet, measurement variables should be empty",
+				readMeasurementVariables.isEmpty());
+	}
+
+	@Test
+	public void isDescriptionSheetExists_WithDescriptionSheet_True() throws WorkbookParserException {
+		final Workbook excelWorkbook = new HSSFWorkbook();
+		excelWorkbook.createSheet("Description");
+		final WorkbookParser workbookParser = new WorkbookParser();
+		Assert.assertEquals(workbookParser.isDescriptionSheetExists(excelWorkbook), true);
+	}
+
+	@Test
+	public void isDescriptionSheetExists_NoDescriptionSheet_False() throws WorkbookParserException {
+		final Workbook excelWorkbook = new HSSFWorkbook();
+		excelWorkbook.createSheet("Observation");
+		final WorkbookParser workbookParser = new WorkbookParser();
+		Assert.assertEquals(workbookParser.isDescriptionSheetExists(excelWorkbook), false);
 	}
 
 	private List<String[]> createVariableDetailsListTestData(final Section section, final String[] headers) {

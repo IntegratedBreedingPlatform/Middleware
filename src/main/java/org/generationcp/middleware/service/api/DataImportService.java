@@ -15,15 +15,16 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Optional;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Message;
+
+import com.google.common.base.Optional;
 
 /**
  * This is the API for importing data to new schema. The methods here involve
@@ -38,11 +39,10 @@ public interface DataImportService {
 	 *
 	 * @param workbook
 	 * @param programUUID
-	 * @param cropPrefix
+	 * @param crop
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(final Workbook workbook, final String programUUID, final String cropPrefix)
-			throws MiddlewareQueryException;
+	int saveDataset(final Workbook workbook, final String programUUID, final CropType crop);
 
 	/**
 	 * Saves a workbook as a local trial or nursery on the new CHADO schema
@@ -55,11 +55,11 @@ public interface DataImportService {
 	 *            if true, values of the workbook observations will be removed
 	 * @param programUUID
 	 *            the program UUID
-	 * @param cropPrefix
+	 * @param crop
 	 * @return id of created trial or nursery
 	 */
 	int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations,
-			final String programUUID, final String cropPrefix) throws MiddlewareQueryException;
+			final String programUUID, final CropType crop);
 
 	/**
 	 * Given a file, parse the file to create a workbook object
@@ -137,10 +137,10 @@ public interface DataImportService {
 	 *
 	 * @param workbook
 	 * @param programUUID
-	 * @param cropPrefix
+	 * @param crop
 	 * @return id of created the study (Table.column = Project.project_id)
 	 */
-	int saveProjectOntology(final Workbook workbook, final String programUUID, final String cropPrefix)
+	int saveProjectOntology(final Workbook workbook, final String programUUID, final CropType crop)
 			throws MiddlewareQueryException;
 
 	/**
@@ -149,10 +149,10 @@ public interface DataImportService {
 	 *
 	 * @param workbook
 	 * @param programUUID
-	 * @param cropPrefix
+	 * @param crop
 	 * @return 1 = successful, 0 = failure
 	 */
-	int saveProjectData(final Workbook workbook, final String programUUID, final String cropPrefix)
+	int saveProjectData(final Workbook workbook, final String programUUID, final CropType crop)
 			throws MiddlewareQueryException;
 
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
