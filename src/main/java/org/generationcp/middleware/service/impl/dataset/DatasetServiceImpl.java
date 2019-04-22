@@ -82,10 +82,6 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.OBSERVATION_UNIT.getId());
 
-	protected static final List<Integer> ENVIRONMENT_VARIABLE_TYPES = Lists.newArrayList( //
-			VariableType.ENVIRONMENT_DETAIL.getId(),
-			VariableType.STUDY_CONDITION.getId());
-
 	protected static final List<Integer> PLOT_COLUMNS_VARIABLE_TYPES = Lists.newArrayList( //
 		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
 		VariableType.EXPERIMENTAL_DESIGN.getId(), //
@@ -577,7 +573,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	List<String> findAdditionalEnvironmentFactors(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentDetailsVariables =
-				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(trialDatasetId, ENVIRONMENT_VARIABLE_TYPES);
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(trialDatasetId, Lists.newArrayList( //
+					VariableType.ENVIRONMENT_DETAIL.getId()));
 		final List<String> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentDetailsVariables) {
 			if (!STANDARD_ENVIRONMENT_FACTORS.contains(variable.getTermId())) {
