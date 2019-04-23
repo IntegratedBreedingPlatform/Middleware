@@ -261,7 +261,7 @@ public class DataSetupTest extends IntegrationTestBase {
 			"Default Breeding Location", DataSetupTest.STUDY, PhenotypicType.TRIAL_ENVIRONMENT, true));
 
 		// Need to set TRIAL_INSTANCE # manually since we're adding other environment level conditions
-		conditions.add(this.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), "SITE_ALT", "Altitude of site observed",
+		conditions.add(this.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), "TRIAL_INSTANCE", "Trial instance - enumerated (number)",
 			"Trial Instance", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER, DataSetupTest.NUMERIC,
 			"1", DataSetupTest.TRIAL, PhenotypicType.TRIAL_ENVIRONMENT, true));
 		conditions.add(this.createMeasurementVariable(TermId.ALTITUDE.getId(), "SITE_ALT", "Altitude of site observed",
