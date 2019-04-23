@@ -997,7 +997,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 			studySummary.setOptionalInfo(additionalProps).setName(dmsProject.getName()).setProgramDbId(dmsProject.getProgramUUID())
 					.setStudyDbid(dmsProject.getProjectId());
-			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId()));
+			final List<Integer> locationIds =
+				filters.get(StudyFilters.LOCATION_ID) != null ? Arrays.asList(Integer.parseInt(filters.get(StudyFilters.LOCATION_ID))) :
+					new ArrayList<Integer>();
+			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId(), locationIds));
 			studySummaries.add(studySummary);
 		}
 		return studySummaries;
@@ -1010,7 +1013,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.getGeolocationDao().getInstanceMetadata(studyId);
+		return this.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<Integer>());
+	}
+
+	List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
+		return this.getGeolocationDao().getInstanceMetadata(studyId, locationIds);
 	}
 
 	@Override
