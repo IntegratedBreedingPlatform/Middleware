@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -950,6 +951,16 @@ public class DatasetServiceImplTest {
 				Assert.assertFalse(subObsUnit.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 			}
 		}
+	}
+
+	@Test
+	@Ignore // TODO IBP-2695
+	public void testImportDataset() {
+		final Boolean draftMode = null;
+		final Integer datasetId = null;
+		final Table<String, String, String> table = null;
+
+		this.datasetService.importDataset(datasetId, table, draftMode);
 	}
 
 	private  List<ExperimentModel> getPlotExperiments(final Integer count) {
