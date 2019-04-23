@@ -34,7 +34,7 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -903,13 +903,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 
 		if (parameters.containsKey(StudyFilters.LOCATION_ID)) {
-			final DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
+			// Find environments with specified location (saved in GeolocationProperty)
+			final DetachedCriteria locationCriteria = DetachedCriteria.forClass(ExperimentModel.class);
+			locationCriteria.add(Restrictions.eq("typeId", TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()));
+			locationCriteria.createAlias("geoLocation", "g");
+			locationCriteria.createAlias("g.properties", "gp");
+			locationCriteria.add(Restrictions.and(Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
+				Restrictions.eq("gp.value", parameters.get(StudyFilters.LOCATION_ID))));
+			locationCriteria.setProjection(Projections.property("project.projectId"));
 
-			ppLocation.add(Restrictions.eq(DmsProjectDao.VARIABLE_ID, DmsProjectDao.LOCATION_ID));
-			ppLocation.add(Restrictions.eq(DmsProjectDao.VALUE, parameters.get(StudyFilters.LOCATION_ID)));
-			ppLocation.setProjection(Projections.property("project.projectId"));
-
-			criteria.add(Property.forName(DmsProjectDao.PROJECT_ID).in(ppLocation));
+			criteria.createAlias("relatedBys", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Property.forName("pr.subjectProject.projectId").in(locationCriteria));
 		}
 
 		criteria.addOrder(orderBy);
