@@ -537,9 +537,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		try {
 
 			final DmsProject currentStudy = this.getDmsProjectDao().getById(studyId);
+			final String oldName = currentStudy.getName();
 			currentStudy.setName(newStudyName);
 			this.getDmsProjectDao().saveOrUpdate(currentStudy);
 
+			final List<DmsProject> datasets = this.getDmsProjectDao().getDatasetsByParent(studyId);
+			for (final DmsProject dataset: datasets) {
+				dataset.setName(dataset.getName().replace(oldName, newStudyName));
+				this.getDmsProjectDao().saveOrUpdate(dataset);
+			}
 			return true;
 		} catch (final Exception e) {
 
@@ -1231,7 +1237,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId) {
 		final Map<Integer, String> phenotypeMap = new HashMap<>();
-		List<Phenotype> phenotypes = this.getPhenotypeDao().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
+		final List<Phenotype> phenotypes = this.getPhenotypeDao().getPhenotypeByDatasetIdAndInstanceDbId(datasetId, instanceDbId);
 		for (final Phenotype phenotype : phenotypes) {
 				phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
 		}
