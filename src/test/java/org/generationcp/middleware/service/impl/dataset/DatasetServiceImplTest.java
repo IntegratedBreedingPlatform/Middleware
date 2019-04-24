@@ -382,12 +382,13 @@ public class DatasetServiceImplTest {
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
 		variables.put(OBS_UNIT_ID, new ObservationUnitData("obunit123"));
 		observationUnitRow.setVariables(variables);
-		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(),"1");
+		final MeasurementVariable trialInstanceVariable = MeasurementVariableTestDataInitializer
+			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1");
 		this.datasetService.addStudyVariablesToUnitRows(Arrays.asList(observationUnitRow), Arrays.asList(trialInstanceVariable));
 		Assert.assertNotNull(observationUnitRow.getVariables().get(trialInstanceVariable.getName()));
 	}
 
-	private  List<DatasetDTO> setUpDatasets(final Integer datasetTypeId){
+	private List<DatasetDTO> setUpDatasets(final Integer datasetTypeId) {
 		final List<DatasetDTO> datasetDTOs1 = new ArrayList<>();
 		final List<DatasetDTO> datasetDTOs2 = new ArrayList<>();
 		final List<DatasetDTO> datasetDTOs3 = new ArrayList<>();
@@ -440,7 +441,8 @@ public class DatasetServiceImplTest {
 		return datasetDTOList;
 	}
 
-	private static DatasetDTO createDataset(final Integer datasetId, final Integer parentDatasetId, final String name,
+	private static DatasetDTO createDataset(
+		final Integer datasetId, final Integer parentDatasetId, final String name,
 		final Integer datasetTypeId) {
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetId(datasetId);
@@ -518,13 +520,14 @@ public class DatasetServiceImplTest {
 		Mockito.when(mockQuery.list()).thenReturn(results);
 
 		// Method to test
-		final List<ObservationUnitRow> actualMeasurements = this.datasetService.getObservationUnitRows(DatasetServiceImplTest.STUDY_ID,
+		final List<ObservationUnitRow> actualMeasurements = this.datasetService.getObservationUnitRows(
+			DatasetServiceImplTest.STUDY_ID,
 			DatasetServiceImplTest.DATASET_ID,
 			new ObservationUnitsSearchDTO());
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
 	}
-	
+
 	@Test
 	public void testDeletePhenotype() {
 		final Random random = new Random();
@@ -538,7 +541,7 @@ public class DatasetServiceImplTest {
 		phenotype.setExperiment(experiment);
 		experiment.setPhenotypes(Lists.newArrayList(phenotype));
 		when(this.phenotypeDao.getById(phenotypeId)).thenReturn(phenotype);
-		
+
 		final Formula formula1 = new Formula();
 		final CVTerm term1 = new CVTerm();
 		term1.setCvTermId(random.nextInt());
@@ -549,22 +552,22 @@ public class DatasetServiceImplTest {
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(observableId);
 
-		
 		this.datasetService.deletePhenotype(phenotypeId);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
-		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitId, Arrays.asList(term1.getCvTermId(), term2.getCvTermId()));
+		Mockito.verify(this.phenotypeDao)
+			.updateOutOfSyncPhenotypes(observationUnitId, Arrays.asList(term1.getCvTermId(), term2.getCvTermId()));
 	}
-	
-    @Test
-    public void testGetDatasetInstances() {
-        final Random random = new Random();
-        final int datasetId = random.nextInt();
-        this.datasetService.getDatasetInstances(datasetId);
-        Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
-    }
 
-    @Test
-	public void countObservationsGroupedByInstance_Verified_ExperimentCountObservationsPerInstance(){
+	@Test
+	public void testGetDatasetInstances() {
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		this.datasetService.getDatasetInstances(datasetId);
+		Mockito.verify(this.dmsProjectDao).getDatasetInstances(datasetId);
+	}
+
+	@Test
+	public void countObservationsGroupedByInstance_Verified_ExperimentCountObservationsPerInstance() {
 		final Random random = new Random();
 		final int datasetId = random.nextInt();
 		this.datasetService.countObservationsGroupedByInstance(datasetId);
@@ -572,7 +575,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void getAllObservationUnitRows_Verified_DAOInteractions(){
+	public void getAllObservationUnitRows_Verified_DAOInteractions() {
 		final Random random = new Random();
 		final int datasetId = random.nextInt();
 		final int studyId = random.nextInt();
@@ -581,13 +584,14 @@ public class DatasetServiceImplTest {
 
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getAdditionalDesignFactors(studyId);
-		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
-			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao)
+			.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
+				String.valueOf(DataSetType.SUMMARY_DATA.getId()));
 
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
-		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
+		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
 			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
-		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
 
 	}
@@ -844,11 +848,11 @@ public class DatasetServiceImplTest {
 		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
 		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
 
-
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getPhenotypes(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
+		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES))
+			.thenReturn(variables);
 		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
@@ -894,11 +898,11 @@ public class DatasetServiceImplTest {
 		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
 		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
 
-
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getPhenotypes(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
+		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES))
+			.thenReturn(variables);
 		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
@@ -922,7 +926,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
 
 		final int plotCount = 3;
-		final List<ExperimentModel> plotExperiments = getPlotExperiments(plotCount);
+		final List<ExperimentModel> plotExperiments = this.getPlotExperiments(plotCount);
 		final int plotDatasetId = new Random().nextInt();
 		final List<Integer> instanceIds = Arrays.asList(11, 12, 13);
 		Mockito.doReturn(plotExperiments).when(this.experimentDao).getObservationUnits(plotDatasetId, instanceIds);
@@ -938,7 +942,7 @@ public class DatasetServiceImplTest {
 		final ArgumentCaptor<ExperimentModel> experimentCaptor = ArgumentCaptor.forClass(ExperimentModel.class);
 		Mockito.verify(this.experimentDao, Mockito.times(plotCount * numberOfSubObsUnits)).save(experimentCaptor.capture());
 		final List<ExperimentModel> subObsExperiments = experimentCaptor.getAllValues();
-		for (int i=0; i<plotCount; i++){
+		for (int i = 0; i < plotCount; i++) {
 			final ExperimentModel plotExperiment = plotExperiments.get(i);
 			final List<ExperimentModel> plotSubObsUnits = subObsExperiments.subList(i * numberOfSubObsUnits, (i + 1) * numberOfSubObsUnits);
 			for (final ExperimentModel subObsUnit : plotSubObsUnits) {
@@ -952,11 +956,75 @@ public class DatasetServiceImplTest {
 		}
 	}
 
-	private  List<ExperimentModel> getPlotExperiments(final Integer count) {
+	@Test
+	public void testFindAdditionalEnvironmentFactors() {
+		final Random random = new Random();
+		final Integer datasetId = random.nextInt(10);
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		final int termId = 100;
+		final String variableName = "VariableName";
+		measurementVariable.setTermId(termId);
+		measurementVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable.setName(variableName);
+
+		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
+		measurementVariable1.setTermId(TermId.LOCATION_ID.getId());
+		measurementVariable1.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable1.setName("LOCATION_ID");
+
+		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
+		measurementVariable2.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		measurementVariable2.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable2.setName("TRIAL_INSTANCE");
+
+		final MeasurementVariable measurementVariable3 = new MeasurementVariable();
+		measurementVariable3.setTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		measurementVariable3.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable3.setName("EXPERIMENT_DESIGN_FACTOR");
+
+		final List<MeasurementVariable> observationSetVariables = Arrays.asList(measurementVariable, measurementVariable1,
+			measurementVariable2, measurementVariable3);
+
+		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
+			VariableType.ENVIRONMENT_DETAIL.getId()))).thenReturn(observationSetVariables);
+
+		final List<String> result = this.datasetService.findAdditionalEnvironmentFactors(datasetId);
+
+		// Only 1 variable is expected to be returned. Standard Environment Variables
+		// (TRIAL_INSTANCE, LOCATION_ID and EXPERIMENT_DESIGN should be ignored.
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.contains(measurementVariable.getName()));
+	}
+
+	@Test
+	public void testGetEnvironmentConditionVariableNames() {
+		final Random random = new Random();
+		final Integer datasetId = random.nextInt(10);
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		final int termId = 100;
+		final String variableName = "VariableName";
+		measurementVariable.setTermId(termId);
+		measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
+		measurementVariable.setName(variableName);
+
+		final List<MeasurementVariable> observationSetVariables = Arrays.asList(measurementVariable);
+
+		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
+			VariableType.STUDY_CONDITION.getId()))).thenReturn(observationSetVariables);
+
+		final List<String> result = this.datasetService.getEnvironmentConditionVariableNames(datasetId);
+
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.contains(measurementVariable.getName()));
+	}
+
+	private List<ExperimentModel> getPlotExperiments(final Integer count) {
 		final List<ExperimentModel> plotUnits = new ArrayList<>();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			final Random random = new Random();
-			final ExperimentModel plot= new ExperimentModel();
+			final ExperimentModel plot = new ExperimentModel();
 			final Geolocation geoLocation = new Geolocation();
 			geoLocation.setLocationId(random.nextInt());
 			plot.setGeoLocation(geoLocation);
