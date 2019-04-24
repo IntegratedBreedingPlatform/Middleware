@@ -35,7 +35,7 @@
 		<preConditions onFail="CONTINUE">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM location location_duplicate INNER JOIN location location
-			    WHERE location.locid > location_duplicate.locid AND location.labbr = location_duplicate.labbr;
+				WHERE location.locid > location_duplicate.locid AND location.labbr = location_duplicate.labbr;
 			</sqlCheck>
 		</preConditions>
 		<comment>Add unique index to labbr column</comment>
