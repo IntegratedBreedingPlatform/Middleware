@@ -11,14 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -58,6 +50,14 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
 // template must not contain exact same combo of property-scale-method
@@ -76,8 +76,10 @@ public class WorkbookSaver extends Saver {
 	private static final String HEADERMAP = "headerMap";
 	private static final String VARIABLETYPEMAP = "variableTypeMap";
 	private static final String MEASUREMENTVARIABLEMAP = "measurementVariableMap";
+	public static final String ENVIRONMENT = "-ENVIRONMENT";
+	public static final String PLOTDATA = "-PLOTDATA";
 
-	private DaoFactory daoFactory;
+	private final DaoFactory daoFactory;
 
 	public WorkbookSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -408,7 +410,7 @@ public class WorkbookSaver extends Saver {
 
 		watch.restart("save geolocation");
 
-		this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, daoFactory.getLocationDAO());
+		this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, this.daoFactory.getLocationDAO());
 
 		final Geolocation g = this.getGeolocationSaver()
 				.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, null,
@@ -472,7 +474,7 @@ public class WorkbookSaver extends Saver {
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
 
-							this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, daoFactory.getLocationDAO());
+							this.assignLocationVariableWithUnspecifiedLocationIfEmptyOrInvalid(geolocation, this.daoFactory.getLocationDAO());
 
 							final Geolocation g = this.getGeolocationSaver()
 									.saveGeolocationOrRetrieveIfExisting(workbook.getStudyDetails().getStudyName(), geolocation, row,
@@ -595,11 +597,11 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private String generateTrialDatasetName(final String studyName) {
-		return studyName + "-ENVIRONMENT";
+		return studyName + ENVIRONMENT;
 	}
 
 	private String generateMeasurementEffectDatasetName(final String studyName) {
-		return studyName + "-PLOTDATA";
+		return studyName + PLOTDATA;
 	}
 
 	private String generateMeansDatasetName(final String studyName) {
@@ -655,37 +657,48 @@ public class WorkbookSaver extends Saver {
 		return studyId;
 	}
 
-	private int createTrialDatasetIfNecessary(final Workbook workbook, final int studyId, final List<MeasurementVariable> trialMV,
-			final VariableTypeList trialVariables, final String programUUID) {
+	private int createTrialDatasetIfNecessary(
+		final Workbook workbook, final int studyId, final List<MeasurementVariable> trialMV,
+		final VariableTypeList trialVariables, final String programUUID) {
 		final TimerWatch watch = new TimerWatch("find trial dataset");
 		String trialName = workbook.getStudyDetails().getTrialDatasetName();
 		Integer trialDatasetId = null;
 		if (trialName == null || "".equals(trialName)) {
 			final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
+			final String studyName = workbook.getStudyDetails().getStudyName();
 			if (datasetRefList != null) {
 				for (final DatasetReference datasetRef : datasetRefList) {
-					if (datasetRef.getName().equals("TRIAL_" + workbook.getStudyDetails().getStudyName())) {
+					if (datasetRef.getName().equals("TRIAL_" + studyName)) {
 						trialDatasetId = datasetRef.getId();
+						break;
+					} else if (datasetRef.getName().contains(ENVIRONMENT)) {
+						trialDatasetId = datasetRef.getId();
+
+						if (!datasetRef.getName().equals(studyName + ENVIRONMENT)) {
+							this.getDatasetProjectSaver().updateDataSetName(trialDatasetId, studyName + ENVIRONMENT);
+						}
+
+						break;
 					}
 				}
 				if (trialDatasetId == null) {
-					trialName = this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
-					trialDatasetId = this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()),
-							programUUID);
+					trialName = this.generateTrialDatasetName(studyName);
+					trialDatasetId = this.getDatasetId(trialName, this.generateTrialDatasetName(studyName),
+						programUUID);
 				}
 			} else {
-				trialName = this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
+				trialName = this.generateTrialDatasetName(studyName);
 				trialDatasetId =
-						this.getDatasetId(trialName, this.generateTrialDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
+					this.getDatasetId(trialName, this.generateTrialDatasetName(studyName), programUUID);
 			}
 		}
 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
 			final String trialDescription = !workbook.getStudyDetails().getDescription().isEmpty() ?
-					this.generateTrialDatasetName(workbook.getStudyDetails().getDescription()) :
-					trialName;
+				this.generateTrialDatasetName(workbook.getStudyDetails().getDescription()) :
+				trialName;
 			final DatasetValues trialValues = this.getDatasetValuesTransformer()
-					.transform(trialName, trialDescription, DataSetType.SUMMARY_DATA, trialMV, trialVariables);
+				.transform(trialName, trialDescription, DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 
 			watch.restart("save trial dataset");
 			final DmsProject trial = this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID);
@@ -703,42 +716,53 @@ public class WorkbookSaver extends Saver {
 		watch.stop();
 	}
 
-	private int createMeasurementEffectDatasetIfNecessary(final Workbook workbook, final int studyId,
-			final List<MeasurementVariable> effectMV, final VariableTypeList effectVariables, final VariableTypeList trialVariables,
-			final String programUUID) {
+	private int createMeasurementEffectDatasetIfNecessary(
+		final Workbook workbook, final int studyId,
+		final List<MeasurementVariable> effectMV, final VariableTypeList effectVariables, final VariableTypeList trialVariables,
+		final String programUUID) {
 		final TimerWatch watch = new TimerWatch("find measurement effect dataset");
+
 		String datasetName = workbook.getStudyDetails().getMeasurementDatasetName();
+		;
 		Integer datasetId = null;
 
 		if (datasetName == null || "".equals(datasetName)) {
+			final String studyName = workbook.getStudyDetails().getStudyName();
+			datasetName = this.generateMeasurementEffectDatasetName(studyName);
 			final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
 			if (datasetRefList != null) {
 				for (final DatasetReference datasetRef : datasetRefList) {
-					if (datasetRef.getName().equals("MEASUREMENT EFEC_" + workbook.getStudyDetails().getStudyName()) || datasetRef.getName()
-							.equals("MEASUREMENT EFECT_" + workbook.getStudyDetails().getStudyName())) {
+					if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyName) || datasetRef.getName()
+						.equals("MEASUREMENT EFECT_" + studyName)) {
 						datasetId = datasetRef.getId();
+						break;
+					} else if (datasetRef.getName().contains(PLOTDATA)) {
+						datasetId = datasetRef.getId();
+						if (!datasetRef.getName().equals(studyName + PLOTDATA)) {
+							this.getDatasetProjectSaver().updateDataSetName(datasetId, studyName + PLOTDATA);
+						}
+						break;
 					}
 				}
 				if (datasetId == null) {
-					datasetName = this.generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
-					datasetId = this.getDatasetId(datasetName,
-							this.generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()), programUUID);
+					datasetId = this.getDatasetId(datasetName, this.generateMeasurementEffectDatasetName(
+						studyName),
+						programUUID);
 				}
 			} else {
-				datasetName = this.generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
 				datasetId =
-						this.getDatasetId(datasetName, this.generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()),
-								programUUID);
+					this.getDatasetId(datasetName, this.generateMeasurementEffectDatasetName(studyName),
+						programUUID);
 			}
 		}
 
 		if (datasetId == null) {
 			watch.restart("transform measurement effect dataset");
 			final String datasetDescription = !workbook.getStudyDetails().getDescription().isEmpty() ?
-					this.generateMeasurementEffectDatasetName(workbook.getStudyDetails().getDescription()) :
-					datasetName;
+				this.generateMeasurementEffectDatasetName(workbook.getStudyDetails().getDescription()) :
+				datasetName;
 			final DatasetValues datasetValues = this.getDatasetValuesTransformer()
-					.transform(datasetName, datasetDescription, DataSetType.PLOT_DATA, effectMV, effectVariables);
+				.transform(datasetName, datasetDescription, DataSetType.PLOT_DATA, effectMV, effectVariables);
 
 			watch.restart("save measurement effect dataset");
 			// fix for GCP-6436 start
