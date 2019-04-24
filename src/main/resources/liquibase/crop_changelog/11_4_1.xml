@@ -9,7 +9,7 @@
 			<not>
 			<sqlCheck expectedResult="0">
 				SELECT count(1)
-				FROM   projectprop pp
+				FROM projectprop pp
 				INNER JOIN projectprop pp_datasettype ON pp.project_id = pp_datasettype.project_id
 				AND pp_datasettype.variable_id = 8160
 				AND pp_datasettype.value = 10080
@@ -22,14 +22,12 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE projectprop pp
-			INNER JOIN project p
-			ON pp.project_id = p.project_id
 			INNER JOIN projectprop pp_datasettype
-			ON p.project_id = pp_datasettype.project_id
+			ON pp.project_id = pp_datasettype.project_id
 			AND pp_datasettype.variable_id = 8160
 			AND pp_datasettype.value = 10080
-			SET    pp.type_id = 1802
-			WHERE  pp.type_id = 1808;
+			SET pp.type_id = 1802
+			WHERE pp.type_id = 1808;
 		</sql>
 	</changeSet>
 
