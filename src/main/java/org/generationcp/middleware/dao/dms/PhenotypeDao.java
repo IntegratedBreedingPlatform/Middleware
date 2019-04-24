@@ -886,15 +886,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
 		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
-		final List<String> cvTermIds = requestDTO.getCvTermIds();
-
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
-			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
-		}
-
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
-		}
+		addPhenotypeSearchFilter(requestDTO, queryString);
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 
@@ -903,13 +895,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setMaxResults(pageSize);
 		}
 
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			sqlQuery.setParameterList(CV_TERM_IDS, cvTermIds);
-		}
-
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
-			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
-		}
+		addPhenotypeSearchQueryParams(requestDTO, sqlQuery);
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
 			.addScalar("observationLevel").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
@@ -991,10 +977,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return new ArrayList<>(observationUnitsByNdExpId.values());
 	}
 
-	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
-		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
+	private static void addPhenotypeSearchFilter(final PhenotypeSearchRequestDTO requestDTO, final StringBuilder queryString) {
+		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
-		final List<String> cvTermIds = requestDTO.getCvTermIds();
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
 		}
@@ -1003,15 +988,34 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
-		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
+		if (requestDTO.getObservationLevel() != null) {
+			queryString.append(" AND pp_dataset_type.value = :datasetType");
+		}
+	}
+
+	private static void addPhenotypeSearchQueryParams(final PhenotypeSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
+
+		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
-			query.setParameterList(CV_TERM_IDS, cvTermIds);
+			sqlQuery.setParameterList(CV_TERM_IDS, cvTermIds);
 		}
 
 		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
-			query.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
+			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
 		}
+
+		if (requestDTO.getObservationLevel() != null) {
+			sqlQuery.setParameter("datasetType", requestDTO.getObservationLevel());
+		}
+	}
+
+	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
+		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
+
+		addPhenotypeSearchFilter(requestDTO, queryString);
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
+		addPhenotypeSearchQueryParams(requestDTO, query);
 
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}

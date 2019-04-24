@@ -5,17 +5,26 @@ import java.util.List;
 
 public class PhenotypeSearchRequestDTO implements Serializable {
 
-	private List<String> cvTermIds;
-	private List<String> studyDbIds;
+	private String observationLevel;
+	private List<String> observationVariableDbIds;
 	private Integer page;
 	private Integer pageSize;
+	private List<String> studyDbIds;
 
-	public List<String> getStudyDbIds() {
-		return studyDbIds;
+	public String getObservationLevel() {
+		return observationLevel;
 	}
 
-	public void setStudyDbIds(final List<String> studyDbIds) {
-		this.studyDbIds = studyDbIds;
+	public void setObservationLevel(final String observationLevel) {
+		this.observationLevel = observationLevel;
+	}
+
+	public List<String> getObservationVariableDbIds() {
+		return observationVariableDbIds;
+	}
+
+	public void setObservationVariableDbIds(List<String> observationVariableDbIds) {
+		this.observationVariableDbIds = observationVariableDbIds;
 	}
 
 	public Integer getPage() {
@@ -34,11 +43,11 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 		this.pageSize = pageSize;
 	}
 
-	public List<String> getCvTermIds() {
-		return cvTermIds;
+	public List<String> getStudyDbIds() {
+		return studyDbIds;
 	}
 
-	public void setCvTermIds(List<String> cvTermIds) {
-		this.cvTermIds = cvTermIds;
+	public void setStudyDbIds(final List<String> studyDbIds) {
+		this.studyDbIds = studyDbIds;
 	}
 }
