@@ -144,7 +144,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		userInfoDao.setSession(this.getCurrentSession());
 		return userInfoDao;
 	}
-	
+
 	private RoleDAO getRoleDao() {
 		final RoleDAO roleDao = new RoleDAO();
 		roleDao.setSession(this.getCurrentSession());
@@ -276,12 +276,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 							.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> userIds) {
 		return this.getProjectUserInfoDao().getByProjectIdAndUserIds(projectId, userIds);
 	}
-	
+
 	@Override
 	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId) {
 		return this.getProjectUserInfoDao().getByProjectIdAndUserId(projectId, userId);
@@ -505,7 +505,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getUsersByProjectId(projectId);
 	}
-	
+
 	@Override
 	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getPersonsByProjectId(projectId);
@@ -514,6 +514,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<CropType> getInstalledCropDatabses() {
 		return this.getCropTypeDao().getAll();
+	}
+
+	@Override
+	public List<CropType> getAvailableCropsForUser(final int workbenchUserId) {
+		return this.getCropTypeDao().getAvailableCropsForUser(workbenchUserId);
 	}
 
 	@Override

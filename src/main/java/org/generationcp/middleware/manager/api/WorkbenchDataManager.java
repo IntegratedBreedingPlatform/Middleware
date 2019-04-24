@@ -426,6 +426,8 @@ public interface WorkbenchDataManager {
 	 */
 	List<CropType> getInstalledCropDatabses();
 
+	List<CropType> getAvailableCropsForUser(int workbenchUserId);
+
 	/**
 	 * Get the crop type corresponding to the given name.
 	 *
