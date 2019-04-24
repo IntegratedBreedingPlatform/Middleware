@@ -34,7 +34,7 @@
 	<changeSet id="v11.4.1-2" author="corina">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-				SELECT COUNT(*) > 0 FROM cvterm c1 INNER JOIN cvterm_relationship c2 ON c2.subject_id=c1.cvterm_id WHERE cv_id=1030 and name like '%yyyymmdd%' and c2.object_id <> 1117;
+				SELECT COUNT(*) > 0 FROM cvterm c1 INNER JOIN cvterm_relationship c2 ON c2.subject_id=c1.cvterm_id WHERE cv_id=1030 and `name` like '%yyyymmdd%' and c2.object_id <> 1117;
 
 			</sqlCheck>
         </preConditions>
@@ -53,7 +53,7 @@
 	<changeSet id="v11.4.1-3" author="corina">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-				SELECT COUNT(*) > 0 FROM cvtermprop where type_id=1800 and cvterm_id IN (8180, 8189, 8190) and value='Study Detail';
+				SELECT COUNT(*) > 0 FROM cvtermprop where type_id=1800 and cvterm_id IN (8180, 8189, 8190) and `value`='Study Detail';
 
 			</sqlCheck>
         </preConditions>
