@@ -28,9 +28,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -63,7 +61,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,13 +77,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DmsProjectDao.class);
 
-	private static final Integer LOCATION_ID = Integer.valueOf(TermId.LOCATION_ID.getId());
+	private static final Integer LOCATION_ID = TermId.LOCATION_ID.getId();
 
 	private static final String PROGRAM_UUID = "program_uuid";
-	private static final String VALUE = "value";
 	private static final String PROJECT_ID = "projectId";
-	private static final String VARIABLE_ID = "variableId";
-	public static final String DELETED = "deleted";
+	private static final String DELETED = "deleted";
 	private static final int DELETED_STUDY = 1;
 
 	// getObservationSetVariables scalars
@@ -115,7 +110,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * Type of study is stored in projectprops table.
 	 * Which folder the study is in, is defined in the project_relationship table.
 	 */
-	public static final String GET_CHILDREN_OF_FOLDER =
+	static final String GET_CHILDREN_OF_FOLDER =
 		"SELECT subject.project_id AS project_id, "
 			+ "subject.name AS name,  subject.description AS description, "
 			+ "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, "
@@ -136,7 +131,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			// the OR here for value = null is required for folders.
 			+ "	ORDER BY name";
 
-	public static final String STUDY_REFERENCE_SQL =
+	private static final String STUDY_REFERENCE_SQL =
 		"SELECT pr.project_id AS project_id, "
 			+ "pr.name AS name,  pr.description AS description, pr.program_uuid AS program_uuid, "
 			+ "st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
@@ -203,7 +198,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         AND geoloc.nd_geolocation_id = :studyId "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
-	static final String GET_PROJECTID_BY_STUDYDBID =
+	private static final String GET_PROJECTID_BY_STUDYDBID =
 		"SELECT DISTINCT pr.object_project_id"
 			+ " FROM project_relationship pr"
 			+ " INNER JOIN project p ON p.project_id = pr.subject_project_id"
@@ -250,7 +245,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String COUNT_PROJECTS_WITH_VARIABLE =
 		"SELECT count(pp.project_id)  FROM projectprop pp inner join project p on (p.project_id = pp.project_id)\n"
 			+ "WHERE pp.variable_id = :variableId and p.deleted = 0";
-	public static final String COUNT_CALCULATED_VARIABLES_IN_DATASETS = "SELECT COUNT(1) FROM projectprop pp\n"
+	static final String COUNT_CALCULATED_VARIABLES_IN_DATASETS = "SELECT COUNT(1) FROM projectprop pp\n"
 		+ "INNER JOIN formula f ON pp.variable_id = f.target_variable_id\n"
 		+ "where project_id in (:projectIds) and type_id = " + VariableType.TRAIT.getId();
 
@@ -708,69 +703,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				e);
 		}
 
-	}
-
-	/**
-	 * Retrieves all the study details
-	 *
-	 * @return List of all nursery and trial study nodes
-	 * @
-	 */
-
-	public List<StudyNode> getAllStudyNodes(final String programUUID) {
-		final List<StudyNode> studyNodes = new ArrayList<>();
-
-		final StringBuilder sqlString =
-			new StringBuilder().append("SELECT DISTINCT p.project_id AS id ").append("        , p.name AS name ")
-				.append("        , p.description AS description ").append("        , p.start_date AS startDate ")
-				.append("        , p.study_type_id AS studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st"
-					+ ".cvterm_id as cvtermId ").append(" , gpSeason.value AS season ")
-				.append("FROM project p  ")
-				.append("   INNER JOIN nd_experiment e ON e.project_id = p.project_id ")
-				.append(" LEFT JOIN study_type st ON p.study_type_id = st.study_type_id ")
-				.append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")
-				.append("           AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ")
-				.append("WHERE p.deleted != " + DELETED_STUDY + " ")
-				.append(" AND p.study_type_id IS NOT NULL ")
-				.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
-				.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
-				.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
-		final List<Object[]> list;
-
-		try {
-			final Query query =
-				this.getSession().createSQLQuery(sqlString.toString()).addScalar("id").addScalar("name").addScalar("description")
-					.addScalar("startDate").addScalar("studyType").addScalar("label").addScalar("name").addScalar("studyTypeName")
-					.addScalar("visible").addScalar("cvtermId").addScalar("season").setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-			list = query.list();
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in getAllStudyNodes() query in DmsProjectDao: " + e.getMessage(), e);
-		}
-
-		if (list == null || list.isEmpty()) {
-			return studyNodes;
-		}
-
-		for (final Object[] row : list) {
-			final Integer id = (Integer) row[0];
-			final String name = (String) row[1];
-			final String description = (String) row[2];
-			final String startDate = (String) row[3];
-			final Integer studyTypeId = (Integer) row[4];
-			final String label = (String) row[5];
-			final String studyTypeName = (String) row[6];
-			final boolean visible = ((Byte) row[7]) == 1;
-			final Integer cvtermId = (Integer) row[8];
-			final String seasonStr = (String) row[9];
-
-			final Season season = Season.getSeason(seasonStr);
-			final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-			studyNodes.add(new StudyNode(id, name, description, startDate, studyTypeDto, season));
-
-		}
-		Collections.sort(studyNodes);
-		return studyNodes;
 	}
 
 	@SuppressWarnings("rawtypes")
