@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
+import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -69,6 +71,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
@@ -984,6 +987,75 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.renameStudy(newStudyName, project.getProjectId(), programUUID);
 		
 		Assert.assertEquals(newStudyName, project.getName());
+
+	}
+
+	@Test
+	public void testCountStudies() throws Exception {
+		// Empty filter will retrieve all studies in crop
+		final Map<StudyFilters, String> map = new HashMap<>();
+		final Long initialCount = this.manager.countAllStudies(map);
+
+		// Add new study with new location ID
+		final StudyReference newStudy = this.studyTDI.addTestStudy();
+		final Integer studyId = newStudy.getId();
+		final StudyReference studyReference = this.manager.getStudyReference(studyId);
+		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		final Random random = new Random();
+		final String location1 = String.valueOf(random.nextInt());
+		final String season = String.valueOf(random.nextInt());
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, location1, season);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.manager.getActiveSession().flush();
+
+		// New study should be retrieved for empty filter
+		Assert.assertEquals(initialCount.intValue() + 1, this.manager.countAllStudies(map).intValue());
+		map.put(StudyFilters.PROGRAM_ID, newStudy.getProgramUUID());
+		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
+		Assert.assertEquals(2, this.manager.countAllStudies(map).intValue());
+		map.put(StudyFilters.LOCATION_ID, location1);
+		// Expecting only one to be retrieved when filtered by location
+		Assert.assertEquals(1, this.manager.countAllStudies(map).intValue());
+	}
+
+	@Test
+	public void testFindPagedProjects() throws Exception {
+		// Add new study with 2 environments assigned new location IDs
+		final StudyReference newStudy = this.studyTDI.addTestStudy();
+		final Integer studyId = newStudy.getId();
+		final StudyReference studyReference = this.manager.getStudyReference(studyId);
+		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		final Random random = new Random();
+		final String location1 = String.valueOf(random.nextInt());
+		final String season = String.valueOf(random.nextInt());
+		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, location1, season);
+		final String location2 = String.valueOf(random.nextInt());
+		this.studyTDI.addEnvironmentToDataset(this.crop, datasetId, location2, season);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.manager.getActiveSession().flush();
+
+		final Map<StudyFilters, String> map = new HashMap<>();
+		map.put(StudyFilters.PROGRAM_ID, newStudy.getProgramUUID());
+		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
+		List<StudySummary> studies = this.manager.findPagedProjects(map, 10, 1);
+		Assert.assertEquals(2, studies.size());
+		StudySummary study1 = studies.get(0);
+		Assert.assertEquals(this.studyReference.getId(), study1.getStudyDbid());
+		final StudySummary study2 = studies.get(1);
+		Assert.assertEquals(newStudy.getId(), study2.getStudyDbid());
+		Assert.assertEquals(2, study2.getInstanceMetaData().size());
+
+		map.put(StudyFilters.LOCATION_ID, location1);
+		// Expecting only one study to be retrieved when filtered by location
+		studies = this.manager.findPagedProjects(map, 10, 1);
+		Assert.assertEquals(1, studies.size());
+		study1 = studies.get(0);
+		Assert.assertEquals(newStudy.getId(), study1.getStudyDbid());
+		// Expecting environments of retrieved study to also be filtered by location
+		Assert.assertEquals(1, study1.getInstanceMetaData().size());
+		Assert.assertEquals(location1, study1.getInstanceMetaData().get(0).getLocationDbId().toString());
 
 	}
 
