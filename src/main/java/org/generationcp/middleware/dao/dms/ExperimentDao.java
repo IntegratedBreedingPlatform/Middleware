@@ -128,6 +128,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "FROM nd_experiment e  INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id "
 			+ "AND p.observable_id = :variableId AND (p.value IS NOT NULL  OR p.cvalue_id IS NOT NULL)";
 
+	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
+	static {
+		geolocSpecialFactorsMap.put("SITE_LAT", "gl.latitude");
+		geolocSpecialFactorsMap.put("SITE_LONG", "gl.longitude");
+		geolocSpecialFactorsMap.put("SITE_ALT", "gl.altitude");
+		geolocSpecialFactorsMap.put("SITE_DATUM", "gl.geodetic_datum");
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {
@@ -695,10 +702,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
 			final String envFactorFormat =
 				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s',  ";
+			final String geolocEnvFactorFormat =
+					" %s AS '%s',  ";
 			for (final String envFactor : searchDto.getEnvironmentDetails()) {
-				sql.append(String.format(envFactorFormat, envFactor, envFactor));
+				if(geolocSpecialFactorsMap.containsKey(envFactor)) {
+					final String column = geolocSpecialFactorsMap.get(envFactor);
+					sql.append(String.format(geolocEnvFactorFormat, column, envFactor));
+				} else {
+					sql.append(String.format(envFactorFormat, envFactor, envFactor));
+				}
 			}
 		}
+
 
 		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
 			final String envConditionFormat =
@@ -794,8 +809,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
 					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId()
 					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = " + TermId.MIN_VALUE.getId()
-					+ "           inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
-					+ "           inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
+					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "           inner join project p2 on nde2.project_id = p2.project_id " //
 					+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid " //
 					+ "      where ph2." + filterByDraftOrValue + " is not null " //
