@@ -12,6 +12,7 @@ public class ObservationDto {
 	private Integer observationUnitId;
 	private Integer draftCategoricalValueId;
 	private String draftValue;
+	private boolean draftMode;
 
 	public ObservationDto(
 		final Integer variableId, final String value, final Integer categoricalValueId, final String status,
@@ -102,5 +103,14 @@ public class ObservationDto {
 	public String getDraftValue() {
 		return this.draftValue;
 	}
+
+	public boolean isDraftMode() {
+		return draftMode;
+	}
+
+	public void setDraftMode(final boolean draftMode) {
+		this.draftMode = draftMode;
+	}
+
 
 }
