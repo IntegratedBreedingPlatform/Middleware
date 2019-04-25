@@ -35,11 +35,14 @@
 		<preConditions onFail="CONTINUE">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(*) FROM location location_duplicate INNER JOIN location location
-				WHERE location.locid > location_duplicate.locid AND location.labbr = location_duplicate.labbr;
+				WHERE location.locid > location_duplicate.locid AND location.labbr = location_duplicate.labbr
+				AND location.labbr NOT IN ("", "-");
 			</sqlCheck>
 		</preConditions>
 		<comment>Add unique index to labbr column</comment>
 		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE location ALTER labbr DROP DEFAULT;
+			UPDATE location SET labbr=NULL WHERE labbr IN ("", "-");
 			ALTER TABLE location ADD UNIQUE INDEX labbr_UNIQUE (labbr ASC);
 		</sql>
 	</changeSet>
