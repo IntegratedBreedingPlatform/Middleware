@@ -81,7 +81,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final String PROGRAM_UUID = "program_uuid";
 	private static final String PROJECT_ID = "projectId";
-	private static final String DELETED = "deleted";
+	public static final String DELETED = "deleted";
 	private static final int DELETED_STUDY = 1;
 
 	// getObservationSetVariables scalars
