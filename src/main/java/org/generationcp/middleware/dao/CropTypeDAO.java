@@ -27,15 +27,15 @@ import java.util.List;
  */
 public class CropTypeDAO extends GenericDAO<CropType, Long> {
 
-	public CropType getByName(String cropName) {
+	public CropType getByName(final String cropName) {
 		CropType toReturn = null;
 		try {
 			if (cropName != null) {
-				Criteria criteria = this.getSession().createCriteria(CropType.class);
+				final Criteria criteria = this.getSession().createCriteria(CropType.class);
 				criteria.add(Restrictions.eq("cropName", cropName));
 				toReturn = (CropType) criteria.uniqueResult();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with getByName(cropName=" + cropName + ") query from CropType: " + e.getMessage(), e);
 		}
 		return toReturn;

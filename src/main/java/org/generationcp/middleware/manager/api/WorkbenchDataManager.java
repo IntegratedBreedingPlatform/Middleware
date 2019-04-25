@@ -10,9 +10,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
@@ -34,6 +31,9 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
  */
@@ -49,7 +49,7 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the projects.
 	 *
-	 * @param start - the starting record
+	 * @param start     - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the projects
 	 */
@@ -66,9 +66,9 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the projects.
 	 *
-	 * @param start - the starting record
+	 * @param start     - the starting record
 	 * @param numOfRows - the number of rows to retrieve
-	 * @param filters - the filters that to be included in the query
+	 * @param filters   - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map
 	 */
 	List<Project> getProjects(final int start, final int numOfRows, final Map<ProgramFilters, Object> filters);
@@ -178,7 +178,7 @@ public interface WorkbenchDataManager {
 	 * Checks if is person exists.
 	 *
 	 * @param firstName - the first name
-	 * @param lastName - the last name
+	 * @param lastName  - the last name
 	 * @return true, if is person exists
 	 */
 	boolean isPersonExists(String firstName, String lastName);
@@ -192,7 +192,6 @@ public interface WorkbenchDataManager {
 	boolean isPersonWithEmailExists(String email);
 
 	/**
-	 *
 	 * @param email
 	 * @return
 	 */
@@ -281,7 +280,7 @@ public interface WorkbenchDataManager {
 	 * Gets a project by name. Should return only one value.
 	 *
 	 * @param projectName - the project name to match
-	 * @param cropType - the crop type to search for a name (name is unique per crop type)
+	 * @param cropType    - the crop type to search for a name (name is unique per crop type)
 	 * @return the project matching the given name
 	 */
 	Project getProjectByNameAndCrop(String projectName, CropType cropType);
@@ -290,7 +289,7 @@ public interface WorkbenchDataManager {
 	 * Gets a project by Uuid and CropType. Should return only one value.
 	 *
 	 * @param projectUuid - the project Uuid to match (uuid is unique per crop type)
-	 * @param cropType - the crop type to match
+	 * @param cropType    - the crop type to match
 	 * @return the project matching the given Uuid and crop type
 	 */
 	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
@@ -327,10 +326,10 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the user by name.
 	 *
-	 * @param name - the name to match
-	 * @param start - the starting record
+	 * @param name      - the name to match
+	 * @param start     - the starting record
 	 * @param numOfRows - the number of rows to retrieve
-	 * @param op the op
+	 * @param op        the op
 	 * @return the user by name
 	 */
 	List<WorkbenchUser> getUserByName(String name, int start, int numOfRows, Operation op);
@@ -397,12 +396,12 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Retrieves the user ids of the program members using the project id
-	 * 
+	 *
 	 * @param projectId
 	 * @return
 	 */
 	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
-	
+
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
 	 *
@@ -410,7 +409,7 @@ public interface WorkbenchDataManager {
 	 * @return the List of {@link WorkbenchUser} records
 	 */
 	List<WorkbenchUser> getUsersByProjectId(Long projectId);
-	
+
 	/**
 	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
 	 *
@@ -448,7 +447,7 @@ public interface WorkbenchDataManager {
 	 * Return a List of {@link ProjectActivity} records associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id
-	 * @param start - the starting record
+	 * @param start     - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the List of {@link ProjectActivity} records
 	 */
@@ -483,9 +482,9 @@ public interface WorkbenchDataManager {
 	 * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
 	 *
 	 * @param workbenchUserId - the specified Workbench User ID
-	 * @param projectId - the specified Project ID
+	 * @param projectId       - the specified Project ID
 	 * @return Returns the IbdbUserMap object associated with the specified Workbench User ID and Project ID. Returns null when there is no
-	 *         IbdbUserMap matching the specified Workbench User ID and Project ID.
+	 * IbdbUserMap matching the specified Workbench User ID and Project ID.
 	 */
 	IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId);
 
@@ -493,9 +492,9 @@ public interface WorkbenchDataManager {
 	 * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
 	 *
 	 * @param workbenchUserId - the specified Workbench User ID
-	 * @param projectId - the specified Project ID
+	 * @param projectId       - the specified Project ID
 	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
-	 *         User ID matching the specified Workbench User ID and Project ID.
+	 * User ID matching the specified Workbench User ID and Project ID.
 	 */
 	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId);
 
@@ -595,9 +594,9 @@ public interface WorkbenchDataManager {
 	 * Returns the correspoding workbench user id.
 	 *
 	 * @param ibdbUserId the ibdb user id
-	 * @param projectId - the specified Project ID
+	 * @param projectId  - the specified Project ID
 	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
-	 *         User ID matching the specified Workbench User ID and Project ID.
+	 * User ID matching the specified Workbench User ID and Project ID.
 	 */
 	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId);
 
@@ -639,36 +638,39 @@ public interface WorkbenchDataManager {
 	 * @return the user matching the given project_uuid
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
-	
+
 	/**
 	 * Returns list of roles that can be assigned to a new user
-	 * 
+	 *
 	 * @return
 	 */
 	List<Role> getAssignableRoles();
-	
+
 	/**
 	 * Returns list of roles
-	 * 
+	 *
 	 * @return
 	 */
 	List<Role> getAllRoles();
-	
+
 	/**
 	 * Return users with SUPERADMIN role
+	 *
 	 * @return
 	 */
 	List<WorkbenchUser> getSuperAdminUsers();
-	
+
 	/**
 	 * Returns true if user has SUPERADMIN role assigned
+	 *
 	 * @param userId
 	 * @return
 	 */
 	boolean isSuperAdminUser(Integer userId);
-	
+
 	/**
 	 * Returns ProjectUserInfo List with the given project id and user ids
+	 *
 	 * @param projectId
 	 * @param ids
 	 * @return
@@ -679,12 +681,13 @@ public interface WorkbenchDataManager {
 	 * Deletes the Project_User_Info and IBDB_User_Map entries of the removed program members
 	 *
 	 * @param workbenchUserIds - the user ids of the removed program members
-	 * @param projectId - the project id
+	 * @param projectId        - the project id
 	 */
-	void removeUsersFromProgram (List<Integer> workbenchUserIds, Long projectId);
+	void removeUsersFromProgram(List<Integer> workbenchUserIds, Long projectId);
 
 	/**
 	 * Returns ProjectUserInfo with the given project id and user id
+	 *
 	 * @param projectId
 	 * @param userId
 	 * @return
