@@ -41,6 +41,10 @@ public abstract class IntegrationTestBase {
 	@Qualifier(value = "cropSessionProvider")
 	protected HibernateSessionProvider sessionProvder;
 
+	@Autowired
+	@Qualifier(value = "workbenchSessionProvider")
+	protected HibernateSessionProvider workbenchSessionProvider;
+
 	@Rule
 	public TestName name = new TestName();
 	private long startTime;
