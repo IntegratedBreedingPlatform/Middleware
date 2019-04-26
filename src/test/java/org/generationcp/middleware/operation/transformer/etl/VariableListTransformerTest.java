@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -88,6 +89,7 @@ public class VariableListTransformerTest {
 	}
 
 	@Test
+	@Ignore // FIXME IBP-2634
 	public void transformTrialEnvironment2() throws Exception {
 
 		final List<MeasurementVariable> mVarList = this.createMeasurementVariableListTestData();
