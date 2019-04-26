@@ -989,7 +989,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (requestDTO.getObservationLevel() != null) {
-			queryString.append(" AND pp_dataset_type.value = :datasetType");
+			queryString.append(" AND pp_dataset_type.value = :datasetType ");
+		}
+
+		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
+			queryString.append(" AND l.locid in (:locationDbIds) ");
 		}
 	}
 
@@ -1007,6 +1011,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (requestDTO.getObservationLevel() != null) {
 			sqlQuery.setParameter("datasetType", requestDTO.getObservationLevel());
+		}
+
+		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
+			sqlQuery.setParameterList("locationDbIds", requestDTO.getLocationDbIds());
 		}
 	}
 

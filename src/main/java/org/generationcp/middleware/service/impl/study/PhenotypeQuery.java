@@ -23,8 +23,8 @@ public class PhenotypeQuery {
 		+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'REP_NO') AS replicate, " //
 		+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'COL') AS COL, " //
 		+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'ROW') AS ROW, " //
-		+ "  (SELECT l.locid FROM nd_geolocationprop gp INNER JOIN location l ON l.locid = gp.value WHERE gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS studyLocationDbId, " //
-		+ "  (SELECT l.lname FROM nd_geolocationprop gp INNER JOIN location l ON l.locid = gp.value WHERE gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS studyLocation, " //
+		+ "  l.locid AS studyLocationDbId, " //
+		+ "  l.lname AS studyLocation, " //
 		+ "  (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, " //
 		+ "  s.uniquename AS entryNumber " //
 		+ " FROM " //
@@ -39,6 +39,8 @@ public class PhenotypeQuery {
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
 		+ "  LEFT JOIN projectprop pp_dataset_type ON dataset.project_id = pp_dataset_type.project_id AND pp_dataset_type.variable_id = " + TermId.DATASET_TYPE.getId() //
 		+ "  LEFT JOIN cvterm datatype_type ON pp_dataset_type.value = datatype_type.cvterm_id " //
+		+ "  LEFT JOIN nd_geolocationprop gp ON gl.nd_geolocation_id = gp.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id " //
+		+ "  LEFT JOIN location l ON l.locid = gp.value " //
 		+ " WHERE 1 = 1" //
 		; //
 
