@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -190,6 +191,7 @@ public class DerivedVariableServiceImplTest {
 	}
 
 	@Test
+	@Ignore // FIXME IBP-2634
 	public void testSaveCalculatedResultUpdatePhenotype() {
 
 		final int variableTermId = this.random.nextInt(10);
