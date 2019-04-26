@@ -35,7 +35,11 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationType;
+import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -48,6 +52,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -236,6 +241,18 @@ public class FieldbookServiceImplTest {
 		Mockito.verify(listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
 				new ArrayList<ListDataProject>(), userId);
 
+
+	}
+
+	@Test
+	public void testAddLocation() {
+		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode())).thenReturn(1001);
+		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode())).thenReturn(1002);
+		this.fieldbookServiceImpl.addLocation("LOCNAME", 1, 101, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
+
+		Mockito.verify(this.locationDataManager).getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+		Mockito.verify(this.locationDataManager).getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
+		Mockito.verify(this.locationDataManager).addLocationAndLocdes(ArgumentMatchers.any(Location.class), ArgumentMatchers.any(Locdes.class));
 
 	}
 
