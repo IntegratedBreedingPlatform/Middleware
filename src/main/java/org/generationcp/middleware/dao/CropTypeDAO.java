@@ -15,28 +15,43 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
 
 /**
  * DAO class for {@link CropType}.
  *
  * @author Joyce Avestro
- *
  */
 public class CropTypeDAO extends GenericDAO<CropType, Long> {
 
-	public CropType getByName(String cropName) throws MiddlewareQueryException {
+	public CropType getByName(final String cropName) {
 		CropType toReturn = null;
 		try {
 			if (cropName != null) {
-				Criteria criteria = this.getSession().createCriteria(CropType.class);
+				final Criteria criteria = this.getSession().createCriteria(CropType.class);
 				criteria.add(Restrictions.eq("cropName", cropName));
 				toReturn = (CropType) criteria.uniqueResult();
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByName(cropName=" + cropName + ") query from CropType: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getByName(cropName=" + cropName + ") query from CropType: " + e.getMessage(), e);
 		}
 		return toReturn;
+	}
+
+	public List<CropType> getAvailableCropsForUser(final int workbenchUserId) {
+		try {
+			final Query query = this.getSession().createQuery("select distinct project.cropType from ProjectUserInfo as projectUserInfo "
+				+ "inner join projectUserInfo.project as project "
+				+ "where projectUserInfo.userId = :workbenchUserId ");
+			query.setParameter("workbenchUserId", workbenchUserId);
+			return query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getAvailableCropsForUser(workbenchUserId=" + workbenchUserId + ") query from CropType: " + e.getMessage(), e);
+		}
 	}
 
 }
