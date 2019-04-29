@@ -66,7 +66,7 @@
 	</changeSet>
 
 	<changeSet  id="v11.4.1-4" author="mderamos">
-		<comment>Drop the default vakue for labbr in the location table and update labbr values of locations with empty string or "-" values to NULL</comment>
+		<comment>Drop the default value for labbr in the location table and update labbr values of locations with empty string or "-" values to NULL</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE location ALTER labbr DROP DEFAULT;
 			UPDATE location SET labbr=NULL WHERE labbr IN ("", "-");
