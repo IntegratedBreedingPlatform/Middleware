@@ -582,6 +582,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return types.get(name.toUpperCase()) != null ? types.get(name.toUpperCase()).getFldno() : null;
 	}
 
+	@Override
+	public long countByLocationAbbreviation(final String locationAbbreviation) {
+		return this.daoFactory.getLocationDAO().countByLocationAbbreviation(locationAbbreviation);
+	}
+
 	public String retrieveLocIdOfUnspecifiedLocation() {
 		String unspecifiedLocationId = "";
 		final List<Location> locations = this.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
