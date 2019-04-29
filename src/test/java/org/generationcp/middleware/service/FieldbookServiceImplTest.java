@@ -52,6 +52,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -248,11 +249,22 @@ public class FieldbookServiceImplTest {
 	public void testAddLocation() {
 		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode())).thenReturn(1001);
 		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode())).thenReturn(1002);
+
 		this.fieldbookServiceImpl.addLocation("LOCNAME", 1, 101, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
 
 		Mockito.verify(this.locationDataManager).getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 		Mockito.verify(this.locationDataManager).getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
-		Mockito.verify(this.locationDataManager).addLocationAndLocdes(ArgumentMatchers.any(Location.class), ArgumentMatchers.any(Locdes.class));
+		final ArgumentCaptor<Location> locationCaptor = ArgumentCaptor.forClass(Location.class);
+		final ArgumentCaptor<Locdes> locdesCaptor = ArgumentCaptor.forClass(Locdes.class);
+		Mockito.verify(this.locationDataManager).addLocationAndLocdes(locationCaptor.capture(), locdesCaptor.capture());
+		final Location location = locationCaptor.getValue();
+		final Locdes locdes = locdesCaptor.getValue();
+		Assert.assertEquals("1001", location.getLtype().toString());
+		Assert.assertEquals("LOCNAME", location.getLname());
+		Assert.assertNull(location.getLabbr());
+		Assert.assertEquals("1002", locdes.getTypeId().toString());
+		Assert.assertEquals("101", locdes.getUserId().toString());
+		Assert.assertEquals("1", locdes.getDval());
 
 	}
 
