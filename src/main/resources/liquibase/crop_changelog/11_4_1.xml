@@ -65,4 +65,25 @@
 		</sql>
 	</changeSet>
 
+	<changeSet  id="v11.4.1-4" author="mderamos">
+		<comment>Drop the default value for labbr in the location table and update labbr values of locations with empty string or "-" values to NULL</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE location ALTER labbr DROP DEFAULT;
+			UPDATE location SET labbr=NULL WHERE labbr IN ("", "-");
+		</sql>
+	</changeSet>
+
+	<changeSet  id="v11.4.1-5" author="mderamos">
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM location location_duplicate INNER JOIN location location
+				WHERE location.locid > location_duplicate.locid AND location.labbr = location_duplicate.labbr;
+			</sqlCheck>
+		</preConditions>
+		<comment>Add unique index to labbr column in location table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE location ADD UNIQUE INDEX labbr_UNIQUE (labbr ASC);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

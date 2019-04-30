@@ -733,6 +733,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return locations;
 	}
 
+	public long countByLocationAbbreviation(final String locationAbbreviation) {
+		try {
+			if (locationAbbreviation != null) {
+				final Criteria criteria = this.getSession().createCriteria(Location.class);
+				criteria.add(Restrictions.eq("labbr", locationAbbreviation));
+				criteria.setProjection(Projections.rowCount());
+				return ((Long) criteria.uniqueResult()).longValue();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("countByLocationAbbreviation", "locationAbbreviation", locationAbbreviation, e.getMessage(),
+				LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return 0;
+	}
+
 	public long countByUniqueID(final String programUUID) {
 		try {
 			if (programUUID != null) {
