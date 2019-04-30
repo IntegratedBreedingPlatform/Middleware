@@ -995,6 +995,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
 			queryString.append(" AND l.locid in (:locationDbIds) ");
 		}
+
+		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
+			queryString.append(" AND s.dbxref_id in (:germplasmDbIds) ");
+		}
 	}
 
 	private static void addPhenotypeSearchQueryParams(final PhenotypeSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
@@ -1015,6 +1019,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
 			sqlQuery.setParameterList("locationDbIds", requestDTO.getLocationDbIds());
+		}
+
+		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
+			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
 		}
 	}
 

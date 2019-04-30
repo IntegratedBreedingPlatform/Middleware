@@ -5,9 +5,10 @@ import java.util.List;
 
 public class PhenotypeSearchRequestDTO implements Serializable {
 
+	private List<String> germplasmDbIds;
+	private List<String> locationDbIds;
 	private String observationLevel;
 	private List<String> observationVariableDbIds;
-	private List<String> locationDbIds;
 	private Integer page;
 	private Integer pageSize;
 	private List<String> studyDbIds;
@@ -58,5 +59,13 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 
 	public void setLocationDbIds(final List<String> locationDbIds) {
 		this.locationDbIds = locationDbIds;
+	}
+
+	public List<String> getGermplasmDbIds() {
+		return germplasmDbIds;
+	}
+
+	public void setGermplasmDbIds(final List<String> germplasmDbIds) {
+		this.germplasmDbIds = germplasmDbIds;
 	}
 }
