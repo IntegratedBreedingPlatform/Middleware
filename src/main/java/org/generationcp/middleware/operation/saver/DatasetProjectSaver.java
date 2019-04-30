@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -22,11 +19,13 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatasetProjectSaver extends Saver {
 
@@ -35,7 +34,7 @@ public class DatasetProjectSaver extends Saver {
 	}
 
 	public DmsProject addDataSet(final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues, final String programUUID)
-			throws MiddlewareException {
+			throws MiddlewareQueryException {
 		final DmsProject datasetProject = new DmsProject();
 		datasetProject.setName(this.getName(datasetValues));
 		datasetProject.setDescription(this.getDescription(datasetValues));
@@ -54,17 +53,6 @@ public class DatasetProjectSaver extends Saver {
 		this.getDmsProjectDao().save(datasetProject);
 
 		return datasetProject;
-	}
-
-
-	public void updateDataSetName(final int projectId, final String name)
-		throws MiddlewareException {
-		final DmsProject datasetProject = this.getDmsProjectDao().getById(projectId);
-		datasetProject.setName(name);
-		datasetProject.setProjectId(projectId);
-		datasetProject.setDescription(name);
-
-		this.getDmsProjectDao().update(datasetProject);
 	}
 
 	private String getName(final DatasetValues datasetValues) {
@@ -89,7 +77,7 @@ public class DatasetProjectSaver extends Saver {
 		}
 	}
 
-	private void addNameVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) throws MiddlewareException {
+	private void addNameVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) throws MiddlewareQueryException {
 		if (variableTypeList.findById(TermId.DATASET_NAME) == null) {
 			variableTypeList.makeRoom(1);
 			final DMSVariableType dataSetName =
@@ -99,7 +87,7 @@ public class DatasetProjectSaver extends Saver {
 		}
 	}
 
-	private void addDescriptionVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) throws MiddlewareException {
+	private void addDescriptionVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) throws MiddlewareQueryException {
 		if (variableTypeList.findById(TermId.DATASET_TITLE) == null) {
 			variableTypeList.makeRoom(2);
 			final DMSVariableType dataSetTitle =
@@ -110,7 +98,7 @@ public class DatasetProjectSaver extends Saver {
 	}
 
 	private DMSVariableType addDataTypeVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID)
-			throws MiddlewareException {
+			throws MiddlewareQueryException {
 		DMSVariableType variableType = variableTypeList.findById(TermId.DATASET_TYPE);
 		if (variableType == null) {
 			variableType =
@@ -122,7 +110,7 @@ public class DatasetProjectSaver extends Saver {
 		return variableType;
 	}
 
-	private StandardVariable getStandardVariable(final TermId stdVarId, final String programUUID) throws MiddlewareException {
+	private StandardVariable getStandardVariable(final TermId stdVarId, final String programUUID) throws MiddlewareQueryException {
 		return this.getStandardVariableBuilder().create(stdVarId.getId(),programUUID);
 	}
 
