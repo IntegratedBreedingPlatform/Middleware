@@ -992,6 +992,19 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(" AND pp_dataset_type.value = :datasetType ");
 		}
 
+		if (requestDTO.getObservationTimeStampRangeStart() != null) {
+			queryString.append(" AND exists(SELECT 1 "
+				+ "             FROM phenotype ph "
+				+ "             WHERE ph.nd_experiment_id = nde.nd_experiment_id "
+				+ "               AND ph.created_date >= :observationTimeStampRangeStart) ");
+		}
+		if (requestDTO.getObservationTimeStampRangeEnd() != null) {
+			queryString.append(" AND exists(SELECT 1 "
+				+ "             FROM phenotype ph "
+				+ "             WHERE ph.nd_experiment_id = nde.nd_experiment_id "
+				+ "               AND ph.created_date <= :observationTimeStampRangeEnd) ");
+		}
+
 		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
 			queryString.append(" AND l.locid in (:locationDbIds) ");
 		}
@@ -1015,6 +1028,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (requestDTO.getObservationLevel() != null) {
 			sqlQuery.setParameter("datasetType", requestDTO.getObservationLevel());
+		}
+
+		if (requestDTO.getObservationTimeStampRangeStart() != null) {
+			sqlQuery.setParameter("observationTimeStampRangeStart", requestDTO.getObservationTimeStampRangeStart());
+		}
+
+		if (requestDTO.getObservationTimeStampRangeEnd() != null) {
+			sqlQuery.setParameter("observationTimeStampRangeEnd", requestDTO.getObservationTimeStampRangeEnd());
 		}
 
 		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {

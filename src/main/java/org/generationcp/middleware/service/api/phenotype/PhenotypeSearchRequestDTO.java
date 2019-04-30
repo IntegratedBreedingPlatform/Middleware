@@ -8,6 +8,8 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	private List<String> germplasmDbIds;
 	private List<String> locationDbIds;
 	private String observationLevel;
+	private String observationTimeStampRangeStart;
+	private String observationTimeStampRangeEnd;
 	private List<String> observationVariableDbIds;
 	private Integer page;
 	private Integer pageSize;
@@ -67,5 +69,21 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 
 	public void setGermplasmDbIds(final List<String> germplasmDbIds) {
 		this.germplasmDbIds = germplasmDbIds;
+	}
+
+	public String getObservationTimeStampRangeStart() {
+		return observationTimeStampRangeStart;
+	}
+
+	public void setObservationTimeStampRangeStart(final String observationTimeStampRangeStart) {
+		this.observationTimeStampRangeStart = observationTimeStampRangeStart;
+	}
+
+	public String getObservationTimeStampRangeEnd() {
+		return observationTimeStampRangeEnd;
+	}
+
+	public void setObservationTimeStampRangeEnd(final String observationTimeStampRangeEnd) {
+		this.observationTimeStampRangeEnd = observationTimeStampRangeEnd;
 	}
 }
