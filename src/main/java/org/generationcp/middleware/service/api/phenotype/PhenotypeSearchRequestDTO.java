@@ -14,6 +14,8 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	private Integer page;
 	private Integer pageSize;
 	private List<String> studyDbIds;
+	private List<String> programDbIds;
+	private List<String> trialDbIds;
 
 	public String getObservationLevel() {
 		return observationLevel;
@@ -85,5 +87,21 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 
 	public void setObservationTimeStampRangeEnd(final String observationTimeStampRangeEnd) {
 		this.observationTimeStampRangeEnd = observationTimeStampRangeEnd;
+	}
+
+	public List<String> getProgramDbIds() {
+		return programDbIds;
+	}
+
+	public void setProgramDbIds(final List<String> programDbIds) {
+		this.programDbIds = programDbIds;
+	}
+
+	public List<String> getTrialDbIds() {
+		return trialDbIds;
+	}
+
+	public void setTrialDbIds(final List<String> trialDbIds) {
+		this.trialDbIds = trialDbIds;
 	}
 }

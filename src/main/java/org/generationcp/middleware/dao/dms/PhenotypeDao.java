@@ -1012,6 +1012,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
 			queryString.append(" AND s.dbxref_id in (:germplasmDbIds) ");
 		}
+
+		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {
+			queryString.append(" AND p.program_uuid IN (:programDbIds) ");
+		}
+
+		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
+			queryString.append(" AND p.project_id IN (:trialDbIds) ");
+		}
 	}
 
 	private static void addPhenotypeSearchQueryParams(final PhenotypeSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
@@ -1044,6 +1052,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
 			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
+		}
+		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {
+			sqlQuery.setParameterList("programDbIds", requestDTO.getProgramDbIds());
+		}
+
+		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
+			sqlQuery.setParameterList("trialDbIds", requestDTO.getTrialDbIds());
 		}
 	}
 
