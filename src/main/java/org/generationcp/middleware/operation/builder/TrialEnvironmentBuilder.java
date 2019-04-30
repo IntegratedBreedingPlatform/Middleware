@@ -201,9 +201,9 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	}
 
-	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds) {
+	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.getGeolocationDao().getEnvironmentsForTraits(traitIds));
+		environments.addAll(this.getGeolocationDao().getEnvironmentsForTraits(traitIds, programUUID));
 		return environments;
 	}
 

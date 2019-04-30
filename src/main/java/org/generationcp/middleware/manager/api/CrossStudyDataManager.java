@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -130,9 +129,10 @@ public interface CrossStudyDataManager {
 	 * country name of location associated with environment. - name of the study
 	 *
 	 * @param traitIds
+	 * @param programUUID
 	 * @return List of TrialEnvironments where any of the traits has been observed
 	 */
-	TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds);
+	TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds, final String programUUID);
 
 	/**
 	 * Retrieve a list of germplasm and location information matching a given set of trial environment ids. Empty list if no matches are
