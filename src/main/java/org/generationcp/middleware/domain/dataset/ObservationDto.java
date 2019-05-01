@@ -105,7 +105,7 @@ public class ObservationDto {
 	}
 
 	public boolean isDraftMode() {
-		return draftMode;
+		return this.draftMode;
 	}
 
 	public void setDraftMode(final boolean draftMode) {

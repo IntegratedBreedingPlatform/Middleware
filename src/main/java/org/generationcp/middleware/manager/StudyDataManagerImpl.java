@@ -570,9 +570,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		try {
 
 			final DmsProject currentStudy = this.getDmsProjectDao().getById(studyId);
+			final String oldName = currentStudy.getName();
 			currentStudy.setName(newStudyName);
 			this.getDmsProjectDao().saveOrUpdate(currentStudy);
 
+			final List<DmsProject> datasets = this.getDmsProjectDao().getDatasetsByParent(studyId);
+			for (final DmsProject dataset: datasets) {
+				dataset.setName(dataset.getName().replace(oldName, newStudyName));
+				this.getDmsProjectDao().saveOrUpdate(dataset);
+			}
 			return true;
 		} catch (final Exception e) {
 

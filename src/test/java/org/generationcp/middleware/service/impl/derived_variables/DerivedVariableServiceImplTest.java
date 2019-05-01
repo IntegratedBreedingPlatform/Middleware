@@ -83,8 +83,8 @@ public class DerivedVariableServiceImplTest {
 
 		final Set<FormulaVariable> formulaVariables = this.createFormulaVariables();
 
-		final int datasetId = random.nextInt(10);
-		when(datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(traits);
+		final int datasetId = this.random.nextInt(10);
+		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(traits);
 		when(this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID, VARIABLE2_TERMID))))
 			.thenReturn(formulaVariables);
 
@@ -111,8 +111,8 @@ public class DerivedVariableServiceImplTest {
 		trait3.setTermId(VARIABLE3_TERMID);
 		trait4.setTermId(VARIABLE4_TERMID);
 
-		final int datasetId = random.nextInt(10);
-		when(datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
+		final int datasetId = this.random.nextInt(10);
+		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
 			.thenReturn(Arrays.asList(trait1, trait2, trait3, trait4));
 		when(this.formulaService.getAllFormulaVariables(
 			new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID, VARIABLE2_TERMID, VARIABLE3_TERMID, VARIABLE4_TERMID))))
@@ -139,8 +139,8 @@ public class DerivedVariableServiceImplTest {
 
 		final Set<FormulaVariable> formulaVariables = this.createFormulaVariables();
 
-		final int datasetId = random.nextInt(10);
-		when(datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(traits);
+		final int datasetId = this.random.nextInt(10);
+		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(traits);
 		when(this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID))))
 			.thenReturn(formulaVariables);
 
@@ -167,8 +167,8 @@ public class DerivedVariableServiceImplTest {
 		trait3.setTermId(VARIABLE3_TERMID);
 		trait4.setTermId(VARIABLE4_TERMID);
 
-		final int datasetId = random.nextInt(10);
-		when(datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
+		final int datasetId = this.random.nextInt(10);
+		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
 			.thenReturn(Arrays.asList(trait1, trait2, trait3, trait4));
 		when(this.formulaService.getAllFormulaVariables(
 			new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID))))
