@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -28,9 +24,12 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Implementation of the CrossStudyDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
- *
  */
 @Transactional
 public class CrossStudyDataManagerImpl extends DataManager implements CrossStudyDataManager {
@@ -73,14 +72,16 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	}
 
 	@Override
-	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
-			final List<Integer> experimentTypes, final String programUUID) {
+	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(
+		final List<GermplasmPair> germplasmPairs,
+		final List<Integer> experimentTypes, final String programUUID) {
 		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes, programUUID);
 	}
 
 	@Override
-	public List<Observation> getObservationsForTraitOnGermplasms(final List<Integer> traitIds, final List<Integer> germplasmIds,
-			final List<Integer> environmentIds) {
+	public List<Observation> getObservationsForTraitOnGermplasms(
+		final List<Integer> traitIds, final List<Integer> germplasmIds,
+		final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
 	}
 

@@ -292,7 +292,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
 					+ TermId.LOCATION_ID.getId() + " LEFT JOIN location l ON l.locid = gp.value"
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
-					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid" + " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID ;";
+					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
+					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID ;";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar(GeolocationDao.ENVT_ID);
 			query.addScalar(GeolocationDao.LOCATION_NAME);
@@ -354,7 +355,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return null;
 	}
 
-	public List<InstanceMetadata> getInstanceMetadata(final int studyId,  final List<Integer> locationIds) {
+	public List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
 
 		final String queryString = "select \n" + "    geoloc.nd_geolocation_id as instanceDBId, \n"
 			+ "    geoloc.description as instanceNumber, \n" + "    pmain.project_id trialDbId, \n"

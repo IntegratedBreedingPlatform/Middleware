@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -24,11 +21,13 @@ import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 
+import java.util.List;
+import java.util.Set;
+
 public interface CrossStudyDataManager {
 
 	/**
 	 * Retrieves a list of all trial environments.
-	 *
 	 *
 	 * @return TrialEnvironments
 	 */
@@ -82,13 +81,14 @@ public interface CrossStudyDataManager {
 	 * experiment types to include is applied affecting the traits that will be included (eg. for plot experiments, include traits. for
 	 * summary experiments, include analysis variables).
 	 *
-	 * @param germplasmPairs List of germplasm pairs of GIDs
+	 * @param germplasmPairs  List of germplasm pairs of GIDs
 	 * @param experimentTypes - List of experiment type IDs to be included in query (can be for plot and/or analysis types)
-	 * @param programUUID - unique identifier for current program
+	 * @param programUUID     - unique identifier for current program
 	 * @return List of TrialEnvironments corresponding to the list of Germplasm IDs
 	 */
-	List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final List<Integer> experimentTypes,
-			final String programUUID);
+	List<GermplasmPair> getEnvironmentsForGermplasmPairs(
+		final List<GermplasmPair> germplasmPairs, final List<Integer> experimentTypes,
+		final String programUUID);
 
 	/**
 	 * For each combination of trait, germplasm, and environment, the value observed is returned. If there was no observation for a
@@ -104,7 +104,7 @@ public interface CrossStudyDataManager {
 
 	/**
 	 * Given a list of traits and environments, return observed data for the list of traits in the given list of environments.
-	 *
+	 * <p>
 	 * With each observation, we need the ff information: - trait - id of trait (standard variable) being observed - environment ID - GID-
 	 * GID of germplasm related to observation (experiment) - observed value - phenotype.value
 	 *
@@ -117,7 +117,7 @@ public interface CrossStudyDataManager {
 	/**
 	 * For each trait in given trial environments, the observed values from local and central databases are returned
 	 *
-	 * @param traitId - phenotype ID
+	 * @param traitId        - phenotype ID
 	 * @param environmentIds - List of environment Ids
 	 * @return list of trait observations
 	 */
@@ -137,7 +137,6 @@ public interface CrossStudyDataManager {
 	/**
 	 * Retrieve a list of germplasm and location information matching a given set of trial environment ids. Empty list if no matches are
 	 * found. Never returns {@code null}.
-	 *
 	 *
 	 * @param environmentIds
 	 * @return
