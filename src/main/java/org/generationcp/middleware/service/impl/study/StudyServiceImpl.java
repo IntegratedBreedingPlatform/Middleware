@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -73,8 +74,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 					+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "        INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id \n"
-					+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+					+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 					+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
@@ -89,10 +89,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private MeasurementVariableService measurementVariableService;
 
-	private GermplasmDescriptors germplasmDescriptors;
-
-	private DesignFactors designFactors;
-
 	private StudyMeasurements studyMeasurements;
 
 	private StudyGermplasmListService studyGermplasmListService;
@@ -105,6 +101,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
+	private DaoFactory daoFactory;
+
 	public StudyServiceImpl() {
 		super();
 	}
@@ -112,8 +110,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public StudyServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
-		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
-		this.designFactors = new DesignFactors(currentSession);
 		this.studyMeasurements = new StudyMeasurements(currentSession);
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(currentSession);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
@@ -132,6 +128,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		};
 		StudyServiceImpl.studyIdToProgramIdCache =
 				CacheBuilder.newBuilder().expireAfterWrite(100, TimeUnit.MINUTES).build(studyKeyCacheBuilder);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	/**
@@ -141,11 +138,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialMeasurements
 	 */
 	StudyServiceImpl(final MeasurementVariableService measurementVariableService, final StudyMeasurements trialMeasurements,
-			final StudyGermplasmListService studyGermplasmListServiceImpl, final GermplasmDescriptors germplasmDescriptors) {
+			final StudyGermplasmListService studyGermplasmListServiceImpl) {
 		this.measurementVariableService = measurementVariableService;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
-		this.germplasmDescriptors = germplasmDescriptors;
+		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -264,19 +261,20 @@ public class StudyServiceImpl extends Service implements StudyService {
 				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
 		return this.studyMeasurements.getAllMeasurements(studyIdentifier, selectionMethodsAndTraits,
-				this.findGenericGermplasmDescriptors(studyIdentifier), this.findAdditionalDesignFactors(studyIdentifier), instanceId,
+				this.getGenericGermplasmDescriptors(studyIdentifier), this.getAdditionalDesignFactors(studyIdentifier), instanceId,
 				pageNumber, pageSize, sortBy, sortOrder);
 	}
 
-	List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {
+	@Override
+	public List<String> getGenericGermplasmDescriptors(final int studyIdentifier) {
 
-		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyIdentifier);
+		final List<String> allGermplasmDescriptors = this.daoFactory.getProjectPropertyDAO().getGermplasmDescriptors(studyIdentifier);
 		/**
 		 * Fixed descriptors are the ones that are NOT stored in stockprop or nd_experimentprop. We dont need additional joins to props
 		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
 		 */
 		final List<String> fixedGermplasmDescriptors =
-				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "PLOT_ID");
+				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID");
 		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
 
 		for (final String gpDescriptor : allGermplasmDescriptors) {
@@ -287,9 +285,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return genericGermplasmDescriptors;
 	}
 
-	List<String> findAdditionalDesignFactors(final int studyIdentifier) {
+	@Override
+	public List<String> getAdditionalDesignFactors(final int studyIdentifier) {
 
-		final List<String> allDesignFactors = this.designFactors.find(studyIdentifier);
+		final List<String> allDesignFactors = this.daoFactory.getProjectPropertyDAO().getDesignFactors(studyIdentifier);
 		/**
 		 * Fixed design factors are already being retrieved individually in Measurements query. We are only interested in additional
 		 * EXPERIMENTAL_DESIGN and TREATMENT FACTOR variables
@@ -310,8 +309,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
 		final List<MeasurementVariableDto> traits =
 				this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
-		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, this.findGenericGermplasmDescriptors(studyIdentifier),
-				this.findAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
+		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, this.getGenericGermplasmDescriptors(studyIdentifier),
+				this.getAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
 	}
 
 	@Override
@@ -350,7 +349,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
 					+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
-					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+					"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" + // 8189 = cvterm for CUSTOM_LOCATION_ABBR
+					"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" + // 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 					"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
 					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 					+ "    inner join project proj on proj.project_id = nde.project_id \n"
@@ -366,13 +367,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 			query.addScalar("INSTANCE_DBID", new IntegerType());
 			query.addScalar("LOCATION_NAME", new StringType());
 			query.addScalar("LOCATION_ABBR", new StringType());
+			query.addScalar("CUSTOM_LOCATION_ABBR", new StringType());
+			query.addScalar("FIELDMAP_BLOCK", new StringType());
 			query.addScalar("INSTANCE_NUMBER", new IntegerType());
 
 			final List queryResults = query.list();
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
-				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3]));
+				final boolean hasFieldmap = !StringUtils.isEmpty((String)row[4]);
+				final StudyInstance instance = new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[5],(String) row[3], hasFieldmap);
+				instances.add(instance);
 			}
 			return instances;
 		} catch (final HibernateException he) {
@@ -494,7 +499,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// Y = row
 				entry.add(String.valueOf(y));
 
-				// plotId
+				// obsUnitId
 				entry.add(String.valueOf(row[12]));
 
 				// phenotypic values
@@ -520,7 +525,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
 				"germplasmName", "observationUnitDbId", "plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X",
-				"Y", "plotId"));
+				"Y", "obsUnitId"));
 
 		return dto;
 	}
@@ -595,14 +600,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 		return startDate;
 	}
-
-	public void setGermplasmDescriptors(final GermplasmDescriptors germplasmDescriptors) {
-		this.germplasmDescriptors = germplasmDescriptors;
-	}
-	
-	public void setDesignFactors(final DesignFactors designFactors) {
-		this.designFactors = designFactors;
-	}
 	
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
@@ -610,5 +607,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 	
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
 		this.studyMeasurements = studyMeasurements;
+	}
+
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 }

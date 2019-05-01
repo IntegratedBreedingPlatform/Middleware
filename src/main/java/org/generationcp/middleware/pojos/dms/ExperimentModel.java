@@ -11,8 +11,9 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
-import java.util.List;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -28,10 +29,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.io.Serializable;
+import java.util.List;
 /**
  *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
@@ -66,17 +65,16 @@ public class ExperimentModel implements Serializable {
 	// Geolocation
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "nd_geolocation_id")
-
 	private Geolocation geoLocation;
 
 	// References cvterm
 	@Column(name = "type_id")
 	private Integer typeId;
 
-	//plot_id
+	//OBS_UNIT_ID
 	@Basic(optional = true)
-	@Column(name = "plot_id")
-	private String plotId;
+	@Column(name = "obs_unit_id")
+	private String obsUnitId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 5000)
@@ -86,15 +84,20 @@ public class ExperimentModel implements Serializable {
 	@JoinColumn(name = "project_id")
 	private DmsProject project;
 
-	//FIXME Should this not be a OneToOne? Can one experiment have multiple stock (germplasm) rows?
-	//Collection always contains one item currently.
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
-	@BatchSize(size = 5000)
-	private List<ExperimentStock> experimentStocks;
+	@ManyToOne(targetEntity = StockModel.class)
+	@JoinColumn(name = "stock_id", nullable = true)
+	private StockModel stock;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 5000)
 	private List<Phenotype> phenotypes;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_id")
+	private ExperimentModel parent;
+
+	@Column(name = "observation_unit_no")
+	private Integer observationUnitNo;
 
 	public ExperimentModel() {
 	}
@@ -109,6 +112,16 @@ public class ExperimentModel implements Serializable {
 		this.ndExperimentId = ndExperimentId;
 		this.geoLocation = geoLocation;
 		this.typeId = typeId;
+	}
+
+	public ExperimentModel(final Geolocation geoLocation, final Integer typeId, final DmsProject project, final StockModel stock,
+			final ExperimentModel parent, final Integer observationUnitNo) {
+		this.geoLocation = geoLocation;
+		this.typeId = typeId;
+		this.project = project;
+		this.stock = stock;
+		this.parent = parent;
+		this.observationUnitNo = observationUnitNo;
 	}
 
 	public Integer getNdExperimentId() {
@@ -150,13 +163,13 @@ public class ExperimentModel implements Serializable {
 	public void setProject(final DmsProject project) {
 		this.project = project;
 	}
-
-	public List<ExperimentStock> getExperimentStocks() {
-		return this.experimentStocks;
+	
+	public StockModel getStock() {
+		return this.stock;
 	}
-
-	public void setExperimentStocks(final List<ExperimentStock> experimentStocks) {
-		this.experimentStocks = experimentStocks;
+	
+	public void setStock(final StockModel stock) {
+		this.stock = stock;
 	}
 
 	public List<Phenotype> getPhenotypes() {
@@ -167,12 +180,28 @@ public class ExperimentModel implements Serializable {
 		this.phenotypes = phenotypes;
 	}
 
-	public void setPlotId(final String plotId) {
-		this.plotId = plotId;
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 	}
 
-	public String getPlotId() {
-		return plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
+	}
+
+	public ExperimentModel getParent() {
+		return this.parent;
+	}
+
+	public void setParent(final ExperimentModel parent) {
+		this.parent = parent;
+	}
+
+	public Integer getObservationUnitNo() {
+		return this.observationUnitNo;
+	}
+
+	public void setObservationUnitNo(final Integer observationUnitNo) {
+		this.observationUnitNo = observationUnitNo;
 	}
 
 	@Override
@@ -223,17 +252,17 @@ public class ExperimentModel implements Serializable {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("Experiment [ndExperimentId=");
-		builder.append(this.ndExperimentId);
-		builder.append(", geoLocationId=");
-		builder.append(this.geoLocation);
-		builder.append(", typeId=");
-		builder.append(this.typeId);
-		builder.append(", plotId=");
-		builder.append(this.plotId);
-		builder.append("]");
-		return builder.toString();
+		return "ExperimentModel{" +
+			"ndExperimentId=" + ndExperimentId +
+			", geoLocation=" + geoLocation +
+			", typeId=" + typeId +
+			", obsUnitId='" + obsUnitId + '\'' +
+			", properties=" + properties +
+			", project=" + project +
+			", stock=" + stock +
+			", phenotypes=" + phenotypes +
+			", parent=" + parent +
+			", observationUnitNo=" + observationUnitNo +
+			'}';
 	}
-	
 }

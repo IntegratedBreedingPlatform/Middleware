@@ -27,6 +27,12 @@ public class MeasurementVariable {
 
 	private String name;
 
+	/**
+	 * Some of the old code may still fill the name with the alias
+	 * The explicit field is preferred in the new code
+	 */
+	private String alias;
+
 	private String description;
 
 	private String scale;
@@ -49,9 +55,20 @@ public class MeasurementVariable {
 
 	private String possibleValuesString;
 
+	/**
+	 * For consistency with the old code, we keep minRange and maxRange to be either scale range when it's present or variable range
+	 */
 	private Double minRange;
 
 	private Double maxRange;
+
+	private Double scaleMinRange;
+
+	private Double scaleMaxRange;
+
+	private Double variableMinRange;
+
+	private Double variableMaxRange;
 
 	private boolean required;
 
@@ -64,6 +81,8 @@ public class MeasurementVariable {
 	private VariableType variableType;
 
 	private FormulaDto formula;
+
+	private String cropOntology;
 
 	public MeasurementVariable() {
 	}
@@ -152,6 +171,14 @@ public class MeasurementVariable {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public String getAlias() {
+		return this.alias;
+	}
+
+	public void setAlias(final String alias) {
+		this.alias = alias;
 	}
 
 	public String getDescription() {
@@ -362,6 +389,38 @@ public class MeasurementVariable {
 		this.maxRange = maxRange;
 	}
 
+	public Double getScaleMinRange() {
+		return this.scaleMinRange;
+	}
+
+	public void setScaleMinRange(final Double scaleMinRange) {
+		this.scaleMinRange = scaleMinRange;
+	}
+
+	public Double getScaleMaxRange() {
+		return this.scaleMaxRange;
+	}
+
+	public void setScaleMaxRange(final Double scaleMaxRange) {
+		this.scaleMaxRange = scaleMaxRange;
+	}
+
+	public Double getVariableMinRange() {
+		return this.variableMinRange;
+	}
+
+	public void setVariableMinRange(final Double variableMinRange) {
+		this.variableMinRange = variableMinRange;
+	}
+
+	public Double getVariableMaxRange() {
+		return this.variableMaxRange;
+	}
+
+	public void setVariableMaxRange(final Double variableMaxRange) {
+		this.variableMaxRange = variableMaxRange;
+	}
+
 	/**
 	 * Gets the single character code that represents the data type of this variable.
 	 *
@@ -503,5 +562,13 @@ public class MeasurementVariable {
 
 	public FormulaDto getFormula() {
 		return this.formula;
+	}
+
+	public String getCropOntology() {
+		return this.cropOntology;
+	}
+
+	public void setCropOntology(final String cropOntology) {
+		this.cropOntology = cropOntology;
 	}
 }

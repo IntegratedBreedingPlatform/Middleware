@@ -11,7 +11,7 @@ public class SampleGermplasmDetailDTO {
 
 	private String sampleBk;
 	private String sampleListName;
-	private String plotId;
+	private String obsUnitId;
 	private String plantBk;
 	private String plateId;
 	private String well;
@@ -23,7 +23,7 @@ public class SampleGermplasmDetailDTO {
 	}
 
 	public String getSampleBk() {
-		return sampleBk;
+		return this.sampleBk;
 	}
 
 	public void setSampleBk(final String sampleBk) {
@@ -31,23 +31,23 @@ public class SampleGermplasmDetailDTO {
 	}
 
 	public String getSampleListName() {
-		return sampleListName;
+		return this.sampleListName;
 	}
 
 	public void setSampleListName(final String sampleListName) {
 		this.sampleListName = sampleListName;
 	}
 
-	public String getPlotId() {
-		return plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
 	}
 
-	public void setPlotId(final String plotId) {
-		this.plotId = plotId;
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 	}
 
 	public String getPlantBk() {
-		return plantBk;
+		return this.plantBk;
 	}
 
 	public void setPlantBk(final String plantBk) {
@@ -55,7 +55,7 @@ public class SampleGermplasmDetailDTO {
 	}
 
 	public StudyReference getStudy() {
-		return study;
+		return this.study;
 	}
 
 	public void setStudy(final StudyReference study) {
@@ -63,7 +63,7 @@ public class SampleGermplasmDetailDTO {
 	}
 
 	public List<Dataset> getDatasets() {
-		return datasets;
+		return this.datasets;
 	}
 
 	public void setDatasets(final List<Dataset> datasets) {
@@ -76,13 +76,13 @@ public class SampleGermplasmDetailDTO {
 		}
 
 		final Dataset dataset = new Dataset(datasetId, datasetName);
-		if (!datasets.contains(dataset)) {
+		if (!this.datasets.contains(dataset)) {
 			this.datasets.add(dataset);
 		}
 	}
 
 	public String getPlateId() {
-		return plateId;
+		return this.plateId;
 	}
 
 	public void setPlateId(final String plateId) {
@@ -90,7 +90,7 @@ public class SampleGermplasmDetailDTO {
 	}
 
 	public String getWell() {
-		return well;
+		return this.well;
 	}
 
 	public void setWell(final String well) {
@@ -108,7 +108,7 @@ public class SampleGermplasmDetailDTO {
 		}
 
 		public String getDatasetName() {
-			return datasetName;
+			return this.datasetName;
 		}
 
 		public void setDatasetName(final String datasetName) {
@@ -116,7 +116,7 @@ public class SampleGermplasmDetailDTO {
 		}
 
 		public Integer getDatasetId() {
-			return datasetId;
+			return this.datasetId;
 		}
 
 		public void setDatasetId(final Integer datasetId) {
@@ -129,23 +129,23 @@ public class SampleGermplasmDetailDTO {
 				return true;
 			}
 
-			if (o == null || getClass() != o.getClass()) {
+			if (o == null || this.getClass() != o.getClass()) {
 				return false;
 			}
 
 			final Dataset dataset = (Dataset) o;
 
 			return new EqualsBuilder()//
-				.append(datasetId, dataset.datasetId)
-				.append(datasetName, dataset.datasetName)
+				.append(this.datasetId, dataset.datasetId)
+				.append(this.datasetName, dataset.datasetName)
 				.isEquals();
 		}
 
 		@Override
 		public int hashCode() {
 			return new HashCodeBuilder(17, 37)//
-				.append(datasetId)
-				.append(datasetName)
+				.append(this.datasetId)
+				.append(this.datasetName)
 				.toHashCode();
 		}
 	}
@@ -156,25 +156,25 @@ public class SampleGermplasmDetailDTO {
 			return true;
 		}
 
-		if (o == null || getClass() != o.getClass()) {
+		if (o == null || this.getClass() != o.getClass()) {
 			return false;
 		}
 
 		final SampleGermplasmDetailDTO sampleGermplasmDetailDTO = (SampleGermplasmDetailDTO) o;
 
 		return new EqualsBuilder()//
-			.append(sampleBk, sampleGermplasmDetailDTO.sampleBk)
-			.append(plotId, sampleGermplasmDetailDTO.plotId)
-			.append(plantBk, sampleGermplasmDetailDTO.plantBk)
+			.append(this.sampleBk, sampleGermplasmDetailDTO.sampleBk)
+			.append(this.obsUnitId, sampleGermplasmDetailDTO.obsUnitId)
+			.append(this.plantBk, sampleGermplasmDetailDTO.plantBk)
 			.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 37)//
-			.append(sampleBk)
-			.append(plotId)
-			.append(plantBk)
+			.append(this.sampleBk)
+			.append(this.obsUnitId)
+			.append(this.plantBk)
 			.toHashCode();
 	}
 

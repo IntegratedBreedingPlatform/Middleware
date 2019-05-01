@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.List;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -34,21 +32,25 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
+import java.util.List;
+
 public class VariableDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyVariableDataManager variableManager;
+
 	@Autowired
 	private OntologyMethodDataManager methodManager;
+
 	@Autowired
 	private OntologyPropertyDataManager propertyManager;
+
 	@Autowired
 	private OntologyScaleDataManager scaleManager;
+
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
@@ -60,33 +62,36 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllVariablesUsingFilter() throws MiddlewareException {
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setFetchAll(true);
 
-		List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
+		final List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
 		Assert.assertTrue(!variables.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "From Total Variables:  " + variables.size());
 	}
 
 	@Test
 	public void testGetVariablesByProperty() throws Exception {
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(this.testProperty.getId());
 
-		List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
+		final List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
 		Assert.assertTrue(variables.size() == 1);
 	}
 
 	@Test
 	public void testGetVariable() throws Exception {
-		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		final Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+
 		Assert.assertNotNull(variable);
 	}
 
 	@Test
 	public void testUpdateVariable() throws Exception {
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		final Variable updatedVariable =
+			this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+
 		Assert.assertNotNull(updatedVariable);
 	}
 
@@ -97,7 +102,7 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
+		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
 		this.testProject = instance.createTestProjectData();
 
 		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
@@ -131,7 +136,6 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 		this.testVariableInfo.setExpectedMin("0");
 		this.testVariableInfo.setExpectedMax("100");
 		this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
 	}

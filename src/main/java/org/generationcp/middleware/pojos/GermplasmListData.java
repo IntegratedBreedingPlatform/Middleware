@@ -34,6 +34,7 @@ import javax.persistence.Transient;
 
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.interfaces.GermplasmExportSource;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -98,7 +99,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	private Integer localRecordId;
 
 	@OneToMany(mappedBy = "listData", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-	private List<ListDataProperty> properties = new ArrayList<ListDataProperty>();
+	private List<ListDataProperty> properties = new ArrayList<>();
 
 	@OneToOne
 	@JoinColumn(name = "gid", nullable = false, insertable = false, updatable = false)
@@ -114,32 +115,21 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	private Integer crossingDate;
 
 	/***
-	 * The following will only be field when we are getting the parents, otherwise, they won't be set
+	 * The following will only be field when we are getting the parents, otherwise, they won't be set.
 	 */
 
 	/**
-	 * The preferred name of the female parent (nval in the database table)
+	 * Germplasm information on gpid1 of germplasm
 	 */
 	@Transient
-	private String femaleParent = null;
+	private GermplasmParent femaleParent;
 
 	/**
-	 * GID of the female parent (gpid1 in the database table)
+	 * The first male parent is germplasm.gpid2.
+	 * The other male parents come from progntrs table.
 	 */
 	@Transient
-	private Integer fgid = null;
-
-	/**
-	 * The preferred name of the male parent (nval in the database table)
-	 */
-	@Transient
-	private String maleParent = "";
-
-	/**
-	 * GID of the male parent (gpid2 in the database table)
-	 */
-	@Transient
-	private Integer mgid = null;
+	private List<GermplasmParent> maleParents = new ArrayList<>();
 
 	/**
 	 * The Group ID of the germplasm. It is mapped to germplsm.mgid column in the database.
@@ -147,17 +137,12 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Transient
 	private Integer groupId = 0;
 
+	// TODO check if this can be removed. It was previously used for design cross list but as of IBP-2044, it uses CrossListData
 	@Transient
 	private String breedingMethodName = "";
 
 	@Transient
 	private String stockIDs = "";
-
-  	@Transient
-  	private String femalePedigree;
-
-  	@Transient
-  	private String malePedigree;
 
 	public GermplasmListData() {
 
@@ -365,10 +350,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		builder.append(this.notes);
 		builder.append(", crossingDate=");
 		builder.append(this.crossingDate);
-		builder.append(", femalePedigree=");
-		builder.append(this.femalePedigree);
-		builder.append(", malePedigree=");
-		builder.append(this.malePedigree);
+		builder.append(", femaleParent=");
+		builder.append(this.femaleParent);
+		builder.append(", maleParents=");
+		builder.append(this.maleParents);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -421,25 +406,57 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	public Integer getCheckType() {
 		return null;
 	}
-
-	@Override
-	public String getFemaleParent() {
+	
+	public GermplasmParent getFemaleParent() {
 		return this.femaleParent;
 	}
 
 	@Override
-	public Integer getFgid() {
-		return this.fgid;
+	public String getFemaleParentDesignation() {
+		if (this.femaleParent != null) {
+			return this.femaleParent.getDesignation();
+		}
+		return null;
+	}
+
+	public void setFemaleParent(final GermplasmParent femaleParent) {
+		this.femaleParent = femaleParent;
 	}
 
 	@Override
-	public String getMaleParent() {
-		return this.maleParent;
+	public Integer getFemaleGid() {
+		if (this.femaleParent != null) {
+			return this.femaleParent.getGid();
+		}
+		return null;
 	}
 
 	@Override
-	public Integer getMgid() {
-		return this.mgid;
+	public String getMaleParentDesignation() {
+		if (!this.maleParents.isEmpty()){			
+			return this.maleParents.get(0).getDesignation();
+		}
+		return null;
+	}
+	
+	public List<GermplasmParent> getMaleParents() {
+		return this.maleParents;
+	}
+
+	public void addMaleParent(final GermplasmParent parent) {
+		this.maleParents.add(parent);
+	}
+	
+	public void addMaleParents(final List<GermplasmParent> parents) {
+		this.maleParents.addAll(parents);
+	}
+
+	@Override
+	public Integer getMaleGid() {
+		if (!this.maleParents.isEmpty()) {
+			return this.maleParents.get(0).getGid();
+		}
+		return null;
 	}
 
 	@Override
@@ -464,22 +481,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return "";
 	}
 
-	public void setFemaleParent(final String femaleParent) {
-		this.femaleParent = femaleParent;
-	}
-
-	public void setFgid(final Integer fgid) {
-		this.fgid = fgid;
-	}
-
-	public void setMaleParent(final String maleParent) {
-		this.maleParent = maleParent;
-	}
-
-	public void setMgid(final Integer mgid) {
-		this.mgid = mgid;
-	}
-
 	public Integer getGroupId() {
 		return this.groupId;
 	}
@@ -499,19 +500,4 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.stockIDs = stockIDs;
 	}
 
-	public String getFemalePedigree() {
-	  return femalePedigree;
-	}
-
-	public void setFemalePedigree(final String femalePedigree) {
-	  this.femalePedigree = femalePedigree;
-	}
-
-	public String getMalePedigree() {
-	  return malePedigree;
-	}
-
-	public void setMalePedigree(final String malePedigree) {
-	  this.malePedigree = malePedigree;
-	}
 }

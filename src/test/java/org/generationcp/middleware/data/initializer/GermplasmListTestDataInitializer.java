@@ -6,6 +6,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
@@ -218,7 +219,7 @@ public class GermplasmListTestDataInitializer {
 		listEntry.setSeedSource("SeedSource " + listDataId);
 		listEntry.setGid(gid);
 		// Default MGID(GROUP ID) is 0
-		listEntry.setMgid(0);
+		listEntry.setGroupId(0);;
 		return listEntry;
 	}
 
@@ -265,6 +266,20 @@ public class GermplasmListTestDataInitializer {
 		listDataInventory.setDistinctScaleCountForGermplsm(0);
 
 		return listDataInventory;
+	}
+
+	public static GermplasmList createGermplasmListTestData(final String name, final String description, final long date,
+			final String type, final int userId, final int status, final String programUUID, final Integer projectId) throws MiddlewareQueryException {
+		final GermplasmList list = new GermplasmList();
+		list.setName(name);
+		list.setDescription(description);
+		list.setDate(date);
+		list.setType(type);
+		list.setUserId(userId);
+		list.setStatus(status);
+		list.setProgramUUID(programUUID);
+		list.setProjectId(projectId);
+		return list;
 	}
 
 }

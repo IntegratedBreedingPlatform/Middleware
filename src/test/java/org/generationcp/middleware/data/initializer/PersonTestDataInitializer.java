@@ -1,5 +1,6 @@
 package org.generationcp.middleware.data.initializer;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.pojos.Person;
 
 public class PersonTestDataInitializer {
@@ -14,7 +15,7 @@ public class PersonTestDataInitializer {
 		person.setTitle("Admin");
 		person.setExtension("1");
 		person.setFax("2");
-		person.setEmail("person@blizzard.com");
+		person.setEmail(RandomStringUtils.randomAlphabetic(5) + "@blizzard.com");
 		person.setNotes("notes");
 		person.setContact("3");
 		person.setLanguage(-1);

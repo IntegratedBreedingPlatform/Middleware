@@ -12,18 +12,19 @@
 package org.generationcp.middleware.manager;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
-import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
+import org.generationcp.middleware.data.initializer.*;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -37,6 +38,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -99,7 +101,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	private TransactionDAO transactionDAO;
 
+	private ProgenitorDAO progenitorDAO;
+
 	private Project commonTestProject;
+
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
@@ -111,6 +116,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.programFavoriteTestDataInitializer = new ProgramFavoriteTestDataInitializer();
+
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -147,6 +153,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		if (this.userDefinedFieldDAO == null) {
 			this.userDefinedFieldDAO = new UserDefinedFieldDAO();
 			this.userDefinedFieldDAO.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.progenitorDAO == null) {
+			this.progenitorDAO = new ProgenitorDAO();
+			this.progenitorDAO.setSession(this.sessionProvder.getSession());
 		}
 
 		// Make sure a seed User(1) is present in the crop db otherwise add one
@@ -662,6 +673,37 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			Debug.println(IntegrationTestBase.INDENT,
 				"testUpdateGermplasmAttribute(" + attributeId + "): " + "\ntBEFORE: " + attributeString + "\ntAFTER: " + attribute);
 		}
+	}
+
+	@Test
+	public void testAddGermplasmWithNameAndProgenitors() {
+
+		final UserDefinedField nameType = createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		germplasm.getPreferredName().setTypeId(nameType.getFldno());
+
+		final Germplasm maleParent1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Germplasm maleParent2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDAO.save(maleParent1);
+		this.germplasmDAO.save(maleParent2);
+
+		final Progenitor progenitor1 = new Progenitor(null, 3, maleParent1.getGid());
+		final Progenitor progenitor2 = new Progenitor(null, 4, maleParent2.getGid());
+
+		final Triple<Germplasm, Name, List<Progenitor>>
+			germplasmTriple = ImmutableTriple.of(germplasm, germplasm.getPreferredName(), Arrays.asList(progenitor1, progenitor2));
+		final List<Integer> gids = this.germplasmDataManager.addGermplasm(Arrays.asList(germplasmTriple));
+
+		final int savedGermplasmGid = gids.get(0);
+		final Germplasm savedGermplasm = this.germplasmDAO.getById(savedGermplasmGid);
+		final Name savedName = this.nameDAO.getNamesByGids(Arrays.asList(savedGermplasmGid)).get(0);
+		Assert.assertNotNull(savedGermplasm);
+		Assert.assertEquals(4, savedGermplasm.getGnpgs().intValue());
+		Assert.assertNotNull(savedName);
+		Assert.assertEquals(1, savedName.getNstat().intValue());
+		Assert.assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor1.getProgenitorGid()));
+		Assert.assertNotNull(this.progenitorDAO.getByGIDAndPID(savedGermplasmGid, progenitor2.getProgenitorGid()));
+
 	}
 
 	@Test
@@ -1245,6 +1287,20 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetByFieldTableNameAndFTypeAndFName() {
+		final UserDefinedField udfld = UserDefinedFieldTestDataInitializer.createUserDefinedField("NAMES", "NAME", "FNAME12345");
+		this.germplasmDataManager.addUserDefinedField(udfld);
+		final List<UserDefinedField> userDefinedFields = this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndFTypeAndFName(udfld.getFtable(), udfld.getFtype(), udfld.getFname());
+		Assert.assertNotNull(userDefinedFields);
+		Assert.assertFalse(userDefinedFields.isEmpty());
+		for(final UserDefinedField userDefinedField: userDefinedFields) {
+			Assert.assertEquals(udfld.getFtable(), userDefinedField.getFtable());
+			Assert.assertEquals(udfld.getFtype(), userDefinedField.getFtype());
+			Assert.assertEquals(udfld.getFname(), userDefinedField.getFname());
+		}
+	}
+
+	@Test
 	public void testGetAttributeValue() {
 		final String attributeVal = "TEST_ATTRIBUTE";
 		final Germplasm germplasm = createGermplasm();
@@ -1254,7 +1310,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm, is(equalTo(germplasmDB)));
 		assertThat(germplasmDB, is(notNullValue()));
 
-		final UserDefinedField userdefinedField = createUserdefinedField("ATRIBUTS", "TEST_ATT");
+		final UserDefinedField userdefinedField = createUserdefinedField("ATRIBUTS", "PASSPORT", "TEST_ATT");
 		assertThat(userdefinedField.getFldno(), is(notNullValue()));
 
 		final UserDefinedField userdefinedFieldDB = this.userDefinedFieldDAO.getById(userdefinedField.getFldno());
@@ -1284,6 +1340,28 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		}
 
 	}
+	
+	@Test
+	public void testGetNamesByTypeAndGIDList() {
+		final UserDefinedField nameType = createUserdefinedField("NAMES", "NAME", RandomStringUtils.randomAlphabetic(5).toUpperCase());
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		germplasm1.getPreferredName().setTypeId(nameType.getFldno());
+		final Integer gid1 = this.germplasmDataManager.addGermplasm(germplasm1, germplasm1.getPreferredName());
+		
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		germplasm2.getPreferredName().setTypeId(nameType.getFldno());
+		final Integer gid2 = this.germplasmDataManager.addGermplasm(germplasm2, germplasm2.getPreferredName());
+		
+		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer gid3 = this.germplasmDataManager.addGermplasm(germplasm3, germplasm3.getPreferredName());
+		
+		Map<Integer, String> namesMap = this.germplasmDataManager.getNamesByTypeAndGIDList(nameType.getFldno(), Arrays.asList(gid1, gid2, gid3));
+		Assert.assertNotNull(namesMap);
+		Assert.assertEquals(3, namesMap.size());
+		Assert.assertEquals(germplasm1.getPreferredName().getNval(), namesMap.get(gid1));
+		Assert.assertEquals(germplasm2.getPreferredName().getNval(), namesMap.get(gid2));
+		Assert.assertEquals("-", namesMap.get(gid3));
+	}
 
 	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
 		final Attribute attr = new Attribute();
@@ -1300,10 +1378,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		return attr;
 	}
 
-	private UserDefinedField createUserdefinedField(final String ftable, final String fcode) {
+	private UserDefinedField createUserdefinedField(final String ftable, final String ftype, final String fcode) {
 		final UserDefinedField usdl = new UserDefinedField();
 		usdl.setFtable(ftable);
-		usdl.setFtype("PASSPORT");
+		usdl.setFtype(ftype);
 		usdl.setFcode(fcode);
 		usdl.setFname("Test");
 		usdl.setFfmt(separator);

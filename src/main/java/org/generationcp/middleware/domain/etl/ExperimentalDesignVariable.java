@@ -62,6 +62,10 @@ public class ExperimentalDesignVariable {
 		return this.getByTermId(TermId.BLOCK_SIZE);
 	}
 
+	public MeasurementVariable getReplicationPercentage() {
+		return this.getByTermId(TermId.PERCENTAGE_OF_REPLICATION);
+	}
+
 	public MeasurementVariable getReplicationsMap() {
 		return this.getByTermId(TermId.REPLICATIONS_MAP);
 	}

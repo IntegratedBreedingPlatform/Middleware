@@ -11,10 +11,12 @@
 package org.generationcp.middleware.service.api;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -37,8 +39,11 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+
+import com.google.common.base.Optional;
 
 import java.util.List;
 import java.util.Map;
@@ -709,10 +714,10 @@ public interface FieldbookService {
 
 	/**
 	 *
-	 * @param germplasmPairs
+	 * @param germplasmTriples
 	 * @return
 	 */
-	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasmPairs);
+	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples);
 
 	/**
 	 * Get an id from the project table that matches the name (regardless if
@@ -850,6 +855,13 @@ public interface FieldbookService {
 	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type);
 
 	/**
+	 * Returns boolean that refers to the existence of Advanced or Crosses list of the Study
+	 *
+	 * @param  projectId - projectId of the study
+	 */
+	boolean hasAdvancedOrCrossesList(final int projectId);
+
+	/**
 	 * Creates or Update a list data project.
 	 *
 	 * @param projectId
@@ -870,16 +882,15 @@ public interface FieldbookService {
 	List<ListDataProject> getListDataProject(int listId);
 
 	/**
-	 * Counts the number of ListDataProject with a speficied
-	 * SystemDefinedEntryType.
+	 * Counts the number of ListDataProject with speficied SystemDefinedEntryTypeIds.
 	 *
 	 * @param listId
-	 * @param systemDefinedEntryType
+	 * @param systemDefinedEntryTypeIds
 	 * @return
 	 */
-	long countListDataProjectByListIdAndEntryType(int listId, SystemDefinedEntryType systemDefinedEntryType);
+	long countListDataProjectByListIdAndEntryTypeIds(int listId, List<Integer> systemDefinedEntryTypeIds);
 
-	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId, final String instanceNumber);
+	List<ListDataProject> getListDataProjectByStudy(int projectId, GermplasmListType type, List<Integer> plotNumbers, final String instanceNumber);
 
 
 	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
@@ -979,6 +990,8 @@ public interface FieldbookService {
 	Workbook getStudyDataSet(int studyID);
 	
 	Workbook getStudyByNameAndProgramUUID(String studyName, String programUUID);
+	
+	Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(String studyName, String programUUID);
 
 	void updatePhenotypeStatus(final List<MeasurementRow> observations);
 

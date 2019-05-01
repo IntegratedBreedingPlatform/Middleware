@@ -13,17 +13,12 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 public interface PedigreeDataManager {
-
-	public static final int MAX_PEDIGREE_LEVEL = 5;
-	public static final int NONE = 0;
-	public static final int MALE_RECURRENT = 1;
-	public static final int FEMALE_RECURRENT = 2;
 
 	/**
 	 * Creates a pedigree tree for the Germplasm identified by the given gid. The tree contains all generative progenitors down to the
@@ -45,9 +40,8 @@ public interface PedigreeDataManager {
 	 * @param gid - GID of a Germplasm
 	 * @param level - level of the tree to be created
 	 * @return GermplasmPedigreeTree representing the pedigree tree
-	 * @throws MiddlewareQueryException
 	 */
-	GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException;
+	GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level);
 
 	/**
 	 * Creates a pedigree tree for the Germplasm identified by the given gid. The tree contains all generative progenitors down to the
@@ -70,21 +64,17 @@ public interface PedigreeDataManager {
 	 * @param level - level of the tree to be created
 	 * @param includeDerivativeLines - option to include derivative lines on result
 	 * @return GermplasmPedigreeTree representing the pedigree tree
-	 * @throws MiddlewareQueryException
 	 */
-	GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException;
+	GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines);
 
 	/**
 	 *
 	 * @param gid
 	 * @return
-	 * @throws MiddlewareQueryException
 	 */
-	Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException,
-	MaxPedigreeLevelReachedException;
+	Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MaxPedigreeLevelReachedException;
 
-	Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine, boolean calculateFullPedigree) throws MiddlewareQueryException,
-	MaxPedigreeLevelReachedException;
+	Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine, boolean calculateFullPedigree) throws MaxPedigreeLevelReachedException;
 
 	/**
 	 * Returns the GermplasmPedigreeTree object which represents the derivative neighborhood for the germplasm identified by the given gid.
@@ -102,8 +92,7 @@ public interface PedigreeDataManager {
 	 * @param numberOfStepsForward - number of steps forward from the germplasm identified by the given gid
 	 * @return GermplasmPedigreeTree representing the neighborhood
 	 */
-	GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
-			throws MiddlewareQueryException;
+	GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward);
 
 	/**
 	 * Returns the GermplasmPedigreeTree object which represents the maintenance neighborhood for the germplasm identified by the given gid.
@@ -122,8 +111,7 @@ public interface PedigreeDataManager {
 	 * @param numberOfStepsForward - number of steps forward from the germplasm identified by the given gid
 	 * @return GermplasmPedigreeTree representing the neighborhood
 	 */
-	GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
-			throws MiddlewareQueryException;
+	GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward);
 
 	/**
 	 * Returns the Germplasm representing the children of the Germplasm identified by the given gid. The function returns a List of Object
@@ -134,18 +122,16 @@ public interface PedigreeDataManager {
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return List of Object arrays, the arrays have 2 elements in them
-	 * @throws MiddlewareQueryException
 	 */
-	List<Object[]> getDescendants(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+	List<Object[]> getDescendants(Integer gid, int start, int numOfRows);
 
 	/**
 	 * Returns the number of children of the Germplasm identified by the given gid.
 	 *
 	 * @param gid
 	 * @return count of children
-	 * @throws MiddlewareQueryException
 	 */
-	long countDescendants(Integer gid) throws MiddlewareQueryException;
+	long countDescendants(Integer gid);
 
 	/**
 	 * Returns the Germplasm which are management group neighbors of the Germplasm identified by the given GID. The given Germplasm is
@@ -156,27 +142,24 @@ public interface PedigreeDataManager {
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException
 	 */
-	List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+	List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows);
 
 	/**
 	 * Returns the number of management neighbors of the Germplasm with the given id.
 	 *
 	 * @param gid - the Germplasm id
 	 * @return the number of management neighbors
-	 * @throws MiddlewareQueryException
 	 */
-	long countManagementNeighbors(Integer gid) throws MiddlewareQueryException;
+	long countManagementNeighbors(Integer gid);
 
 	/**
 	 * Returns the number of group relatives a Germplasm has.
 	 *
 	 * @param gid
 	 * @return The number of group relatives of a Germplasm
-	 * @throws MiddlewareQueryException
 	 */
-	long countGroupRelatives(Integer gid) throws MiddlewareQueryException;
+	long countGroupRelatives(Integer gid);
 
 	/**
 	 * Returns the Germplasm which are group relatives of the Germplasm identified by the given GID. The Germplasm POJOs included in the
@@ -184,9 +167,8 @@ public interface PedigreeDataManager {
 	 *
 	 * @param gid
 	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException
 	 */
-	List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException;
+	List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows);
 
 	/**
 	 * Returns the generation history of the Germplasm identified by the given GID. The history is created by tracing back through the
@@ -196,9 +178,8 @@ public interface PedigreeDataManager {
 	 *
 	 * @param gid
 	 * @return List of Germplasm POJOs, arranged from the given Germplasm down to the last source on the generation history
-	 * @throws MiddlewareQueryException
 	 */
-	List<Germplasm> getGenerationHistory(Integer gid) throws MiddlewareQueryException;
+	List<Germplasm> getGenerationHistory(Integer gid);
 
 	/**
 	 * Returns the Germplasm representing the parent of the child Germplasm identified by the given gid and having the given progenitor
@@ -207,9 +188,25 @@ public interface PedigreeDataManager {
 	 * @param gid - gid of child Germplasm
 	 * @param progenitorNumber - progenitor number of the parent with respect to the child
 	 * @return Germplasm POJO
-	 * @throws MiddlewareQueryException
 	 */
-	Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException;
+	Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber);
 
-	int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException;
+	int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID);
+	
+	List<Progenitor> getProgenitorsByGID(final Integer gid);
+
+	/**
+	 * Given the gid of the child germplasm, the gid of the parent germplasm and the progenitor number, this method makes the necessary
+	 * changes to save the relationship on the database.
+	 *
+	 * This method will either update the Germplasm record, to change the gpid1 or gpid2 fields (if the progenitor number given is 1 or 2),
+	 * or will either add or update the Progenitor record which represents this relationship. A new Progenitor record will be stored when
+	 * necessary.
+	 *
+	 * @param gid the gid
+	 * @param progenitorId the progenitor id
+	 * @param progenitorNumber the progenitor number
+	 * @return Returns the id of the updated Progenitor
+	 */
+	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber);
 }

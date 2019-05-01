@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -26,6 +27,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
@@ -127,20 +129,19 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return result;
 	}
 
-	public ListDataProject getByStudy(final int studyId, final GermplasmListType listType, final int plotNo, final String instanceNumber) {
+	public List<ListDataProject> getByStudy(final int studyId, final GermplasmListType listType, final List<Integer> plotNumbers, final String instanceNumber) {
 		try {
 
 			final String queryStr = "select ldp.* FROM nd_experiment e,"
-				+ " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
+				+ " nd_experimentprop nd_ep, stock,"
 				+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms, nd_geolocation geo"
 				+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
 				+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
 				+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"
 				+ " AND e.project_id = pr.subject_project_id"
 				+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
-				+ " AND nd_stock.nd_experiment_id = nd_ep.nd_experiment_id"
-				+ " AND stock.stock_id = nd_stock.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
-				+ " AND nd_ep.value = :PLOT_NO"
+				+ " AND stock.stock_id = e.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
+				+ " AND nd_ep.value in (:PLOT_NO)"
 				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id"
 				+ " AND e.nd_geolocation_id = geo.nd_geolocation_id"
 				+ " AND geo.description = :INSTANCE_NUMBER"
@@ -154,23 +155,18 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.addEntity("ldp", ListDataProject.class);
 			query.setParameter("LIST_TYPE", listType.name());
 			query.setParameter("STUDY_ID", studyId);
-			query.setParameter("PLOT_NO", plotNo);
+			query.setParameterList("PLOT_NO", plotNumbers);
 			query.setParameter("INSTANCE_NUMBER", instanceNumber);
 			query.setParameter("DATASET_TYPE", DataSetType.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
 				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
 
-			final List resultList = query.list();
-			if (!resultList.isEmpty()) {
-				return (ListDataProject) resultList.get(0);
-			}
+			return query.list();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				"Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}
-
-		return null;
 
 	}
 
@@ -221,13 +217,13 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return 0;
 	}
 
-	public long countByListIdAndEntryType(final Integer id, final SystemDefinedEntryType systemDefinedEntryType) {
+	public long countByListIdAndEntryType(final Integer id, final List<Integer> systemDefinedEntryTypeIds) {
 		try {
 			if (id != null) {
 				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
 				criteria.createAlias("list", "l");
 				criteria.add(Restrictions.eq("l.id", id));
-				criteria.add(Restrictions.eq("checkType", systemDefinedEntryType.getEntryTypeCategoricalId()));
+				criteria.add(Restrictions.in("checkType", systemDefinedEntryTypeIds));
 				criteria.setProjection(Projections.rowCount());
 				return ((Long) criteria.uniqueResult()).longValue(); // count
 			}
@@ -251,8 +247,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			final String queryStr = "select lp.listdata_project_id as listdata_project_id, "
 					+ " lp.entry_id as entry_id, " + " lp.designation as designation, "
-					+ " lp.group_name as group_name, " + " femaleParentName.nval as fnval, " + " g.gpid1 as fpgid, "
-					+ " maleParentName.nval as mnval, " + " g.gpid2 as mpgid, " + " g.mgid as mgid, "
+					+ " lp.group_name as group_name, " + " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', femaleParentName.nval) as fnval, " + " g.gpid1 as fpgid, "
+					+ " if(g.gpid2 = 0, '" + Name.UNKNOWN + "', maleParentName.nval) as mnval, " + " g.gpid2 as mpgid, " + " g.mgid as mgid, "
 					+ " g.gid as gid, " + " lp.seed_source as seed_source, "
 					+ " lp.duplicate_notes as duplicate_notes, " + " lp.check_type as check_type, "
 					+ " lp.entry_code as entry_code" + " from listdata_project lp "
@@ -316,10 +312,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setEntryId(entryId);
 			listDataProject.setDesignation(designation);
 			listDataProject.setGroupName(parentage);
-			listDataProject.setFemaleParent(femaleParent);
-			listDataProject.setFgid(fgid);
-			listDataProject.setMaleParent(maleParent);
-			listDataProject.setMgid(mpgid);
+			listDataProject.setFemaleParent(new GermplasmParent(fgid, femaleParent, ""));
+			listDataProject.addMaleParent(new GermplasmParent(mpgid, maleParent, ""));
 			listDataProject.setGroupId(mgid);
 			listDataProject.setGermplasmId(gid);
 			listDataProject.setSeedSource(seedSource);

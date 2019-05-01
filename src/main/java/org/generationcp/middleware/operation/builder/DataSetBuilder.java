@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.DatasetUtil;
+import org.generationcp.middleware.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +91,20 @@ public class DataSetBuilder extends Builder {
 		return variableTypeList.sort();
 	}
 
+	public VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId)  {
+		final VariableTypeList variableTypeList = new VariableTypeList();
+		final DmsProject project = this.dmsProjectDao.getById(dataSetId);
+		if (project != null) {
+			final Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
+			for (final VariableInfo variableInfo : variableInfoList) {
+				if(!StringUtil.isEmpty(variableInfo.getTreatmentLabel())) {
+					variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
+				}
+			}
+		}
+		return variableTypeList.sort();
+	}
+
 	private DataSet createDataSet(final DmsProject project)  {
 		final DataSet dataSet = new DataSet();
 		dataSet.setId(project.getProjectId());
@@ -99,6 +114,7 @@ public class DataSetBuilder extends Builder {
 		dataSet.setDataSetType(this.getDataSetType(project));
 		dataSet.setVariableTypes(this.getVariableTypes(project));
 		dataSet.setLocationIds(this.getLocationIds(project.getProjectId()));
+		dataSet.setProgramUUID(project.getProgramUUID());
 		return dataSet;
 	}
 
@@ -123,7 +139,7 @@ public class DataSetBuilder extends Builder {
 
 	private DataSetType getDataSetType(final DmsProject project) {
 		for (final ProjectProperty property : project.getProperties()) {
-			if (TermId.DATASET_TYPE.getId() == property.getTypeId()) {
+			if (TermId.DATASET_TYPE.getId() == property.getVariableId()) {
 				return DataSetType.findById(Integer.valueOf(property.getValue()));
 			}
 		}

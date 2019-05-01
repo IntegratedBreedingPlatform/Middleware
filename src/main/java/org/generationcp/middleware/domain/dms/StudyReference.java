@@ -25,6 +25,12 @@ public class StudyReference extends Reference {
 	private Integer numberOfEnvironments;
 	
 	private StudyTypeDto studyType;
+	
+	private Boolean isLocked;
+	
+	private Integer ownerId;
+	
+	private String ownerName;
 
 	public StudyReference(final Integer id, final String name) {
 		super.setId(id);
@@ -44,6 +50,14 @@ public class StudyReference extends Reference {
 	public StudyReference(final Integer id, final String name, final String description, final String programUUID, final StudyTypeDto studyType) {
 		this(id, name, description, programUUID);
 		this.studyType = studyType;
+	}
+	
+	public StudyReference(final Integer id, final String name, final String description, final String programUUID,
+			final StudyTypeDto studyType, final Boolean isLocked, final Integer ownerId, final String ownerName) {
+		this(id, name, description, programUUID, studyType);
+		this.isLocked = isLocked;
+		this.ownerId = ownerId;
+		this.ownerName = ownerName;
 	}
 
 	public StudyReference(final Integer id, final String name, final String description, final Integer numberOfEnvironments) {
@@ -65,6 +79,36 @@ public class StudyReference extends Reference {
 
 	public void setStudyType(final StudyTypeDto studyType) {
 		this.studyType = studyType;
+	}
+
+	
+	public Boolean getIsLocked() {
+		return isLocked;
+	}
+
+	
+	public void setIsLocked(Boolean isLocked) {
+		this.isLocked = isLocked;
+	}
+
+	
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
+	
+	public void setOwnerId(Integer ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 
 	@Override

@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v11.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="plant"/>
+				<not>
+					<columnExists tableName="sample" columnName="nd_experiment_id"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Directly link sample to nd_experiment because plant table is now obsolete.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `sample` ADD COLUMN `nd_experiment_id` INT NOT NULL;
+			ALTER TABLE `sample` ADD COLUMN `sample_no` INT NOT NULL;
+			UPDATE `sample` sp INNER JOIN `plant` pl ON sp.plant_id = pl.plant_id SET sp.nd_experiment_id = pl.nd_experiment_id, sp.sample_no = pl.plant_no;
+			ALTER TABLE `sample` DROP FOREIGN KEY `fk_sample_plant`;
+			ALTER TABLE `sample` DROP INDEX `fk_sample_plant_idx` ;
+			ALTER TABLE `sample` DROP COLUMN `plant_id`;
+
+			ALTER TABLE `sample` ADD INDEX `fk_sample_experiment_idx` (`nd_experiment_id` ASC);
+			ALTER TABLE `sample`
+			ADD CONSTRAINT `fk_sample_experiment`
+			  FOREIGN KEY (`nd_experiment_id`)
+			  REFERENCES `nd_experiment` (`nd_experiment_id`);
+			DROP TABLE plant;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

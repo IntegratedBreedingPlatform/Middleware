@@ -89,8 +89,8 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 		scale.addCategory(category2);
 		variable.setScale(scale);
 
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(3001), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(variable);
+		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(3001), Matchers.eq(true)))
+				.thenReturn(variable);
 
 		List<String> serviceResult = this.service.getProgramIdentifiers(1, "uuidgobbledygook");
 		Assert.assertTrue(serviceResult.contains(category1.getName()));
@@ -109,8 +109,8 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 		scale.addCategory(category2);
 		variable.setScale(scale);
 
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(3002), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(variable);
+		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(3002), Matchers.eq(true)
+				)).thenReturn(variable);
 
 		List<String> serviceResult = this.service.getProgramIdentifiers(2, "uuidgobbledygook");
 		Assert.assertTrue(serviceResult.contains(category1.getName()));
@@ -119,15 +119,13 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testGetProgramIdentifiersWhenLevel1VariableIsNotSetup() {
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.anyInt(), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(null);
+		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.anyInt(), Matchers.eq(true))).thenReturn(null);
 		this.service.getProgramIdentifiers(1, "uuidgobbledygook");
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testGetProgramIdentifiersWhenLevel2VariableIsNotSetup() {
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.anyInt(), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(null);
+		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.anyInt(), Matchers.eq(true))).thenReturn(null);
 		this.service.getProgramIdentifiers(2, "uuidgobbledygook");
 	}
 

@@ -3,7 +3,7 @@ package org.generationcp.middleware.service.api.study;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-
+//FIXME This class should be removed and try to use MeasurementVariable instead
 public class MeasurementVariableDto {
 
 	private final Integer id;

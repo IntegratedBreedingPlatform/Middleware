@@ -51,22 +51,22 @@ public interface GermplasmExportSource {
 	/**
 	 * @return the female Parent
 	 */
-	String getFemaleParent();
+	String getFemaleParentDesignation();
 
 	/**
 	 * @return the female GID
 	 */
-	Integer getFgid();
+	Integer getFemaleGid();
 
 	/**
 	 * @return the Male Parent
 	 */
-	String getMaleParent();
+	String getMaleParentDesignation();
 
 	/**
 	 * @return the male GID
 	 */
-	Integer getMgid();
+	Integer getMaleGid();
 
 	/**
 	 * @return the StockID

@@ -10,7 +10,10 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import org.apache.commons.lang.RandomStringUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -20,54 +23,53 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
+import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+@Transactional
+public class ExperimentModelSaver {
+	
+	private DaoFactory daoFactory;
+	private PhenotypeSaver phenotypeSaver;
+	private GeolocationSaver geolocationSaver;
+	private StockModelBuilder stockModelBuilder;
 
-public class ExperimentModelSaver extends Saver {
-
-	private static final String P = "P";
-
-	public ExperimentModelSaver(HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new DaoFactory(sessionProvider);
+		this.phenotypeSaver = new PhenotypeSaver(sessionProvider);
+		this.geolocationSaver = new GeolocationSaver(sessionProvider);
+		this.stockModelBuilder = new StockModelBuilder(sessionProvider);
 	}
 
-	public void addExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) {
-		TermId myExperimentType = this.mapExperimentType(experimentType);
-		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
+	public void addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
+		final TermId myExperimentType = this.mapExperimentType(experimentType);
+		final ExperimentModel experimentModel = this.create(crop, projectId, values, myExperimentType);
 
-		this.getExperimentDao().save(experimentModel);
-		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+		this.daoFactory.getExperimentDao().save(experimentModel);
+		this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
 	}
 
-	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) {
-		int experimentId =
-				this.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
+	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
+		final int experimentId =
+				this.daoFactory.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
-
-		// update if existing
-		Boolean isUpdated = false;
-		for (Variable variable : values.getVariableList().getVariables()) {
-			int val =
-					this.getPhenotypeDao().updatePhenotypesByProjectIdAndLocationId(projectId, values.getLocationId(),
-							values.getGermplasmId(), variable.getVariableType().getId(), variable.getValue());
-
-			if (val > 0) {
-				isUpdated = true;
+		if(experimentId != 0 ) {
+			for (final Variable variable : values.getVariableList().getVariables()) {
+				final int val = this.daoFactory.getPhenotypeDAO()
+						.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue());
+				if (val == 0) {
+					this.phenotypeSaver.save(experimentId, variable);
+				}
 			}
-
-			if (experimentId != 0 && val == 0) {
-				this.getPhenotypeSaver().save(experimentId, variable);
-			}
-
-		}
-
-		if (!isUpdated && experimentId == 0) {
+		} else {
 			TermId myExperimentType = null;
 			if (values instanceof StudyValues) {
 				myExperimentType = TermId.STUDY_EXPERIMENT;
@@ -75,14 +77,14 @@ public class ExperimentModelSaver extends Saver {
 				myExperimentType = this.mapExperimentType(experimentType);
 			}
 
-			ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
+			final ExperimentModel experimentModel = this.create(crop, projectId, values, myExperimentType);
 
-			this.getExperimentDao().save(experimentModel);
-			this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+			this.daoFactory.getExperimentDao().save(experimentModel);
+			this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
 		}
 	}
 
-	private TermId mapExperimentType(ExperimentType experimentType) {
+	private TermId mapExperimentType(final ExperimentType experimentType) {
 		switch (experimentType) {
 			case PLOT:
 				return TermId.PLOT_EXPERIMENT;
@@ -100,8 +102,8 @@ public class ExperimentModelSaver extends Saver {
 		return null;
 	}
 
-	private ExperimentModel create(int projectId, Values values, TermId expType, String cropPrefix) {
-		ExperimentModel experimentModel = new ExperimentModel();
+	private ExperimentModel create(final CropType crop, final int projectId, final Values values, final TermId expType) {
+		final ExperimentModel experimentModel = new ExperimentModel();
 		final DmsProject project = new DmsProject();
 		project.setProjectId(projectId);
 		experimentModel.setProject(project);
@@ -111,46 +113,32 @@ public class ExperimentModelSaver extends Saver {
 		if (values.getLocationId() == null && values instanceof StudyValues) {
 			experimentModel.setGeoLocation(this.createNewGeoLocation());
 		} else if (values.getLocationId() != null) {
-			experimentModel.setGeoLocation(this.getGeolocationDao().getById(values.getLocationId()));
+			experimentModel.setGeoLocation(this.daoFactory.getGeolocationDao().getById(values.getLocationId()));
 		}
 		if (values.getGermplasmId() != null) {
-			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
-			experimentModel.getExperimentStocks().add(this.createExperimentStock(experimentModel, values.getGermplasmId()));
+			experimentModel.setStock(this.stockModelBuilder.get(values.getGermplasmId()));
 		}
-
-		if (!(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.equals(expType) && TermId.STUDY_INFORMATION.equals(expType))) {
-			String plotUniqueId = getPlotUniqueId(cropPrefix);
-
-			experimentModel.setPlotId(plotUniqueId);
-		}
-
+		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
+		observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 		return experimentModel;
 	}
 
-	private String getPlotUniqueId(String cropPrefix) {
-		String plotUniqueId = cropPrefix;
-		plotUniqueId = plotUniqueId + P;
-		plotUniqueId = plotUniqueId + RandomStringUtils.randomAlphanumeric(8);
-		
-		return plotUniqueId;
-	}
-
 	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
-	private Geolocation createNewGeoLocation() {
-		Geolocation location = new Geolocation();
+	public Geolocation createNewGeoLocation() {
+		final Geolocation location = new Geolocation();
 		location.setDescription("1");
-		this.getGeolocationDao().save(location);
+		this.daoFactory.getGeolocationDao().save(location);
 		return location;
 	}
 
-	protected List<ExperimentProperty> createTrialDesignExperimentProperties(ExperimentModel experimentModel, VariableList factors) {
+	protected List<ExperimentProperty> createTrialDesignExperimentProperties(final ExperimentModel experimentModel, final VariableList factors) {
 
-		List<ExperimentProperty> experimentProperties = new ArrayList<>();
+		final List<ExperimentProperty> experimentProperties = new ArrayList<>();
 
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
-			for (Variable variable : factors.getVariables()) {
+			for (final Variable variable : factors.getVariables()) {
 				if (PhenotypicType.TRIAL_DESIGN == variable.getVariableType().getRole()) {
-					experimentProperties.add(createTrialDesignProperty(experimentModel, variable));
+					experimentProperties.add(this.createTrialDesignProperty(experimentModel, variable));
 				}
 			}
 		}
@@ -158,9 +146,9 @@ public class ExperimentModelSaver extends Saver {
 		return experimentProperties;
 	}
 
-	protected ExperimentProperty createTrialDesignProperty(ExperimentModel experimentModel, Variable variable) {
+	protected ExperimentProperty createTrialDesignProperty(final ExperimentModel experimentModel, final Variable variable) {
 
-		ExperimentProperty experimentProperty = new ExperimentProperty();
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
 		experimentProperty.setExperiment(experimentModel);
 		experimentProperty.setTypeId(variable.getVariableType().getId());
 
@@ -176,32 +164,23 @@ public class ExperimentModelSaver extends Saver {
 		return experimentProperty;
 	}
 
-	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) {
-		ExperimentStock experimentStock = new ExperimentStock();
-		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
-		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
-		experimentStock.setExperiment(experiment);
-
-		return experimentStock;
-	}
-
-	public int moveStudyToNewGeolocation(int studyId) {
-		List<DatasetReference> datasets = this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
-		List<Integer> ids = new ArrayList<>();
+	public int moveStudyToNewGeolocation(final int studyId) {
+		final List<DatasetReference> datasets = this.daoFactory.getDmsProjectDAO().getDatasetNodesByStudyId(studyId);
+		final List<Integer> ids = new ArrayList<>();
 		ids.add(studyId);
 		if (datasets != null) {
-			for (DatasetReference dataset : datasets) {
+			for (final DatasetReference dataset : datasets) {
 				ids.add(dataset.getId());
 			}
 		}
 
-		Geolocation location = this.getGeolocationSaver().createMinimumGeolocation();
-		List<ExperimentModel> experiments = this.getExperimentDao().getExperimentsByProjectIds(ids);
+		final Geolocation location = this.geolocationSaver.createMinimumGeolocation();
+		final List<ExperimentModel> experiments = this.daoFactory.getExperimentDao().getExperimentsByProjectIds(ids);
 		if (experiments != null && !experiments.isEmpty()) {
-			for (ExperimentModel experiment : experiments) {
+			for (final ExperimentModel experiment : experiments) {
 				if (experiment.getGeoLocation().getLocationId().intValue() == 1) {
 					experiment.setGeoLocation(location);
-					this.getExperimentDao().update(experiment);
+					this.daoFactory.getExperimentDao().update(experiment);
 				}
 			}
 		}

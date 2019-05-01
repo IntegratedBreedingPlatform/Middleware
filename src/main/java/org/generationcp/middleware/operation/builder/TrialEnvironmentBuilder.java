@@ -30,7 +30,6 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -136,7 +135,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		}
 
 		// Step 1: Get Trial Environments for each GID
-		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentStockDao().getEnvironmentsOfGermplasms(allGids, programUUID);
+		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentDao().getEnvironmentsOfGermplasms(allGids, programUUID);
 
 		// Step 2: Get the trial environment details
 		final Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();

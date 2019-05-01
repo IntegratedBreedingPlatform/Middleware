@@ -10,8 +10,18 @@
 
 package org.generationcp.middleware.service;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -21,6 +31,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -58,6 +69,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -76,14 +88,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Optional;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -110,7 +115,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public FieldbookServiceImpl(final HibernateSessionProvider sessionProvider, final String localDatabaseName) {
 		super(sessionProvider, localDatabaseName);
-		daoFactory = new DaoFactory(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -323,7 +328,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
-		final List<MeasurementData> result = new ArrayList();
+		final List<MeasurementData> result = new ArrayList<>();
 		for (final MeasurementRow measurementRow : observations) {
 			final List<MeasurementData> dataList = measurementRow.getDataList();
 			if (dataList == null || dataList.isEmpty()) {
@@ -407,7 +412,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
-		final GermplasmListDAO germplasmListDao = daoFactory.getGermplasmListDAO();
+		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
 
@@ -483,7 +488,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				// Save germplasmListData
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
-				daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+				this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 				counter++;
 			}
 
@@ -514,7 +519,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Integer saveGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
 			final boolean isApplyNewGroupToPreviousCrosses) {
 
-		final GermplasmListDAO germplasmListDao = daoFactory.getGermplasmListDAO();
+		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
 
@@ -532,7 +537,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
-				daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+				this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 			}
 
 			// For Management Group Settings Processing
@@ -661,7 +666,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		final List<Integer> variableIdList = new ArrayList<>(variableIds);
-		variables.addAll(daoFactory.getCvTermDao()
+		variables.addAll(this.daoFactory.getCvTermDao()
 				.getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(), TermId.CATEGORICAL_VARIABLE.getId()));
 		for (final CVTerm variable : variables) {
 			list.add(new StandardVariableReference(variable.getCvTermId(), variable.getName(), variable.getDefinition()));
@@ -697,14 +702,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	private void addAllVariableIdsInMode(final Set<Integer> variableIds, final List<Integer> storedInIds) {
 		for (final Integer storedInId : storedInIds) {
-			variableIds.addAll(daoFactory.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
+			variableIds.addAll(this.daoFactory.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
 		}
 	}
 
 	private void createPropertyList(final Set<Integer> propertyVariableList, final List<Integer> propertyIds) {
 		for (final Integer propertyId : propertyIds) {
 			propertyVariableList
-					.addAll(daoFactory.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
+					.addAll(this.daoFactory.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
 		}
 	}
 
@@ -787,7 +792,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final LocationDataManager manager = this.getLocationDataManager();
 
 		final Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
-		final Location location = new Location(null, lType, 0, locationName, "-", 0, 0, 0, 0, 0);
+		final Location location = new Location(null, lType, 0, locationName, null, 0, 0, 0, 0, 0);
 
 		final Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
 		final Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
@@ -803,7 +808,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StandardVariable> getPossibleTreatmentPairs(final int cvTermId, final int propertyId, final List<Integer> hiddenFields) {
 		final List<StandardVariable> treatmentPairs = new ArrayList<>();
-		treatmentPairs.addAll(daoFactory.getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
+		treatmentPairs.addAll(this.daoFactory.getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 
 		final List<Integer> termIds = new ArrayList<>();
 		final Map<Integer, CVTerm> termMap = new HashMap<>();
@@ -815,7 +820,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		final List<CVTerm> terms = new ArrayList<>();
-		terms.addAll(daoFactory.getCvTermDao().getByIds(termIds));
+		terms.addAll(this.daoFactory.getCvTermDao().getByIds(termIds));
 
 		for (final CVTerm term : terms) {
 			termMap.put(term.getCvTermId(), term);
@@ -849,7 +854,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Integer updateGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList) {
-		final GermplasmListDAO germplasmListDao = daoFactory.getGermplasmListDAO();
+		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
 
@@ -865,7 +870,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
-				daoFactory.getGermplasmListDataDAO().update(germplasmListData);
+				this.daoFactory.getGermplasmListDataDAO().update(germplasmListData);
 			}
 
 		} catch (final MiddlewareQueryException e) {
@@ -1004,8 +1009,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final List<Pair<Germplasm, Name>> germplasmPairs) {
-		return this.getGermplasmDataManager().addGermplasm(germplasmPairs);
+	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples) {
+		return this.getGermplasmDataManager().addGermplasm(germplasmTriples);
 	}
 
 	@Override
@@ -1120,7 +1125,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<GermplasmList> getGermplasmListsByProjectId(final int projectId, final GermplasmListType type) {
-		return daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		return this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+	}
+
+	@Override
+	public boolean hasAdvancedOrCrossesList(final int projectId) {
+		return this.daoFactory.getGermplasmListDAO().hasAdvancedOrCrossesList(projectId);
 	}
 
 	@Override
@@ -1129,14 +1139,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public long countListDataProjectByListIdAndEntryType(final int listId, final SystemDefinedEntryType systemDefinedEntryType) {
-		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryType);
+	public long countListDataProjectByListIdAndEntryTypeIds(final int listId, final List<Integer> systemDefinedEntryTypeIds) {
+		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryTypeIds);
 	}
 
 	@Override
-	public ListDataProject getListDataProjectByStudy(final int projectId, final GermplasmListType type, final int plotId,
+	public List<ListDataProject> getListDataProjectByStudy(final int projectId, final GermplasmListType type, final List<Integer> plotNumbers,
 			final String instanceNumber) {
-		return this.getListDataProjectDAO().getByStudy(projectId, type, plotId, instanceNumber);
+		return this.getListDataProjectDAO().getByStudy(projectId, type, plotNumbers, instanceNumber);
 	}
 
 	@Override
@@ -1148,7 +1158,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public void deleteListDataProjects(final int projectId, final GermplasmListType type) {
 		// when used in advanced, it will delete all the advance lists (list
 		// data projects)
-		final List<GermplasmList> lists = daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		final List<GermplasmList> lists = this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (lists != null && !lists.isEmpty()) {
 			for (final GermplasmList list : lists) {
 				this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
@@ -1298,6 +1308,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public void setListDataProjectSaver(final ListDataProjectSaver listDataProjectSaver) {
 		this.listDataProjectSaver = listDataProjectSaver;
+	}
+
+	@Override
+	public Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(final String name, final String programUUID) {
+		final Integer studyId = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(name, programUUID);
+		if (studyId != null) {
+			return Optional.of(this.getStudyDataManager().getStudyReference(studyId));
+		}
+		return Optional.absent();
 	}
 
 }

@@ -145,9 +145,12 @@ public class Germplasm implements Serializable {
 	public static final String GET_PROGENITOR2 = "getProgenitor2";
 	public static final String GET_PROGENITOR = "getProgenitor";
 
-	public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME =
-			"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-					+ "JOIN progntrs p ON p.pid = g.gid " + "WHERE p.gid = :gid and  g.deleted = 0  and g.grplce = 0";
+	public static final String GET_PROGENITORS_BY_GIDS_WITH_PREF_NAME =
+			"SELECT p.gid, {g.*}, {n.*}, (select pMale.grpName from listdata pMale where pMale.gid = g.gid limit 1) as malePedigree " 
+					+ "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
+					+ "JOIN progntrs p ON p.pid = g.gid " 
+					+ "WHERE p.gid in (:gidList) and  g.deleted = 0  and g.grplce = 0 "
+					+ "ORDER BY p.gid, p.pno";
 
 	public static final String GET_MANAGEMENT_NEIGHBORS =
 			"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
@@ -237,6 +240,7 @@ public class Germplasm implements Serializable {
 					+ " WHERE (g.gpid1 in (:gids) OR g.gpid2 in (:gids) OR p.pid in (:gids)) \n" + "   AND g.deleted = 0 \n"
 					+ "   AND g.grplce = 0 \n" + "   AND ( l.liststatus != " + GermplasmListDAO.STATUS_DELETED
 					+ " OR l.liststatus IS NULL)";
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -454,6 +458,13 @@ public class Germplasm implements Serializable {
 	 */
 	@Transient
 	private Map<String, String> attributeTypesValueMap = new HashMap<>();
+	
+	/**
+	 *
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private Map<String, String> nameTypesValueMap = new HashMap<>();
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
@@ -899,6 +910,17 @@ public class Germplasm implements Serializable {
 			throw new NullArgumentException("attributeTypesValueMap must not be null");
 		}
 		this.attributeTypesValueMap = attributeTypesValueMap;
+	}
+	
+	public Map<String, String> getNameTypesValueMap() {
+		return ImmutableMap.copyOf(this.nameTypesValueMap);
+	}
+
+	public void setNameTypesValueMap(final Map<String, String> nameTypesValueMap) {
+		if (attributeTypesValueMap == null) {
+			throw new NullArgumentException("nameTypesValueMap must not be null");
+		}
+		this.nameTypesValueMap = nameTypesValueMap;
 	}
 
 	public String getGroupSourcePreferredName() {

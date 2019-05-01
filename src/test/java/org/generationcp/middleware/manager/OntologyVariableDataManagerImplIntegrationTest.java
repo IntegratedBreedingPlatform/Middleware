@@ -187,7 +187,8 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	@Test
 	public void testGetVariable() throws Exception {
 		final Variable variable =
-				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, true);
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+		variableManager.fillVariableUsage(variable);
 		Assert.assertNotNull(variable);
 		Assert.assertEquals("Variable should has the id " + this.testVariableInfo.getId(), this.testVariableInfo.getId(), variable.getId());
 		Assert.assertFalse("Variable should not be obsolete.", variable.isObsolete());
@@ -203,7 +204,8 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	public void testGetVariableWithFormula() throws Exception {
 		final Formula formula = this.saveFormulaForTestVariable();
 		final Variable variable =
-				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, true);
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+
 		Assert.assertNotNull(variable);
 		// Verify formula details
 		final FormulaDto retrievedFormula = variable.getFormula();
@@ -216,7 +218,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	@Test
 	public void testNotRetrievingVariableUsageStatistics() throws Exception {
 		final Variable variable =
-				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertNotNull(variable);
 		Assert.assertEquals("Study usage should be -1 i.e. unknown.", new Integer(-1), variable.getStudies());
 		Assert.assertEquals("Observation usage should be -1 i.e. unknown.", new Integer(-1), variable.getObservations());
@@ -242,7 +244,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.cvTermDAO.update(testVariableCvTerm);
 
 		final Variable variable =
-				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), false, false);
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), false);
 		Assert.assertNotNull(variable);
 		Assert.assertEquals("Variable should has the id " + this.testVariableInfo.getId(), this.testVariableInfo.getId(), variable.getId());
 		Assert.assertTrue("Variable should be obsolete.", variable.isObsolete());
@@ -307,12 +309,30 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.variableManager.addVariable(variableInfo);
 		Assert.fail("'Analysis' variable type should not be assigned together with 'Analysis Summary' variable type");
 	}
+	
+	@Test(expected = MiddlewareException.class)
+	public void testAddObservationUnitVariableTypeShouldNotBeTrait() throws Exception {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.addVariableType(VariableType.OBSERVATION_UNIT);
+		variableInfo.addVariableType(VariableType.TRAIT);
+		this.variableManager.addVariable(variableInfo);
+		Assert.fail("'Observation Unit' variable type should not be assigned together 'Trait' variable type");
+	}
+
+	@Test(expected = MiddlewareException.class)
+	public void testUpdateObservationUnitVariableTypeShouldNotBeTrait() throws Exception {
+		this.testVariableInfo.addVariableType(VariableType.OBSERVATION_UNIT);
+		this.testVariableInfo.addVariableType(VariableType.TRAIT);
+		this.variableManager.updateVariable(this.testVariableInfo);
+		Assert.fail("'Observation Unit' variable type should not be assigned together 'Trait' variable type");
+	}
 
 	@Test
 	public void testUpdateVariable() throws Exception {
 		this.variableManager.updateVariable(this.testVariableInfo);
 		final Variable updatedVariable =
-				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertNotNull(updatedVariable);
 	}
 
@@ -321,7 +341,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.setName("UpdatedVariableName");
 		this.variableManager.updateVariable(this.testVariableInfo);
 		final Variable updatedVariable =
-				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertEquals("UpdatedVariableName", updatedVariable.getName());
 		Assert.assertNotNull(updatedVariable);
 	}
@@ -331,10 +351,10 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.setName("UpdatedVariableName");
 		this.variableManager.updateVariable(this.testVariableInfo);
 		final Variable updatedVariable =
-				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+				this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertEquals(this.testVariableInfo.getName(), updatedVariable.getName());
 		this.variableManager.deleteVariable(this.testVariableInfo.getId());
-		this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.fail("Variable does not exist");
 	}
 
@@ -448,5 +468,10 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.variableManager.deleteVariablesFromCache(variablesIds);
 		Assert.assertEquals(size, VariableCache.getCacheSize());
 		Assert.assertNull(VariableCache.getFromCache(variable1Id));
+	}
+
+	@Test
+	public void testGetDataType() {
+		Assert.assertEquals(DataType.NUMERIC_VARIABLE, this.variableManager.getDataType(this.testVariableInfo.getId()).get());
 	}
 }

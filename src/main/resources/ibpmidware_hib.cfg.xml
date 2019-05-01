@@ -16,7 +16,6 @@
         <mapping class="org.generationcp.middleware.pojos.Method"/>
         <mapping class="org.generationcp.middleware.pojos.Name"/>
         <mapping class="org.generationcp.middleware.pojos.Progenitor"/>
-        <mapping class="org.generationcp.middleware.pojos.ProgenitorPK"/>
         <mapping class="org.generationcp.middleware.pojos.User"/>
         <mapping class="org.generationcp.middleware.pojos.UserDefinedField"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
@@ -90,7 +89,6 @@
         <mapping class="org.generationcp.middleware.pojos.dms.StockProperty"/>
         <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
         <mapping class="org.generationcp.middleware.pojos.dms.PhenotypeOutlier"/>
-        <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProgramFavorite"/>
 
@@ -106,7 +104,6 @@
         <mapping class="org.generationcp.middleware.pojos.UserProgramTreeState"/>
         
         <mapping class="org.generationcp.middleware.pojos.Sample"/>
-        <mapping class="org.generationcp.middleware.pojos.Plant"/>
         <mapping class="org.generationcp.middleware.pojos.SampleList"/>
         <mapping class="org.generationcp.middleware.pojos.dms.StudyType"/>
 

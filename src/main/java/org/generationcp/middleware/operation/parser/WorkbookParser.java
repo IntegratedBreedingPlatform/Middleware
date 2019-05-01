@@ -78,6 +78,8 @@ public class WorkbookParser {
 	private static final String DATA_TYPE = "DATA TYPE";
 	private static final String METHOD = "METHOD";
 	private static final String SCALE = "SCALE";
+	private static final String DESCRIPTION_SHEET_NAME = "Description";
+	private static final String OBSERVATION_SHEET_NAME = "Observation";
 
 	public static final int DEFAULT_MAX_ROW_LIMIT = 10000;
 
@@ -219,11 +221,20 @@ public class WorkbookParser {
 		return this.currentWorkbook;
 	}
 
+	protected boolean isDescriptionSheetExists(final Workbook wb) throws WorkbookParserException {
+		final Sheet sheet1 = wb.getSheetAt(WorkbookParser.DESCRIPTION_SHEET);
+
+		if (sheet1 == null || sheet1.getSheetName() == null || !WorkbookParser.DESCRIPTION_SHEET_NAME.equals(sheet1.getSheetName())) {
+			return false;
+		}
+		return true;
+	}
+
 	protected void validateExistenceOfSheets(final Workbook wb) throws WorkbookParserException {
 		try {
 			final Sheet sheet1 = wb.getSheetAt(WorkbookParser.DESCRIPTION_SHEET);
 
-			if (sheet1 == null || sheet1.getSheetName() == null || !"Description".equals(sheet1.getSheetName())) {
+			if (sheet1 == null || sheet1.getSheetName() == null || !WorkbookParser.DESCRIPTION_SHEET_NAME.equals(sheet1.getSheetName())) {
 				this.errorMessages.add(new Message("error.missing.sheet.description"));
 			}
 		} catch (final IllegalArgumentException e) {
@@ -236,7 +247,7 @@ public class WorkbookParser {
 		try {
 			final Sheet sheet2 = wb.getSheetAt(WorkbookParser.OBSERVATION_SHEET);
 
-			if (sheet2 == null || sheet2.getSheetName() == null || !"Observation".equals(sheet2.getSheetName())) {
+			if (sheet2 == null || sheet2.getSheetName() == null || !WorkbookParser.OBSERVATION_SHEET_NAME.equals(sheet2.getSheetName())) {
 				this.errorMessages.add(new Message("error.missing.sheet.observation"));
 			}
 		} catch (final IllegalArgumentException e) {
@@ -302,12 +313,7 @@ public class WorkbookParser {
 		final String endDateStr = WorkbookParser
 				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.END_DATE_ROW_INDEX - rowAdjustMent,
 						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-
-		// determine study type
-		final String studyTypeName = WorkbookParser
-				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX - rowAdjustMent,
-						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
-		final StudyTypeDto studyTypeValue = new StudyTypeDto(studyTypeName);
+		final StudyTypeDto studyTypeValue = determineStudyType(wb, rowAdjustMent);
 
 		// GCP-6991 and GCP-6992
 		if (study == null || StringUtils.isEmpty(study)) {
@@ -318,8 +324,8 @@ public class WorkbookParser {
 			this.errorMessages.add(new Message("error.blank.study.title"));
 		}
 
-		Date startDate = this.validateDate(startDateStr, true, new Message("error.start.date.invalid"));
-		Date endDate = this.validateDate(endDateStr, false, new Message("error.end.date.invalid"));
+		final Date startDate = this.validateDate(startDateStr, true, new Message("error.start.date.invalid"));
+		final Date endDate = this.validateDate(endDateStr, false, new Message("error.end.date.invalid"));
 
 		if (startDate != null && endDate != null && startDate.after(endDate)) {
 			this.errorMessages.add(new Message("error.start.is.after.end.date"));
@@ -334,16 +340,24 @@ public class WorkbookParser {
 			this.errorMessages.add(new Message("error.start.is.after.current.date"));
 		}
 
+		// Study is not locked by default
 		final StudyDetails studyDetails =
 				new StudyDetails(study, description, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null, Util
-					.getCurrentDateAsStringValue(), createdBy);
+					.getCurrentDateAsStringValue(), createdBy, false);
 
 		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
 			this.currentRowZeroBased++;
 		}
 		return studyDetails;
 	}
-	
+
+	StudyTypeDto determineStudyType(final Workbook wb, final int rowAdjustMent) {
+		final String studyTypeName = WorkbookParser
+				.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, WorkbookParser.STUDY_TYPE_ROW_INDEX - rowAdjustMent,
+						WorkbookParser.STUDY_DETAILS_VALUE_COLUMN_INDEX);
+		return new StudyTypeDto(StringUtils.isEmpty(studyTypeName)? StudyTypeDto.NURSERY_NAME: studyTypeName);
+	}
+
 	protected Date validateDate(final String dateString, final boolean isStartDate, final Message errorMessage) {
 		final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 		Date date = null;
@@ -368,6 +382,11 @@ public class WorkbookParser {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		try {
+
+			// Skip checking description sheet if it is not present in file
+			if(!this.isDescriptionSheetExists(wb)){
+				return Collections.<MeasurementVariable>emptyList();
+			}
 
 			// Cannot have more than one empty row in the description worksheet.
 			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {

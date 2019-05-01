@@ -16,6 +16,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -30,6 +35,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
@@ -318,6 +324,25 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList);
 
+	
+	/**
+	 * Returns all the list of name types available for the given list of gids.
+	 *
+	 * @param gidList - list of GIDs
+	 * @return List of UserDefinedField POJOs that contains the name types for the given GIDs.
+	 */
+	List<UserDefinedField> getNameTypesByGIDList(List<Integer> gidList);
+	
+	/**
+	 * Returns a Map of GIDs to the name values given name type and a list of GIDs.
+	 *
+	 * @param nameType - name type ID of the values to retrieve
+	 * @param gidList - list of GIDs
+	 * @return Map<Integer, String> - map of gids to their corresponding name values for the specified name type
+	 */
+	Map<Integer, String> getNamesByTypeAndGIDList(Integer nameType, List<Integer> gidList);
+	
+	
 	/**
 	 * Returns the Method record identified by the id.
 	 *
@@ -494,13 +519,23 @@ public interface GermplasmDataManager {
 	UserDefinedField getUserDefinedFieldByID(Integer id);
 
 	/**
-	 * Returns the udfld records identified by the given tablename.
+	 * Returns the udfld records identified by the given tablename and field type.
 	 *
 	 * @param tableName - the value of the ftable record
 	 * @param fieldType - the value of the ftype record
 	 * @return the Udflds POJO representing the record
 	 */
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType);
+
+	/**
+	 * Returns the udfld records identified by the given tablename, field type, and field name.
+	 *
+	 * @param tableName - the value of the ftable record
+	 * @param fieldType - the value of the ftype record
+	 * @param fieldName - the value of the fname record
+	 * @return the Udflds POJO representing the record
+	 */
+	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(String tableName, String fieldType, String fieldName);
 
 	/**
 	 * Return the UserDefinedField using local field no
@@ -620,22 +655,7 @@ public interface GermplasmDataManager {
 	 * @return The attribute record corresponding to the given id.
 	 */
 	Attribute getAttributeById(Integer id);
-
-	/**
-	 * Given the gid of the child germplasm, the gid of the parent germplasm and the progenitor number, this method makes the necessary
-	 * changes to save the relationship on the database.
-	 *
-	 * This method will either update the Germplasm record, to change the gpid1 or gpid2 fields (if the progenitor number given is 1 or 2),
-	 * or will either add or update the Progenitor record which represents this relationship. A new Progenitor record will be stored when
-	 * necessary.
-	 *
-	 * @param gid the gid
-	 * @param progenitorId the progenitor id
-	 * @param progenitorNumber the progenitor number
-	 * @return Returns the id of the updated Progenitor
-	 */
-	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber);
-
+	
 	/**
 	 * Given a valid Germplasm object, update the corresponding record in the database.
 	 *
@@ -675,7 +695,7 @@ public interface GermplasmDataManager {
 	 */
 	List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap);
 
-	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasms);
+	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples);
 
 	/**
 	 * Given a UserDefinedField object, add new record for the given parameter.
@@ -1003,6 +1023,10 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
+	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, final Boolean includeSiblings);
+
+	ProgenyDTO getProgeny(Integer germplasmDbId);
+
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
 	 *
@@ -1163,4 +1187,15 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	NamingConfiguration getNamingConfigurationByName(String name);
+
+	GermplasmDTO getGermplasmDTOByGID (Integer gid);
+
+	List<GermplasmDTO> searchGermplasmDTO (GermplasmSearchRequestDTO germplasmSearchRequestDTO);
+
+	long countGermplasmDTOs(GermplasmSearchRequestDTO germplasmSearchRequestDTO);
+	
+	Germplasm getUnknownGermplasmWithPreferredName();
+	
+	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
+
 }

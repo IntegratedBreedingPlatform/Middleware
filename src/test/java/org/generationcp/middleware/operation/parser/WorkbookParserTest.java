@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.PoiUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,6 +213,7 @@ public class WorkbookParserTest {
 
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
+		Mockito.when(moleWorkbookParser.isDescriptionSheetExists(sampleWorkbook)).thenReturn(true);
 		moleWorkbookParser.parseFile(sampleWorkbook, true, CREATED_BY);
 		Mockito.verify(moleWorkbookParser).checkHeadersValid(sampleWorkbook, 0, 0, headerArray);
 	}
@@ -223,6 +225,7 @@ public class WorkbookParserTest {
 		final String sectionName = section.toString();
 		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(sectionName, headerArray);
 
+		Mockito.when(moleWorkbookParser.isDescriptionSheetExists(sampleWorkbook)).thenReturn(true);
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
 		try {
@@ -237,7 +240,6 @@ public class WorkbookParserTest {
 	private void setupHeaderValidationMocks(final WorkbookParser moleWorkbookParser, final Workbook sampleWorkbook, final Section section)
 			throws IOException, WorkbookParserException {
 		// mock / skip other parsing logic and validations
-		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).loadFileToExcelWorkbook(file);
 		Mockito.doNothing().when(moleWorkbookParser).validateExistenceOfSheets(sampleWorkbook);
 		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook, CREATED_BY);
 
@@ -670,9 +672,10 @@ public class WorkbookParserTest {
 	 */
 	@Test
 	public void testReadMeasurementVariablesEmptyRowValidation() throws Exception {
-		final Workbook mockWorkbook = Mockito.mock(Workbook.class);
-		final WorkbookParser workbookParser = new WorkbookParser();
-		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(mockWorkbook, "CONDITION");
+		final Workbook workbook = new HSSFWorkbook();
+		workbook.createSheet("Description");
+		final WorkbookParser workbookParser =  new WorkbookParser();
+		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(workbook, "CONDITION");
 
 		Assert.assertTrue("Since the work book is empty we should have an empty list of measurement variables.",
 				readMeasurementVariables.isEmpty());
@@ -834,6 +837,28 @@ public class WorkbookParserTest {
 	}
 
 	@Test
+	public void testDetermineStudyTypeWithNoSpecifiedType() {
+		final Workbook wb = Mockito.mock(Workbook.class);
+		final StudyTypeDto studyTypeDto = this.workbookParser.determineStudyType(wb, 1);
+		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, studyTypeDto.getName());
+	}
+
+	@Test
+	public void testDetermineStudyType() {
+		final Workbook wb = Mockito.mock(Workbook.class);
+		final Sheet sheet = Mockito.mock(Sheet.class);
+		Mockito.when(wb.getSheetAt(Matchers.anyInt())).thenReturn(sheet);
+		final Row row = Mockito.mock(Row.class);
+		Mockito.when(sheet.getRow(Matchers.anyInt())).thenReturn(row);
+		final Cell cell = Mockito.mock(Cell.class);
+		Mockito.when(row.getCell(Matchers.anyInt())).thenReturn(cell);
+		Mockito.when(cell.getStringCellValue()).thenReturn(StudyTypeDto.TRIAL_NAME);
+		Mockito.when(cell.getCellType()).thenReturn(Cell.CELL_TYPE_STRING);
+		final StudyTypeDto studyTypeDto = this.workbookParser.determineStudyType(wb, 1);
+		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, studyTypeDto.getName());
+	}
+
+	@Test
 	public void testConvertSheetRowToDataListKeepInvalidValues() {
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
@@ -970,6 +995,34 @@ public class WorkbookParserTest {
 		Assert.assertNull("No cell should be on the fourth column", dataRow.getCell(3));
 		Assert.assertNull("No cell should be on the fifth column", dataRow.getCell(4));
 
+	}
+
+	@Test
+	public void testReadMeasurementVariablesNoDescriptionSheet() throws Exception {
+
+		final Workbook excelWorkbook = new HSSFWorkbook();
+		excelWorkbook.createSheet("Observation");
+
+		final WorkbookParser workbookParser = new WorkbookParser();
+		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(excelWorkbook, "CONDITION");
+		Assert.assertTrue("Since the work book has no description sheet, measurement variables should be empty",
+				readMeasurementVariables.isEmpty());
+	}
+
+	@Test
+	public void isDescriptionSheetExists_WithDescriptionSheet_True() throws WorkbookParserException {
+		final Workbook excelWorkbook = new HSSFWorkbook();
+		excelWorkbook.createSheet("Description");
+		final WorkbookParser workbookParser = new WorkbookParser();
+		Assert.assertEquals(workbookParser.isDescriptionSheetExists(excelWorkbook), true);
+	}
+
+	@Test
+	public void isDescriptionSheetExists_NoDescriptionSheet_False() throws WorkbookParserException {
+		final Workbook excelWorkbook = new HSSFWorkbook();
+		excelWorkbook.createSheet("Observation");
+		final WorkbookParser workbookParser = new WorkbookParser();
+		Assert.assertEquals(workbookParser.isDescriptionSheetExists(excelWorkbook), false);
 	}
 
 	private List<String[]> createVariableDetailsListTestData(final Section section, final String[] headers) {

@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.generationcp.middleware.interfaces.GermplasmExportSource;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -99,16 +100,14 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	 * The following will only be field when getListDataProjectWithParents() is called, otherwise, it will always be null
 	 */
 	@Transient
-	private String femaleParent = null;
-
+	private GermplasmParent femaleParent;
+	
+	/**
+	 * The first male parent is germplasm.gpid2.
+	 * The other male parents come from progntrs table.
+	 */
 	@Transient
-	private Integer fgid = null;
-
-	@Transient
-	private String maleParent = null;
-
-	@Transient
-	private Integer mgid = null;
+	private List<GermplasmParent> maleParents = new ArrayList<>();
 
 	@Transient
 	private Integer groupId = null;
@@ -277,41 +276,57 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	}
 
 	@Override
-	public String getFemaleParent() {
-		return this.femaleParent;
+	public String getFemaleParentDesignation() {
+		if (this.femaleParent != null) {
+			return this.femaleParent.getDesignation();
+		}
+		return null;
+	}
+	
+	public GermplasmParent getFemaleParent() {
+		return femaleParent;
 	}
 
-	public void setFemaleParent(final String femaleParent) {
+	public void setFemaleParent(final GermplasmParent femaleParent) {
 		this.femaleParent = femaleParent;
 	}
 
 	@Override
-	public Integer getFgid() {
-		return this.fgid;
-	}
-
-	public void setFgid(final Integer fgid) {
-		this.fgid = fgid;
-	}
-
-	@Override
-	public String getMaleParent() {
-		return this.maleParent;
-	}
-
-	public void setMaleParent(final String maleParent) {
-		this.maleParent = maleParent;
+	public Integer getFemaleGid() {
+		if (this.femaleParent != null) {
+			return this.femaleParent.getGid();
+		}
+		return null;
 	}
 
 	@Override
-	public Integer getMgid() {
-		return this.mgid;
+	public String getMaleParentDesignation() {
+		if (!this.maleParents.isEmpty()){			
+			return this.maleParents.get(0).getDesignation();
+		}
+		return null;
+	}
+	
+	public List<GermplasmParent> getMaleParents() {
+		return this.maleParents;
 	}
 
-	public void setMgid(final Integer mgid) {
-		this.mgid = mgid;
+	public void addMaleParent(final GermplasmParent parent) {
+		this.maleParents.add(parent);
+	}
+	
+	public void addMaleParents(final List<GermplasmParent> parents) {
+		this.maleParents.addAll(parents);
 	}
 
+	@Override
+	public Integer getMaleGid() {
+		if (!this.maleParents.isEmpty()) {
+			return this.maleParents.get(0).getGid();
+		}
+		return null;
+	}
+	
 	@Override
 	public Integer getListDataId() {
 		return this.getListDataProjectId();
@@ -331,9 +346,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		sb.append(", groupName='").append(this.groupName).append('\'');
 		sb.append(", duplicate='").append(this.duplicate).append('\'');
 		sb.append(", femaleParent='").append(this.femaleParent).append('\'');
-		sb.append(", fgid=").append(this.fgid);
-		sb.append(", maleParent='").append(this.maleParent).append('\'');
-		sb.append(", mgid=").append(this.mgid);
+		sb.append(", maleParents='").append(this.maleParents).append('\'');
 		sb.append(", checkTypeDescription='").append(this.checkTypeDescription).append('\'');
 		sb.append(", notes='").append(this.notes).append('\'');
 		sb.append(", crossingDate='").append(this.crossingDate).append('\'');

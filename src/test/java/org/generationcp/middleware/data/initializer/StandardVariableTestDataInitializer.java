@@ -114,6 +114,26 @@ public class StandardVariableTestDataInitializer {
 		return standardVariable;
 	}
 
+	public static StandardVariable createStandardVariable(final String name, final String propertyName, final String scaleName, final String methodName) {
+
+		final StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setName(name);
+		standardVariable.setDescription("For unit testing purposes");
+
+		final Term property = new Term(1, propertyName, propertyName);
+		standardVariable.setProperty(property);
+
+		final Term scale = new Term(2, scaleName, scaleName);
+		standardVariable.setScale(scale);
+
+		final Term method = new Term(3, methodName, methodName);
+		standardVariable.setMethod(method);
+
+		standardVariable.setPhenotypicType(PhenotypicType.VARIATE);
+
+		return standardVariable;
+	}
+
 	public static StandardVariable createStandardVariableWithCategoricalDataType(final int id, final String name) {
 
 		final StandardVariable stdVariable = StandardVariableTestDataInitializer.createStandardVariable();

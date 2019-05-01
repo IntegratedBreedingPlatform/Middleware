@@ -13,12 +13,11 @@ import java.util.Date;
 public class SampleDetailsDTO implements Serializable {
 
 	private static final long serialVersionUID = -4175016670661637734L;
-	private SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.FRONTEND_DATE_FORMAT_3);
+	private final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.FRONTEND_DATE_FORMAT_3);
 
 	private Integer studyDbId;
 	private Integer locationDbId;
-	private String plotId;
-	private String plantBusinessKey;
+	private String obsUnitId;
 	private String sampleBusinessKey;
 	private String takenBy;
 	private Date sampleDate;
@@ -36,27 +35,27 @@ public class SampleDetailsDTO implements Serializable {
 	private String harvestDate;
 	private String sampleName;
 	private String designation;
-	private Integer plantNo;
 	private String displayDate;
 	private Integer entryNumber;
 	private String plotNumber;
 	private Integer sampleEntryNo;
 	private String plateId;
 	private String well;
+	private Integer observationUnitNumber;
+	private Integer sampleNumber;
 
 	public SampleDetailsDTO() {
 
 	}
 
-	public SampleDetailsDTO(final Integer studyDbId, final String plotId, final String plantBusinessKey, final String sampleBusinessKey) {
+	public SampleDetailsDTO(final Integer studyDbId, final String obsUnitId, final String sampleBusinessKey) {
 		this.setStudyDbId(studyDbId);
-		this.setPlotId(plotId);
-		this.setPlantBusinessKey(plantBusinessKey);
+		this.setObsUnitId(obsUnitId);
 		this.setSampleBusinessKey(sampleBusinessKey);
 	}
 
 	public String getPlotNumber() {
-		return plotNumber;
+		return this.plotNumber;
 	}
 
 	public void setPlotNumber(final String plotNumber) {
@@ -64,7 +63,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Integer getEntryNumber() {
-		return entryNumber;
+		return this.entryNumber;
 	}
 
 	public void setEntryNumber(final Integer entryNumber) {
@@ -72,7 +71,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Integer getStudyDbId() {
-		return studyDbId;
+		return this.studyDbId;
 	}
 
 	public void setStudyDbId(final Integer studyDbId) {
@@ -80,31 +79,23 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Integer getLocationDbId() {
-		return locationDbId;
+		return this.locationDbId;
 	}
 
 	public void setLocationDbId(final Integer locationDbId) {
 		this.locationDbId = locationDbId;
 	}
 
-	public String getPlotId() {
-		return plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
 	}
 
-	public void setPlotId(final String plotId) {
-		this.plotId = plotId;
-	}
-
-	public String getPlantBusinessKey() {
-		return plantBusinessKey;
-	}
-
-	public void setPlantBusinessKey(final String plantBusinessKey) {
-		this.plantBusinessKey = plantBusinessKey;
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 	}
 
 	public String getSampleBusinessKey() {
-		return sampleBusinessKey;
+		return this.sampleBusinessKey;
 	}
 
 	public void setSampleBusinessKey(final String sampleBusinessKey) {
@@ -112,7 +103,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getTakenBy() {
-		return takenBy;
+		return this.takenBy;
 	}
 
 	public void setTakenBy(final String takenBy) {
@@ -120,16 +111,16 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Date getSampleDate() {
-		return sampleDate;
+		return this.sampleDate;
 	}
 
 	public void setSampleDate(final Date sampleDate) {
 		this.sampleDate = sampleDate;
-		this.displayDate = sampleDate != null ? dateFormat.format(sampleDate) : "-";
+		this.displayDate = sampleDate != null ? this.dateFormat.format(sampleDate) : "-";
 	}
 
 	public String getSampleType() {
-		return sampleType;
+		return this.sampleType;
 	}
 
 	public void setSampleType(final String sampleType) {
@@ -137,7 +128,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getTissueType() {
-		return tissueType;
+		return this.tissueType;
 	}
 
 	public void setTissueType(final String tissueType) {
@@ -145,7 +136,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getNotes() {
-		return notes;
+		return this.notes;
 	}
 
 	public void setNotes(final String notes) {
@@ -153,7 +144,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getStudyName() {
-		return studyName;
+		return this.studyName;
 	}
 
 	public void setStudyName(final String studyName) {
@@ -161,7 +152,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getSeason() {
-		return season;
+		return this.season;
 	}
 
 	public void setSeason(final String season) {
@@ -169,7 +160,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -178,7 +169,7 @@ public class SampleDetailsDTO implements Serializable {
 
 	// TODO not in brapi? use another name or remove, to avoid confusion with entryNumber
 	public Integer getEntryNo() {
-		return entryNo;
+		return this.entryNo;
 	}
 
 	public void setEntryNo(final Integer entryNo) {
@@ -186,7 +177,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Integer getPlotNo() {
-		return plotNo;
+		return this.plotNo;
 	}
 
 	public void setPlotNo(final Integer plotNo) {
@@ -194,7 +185,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
@@ -202,7 +193,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getSeedingDate() {
-		return seedingDate;
+		return this.seedingDate;
 	}
 
 	public void setSeedingDate(final String seedingDate) {
@@ -210,11 +201,19 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public String getHarvestDate() {
-		return harvestDate;
+		return this.harvestDate;
 	}
 
 	public void setHarvestDate(final String harvestDate) {
 		this.harvestDate = harvestDate;
+	}
+
+	public Integer getObservationUnitNumber() {
+		return observationUnitNumber;
+	}
+
+	public void setObservationUnitNumber(final Integer observationUnitNumber) {
+		this.observationUnitNumber = observationUnitNumber;
 	}
 
 	@Override
@@ -224,14 +223,13 @@ public class SampleDetailsDTO implements Serializable {
 		}
 		final SampleDetailsDTO sampleDetailsDto = (SampleDetailsDTO) other;
 		return new EqualsBuilder().append(this.studyDbId, sampleDetailsDto.studyDbId)
-			.append(this.locationDbId, sampleDetailsDto.locationDbId).append(this.plotId, sampleDetailsDto.plotId)
-			.append(this.plantBusinessKey, sampleDetailsDto.plantBusinessKey)
+			.append(this.locationDbId, sampleDetailsDto.locationDbId).append(this.obsUnitId, sampleDetailsDto.obsUnitId)
 			.append(this.sampleBusinessKey, sampleDetailsDto.sampleBusinessKey).append(this.gid, sampleDetailsDto.gid).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.studyDbId).append(this.locationDbId).append(this.plotId).append(this.plantBusinessKey)
+		return new HashCodeBuilder().append(this.studyDbId).append(this.locationDbId).append(this.obsUnitId)
 			.append(this.sampleBusinessKey).append(this.gid).hashCode();
 	}
 
@@ -248,32 +246,20 @@ public class SampleDetailsDTO implements Serializable {
 		this.designation = designation;
 	}
 
-	public void setPlantNo(final Integer plantNo) {
-		this.plantNo = plantNo;
-	}
-
 	public String getSampleName() {
-		return sampleName;
+		return this.sampleName;
 	}
 
 	public String getDesignation() {
-		return designation;
-	}
-
-	public Integer getPlantNo() {
-		return plantNo;
-	}
-
-	public void setDisplayDate(final String displayDate) {
-		this.displayDate = displayDate;
+		return this.designation;
 	}
 
 	public String getDisplayDate() {
-		return displayDate;
+		return this.displayDate;
 	}
 
 	public Integer getSampleEntryNo() {
-		return sampleEntryNo;
+		return this.sampleEntryNo;
 	}
 
 	public void setSampleEntryNo(final Integer sampleEntryNo) {
@@ -281,22 +267,30 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public SimpleDateFormat getDateFormat() {
-		return dateFormat;
+		return this.dateFormat;
 	}
 
 	public String getPlateId() {
-		return plateId;
+		return this.plateId;
 	}
 
-	public void setPlateId(String plateId) {
+	public void setPlateId(final String plateId) {
 		this.plateId = plateId;
 	}
 
 	public String getWell() {
-		return well;
+		return this.well;
 	}
 
-	public void setWell(String well) {
+	public void setWell(final String well) {
 		this.well = well;
+	}
+
+	public Integer getSampleNumber() {
+		return sampleNumber;
+	}
+
+	public void setSampleNumber(final Integer sampleNumber) {
+		this.sampleNumber = sampleNumber;
 	}
 }

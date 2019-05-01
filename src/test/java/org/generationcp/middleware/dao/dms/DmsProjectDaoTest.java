@@ -1,12 +1,12 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.Type;
@@ -15,8 +15,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -58,14 +62,20 @@ public class DmsProjectDaoTest {
 		final Object[] mockDBRow2 = new Object[] {2, "My Folder", "My Folder Desc", 0, PROG_UUID, null};
 		mockQueryResult.add(mockDBRow2);
 
+		final Integer ownerId1 = 100;
+		final String ownerName1 = RandomStringUtils.randomAlphabetic(20);
 		final Object[] mockDBRow3 =
-			new Object[] {3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, 1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME,
-				Byte.valueOf("1"), 1};
+			new Object[] {
+				3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, 1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME,
+				Byte.valueOf("1"), 200, true, ownerId1, ownerName1};
 		mockQueryResult.add(mockDBRow3);
 
+		final Integer ownerId2 = 110;
+		final String ownerName2 = RandomStringUtils.randomAlphabetic(20);
 		final Object[] mockDBRow4 =
-			new Object[] {4, "My Trial", "My Trial Desc", 1, PROG_UUID, 2, StudyTypeDto.TRIAL_LABEL, StudyTypeDto.TRIAL_NAME,
-				Byte.valueOf("1"), 1};
+			new Object[] {
+				4, "My Trial", "My Trial Desc", 1, PROG_UUID, 2, StudyTypeDto.TRIAL_LABEL, StudyTypeDto.TRIAL_NAME,
+				Byte.valueOf("1"), 201, false, ownerId2, ownerName2};
 		mockQueryResult.add(mockDBRow4);
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
@@ -84,35 +94,52 @@ public class DmsProjectDaoTest {
 
 		final Reference myNursery = result.get(2);
 		Assert.assertTrue(myNursery.isStudy());
-		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, ((StudyReference) myNursery).getStudyType().getName());
+		final StudyReference nurseryResult = (StudyReference) myNursery;
+		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, nurseryResult.getStudyType().getName());
+		Assert.assertTrue(nurseryResult.getIsLocked());
+		Assert.assertEquals(ownerId1, nurseryResult.getOwnerId());
+		Assert.assertEquals(ownerName1, nurseryResult.getOwnerName());
 		this.assertCommonDataMapping(mockDBRow3, myNursery);
 
 		final Reference myTrial = result.get(3);
 		Assert.assertTrue(myTrial.isStudy());
-		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, ((StudyReference) myTrial).getStudyType().getName());
+		final StudyReference trialResult = (StudyReference) myTrial;
+		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, trialResult.getStudyType().getName());
+		Assert.assertFalse(trialResult.getIsLocked());
+		Assert.assertEquals(ownerId2, trialResult.getOwnerId());
+		Assert.assertEquals(ownerName2, trialResult.getOwnerName());
 		this.assertCommonDataMapping(mockDBRow4, myTrial);
 	}
 
 	@Test
 	public void testGetStudyMetadata() {
- 		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID)).thenReturn(this.mockQuery);
+		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID)).thenReturn(this.mockQuery);
 
-		final Object[] mockDBRow1 = new Object[] {"31", 2088, "TR", StudyTypeDto.TRIAL_NAME, "10300", "2088", "TR", "20161212", "", "9006", "2"};
+		final Object[] mockDBRow1 =
+			new Object[] {"31", 2088, "TR", StudyTypeDto.TRIAL_NAME, "10300", "2088", "TR", "20161212", "", "9006", "2"};
 		Mockito.when(this.mockQuery.uniqueResult()).thenReturn(mockDBRow1);
 		final StudyMetadata studyMetadata = this.dao.getStudyMetadata(31);
 
-		assertThat(studyMetadata.getStudyDbId(), equalTo(Integer.parseInt((String)mockDBRow1[0])));
+		assertThat(studyMetadata.getStudyDbId(), equalTo(Integer.parseInt((String) mockDBRow1[0])));
 		assertThat(studyMetadata.getNurseryOrTrialId(), equalTo(mockDBRow1[1]));
 		assertThat(studyMetadata.getStudyName(), equalTo(mockDBRow1[2]));
 		assertThat(studyMetadata.getStudyType(), equalTo(mockDBRow1[3]));
 		assertThat(studyMetadata.getSeasons().get(0), equalTo(TermId.getById(Integer.parseInt((String) mockDBRow1[4])).toString()));
-		assertThat(studyMetadata.getTrialDbId(), equalTo(Integer.parseInt( (String) mockDBRow1[5])));
+		assertThat(studyMetadata.getTrialDbId(), equalTo(Integer.parseInt((String) mockDBRow1[5])));
 		assertThat(studyMetadata.getTrialName(), equalTo(mockDBRow1[6]));
 		assertThat(studyMetadata.getStartDate(), equalTo((mockDBRow1[7])));
 		assertThat(studyMetadata.getEndDate(), equalTo(mockDBRow1[8]));
 		assertThat(studyMetadata.getActive(), equalTo(Boolean.FALSE));
 		assertThat(studyMetadata.getLocationId(), equalTo(Integer.parseInt((String) mockDBRow1[10])));
 
+	}
+
+	@Test
+	public void testCountCalculatedVariablesInDatasets() {
+		final BigInteger expectedCount = BigInteger.valueOf(new Random().nextInt());
+		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.COUNT_CALCULATED_VARIABLES_IN_DATASETS)).thenReturn(this.mockQuery);
+		Mockito.when(this.mockQuery.uniqueResult()).thenReturn(expectedCount);
+		assertThat(dao.countCalculatedVariablesInDatasets(new HashSet<Integer>(Arrays.asList(1))), equalTo(expectedCount.intValue()));
 	}
 
 	private void assertCommonDataMapping(final Object[] expected, final Reference actual) {

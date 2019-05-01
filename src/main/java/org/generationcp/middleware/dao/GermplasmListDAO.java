@@ -575,6 +575,23 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 	}
 
+	public boolean hasAdvancedOrCrossesList(final int projectId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+			criteria.add(Restrictions.eq("projectId", projectId));
+			criteria.add(Restrictions.in("type", Arrays.asList(GermplasmListType.ADVANCED.name(), GermplasmListType.IMP_CROSS.name(), GermplasmListType.CRT_CROSS.name())));
+			criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
+
+			return ((Number)criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue() > 0;
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with hasAdvancedOrCrossesList(projectId=" + projectId
+					+ ") query from GermplasmList: " + e.getMessage();
+			GermplasmListDAO.LOG.error(errorMessage);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 	public Integer getListDataListIDFromListDataProjectListID(final Integer listDataProjectListID) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);

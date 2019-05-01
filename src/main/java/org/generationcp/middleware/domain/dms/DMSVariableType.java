@@ -34,7 +34,6 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 
 	private StandardVariable standardVariable;
 
-	@Deprecated
 	private String treatmentLabel;
 	
 	private PhenotypicType role;
@@ -44,16 +43,16 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	public DMSVariableType() {
 	}
 
-	public DMSVariableType(String localName, String localDescription, StandardVariable standardVariable, int rank) {
+	public DMSVariableType(final String localName, final String localDescription, final StandardVariable standardVariable, final int rank) {
 		this.localName = localName;
 		this.localDescription = localDescription;
 		this.standardVariable = standardVariable;
 		this.role = standardVariable.getPhenotypicType();
 
 		//Setting first variable type if exist
-		Set<VariableType> variableTypes = standardVariable.getVariableTypes();
+		final Set<VariableType> variableTypes = standardVariable.getVariableTypes();
 		if(variableTypes != null){
-			Iterator<VariableType> iterator = variableTypes.iterator();
+			final Iterator<VariableType> iterator = variableTypes.iterator();
 			this.variableType = iterator.next();
 		}
 
@@ -68,7 +67,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		return this.localName;
 	}
 
-	public void setLocalName(String localName) {
+	public void setLocalName(final String localName) {
 		this.localName = localName;
 	}
 
@@ -76,7 +75,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		return this.localDescription;
 	}
 
-	public void setLocalDescription(String localDescription) {
+	public void setLocalDescription(final String localDescription) {
 		this.localDescription = localDescription;
 	}
 
@@ -84,7 +83,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		return this.rank;
 	}
 
-	public void setRank(int rank) {
+	public void setRank(final int rank) {
 		this.rank = rank;
 	}
 
@@ -92,34 +91,32 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		return this.standardVariable;
 	}
 
-	public void setStandardVariable(StandardVariable standardVariable) {
+	public void setStandardVariable(final StandardVariable standardVariable) {
 		this.standardVariable = standardVariable;
 	}
 
-	@Deprecated
 	public String getTreatmentLabel() {
 		return this.treatmentLabel;
 	}
 
-	@Deprecated
-	public void setTreatmentLabel(String treatmentLabel) {
+	public void setTreatmentLabel(final String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
 
 	public PhenotypicType getRole() {
-		return role;
+		return this.role;
 	}
 
-	public void setRole(PhenotypicType role) {
+	public void setRole(final PhenotypicType role) {
 		this.role = role;
 	}
 
 	public VariableType getVariableType() {
-		return variableType;
+		return this.variableType;
 	}
 
 	//NOTE: We also add variable type to associated standard variable.
-	public void setVariableType(VariableType variableType) {
+	public void setVariableType(final VariableType variableType) {
 		this.variableType = variableType;
 	}
 
@@ -136,7 +133,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 			return;
 		}
 
-		StandardVariable standardVariable = this.getStandardVariable();
+		final StandardVariable standardVariable = this.getStandardVariable();
 		String propertyName = "";
 		if (standardVariable != null && standardVariable.getProperty() != null) {
 			propertyName = standardVariable.getProperty().getName();
@@ -151,20 +148,20 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (!(obj instanceof DMSVariableType)) {
 			return false;
 		}
-		DMSVariableType other = (DMSVariableType) obj;
+		final DMSVariableType other = (DMSVariableType) obj;
 		return other.getId() == this.getId();
 	}
 
 	@Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("DMSVariableType [localName=");
         builder.append(this.localName);
         builder.append(", localDescription=");
@@ -183,7 +180,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
         return builder.toString();
     }
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "DMS Variable Type: ");
 		Debug.println(indent + 3, "localName: " + this.localName);
 		Debug.println(indent + 3, "localDescription: " + this.localDescription);
@@ -196,8 +193,8 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 
 	@Override
 	// Sort in ascending order by rank
-	public int compareTo(DMSVariableType compareValue) {
-		int compareRank = compareValue.getRank();
+	public int compareTo(final DMSVariableType compareValue) {
+		final int compareRank = compareValue.getRank();
 		return Integer.valueOf(this.rank).compareTo(compareRank);
 	}
 

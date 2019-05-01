@@ -16,7 +16,9 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
@@ -63,10 +65,11 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Autowired
 	private FieldbookService fieldbookService;
 	
+	@Autowired
+	private UserDataManager userDataManager;
+	
 	@Mock
 	private Session mockSession;
-	
-	private final String cropPrefix = "ABCD";
 	
 	private final List<StudyReference> dryStudies = new ArrayList<>();
 	private final List<StudyReference> wetStudies = new ArrayList<>();
@@ -508,38 +511,36 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		studyDataManager.setSessionProvider(this.sessionProvder);
 
 		final StudyTestDataInitializer studyTestDataInitializer =
-				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager);
+				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager, this.userDataManager);
 
 		// First 3 studies have location and season variables at study level
 		// We need to add datasets to studies because search queries expect "Belongs to Study" record in project_relationship
 		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_1, StudyTypeDto.getTrialDto(),
-				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101",
-				this.cropPrefix);
+				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101");
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());
 		this.dryStudies.add(studyReference1);
 
 		final StudyReference studyReference2 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_2, StudyTypeDto.getTrialDto(),
-				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102",
-				this.cropPrefix);
+				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102");
 		studyTestDataInitializer.addTestDataset(studyReference2.getId());
 		this.wetStudies.add(studyReference2);
 
 		final StudyReference studyReference3 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_3, StudyTypeDto.getTrialDto(),
-				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201",
-				this.cropPrefix);
+				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201");
 		studyTestDataInitializer.addTestDataset(studyReference3.getId());
 		this.dryStudies.add(studyReference3);
 
 		// This study has season and location variables at environment level
+		final CropType crop = new CropType();
+		crop.setUseUUID(true);
 		final StudyReference studyReference4 =
-				studyTestDataInitializer.addTestStudy(StudyTypeDto.getTrialDto(), StudySearchDaoTest.TEST_STUDY_NAME_4, this.cropPrefix);
-		studyTestDataInitializer.addEnvironmentDataset(studyReference4.getId(),
+				studyTestDataInitializer.addTestStudy(StudyTypeDto.getTrialDto(), StudySearchDaoTest.TEST_STUDY_NAME_4);
+		studyTestDataInitializer.addEnvironmentDataset(crop, studyReference4.getId(),
 				String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), String.valueOf(TermId.SEASON_DRY.getId()));
 		this.dryStudies.add(studyReference4);
 		
 		final StudyReference studyReference5 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_5, StudyTypeDto.getTrialDto(),
-				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.BANGLADESH_COUNTRY_LOCATION_ID), "20200103",
-				this.cropPrefix);
+				String.valueOf(TermId.SEASON_WET.getId()), String.valueOf(StudySearchDaoTest.BANGLADESH_COUNTRY_LOCATION_ID), "20200103");
 		studyTestDataInitializer.addTestDataset(studyReference5.getId());
 		this.wetStudies.add(studyReference5);
 	}

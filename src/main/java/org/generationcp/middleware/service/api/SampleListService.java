@@ -61,7 +61,9 @@ public interface SampleListService {
 
 	long countSamplesByUIDs(Set<String> sampleUIDs, Integer listId);
 
-	List<SampleListDTO> getSampleLists(final Integer trialId);
+	long countSamplesByDatasetId(Integer datasetId);
+
+	List<SampleListDTO> getSampleLists(final List<Integer> datasetIds);
 
 	SampleList getSampleList(final Integer sampleListId);
 
@@ -132,4 +134,6 @@ public interface SampleListService {
 	SampleList getSampleListById (Integer sampleListId);
 
 	SampleList saveOrUpdate(SampleList sampleList);
+
+	String getObservationVariableName(Integer sampleListId);
 }

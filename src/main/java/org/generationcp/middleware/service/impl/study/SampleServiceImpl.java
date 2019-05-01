@@ -1,7 +1,11 @@
 package org.generationcp.middleware.service.impl.study;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -14,15 +18,20 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.dms.*;
-import org.generationcp.middleware.service.api.PlantService;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 @Repository
 @Transactional
@@ -32,14 +41,7 @@ public class SampleServiceImpl implements SampleService {
 
 	private final HibernateSessionProvider sessionProvider;
 
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private PlantService plantService;
-
-	private DaoFactory daoFactory;
-
+	private final DaoFactory daoFactory;
 
 	public SampleServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
@@ -47,20 +49,11 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final Integer entryNumber,
+	public Sample buildSample(final String cropName, final String cropPrefix, final Integer entryNumber,
 		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
-		final Date createdDate, final User takenBy) {
+		final Date createdDate, final User takenBy, final Integer sampleNumber) {
 
 		final Sample sample = new Sample();
-		final String localCropPrefix;
-
-		if (cropPrefix == null) {
-			localCropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
-		} else {
-			localCropPrefix = cropPrefix;
-		}
-
-		sample.setPlant(this.plantService.buildPlant(localCropPrefix, plantNumber, experimentId));
 		sample.setTakenBy(takenBy);
 		sample.setEntryNumber(entryNumber);
 		sample.setSampleName(sampleName);
@@ -70,6 +63,8 @@ public class SampleServiceImpl implements SampleService {
 		sample.setSampleList(sampleList);
 		sample.setCreatedDate(createdDate);
 		sample.setCreatedBy(createdBy);
+		sample.setExperiment(daoFactory.getExperimentDao().getById(experimentId));
+		sample.setSampleNumber(sampleNumber);
 
 		return sample;
 	}
@@ -83,13 +78,24 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public List<SampleDTO> filter(final String plotId, final Integer listId, Pageable pageable) {
-		return this.daoFactory.getSampleDao().filter(plotId, listId, pageable);
+	public List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable) {
+		Integer ndExperimentId = null;
+		final ExperimentModel experiment = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
+		if (experiment != null) {
+			ndExperimentId = experiment.getNdExperimentId();
+		}
+		return this.daoFactory.getSampleDao().filter(ndExperimentId, listId, pageable);
 	}
 
 	@Override
-	public long countFilter(final String plotId, final Integer listId) {
-		return this.daoFactory.getSampleDao().countFilter(plotId, listId);
+	public long countFilter(final String obsUnitId, final Integer listId) {
+
+		Integer ndExperimentId = null;
+		final ExperimentModel experiment = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
+		if (experiment != null) {
+			ndExperimentId = experiment.getNdExperimentId();
+		}
+		return this.daoFactory.getSampleDao().countFilter(ndExperimentId, listId);
 	}
 
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
@@ -115,17 +121,17 @@ public class SampleServiceImpl implements SampleService {
 			return new SampleDetailsDTO();
 		}
 
-		final ExperimentModel experiment = sample.getPlant().getExperiment();
+		final ExperimentModel experiment = sample.getExperiment();
 		final DmsProject objectProject = experiment.getProject().getRelatedTos().get(0).getObjectProject();
 		final Integer studyId = objectProject.getProjectId();
 		final String takenBy = (sample.getTakenBy() != null) ? sample.getTakenBy().getPerson().getDisplayName() : null;
-		final String plotId = experiment.getPlotId();
+		final String obsUnitId = experiment.getObsUnitId();
 		final String studyName = objectProject.getName();
-		final StockModel stock = experiment.getExperimentStocks().get(0).getStock();
+		final StockModel stock = experiment.getStock();
 		final String entryNo = stock.getUniqueName();
-		final Integer gid = stock.getDbxrefId();
+		final Integer gid = (stock.getGermplasm() != null) ? stock.getGermplasm().getGid() : null;
 
-		samplesDetailsDto = new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
+		samplesDetailsDto = new SampleDetailsDTO(studyId, obsUnitId, sample.getSampleBusinessKey());
 		samplesDetailsDto.setTakenBy(takenBy);
 		samplesDetailsDto.setSampleDate(sample.getSamplingDate());
 		samplesDetailsDto.setStudyName(studyName);
@@ -133,7 +139,6 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setGid(gid);
 		samplesDetailsDto.setSampleName(sample.getSampleName());
 		samplesDetailsDto.setDesignation(stock.getName());
-		samplesDetailsDto.setPlantNo(sample.getPlant().getPlantNumber());
 
 		this.fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
 		this.fillProjectProperties(objectProject.getProperties(), samplesDetailsDto);
@@ -188,7 +193,7 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid) {
+	public List<SampleDTO> getByGid(final Integer gid) {
 		return this.daoFactory.getSampleDao().getByGid(gid);
 	}
 

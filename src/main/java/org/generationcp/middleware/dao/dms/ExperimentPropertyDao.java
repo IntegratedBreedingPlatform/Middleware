@@ -11,6 +11,13 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
@@ -29,22 +36,20 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link ExperimentProperty}.
  * 
  */
 public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Integer> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ExperimentPropertyDao.class);
+
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getExperimentIdsByPropertyTypeAndValue(final Integer typeId, final String value) throws MiddlewareQueryException {
+	public List<Integer> getExperimentIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -54,14 +59,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getExperimentIdsByPropertyTypeAndValue=" + typeId + ", " + value
-					+ " query at ExperimentDao: " + e.getMessage(), e);
+			final String message = "Error at getExperimentIdsByPropertyTypeAndValue=" + typeId + ", " + value
+					+ " query at ExperimentPropertyDao: " + e.getMessage();
+			ExperimentPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Integer>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<FieldMapDatasetInfo> getFieldMapLabels(final int projectId) throws MiddlewareQueryException {
+	public List<FieldMapDatasetInfo> getFieldMapLabels(final int projectId) {
 		List<FieldMapDatasetInfo> datasets = null;
 
 		try {
@@ -92,15 +98,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , siteId.value AS siteId")
 							.append(" , epropBlock.value AS blockNo ")
 							.append(" , ldp.group_name AS pedigree ")
-							.append (" , geo.plot_id as plotId ")
+							.append (" , geo.obs_unit_id as obsUnitId ")
 							.append(" FROM ")
 							.append(" nd_experiment nde ")
 							.append(" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ")
 							.append(TermId.BELONGS_TO_STUDY.getId())
-							.append(" INNER JOIN project st ON st.project_id = pr.object_project_id ")
-							.append(" INNER JOIN nd_experiment_stock es ON nde.nd_experiment_id = es.nd_experiment_id  ")
 							.append("       AND nde.project_id = pr.subject_project_id ")
-							.append(" INNER JOIN stock s ON es.stock_id = s.stock_id ")
+							.append(" INNER JOIN project st ON st.project_id = pr.object_project_id ")
+							.append(" INNER JOIN stock s ON s.stock_id = nde.stock_id ")
 							.append(" LEFT JOIN nd_experimentprop epropRep ON nde.nd_experiment_id = epropRep.nd_experiment_id ")
 							.append("       AND epropRep.type_id =  " + TermId.REP_NO.getId()
 									+ "  AND nde.project_id = pr.subject_project_id ")
@@ -136,12 +141,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id")
 							.append(" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ").append(order);
 
-			final Query query =
-					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName")
+			final SQLQuery query =
+					this.getSession().createSQLQuery(sql.toString());
+					query.addScalar("datasetId").addScalar("datasetName")
 							.addScalar("geolocationId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("plotId", Hibernate.STRING);
+							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("obsUnitId", Hibernate.STRING);
 			query.setParameter("projectId", projectId);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
@@ -149,8 +155,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getFieldMapLabels(projectId=" + projectId + ") at ExperimentPropertyDao: " + e.getMessage(), e);
+			final String message = "Error at getFieldMapLabels(projectId=" + projectId + ") at ExperimentPropertyDao: " + e.getMessage();
+			ExperimentPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return datasets;
@@ -158,8 +165,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 	@SuppressWarnings("unchecked")
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId, final Integer blockId)
-			throws MiddlewareQueryException {
-		List<FieldMapInfo> fieldmaps = new ArrayList<FieldMapInfo>();
+			{
+		List<FieldMapInfo> fieldmaps = new ArrayList<>();
 
 		try {
 			final String order = geolocationId > 0 ? "ASC" : "DESC";
@@ -174,7 +181,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , geo.description AS trialInstance ").append(" , s.dbxref_id AS gid ")
 							.append(" , st.start_date as startDate ").append(" , gpSeason.value as season ")
 							.append(" , epropBlock.value AS blockNo ")
-							.append(" , e.plot_id as plotId ")
+							.append(" , e.obs_unit_id as obsUnitId ")
 							.append(" FROM ").append("  nd_geolocationprop blk ")
 							.append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ")
 							.append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
@@ -182,8 +189,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("  INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id ")
 							.append("     AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
 							.append("  INNER JOIN project st ON st.project_id = pr.object_project_id ")
-							.append("  INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ")
-							.append("  INNER JOIN stock s ON es.stock_id = s.stock_id ")
+							.append("  INNER JOIN stock s ON e.stock_id = s.stock_id ")
 							.append("  LEFT JOIN nd_experimentprop epropRep ON epropRep.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND epropRep.type_id = ").append(TermId.REP_NO.getId()).append(" AND epropRep.value <> '' ")
 							.append("  LEFT JOIN nd_experimentprop epropBlock ON epropBlock.nd_experiment_id = e.nd_experiment_id ")
@@ -214,12 +220,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			}
 			sql.append(" ORDER BY e.nd_experiment_id ").append(order);
 
-			final Query query =
-					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
+			final SQLQuery query =
+					this.getSession().createSQLQuery(sql.toString());
+					query.addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
 							.addScalar("geolocationId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
 							"rep").addScalar("plotNo").addScalar("row")
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("plotId", Hibernate.STRING);
+							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
 
 			if (blockId != null) {
 				query.setParameter("blockId", blockId);
@@ -235,13 +242,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getAllFieldMapsInBlockByTrialInstanceId(" + geolocationId + ")", e);
+			final String message = "Error at getAllFieldMapsInBlockByTrialInstanceId(" + geolocationId + ") at ExperimentPropertyDao: " + e.getMessage();
+			ExperimentPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return fieldmaps;
 	}
 
-	public int countExperimentPropObservations(final int datasetId, final String nonEditableFactors) throws MiddlewareQueryException {
+	public int countExperimentPropObservations(final int datasetId, final String nonEditableFactors) {
 		try {
 
 			final StringBuilder sql =
@@ -254,14 +263,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			return ((BigInteger) query.uniqueResult()).intValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at countExperimentPropObservations=" + datasetId + " at ExperimentPropertyDao: " + e.getMessage(), e);
+			final String message = "Error at countExperimentPropObservations=" + datasetId + " at ExperimentPropertyDao: " + e.getMessage();
+			ExperimentPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
 	}
 
 	private List<FieldMapDatasetInfo> createFieldMapDatasetInfo(final List<Object[]> list) {
-		final List<FieldMapDatasetInfo> datasets = new ArrayList<FieldMapDatasetInfo>();
+		final List<FieldMapDatasetInfo> datasets = new ArrayList<>();
 		FieldMapDatasetInfo dataset = null;
 		List<FieldMapTrialInstanceInfo> trialInstances = null;
 		FieldMapTrialInstanceInfo trialInstance = null;
@@ -276,7 +285,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		for (final Object[] row : list) {
 			if (geolocationId == null) {
 				trialInstance = new FieldMapTrialInstanceInfo();
-				labels = new ArrayList<FieldMapLabel>();
+				labels = new ArrayList<>();
 			} else {
 				// if trial instance or dataset has changed, add previously saved trial instance
 				if (!geolocationId.equals(row[2]) || !datasetId.equals(row[0])) {
@@ -292,13 +301,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					}
 					trialInstances.add(trialInstance);
 					trialInstance = new FieldMapTrialInstanceInfo();
-					labels = new ArrayList<FieldMapLabel>();
+					labels = new ArrayList<>();
 				}
 			}
 
 			if (datasetId == null) {
 				dataset = new FieldMapDatasetInfo();
-				trialInstances = new ArrayList<FieldMapTrialInstanceInfo>();
+				trialInstances = new ArrayList<>();
 			} else {
 				// if dataset has changed, add previously saved dataset to the list
 				if (!datasetId.equals(row[0])) {
@@ -307,7 +316,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					dataset.setTrialInstances(trialInstances);
 					datasets.add(dataset);
 					dataset = new FieldMapDatasetInfo();
-					trialInstances = new ArrayList<FieldMapTrialInstanceInfo>();
+					trialInstances = new ArrayList<>();
 				}
 			}
 
@@ -341,7 +350,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
 			label.setSeason(Season.getSeason(season));
 			label.setPedigree((String) row[19]);
-			label.setPlotId((row[20] == null) ? "" : (String) row[20]);
+			label.setObsUnitId((row[20] == null) ? "" : (String) row[20]);
 			labels.add(label);
 
 			datasetId = (Integer) row[0];
@@ -380,11 +389,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 	private List<FieldMapInfo> createFieldMapLabels(final List<Object[]> rows) {
 
-		final List<FieldMapInfo> infos = new ArrayList<FieldMapInfo>();
+		final List<FieldMapInfo> infos = new ArrayList<>();
 
-		final Map<Integer, FieldMapInfo> infoMap = new HashMap<Integer, FieldMapInfo>();
-		final Map<Integer, FieldMapDatasetInfo> datasetMap = new HashMap<Integer, FieldMapDatasetInfo>();
-		final Map<String, FieldMapTrialInstanceInfo> trialMap = new HashMap<String, FieldMapTrialInstanceInfo>();
+		final Map<Integer, FieldMapInfo> infoMap = new HashMap<>();
+		final Map<Integer, FieldMapDatasetInfo> datasetMap = new HashMap<>();
+		final Map<String, FieldMapTrialInstanceInfo> trialMap = new HashMap<>();
 
 		for (final Object[] row : rows) {
 			final FieldMapLabel label = new FieldMapLabel();
@@ -404,7 +413,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
 			label.setSeason(Season.getSeason((String) row[18]));
 			label.setBlockNo(this.getIntegerValue(row[19]));
-			label.setPlotId((String) row[20]);
+			label.setObsUnitId((String) row[20]);
 
 			final String trialKey = this.getTrialKey((Integer) row[0], (Integer) row[3]);
 			FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
@@ -482,15 +491,17 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 	@SuppressWarnings("unchecked")
 	public List<String> getTreatmentFactorValues(final int levelId, final int amountId, final int measurementDatasetId)
-			throws MiddlewareQueryException {
+			{
 		try {
 
 			final StringBuilder sql =
 					new StringBuilder().append("SELECT DISTINCT levelprop.value level_value, ep.value ")
 							.append(" FROM nd_experimentprop ep ")
 							.append(" INNER JOIN nd_experimentprop levelprop ON levelprop.nd_experiment_id = ep.nd_experiment_id ")
-							.append("   AND levelprop.type_id = ").append(levelId).append(" WHERE ep.type_id = ").append(amountId)
-							.append("   AND ep.project_id = ").append(measurementDatasetId)
+							.append("   AND levelprop.type_id = ").append(levelId)
+							.append(" INNER JOIN nd_experiment e ON ep.nd_experiment_id= e.nd_experiment_id ")
+							.append(" WHERE ep.type_id = ").append(amountId)
+							.append("   AND e.project_id = ").append(measurementDatasetId)
 							.append(" ORDER BY CAST(levelprop.value AS UNSIGNED) ");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
@@ -505,13 +516,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			return returnData;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getTreatmentFactorValues=" + levelId + ", " + amountId + ", " + measurementDatasetId
-					+ " at ExperimentPropertyDao: " + e.getMessage(), e);
+			final String message = "Error at getTreatmentFactorValues=" + levelId + ", " + amountId + ", " + measurementDatasetId
+					+ " at ExperimentPropertyDao: " + e.getMessage();
+			ExperimentPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<String>();
 	}
 
-	public void deleteExperimentPropInProjectByTermId(final int projectId, final int termId) throws MiddlewareQueryException {
+	public void deleteExperimentPropInProjectByTermId(final int projectId, final int termId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
 			// of synch with
@@ -529,8 +541,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			Debug.println("DELETE ND_EXPERIMENTPROP ROWS FOR " + termId + " : " + query.executeUpdate());
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in deleteExperimentPropInProjectByTermId(" + projectId + ", " + termId
-					+ ") in ExperimentPropertyDao: " + e.getMessage(), e);
+			final String message = "Error in deleteExperimentPropInProjectByTermId(" + projectId + ", " + termId
+					+ ") in ExperimentPropertyDao: " + e.getMessage();
+			ExperimentPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
 }

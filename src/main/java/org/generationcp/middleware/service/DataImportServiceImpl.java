@@ -10,7 +10,21 @@
 
 package org.generationcp.middleware.service;
 
-import com.google.common.base.Optional;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -33,7 +47,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
-import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.StringUtil;
@@ -42,19 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.common.base.Optional;
 
 @Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
@@ -98,8 +100,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * <p/>
 	 */
 	@Override
-	public int saveDataset(final Workbook workbook, final String programUUID, final String cropPrefix) {
-		return this.saveDataset(workbook, false, false, programUUID, cropPrefix);
+	public int saveDataset(final Workbook workbook, final String programUUID, final CropType crop) {
+		return this.saveDataset(workbook, false, false, programUUID, crop);
 	}
 
 	/**
@@ -119,14 +121,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * @param retainValues         if true, values of the workbook items are retained, else they
 	 *                             are cleared to conserve memory
 	 * @param isDeleteObservations
-	 * @param cropPrefix
+	 * @param crop
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations,
-			final String programUUID, final String cropPrefix) {
+			final String programUUID, final CropType crop) {
 
 		Map<String, ?> variableMap = null;
 		final TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
@@ -150,7 +152,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			return this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID, cropPrefix);
+			return this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID, crop);
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
@@ -203,10 +205,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Set<Integer> conditionsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getConditions());
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
-
-		if (conditionsTermIds.contains(TermId.TRIAL_LOCATION.getId()) && !conditionsTermIds.contains(TermId.LOCATION_ID.getId())) {
-			messages.add(new Message(DataImportServiceImpl.LOCATION_ID_DOESNT_EXISTS));
-		}
 
 		if (factorsTermIds.contains(TermId.TRIAL_LOCATION.getId()) && !factorsTermIds.contains(TermId.LOCATION_ID.getId())) {
 			messages.add(new Message(DataImportServiceImpl.LOCATION_ID_DOESNT_EXISTS));
@@ -341,7 +339,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Optional<MeasurementVariable> locationIdMeasurementVariable =
 				this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), measurementVariables);
 		if (locationIdMeasurementVariable.isPresent() && StringUtils.isEmpty(locationIdMeasurementVariable.get().getValue())) {
-			locationIdMeasurementVariable.get().setValue(this.retrieveLocIdOfUnspecifiedLocation());
+			locationIdMeasurementVariable.get().setValue(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation());
 		}
 
 	}
@@ -375,7 +373,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// Creates a LOCATION_ID Variable with default value of "Unspecified Location".
 		// This variable will be added to an imported study with no LOCATION_ID Variable specified in the file.
-		final String unspecifiedLocationId = this.retrieveLocIdOfUnspecifiedLocation();
+		final String unspecifiedLocationId = this.locationDataManager.retrieveLocIdOfUnspecifiedLocation();
 		final MeasurementVariable variable = this.createMeasurementVariable(TermId.LOCATION_ID.getId(), unspecifiedLocationId, Operation.ADD,
 				PhenotypicType.TRIAL_ENVIRONMENT, programUUID);
 		variable.setName(Workbook.DEFAULT_LOCATION_ID_VARIABLE_ALIAS);
@@ -399,16 +397,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		var.setOperation(operation);
 		return var;
 
-	}
-
-	protected String retrieveLocIdOfUnspecifiedLocation() {
-
-		String unspecifiedLocationId = "";
-		final List<Location> locations = this.locationDataManager.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
-		if (!locations.isEmpty()) {
-			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
-		}
-		return unspecifiedLocationId;
 	}
 
 	/**
@@ -613,8 +601,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 		} else {
 			final boolean isExisting = this.checkIfProjectNameIsExistingInProgram(studyName, programUUID);
-			// existing and is not a valid study
-			if (isExisting && this.getStudyId(studyName, programUUID) == null) {
+			// existing and is study or folder.
+			if (isExisting && (this.isStudy(studyName, programUUID) || this.isFolder(studyName, programUUID))) {
 				messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 			}
 			// else we will create a new study or append the data sets to the
@@ -783,8 +771,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return "1";
 	}
 
-	private Integer getStudyId(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.IS_STUDY);
+	private boolean isStudy(final String name, final String programUUID) {
+		return this.getProjectId(name, programUUID, TermId.IS_STUDY) != null;
+	}
+
+	private boolean isFolder(final String name, final String programUUID) {
+		return this.getProjectId(name, programUUID, TermId.HAS_PARENT_FOLDER) != null;
 	}
 
 	private Integer getProjectId(final String name, final String programUUID, final TermId relationship) {
@@ -995,14 +987,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public int saveProjectOntology(final Workbook workbook, final String programUUID, final String cropPrefix) {
+	public int saveProjectOntology(final Workbook workbook, final String programUUID, final CropType crop) {
 
 		final TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)");
 		int studyId = 0;
 
 		try {
 
-			studyId = this.getWorkbookSaver().saveProjectOntology(workbook, programUUID, cropPrefix);
+			studyId = this.getWorkbookSaver().saveProjectOntology(workbook, programUUID, crop);
 
 		} catch (final Exception e) {
 
@@ -1016,13 +1008,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public int saveProjectData(final Workbook workbook, final String programUUID, final String cropPrefix) {
+	public int saveProjectData(final Workbook workbook, final String programUUID, final CropType crop) {
 
 		final TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)");
 
 		try {
 
-			this.getWorkbookSaver().saveProjectData(workbook, programUUID, cropPrefix);
+			this.getWorkbookSaver().saveProjectData(workbook, programUUID, crop);
 
 		} catch (final Exception e) {
 

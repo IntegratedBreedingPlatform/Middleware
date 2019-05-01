@@ -18,17 +18,20 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.StockModel;
 
-public class StockModelBuilder extends Builder {
+public class StockModelBuilder {
 
-	public StockModelBuilder(HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	private DaoFactory daoFactory;
+	
+	public StockModelBuilder(HibernateSessionProvider sessionProvider) {
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public StockModel get(int stockId) throws MiddlewareQueryException {
 		StockModel stockModel = null;
-		stockModel = this.getStockDao().getById(stockId);
+		stockModel = this.daoFactory.getStockDao().getById(stockId);
 		return stockModel;
 	}
 
@@ -36,7 +39,7 @@ public class StockModelBuilder extends Builder {
 		Map<Integer, StockModel> stockModels = new HashMap<Integer, StockModel>();
 
 		if (stockIds != null && !stockIds.isEmpty()) {
-			stockModels.putAll(this.getStockDao().getStocksByIds(stockIds));
+			stockModels.putAll(this.daoFactory.getStockDao().getStocksByIds(stockIds));
 		}
 
 		return stockModels;
@@ -44,7 +47,7 @@ public class StockModelBuilder extends Builder {
 
 	public Map<String, Integer> getStockMapForDataset(int datasetId) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = new HashMap<String, Integer>();
-		Set<StockModel> stocks = this.getStockDao().findInDataSet(datasetId);
+		Set<StockModel> stocks = this.daoFactory.getStockDao().findInDataSet(datasetId);
 		for (StockModel stock : stocks) {
 			if (stock != null) {
 				stockMap.put(stock.getUniqueName(), stock.getStockId());

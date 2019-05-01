@@ -503,4 +503,18 @@ public interface LocationDataManager {
 	 * @return Returns map with key locid with a Map whit additional info.
 
 	 */
+
+	/**
+	 * Returns location ID of unspecified location
+	 *
+	 * @return the location ID of unspecified lication
+	 */
+	String retrieveLocIdOfUnspecifiedLocation();
+
+	/**
+	 * Returns the number of locations where the location abbreviation value equals to the locationAbbreviation parameter
+	 * @param locationAbbreviation
+	 * @return
+	 */
+	long countByLocationAbbreviation(final String locationAbbreviation);
 }

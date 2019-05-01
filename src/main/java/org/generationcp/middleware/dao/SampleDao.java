@@ -1,7 +1,28 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.SampleDetailsBean;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.Sample;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+import org.springframework.data.domain.Pageable;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,35 +32,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Plant;
-import org.generationcp.middleware.pojos.Sample;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
-import org.generationcp.middleware.pojos.gdms.Dataset;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.data.domain.Pageable;
-
 public class SampleDao extends GenericDAO<Sample, Integer> {
+
 	protected static final String SQL_SAMPLES_AND_EXPERIMENTS =
-		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM plant pl INNER JOIN\n"
-			+ "            						sample AS sp ON pl.plant_id = sp.plant_id\n" + "        WHERE\n"
-			+ "            						nde.nd_experiment_id = pl.nd_experiment_id) 'SAMPLES'"
+		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM \n"
+			+ "            						sample AS sp \n" + "        WHERE\n"
+			+ "            						nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
 			+ "		FROM project p INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
 			+ "		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
 			+ "								INNER JOIN project p ON p.project_id = pr.subject_project_id\n"
@@ -47,31 +45,55 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ "GROUP BY nde.nd_experiment_id";
 
 	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample FROM project p INNER JOIN\n"
-			+ "    nd_experiment nde ON nde.project_id = p.project_id INNER JOIN\n"
-			+ "    plant AS pl ON nde.nd_experiment_id = pl.nd_experiment_id INNER JOIN\n"
-			+ "    sample AS sp ON pl.plant_id = sp.plant_id WHERE p.project_id = (SELECT \n"
-			+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
-			+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
-			+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n" + "GROUP BY pl.nd_experiment_id";
+		+ "    nd_experiment nde ON nde.project_id = p.project_id INNER JOIN\n"
+		+ "    sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id WHERE p.project_id = (SELECT \n"
+		+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
+		+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
+		+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n" + "GROUP BY sp.nd_experiment_id";
+
+	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
+		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           0,"
+		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1))*1) AS max_sequence_no"
+		+ " FROM nd_experiment nde "
+		+ " INNER JOIN stock st ON st.stock_id = nde.stock_id "
+		+ " INNER JOIN sample s ON s.nd_experiment_id = nde.nd_experiment_id WHERE st.dbxref_id IN (:gids)"
+		+ " GROUP BY st.dbxref_id;";
+
+	private static final String MAX_SAMPLE_NUMBER_QUERY =
+		"select nde.nd_experiment_id  as nd_experiment_id,  max(sp.sample_no) as max_sample_no from nd_experiment nde"
+			+ " inner join sample sp on sp.nd_experiment_id = nde.nd_experiment_id"
+			+ " where nde.nd_experiment_id in (:experimentIds)  group by nde.nd_experiment_id";
+
+
 
 	private static final String SAMPLE = "sample";
-	private static final String SAMPLE_PLANT = "sample.plant";
-	private static final String PLANT = "plant";
-	private static final String PLANT_EXPERIMENT = "plant.experiment";
+	private static final String SAMPLE_EXPERIMENT = "sample.experiment";
 	private static final String EXPERIMENT = "experiment";
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
 	public static final String SAMPLE_ID = "sampleId";
 
-	public List<SampleDTO> filter(final String plotId, final Integer listId, final Pageable pageable) {
-		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+	public List<SampleDTO> filter(final Integer ndExperimentId, final Integer listId, final Pageable pageable) {
+
+		final Criteria criteria = createSampleDetailsCriteria();
+		final int pageSize = pageable.getPageSize();
+		final int start = pageSize * pageable.getPageNumber();
+
 		addOrder(criteria, pageable);
-		if (StringUtils.isNotBlank(plotId)) {
-			criteria.add(Restrictions.eq("experiment.plotId", plotId));
+		if (ndExperimentId != null) {
+			criteria.add(Restrictions.or(
+				Restrictions.eq("experiment.ndExperimentId", ndExperimentId),
+				Restrictions.eq("experiment.parent.ndExperimentId", ndExperimentId)));
 		}
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
 		}
-		return getSampleDTOS(criteria, pageable);
+
+		final List<SampleDetailsBean> results = criteria
+			.setFirstResult(start)
+			.setMaxResults(pageSize)
+			.list();
+
+		return this.convertToSampleDTOs(results);
 	}
 
 	public Sample getBySampleId(final Integer sampleId) {
@@ -80,25 +102,28 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return (Sample) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
 
-	public long countFilter(final String plotId, final Integer listId) {
-		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
-		if (StringUtils.isNotBlank(plotId)) {
-			criteria.add(Restrictions.eq("experiment.plotId", plotId));
+	public long countFilter(final Integer ndExperimentId, final Integer listId) {
+
+		final Criteria criteria = this.getSession().createCriteria(Sample.class, SAMPLE);
+
+		if (ndExperimentId != null) {
+			criteria.add(Restrictions.or(
+				Restrictions.eq("experiment.ndExperimentId", ndExperimentId),
+				Restrictions.eq("experiment.parent.ndExperimentId", ndExperimentId)));
 		}
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
 		}
-		criteria.createAlias(SAMPLE_PLANT, PLANT)
-				.createAlias("sample.sampleList", "sampleList")
-				.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-				.setProjection(Projections.rowCount());
+		criteria.createAlias("sample.sampleList", "sampleList")
+			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
+			.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
 	}
 
-	public long countBySampleUIDs(final Set<String> sampleUIDs , final Integer listId) {
-		final Criteria criteria = getSession().createCriteria(Sample.class, SAMPLE);
+	public long countBySampleUIDs(final Set<String> sampleUIDs, final Integer listId) {
+		final Criteria criteria = this.getSession().createCriteria(Sample.class, SAMPLE);
 		if (!sampleUIDs.isEmpty()) {
-			criteria.add(Restrictions.in("sampleBusinessKey", sampleUIDs));
+			criteria.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs));
 		}
 		if (listId != null) {
 			criteria.add(Restrictions.eq("sampleList.id", listId));
@@ -108,19 +133,26 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return (Long) criteria.uniqueResult();
 	}
 
+	public long countByDatasetId(final Integer datasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
+		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<SampleDTO> getSampleDTOS(final Criteria criteria) {
-	    if (criteria == null) {
-	    	return Collections.<SampleDTO>emptyList();
+		if (criteria == null) {
+			return Collections.<SampleDTO>emptyList();
 		}
 		final List<Object[]> result = criteria
-			.createAlias(SAMPLE_PLANT, PLANT)
 			.createAlias("sample.sampleList", "sampleList")
 			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
-			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
+			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
+			.createAlias("experiment.stock", "stock")
+			.createAlias("stock.germplasm", "germplasm")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
@@ -130,18 +162,16 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("person.firstName")) //row[3]
 				.add(Projections.property("person.lastName")) //row[4]
 				.add(Projections.property("sampleList.listName")) //row[5]
-				.add(Projections.property("plant.plantNumber")) //row[6]
-				.add(Projections.property("plant.plantBusinessKey")) //row[7]
-				.add(Projections.property("dataset.datasetId")) //row[8]
-				.add(Projections.property("dataset.datasetName")) //row[9]
-				.add(Projections.property("stock.dbxrefId")) //row[10]
-				.add(Projections.property("stock.name")) //row[11] TODO preferred name - see BMS-5033
-				.add(Projections.property("samplingDate")) //row[12]
-				.add(Projections.property("entryNumber")) //row[13]
-				.add(Projections.property("sample.plateId")) //row[14]
-				.add(Projections.property("sample.well")) //row[15]
+				.add(Projections.property("dataset.datasetId")) //row[6]
+				.add(Projections.property("dataset.datasetName")) //row[7]
+				.add(Projections.property("germplasm.gid")) //row[8]
+				.add(Projections.property("stock.name")) //row[9] TODO preferred name
+				.add(Projections.property("samplingDate")) //row[10]
+				.add(Projections.property("entryNumber")) //row[11]
+				.add(Projections.property("sample.plateId")) //row[12]
+				.add(Projections.property("sample.well")) //row[13]
 			)).list();
-		return mapSampleDTOS(result);
+		return this.mapSampleDTOS(result);
 	}
 
 	private List<SampleDTO> mapSampleDTOS(final List<Object[]> result) {
@@ -152,29 +182,26 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			SampleDTO dto = sampleDTOMap.get(sampleId);
 			if (dto == null) {
 				dto = new SampleDTO();
-				dto.setEntryNo((Integer) row[13]);
+				dto.setEntryNo((Integer) row[11]);
 				dto.setSampleId(sampleId);
 				dto.setSampleName((String) row[1]);
 				dto.setSampleBusinessKey((String) row[2]);
-				if(row[3] != null && row[4] != null) dto.setTakenBy(row[3] + " " + row[4]);
+				if (row[3] != null && row[4] != null)
+					dto.setTakenBy(row[3] + " " + row[4]);
 				dto.setSampleList((String) row[5]);
-				dto.setPlantNumber((Integer) row[6]);
-				dto.setPlantBusinessKey((String) row[7]);
-				dto.setGid((Integer) row[10]);
-				dto.setDesignation((String) row[11]);
-				if (row[12] != null) {
-					dto.setSamplingDate((Date) row[12]);
+				dto.setGid((Integer) row[8]);
+				dto.setDesignation((String) row[9]);
+				if (row[10] != null) {
+					dto.setSamplingDate((Date) row[10]);
 				}
 				dto.setDatasets(new HashSet<SampleDTO.Dataset>());
-				dto.setPlateId((String) row[14]);
-				dto.setWell((String) row[15]);
+				dto.setPlateId((String) row[12]);
+				dto.setWell((String) row[13]);
 			}
 
-			if ((row[8] != null) && (row[9] != null)) {
+			if ((row[6] != null) && (row[7] != null)) {
 				final SampleDTO.Dataset dataset;
-				dataset = new SampleDTO().new Dataset();
-				dataset.setDatasetId((Integer) row[8]);
-				dataset.setName((String) row[9]);
+				dataset = new SampleDTO().new Dataset((Integer) row[6], (String) row[7]);
 				dto.getDatasets().add(dataset);
 			}
 
@@ -184,80 +211,120 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return new ArrayList<>(sampleDTOMap.values());
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<SampleDTO> getSampleDTOS(final Criteria criteria, final Pageable pageable) {
-		if (criteria == null) {
-			return Collections.<SampleDTO>emptyList();
-		}
-		final int pageSize = pageable.getPageSize();
-		final int start = pageSize * pageable.getPageNumber();
-
-		final List<Sample> samples = criteria
-			.setFirstResult(start)
-			.setMaxResults(pageSize)
-			.createAlias(SAMPLE_PLANT, PLANT)
+	private Criteria createSampleDetailsCriteria() {
+		return this.getSession().createCriteria(Sample.class, SAMPLE)
 			.createAlias("sample.sampleList", "sampleList")
 			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
 			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
-			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)
-			.createAlias("experiment.experimentStocks", "experimentStocks")
-			.createAlias("experimentStocks.stock", "stock")
-			.list();
+			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
+			.createAlias("experiment.project", "project")
+			.createAlias(
+				"project.properties", "projectProperty", Criteria.INNER_JOIN, Restrictions.eq("variableId", TermId.DATASET_TYPE.getId()))
+			.createAlias(
+				"experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("typeId", TermId.PLOT_NO.getId()))
+			.createAlias("project.relatedTos", "relatedTos")
+			.createAlias("relatedTos.objectProject", "objectProject")
+			.createAlias("objectProject.relatedTos", "parentProjectRelatedTos")
+			.createAlias("parentProjectRelatedTos.objectProject", "parentProject")
+			.createAlias("objectProject.studyType", "studyType", Criteria.LEFT_JOIN)
+			.createAlias("experiment.stock", "stock")
+			.createAlias("stock.germplasm", "germplasm")
+			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
+			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)
+			.setProjection(Projections.distinct(Projections.projectionList()
+				.add(Projections.alias(Projections.property("sample.sampleId"), "sampleId"))
+				.add(Projections.alias(Projections.property("sample.entryNumber"), "entryNumber"))
+				.add(Projections.alias(Projections.property("germplasm.gid"), "gid"))
+				.add(Projections.alias(Projections.property("stock.name"), "designation"))
+				.add(Projections.alias(Projections.property("sample.sampleNumber"), "sampleNumber"))
+				.add(Projections.alias(Projections.property("sample.sampleName"), "sampleName"))
+				.add(Projections.alias(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey"))
+				.add(Projections.alias(Projections.property("person.firstName"), "takenByFirstName"))
+				.add(Projections.alias(Projections.property("person.lastName"), "takenByLastName"))
+				.add(Projections.alias(Projections.property("sampleList.listName"), "sampleList"))
+				.add(Projections.alias(Projections.property("sample.samplingDate"), "samplingDate"))
+				.add(Projections.alias(Projections.property("sample.plateId"), "plateId"))
+				.add(Projections.alias(Projections.property("sample.well"), "well"))
+				.add(Projections.alias(Projections.property("projectProperty.value"), "datasetType"))
+				.add(Projections.alias(Projections.property("objectProject.projectId"), "projectId"))
+				.add(Projections.alias(Projections.property("objectProject.name"), "projectName"))
+				.add(Projections.alias(Projections.property("parentProject.projectId"), "parentProjectId"))
+				.add(Projections.alias(Projections.property("parentProject.name"), "parentProjectName"))
+				.add(Projections.alias(Projections.property("experiment.observationUnitNo"), "observationUnitNo"))
+				.add(Projections.alias(Projections.property("experimentProperty.value"), "plotNo"))
+				.add(Projections.alias(Projections.property("experiment.obsUnitId"), "observationUnitId"))
+				.add(Projections.alias(Projections.property("dataset.datasetId"), "gdmsDatasetId"))
+				.add(Projections.alias(Projections.property("dataset.datasetName"), "gdmsDatasetName")))
+			).setResultTransformer(Transformers.aliasToBean(SampleDetailsBean.class));
+	}
 
-		final List<SampleDTO> sampleDTOs = new ArrayList<>();
+	@SuppressWarnings("unchecked")
+	private List<SampleDTO> convertToSampleDTOs(final List<SampleDetailsBean> sampleDetailsBeans) {
+		if (sampleDetailsBeans.isEmpty()) {
+			return Collections.<SampleDTO>emptyList();
+		}
+		final HashMap<Integer, SampleDTO> samplesMap = new LinkedHashMap<>();
 
-		for (final Sample sample : samples) {
-
-			final Integer sampleId = sample.getSampleId();
-			SampleDTO sampleDTO = new SampleDTO();
-			sampleDTO.setEntryNo(sample.getEntryNumber());
-			sampleDTO.setSampleId(sampleId);
-			sampleDTO.setSampleName(sample.getSampleName());
-			sampleDTO.setSampleBusinessKey(sample.getSampleBusinessKey());
-			final User takenBy = sample.getTakenBy();
-			if (takenBy != null && takenBy.getPerson() != null) {
-				final Person person = takenBy.getPerson();
-				sampleDTO.setTakenBy(person.getFirstName() + " " + person.getLastName());
-			}
-			sampleDTO.setSampleList(sample.getSampleList().getListName());
-			final Plant plant = sample.getPlant();
-			sampleDTO.setPlantNumber(plant.getPlantNumber());
-			sampleDTO.setPlantBusinessKey(plant.getPlantBusinessKey());
-			if (plant.getExperiment() != null && plant.getExperiment().getExperimentStocks() != null
-				&& plant.getExperiment().getExperimentStocks().get(0) != null
-				&& plant.getExperiment().getExperimentStocks().get(0).getStock() != null) {
-				final StockModel stock = plant.getExperiment().getExperimentStocks().get(0).getStock();
-				sampleDTO.setGid(stock.getDbxrefId());
-				sampleDTO.setDesignation(stock.getName()); // TODO preferred name - see BMS-5033
-			}
-			if (sample.getSamplingDate() != null) {
-				sampleDTO.setSamplingDate(sample.getSamplingDate());
-			}
-			sampleDTO.setPlateId(sample.getPlateId());
-			sampleDTO.setWell(sample.getWell());
-
-			if (sample.getAccMetadataSets() != null) {
-				sampleDTO.setDatasets(new HashSet<SampleDTO.Dataset>());
-
-				for (AccMetadataSet accMetadataSet : sample.getAccMetadataSets()) {
-					final SampleDTO.Dataset datasetDto = new SampleDTO().new Dataset();
-					final Dataset dataset = accMetadataSet.getDataset();
-					datasetDto.setDatasetId(dataset.getDatasetId());
-					datasetDto.setName(dataset.getDatasetName());
-					sampleDTO.getDatasets().add(datasetDto);
+		for (final SampleDetailsBean sampleDetail : sampleDetailsBeans) {
+			if (samplesMap.containsKey(sampleDetail.getSampleId())) {
+				final SampleDTO sample = samplesMap.get(sampleDetail.getSampleId());
+				if (sampleDetail.getGdmsDatasetId() != null) {
+					sample.addDataset(sampleDetail.getGdmsDatasetId(), sampleDetail.getGdmsDatasetName());
 				}
+			} else {
+
+				final DataSetType dataSetType = DataSetType.findById(Integer.valueOf(sampleDetail.getDatasetType()));
+				final SampleDTO sampleDTO = new SampleDTO();
+
+				if (DataSetType.isSubObservationDatasetType(dataSetType)) {
+					// If the sample was created from subobservation, we should get the study name and id
+					// from Observation/Plot dataset's parent project (which is the study)
+					sampleDTO.setStudyName(sampleDetail.getParentProjectName());
+					sampleDTO.setStudyId(sampleDetail.getParentProjectId());
+				} else {
+					sampleDTO.setStudyName(sampleDetail.getProjectName());
+					sampleDTO.setStudyId(sampleDetail.getProjectId());
+				}
+
+				sampleDTO.setSampleId(sampleDetail.getSampleId());
+				sampleDTO.setEntryNo(sampleDetail.getEntryNumber());
+				sampleDTO.setGid(sampleDetail.getGid());
+				sampleDTO.setDesignation(sampleDetail.getDesignation());
+				sampleDTO.setSampleNumber(sampleDetail.getSampleNumber());
+				sampleDTO.setSampleName(sampleDetail.getSampleName());
+				sampleDTO.setSampleBusinessKey(sampleDetail.getSampleBusinessKey());
+				if (sampleDetail.getTakenByFirstName() != null && sampleDetail.getTakenByLastName() != null) {
+					sampleDTO.setTakenBy(sampleDetail.getTakenByFirstName() + " " + sampleDetail.getTakenByLastName());
+				}
+				sampleDTO.setSampleList(sampleDetail.getSampleList());
+				sampleDTO.setSamplingDate(sampleDetail.getSamplingDate());
+				sampleDTO.setPlateId(sampleDetail.getPlateId());
+				sampleDTO.setWell(sampleDetail.getWell());
+				sampleDTO.setDatasetType(dataSetType.getReadableName());
+
+				// Enumerator (a.k.a Observation Unit Number) is null if the sample was created from observation dataset, in that case,
+				// we should use PlotNo
+				sampleDTO.setEnumerator(sampleDetail.getObservationUnitNo() != null ? String.valueOf(sampleDetail.getObservationUnitNo()) :
+					sampleDetail.getPlotNo());
+				sampleDTO.setObservationUnitId(sampleDetail.getObservationUnitId());
+
+				if (sampleDetail.getGdmsDatasetId() != null) {
+					sampleDTO.addDataset(sampleDetail.getGdmsDatasetId(), sampleDetail.getGdmsDatasetName());
+				}
+
+				samplesMap.put(sampleDetail.getSampleId(), sampleDTO);
 			}
-			sampleDTOs.add(sampleDTO);
 		}
 
-		return sampleDTOs;
+		return new ArrayList<>(samplesMap.values());
+
 	}
 
 	@SuppressWarnings("rawtypes")
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
 		final Map<Integer, String> samplesMap = new HashMap<>();
 		try {
-			final SQLQuery query = getSession().createSQLQuery(SQL_SAMPLES_AND_EXPERIMENTS);
+			final SQLQuery query = this.getSession().createSQLQuery(SQL_SAMPLES_AND_EXPERIMENTS);
 
 			query.setParameter("studyId", studyDbId);
 			final List results = query.list();
@@ -276,10 +343,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return samplesMap;
 	}
 
-	public Sample getBySampleBk(final String sampleBk){
+	public Sample getBySampleBk(final String sampleBk) {
 		final Sample sample;
 		try {
-			sample = (Sample) getSession().createCriteria(Sample.class, SAMPLE).add(Restrictions.eq(SAMPLE_BUSINESS_KEY, sampleBk))
+			sample = (Sample) this.getSession().createCriteria(Sample.class, SAMPLE).add(Restrictions.eq(SAMPLE_BUSINESS_KEY, sampleBk))
 				.uniqueResult();
 		} catch (final HibernateException he) {
 			throw new MiddlewareException(
@@ -288,92 +355,39 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return sample;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
+		final Map<Integer, Integer> map = new HashMap<>();
+		final List<Object[]> result = this.getSession()
+			.createCriteria(Sample.class, SAMPLE)
+			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
+			.createAlias("experiment.stock", "stock")
+			.createAlias("stock.germplasm", "germplasm")
+			.add(Restrictions.in(SAMPLE_ID, sampleIds))
+			.setProjection(Projections.projectionList()
+				.add(Projections.property("sample.sampleId"))
+				.add(Projections.property("germplasm.gid")))
+			.list();
+		for (final Object[] row : result) {
+			map.put((Integer) row[0], (Integer) row[1]);
+		}
+		return map;
+	}
+
 	public List<SampleDTO> getBySampleBks(final Set<String> sampleUIDs) {
-		return getSampleDTOS(getSession().createCriteria(Sample.class, SAMPLE) //
-				.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs)));
+		return this.getSampleDTOS(this.getSession().createCriteria(Sample.class, SAMPLE) //
+			.add(Restrictions.in(SAMPLE_BUSINESS_KEY, sampleUIDs)));
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<SampleGermplasmDetailDTO> getByGid(final Integer gid){
-		final List<Object[]> result = getSession()
-
-			.createCriteria(Sample.class, SAMPLE).createAlias(SAMPLE_PLANT, PLANT)//
-			.createAlias("sample.sampleList", "sampleList", CriteriaSpecification.LEFT_JOIN)//
-			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)//
-			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)//
-			.createAlias(PLANT_EXPERIMENT, EXPERIMENT)//
-
-			.createAlias("experiment.experimentStocks", "experimentStocks")//
-			.createAlias("experimentStocks.stock", "stock")//
-			.createAlias("experiment.project", "project")//
-			.createAlias("project.relatedTos", "relatedTos")//
-			.createAlias("relatedTos.objectProject", "objectProject")//
-			.createAlias("objectProject.studyType", "studyType")//
-			.add(Restrictions.eq("stock.dbxrefId", gid))//
+	public List<SampleDTO> getByGid(final Integer gid) {
+		final List<SampleDetailsBean> results = this.createSampleDetailsCriteria()
+			.add(Restrictions.eq("germplasm.gid", gid))
 			.add(Restrictions.ne("project." + DmsProjectDao.DELETED, true))
+			.addOrder(Order.desc("sample.sampleBusinessKey"))
+			.list();
 
-			.addOrder(Order.desc("sample.sampleBusinessKey"))//
-
-			.setProjection(Projections.distinct(Projections.projectionList()//
-				.add(Projections.property("sampleList.listName"))//
-				.add(Projections.property("sample.sampleBusinessKey"))//
-				.add(Projections.property("experiment.plotId"))//
-				.add(Projections.property("plant.plantBusinessKey"))//
-				.add(Projections.property("dataset.datasetId"))//
-				.add(Projections.property("dataset.datasetName"))//
-
-				.add(Projections.property("objectProject.projectId"))//
-				.add(Projections.property("objectProject.name"))//
-				.add(Projections.property("objectProject.programUUID"))//
-				.add(Projections.property("studyType.studyTypeId"))//
-				.add(Projections.property("studyType.label"))//
-				.add(Projections.property("studyType.name"))//
-				.add(Projections.property("studyType.visible"))//
-				.add(Projections.property("studyType.cvTermId"))//
-				//.add(Projections.property("objectProject.studyType"))//
-				.add(Projections.property("sample.plateId"))//
-				.add(Projections.property("sample.well"))))//
-			.list();//
-
-		final HashMap<String,SampleGermplasmDetailDTO> samplesMap = new HashMap<>();
-		for (final Object[] row : result) {
-			final SampleGermplasmDetailDTO sample;
-
-			final String sampleListName = (String) row[0];
-			final String sampleBk = (String) row[1];
-			final String plotId = (String) row[2];
-			final String plantBk = (String) row[3];
-			final Integer datasetId = (Integer) row[4];
-			final String datasetName = (String) row[5];
-			final Integer projectId = (Integer) row[6];
-			final String studyName = (String) row[7];
-			final String programUuid = (String) row[8];
-			final Integer studyTypeId = (Integer) row[9];
-			final String label = (String) row[10];
-			final String studyTypeName = (String) row[11];
-			final boolean visible = ((Boolean) row[12]);
-			final Integer cvtermId = (Integer) row[13];
-			final String plateId = (String) row[14];
-			final String well = (String) row[15];
-			final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-
-			if(samplesMap.containsKey(sampleBk)){
-				sample = samplesMap.get(sampleBk);
-				sample.addDataset(datasetId, datasetName);
-			}else{
-				sample = new SampleGermplasmDetailDTO();
-				sample.setSampleListName(sampleListName);
-				sample.setSampleBk(sampleBk);
-				sample.setPlotId(plotId);
-				sample.setPlantBk(plantBk);
-				sample.setStudy(new StudyReference(projectId, studyName, "", programUuid, studyTypeDto));
-				sample.setPlateId(plateId);
-				sample.setWell(well);
-				sample.addDataset(datasetId, datasetName);
-				samplesMap.put(sampleBk,sample);
-			}
-		}
-		return new ArrayList<>(samplesMap.values());
+		return this.convertToSampleDTOs(results);
 	}
 
 	public boolean hasSamples(final Integer studyId) {
@@ -384,9 +398,53 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			queryResults = query.list();
 
 		} catch (final HibernateException he) {
-			throw new MiddlewareException("Unexpected error in executing hasSamples(studyId = " + studyId + ") query: " + he.getMessage(),
-					he);
+			throw new MiddlewareException(
+				"Unexpected error in executing hasSamples(studyId = " + studyId + ") query: " + he.getMessage(),
+				he);
 		}
 		return queryResults.isEmpty() ? false : true;
 	}
+
+	public Map<Integer, Integer> getMaxSampleNumber(final Collection<Integer> experimentIds) {
+		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(MAX_SAMPLE_NUMBER_QUERY);
+		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
+		createSQLQuery.addScalar("max_sample_no", new IntegerType());
+		createSQLQuery.setParameterList("experimentIds", experimentIds);
+		return this.mapResults(createSQLQuery.list());
+
+	}
+
+	private Map<Integer, Integer> mapResults(final List<Object[]> results) {
+
+		final Map<Integer, Integer> map = new HashMap<>();
+		if (results != null && !results.isEmpty()) {
+			for (final Object[] row : results) {
+				map.put((Integer) row[0], (Integer) row[1]);
+			}
+		}
+		return map;
+	}
+
+	public Map<Integer, Integer> getMaxSequenceNumber(final Collection<Integer> gids) {
+		final SQLQuery createSQLQuery = this.getSession().createSQLQuery(SampleDao.MAX_SEQUENCE_NUMBER_QUERY);
+		createSQLQuery.addScalar("gid", new StringType());
+		createSQLQuery.addScalar("max_sequence_no", new IntegerType());
+		createSQLQuery.setParameterList("gids", gids);
+		return this.mapResultsToSampleSequence(createSQLQuery.list());
+	}
+
+	private Map<Integer, Integer> mapResultsToSampleSequence(final List<Object[]> results) {
+		final Map<Integer, Integer> map = new HashMap<>();
+		if (results != null && !results.isEmpty()) {
+
+			for (final Object[] row : results) {
+				map.put(Integer.valueOf((String) row[0]), (Integer) row[1]);
+			}
+		}
+		return map;
+	}
+	
+	
+
+
 }

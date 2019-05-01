@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.workbench.CropType;
 
 /**
  * Saves a study (the corresponding Project, ProjectProperty, ProjectRelationship entries) to the database.
@@ -34,8 +35,8 @@ public class StudySaver extends Saver {
 	 * Saves a study. Creates an entry in project, projectprop and project_relationship tables (default) Creates an entry in nd_experiment
 	 * table if saveStudyExperiment is true.
 	 */
-	public DmsProject saveStudy(final int parentId, final VariableTypeList variableTypeList, final StudyValues studyValues, final boolean saveStudyExperiment,
-		final String programUUID, final String cropPrefix, final StudyTypeDto studyType, final String description, final String startDate,
+	public DmsProject saveStudy(final CropType crop, final int parentId, final VariableTypeList variableTypeList, final StudyValues studyValues, final boolean saveStudyExperiment,
+		final String programUUID, final StudyTypeDto studyType, final String description, final String startDate,
 		final String endDate, final String objective, final String name, final String createdBy) throws Exception {
 
 		DmsProject project = this.getProjectSaver().create(studyValues, studyType, description, startDate, endDate, objective, name,
@@ -47,7 +48,7 @@ public class StudySaver extends Saver {
 		this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, studyValues.getVariableList());
 		this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
 		if (saveStudyExperiment) {
-			this.saveStudyExperiment(project.getProjectId(), studyValues, cropPrefix);
+			this.saveStudyExperiment(crop, project.getProjectId(), studyValues);
 		}
 		return project;
 
@@ -56,9 +57,9 @@ public class StudySaver extends Saver {
 	/**
 	 * Creates an entry in nd_experiment table if saveStudyExperiment is true.
 	 */
-	public void saveStudyExperiment(final int projectId, final StudyValues values, final String cropPrefix) throws Exception {
+	public void saveStudyExperiment(final CropType crop, final int projectId, final StudyValues values) throws Exception {
 		try {
-			this.getExperimentModelSaver().addExperiment(projectId, ExperimentType.STUDY_INFORMATION, values, cropPrefix);
+			this.getExperimentModelSaver().addExperiment(crop, projectId, ExperimentType.STUDY_INFORMATION, values);
 		} catch (final Exception e) {
 			throw e;
 		}

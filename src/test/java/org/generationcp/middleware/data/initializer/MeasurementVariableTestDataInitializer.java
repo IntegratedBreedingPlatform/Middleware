@@ -34,6 +34,12 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setName(name);
 		measurementVar.setValue(value);
 		measurementVar.setDataTypeId(TermId.NUMERIC_VARIABLE.getId());
+		measurementVar.setRole(PhenotypicType.TRIAL_DESIGN);
+		measurementVar.setVariableType(VariableType.STUDY_DETAIL);
+		measurementVar.setDescription(name);
+		measurementVar.setProperty("PROPERTY");
+		measurementVar.setScale("SCALE");
+		measurementVar.setMethod("METHOD");
 		return measurementVar;
 	}
 	
