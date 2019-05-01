@@ -1,13 +1,16 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
+import org.generationcp.middleware.service.api.sample.SampleSearchRequestDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -17,10 +20,12 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -64,6 +69,21 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ " inner join sample sp on sp.nd_experiment_id = nde.nd_experiment_id"
 			+ " where nde.nd_experiment_id in (:experimentIds)  group by nde.nd_experiment_id";
 
+	private static final String SAMPLES_SEARCH_MAIN_QUERY = "select ne.nd_geolocation_id as instanceId, " //
+		+ "       ne.obs_unit_id as obsUnitId, " //
+		+ "       s.sample_bk as sampleBusinessKey, " //
+		+ "       CONCAT (p.fname, ' ' ,p.lname) as takenBy, " //
+		+ "       TIMESTAMP(s.sampling_date) as sampleDate, " //
+		+ "       s2.dbxref_id as gid, " //
+		+ "       s.well as well, " //
+		+ "       s.plate_id as plateId " //
+		+ "       from sample s " //
+		+ "  inner join nd_experiment ne on s.nd_experiment_id = ne.nd_experiment_id " //
+		+ "         inner join nd_geolocation ng on ne.nd_geolocation_id = ng.nd_geolocation_id " //
+		+ "  inner join stock s2 on ne.stock_id = s2.stock_id "//
+		+ "inner join users u on u.userid = s.created_by " //
+		+ "inner join persons p on p.personid = u.personid " //
+		+ "where 1=1";
 
 
 	private static final String SAMPLE = "sample";
@@ -443,8 +463,90 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return map;
 	}
-	
-	
 
+	private void addSearchFilters (StringBuilder queryString, final SampleSearchRequestDto sampleSearchRequestDto) {
+
+		if (!StringUtils.isEmpty(sampleSearchRequestDto.getStudyDbId())) {
+			queryString.append(" and ne.nd_geolocation_id = :studyDbId");
+		}
+
+		if (sampleSearchRequestDto.getObservationUnitDbId()!=null && !sampleSearchRequestDto.getObservationUnitDbId().isEmpty()) {
+			queryString.append(" and ne.obs_unit_id in (:obsUnitIds)");
+		}
+
+		if (sampleSearchRequestDto.getSampleDbId()!=null && !sampleSearchRequestDto.getSampleDbId().isEmpty()) {
+			queryString.append(" and s.sample_bk in (:sampleBkIds)");
+		}
+
+		if (sampleSearchRequestDto.getGermplasmDbId()!=null && !sampleSearchRequestDto.getGermplasmDbId().isEmpty()) {
+			queryString.append(" and s2.dbxref_id in (:gids)");
+		}
+
+		if (sampleSearchRequestDto.getPlateDbId()!=null && !sampleSearchRequestDto.getPlateDbId().isEmpty()) {
+			queryString.append(" and s.plate_id in (:plateIds)");
+		}
+	}
+
+	private void setSearchParameters (SQLQuery sqlQuery, final SampleSearchRequestDto sampleSearchRequestDto) {
+
+		if (!StringUtils.isEmpty(sampleSearchRequestDto.getStudyDbId())) {
+			sqlQuery.setParameter("studyDbId", sampleSearchRequestDto.getStudyDbId());
+		}
+
+		if (sampleSearchRequestDto.getObservationUnitDbId()!=null && !sampleSearchRequestDto.getObservationUnitDbId().isEmpty()) {
+			sqlQuery.setParameterList("obsUnitIds", sampleSearchRequestDto.getObservationUnitDbId());
+		}
+
+		if (sampleSearchRequestDto.getSampleDbId()!=null && !sampleSearchRequestDto.getSampleDbId().isEmpty()) {
+			sqlQuery.setParameterList("sampleBkIds", sampleSearchRequestDto.getSampleDbId());
+		}
+
+		if (sampleSearchRequestDto.getGermplasmDbId()!=null && !sampleSearchRequestDto.getGermplasmDbId().isEmpty()) {
+			sqlQuery.setParameterList("gids", sampleSearchRequestDto.getGermplasmDbId());
+		}
+
+		if (sampleSearchRequestDto.getPlateDbId()!=null && !sampleSearchRequestDto.getPlateDbId().isEmpty()) {
+			sqlQuery.setParameterList("plateIds", sampleSearchRequestDto.getPlateDbId());
+		}
+	}
+	
+	public List<SampleDetailsDTO> searchSamples(final SampleSearchRequestDto sampleSearchRequestDto) {
+
+		final StringBuilder queryString = new StringBuilder(SampleDao.SAMPLES_SEARCH_MAIN_QUERY);
+
+		this.addSearchFilters(queryString, sampleSearchRequestDto);
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+
+		if (sampleSearchRequestDto.getPage() != null && sampleSearchRequestDto.getPageSize() != null) {
+			sqlQuery.setFirstResult(sampleSearchRequestDto.getPageSize() * (sampleSearchRequestDto.getPage() - 1));
+			sqlQuery.setMaxResults(sampleSearchRequestDto.getPageSize());
+		}
+
+		this.setSearchParameters(sqlQuery, sampleSearchRequestDto);
+
+		sqlQuery.addScalar("instanceId", new IntegerType()).addScalar("obsUnitId", new StringType()).addScalar("sampleBusinessKey", new StringType())
+			.addScalar("takenBy", new StringType()).addScalar("sampleDate", new DateType()).addScalar("gid", new IntegerType())
+			.addScalar("well", new StringType()).addScalar("plateId", new StringType())
+			.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class));
+
+
+		final List<SampleDetailsDTO> results = sqlQuery.list();
+
+		return results;
+
+	}
+
+	public long countSearchSamplesResults(final SampleSearchRequestDto sampleSearchRequestDto) {
+		final StringBuilder queryString = new StringBuilder(SampleDao.SAMPLES_SEARCH_MAIN_QUERY);
+
+		this.addSearchFilters(queryString, sampleSearchRequestDto);
+
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
+
+		this.setSearchParameters(query, sampleSearchRequestDto);
+
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
 
 }

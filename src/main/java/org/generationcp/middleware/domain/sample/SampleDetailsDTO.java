@@ -13,9 +13,12 @@ import java.util.Date;
 public class SampleDetailsDTO implements Serializable {
 
 	private static final long serialVersionUID = -4175016670661637734L;
+
+	//TODO we should not be formatting the date at this level, this DTO is also being used in BrAPI
 	private final SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.FRONTEND_DATE_FORMAT_3);
 
 	private Integer studyDbId;
+	private Integer instanceId;
 	private Integer locationDbId;
 	private String obsUnitId;
 	private String sampleBusinessKey;
@@ -292,5 +295,13 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setSampleNumber(final Integer sampleNumber) {
 		this.sampleNumber = sampleNumber;
+	}
+
+	public Integer getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(final Integer instanceId) {
+		this.instanceId = instanceId;
 	}
 }

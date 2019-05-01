@@ -3,10 +3,10 @@ package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.sample.SampleSearchRequestDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
@@ -34,4 +34,9 @@ public interface SampleService {
 	List<SampleDTO> getByGid(final Integer gid);
 
 	Boolean studyHasSamples(final Integer studyId);
+
+	long countSearchSampleObservationsResults(final SampleSearchRequestDto sampleSearchRequestDto);
+
+	List<SampleDetailsDTO> searchSampleObservations(final SampleSearchRequestDto sampleSearchRequestDto);
+
 }

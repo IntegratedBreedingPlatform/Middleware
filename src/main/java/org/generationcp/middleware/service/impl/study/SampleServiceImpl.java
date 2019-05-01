@@ -1,20 +1,14 @@
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -25,13 +19,16 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.SampleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.generationcp.middleware.service.api.sample.SampleSearchRequestDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Repository
 @Transactional
@@ -202,4 +199,15 @@ public class SampleServiceImpl implements SampleService {
 		return this.daoFactory.getSampleDao().hasSamples(studyId);
 	}
 
+	@Override
+	public List<SampleDetailsDTO> searchSampleObservations(
+		final SampleSearchRequestDto sampleSearchRequestDto) {
+		return this.daoFactory.getSampleDao().searchSamples(sampleSearchRequestDto);
+	}
+
+	@Override
+	public long countSearchSampleObservationsResults(
+		final SampleSearchRequestDto sampleSearchRequestDto) {
+		return this.daoFactory.getSampleDao().countSearchSamplesResults(sampleSearchRequestDto);
+	}
 }
