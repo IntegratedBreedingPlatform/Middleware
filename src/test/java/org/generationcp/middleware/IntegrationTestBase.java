@@ -1,8 +1,6 @@
 
 package org.generationcp.middleware;
 
-import java.util.UUID;
-
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -14,11 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 /**
  * A marker base class to hold common Spring test annotations and other common stuff when needed, for Middleware data managers and services
@@ -64,7 +63,7 @@ public abstract class IntegrationTestBase {
 
 	@After
 	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - this.startTime;
+		final long elapsedTime = System.nanoTime() - this.startTime;
 		LOG.info(" +++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() ended, took "
 				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++\n");
 	}

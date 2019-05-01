@@ -22,11 +22,13 @@ import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
@@ -81,6 +83,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+
+import static org.generationcp.middleware.operation.saver.WorkbookSaver.ENVIRONMENT;
+import static org.generationcp.middleware.operation.saver.WorkbookSaver.PLOTDATA;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
@@ -965,21 +970,71 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Mockito.verify(mockManager, Mockito.times(2)).updateDependentPhenotypesStatus(Matchers.eq(variableId), Matchers.eq(experimentId));
 	}
 
+	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)
+		throws Exception {
+		final StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
+		final DMSVariableType vtype = new DMSVariableType();
+		vtype.setLocalName(name);
+		vtype.setLocalDescription(description);
+		vtype.setRank(rank);
+		vtype.setStandardVariable(stdVar);
+		vtype.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+
+		return vtype;
+	}
+
+	private DatasetReference addTestDataset(final int studyId, final String name, final DataSetType dataSetType) throws Exception {
+		final VariableTypeList typeList = new VariableTypeList();
+
+		final DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName(name);
+		datasetValues.setDescription("My Dataset Description");
+		datasetValues.setType(dataSetType);
+
+		DMSVariableType variableType =
+			this.createVariableType(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha", 4);
+		variableType.setLocalName("GY_Adj_kgha");
+		typeList.add(variableType);
+
+		variableType =
+			this.createVariableType(20444, "SCMVInc_Cmp_pct", "Sugarcane mosaic virus incidence BY SCMVInc - Computation IN %", 5);
+		variableType.setLocalName("Aphid damage");
+		typeList.add(variableType);
+
+		variableType = this.createVariableType(TermId.PLOT_NO.getId(), "Plot No", "Plot No", 6);
+		variableType.setLocalName("Plot No");
+		typeList.add(variableType);
+
+		return this.manager.addDataSet(studyId, typeList, datasetValues, null);
+	}
 	@Test
-	public void testRenameStudy() {
+	public void testRenameStudy() throws Exception {
 		// Create project record
-		final DmsProject project = new DmsProject();
+		DmsProject project = new DmsProject();
 		final String programUUID = "74364-9075-asdhaskj-74825";
 		project.setProjectId(1);
 		project.setName("projectName");
 		project.setDescription("ProjectDescription");
 		project.setProgramUUID(programUUID);
-		this.manager.getDmsProjectDao().save(project);
+		project = this.manager.getDmsProjectDao().save(project);
+
+		final DatasetReference plotdata =
+			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DataSetType.PLOT_DATA);
+
+
+		final DatasetReference environment =
+			this.addTestDataset(project.getProjectId(), project.getName() + ENVIRONMENT, DataSetType.SUMMARY_DATA);
 
 		final String newStudyName = "newStudyName";
 		this.manager.renameStudy(newStudyName, project.getProjectId(), programUUID);
 
+		final DmsProject plotDataset = this.manager.getDmsProjectDao().getById(plotdata.getId());
+		final DmsProject environmentDataset = this.manager.getDmsProjectDao().getById(environment.getId());
+
+		Assert.assertEquals(newStudyName + PLOTDATA, plotDataset.getName());
+		Assert.assertEquals(newStudyName + ENVIRONMENT, environmentDataset.getName());
 		Assert.assertEquals(newStudyName, project.getName());
+
 	}
 
 	@Test
