@@ -510,4 +510,11 @@ public interface LocationDataManager {
 	 * @return the location ID of unspecified lication
 	 */
 	String retrieveLocIdOfUnspecifiedLocation();
+
+	/**
+	 * Returns the number of locations where the location abbreviation value equals to the locationAbbreviation parameter
+	 * @param locationAbbreviation
+	 * @return
+	 */
+	long countByLocationAbbreviation(final String locationAbbreviation);
 }

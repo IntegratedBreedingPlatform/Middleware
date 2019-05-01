@@ -10,13 +10,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -26,10 +19,10 @@ import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
+import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -53,12 +46,17 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Implementation of the WorkbenchDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -144,7 +142,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		userInfoDao.setSession(this.getCurrentSession());
 		return userInfoDao;
 	}
-	
+
 	private RoleDAO getRoleDao() {
 		final RoleDAO roleDao = new RoleDAO();
 		roleDao.setSession(this.getCurrentSession());
@@ -210,7 +208,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.getProjectDao().merge(project);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Cannot save Project: WorkbenchDataManager.saveOrUpdateProject(project=" + project + "): " + e.getMessage(), e);
+				"Cannot save Project: WorkbenchDataManager.saveOrUpdateProject(project=" + project + "): " + e.getMessage(), e);
 		}
 
 		return project;
@@ -223,8 +221,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.getProjectUserInfoDao().merge(projectUserInfo);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Cannot save ProjectUserInfo: WorkbenchDataManager.saveOrUpdateProjectUserInfo(project=" + projectUserInfo + "): " + e
-							.getMessage(), e);
+				"Cannot save ProjectUserInfo: WorkbenchDataManager.saveOrUpdateProjectUserInfo(project=" + projectUserInfo + "): " + e
+					.getMessage(), e);
 		}
 
 		return projectUserInfo;
@@ -238,7 +236,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.getProjectDao().save(project);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): " + e.getMessage(), e);
+				"Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): " + e.getMessage(), e);
 		}
 		return project;
 	}
@@ -249,7 +247,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.getProjectDao().merge(project);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Cannot save Project: WorkbenchDataManager.updateProject(project=" + project + "): " + e.getMessage(), e);
+				"Cannot save Project: WorkbenchDataManager.updateProject(project=" + project + "): " + e.getMessage(), e);
 		}
 		return project;
 	}
@@ -260,7 +258,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 			final Long projectId = project.getProjectId();
 			final List<ProjectActivity> projectActivities =
-					this.getProjectActivitiesByProjectId(projectId, 0, (int) this.countProjectActivitiesByProjectId(projectId));
+				this.getProjectActivitiesByProjectId(projectId, 0, (int) this.countProjectActivitiesByProjectId(projectId));
 			for (final ProjectActivity projectActivity : projectActivities) {
 				this.deleteProjectActivity(projectActivity);
 			}
@@ -272,18 +270,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): " + e
-							.getMessage(), e);
+				"Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): " + e
+					.getMessage(), e);
 		}
 	}
-	
+
 	@Override
-	public List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> userIds) {
+	public List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(final Long projectId, final List<Integer> userIds) {
 		return this.getProjectUserInfoDao().getByProjectIdAndUserIds(projectId, userIds);
 	}
-	
+
 	@Override
-	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId) {
+	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(final Long projectId, final Integer userId) {
 		return this.getProjectUserInfoDao().getByProjectIdAndUserId(projectId, userId);
 	}
 
@@ -305,8 +303,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Cannot delete ProjectUserInfo: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo=" + projectUserInfo
-							+ "): " + e.getMessage(), e);
+				"Cannot delete ProjectUserInfo: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo=" + projectUserInfo
+					+ "): " + e.getMessage(), e);
 		}
 	}
 
@@ -320,7 +318,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): " + e.getMessage(), e);
+				"Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -381,7 +379,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Person: WorkbenchDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
+				"Error encountered while saving Person: WorkbenchDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
 		}
 		return idPersonSaved;
 	}
@@ -398,7 +396,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+				"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
 
 		return idUserSaved;
@@ -462,7 +460,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting User: WorkbenchDataManager.deleteUser(user=" + user + "):  " + e.getMessage(), e);
+				"Error encountered while deleting User: WorkbenchDataManager.deleteUser(user=" + user + "):  " + e.getMessage(), e);
 		}
 	}
 
@@ -491,8 +489,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting Person: WorkbenchDataManager.deletePerson(person=" + person + "): " + e.getMessage(),
-					e);
+				"Error encountered while deleting Person: WorkbenchDataManager.deletePerson(person=" + person + "): " + e.getMessage(),
+				e);
 		}
 	}
 
@@ -505,7 +503,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getUsersByProjectId(projectId);
 	}
-	
+
 	@Override
 	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getPersonsByProjectId(projectId);
@@ -514,6 +512,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<CropType> getInstalledCropDatabses() {
 		return this.getCropTypeDao().getAll();
+	}
+
+	@Override
+	public List<CropType> getAvailableCropsForUser(final int workbenchUserId) {
+		return this.getCropTypeDao().getAvailableCropsForUser(workbenchUserId);
 	}
 
 	@Override
@@ -538,8 +541,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while adding crop type: WorkbenchDataManager.addCropType(cropType=" + cropType + "): " + e
-							.getMessage(), e);
+				"Error encountered while adding crop type: WorkbenchDataManager.addCropType(cropType=" + cropType + "): " + e
+					.getMessage(), e);
 		}
 
 		return idSaved;
@@ -581,8 +584,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while adding addProjectActivity: WorkbenchDataManager.addOrUpdateProjectActivityData(projectActivityList="
-							+ projectActivityList + ", operation=" + operation + "): " + e.getMessage(), e);
+				"Error encountered while adding addProjectActivity: WorkbenchDataManager.addOrUpdateProjectActivityData(projectActivityList="
+					+ projectActivityList + ", operation=" + operation + "): " + e.getMessage(), e);
 		}
 
 		return idsSaved;
@@ -603,8 +606,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting ProjectActivity: WorkbenchDataManager.deleteProjectActivity(projectActivity="
-							+ projectActivity + "): " + e.getMessage(), e);
+				"Error encountered while deleting ProjectActivity: WorkbenchDataManager.deleteProjectActivity(projectActivity="
+					+ projectActivity + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -626,8 +629,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			}
 		} catch (final Exception e) {
 			final String message =
-					"Error encountered while adding IbdbUserMap (linking workbench user id to crop database user): WorkbenchDataManager.addIbdbUserMap(userMap="
-							+ userMap + "): " + e.getMessage();
+				"Error encountered while adding IbdbUserMap (linking workbench user id to crop database user): WorkbenchDataManager.addIbdbUserMap(userMap="
+					+ userMap + "): " + e.getMessage();
 			WorkbenchDataManagerImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -671,8 +674,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
-							+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
+				"Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
+					+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
 		}
 
 		return ibdbUserId;
@@ -802,7 +805,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
+				"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -819,13 +822,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
+				"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public List<StandardPreset> getStandardPresetFromCropAndToolByName(final String presetName, final String cropName, final int toolId,
-			final String toolSection) {
+	public List<StandardPreset> getStandardPresetFromCropAndToolByName(
+		final String presetName, final String cropName, final int toolId,
+		final String toolSection) {
 
 		try {
 			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
@@ -838,8 +842,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"error in: WorkbenchDataManager.getStandardPresetFromCropAndToolByName(cropName=" + cropName + "): " + e.getMessage(),
-					e);
+				"error in: WorkbenchDataManager.getStandardPresetFromCropAndToolByName(cropName=" + cropName + "): " + e.getMessage(),
+				e);
 		}
 	}
 
@@ -850,8 +854,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset=" + standardPreset.getName() + "): " + e
-							.getMessage(), e);
+				"Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset=" + standardPreset.getName() + "): " + e
+					.getMessage(), e);
 		}
 	}
 
@@ -862,8 +866,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.getCurrentSession().delete(preset);
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId=" + standardPresetId + "): " + e
-							.getMessage(), e);
+				"Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId=" + standardPresetId + "): " + e
+					.getMessage(), e);
 		}
 	}
 
@@ -921,7 +925,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+				"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
 
 		final UserInfo userInfo = new UserInfo();
@@ -959,7 +963,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-					"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+				"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
 
 		return idUserSaved;
@@ -997,7 +1001,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Integer> getActiveUserIDsByProjectId(Long projectId) {
+	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
 		return this.getProjectUserInfoDao().getActiveUserIDsByProjectId(projectId);
 	}
 
@@ -1012,7 +1016,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public boolean isSuperAdminUser(Integer userId) {
+	public boolean isSuperAdminUser(final Integer userId) {
 		return this.getWorkbenchUserDao().isSuperAdminUser(userId);
 	}
 
