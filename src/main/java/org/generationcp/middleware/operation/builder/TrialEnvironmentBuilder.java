@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -34,6 +27,13 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class TrialEnvironmentBuilder extends Builder {
 
@@ -201,9 +201,9 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	}
 
-	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds) {
+	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
 		final TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(this.getGeolocationDao().getEnvironmentsForTraits(traitIds));
+		environments.addAll(this.getGeolocationDao().getEnvironmentsForTraits(traitIds, programUUID));
 		return environments;
 	}
 
