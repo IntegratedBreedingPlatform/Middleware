@@ -5,7 +5,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 
-	<changeSet author="vanina" id="v12.0.1-1">
+	<changeSet author="vanina" id="v11.4.2-1">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'trait_donor_query';
