@@ -249,9 +249,9 @@ class ObservationQuery {
 		 */
 		final List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW", "COL", "BLOCK_NO");
 		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
-			orderColumn = "(1 * " + orderColumn + ")";
+			return " ORDER BY (1 * " + orderColumn + ") " + direction + " ";
 		}
-		return " ORDER BY " + orderColumn + " " + direction + " ";
+		return " ORDER BY `" + orderColumn + "` " + direction + " ";
 	}
 
 	String getGroupingClause() {
