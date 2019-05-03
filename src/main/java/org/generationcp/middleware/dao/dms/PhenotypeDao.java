@@ -31,6 +31,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservat
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -48,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -949,9 +951,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			// Get observations (Traits)
 			final SQLQuery observationsQuery = this.getSession().createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS);
 			observationsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
-			observationsQuery.addScalar("expid").addScalar("phen_id").addScalar("cvterm_id")
-				.addScalar("cvterm_name", new StringType()).
-				addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType());
+			observationsQuery.addScalar("expid").addScalar("phen_id").addScalar("cvterm_id").addScalar("cvterm_name", new StringType())
+				.addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType())
+				.addScalar("updated_date");
 			final List<Object[]> observationResults = observationsQuery.list();
 
 			for (final Object[] result : observationResults) {
@@ -962,14 +964,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					(result[5] != null && !((String) result[5]).isEmpty()) ? (String) result[5] : String.valueOf(result[2]);
 				observation.setObservationVariableDbId(variableId);
 				observation.setObservationVariableName((String) result[3]);
-				observation.setObservationTimeStamp(StringUtils.EMPTY);
-				observation.setSeason(StringUtils.EMPTY);
-				observation.setCollector(StringUtils.EMPTY);
 				observation.setObservationDbId((Integer) result[1]);
 				observation.setValue((String) result[4]);
+				observation.setObservationTimeStamp(Util.formatDateAsStringValue((Date) result[6], Util.FRONTEND_TIMESTAMP_FORMAT));
+				// TODO
+				observation.setSeason(StringUtils.EMPTY);
+				observation.setCollector(StringUtils.EMPTY);
 
 				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
-				// TODO solve duplicate nd_experiment_phenotype_id
 				observationUnit.getObservations().add(observation);
 			}
 		}

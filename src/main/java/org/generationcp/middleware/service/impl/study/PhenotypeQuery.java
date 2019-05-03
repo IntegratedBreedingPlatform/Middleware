@@ -63,7 +63,8 @@ public class PhenotypeQuery {
 		+ "  cvt.cvterm_id as cvterm_id, " //
 		+ "  cvt.name as cvterm_name, " //
 		+ "  ph.value as value , " //
-		+ "  cvp.value as crop_ontology_id "
+		+ "  cvp.value as crop_ontology_id, "
+		+ "  ph.updated_date as updated_date "
 		+ " FROM " //
 		+ "  phenotype ph  " //
 		+ "  INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //

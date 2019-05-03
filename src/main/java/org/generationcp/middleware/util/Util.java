@@ -24,6 +24,8 @@ package org.generationcp.middleware.util;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +48,8 @@ import java.util.TreeSet;
  *
  */
 public class Util {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Util.class);
 
 	public static final String DATE_AS_NUMBER_FORMAT = "yyyyMMdd";
 	public static final String FRONTEND_DATE_FORMAT = "yyyy-MM-dd";
@@ -298,7 +302,17 @@ public class Util {
 	 * @return date in the specified format as String
 	 */
 	public static String formatDateAsStringValue(final Date date, final String format) {
-		return Util.getSimpleDateFormat(format).format(date.getTime());
+		if (date == null || format == null) {
+			return null;
+		}
+
+		try {
+			return Util.getSimpleDateFormat(format).format(date.getTime());
+		} catch (final IllegalArgumentException e) {
+			LOG.warn("Cannot format date: " + date + " - format: " + format, e);
+			System.out.println("Cannot format date: " + date + " - format: " + format);
+			return null;
+		}
 	}
 
 	/**
