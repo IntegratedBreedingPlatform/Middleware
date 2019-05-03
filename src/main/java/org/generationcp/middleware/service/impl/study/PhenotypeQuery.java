@@ -9,7 +9,7 @@ public class PhenotypeQuery {
 		+ "  nde.nd_experiment_id AS nd_experiment_id, " //
 		+ "  nde.obs_unit_id AS observationUnitDbId, " //
 		+ "  '' AS observationUnitName, " //
-		+ "  'plot' AS observationLevel, " //
+		+ "  dataset_type.name AS observationLevel, " //
 		+ "  NULL AS plantNumber, " // Until we have plant level observation
 		+ "  s.dbxref_id AS germplasmDbId, " //
 		+ "  s.name AS germplasmName, " //
@@ -38,7 +38,7 @@ public class PhenotypeQuery {
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
 		+ "  LEFT JOIN projectprop pp_dataset_type ON dataset.project_id = pp_dataset_type.project_id AND pp_dataset_type.variable_id = " + TermId.DATASET_TYPE.getId() //
-		+ "  LEFT JOIN cvterm datatype_type ON pp_dataset_type.value = datatype_type.cvterm_id " //
+		+ "  LEFT JOIN cvterm dataset_type ON pp_dataset_type.value = dataset_type.cvterm_id " //
 		+ "  LEFT JOIN nd_geolocationprop gp ON gl.nd_geolocation_id = gp.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id " //
 		+ "  LEFT JOIN location l ON l.locid = gp.value " //
 		+ " WHERE 1 = 1" //
