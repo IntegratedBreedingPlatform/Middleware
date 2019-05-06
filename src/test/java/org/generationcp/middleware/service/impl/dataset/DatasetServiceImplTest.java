@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -524,7 +525,7 @@ public class DatasetServiceImplTest {
 
 		Assert.assertEquals(testMeasurements, actualMeasurements);
 	}
-	
+
 	@Test
 	public void testDeletePhenotype() {
 		final Random random = new Random();
@@ -538,7 +539,7 @@ public class DatasetServiceImplTest {
 		phenotype.setExperiment(experiment);
 		experiment.setPhenotypes(Lists.newArrayList(phenotype));
 		when(this.phenotypeDao.getById(phenotypeId)).thenReturn(phenotype);
-		
+
 		final Formula formula1 = new Formula();
 		final CVTerm term1 = new CVTerm();
 		term1.setCvTermId(random.nextInt());
@@ -549,12 +550,12 @@ public class DatasetServiceImplTest {
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(observableId);
 
-		
+
 		this.datasetService.deletePhenotype(phenotypeId);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
 		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitId, Arrays.asList(term1.getCvTermId(), term2.getCvTermId()));
 	}
-	
+
     @Test
     public void testGetDatasetInstances() {
         final Random random = new Random();
@@ -922,7 +923,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
 
 		final int plotCount = 3;
-		final List<ExperimentModel> plotExperiments = getPlotExperiments(plotCount);
+		final List<ExperimentModel> plotExperiments = this.getPlotExperiments(plotCount);
 		final int plotDatasetId = new Random().nextInt();
 		final List<Integer> instanceIds = Arrays.asList(11, 12, 13);
 		Mockito.doReturn(plotExperiments).when(this.experimentDao).getObservationUnits(plotDatasetId, instanceIds);
@@ -950,6 +951,80 @@ public class DatasetServiceImplTest {
 				Assert.assertFalse(subObsUnit.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
 			}
 		}
+	}
+	@Test
+	public void testFindAdditionalEnvironmentFactors() {
+		final Random random = new Random();
+		final Integer datasetId = random.nextInt(10);
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		final int termId = 100;
+		final String variableName = "VariableName";
+		measurementVariable.setTermId(termId);
+		measurementVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable.setName(variableName);
+
+		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
+		measurementVariable1.setTermId(TermId.LOCATION_ID.getId());
+		measurementVariable1.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable1.setName("LOCATION_ID");
+
+		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
+		measurementVariable2.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		measurementVariable2.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable2.setName("TRIAL_INSTANCE");
+
+		final MeasurementVariable measurementVariable3 = new MeasurementVariable();
+		measurementVariable3.setTermId(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		measurementVariable3.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		measurementVariable3.setName("EXPERIMENT_DESIGN_FACTOR");
+
+		final List<MeasurementVariable> observationSetVariables = Arrays.asList(measurementVariable, measurementVariable1,
+			measurementVariable2, measurementVariable3);
+
+		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
+			VariableType.ENVIRONMENT_DETAIL.getId()))).thenReturn(observationSetVariables);
+
+		final List<String> result = this.datasetService.findAdditionalEnvironmentFactors(datasetId);
+
+		// Only 1 variable is expected to be returned. Standard Environment Variables
+		// (TRIAL_INSTANCE, LOCATION_ID and EXPERIMENT_DESIGN should be ignored.
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.contains(measurementVariable.getName()));
+	}
+
+
+	@Test
+	public void testGetEnvironmentConditionVariableNames() {
+		final Random random = new Random();
+		final Integer datasetId = random.nextInt(10);
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		final int termId = 100;
+		final String variableName = "VariableName";
+		measurementVariable.setTermId(termId);
+		measurementVariable.setVariableType(VariableType.STUDY_CONDITION);
+		measurementVariable.setName(variableName);
+
+		final List<MeasurementVariable> observationSetVariables = Arrays.asList(measurementVariable);
+
+		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
+			VariableType.STUDY_CONDITION.getId()))).thenReturn(observationSetVariables);
+
+		final List<String> result = this.datasetService.getEnvironmentConditionVariableNames(datasetId);
+
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.contains(measurementVariable.getName()));
+	}
+
+	@Test
+	@Ignore // TODO IBP-2695
+	public void testImportDataset() {
+		final Boolean draftMode = null;
+		final Integer datasetId = null;
+		final Table<String, String, String> table = null;
+
+		this.datasetService.importDataset(datasetId, table, draftMode);
 	}
 
 	private  List<ExperimentModel> getPlotExperiments(final Integer count) {

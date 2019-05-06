@@ -30,6 +30,7 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -278,7 +279,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds) {
+	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
 		final TrialEnvironments environments = new TrialEnvironments();
 		try {
 			final String sql =
@@ -291,7 +292,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
 					+ TermId.LOCATION_ID.getId() + " LEFT JOIN location l ON l.locid = gp.value"
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
-					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid" + " WHERE ph.observable_id IN (:traitIds);";
+					+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
+					+ " WHERE ph.observable_id IN (:traitIds) AND p.program_uuid = :programUUID ;";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar(GeolocationDao.ENVT_ID);
 			query.addScalar(GeolocationDao.LOCATION_NAME);
@@ -301,6 +303,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.addScalar("name");
 			query.addScalar(GeolocationDao.LOCATION_ID);
 			query.setParameterList("traitIds", traitIds);
+			query.setParameter("programUUID", programUUID);
 			final List<Object[]> list = query.list();
 			for (final Object[] row : list) {
 				// otherwise it's invalid data and should not be included
@@ -352,7 +355,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return null;
 	}
 
-	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
+	public List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
 
 		final String queryString = "select \n" + "    geoloc.nd_geolocation_id as instanceDBId, \n"
 			+ "    geoloc.description as instanceNumber, \n" + "    pmain.project_id trialDbId, \n"
@@ -369,13 +372,21 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			+ "    inner join project pmain on pmain.project_id = pr.object_project_id and pr.type_id = 1150 \n"
 			+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 			+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-			+ " where nde.type_id = 1020 and pmain.project_id = :studyId \n"
-			+ "    group by geoloc.nd_geolocation_id " + "    order by geoloc.nd_geolocation_id asc \n";
+			+ " where nde.type_id = 1020 and pmain.project_id = :studyId \n";
 
-		final SQLQuery query = this.getSession().createSQLQuery(queryString);
+		final StringBuilder strBuilder = new StringBuilder(queryString);
+		final boolean locationFilterSpecified = !CollectionUtils.isEmpty(locationIds);
+		if (locationFilterSpecified) {
+			strBuilder.append("    and geoprop.value in (:locationIds) ");
+		}
+		strBuilder.append("    group by geoloc.nd_geolocation_id ");
+		strBuilder.append("    order by geoloc.nd_geolocation_id asc \n");
+		final SQLQuery query = this.getSession().createSQLQuery(strBuilder.toString());
 
 		query.setParameter("studyId", studyId);
-
+		if (locationFilterSpecified) {
+			query.setParameterList("locationIds", locationIds);
+		}
 		query.addScalar("instanceDBId", new IntegerType());
 		query.addScalar("instanceNumber");
 		query.addScalar("trialDbId", new IntegerType());
