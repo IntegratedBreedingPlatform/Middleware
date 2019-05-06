@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.jdbc.util.BasicFormatterImpl;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,9 +30,12 @@ public class ObservationQueryTest {
 	final List<String> germplasmDescriptors = Lists.newArrayList(STOCK_ID);
 	final List<String> designFactors = Lists.newArrayList(FACT1);
 	List<MeasurementVariableDto> traitNames  = new LinkedList<>();
-	
+
+	private ObservationQuery observationQuery;
+
 	@Before
 	public void setup() {
+		this.observationQuery = new ObservationQuery();
 		this.traitNames = new LinkedList<>();
 		this.traitNames.add(new MeasurementVariableDto(1, PH_CM));
 	}
@@ -45,23 +49,20 @@ public class ObservationQueryTest {
 	 */
 	@Test
 	public void testGetAllMeasurementsQueryGeneration() throws Exception {
-		final ObservationQuery fixture = new ObservationQuery();
-		final String result = fixture.getAllObservationsQuery(this.traitNames, this.germplasmDescriptors, this.designFactors, null, null);
+		final String result = this.observationQuery.getAllObservationsQuery(this.traitNames, this.germplasmDescriptors, this.designFactors, null, null);
 		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForAllMeasurements()),
 			this.formatString(result));
 	}
 
 	@Test
 	public void testGetSingleMeasurementQueryGeneration() throws Exception {
-		final ObservationQuery fixture = new ObservationQuery();
-		final String result = fixture.getSingleObservationQuery(this.traitNames, this.germplasmDescriptors, this.designFactors);
+		final String result = this.observationQuery.getSingleObservationQuery(this.traitNames, this.germplasmDescriptors, this.designFactors);
 		assertEquals("The generated query must match the expected query.", this.formatString(this.expectedQueryForSingleMeasurement()),
 			this.formatString(result));
 	}
-	
+
 	@Test
 	public void testGetSampleObservationQuery() {
-		final ObservationQuery fixture = new ObservationQuery();
 		final String sql = "SELECT \n" + "    nde.nd_experiment_id as nd_experiment_id,\n"
 				+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value"
 				+ " as value, s.dbxref_id as gid"
@@ -74,7 +75,18 @@ public class ObservationQueryTest {
 				+ "\tp.project_id = :datasetId \n" + " AND gl.description IN (:instanceIds) \n"
 				+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 		assertEquals("The generated query must match the expected query.", this.formatString(sql),
-			this.formatString(fixture.getSampleObservationQuery()));
+			this.formatString(this.observationQuery.getSampleObservationQuery()));
+	}
+
+	@Test
+	public void testGetOrderingClause() {
+		final String orderBy = " ORDER BY ";
+		String orderingClause = this.observationQuery.getOrderingClause(null, null);
+		String expectedResult = orderBy + "(1 * " + ObservationQuery.DEFAULT_SORT_COLUMN + ") " + ObservationQuery.DEFAULT_SORT_ORDER + " ";
+		Assert.assertEquals(expectedResult, orderingClause);
+		orderingClause = this.observationQuery.getOrderingClause("FIELDMAP RANGE", "desc");
+		expectedResult = orderBy + "`FIELDMAP RANGE` desc ";
+		Assert.assertEquals(expectedResult, orderingClause);
 	}
 
 	private String formatString(final String format) {
