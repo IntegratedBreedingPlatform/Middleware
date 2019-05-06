@@ -38,7 +38,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.BeanFormState;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -116,7 +115,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	private List<UserRole> roles;
 
 	@Transient
-	private Boolean isnew = false;
+	private Boolean isNew = false;
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="personid", insertable=false, updatable=false)
@@ -169,7 +168,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		user.setPersonid(this.personid);
 		user.setAssignDate(this.adate);
 		user.setCloseDate(this.cdate);
-		user.setIsNew(this.isnew);
+		user.setIsNew(this.isNew);
 		user.setActive(this.active);
 		user.setEnabled(this.enabled);
 		return user;
@@ -191,7 +190,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		user.setPersonid(this.personid);
 		user.setAssignDate(this.adate);
 		user.setCloseDate(this.cdate);
-		user.setIsNew(this.isnew);
+		user.setIsNew(this.isNew);
 		user.setActive(this.active);
 		user.setEnabled(this.enabled);
 		return user;
@@ -286,11 +285,11 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	public Boolean isNew() {
-		return this.isnew;
+		return this.isNew;
 	}
 
 	public void setIsNew(Boolean val) {
-		this.isnew = val;
+		this.isNew = val;
 	}
 
 	public List<UserRole> getRoles() {
@@ -348,8 +347,8 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		builder.append(this.cdate);
 		builder.append(", person=");
 		builder.append(this.person);
-		builder.append(", isnew=");
-		builder.append(this.isnew);
+		builder.append(", isNew=");
+		builder.append(this.isNew);
 		builder.append(", isActive=");
 		builder.append(this.active);
 		builder.append(", isEnabled=");
