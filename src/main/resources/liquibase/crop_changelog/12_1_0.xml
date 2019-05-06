@@ -1,0 +1,79 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v12.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+                <tableExists tableName="dataset_type"/>
+            </not>
+		</preConditions>
+		<comment>
+			Creates dataset_type table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `dataset_type` (
+			  `dataset_type_id` int(11) NOT NULL AUTO_INCREMENT,
+			  `name` varchar(100) DEFAULT NULL,
+			  `description` varchar(1024) DEFAULT NULL,
+			  `cvterm_id` int(11) DEFAULT NULL,
+			  `is_subobs_type` tinyint(4) DEFAULT '0',
+			  PRIMARY KEY (`dataset_type_id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+
+			INSERT INTO `dataset_type`
+			(`dataset_type_id`,
+			`name`,
+			`description`,
+			`cvterm_id`,
+			`is_subobs_type`)
+			VALUES
+			(1,'STUDY','Study conditions',10060,0),
+			(2,'MEANS','Means data for each trial instance',10070,0),
+			(3,'SUMMARY','Environment conditions and summary data',10080,0),
+			(4,'PLOT','Plot data',10090,0),
+			(5,'PLANT','Plant Sub-Observation Dataset',10094,1),
+			(6,'QUADRAT','Quadrats Sub-Observation Dataset',10095,1),
+			(7,'TIMESERIES','Time Series Sub-Observation Dataset',10096,1),
+			(8,'CUSTOM','Custom Sub-Observation Dataset',10097,1),
+			(9,'SS','Sub-sample data',10091,0),
+			(10,'WD','Weather data',10092,0),
+			(11,'OM','Means over trial instances',10093,0);
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v12.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+                <columnExists tableName="project" columnName="dataset_type_id"/>
+            </not>
+		</preConditions>
+		<comment>
+			Add new dataset_type_id column to project table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `project`
+			ADD COLUMN `dataset_type_id` INT(11) NULL DEFAULT NULL AFTER `study_type_id`;
+
+			ALTER TABLE `project`
+			ADD INDEX `dataset_type_fk_idx` (`dataset_type_id` ASC);
+
+			ALTER TABLE `project`
+			ADD CONSTRAINT `dataset_type_fk`
+			  FOREIGN KEY (`dataset_type_id`)
+			  REFERENCES `dataset_type` (`dataset_type_id`)
+			  ON DELETE NO ACTION
+			  ON UPDATE NO ACTION;
+
+			-- Populate project.dataset_type_id based on projectprop value (linking by dataset_type.cvterm_id)
+			UPDATE project p
+			INNER JOIN projectprop pp ON p.project_id  = pp.project_id
+			INNER JOIN dataset_type dt ON pp.value = dt.cvterm_id
+			SET p.dataset_type_id = dt.dataset_type_id
+			WHERE pp.variable_id = 8160;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
