@@ -31,6 +31,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.xml.crypto.Data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +106,10 @@ public class DmsProject implements Serializable {
 	@JoinColumn(name = "study_type_id")
 	@NotFound(action = NotFoundAction.EXCEPTION)
 	private StudyType studyType;
+
+	@ManyToOne(targetEntity = DatasetType.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "dataset_type_id")
+	private DatasetType datasetType;
 
 	@Column(name = "start_date")
 	private String startDate;
@@ -270,6 +275,14 @@ public class DmsProject implements Serializable {
 		if (this.createdBy == null || this.createdBy.isEmpty()) {
 			this.createdBy = createdBy;
 		}
+	}
+
+	public DatasetType getDatasetType() {
+		return this.datasetType;
+	}
+
+	public void setDatasetType(final DatasetType datasetType) {
+		this.datasetType = datasetType;
 	}
 
 	@Override
