@@ -7,6 +7,13 @@ import java.util.List;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DMSVariableTypeTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -24,6 +31,11 @@ public class DataSetBuilderTest {
 	private static final int STUDY_ID_WITH_STUDY = 1;
 	private static final int STUDY_ID_NO_STUDY = 2;
 	private static final int STUDY_ID_NODATASETS = 3;
+	private static final int RANK = 0;
+	private static final String DATASET_NAME = "DATASET_NAME";
+	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	private static final String LOCATION_NAME = "LOCATION_NAME";
+	private static final String NFERT_NO = "NFert_NO";
 
 	@Mock
 	HibernateSessionProvider hibernateSessionProvider;
@@ -64,6 +76,61 @@ public class DataSetBuilderTest {
 	public void testGetStudyDataSetByUsingDatasetType() {
 		final DmsProject dataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_NO_STUDY);
 		Assert.assertEquals("The Study Dataset's project id should be 3", "3", dataset.getProjectId().toString());
+	}
+
+	@Test
+	public void filterVariables_partOfHiddenDatasetColumns_RemoveVariable() {
+		final VariableTypeList variables = new VariableTypeList();
+		variables.add(new DMSVariableType(DataSetBuilderTest.DATASET_NAME, DataSetBuilderTest.DATASET_NAME,
+				StandardVariableTestDataInitializer.createStandardVariable(TermId.DATASET_NAME.getId(), DataSetBuilderTest.DATASET_NAME), DataSetBuilderTest.RANK));
+		final VariableTypeList newVariables = this.dataSetBuilder.filterDatasetVariables(variables, true);
+		Assert.assertTrue("Dataset column removed.", newVariables.getVariableTypes().size() == 0);
+	}
+
+	@Test
+	public void filterVariables_isMeasurementDatasetAndIsTrialFactors_RemoveVariable() {
+		final VariableTypeList variables = new VariableTypeList();
+
+		variables
+				.add(new DMSVariableType(DataSetBuilderTest.LOCATION_NAME,
+						DataSetBuilderTest.LOCATION_NAME,
+						StandardVariableTestDataInitializer.createStandardVariableTestData(
+								DataSetBuilderTest.LOCATION_NAME, PhenotypicType.TRIAL_ENVIRONMENT), DataSetBuilderTest.RANK));
+		final VariableTypeList newVariables = this.dataSetBuilder.filterDatasetVariables(variables, true);
+
+		Assert.assertTrue("Trial factor removed.", newVariables.getVariableTypes().size() == 0);
+	}
+
+	@Test
+	public void filterVariables_isTrialAndOcc_AddVariable() {
+		final VariableTypeList variables = new VariableTypeList();
+
+		variables.add(new DMSVariableType(DataSetBuilderTest.TRIAL_INSTANCE, DataSetBuilderTest.TRIAL_INSTANCE,
+				StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), DataSetBuilderTest.TRIAL_INSTANCE), DataSetBuilderTest.RANK));
+		final VariableTypeList newVariables = this.dataSetBuilder.filterDatasetVariables(variables, false);
+
+		Assert.assertTrue("Trial instance added.", newVariables.size() == variables.size());
+		Assert.assertEquals(DataSetBuilderTest.TRIAL_INSTANCE, newVariables.getVariableTypes().get(0).getLocalName());
+	}
+
+	@Test
+	public void filterVariables_isTreatmentFactorDuplicate_RemoveVariable() {
+		// Create treatment factor variable
+		final VariableTypeList variables = new VariableTypeList();
+		variables.add(DMSVariableTypeTestDataInitializer.createDmsVariableType(DataSetBuilderTest.NFERT_NO, DataSetBuilderTest.NFERT_NO));
+
+		// Create additional prop added to projectprop when adding treatment factors
+		DMSVariableType variableType = DMSVariableTypeTestDataInitializer.createDmsVariableType(DataSetBuilderTest.NFERT_NO, DataSetBuilderTest.NFERT_NO, DataSetBuilderTest.RANK);
+		variableType.setVariableType(VariableType.TREATMENT_FACTOR);
+		variableType.setStandardVariable(StandardVariableTestDataInitializer.createStandardVariable(8241, variableType.getLocalName()));
+		variables.add(variableType);
+
+		final VariableTypeList newVariables = this.dataSetBuilder.filterDatasetVariables(variables, true);
+
+		// Assert that duplicate was removed
+		Assert.assertTrue("Duplicate treatment factor variable was removed.", newVariables.getVariableTypes().size() < variables.getVariableTypes().size());
+		Assert.assertEquals(DataSetBuilderTest.NFERT_NO, variables.getVariableTypes().get(0).getLocalName());
+		Assert.assertNotNull(newVariables.getVariableTypes().get(0).getVariableType());
 	}
 
 	@Test(expected = MiddlewareQueryException.class)

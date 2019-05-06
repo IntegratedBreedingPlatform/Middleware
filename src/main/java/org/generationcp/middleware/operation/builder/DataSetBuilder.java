@@ -196,7 +196,7 @@ public class DataSetBuilder extends Builder {
 		return workbook;
 	}
 
-	private VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
+	protected VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
 		final VariableTypeList newVariables = new VariableTypeList();
 		if (variables != null) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
