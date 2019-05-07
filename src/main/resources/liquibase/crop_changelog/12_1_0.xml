@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="vanina" id="v12.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+			<tableExists tableName="brapi_search" />
+			</not>
+		</preConditions>
+		<comment>
+			This table must be generic and will save all data from the search calls
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE brapi_search (
+			request_id INT(11) NOT NULL,
+			request_type VARCHAR(45) NOT NULL,
+			parameters TEXT NOT NULL,
+			PRIMARY KEY (request_id));
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

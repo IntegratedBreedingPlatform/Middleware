@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.dao.BrapiSearchDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -27,7 +28,6 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.Progenitor;
 
 public class DaoFactory {
 
@@ -198,5 +198,11 @@ public class DaoFactory {
 		final ProgenitorDAO progenitorDao = new ProgenitorDAO();
 		progenitorDao.setSession(this.sessionProvider.getSession());
 		return progenitorDao;
+	}
+
+	public BrapiSearchDAO getBrapiSearchDAO() {
+		final BrapiSearchDAO brapiSearchDAO = new BrapiSearchDAO();
+		brapiSearchDAO.setSession(this.sessionProvider.getSession());
+		return brapiSearchDAO;
 	}
 }
