@@ -38,6 +38,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -666,7 +667,7 @@ public class WorkbookSaver extends Saver {
 		Integer datasetId = null;
 		if (trialName == null || "".equals(trialName)) {
 
-			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DataSetType.SUMMARY_DATA);
+			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetType.SUMMARY_DATA);
 			if (dataSetsByType != null && !CollectionUtils.isEmpty(dataSetsByType)) {
 				datasetId = dataSetsByType.get(0).getId();
 			}
@@ -688,7 +689,7 @@ public class WorkbookSaver extends Saver {
 				.transform(trialName, trialDescription, DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 
 			watch.restart("save trial dataset");
-			final DmsProject trial = this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID);
+			final DmsProject trial = this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID, DatasetType.SUMMARY_DATA);
 			datasetId = trial.getProjectId();
 		}
 
@@ -713,7 +714,7 @@ public class WorkbookSaver extends Saver {
 		Integer datasetId = null;
 
 		if (datasetName == null || "".equals(datasetName)) {
-			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DataSetType.PLOT_DATA);
+			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetType.PLOT_DATA);
 			if (dataSetsByType != null && !CollectionUtils.isEmpty(dataSetsByType)) {
 				datasetId = dataSetsByType.get(0).getId();
 			}
@@ -740,7 +741,7 @@ public class WorkbookSaver extends Saver {
 			final VariableTypeList datasetVariables = this.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 			// no need to add occ as it is already added in trialVariables
 			// fix for GCP-6436 end
-			final DmsProject dataset = this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID);
+			final DmsProject dataset = this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID, DatasetType.PLOT_DATA);
 			datasetId = dataset.getProjectId();
 		}
 
@@ -1184,7 +1185,7 @@ public class WorkbookSaver extends Saver {
 
 			watch.restart("save means dataset");
 			final VariableTypeList datasetVariables = this.getMeansData(effectVariables, trialVariables);
-			final DmsProject dataset = this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID);
+			final DmsProject dataset = this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID, DatasetType.MEANS_DATA);
 			datasetId = dataset.getProjectId();
 		}
 

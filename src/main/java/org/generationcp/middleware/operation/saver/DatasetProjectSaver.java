@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 
@@ -33,12 +34,12 @@ public class DatasetProjectSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public DmsProject addDataSet(final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues, final String programUUID)
+	public DmsProject addDataSet(final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues, final String programUUID, final int datasetTypeId)
 			throws MiddlewareQueryException {
 		final DmsProject datasetProject = new DmsProject();
 		datasetProject.setName(this.getName(datasetValues));
 		datasetProject.setDescription(this.getDescription(datasetValues));
-
+		datasetProject.setDatasetType(new DatasetType(datasetTypeId));
 		datasetProject.setProgramUUID(programUUID);
 
 		this.addNameVariableTypeIfNecessary(variableTypeList, programUUID);

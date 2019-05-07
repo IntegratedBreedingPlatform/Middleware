@@ -14,6 +14,7 @@ package org.generationcp.middleware.domain.dms;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -29,7 +30,7 @@ public class DataSet {
 
 	private int studyId;
 
-	private DataSetType dataSetType;
+	private DatasetType datasetType;
 
 	private VariableTypeList variableTypes;
 
@@ -69,12 +70,12 @@ public class DataSet {
 		this.studyId = studyId;
 	}
 
-	public DataSetType getDataSetType() {
-		return this.dataSetType;
+	public DatasetType getDatasetType() {
+		return this.datasetType;
 	}
 
-	public void setDataSetType(DataSetType dataSetType) {
-		this.dataSetType = dataSetType;
+	public void setDatasetType(DatasetType datasetType) {
+		this.datasetType = datasetType;
 	}
 
 	public VariableTypeList getVariableTypes() {
@@ -148,7 +149,7 @@ public class DataSet {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.dataSetType == null ? 0 : this.dataSetType.hashCode());
+		result = prime * result + (this.datasetType == null ? 0 : this.datasetType.hashCode());
 		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
 		result = prime * result + this.id;
 		result = prime * result + (this.locationIds == null ? 0 : this.locationIds.hashCode());

@@ -199,7 +199,7 @@ public interface StudyDataManager {
 	 * @param programUUID      the program UUID
 	 * @return DatasetReference corresponding to the newly-created DataSet
 	 */
-	DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID);
+	DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID, int datasetTypeId);
 
 	/**
 	 * Add a new variable/column to the dataset.
@@ -256,10 +256,10 @@ public interface StudyDataManager {
 	 * local.
 	 *
 	 * @param studyId     the study id
-	 * @param dataSetType the data set type
-	 * @return The list of datasets matching the dataSetType or empty list if non found.
+	 * @param datasetTypeId the dataset type id
+	 * @return The list of datasets matching the datasetTypeId or empty list if non found.
 	 */
-	List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType);
+	List<DataSet> getDataSetsByType(int studyId, int datasetTypeId);
 
 	/**
 	 * Retrieves the trial environments belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise
@@ -299,7 +299,7 @@ public interface StudyDataManager {
 	 * @return the data set
 	 */
 
-	DataSet findOneDataSetByType(int studyId, DataSetType type);
+	DataSet findOneDataSetByType(int studyId, int datasetTypeId);
 
 	/**
 	 * Light weight variant of {@link #findOneDataSetByType(int, DataSetType)} which does not load entire DataSet, just a DatasetReference.
@@ -308,10 +308,10 @@ public interface StudyDataManager {
 	 * first one is returned. If there are none, null is returned.
 	 *
 	 * @param studyId the study id
-	 * @param type    the dataset type
+	 * @param datasetTypeId    the dataset type id
 	 * @return the data set reference
 	 */
-	DatasetReference findOneDataSetReferenceByType(int studyId, DataSetType type);
+	DatasetReference findOneDataSetReferenceByType(int studyId, int datasetTypeId);
 
 	/**
 	 * Retrieves the local name associated to the given project ID and standard variable ID.
@@ -634,11 +634,12 @@ public interface StudyDataManager {
 
 	/**
 	 * Checks whether the specified locationIds exist in a given dataset
-	 *
-	 * @param locationIds list of location ids
+	 * @param studyId
+	 * @param datasetTypeId
+	 * @param locationIds
 	 * @return
 	 */
-	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, DataSetType dataSetType, List<Integer> locationIds);
+	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, int datasetTypeId, List<Integer> locationIds);
 
 	/**
 	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId

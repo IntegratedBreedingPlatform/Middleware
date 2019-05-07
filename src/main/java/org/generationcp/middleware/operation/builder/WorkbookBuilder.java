@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -42,6 +41,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -328,14 +328,14 @@ public class WorkbookBuilder extends Builder {
 
 		// if dataset is not found, get dataset with Plot Data type
 		if (dataSetId == null || dataSetId == 0) {
-			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DataSetType.PLOT_DATA);
+			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetType.PLOT_DATA);
 			if (dataset != null) {
 				dataSetId = dataset.getId();
 			}
 		}
 
 		if (trialDatasetId == null || trialDatasetId == 0) {
-			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DataSetType.SUMMARY_DATA);
+			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetType.SUMMARY_DATA);
 			if (dataset != null) {
 				trialDatasetId = dataset.getId();
 			}
@@ -957,7 +957,7 @@ public class WorkbookBuilder extends Builder {
 		// using the name,
 		// get dataset reference by dataset type in projectprops
 		final DatasetReference datasetRef = this.getStudyDataManager().findOneDataSetReferenceByType(studyId,
-				DataSetType.PLOT_DATA);
+				DatasetType.PLOT_DATA);
 		if (datasetRef != null) {
 			return datasetRef.getId();
 		} else {
@@ -976,7 +976,7 @@ public class WorkbookBuilder extends Builder {
 		}
 		// if not found in the list using the name, get dataset with Summary
 		// Data type
-		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
+		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DatasetType.SUMMARY_DATA);
 		if (dataset != null) {
 			return dataset.getId();
 		} else {

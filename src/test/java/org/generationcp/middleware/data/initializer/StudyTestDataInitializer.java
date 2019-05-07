@@ -27,6 +27,7 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -228,16 +229,15 @@ public class StudyTestDataInitializer {
 		variableType.setLocalName("Plot No");
 		typeList.add(variableType);
 
-		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null);
+		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null, DatasetType.MEANS_DATA);
 	}
 
-	public DatasetReference addTestDataset(final int studyId, final DataSetType datasetType) throws Exception {
+	public DatasetReference addTestDataset(final int studyId, final int datasetTypeId) throws Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName(StudyTestDataInitializer.DATASET_NAME);
 		datasetValues.setDescription("My Dataset Description");
-		datasetValues.setType(datasetType);
 
 		final DMSVariableType variableType = this.createVariableType(TermId.LOCATION_ID.getId(), "Location Id", "Location Id", 1);
 		variableType.setLocalName("LOCATION_NAME");
@@ -247,7 +247,7 @@ public class StudyTestDataInitializer {
 		variableType2.setLocalName("EXPERIMENT_DESIGN_FACTOR");
 		typeList.add(variableType2);
 
-		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null);
+		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null, datasetTypeId);
 
 	}
 	
@@ -256,7 +256,7 @@ public class StudyTestDataInitializer {
 		datasetValues.setName("ENVIRONMENT " + StudyTestDataInitializer.DATASET_NAME);
 		datasetValues.setDescription("My Environment Dataset");
 		datasetValues.setType(DataSetType.SUMMARY_DATA);
-		final DatasetReference dataSet = this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null);
+		final DatasetReference dataSet = this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null, DatasetType.SUMMARY_DATA);
 
 		this.addEnvironmentToDataset(crop, dataSet.getId(), locationId, seasonId);
 

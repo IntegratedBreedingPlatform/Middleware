@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 
 import java.util.List;
 
@@ -25,9 +26,9 @@ public class DatasetUtil {
 	}
 
 	public static DataSet getTrialDataSet(StudyDataManager studyDataManager, int studyId) {
-		List<DataSet> summaryDatasets = studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA);
+		List<DataSet> summaryDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.SUMMARY_DATA);
 		if (summaryDatasets == null || summaryDatasets.isEmpty()) {
-			List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DataSetType.PLOT_DATA);
+			List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
 			for (DataSet dataSet : plotDatasets) {
 				String name = dataSet.getName();
 				if (name != null
@@ -57,7 +58,7 @@ public class DatasetUtil {
 	}
 
 	public static DataSet getMeansDataSet(StudyDataManager studyDataManager, int studyId) {
-		return studyDataManager.getDataSetsByType(studyId, DataSetType.MEANS_DATA).get(0);
+		return studyDataManager.getDataSetsByType(studyId, DatasetType.MEANS_DATA).get(0);
 	}
 
 	public static Integer getPlotDataSetId(StudyDataManager studyDataManager, int studyId) {
@@ -69,7 +70,7 @@ public class DatasetUtil {
 	}
 
 	public static DataSet getPlotDataSet(StudyDataManager studyDataManager, int studyId) {
-		List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DataSetType.PLOT_DATA);
+		List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
 		if (plotDatasets == null) {
 			return null;
 		}

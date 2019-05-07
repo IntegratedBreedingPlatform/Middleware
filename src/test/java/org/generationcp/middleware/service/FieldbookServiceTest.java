@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.junit.Assert;
@@ -83,7 +84,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 		this.studyReference = this.studyTDI.addTestStudy();
 		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
-		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetType.PLOT_DATA);
 	}
 
 	@Test

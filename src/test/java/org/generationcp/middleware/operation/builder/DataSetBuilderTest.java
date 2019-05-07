@@ -11,6 +11,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class DataSetBuilderTest {
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NO_STUDY)).thenReturn(generateDatasetReferences(false));
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NODATASETS)).thenReturn(new ArrayList<DatasetReference>());
 		Mockito.when(this.dmsProjectDao.getById(4)).thenReturn(generateDmsProject(4));
-		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NO_STUDY, DataSetType.SUMMARY_DATA)).thenReturn(generateDatasetReference(3));
+		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NO_STUDY, DatasetType.SUMMARY_DATA)).thenReturn(generateDatasetReference(3));
 		Mockito.when(this.dmsProjectDao.getById(3)).thenReturn(generateDmsProject(3));
 
 		MockitoAnnotations.initMocks(this);

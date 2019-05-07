@@ -22,7 +22,6 @@ import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -64,6 +63,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -209,12 +209,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public DatasetReference addDataSet(final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues,
-			final String programUUID) {
+			final String programUUID, final int datasetTypeId) {
 
 		try {
 
 			final DmsProject datasetProject =
-					this.getDatasetProjectSaver().addDataSet(studyId, variableTypeList, datasetValues, programUUID);
+					this.getDatasetProjectSaver().addDataSet(studyId, variableTypeList, datasetValues, programUUID, datasetTypeId);
 
 			return new DatasetReference(datasetProject.getProjectId(), datasetProject.getName(), datasetProject.getDescription());
 
@@ -322,10 +322,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<DataSet> getDataSetsByType(final int studyId, final DataSetType dataSetType) {
+	public List<DataSet> getDataSetsByType(final int studyId, final int datasetTypeId) {
 
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao()
-				.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(dataSetType.getId()));
+		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getByStudyAndDatasetType(studyId, datasetTypeId);
 		final List<DataSet> datasets = new ArrayList<>();
 
 		for (final DmsProject datasetProject : datasetProjects) {
@@ -365,8 +364,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public DataSet findOneDataSetByType(final int studyId, final DataSetType dataSetType) {
-		final List<DataSet> datasets = this.getDataSetsByType(studyId, dataSetType);
+	public DataSet findOneDataSetByType(final int studyId, final int datasetTypeId) {
+		final List<DataSet> datasets = this.getDataSetsByType(studyId, datasetTypeId);
 		if (datasets != null && !datasets.isEmpty()) {
 			return datasets.get(0);
 		}
@@ -374,9 +373,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public DatasetReference findOneDataSetReferenceByType(final int studyId, final DataSetType type) {
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao()
-				.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(type.getId()));
+	public DatasetReference findOneDataSetReferenceByType(final int studyId, final int datasetTypeId) {
+		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getByStudyAndDatasetType(studyId, datasetTypeId);
 		if (datasetProjects != null && !datasetProjects.isEmpty()) {
 			final DmsProject dataSetProject = datasetProjects.get(0);
 			return new DatasetReference(dataSetProject.getProjectId(), dataSetProject.getName(), dataSetProject.getDescription());
@@ -989,11 +987,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean checkIfAnyLocationIDsExistInExperiments(final int studyId, final DataSetType dataSetType,
+	public boolean checkIfAnyLocationIDsExistInExperiments(final int studyId, final int datasetTypeId,
 			final List<Integer> locationIds) {
 
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao()
-				.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(dataSetType.getId()));
+		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getByStudyAndDatasetType(studyId, datasetTypeId);
 
 		if (!datasetProjects.isEmpty()) {
 			final int dataSetId = datasetProjects.get(0).getProjectId();
@@ -1161,7 +1158,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public boolean isLocationIdVariable(final int studyId, final String variableName) {
 
-		final DataSet trialDataSet = this.findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
+		final DataSet trialDataSet = this.findOneDataSetByType(studyId, DatasetType.SUMMARY_DATA);
 
 		final DMSVariableType dmsVariableType = trialDataSet.findVariableTypeByLocalName(variableName);
 
