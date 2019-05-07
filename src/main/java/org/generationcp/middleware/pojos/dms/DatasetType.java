@@ -2,6 +2,7 @@ package org.generationcp.middleware.pojos.dms;
 
 import org.hibernate.annotations.Type;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -13,7 +14,20 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "dataset_type")
+@AutoProperty
 public class DatasetType {
+
+	public static final int STUDY_CONDITIONS = 1;
+	public static final int MEANS_DATA = 2;
+	public static final int SUMMARY_DATA = 3;
+	public static final int PLOT_DATA = 4;
+	public static final int PLANT_SUBOBSERVATIONS = 5;
+	public static final int QUADRAT_SUBOBSERVATIONS = 6;
+	public static final int TIME_SERIES_SUBOBSERVATIONS = 7;
+	public static final int CUSTOM_SUBOBSERVATIONS = 8;
+	public static final int SUB_SAMPLE_DATA = 9;
+	public static final int WEATHER_DATA = 10;
+	public static final int MEANS_OVER_TRIAL_INSTANCES = 11;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +51,12 @@ public class DatasetType {
 	@Basic(optional = false)
 	@Column(name = "is_subobs_type", columnDefinition = "TINYINT")
 	private boolean isSubObservationType;
+
+	public DatasetType() { }
+
+	public DatasetType(final int datasetTypeId) {
+		this.setDatasetTypeId(datasetTypeId);
+	}
 
 	public Integer getDatasetTypeId() {
 		return this.datasetTypeId;
@@ -72,6 +92,10 @@ public class DatasetType {
 
 	public boolean isSubObservationType() {
 		return this.isSubObservationType;
+	}
+
+	public boolean isObservationType() {
+		return this.datasetTypeId == PLOT_DATA;
 	}
 
 	public void setSubObservationType(final boolean subObservationType) {
