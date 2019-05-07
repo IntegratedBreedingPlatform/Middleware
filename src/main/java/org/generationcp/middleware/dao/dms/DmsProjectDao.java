@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -31,6 +30,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.study.StudyFilters;
@@ -204,11 +204,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " INNER JOIN project p ON p.project_id = pr.subject_project_id"
 			+ " INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id"
 			+ " INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
-			+ " INNER JOIN projectprop pp ON pp.project_id = p.project_id"
 			+ " WHERE gl.nd_geolocation_id = :studyDbId"
 			+ " AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-			+ "	AND pp.value = " + DataSetType.SUMMARY_DATA.getId()
-			+ "	AND pp.variable_id = " + TermId.DATASET_TYPE.getId();
+			+ " AND p.dataset_type_id = " + DatasetType.SUMMARY_DATA;
 
 	private static final String STUDY_DETAILS_SQL = " SELECT DISTINCT \n"
 		+ "   p.name                     AS name, \n"
@@ -1401,4 +1399,19 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public List<DmsProject> getByStudyAndDatasetType(final int studyId, final int datasetTypeId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			criteria.createAlias("relatedTos", "pr");
+			criteria.createAlias("project.datasetType", "dt");
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
+			criteria.add(Restrictions.eq("dt.datasetTypeId", datasetTypeId));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error getting getByStudyAndDatasetType for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
 }

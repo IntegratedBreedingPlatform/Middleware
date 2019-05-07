@@ -1,6 +1,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -8,10 +9,12 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.junit.Assert;
@@ -38,6 +41,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	private GermplasmDAO germplasmDao;
 
 	private DmsProjectDao dmsProjectDao;
+
+	private ProjectRelationshipDao projectRelationshipDao;
 	
 	private DmsProject study;
 
@@ -74,6 +79,11 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		if (this.dmsProjectDao == null) {
 			this.dmsProjectDao = new DmsProjectDao();
 			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.projectRelationshipDao == null) {
+			this.projectRelationshipDao = new ProjectRelationshipDao();
+			this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
 		}
 		
 		if (this.study == null) {
@@ -117,8 +127,86 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(customLocation, instance3.getCustomLocationAbbreviation());
 		Assert.assertFalse(instance3.isHasFieldmap());
 	}
+
+	@Test
+	public void testGetByStudyAndDatasetType() {
+
+		final String studyName = "Study1";
+		final String programUUID = UUID.randomUUID().toString();
+
+		final DmsProject study = new DmsProject();
+		study.setName(studyName);
+		study.setDescription(studyName);
+		study.setProgramUUID(programUUID);
+		this.dmsProjectDao.save(study);
+
+		final DmsProject plot = new DmsProject();
+		plot.setName(studyName + " - Plot Dataset");
+		plot.setDescription(studyName + " - Plot Dataset");
+		plot.setProgramUUID(programUUID);
+		plot.setDatasetType(new DatasetType(DatasetType.PLOT_DATA));
+		this.dmsProjectDao.save(plot);
+
+		final ProjectRelationship projectRelationshipPlot = new ProjectRelationship();
+		projectRelationshipPlot.setTypeId(TermId.BELONGS_TO_STUDY.getId());
+		projectRelationshipPlot.setObjectProject(study);
+		projectRelationshipPlot.setSubjectProject(plot);
+		this.projectRelationshipDao.save(projectRelationshipPlot);
+
+		final List<DmsProject> resultPlot = this.dmsProjectDao.getByStudyAndDatasetType(study.getProjectId(), DatasetType.PLOT_DATA);
+		Assert.assertEquals(1, resultPlot.size());
+		Assert.assertEquals(plot.getProjectId(), resultPlot.get(0).getProjectId());
+
+		final List<DmsProject> result = this.dmsProjectDao.getByStudyAndDatasetType(study.getProjectId(), DatasetType.PLANT_SUBOBSERVATIONS);
+		Assert.assertEquals(0, result.size());
+
+	}
+
+	@Test
+	public void testGetProjectIdByStudyDbId() {
+
+		final String studyName = "Study1";
+		final String programUUID = UUID.randomUUID().toString();
+
+		final DmsProject study = new DmsProject();
+		study.setName(studyName);
+		study.setDescription(studyName);
+		study.setProgramUUID(programUUID);
+		this.dmsProjectDao.save(study);
+
+		final DmsProject summary = new DmsProject();
+		summary.setName(studyName + " - Summary Dataset");
+		summary.setDescription(studyName + " - Summary Dataset");
+		summary.setProgramUUID(programUUID);
+		summary.setDatasetType(new DatasetType(DatasetType.SUMMARY_DATA));
+		this.dmsProjectDao.save(summary);
+
+		final ProjectRelationship projectRelationship = new ProjectRelationship();
+		projectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
+		projectRelationship.setObjectProject(study);
+		projectRelationship.setSubjectProject(summary);
+		this.projectRelationshipDao.save(projectRelationship);
+
+		final Geolocation geolocation = new Geolocation();
+		geolocation.setDescription("1");
+		this.geolocationDao.saveOrUpdate(geolocation);
+
+		final ExperimentModel experimentModel = new ExperimentModel();
+		experimentModel.setGeoLocation(geolocation);
+		experimentModel.setTypeId(TermId.SUMMARY_EXPERIMENT.getId());
+		experimentModel.setProject(summary);
+		this.experimentDao.saveOrUpdate(experimentModel);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSessionFactory().getCurrentSession().flush();
+
+		final Integer result = this.dmsProjectDao.getProjectIdByStudyDbId(geolocation.getLocationId());
+		Assert.assertEquals(study.getProjectId(), result);
+
+
+	}
 	
-	private Integer createEnvironmentData(final String instanceNumber, final Integer locationId, Optional<String> customAbbev, Optional<Integer> blockId) {
+	private Integer createEnvironmentData(final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(instanceNumber);
 		this.geolocationDao.saveOrUpdate(geolocation);
