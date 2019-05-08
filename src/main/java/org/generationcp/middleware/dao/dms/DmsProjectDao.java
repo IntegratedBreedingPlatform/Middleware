@@ -1196,15 +1196,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("project.projectId"), "datasetId");
-			projectionList
-				.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {new IntegerType()}),
-					"datasetTypeId");
+			projectionList.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
 			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.relatedTos", "pr");
-			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN,
-				Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.createAlias("project.datasetType", "dt");
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", parentId));
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.setProjection(projectionList);
@@ -1318,8 +1315,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("project.projectId"), "datasetId");
-			projectionList
-				.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
+			projectionList.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
 			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
@@ -1347,9 +1343,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("project.projectId"), "datasetId");
-			projectionList
-				.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {new IntegerType()}),
-					"datasetTypeId");
+			projectionList.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
 			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
 
@@ -1358,9 +1352,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.createAlias("samples.experiment", "experiment")
 				.createAlias("experiment.project", "project")
 				.createAlias("project.relatedTos", "pr")
-				.createAlias(
-					"project.properties", "pp", CriteriaSpecification.INNER_JOIN,
-					Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()))
+				.createAlias("project.datasetType", "dt")
 				.add(Restrictions.eq("id", sampleListId));
 			criteria.setProjection(Projections.distinct(projectionList));
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
