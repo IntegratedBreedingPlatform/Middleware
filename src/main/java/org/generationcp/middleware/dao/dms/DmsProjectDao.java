@@ -1319,14 +1319,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("project.projectId"), "datasetId");
 			projectionList
-				.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {new IntegerType()}),
-					"datasetTypeId");
+				.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
 			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.relatedTos", "pr");
-			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN,
-				Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.createAlias("project.datasetType", "dt");
 			criteria.add(Restrictions.eq("project.projectId", datasetId));
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.setProjection(projectionList);

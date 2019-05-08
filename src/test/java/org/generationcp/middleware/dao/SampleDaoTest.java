@@ -19,7 +19,6 @@ import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -28,6 +27,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -190,7 +190,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sample.getSampleNumber().intValue());
 		Assert.assertNotNull(sample.getStudyId());
 		Assert.assertNotNull(STUDY_NAME, sample.getStudyName());
-		Assert.assertEquals(DataSetType.PLOT_DATA.getReadableName(), sample.getDatasetType());
+		Assert.assertEquals("PLOT", sample.getDatasetType());
 		Assert.assertNotNull(USER_FIRST_NAME + " " + USER_LAST_NAME, sample.getTakenBy());
 		Assert.assertNotNull(sample.getEnumerator());
 	}
@@ -219,7 +219,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sample.getSampleNumber().intValue());
 		Assert.assertNotNull(sample.getStudyId());
 		Assert.assertNotNull(STUDY_NAME, sample.getStudyName());
-		Assert.assertEquals(DataSetType.PLANT_SUBOBSERVATIONS.getReadableName(), sample.getDatasetType());
+		Assert.assertEquals("PLANT", sample.getDatasetType());
 		Assert.assertNotNull(USER_FIRST_NAME + " " + USER_LAST_NAME, sample.getTakenBy());
 		Assert.assertNotNull(sample.getEnumerator());
 	}
@@ -347,7 +347,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.ndExperimentId = null;
 
 		final DmsProject study = createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1));
-		final DmsProject plotDataset = createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DataSetType.PLOT_DATA, study);
+		final DmsProject plotDataset = createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetType.PLOT_DATA, study);
 		final SampleList sampleListForPlotDataset =
 			this.createExperimentsWithSampleList(listName, plotDataset, user, sampleSize);
 
@@ -358,9 +358,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.ndExperimentId = null;
 
 		final DmsProject study = createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1));
-		final DmsProject plotDataset = createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DataSetType.PLOT_DATA, study);
+		final DmsProject plotDataset = createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetType.PLOT_DATA, study);
 		final DmsProject subObservationDataset =
-			createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DataSetType.PLANT_SUBOBSERVATIONS, plotDataset);
+			createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetType.PLANT_SUBOBSERVATIONS, plotDataset);
 		final SampleList sampleListForSubObservation =
 			this.createExperimentsWithSampleList(listName, subObservationDataset, user, sampleSize);
 
@@ -368,11 +368,12 @@ public class SampleDaoTest extends IntegrationTestBase {
 	}
 
 	private DmsProject createDmsProject(
-		final String name, final String description, final DataSetType dataSetType, final DmsProject parent) {
+		final String name, final String description, final Integer datasetTypeId, final DmsProject parent) {
 
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setName(name);
 		dmsProject.setDescription(description);
+		dmsProject.setDatasetType((datasetTypeId != null) ? new DatasetType(datasetTypeId) : null);
 		this.dmsProjectDao.save(dmsProject);
 
 		final ProjectRelationship plotDmsProjectToStudyProjectRelationship = new ProjectRelationship();
@@ -380,12 +381,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 		plotDmsProjectToStudyProjectRelationship.setObjectProject(parent);
 		plotDmsProjectToStudyProjectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
 		this.projectRelationshipDao.save(plotDmsProjectToStudyProjectRelationship);
-
-		if (dataSetType != null) {
-			final ProjectProperty datasetTypeProperty =
-				new ProjectProperty(dmsProject, 1805, String.valueOf(dataSetType.getId()), 1, TermId.DATASET_TYPE.getId(), "");
-			this.projectPropertyDao.save(datasetTypeProperty);
-		}
 
 		return dmsProject;
 	}
