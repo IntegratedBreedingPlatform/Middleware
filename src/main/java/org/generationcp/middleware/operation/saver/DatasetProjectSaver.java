@@ -86,19 +86,6 @@ public class DatasetProjectSaver extends Saver {
 		}
 	}
 
-	private DMSVariableType addDataTypeVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID)
-			throws MiddlewareQueryException {
-		DMSVariableType variableType = variableTypeList.findById(TermId.DATASET_TYPE);
-		if (variableType == null) {
-			variableType =
-					new DMSVariableType("DATASET_TYPE", "Dataset type", this.getStandardVariable(TermId.DATASET_TYPE, programUUID), 3);
-			variableType.setRole(PhenotypicType.DATASET);
-			variableTypeList.makeRoom(3);
-			variableTypeList.add(variableType);
-		}
-		return variableType;
-	}
-
 	private StandardVariable getStandardVariable(final TermId stdVarId, final String programUUID) throws MiddlewareQueryException {
 		return this.getStandardVariableBuilder().create(stdVarId.getId(),programUUID);
 	}
