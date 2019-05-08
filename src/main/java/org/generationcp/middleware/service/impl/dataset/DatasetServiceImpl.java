@@ -31,6 +31,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -222,8 +223,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
-		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO()
-			.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.PLOT_DATA.getId()));
+		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO().getByStudyAndDatasetType(studyId, DatasetType.PLOT_DATA);
 
 		if (plotDatasets == null || plotDatasets.isEmpty()) {
 			throw new MiddlewareException("Study does not have a plot dataset associated to it");
@@ -546,8 +546,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
 
 		final DmsProject environmentDataset =
-			this.daoFactory.getDmsProjectDAO().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
-				String.valueOf(DataSetType.SUMMARY_DATA.getId())).get(0);
+			this.daoFactory.getDmsProjectDAO().getByStudyAndDatasetType(studyId, DatasetType.SUMMARY_DATA).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
@@ -1021,8 +1020,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
 
 		final DmsProject environmentDataset =
-			this.daoFactory.getDmsProjectDAO().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
-				String.valueOf(DataSetType.SUMMARY_DATA.getId())).get(0);
+			this.daoFactory.getDmsProjectDAO().getByStudyAndDatasetType(studyId, DatasetType.SUMMARY_DATA).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));

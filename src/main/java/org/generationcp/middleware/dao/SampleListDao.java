@@ -16,7 +16,7 @@ import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.workbench.DatasetType;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -159,10 +159,10 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		final Conjunction plotNoConjunction = Restrictions.conjunction();
 		plotNoConjunction.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()));
-		plotNoConjunction.add(Restrictions.eq("pp.value", String.valueOf(DataSetType.PLOT_DATA.getId())));
+		plotNoConjunction.add(Restrictions.eq("dt.datasetTypeId", DatasetType.PLOT_DATA));
 
 		final Conjunction datasetConjunction = Restrictions.conjunction();
-		datasetConjunction.add(Restrictions.or(plotNoConjunction, Restrictions.ne("pp.value", String.valueOf(DataSetType.PLOT_DATA.getId()))));
+		datasetConjunction.add(Restrictions.or(plotNoConjunction, Restrictions.ne("dt.datasetTypeId", DatasetType.PLOT_DATA)));
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample")
 				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
@@ -172,7 +172,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 				.createAlias("stock.germplasm", "germplasm")
 				.createAlias("experiment.properties", "properties", CriteriaSpecification.LEFT_JOIN)
 				.createAlias("experiment.project", "project")
-				.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN, Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()))
+				.createAlias("project.datasetType", "dt")
 				.add(Restrictions.eq("id", sampleListId))
 				.add(datasetConjunction)
 				.setProjection(projectionList)

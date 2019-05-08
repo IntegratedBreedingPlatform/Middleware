@@ -902,7 +902,7 @@ public class WorkbookSaver extends Saver {
 	private Integer getMeansDataset(final Integer studyId) {
 		Integer id = null;
 		final List<DmsProject> datasets = this.getDmsProjectDao()
-				.getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.MEANS_DATA.getId()));
+				.getByStudyAndDatasetType(studyId, DatasetType.MEANS_DATA);
 		if (datasets != null && !datasets.isEmpty()) {
 			id = datasets.get(0).getProjectId();
 		}
@@ -947,7 +947,8 @@ public class WorkbookSaver extends Saver {
 		final int trialDatasetId = this.createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables, programUUID);
 		int measurementDatasetId = 0;
 		int meansDatasetId = 0;
-		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DataSetType.MEANS_DATA.getId()) {
+
+		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetType.MEANS_DATA) {
 			meansDatasetId = this.createMeansDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
 		} else {
 			measurementDatasetId =
@@ -984,8 +985,9 @@ public class WorkbookSaver extends Saver {
 		final int trialDatasetId = workbook.getTrialDatasetId();
 		final int measurementDatasetId = workbook.getMeasurementDatesetId() != null ? workbook.getMeasurementDatesetId() : 0;
 		final int meansDatasetId = workbook.getMeansDatasetId() != null ? workbook.getMeansDatasetId() : 0;
+
 		final boolean isMeansDataImport =
-				workbook.getImportType() != null && workbook.getImportType().intValue() == DataSetType.MEANS_DATA.getId();
+				workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetType.MEANS_DATA;
 
 		Map<String, ?> variableMap = workbook.getVariableMap();
 		if (variableMap == null || variableMap.isEmpty()) {

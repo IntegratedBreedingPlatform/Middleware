@@ -15,6 +15,7 @@ import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.SQLQuery;
@@ -234,10 +235,10 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 		final String expectedSql = "select ldp.* FROM nd_experiment e,"
 			+ " nd_experimentprop nd_ep, stock,"
-			+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms, nd_geolocation geo"
+			+ " listdata_project ldp, project_relationship pr, project p, listnms nms, nd_geolocation geo"
 			+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
-			+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
-			+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"
+			+ " AND nms.listid = ldp.list_id" + " AND p.project_id = pr.subject_project_id"
+			+ " AND nms.projectid = :STUDY_ID" + " AND p.dataset_type_id = :DATASET_TYPE"
 			+ " AND e.project_id = pr.subject_project_id"
 			+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
 			+ " AND stock.stock_id = e.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
@@ -258,7 +259,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		Mockito.verify(mockQuery).setParameter("STUDY_ID", studyID);
 		Mockito.verify(mockQuery).setParameterList("PLOT_NO", plotNumbers);
 		Mockito.verify(mockQuery).setParameter("INSTANCE_NUMBER", instanceNumber);
-		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DataSetType.PLOT_DATA.getId());
+		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DatasetType.PLOT_DATA);
 		Mockito.verify(mockQuery).setParameterList(
 			"PLOT_NO_TERM_IDS",
 			new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});

@@ -47,6 +47,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
@@ -964,7 +965,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
 		}
 
-		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && !factorsTermIds
+		if ((workbook.getImportType() == null || workbook.getImportType() == DatasetType.PLOT_DATA) && !factorsTermIds
 				.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
@@ -1085,7 +1086,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			maxNumOfIterations = observationCount;
 		}
 		final List<String> duplicateTrialInstances = new ArrayList<>();
-		final boolean isMeansDataImport = workbook.getImportType() != null && workbook.getImportType() == DataSetType.MEANS_DATA.getId();
+		final boolean isMeansDataImport = workbook.getImportType() != null && workbook.getImportType() == DatasetType.MEANS_DATA;
 		for (int i = 0; i < maxNumOfIterations; i++) {
 			final MeasurementRow row = workbook.getObservations().get(i);
 			trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);

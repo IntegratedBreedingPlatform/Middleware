@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -292,6 +293,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		final DmsProject plotDmsProject = new DmsProject();
 		plotDmsProject.setName("Plot Dataset");
 		plotDmsProject.setDescription("Plot Dataset");
+		plotDmsProject.setDatasetType(new DatasetType(DatasetType.PLOT_DATA));
 		dmsProjectDao.save(plotDmsProject);
 
 		final ProjectProperty datasetTypeProperty =
