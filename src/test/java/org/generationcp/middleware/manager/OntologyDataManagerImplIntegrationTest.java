@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
 import org.junit.Assert;
@@ -941,6 +942,12 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	public void testGetCVIdByName() throws MiddlewareQueryException {
 		final Integer cvId = this.ontologyDataManager.getCVIdByName("Variables");
 		Assert.assertEquals(1040, cvId.intValue());
+	}
+
+	@Test
+	public void testGetDatasetTypeById() {
+		final DatasetType datasetType = this.ontologyDataManager.getDatasetTypeById(DatasetType.SUMMARY_DATA);
+		Assert.assertEquals(DatasetType.SUMMARY_DATA, datasetType.getDatasetTypeId().intValue());
 	}
 
 	private StandardVariable createStandardVariable(final String name) {

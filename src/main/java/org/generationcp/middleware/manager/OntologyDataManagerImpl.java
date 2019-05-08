@@ -43,6 +43,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.VariableCache;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.pojos.ErrorCode;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -983,6 +984,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public Term findTermByName(String name, int cvId) {
 		return this.getTermBuilder().findTermByName(name, cvId);
+	}
+
+	@Override
+	public DatasetType getDatasetTypeById(final int datasetTypeId) {
+		return this.daoFactory.getDatasetTypeDao().getById(datasetTypeId);
 	}
 
 	public void setDaoFactory(DaoFactory daoFactory) {

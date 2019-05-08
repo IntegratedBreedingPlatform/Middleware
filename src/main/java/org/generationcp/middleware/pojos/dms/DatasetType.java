@@ -11,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name = "dataset_type")
@@ -28,6 +30,9 @@ public class DatasetType {
 	public static final int SUB_SAMPLE_DATA = 9;
 	public static final int WEATHER_DATA = 10;
 	public static final int MEANS_OVER_TRIAL_INSTANCES = 11;
+	public static final List<Integer> SUBOBSERVATIONS =
+		Arrays.asList(PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

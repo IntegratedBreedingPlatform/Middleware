@@ -30,6 +30,7 @@ import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 /**
@@ -609,4 +610,6 @@ public interface OntologyDataManager {
 	void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) ;
 
 	List<ProjectProperty> getProjectPropertiesByProjectId(int projectId);
+
+	DatasetType getDatasetTypeById(int datasetTypeId);
 }

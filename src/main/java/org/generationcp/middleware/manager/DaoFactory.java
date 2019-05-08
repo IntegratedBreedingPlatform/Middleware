@@ -12,6 +12,7 @@ import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
@@ -27,7 +28,6 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.Progenitor;
 
 public class DaoFactory {
 
@@ -198,5 +198,11 @@ public class DaoFactory {
 		final ProgenitorDAO progenitorDao = new ProgenitorDAO();
 		progenitorDao.setSession(this.sessionProvider.getSession());
 		return progenitorDao;
+	}
+
+	public DatasetTypeDAO getDatasetTypeDao() {
+		final DatasetTypeDAO datasetTypeDao = new DatasetTypeDAO();
+		datasetTypeDao.setSession(this.sessionProvider.getSession());
+		return datasetTypeDao;
 	}
 }
