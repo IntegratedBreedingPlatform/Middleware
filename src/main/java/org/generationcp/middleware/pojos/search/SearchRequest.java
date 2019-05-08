@@ -8,9 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * Created by cyrus on 12/19/14.
- */
 @Entity
 @Table(name = "search_request")
 public class SearchRequest {
