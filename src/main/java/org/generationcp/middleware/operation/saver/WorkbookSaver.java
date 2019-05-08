@@ -686,7 +686,7 @@ public class WorkbookSaver extends Saver {
 				this.generateTrialDatasetName(workbook.getStudyDetails().getDescription()) :
 				trialName;
 			final DatasetValues trialValues = this.getDatasetValuesTransformer()
-				.transform(trialName, trialDescription, DataSetType.SUMMARY_DATA, trialMV, trialVariables);
+				.transform(trialName, trialDescription, trialMV, trialVariables);
 
 			watch.restart("save trial dataset");
 			final DmsProject trial = this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID, DatasetType.SUMMARY_DATA);
@@ -734,7 +734,7 @@ public class WorkbookSaver extends Saver {
 				this.generatePlotDatasetName(workbook.getStudyDetails().getDescription()) :
 				datasetName;
 			final DatasetValues datasetValues = this.getDatasetValuesTransformer()
-				.transform(datasetName, datasetDescription, DataSetType.PLOT_DATA, effectMV, effectVariables);
+				.transform(datasetName, datasetDescription, effectMV, effectVariables);
 
 			watch.restart("save measurement effect dataset");
 			// fix for GCP-6436 start
@@ -1181,7 +1181,7 @@ public class WorkbookSaver extends Saver {
 			final String datasetName = this.generateMeansDatasetName(workbook.getStudyDetails().getStudyName());
 			final String datasetDescription = this.generateMeansDatasetName(workbook.getStudyDetails().getDescription());
 			final DatasetValues datasetValues = this.getDatasetValuesTransformer()
-					.transform(datasetName, datasetDescription, DataSetType.MEANS_DATA, effectMV, effectVariables);
+					.transform(datasetName, datasetDescription, effectMV, effectVariables);
 
 			watch.restart("save means dataset");
 			final VariableTypeList datasetVariables = this.getMeansData(effectVariables, trialVariables);

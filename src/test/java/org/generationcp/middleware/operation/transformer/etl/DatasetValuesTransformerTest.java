@@ -43,18 +43,16 @@ public class DatasetValuesTransformerTest extends TestOutputFormatter {
 	public void testTransform() throws Exception {
 		final String datasetName = "DataSet Name here";
 		final String datasetDescription = "DataSet Description here";
-		final DataSetType dataType = DataSetType.PLOT_DATA;
 
 		final List<MeasurementVariable> mVarList = this.createMeasurementVariableListTestData();
 		final VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
 		final DatasetValues datasetVal =
-				DatasetValuesTransformerTest.transformer.transform(datasetName, datasetDescription, dataType, mVarList, varTypeList);
+				DatasetValuesTransformerTest.transformer.transform(datasetName, datasetDescription, mVarList, varTypeList);
 
 		Assert.assertNotNull("The transformation must result in valued dataset collection", datasetVal);
 		Assert.assertEquals("Data set name mapping did not work.", datasetName, datasetVal.getName());
 		Assert.assertEquals("Data set description mapping did not work.", datasetDescription, datasetVal.getDescription());
-		Assert.assertEquals("Data set d mapping did not work.", dataType, datasetVal.getType());
 
 		final VariableList variables = datasetVal.getVariables();
 		final List<Variable> newlyMappedVariables = variables.getVariables();

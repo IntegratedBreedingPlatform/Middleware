@@ -213,7 +213,6 @@ public class StudyTestDataInitializer {
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName(StudyTestDataInitializer.DATASET_NAME);
 		datasetValues.setDescription("My Dataset Description");
-		datasetValues.setType(DataSetType.MEANS_DATA);
 
 		DMSVariableType variableType =
 			this.createVariableType(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha", 4);
@@ -255,7 +254,6 @@ public class StudyTestDataInitializer {
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName("ENVIRONMENT " + StudyTestDataInitializer.DATASET_NAME);
 		datasetValues.setDescription("My Environment Dataset");
-		datasetValues.setType(DataSetType.SUMMARY_DATA);
 		final DatasetReference dataSet = this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null, DatasetType.SUMMARY_DATA);
 
 		this.addEnvironmentToDataset(crop, dataSet.getId(), locationId, seasonId);

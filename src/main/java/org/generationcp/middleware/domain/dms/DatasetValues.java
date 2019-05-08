@@ -20,17 +20,14 @@ public class DatasetValues {
 
 	private String description;
 
-	private DataSetType type;
-
 	private VariableList variables;
 
 	public DatasetValues() {
 	}
 
-	public DatasetValues(String name, String description, DataSetType type) {
+	public DatasetValues(String name, String description) {
 		this.name = name;
 		this.description = description;
-		this.type = type;
 	}
 
 	public void setName(String name) {
@@ -41,20 +38,12 @@ public class DatasetValues {
 		this.description = description;
 	}
 
-	public void setType(DataSetType type) {
-		this.type = type;
-	}
-
 	public String getName() {
 		return this.name;
 	}
 
 	public String getDescription() {
 		return this.description;
-	}
-
-	public DataSetType getType() {
-		return this.type;
 	}
 
 	public VariableList getVariables() {
@@ -79,8 +68,6 @@ public class DatasetValues {
 		builder.append(this.getName());
 		builder.append(", description=");
 		builder.append(this.getDescription());
-		builder.append(", DataSetType=");
-		builder.append(this.getType().toString());
 		builder.append(", VariableList=");
 		builder.append(this.getVariables().toString());
 		builder.append("]");
