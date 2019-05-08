@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 
 public class DataSetTestDataInitializer {

@@ -16,7 +16,6 @@ import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -295,10 +294,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		plotDmsProject.setDescription("Plot Dataset");
 		plotDmsProject.setDatasetType(new DatasetType(DatasetType.PLOT_DATA));
 		dmsProjectDao.save(plotDmsProject);
-
-		final ProjectProperty datasetTypeProperty =
-			new ProjectProperty(plotDmsProject, 1805, String.valueOf(DataSetType.PLOT_DATA.getId()), 1, TermId.DATASET_TYPE.getId(), "");
-		this.projectPropertyDao.save(datasetTypeProperty);
 
 		final User user = this.createTestUser();
 

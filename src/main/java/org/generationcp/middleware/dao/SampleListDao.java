@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
