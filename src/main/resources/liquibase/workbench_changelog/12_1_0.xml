@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="nahuel" id="v12.1.0-1" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="users_crops" />
+			</not>
+		</preConditions>
+		<comment>Add users_crops table to enhance permission management im BMS</comment>
+		<createTable tableName="users_crops">
+			<column name="user_id" type="INT">
+				<constraints nullable="false"
+							 foreignKeyName="fk_users_crops_user_id"
+							 referencedTableName="users"
+							 referencedColumnNames="userid"
+							 primaryKey="true" />
+			</column>
+			<column name="crop_name" type="VARCHAR(32)">
+				<constraints nullable="false"
+							 foreignKeyName="fk_users_crops_crop_name"
+							 referencedTableName="workbench_crop"
+							 referencedColumnNames="crop_name"
+							 primaryKey="true" />
+			</column>
+		</createTable>
+		<modifySql dbms="mysql">
+			<append value="ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci" />
+		</modifySql>
+	</changeSet>
+
+</databaseChangeLog>
