@@ -14,7 +14,6 @@ import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -235,7 +234,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final DmsProject subObservationDataset = new DmsProject();
 
 		final List<ProjectProperty> projectProperties =
-			this.buildDefaultDatasetProperties(study, subObservationDataset, datasetName, datasetTypeId);
+			this.buildDefaultDatasetProperties(study, subObservationDataset, datasetName);
 		final Variable observationUnitVariable =
 			this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), observationUnitVariableId, false);
 
@@ -249,6 +248,7 @@ public class DatasetServiceImpl implements DatasetService {
 		subObservationDataset.setDeleted(false);
 		subObservationDataset.setLocked(false);
 		subObservationDataset.setProperties(projectProperties);
+		subObservationDataset.setDatasetType(new DatasetType(datasetTypeId));
 		subObservationDataset.setRelatedTos(this.buildProjectRelationships(parentDataset, subObservationDataset));
 
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().save(subObservationDataset);
@@ -302,7 +302,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private List<ProjectProperty> buildDefaultDatasetProperties(
 		final DmsProject study, final DmsProject dmsProject,
-		final String datasetName, final Integer datasetTypeId) {
+		final String datasetName) {
 		final List<ProjectProperty> projectProperties = new ArrayList<>();
 
 		final ProjectProperty datasetProperty =

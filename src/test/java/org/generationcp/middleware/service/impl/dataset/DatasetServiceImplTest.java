@@ -12,7 +12,6 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
