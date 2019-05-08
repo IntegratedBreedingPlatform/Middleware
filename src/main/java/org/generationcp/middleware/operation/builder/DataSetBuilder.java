@@ -46,9 +46,8 @@ public class DataSetBuilder extends Builder {
 	private final DmsProjectDao dmsProjectDao;
 	private final StudyDataManager studyDataManager;
 
-	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(),
-			TermId.DATASET_TYPE.getId());
-	
+	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId());
+
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetBuilder.class);
 
 	public DataSetBuilder(final HibernateSessionProvider sessionProviderForLocal) {
