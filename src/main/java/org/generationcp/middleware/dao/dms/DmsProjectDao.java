@@ -396,27 +396,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getDataSetsByStudyAndProjectProperty(final int studyId, final int variable, final String value) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
-			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
-			criteria.createAlias("properties", "prop");
-			criteria.add(Restrictions.eq("prop.variableId", variable));
-			criteria.add(Restrictions.eq("prop.value", value));
-			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-			criteria.addOrder(Order.asc("prop.rank"));
-
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				"Error in getDataSetsByProjectProperty(" + variable + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
-		}
-	}
-
 	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID, final TermId relationship) {
 		try {
 			final String sql = "SELECT s.project_id FROM project s " + " WHERE name = :name AND program_uuid = :program_uuid"

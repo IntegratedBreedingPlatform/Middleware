@@ -24,6 +24,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -582,12 +583,10 @@ public class DatasetServiceImplTest {
 
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getAdditionalDesignFactors(studyId);
-		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
-			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getByStudyAndDatasetType(studyId, DatasetType.SUMMARY_DATA);
 
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
-		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
-			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+		Mockito.verify(this.dmsProjectDao).getByStudyAndDatasetType(studyId, DatasetType.SUMMARY_DATA);
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
 

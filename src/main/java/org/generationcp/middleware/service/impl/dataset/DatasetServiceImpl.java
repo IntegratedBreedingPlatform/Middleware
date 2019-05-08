@@ -315,14 +315,8 @@ public class DatasetServiceImpl implements DatasetService {
 				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TITLE.getId(),
 				null, null, 2,
 				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TITLE.getId(), false));
-		final ProjectProperty datasetTypeProperty =
-			this.buildDatasetProperty(dmsProject,
-				VariableType.STUDY_DETAIL.getId(), TermId.DATASET_TYPE.getId(),
-				String.valueOf(datasetTypeId), null, 3,
-				this.ontologyVariableDataManager.getVariable(study.getProgramUUID(), TermId.DATASET_TYPE.getId(), false));
 		projectProperties.add(datasetProperty);
 		projectProperties.add(datasetTitleProperty);
-		projectProperties.add(datasetTypeProperty);
 		return projectProperties;
 	}
 
