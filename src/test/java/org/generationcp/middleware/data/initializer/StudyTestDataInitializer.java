@@ -89,7 +89,7 @@ public class StudyTestDataInitializer {
 
 		final StudyValues studyValues = this.createStudyValues(variableList);
 		
-		final Integer userId = addTestUser();
+		final Integer userId = this.addTestUser();
 
 		final CropType crop = new CropType();
 		final StudyReference addedStudy = this.studyDataManager.addStudy(crop, StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId,
@@ -121,7 +121,7 @@ public class StudyTestDataInitializer {
 		variableList.add(variable);
 
 		final StudyValues studyValues = this.createStudyValues(variableList);
-		final Integer userId = addTestUser();
+		final Integer userId = this.addTestUser();
 
 		final StudyReference addedStudy = this.studyDataManager.addStudy(new CropType(), StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate, StudyTestDataInitializer
 				.END_DATE, StudyTestDataInitializer.OBJECTIVE, studyName, String.valueOf(userId));
@@ -239,11 +239,11 @@ public class StudyTestDataInitializer {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(datasetType);
 
-		DMSVariableType variableType = this.createVariableType(TermId.LOCATION_ID.getId(), "Location Id", "Location Id", 1);
+		final DMSVariableType variableType = this.createVariableType(TermId.LOCATION_ID.getId(), "Location Id", "Location Id", 1);
 		variableType.setLocalName("LOCATION_NAME");
 		typeList.add(variableType);
 
-		DMSVariableType variableType2 = this.createVariableType(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), "Design Factor", "Design Factor", 2);
+		final DMSVariableType variableType2 = this.createVariableType(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), "Design Factor", "Design Factor", 2);
 		variableType2.setLocalName("EXPERIMENT_DESIGN_FACTOR");
 		typeList.add(variableType2);
 

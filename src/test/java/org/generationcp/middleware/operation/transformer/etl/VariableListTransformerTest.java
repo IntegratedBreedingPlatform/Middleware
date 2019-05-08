@@ -38,7 +38,7 @@ import java.util.Random;
 public class VariableListTransformerTest {
 
 	private static VariableListTransformer transformer;
-	private Random random = new Random();
+	private final Random random = new Random();
 
 	@BeforeClass
 	public static void setUp() {
@@ -127,16 +127,16 @@ public class VariableListTransformerTest {
 	private VariableTypeList createVariableTypeListTestData() {
 		final VariableTypeList list = new VariableTypeList();
 
-		list.add(createDMSVariableType("FACTOR1", "", 1, PhenotypicType.GERMPLASM, VariableType.GERMPLASM_DESCRIPTOR));
-		list.add(createDMSVariableType("FACTOR2", "", 2, PhenotypicType.DATASET, VariableType.STUDY_DETAIL));
-		list.add(createDMSVariableType("FACTOR3", "", 3, PhenotypicType.TRIAL_ENVIRONMENT, VariableType.ENVIRONMENT_DETAIL));
-		list.add(createDMSVariableType("FACTOR4", "", 4, PhenotypicType.TRIAL_DESIGN, VariableType.ENVIRONMENT_DETAIL));
-		list.add(createDMSVariableType("FACTOR5", "", 5, PhenotypicType.GERMPLASM, VariableType.GERMPLASM_DESCRIPTOR));
-		list.add(createDMSVariableType("FACTOR6", "", 6, PhenotypicType.GERMPLASM, VariableType.GERMPLASM_DESCRIPTOR));
-		list.add(createDMSVariableType("FACTOR7", "", 7, PhenotypicType.TRIAL_ENVIRONMENT, VariableType.ENVIRONMENT_DETAIL));
-		list.add(createDMSVariableType("FACTOR8", "", 8, PhenotypicType.TRIAL_ENVIRONMENT, VariableType.ENVIRONMENT_DETAIL));
-		list.add(createDMSVariableType("VARIATE1", "", 9, PhenotypicType.VARIATE, VariableType.TRAIT));
-		list.add(createDMSVariableType("VARIATE2", "", 10, PhenotypicType.VARIATE, VariableType.TRAIT));
+		list.add(this.createDMSVariableType("FACTOR1", "", 1, PhenotypicType.GERMPLASM, VariableType.GERMPLASM_DESCRIPTOR));
+		list.add(this.createDMSVariableType("FACTOR2", "", 2, PhenotypicType.DATASET, VariableType.STUDY_DETAIL));
+		list.add(this.createDMSVariableType("FACTOR3", "", 3, PhenotypicType.TRIAL_ENVIRONMENT, VariableType.ENVIRONMENT_DETAIL));
+		list.add(this.createDMSVariableType("FACTOR4", "", 4, PhenotypicType.TRIAL_DESIGN, VariableType.ENVIRONMENT_DETAIL));
+		list.add(this.createDMSVariableType("FACTOR5", "", 5, PhenotypicType.GERMPLASM, VariableType.GERMPLASM_DESCRIPTOR));
+		list.add(this.createDMSVariableType("FACTOR6", "", 6, PhenotypicType.GERMPLASM, VariableType.GERMPLASM_DESCRIPTOR));
+		list.add(this.createDMSVariableType("FACTOR7", "", 7, PhenotypicType.TRIAL_ENVIRONMENT, VariableType.ENVIRONMENT_DETAIL));
+		list.add(this.createDMSVariableType("FACTOR8", "", 8, PhenotypicType.TRIAL_ENVIRONMENT, VariableType.ENVIRONMENT_DETAIL));
+		list.add(this.createDMSVariableType("VARIATE1", "", 9, PhenotypicType.VARIATE, VariableType.TRAIT));
+		list.add(this.createDMSVariableType("VARIATE2", "", 10, PhenotypicType.VARIATE, VariableType.TRAIT));
 
 		return list;
 	}
@@ -216,14 +216,14 @@ public class VariableListTransformerTest {
 	private StandardVariable createStandardVariable(final String name) {
 
 		final StandardVariable standardVariable = new StandardVariable();
-		standardVariable.setId(random.nextInt(1000));
+		standardVariable.setId(this.random.nextInt(1000));
 		standardVariable.setName(name);
 		standardVariable.setProperty(
-			new Term(random.nextInt(1000), RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10)));
+			new Term(this.random.nextInt(1000), RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10)));
 		standardVariable
-			.setScale(new Term(random.nextInt(1000), RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10)));
+			.setScale(new Term(this.random.nextInt(1000), RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10)));
 		standardVariable
-			.setMethod(new Term(random.nextInt(1000), RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10)));
+			.setMethod(new Term(this.random.nextInt(1000), RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10)));
 		standardVariable.setDataType(new Term(DataType.CHARACTER_VARIABLE.getId(), "Character variable", "variable with char values"));
 		standardVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 

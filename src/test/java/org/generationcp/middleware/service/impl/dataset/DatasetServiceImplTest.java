@@ -923,7 +923,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
 
 		final int plotCount = 3;
-		final List<ExperimentModel> plotExperiments = getPlotExperiments(plotCount);
+		final List<ExperimentModel> plotExperiments = this.getPlotExperiments(plotCount);
 		final int plotDatasetId = new Random().nextInt();
 		final List<Integer> instanceIds = Arrays.asList(11, 12, 13);
 		Mockito.doReturn(plotExperiments).when(this.experimentDao).getObservationUnits(plotDatasetId, instanceIds);
