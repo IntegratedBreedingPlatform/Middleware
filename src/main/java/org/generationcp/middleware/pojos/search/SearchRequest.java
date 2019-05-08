@@ -12,8 +12,8 @@ import javax.persistence.Table;
  * Created by cyrus on 12/19/14.
  */
 @Entity
-@Table(name = "brapi_search")
-public class BrapiSearchRequest {
+@Table(name = "search_request")
+public class SearchRequest {
 
 	private int requestId;
 	private String requestType;
@@ -59,7 +59,7 @@ public class BrapiSearchRequest {
 			return false;
 		}
 
-		final BrapiSearchRequest that = (BrapiSearchRequest) o;
+		final SearchRequest that = (SearchRequest) o;
 
 		if (this.requestId != that.requestId) {
 			return false;

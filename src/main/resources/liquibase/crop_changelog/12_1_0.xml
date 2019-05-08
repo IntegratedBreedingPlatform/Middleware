@@ -7,14 +7,14 @@
 	<changeSet author="vanina" id="v12.1.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
-			<tableExists tableName="brapi_search" />
+			<tableExists tableName="search_request" />
 			</not>
 		</preConditions>
 		<comment>
 			This table must be generic and will save all data from the search calls
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			CREATE TABLE brapi_search (
+			CREATE TABLE search_request (
 			request_id INT(11) NOT NULL,
 			request_type VARCHAR(45) NOT NULL,
 			parameters TEXT NOT NULL,
