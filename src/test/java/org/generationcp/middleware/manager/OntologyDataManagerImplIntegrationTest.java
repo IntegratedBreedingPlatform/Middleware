@@ -950,6 +950,23 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		Assert.assertEquals(DatasetType.SUMMARY_DATA, datasetType.getDatasetTypeId().intValue());
 	}
 
+	@Test
+	public void testGetAllDatasetTypes() {
+		final Map<Integer, DatasetType> datasetTypeMap = this.ontologyDataManager.getAllDatasetTypes();
+		Assert.assertEquals(11, datasetTypeMap.size());
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.STUDY_CONDITIONS));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.MEANS_DATA));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.SUMMARY_DATA));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.PLOT_DATA));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.PLANT_SUBOBSERVATIONS));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.QUADRAT_SUBOBSERVATIONS));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.TIME_SERIES_SUBOBSERVATIONS));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.CUSTOM_SUBOBSERVATIONS));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.SUB_SAMPLE_DATA));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.WEATHER_DATA));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.MEANS_OVER_TRIAL_INSTANCES));
+	}
+
 	private StandardVariable createStandardVariable(final String name) {
 
 		final CVTerm property = this.cvTermDao.save(RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
