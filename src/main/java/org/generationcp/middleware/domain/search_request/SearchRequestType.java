@@ -12,6 +12,15 @@ public enum SearchRequestType {
 		this.name = name;
 	}
 
+	public static SearchRequestType findByName(final String name) {
+		for (final SearchRequestType type : SearchRequestType.values()) {
+			if (type.getName() == name) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	public int getId() {
 		return this.id;
 	}

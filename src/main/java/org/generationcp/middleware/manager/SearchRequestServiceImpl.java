@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
+import org.generationcp.middleware.domain.search_request.SearchRequestType;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.search.SearchRequest;
@@ -14,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class SearchRequestServiceImpl implements SearchRequestService {
 
 	private final ObjectMapper jacksonMapper;
-
 	private HibernateSessionProvider sessionProvider;
 	private DaoFactory daoFactory;
 
@@ -32,20 +33,29 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 	}
 
 	@Override
-	public SearchRequest saveSearchRequest(final GermplasmSearchRequestDto searchRequest, final Class type) {
+	public SearchRequest saveSearchRequest(final GermplasmSearchRequestDto searchRequestDto, final SearchRequestType type) {
 		try {
-			final String des = this.jacksonMapper.writeValueAsString(searchRequest);
-			final SearchRequestDto s = (SearchRequestDto) this.jacksonMapper.readValue(des, type);
-			System.out.printf("");
-		} catch (final Exception e ) {
-
+			final SearchRequest searchRequest = new SearchRequest();
+			searchRequest.setParameters(this.jacksonMapper.writeValueAsString(searchRequestDto));
+			searchRequest.setRequestType(type.getName());
+			return this.daoFactory.getSearchRequestDAO().save(searchRequest);
+		} catch (final Exception e) {
+			throw new MiddlewareException("Error saving search request", e);
 		}
-		return null;
-//		return this.daoFactory.getSearchRequestDAO().save(searchRequest);
 	}
 
 	@Override
-	public SearchRequest getSearchRequest(final Integer requestId) {
-		return this.daoFactory.getSearchRequestDAO().getById(requestId);
+	public SearchRequestDto getSearchRequest(
+		final Integer requestId,
+		final Class<GermplasmSearchRequestDto> searchRequestDtoClass) {
+		try {
+			final SearchRequest searchRequest = this.daoFactory.getSearchRequestDAO().getById(requestId);
+			final SearchRequestDto searchRequestDto = this.jacksonMapper.readValue(searchRequest.getParameters(), searchRequestDtoClass);
+
+			return searchRequestDto;
+		} catch (final Exception e) {
+			throw new MiddlewareException("Error getting search request", e);
+		}
+
 	}
 }

@@ -1,7 +1,7 @@
 package org.generationcp.middleware.domain.search_request;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 @AutoProperty
 @JsonTypeName("GermplasmSearchRequestDto")
-//@JsonDeserialize(as = GermplasmSearchRequestDto.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GermplasmSearchRequestDto extends SearchRequestDto {
 
 	private List<String> accessionNumbers;
