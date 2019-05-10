@@ -63,6 +63,11 @@ public class DatasetType {
 		this.setDatasetTypeId(datasetTypeId);
 	}
 
+	public DatasetType(final int datasetTypeId, final String name) {
+		this.setDatasetTypeId(datasetTypeId);
+		this.setName(name);
+	}
+
 	public Integer getDatasetTypeId() {
 		return this.datasetTypeId;
 	}
@@ -100,7 +105,8 @@ public class DatasetType {
 	}
 
 	public boolean isObservationType() {
-		return this.datasetTypeId == PLOT_DATA;
+		return Arrays.asList(PLOT_DATA, PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS)
+			.contains(this.datasetTypeId);
 	}
 
 	public void setSubObservationType(final boolean subObservationType) {
