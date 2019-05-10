@@ -23,7 +23,7 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
 		this.jacksonMapper = new ObjectMapper();
-		this.jacksonMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+
 	}
 
 	public SearchRequestServiceImpl() {
@@ -33,11 +33,11 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 	}
 
 	@Override
-	public SearchRequest saveSearchRequest(final GermplasmSearchRequestDto searchRequestDto, final SearchRequestType type) {
+	public SearchRequest saveSearchRequest(final SearchRequestDto searchRequestDto,  Class<? extends SearchRequestDto> searchRequestDtoClass) {
 		try {
 			final SearchRequest searchRequest = new SearchRequest();
-			searchRequest.setParameters(this.jacksonMapper.writeValueAsString(searchRequestDto));
-			searchRequest.setRequestType(type.getName());
+			searchRequest.setParameters(this.jacksonMapper.writeValueAsString(searchRequestDtoClass.cast(searchRequestDto)));
+			searchRequest.setRequestType("A");
 			return this.daoFactory.getSearchRequestDAO().save(searchRequest);
 		} catch (final Exception e) {
 			throw new MiddlewareException("Error saving search request", e);
@@ -47,7 +47,7 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 	@Override
 	public SearchRequestDto getSearchRequest(
 		final Integer requestId,
-		final Class<GermplasmSearchRequestDto> searchRequestDtoClass) {
+		final Class<? extends SearchRequestDto> searchRequestDtoClass) {
 		try {
 			final SearchRequest searchRequest = this.daoFactory.getSearchRequestDAO().getById(requestId);
 			final SearchRequestDto searchRequestDto = this.jacksonMapper.readValue(searchRequest.getParameters(), searchRequestDtoClass);

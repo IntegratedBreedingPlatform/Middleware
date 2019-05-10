@@ -8,7 +8,6 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.List;
 
 @AutoProperty
-@JsonTypeName("GermplasmSearchRequestDto")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GermplasmSearchRequestDto extends SearchRequestDto {
 
