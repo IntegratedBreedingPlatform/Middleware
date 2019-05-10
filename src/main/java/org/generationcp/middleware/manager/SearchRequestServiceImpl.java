@@ -9,11 +9,12 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.search.SearchRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+@SuppressWarnings("FieldMayBeFinal")
 @Transactional
 public class SearchRequestServiceImpl implements SearchRequestService {
 
 	private final ObjectMapper jacksonMapper;
-	private HibernateSessionProvider sessionProvider;
+	private final HibernateSessionProvider sessionProvider;
 	private DaoFactory daoFactory;
 
 	public SearchRequestServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -24,19 +25,17 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 	}
 
 	@Override
-	public SearchRequest saveSearchRequest(final SearchRequestDto searchRequestDto,  Class<? extends SearchRequestDto> searchRequestDtoClass) {
+	public SearchRequest saveSearchRequest(final SearchRequestDto searchRequestDto,  final Class<? extends SearchRequestDto> searchRequestDtoClass) {
 		try {
 			final SearchRequest searchRequest = new SearchRequest();
 			searchRequest.setParameters(this.jacksonMapper.writeValueAsString(searchRequestDtoClass.cast(searchRequestDto)));
-			searchRequest.setRequestType("A");
 			return this.daoFactory.getSearchRequestDAO().save(searchRequest);
 		} catch (final Exception e) {
 			throw new MiddlewareException("Error saving search request", e);
 		}
 	}
 
-	@Override
-	public SearchRequestDto getSearchRequest(
+	private SearchRequestDto getSearchRequest(
 		final Integer requestId,
 		final Class<? extends SearchRequestDto> searchRequestDtoClass) {
 		try {

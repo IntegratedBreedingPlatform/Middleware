@@ -7,8 +7,4 @@ public interface SearchRequestService {
 
 	SearchRequest saveSearchRequest(SearchRequestDto searchRequestDto, Class<? extends SearchRequestDto> searchRequestDtoClass);
 
-	SearchRequestDto getSearchRequest(
-		Integer requestId,
-		Class<? extends SearchRequestDto> germplasmSearchRequestDtoClass);
-
 }

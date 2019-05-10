@@ -16,7 +16,6 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE search_request (
 			request_id INT(11) NOT NULL AUTO_INCREMENT,
-			request_type VARCHAR(45) NOT NULL,
 			parameters TEXT NOT NULL,
 			PRIMARY KEY (request_id));
 		</sql>

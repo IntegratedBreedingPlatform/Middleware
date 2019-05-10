@@ -13,7 +13,6 @@ import javax.persistence.Table;
 public class SearchRequest {
 
 	private int requestId;
-	private String requestType;
 	private String parameters;
 
 	@GeneratedValue
@@ -25,16 +24,6 @@ public class SearchRequest {
 
 	public void setRequestId(final int programPresetsId) {
 		this.requestId = programPresetsId;
-	}
-
-	@Basic
-	@Column(name = "request_type")
-	public String getRequestType() {
-		return this.requestType;
-	}
-
-	public void setRequestType(final String requestType) {
-		this.requestType = requestType;
 	}
 
 	@Basic
@@ -71,7 +60,6 @@ public class SearchRequest {
 	@Override
 	public int hashCode() {
 		int result = this.requestId;
-		result = 31 * result + (this.requestType != null ? this.requestType.hashCode() : 0);
 		result = 31 * result + (this.parameters != null ? this.parameters.hashCode() : 0);
 		return result;
 	}
