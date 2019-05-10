@@ -1,11 +1,8 @@
 
 package org.generationcp.middleware.manager;
 
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
-import org.generationcp.middleware.domain.search_request.SearchRequestType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -24,12 +21,6 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 		this.daoFactory = new DaoFactory(this.sessionProvider);
 		this.jacksonMapper = new ObjectMapper();
 
-	}
-
-	public SearchRequestServiceImpl() {
-		super();
-		this.jacksonMapper = new ObjectMapper();
-		this.jacksonMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
 	}
 
 	@Override
