@@ -174,9 +174,9 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, userId);
 
 		Assert.assertEquals(String.format("There are only {0} check entries in the list", noOfCheckEntries), noOfCheckEntries,
-			this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.CHECK_ENTRY));
+			this.listDataProjectDAO.countByListIdAndEntryType(listId, Arrays.asList(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
 		Assert.assertEquals(String.format("There are only {0} test entries in the list", noOfTestEntries), noOfTestEntries,
-			this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.TEST_ENTRY));
+			this.listDataProjectDAO.countByListIdAndEntryType(listId, Arrays.asList(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 
 	}
 

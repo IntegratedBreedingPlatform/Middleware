@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="darla" id="v11.4.0-1" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="workbench_crop" columnName="use_uuid" />
+			</not>
+		</preConditions>
+		<comment>Add use_uuid field in workbench_crop table for specifying whether to use UUIDs for observation unit IDs</comment>
+		<addColumn tableName="workbench_crop">
+			<column name="use_uuid" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="1">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>
