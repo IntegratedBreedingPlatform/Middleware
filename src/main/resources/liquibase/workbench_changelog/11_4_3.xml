@@ -1,0 +1,39 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="darla" id="v11.4.3-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT count(*)
+					  FROM role r
+					 WHERE NOT EXISTS (
+						   SELECT 1
+							 FROM workbench_sidebar_category_link_role sr
+						    INNER JOIN workbench_sidebar_category_link l ON sr.sidebar_category_link_id = l.sidebar_category_link_id
+						    WHERE sr.role_id = r.id AND l.tool_name = 'trait_donor_query'
+						);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Show Multi-trait Query tool in sidebar for roles who do not have it configured to be visible yet</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `workbench_sidebar_category_link_role` (`sidebar_category_link_id`, `role_id`)
+			SELECT `sidebar_category_link_id`, role.id
+ 			  FROM `workbench_sidebar_category_link` link
+			 INNER JOIN role
+			 WHERE tool_name = 'trait_donor_query' AND NOT EXISTS (
+					SELECT 1
+        			  FROM workbench_sidebar_category_link_role sr
+	   				 INNER JOIN workbench_sidebar_category_link l ON sr.sidebar_category_link_id = l.sidebar_category_link_id
+       				 WHERE sr.role_id = role.id AND l.tool_name = 'trait_donor_query'
+				);
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>
