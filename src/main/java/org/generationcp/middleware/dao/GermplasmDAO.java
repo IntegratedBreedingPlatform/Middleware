@@ -10,22 +10,14 @@
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ObjectUtils;
-import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -47,8 +39,15 @@ import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -1341,7 +1340,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<GermplasmDTO> getGermplasmDTOList(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+	public List<GermplasmDTO> getGermplasmDTOList(
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Integer page, final Integer pageSize) {
 
 		try {
 
@@ -1401,9 +1401,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%") //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
-			if (germplasmSearchRequestDTO.getPage() != null && germplasmSearchRequestDTO.getPageSize() != null) {
-				sqlQuery.setFirstResult(germplasmSearchRequestDTO.getPageSize() * germplasmSearchRequestDTO.getPage());
-				sqlQuery.setMaxResults(germplasmSearchRequestDTO.getPageSize());
+			if (page != null && pageSize != null) {
+				sqlQuery.setFirstResult(pageSize * page);
+				sqlQuery.setMaxResults(pageSize);
 			}
 
 			final List<GermplasmDTO> germplasmDTOList = sqlQuery.list();
@@ -1417,7 +1417,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public long countGermplasmDTOs(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+	public long countGermplasmDTOs(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 
 		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) "
 		        + "  FROM germplsm g " //

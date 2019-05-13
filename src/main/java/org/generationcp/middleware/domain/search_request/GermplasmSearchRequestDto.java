@@ -1,7 +1,6 @@
 package org.generationcp.middleware.domain.search_request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -18,8 +17,42 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	private List<String> germplasmNames;
 	private List<String> germplasmPUIs;
 	private List<String> germplasmSpecies;
+	private Integer gid;
+	private String preferredName;
+	private String pui;
 
 	public GermplasmSearchRequestDto() {
+	}
+
+	public GermplasmSearchRequestDto(final Integer gid, final String preferredName, final String pui) {
+		super();
+		this.gid = gid;
+		this.preferredName = preferredName;
+		this.pui = pui;
+	}
+
+	public Integer getGid() {
+		return this.gid;
+	}
+
+	public void setGid(final Integer gid) {
+		this.gid = gid;
+	}
+
+	public String getPreferredName() {
+		return this.preferredName;
+	}
+
+	public void setPreferredName(final String preferredName) {
+		this.preferredName = preferredName;
+	}
+
+	public String getPui() {
+		return this.pui;
+	}
+
+	public void setPui(final String pui) {
+		this.pui = pui;
 	}
 
 	public List<String> getAccessionNumbers() {
