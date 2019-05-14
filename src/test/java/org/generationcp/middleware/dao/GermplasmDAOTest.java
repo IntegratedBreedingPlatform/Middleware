@@ -10,20 +10,7 @@
 
 package org.generationcp.middleware.dao;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Is.is;
-
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -54,7 +41,19 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
@@ -768,7 +767,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		}
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
-		request.setGid(germplasmGID);
+		request.setGermplasmDbIds(Lists.newArrayList(germplasmGID.toString()));
 		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, 1, 100);
 
 		final String displayName = germplasm.getPreferredName().getNval();
