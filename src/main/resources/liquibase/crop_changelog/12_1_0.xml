@@ -101,10 +101,11 @@
 			</not>
 		</preConditions>
 		<comment>
-			Remove PSM values for DATASET_TYPE from cvterm_relationship table
+			Remove DATASET_TYPE variable from cvterm table and its PSM values from cvterm_relationship table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM cvterm_relationship WHERE subject_id = 8160;
+			DELETE FROM cvterm WHERE cvterm_id = 8160;
 		</sql>
 	</changeSet>
 
