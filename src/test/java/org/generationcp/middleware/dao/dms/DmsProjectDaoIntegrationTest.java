@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -25,13 +26,13 @@ import com.google.common.base.Optional;
 
 
 public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
-	
+
 	private static final int NO_OF_GERMPLASM = 5;
 
 	private ExperimentPropertyDao experimentPropertyDao;
-	
+
 	private GeolocationDao geolocationDao;
-	
+
 	private GeolocationPropertyDao geolocPropDao;
 
 	private ExperimentDao experimentDao;
@@ -43,19 +44,19 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	private DmsProjectDao dmsProjectDao;
 
 	private ProjectRelationshipDao projectRelationshipDao;
-	
+
 	private DmsProject study;
 
 	@Before
 	public void setUp() {
 		this.experimentPropertyDao = new ExperimentPropertyDao();
 		this.experimentPropertyDao.setSession(this.sessionProvder.getSession());
-		
+
 		if (this.geolocationDao == null) {
 			this.geolocationDao = new GeolocationDao();
 			this.geolocationDao.setSession(this.sessionProvder.getSession());
 		}
-		
+
 		if (this.geolocPropDao == null) {
 			this.geolocPropDao = new GeolocationPropertyDao();
 			this.geolocPropDao.setSession(this.sessionProvder.getSession());
@@ -85,7 +86,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.projectRelationshipDao = new ProjectRelationshipDao();
 			this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
 		}
-		
+
 		if (this.study == null) {
 			this.study = new DmsProject();
 			this.study.setName("Test Project");
@@ -93,7 +94,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.dmsProjectDao.save(this.study);
 		}
 	}
-	
+
 	@Test
 	public void testGetDatasetInstances() {
 		final Integer env1 = this.createEnvironmentData("1", 1, Optional.<String>absent(), Optional.of(1));
@@ -102,7 +103,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final Integer env3 = this.createEnvironmentData("3", 3, Optional.of(customLocation), Optional.<Integer>absent());
 		final List<StudyInstance> instances = this.dmsProjectDao.getDatasetInstances(this.study.getProjectId());
 		Assert.assertEquals(3, instances.size());
-		
+
 		final StudyInstance instance1 = instances.get(0);
 		Assert.assertEquals(env1.intValue(), instance1.getInstanceDbId());
 		Assert.assertEquals(1, instance1.getInstanceNumber());
@@ -110,7 +111,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("AFG", instance1.getLocationAbbreviation());
 		Assert.assertNull(instance1.getCustomLocationAbbreviation());
 		Assert.assertTrue(instance1.isHasFieldmap());
-		
+
 		final StudyInstance instance2 = instances.get(1);
 		Assert.assertEquals(env2.intValue(), instance2.getInstanceDbId());
 		Assert.assertEquals(2, instance2.getInstanceNumber());
@@ -118,7 +119,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("ALB", instance2.getLocationAbbreviation());
 		Assert.assertNull(instance2.getCustomLocationAbbreviation());
 		Assert.assertTrue(instance2.isHasFieldmap());
-		
+
 		final StudyInstance instance3 = instances.get(2);
 		Assert.assertEquals(env3.intValue(), instance3.getInstanceDbId());
 		Assert.assertEquals(3, instance3.getInstanceNumber());
@@ -205,19 +206,49 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 
 	}
-	
+
+	@Test
+	public void testGetDataSet() {
+		final String studyName = "Study1";
+		final String programUUID = UUID.randomUUID().toString();
+
+		final DmsProject study = new DmsProject();
+		study.setName(studyName);
+		study.setDescription(studyName);
+		study.setProgramUUID(programUUID);
+		this.dmsProjectDao.save(study);
+
+		final DmsProject summary = new DmsProject();
+		summary.setName(studyName + " - Summary Dataset");
+		summary.setDescription(studyName + " - Summary Dataset");
+		summary.setProgramUUID(programUUID);
+		summary.setDatasetType(new DatasetType(DatasetType.SUMMARY_DATA));
+		this.dmsProjectDao.save(summary);
+
+		final ProjectRelationship projectRelationship = new ProjectRelationship();
+		projectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
+		projectRelationship.setObjectProject(study);
+		projectRelationship.setSubjectProject(summary);
+		this.projectRelationshipDao.save(projectRelationship);
+
+		final DatasetDTO retrievedProject = this.dmsProjectDao.getDataset(summary.getProjectId());
+		Assert.assertNotNull(retrievedProject);
+		Assert.assertEquals(summary.getName(), retrievedProject.getName());
+		Assert.assertEquals(summary.getDatasetType().getDatasetTypeId(), retrievedProject.getDatasetTypeId());
+	}
+
 	private Integer createEnvironmentData(final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(instanceNumber);
 		this.geolocationDao.saveOrUpdate(geolocation);
-		
+
 		final GeolocationProperty prop = new GeolocationProperty();
 		prop.setGeolocation(geolocation);
 		prop.setType(TermId.LOCATION_ID.getId());
 		prop.setRank(1);
 		prop.setValue(locationId.toString());
 		this.geolocPropDao.save(prop);
-		
+
 		if (customAbbev.isPresent()){
 			final GeolocationProperty prop2 = new GeolocationProperty();
 			prop2.setGeolocation(geolocation);
@@ -226,7 +257,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			prop2.setValue(customAbbev.get());
 			this.geolocPropDao.save(prop2);
 		}
-		
+
 		if (blockId.isPresent()){
 			final GeolocationProperty prop3 = new GeolocationProperty();
 			prop3.setGeolocation(geolocation);
@@ -235,7 +266,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			prop3.setValue(blockId.get().toString());
 			this.geolocPropDao.save(prop3);
 		}
-		
+
 		for (int i = 1; i < NO_OF_GERMPLASM + 1; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
