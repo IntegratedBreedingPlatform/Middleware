@@ -96,7 +96,7 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT count(1) FROM cvterm_relationship WHERE subject_id=8160;
+					SELECT count(1) FROM cvterm_relationship WHERE subject_id = 8160;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -104,7 +104,7 @@
 			Remove PSM values for DATASET_TYPE from cvterm_relationship table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			DELETE FROM cvterm_relationship WHERE subject_id=8160;
+			DELETE FROM cvterm_relationship WHERE subject_id = 8160;
 		</sql>
 	</changeSet>
 
@@ -112,7 +112,7 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT count(1) FROM cvtermsynonym WHERE cvterm_id=8160;
+					SELECT count(1) FROM cvtermsynonym WHERE cvterm_id = 8160;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -120,7 +120,7 @@
 			Remove DATASET_TYPE synonyms from cvtermsynonym table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			DELETE FROM cvtermsynonym WHERE cvterm_id=8160;
+			DELETE FROM cvtermsynonym WHERE cvterm_id = 8160;
 		</sql>
 	</changeSet>
 
@@ -128,7 +128,7 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT (1) FROM cvtermprop WHERE cvterm_id=8160;
+					SELECT (1) FROM cvtermprop WHERE cvterm_id = 8160;
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -136,7 +136,7 @@
 			Remove DATASET_TYPE entries from cvtermprop table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			DELETE FROM cvtermprop WHERE cvterm_id=8160;
+			DELETE FROM cvtermprop WHERE cvterm_id = 8160;
 		</sql>
 	</changeSet>
 
@@ -144,41 +144,21 @@
 		<preConditions onFail="CONTINUE">
 			<and>
 				<sqlCheck expectedResult="0">
-					SELECT count(1) FROM cvterm_relationship WHERE object_id=17267;
+					SELECT count(1) FROM cvterm_relationship WHERE object_id = 17267;
 				</sqlCheck>
 				<not>
 					<sqlCheck expectedResult="0">
-						SELECT count(1) FROM cvterm_relationship WHERE object_id in (10060, 10070, 10080, 10090, 10094, 10095, 10096, 10097);
+						SELECT count(1) FROM cvterm_relationship WHERE subject_id = 17267;
 					</sqlCheck>
 				</not>
 			</and>
 		</preConditions>
 		<comment>
-			Remove all DATASET_TYPE categorical values from cvterm table
+			Remove "Type of DATASET_TYPE" variable from cvterm and its categorical values from cvterm_relationship table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			DELETE FROM cvterm WHERE cvterm_id in (10060, 10070, 10080, 10090, 10094, 10095, 10096, 10097);
-		</sql>
-	</changeSet>
-
-	<changeSet author="mderamos" id="v12.1.0-8">
-		<preConditions onFail="CONTINUE">
-			<and>
-				<sqlCheck expectedResult="0">
-					SELECT count(1) FROM cvterm_relationship WHERE object_id=17267;
-				</sqlCheck>
-				<not>
-					<sqlCheck expectedResult="0">
-						SELECT count(1) FROM cvterm_relationship WHERE subject_id=17267;
-					</sqlCheck>
-				</not>
-			</and>
-		</preConditions>
-		<comment>
-			Remove all "Type of DATASET_TYPE" related values from cvterm_relationship table
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DELETE FROM cvterm_relationship WHERE subject_id=17267;
+			DELETE FROM cvterm_relationship WHERE subject_id = 17267;
+			DELETE FROM cvterm WHERE cvterm_id = 17267;
 		</sql>
 	</changeSet>
 
