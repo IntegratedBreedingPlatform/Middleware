@@ -35,7 +35,9 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 		}
 	}
 
-	private SearchRequestDto getSearchRequest(
+
+	@Override
+	public SearchRequestDto getSearchRequest(
 		final Integer requestId,
 		final Class<? extends SearchRequestDto> searchRequestDtoClass) {
 		try {

@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -38,6 +39,7 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -1373,13 +1375,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS subtaxaAuthority, " //
 				+ "   (SELECT a.aval FROM atributs a " //
 				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'PROGM' AND u.fldno = a.atype)" //
-				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS instituteCode " //
+				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS instituteCode, " //
+				+ "   m.mname as breedingMethodDbId " //
 				+ "  FROM germplsm g " //
 				+ "  	LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
+				+ "  	LEFT join methods m ON g.methn = m.mid " //
+				+ "		LEFT JOIN listdata l on l.gid = g.gid " //
 				+ "	 WHERE g.deleted = 0" //
 				+ "      AND g.grplce = 0"; //
 
-			if (germplasmSearchRequestDTO.getPreferredName() != null) {
+			if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
 				queryString = queryString
 					+ "      AND (SELECT n.nval" //
 					+ "                    FROM names n" //
@@ -1387,42 +1392,42 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "                    LIMIT 1) like :likeCondition "; //
 			}
 
-			if (!germplasmSearchRequestDTO.getAccessionNumbers().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
 				queryString = queryString + " AND EXISTS (SELECT 1" //
 					+ "         FROM names n" //
 					+ "                  INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
 					+ "         WHERE n.gid = g.gid AND n.nval IN (:accessionNumbers)) "; //
 			}
 
-			if (!germplasmSearchRequestDTO.getCommonCropNames().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
 				queryString = queryString + " AND EXISTS (SELECT 1" //
 					+ "         FROM atributs a" //
 					+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'CROPNM' AND u.fldno = a.atype)" //
 					+ "         WHERE a.gid = g.gid AND a.aval IN (:commonCropNames)) "; //
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmDbIds().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
 				queryString = queryString + " AND g.gid IN (:germplasmDbIds) ";
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmGenus().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
 				queryString = queryString + " AND EXISTS (SELECT 1" //
 					+ "         FROM names n" //
 					+ "                  INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'GENUS' AND u.fldno = n.ntype)" //
 					+ "         WHERE n.gid = g.gid AND n.nval IN (:germplasmGenus)) "; //
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmNames().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmNames())) {
 				queryString = queryString + " AND EXISTS (SELECT 1" //
 					+ "         FROM names n" //
 					+ "         WHERE n.gid = g.gid AND n.nval IN (:germplasmNames)) "; //
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmPUIs().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
 				queryString = queryString + " AND reference.btable IN (:germplasmPUIs) "; //
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmSpecies().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 				queryString = queryString + " AND EXISTS (SELECT 1" //
 					+ "         FROM atributs a" //
 					+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
@@ -1434,38 +1439,38 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			sqlQuery.addScalar("germplasmDbId").addScalar("germplasmPUI").addScalar("accessionNumber").addScalar("acquisitionDate")
 				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
 				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
-				.addScalar("instituteCode") //
+				.addScalar("instituteCode").addScalar("breedingMethodDbId") //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
-			if (germplasmSearchRequestDTO.getPreferredName() != null) {
+			if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
 				sqlQuery.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%"); //
 			}
 
-			if (!germplasmSearchRequestDTO.getAccessionNumbers().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
 				sqlQuery.setParameterList("accessionNumbers", germplasmSearchRequestDTO.getAccessionNumbers());
 			}
 
-			if (!germplasmSearchRequestDTO.getCommonCropNames().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
 				sqlQuery.setParameterList("commonCropNames", germplasmSearchRequestDTO.getCommonCropNames());
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmDbIds().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
 				sqlQuery.setParameterList("germplasmDbIds", germplasmSearchRequestDTO.getGermplasmDbIds());
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmGenus().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
 				sqlQuery.setParameterList("germplasmGenus", germplasmSearchRequestDTO.getGermplasmGenus());
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmNames().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmNames())) {
 				sqlQuery.setParameterList("germplasmNames", germplasmSearchRequestDTO.getGermplasmNames());
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmPUIs().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
 				sqlQuery.setParameterList("germplasmPUIs", germplasmSearchRequestDTO.getGermplasmPUIs());
 			}
 
-			if (!germplasmSearchRequestDTO.getGermplasmSpecies().isEmpty()) {
+			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 				sqlQuery.setParameterList("germplasmSpecies", germplasmSearchRequestDTO.getGermplasmSpecies());
 			}
 
@@ -1489,30 +1494,93 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		String queryString = "SELECT COUNT(1) "
 			+ "  FROM germplsm g " //
-			+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.deleted = 0 AND g.grplce = 0" //
-			+ "  AND (SELECT n.nval FROM names n" //
-			+ "  WHERE n.nstat = 1 AND n.gid = g.gid LIMIT 1) like :likeCondition ";
+			+ "  LEFT JOIN reflinks reference ON reference.brefid = g.gref WHERE g.deleted = 0 AND g.grplce = 0"; //
 
-		if (!germplasmSearchRequestDTO.getGermplasmDbIds().isEmpty()) {
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
+			queryString = queryString
+				+ "      AND (SELECT n.nval" //
+				+ "                    FROM names n" //
+				+ "                    WHERE n.nstat = 1 AND n.gid = g.gid" //
+				+ "                    LIMIT 1) like :likeCondition "; //
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
+			queryString = queryString + " AND EXISTS (SELECT 1" //
+				+ "         FROM names n" //
+				+ "                  INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'ACCNO' AND u.fldno = n.ntype)" //
+				+ "         WHERE n.gid = g.gid AND n.nval IN (:accessionNumbers)) "; //
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
+			queryString = queryString + " AND EXISTS (SELECT 1" //
+				+ "         FROM atributs a" //
+				+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'CROPNM' AND u.fldno = a.atype)" //
+				+ "         WHERE a.gid = g.gid AND a.aval IN (:commonCropNames)) "; //
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
 			queryString = queryString + " AND g.gid IN (:germplasmDbIds) ";
 		}
 
-		if (!germplasmSearchRequestDTO.getGermplasmPUIs().isEmpty()) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
+			queryString = queryString + " AND EXISTS (SELECT 1" //
+				+ "         FROM names n" //
+				+ "                  INNER JOIN udflds u ON (u.ftable = 'NAMES' AND u.fcode = 'GENUS' AND u.fldno = n.ntype)" //
+				+ "         WHERE n.gid = g.gid AND n.nval IN (:germplasmGenus)) "; //
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmNames())) {
+			queryString = queryString + " AND EXISTS (SELECT 1" //
+				+ "         FROM names n" //
+				+ "         WHERE n.gid = g.gid AND n.nval IN (:germplasmNames)) "; //
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
 			queryString = queryString + " AND reference.btable IN (:germplasmPUIs) "; //
 		}
 
-		final SQLQuery query = this.getSession().createSQLQuery(queryString);
-		query.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%");
-
-		if (!germplasmSearchRequestDTO.getGermplasmPUIs().isEmpty()) {
-			query.setParameterList("germplasmPUIs", germplasmSearchRequestDTO.getGermplasmPUIs());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
+			queryString = queryString + " AND EXISTS (SELECT 1" //
+				+ "         FROM atributs a" //
+				+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
+				+ "         WHERE a.gid = g.gid AND a.aval IN (:germplasmSpecies)) "; //
 		}
 
-		if (!germplasmSearchRequestDTO.getGermplasmDbIds().isEmpty()) {
-			query.setParameterList("germplasmDbIds", germplasmSearchRequestDTO.getGermplasmDbIds());
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString);
+
+		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
+			sqlQuery.setParameter("likeCondition", "%" + germplasmSearchRequestDTO.getPreferredName() + "%"); //
 		}
 
-		return ((BigInteger) query.uniqueResult()).longValue();
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
+			sqlQuery.setParameterList("accessionNumbers", germplasmSearchRequestDTO.getAccessionNumbers());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
+			sqlQuery.setParameterList("commonCropNames", germplasmSearchRequestDTO.getCommonCropNames());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
+			sqlQuery.setParameterList("germplasmDbIds", germplasmSearchRequestDTO.getGermplasmDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
+			sqlQuery.setParameterList("germplasmGenus", germplasmSearchRequestDTO.getGermplasmGenus());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmNames())) {
+			sqlQuery.setParameterList("germplasmNames", germplasmSearchRequestDTO.getGermplasmNames());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
+			sqlQuery.setParameterList("germplasmPUIs", germplasmSearchRequestDTO.getGermplasmPUIs());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
+			sqlQuery.setParameterList("germplasmSpecies", germplasmSearchRequestDTO.getGermplasmSpecies());
+		}
+
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 
 	}
 
