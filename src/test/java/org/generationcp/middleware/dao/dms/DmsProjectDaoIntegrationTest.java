@@ -271,20 +271,20 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Geolocation geolocation = new Geolocation();
-		geolocationDao.saveOrUpdate(geolocation);
+		this.geolocationDao.saveOrUpdate(geolocation);
 
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(plot);
 		experimentModel.setObservationUnitNo(1);
-		experimentDao.saveOrUpdate(experimentModel);
+		this.experimentDao.saveOrUpdate(experimentModel);
 
 		final ExperimentProperty experimentProperty = new ExperimentProperty();
 		experimentProperty.setExperiment(experimentModel);
 		experimentProperty.setTypeId(TermId.PLOT_NO.getId());
 		experimentProperty.setValue("1");
 		experimentProperty.setRank(1);
-		experimentPropertyDao.saveOrUpdate(experimentProperty);
+		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
@@ -299,7 +299,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		this.stockDao.saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);
-		experimentDao.saveOrUpdate(experimentModel);
+		this.experimentDao.saveOrUpdate(experimentModel);
 
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 		sampleList.setListName("listName");
