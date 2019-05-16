@@ -295,7 +295,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		this.sampleListDao.saveOrUpdate(sampleList);
 		this.sampleDao.saveOrUpdate(sample);
 
-		final DatasetDTO retrievedProject = this.dmsProjectDao.getDataset(plot.getProjectId());
+		final DatasetDTO retrievedProject = this.dmsProjectDao.getDatasetOfSampleList(sampleList.getId());
 		Assert.assertNotNull(retrievedProject);
 		Assert.assertEquals(plot.getName(), retrievedProject.getName());
 		Assert.assertEquals(plot.getDatasetType().getDatasetTypeId(), retrievedProject.getDatasetTypeId());
