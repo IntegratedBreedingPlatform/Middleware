@@ -6,16 +6,19 @@ import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
-import org.generationcp.middleware.dao.SampleListDaoTest;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -60,6 +63,9 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	private SampleListDao sampleListDao;
 
 	private SampleDao sampleDao;
+
+	private PersonDAO personDAO;
+
 	private DmsProject study;
 
 	@Before
@@ -115,6 +121,11 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		if(this.sampleDao == null) {
 			this.sampleDao = new SampleDao();
 			this.sampleDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if(this.personDAO == null) {
+			this.personDAO = new PersonDAO();
+			this.personDAO.setSession(this.sessionProvder.getSession());
 		}
 
 		if (this.study == null) {
@@ -246,7 +257,17 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final DmsProject plot = this.createDataset(studyName + " - Plot Dataset", programUUID, DatasetType.PLOT_DATA);
 		this.createProjectRelationship(study, plot);
 
-		User user = this.userDao.getUserByUserName(SampleListDaoTest.ADMIN);
+		final Person person = PersonTestDataInitializer.createPerson();
+		person.setFirstName("John");
+		person.setLastName("Doe");
+		this.personDAO.saveOrUpdate(person);
+
+		final User user = UserTestDataInitializer.createUser();
+		user.setName("USER");
+		user.setUserid(null);
+		user.setPersonid(person.getId());
+		user.setPerson(person);
+		this.userDao.saveOrUpdate(user);
 
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Geolocation geolocation = new Geolocation();
@@ -278,6 +299,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		this.stockDao.saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);
+		experimentDao.saveOrUpdate(experimentModel);
 
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(user);
 		sampleList.setListName("listName");
