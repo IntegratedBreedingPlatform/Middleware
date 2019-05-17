@@ -58,13 +58,13 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 	private ProjectRelationshipDao projectRelationshipDao;
 
+	private PersonDAO personDao;
+
 	private UserDAO userDao;
 
 	private SampleListDao sampleListDao;
 
 	private SampleDao sampleDao;
-
-	private PersonDAO personDAO;
 
 	private DmsProject study;
 
@@ -108,24 +108,24 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
 		}
 
-		if(this.userDao == null) {
+		if (this.personDao == null) {
+			this.personDao = new PersonDAO();
+			this.personDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.userDao == null) {
 			this.userDao = new UserDAO();
 			this.userDao.setSession(this.sessionProvder.getSession());
 		}
 
-		if(this.sampleListDao == null) {
-			this.sampleListDao = new SampleListDao();
-			this.sampleListDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if(this.sampleDao == null) {
+		if (this.sampleDao == null) {
 			this.sampleDao = new SampleDao();
 			this.sampleDao.setSession(this.sessionProvder.getSession());
 		}
 
-		if(this.personDAO == null) {
-			this.personDAO = new PersonDAO();
-			this.personDAO.setSession(this.sessionProvder.getSession());
+		if (this.sampleListDao == null) {
+			this.sampleListDao = new SampleListDao();
+			this.sampleListDao.setSession(this.sessionProvder.getSession());
 		}
 
 		if (this.study == null) {
@@ -260,7 +260,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final Person person = PersonTestDataInitializer.createPerson();
 		person.setFirstName("John");
 		person.setLastName("Doe");
-		this.personDAO.saveOrUpdate(person);
+		this.personDao.saveOrUpdate(person);
 
 		final User user = UserTestDataInitializer.createUser();
 		user.setName("USER");
@@ -350,6 +350,36 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		return dataset;
 	}
 
+	@Test
+	public void testGetDataSets() {
+		final String studyName = "Study1";
+		final String programUUID = UUID.randomUUID().toString();
+
+		final DmsProject study = new DmsProject();
+		study.setName(studyName);
+		study.setDescription(studyName);
+		study.setProgramUUID(programUUID);
+		this.dmsProjectDao.save(study);
+
+		final DmsProject summary = new DmsProject();
+		summary.setName(studyName + " - Summary Dataset");
+		summary.setDescription(studyName + " - Summary Dataset");
+		summary.setProgramUUID(programUUID);
+		summary.setDatasetType(new DatasetType(DatasetType.SUMMARY_DATA));
+		this.dmsProjectDao.save(summary);
+
+		final ProjectRelationship projectRelationship = new ProjectRelationship();
+		projectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
+		projectRelationship.setObjectProject(study);
+		projectRelationship.setSubjectProject(summary);
+		this.projectRelationshipDao.save(projectRelationship);
+
+		final List<DatasetDTO> datasets = this.dmsProjectDao.getDatasets(study.getProjectId());
+		Assert.assertEquals(1, datasets.size());
+		Assert.assertEquals(summary.getName(), datasets.get(0).getName());
+		Assert.assertEquals(summary.getDatasetType().getDatasetTypeId(),  datasets.get(0).getDatasetTypeId());
+	}
+
 	private Integer createEnvironmentData(final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(instanceNumber);
@@ -404,5 +434,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		return geolocation.getLocationId();
 	}
+
+
 
 }

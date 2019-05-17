@@ -16,11 +16,12 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
@@ -28,10 +29,22 @@ import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatasetProjectSaver extends Saver {
+public class DatasetProjectSaver {
 
-	public DatasetProjectSaver(final HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+	private DaoFactory daoFactory;
+
+	private ProjectPropertySaver projectPropertySaver;
+
+	private StandardVariableBuilder standardVariableBuilder;
+
+	public DatasetProjectSaver() {
+		// for unit testing purpose
+	}
+
+	public DatasetProjectSaver(final HibernateSessionProvider sessionProvider) {
+		this.projectPropertySaver = new ProjectPropertySaver(sessionProvider);
+		this.standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	public DmsProject addDataSet(final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues, final String programUUID, final int datasetTypeId)
@@ -45,9 +58,9 @@ public class DatasetProjectSaver extends Saver {
 		this.addNameVariableTypeIfNecessary(variableTypeList, programUUID);
 		this.addDescriptionVariableTypeIfNecessary(variableTypeList, programUUID);
 
-		datasetProject.setProperties(this.getProjectPropertySaver().create(datasetProject, variableTypeList, datasetValues.getVariables()));
+		datasetProject.setProperties(this.projectPropertySaver.create(datasetProject, variableTypeList, datasetValues.getVariables()));
 		datasetProject.setRelatedTos(this.createProjectRelationship(studyId, datasetProject));
-		this.getDmsProjectDao().save(datasetProject);
+		this.daoFactory.getDmsProjectDAO().save(datasetProject);
 
 		return datasetProject;
 	}
@@ -87,13 +100,13 @@ public class DatasetProjectSaver extends Saver {
 	}
 
 	private StandardVariable getStandardVariable(final TermId stdVarId, final String programUUID) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().create(stdVarId.getId(),programUUID);
+		return this.standardVariableBuilder.create(stdVarId.getId(),programUUID);
 	}
 
 	public void addDatasetVariableType(final int datasetId, final DMSVariableType variableType) throws MiddlewareQueryException {
-		final DmsProject project = this.getDmsProjectDao().getById(datasetId);
+		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
 		if (project != null) {
-			this.getProjectPropertySaver().saveVariableType(project, variableType, null);
+			this.projectPropertySaver.saveVariableType(project, variableType, null);
 		}
 	}
 
@@ -110,7 +123,7 @@ public class DatasetProjectSaver extends Saver {
 	private List<ProjectRelationship> createProjectRelationship(final int studyId, final DmsProject datasetProject) throws MiddlewareQueryException {
 		final ProjectRelationship relationship = new ProjectRelationship();
 		relationship.setSubjectProject(datasetProject);
-		relationship.setObjectProject(this.getDmsProjectDao().getById(studyId));
+		relationship.setObjectProject(this.daoFactory.getDmsProjectDAO().getById(studyId));
 		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
 
 		final List<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
