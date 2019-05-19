@@ -33,7 +33,7 @@ public class DaoFactory {
 
 	private HibernateSessionProvider sessionProvider;
 
-	public DaoFactory(){
+	public DaoFactory() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
@@ -94,7 +94,7 @@ public class DaoFactory {
 		transactionDao.setSession(this.sessionProvider.getSession());
 		return transactionDao;
 	}
-	
+
 	public StockDao getStockDao() {
 		final StockDao stockDao = new StockDao();
 		stockDao.setSession(this.sessionProvider.getSession());
@@ -136,14 +136,14 @@ public class DaoFactory {
 		personDao.setSession(this.sessionProvider.getSession());
 		return personDao;
 	}
-	
+
 	public PhenotypeDao getPhenotypeDAO() {
 		final PhenotypeDao phenotypeDao = new PhenotypeDao();
 		phenotypeDao.setSession(this.sessionProvider.getSession());
 		return phenotypeDao;
-				
+
 	}
-	
+
 	public DmsProjectDao getDmsProjectDAO() {
 		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.sessionProvider.getSession());
@@ -169,7 +169,7 @@ public class DaoFactory {
 		return experimentDao;
 
 	}
-	
+
 	public GeolocationDao getGeolocationDao() {
 		final GeolocationDao geolocationDao = new GeolocationDao();
 		geolocationDao.setSession(this.sessionProvider.getSession());
@@ -182,7 +182,7 @@ public class DaoFactory {
 		return geolocationPropertyDao;
 	}
 
-	public ProgramPresetDAO getProgramPresetDAO(){
+	public ProgramPresetDAO getProgramPresetDAO() {
 		final ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
 		programPresetDAO.setSession(this.sessionProvider.getSession());
 		return programPresetDAO;

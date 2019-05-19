@@ -63,8 +63,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ " inner join sample sp on sp.nd_experiment_id = nde.nd_experiment_id"
 			+ " where nde.nd_experiment_id in (:experimentIds)  group by nde.nd_experiment_id";
 
-
-
 	private static final String SAMPLE = "sample";
 	private static final String SAMPLE_EXPERIMENT = "sample.experiment";
 	private static final String EXPERIMENT = "experiment";
@@ -73,7 +71,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	public List<SampleDTO> filter(final Integer ndExperimentId, final Integer listId, final Pageable pageable) {
 
-		final Criteria criteria = createSampleDetailsCriteria();
+		final Criteria criteria = this.createSampleDetailsCriteria();
 		final int pageSize = pageable.getPageSize();
 		final int start = pageSize * pageable.getPageNumber();
 
@@ -442,8 +440,5 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return map;
 	}
-	
-	
-
 
 }

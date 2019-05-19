@@ -33,7 +33,6 @@ public class DatasetType {
 	public static final List<Integer> SUBOBSERVATIONS =
 		Arrays.asList(PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
 
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -57,7 +56,8 @@ public class DatasetType {
 	@Column(name = "is_subobs_type", columnDefinition = "TINYINT")
 	private boolean isSubObservationType;
 
-	public DatasetType() { }
+	public DatasetType() {
+	}
 
 	public DatasetType(final int datasetTypeId) {
 		this.setDatasetTypeId(datasetTypeId);

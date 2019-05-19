@@ -18,7 +18,6 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -47,8 +46,9 @@ public class DatasetProjectSaver {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	public DmsProject addDataSet(final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues, final String programUUID, final int datasetTypeId)
-			throws MiddlewareQueryException {
+	public DmsProject addDataSet(
+		final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues, final String programUUID,
+		final int datasetTypeId) {
 		final DmsProject datasetProject = new DmsProject();
 		datasetProject.setName(this.getName(datasetValues));
 		datasetProject.setDescription(this.getDescription(datasetValues));
@@ -79,31 +79,31 @@ public class DatasetProjectSaver {
 		return this.getStringValue(datasetValues, TermId.DATASET_TITLE.getId());
 	}
 
-	private void addNameVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) throws MiddlewareQueryException {
+	private void addNameVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) {
 		if (variableTypeList.findById(TermId.DATASET_NAME) == null) {
 			variableTypeList.makeRoom(1);
 			final DMSVariableType dataSetName =
-					new DMSVariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME, programUUID), 1);
+				new DMSVariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME, programUUID), 1);
 			dataSetName.setRole(PhenotypicType.DATASET);
 			variableTypeList.add(dataSetName);
 		}
 	}
 
-	private void addDescriptionVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) throws MiddlewareQueryException {
+	private void addDescriptionVariableTypeIfNecessary(final VariableTypeList variableTypeList, final String programUUID) {
 		if (variableTypeList.findById(TermId.DATASET_TITLE) == null) {
 			variableTypeList.makeRoom(2);
 			final DMSVariableType dataSetTitle =
-					new DMSVariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE, programUUID), 2);
+				new DMSVariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE, programUUID), 2);
 			dataSetTitle.setRole(PhenotypicType.DATASET);
 			variableTypeList.add(dataSetTitle);
 		}
 	}
 
-	private StandardVariable getStandardVariable(final TermId stdVarId, final String programUUID) throws MiddlewareQueryException {
-		return this.standardVariableBuilder.create(stdVarId.getId(),programUUID);
+	private StandardVariable getStandardVariable(final TermId stdVarId, final String programUUID) {
+		return this.standardVariableBuilder.create(stdVarId.getId(), programUUID);
 	}
 
-	public void addDatasetVariableType(final int datasetId, final DMSVariableType variableType) throws MiddlewareQueryException {
+	public void addDatasetVariableType(final int datasetId, final DMSVariableType variableType) {
 		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
 		if (project != null) {
 			this.projectPropertySaver.saveVariableType(project, variableType, null);
@@ -120,7 +120,7 @@ public class DatasetProjectSaver {
 		return null;
 	}
 
-	private List<ProjectRelationship> createProjectRelationship(final int studyId, final DmsProject datasetProject) throws MiddlewareQueryException {
+	private List<ProjectRelationship> createProjectRelationship(final int studyId, final DmsProject datasetProject) {
 		final ProjectRelationship relationship = new ProjectRelationship();
 		relationship.setSubjectProject(datasetProject);
 		relationship.setObjectProject(this.daoFactory.getDmsProjectDAO().getById(studyId));

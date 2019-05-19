@@ -1004,6 +1004,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		return this.manager.addDataSet(studyId, typeList, datasetValues, null, datasetTypeId);
 	}
+
 	@Test
 	public void testRenameStudy() throws Exception {
 		// Create project record
@@ -1017,7 +1018,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final DatasetReference plotdata =
 			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DatasetType.PLOT_DATA);
-
 
 		final DatasetReference environment =
 			this.addTestDataset(project.getProjectId(), project.getName() + ENVIRONMENT, DatasetType.SUMMARY_DATA);

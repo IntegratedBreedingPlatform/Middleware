@@ -54,7 +54,6 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
-import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -746,7 +745,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID) {
 		try {
-			final String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid and study_type_id is not null";
+			final String sql =
+				"SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid and study_type_id is not null";
 			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameter("name", name);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
@@ -817,7 +817,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			locationCriteria.add(Restrictions.eq("typeId", TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()));
 			locationCriteria.createAlias("geoLocation", "g");
 			locationCriteria.createAlias("g.properties", "gp");
-			locationCriteria.add(Restrictions.and(Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
+			locationCriteria.add(Restrictions.and(
+				Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
 				Restrictions.eq("gp.value", parameters.get(StudyFilters.LOCATION_ID))));
 			locationCriteria.setProjection(Projections.property("project.projectId"));
 
@@ -1027,7 +1028,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   category.cvterm_id AS " + OBS_SET_CATEGORY_ID + ", "  //
 				+ "   category.name AS " + OBS_SET_CATEGORY_NAME + ", "  //
 				+ "   category.definition AS " + OBS_SET_CATEGORY_DESCRIPTION + ", "  //
-				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id and active = 1 LIMIT 1) AS " + OBS_SET_FORMULA_ID + ", "
+				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id and active = 1 LIMIT 1) AS "
+				+ OBS_SET_FORMULA_ID + ", "
 				+ "   scaleMinRange.value AS " + OBS_SET_SCALE_MIN_RANGE + ", "  //
 				+ "   scaleMaxRange.value AS " + OBS_SET_SCALE_MAX_RANGE + ", "  //
 				+ "   vo.expected_min AS " + OBS_SET_EXPECTED_MIN + ", "  //

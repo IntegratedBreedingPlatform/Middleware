@@ -76,7 +76,7 @@ public class DatasetProjectSaverTest {
 
 		final DmsProject
 			createdProject =
-			this.datasetProjectSaver.addDataSet(studyId, variableTypeList, datasetValues, programUUID, DatasetType.PLANT_SUBOBSERVATIONS);
+			this.datasetProjectSaver.addDataSet(studyId, variableTypeList, datasetValues, this.programUUID, DatasetType.PLANT_SUBOBSERVATIONS);
 
 		assertEquals(datasetName, createdProject.getName());
 		assertEquals(datasetTitle, createdProject.getDescription());

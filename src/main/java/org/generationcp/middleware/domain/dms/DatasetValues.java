@@ -25,16 +25,16 @@ public class DatasetValues {
 	public DatasetValues() {
 	}
 
-	public DatasetValues(String name, String description) {
+	public DatasetValues(final String name, final String description) {
 		this.name = name;
 		this.description = description;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -50,20 +50,20 @@ public class DatasetValues {
 		return this.variables;
 	}
 
-	public void addVariable(Variable variable) {
+	public void addVariable(final Variable variable) {
 		if (this.variables == null) {
 			this.variables = new VariableList();
 		}
 		this.variables.add(variable);
 	}
 
-	public void setVariables(VariableList variables) {
+	public void setVariables(final VariableList variables) {
 		this.variables = variables;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append(this.getEntityName() + " [name=");
 		builder.append(this.getName());
 		builder.append(", description=");

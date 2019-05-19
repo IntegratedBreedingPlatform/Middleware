@@ -1,8 +1,6 @@
 package org.generationcp.middleware.dao.dms;
 
-import java.util.List;
-import java.util.UUID;
-
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -35,8 +33,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Optional;
-
+import java.util.List;
+import java.util.UUID;
 
 public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
@@ -184,7 +182,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(1, resultPlot.size());
 		Assert.assertEquals(plot.getProjectId(), resultPlot.get(0).getProjectId());
 
-		final List<DmsProject> result = this.dmsProjectDao.getByStudyAndDatasetType(study.getProjectId(), DatasetType.PLANT_SUBOBSERVATIONS);
+		final List<DmsProject> result =
+			this.dmsProjectDao.getByStudyAndDatasetType(study.getProjectId(), DatasetType.PLANT_SUBOBSERVATIONS);
 		Assert.assertEquals(0, result.size());
 
 	}
@@ -214,7 +213,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final Integer result = this.dmsProjectDao.getProjectIdByStudyDbId(geolocation.getLocationId());
 		Assert.assertEquals(study.getProjectId(), result);
-
 
 	}
 
@@ -377,10 +375,11 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final List<DatasetDTO> datasets = this.dmsProjectDao.getDatasets(study.getProjectId());
 		Assert.assertEquals(1, datasets.size());
 		Assert.assertEquals(summary.getName(), datasets.get(0).getName());
-		Assert.assertEquals(summary.getDatasetType().getDatasetTypeId(),  datasets.get(0).getDatasetTypeId());
+		Assert.assertEquals(summary.getDatasetType().getDatasetTypeId(), datasets.get(0).getDatasetTypeId());
 	}
 
-	private Integer createEnvironmentData(final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
+	private Integer createEnvironmentData(
+		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(instanceNumber);
 		this.geolocationDao.saveOrUpdate(geolocation);
@@ -392,7 +391,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		prop.setValue(locationId.toString());
 		this.geolocPropDao.save(prop);
 
-		if (customAbbev.isPresent()){
+		if (customAbbev.isPresent()) {
 			final GeolocationProperty prop2 = new GeolocationProperty();
 			prop2.setGeolocation(geolocation);
 			prop2.setType(TermId.LOCATION_ABBR.getId());
@@ -401,7 +400,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.geolocPropDao.save(prop2);
 		}
 
-		if (blockId.isPresent()){
+		if (blockId.isPresent()) {
 			final GeolocationProperty prop3 = new GeolocationProperty();
 			prop3.setGeolocation(geolocation);
 			prop3.setType(TermId.BLOCK_ID.getId());
@@ -434,7 +433,5 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		return geolocation.getLocationId();
 	}
-
-
 
 }

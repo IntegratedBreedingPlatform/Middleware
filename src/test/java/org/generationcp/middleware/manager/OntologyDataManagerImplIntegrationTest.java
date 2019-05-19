@@ -81,8 +81,8 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 
 	@Test
 	public void getStandVariableList() {
-		final StandardVariable standardVariable1 = createStandardVariable("StandardVariable1");
-		final StandardVariable standardVariable2 = createStandardVariable("StandardVariable2");
+		final StandardVariable standardVariable1 = this.createStandardVariable("StandardVariable1");
+		final StandardVariable standardVariable2 = this.createStandardVariable("StandardVariable2");
 
 		final List<Integer> ids = Arrays.asList(standardVariable1.getId(), standardVariable2.getId());
 		final List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(ids, PROGRAM_UUID);
@@ -94,8 +94,8 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	@Test
 	public void testGetStandardVariableSummaries() {
 
-		final StandardVariable standardVariable1 = createStandardVariable("StandardVariable1");
-		final StandardVariable standardVariable2 = createStandardVariable("StandardVariable2");
+		final StandardVariable standardVariable1 = this.createStandardVariable("StandardVariable1");
+		final StandardVariable standardVariable2 = this.createStandardVariable("StandardVariable2");
 
 		final List<Integer> ids = Arrays.asList(standardVariable1.getId(), standardVariable2.getId());
 
@@ -111,7 +111,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	@Test
 	public void testGetStandardVariableSummary() {
 		// First create a new Standardvariable
-		final StandardVariable testStandardVariable = createStandardVariable("TestVariable");
+		final StandardVariable testStandardVariable = this.createStandardVariable("TestVariable");
 
 		// Load summary from the view based method
 		final StandardVariableSummary summary = this.ontologyDataManager.getStandardVariableSummary(testStandardVariable.getId());
@@ -374,7 +374,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	@Test
 	public void testGetStandardVariablesForNewlyCreatedEntries() {
 		// set up and create a new standard variable for this test
-		final StandardVariable standardVariable = createStandardVariable("testVariable");
+		final StandardVariable standardVariable = this.createStandardVariable("testVariable");
 
 		final List<String> headers = Arrays.asList(standardVariable.getName());
 
@@ -503,7 +503,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	@Test
 	public void testFindStandardVariableByTraitScaleMethodNames() {
 
-		final StandardVariable standardVariable = createStandardVariable("testVariable");
+		final StandardVariable standardVariable = this.createStandardVariable("testVariable");
 
 		final StandardVariable result =
 			this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(standardVariable.getProperty().getName(),
@@ -537,7 +537,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 
 	@Test
 	public void testGetMethodsForTrait() {
-		final StandardVariable standardVariable = createStandardVariable("testVariable");
+		final StandardVariable standardVariable = this.createStandardVariable("testVariable");
 
 		final List<Term> terms = this.ontologyDataManager.getMethodsForTrait(standardVariable.getProperty().getId());
 
@@ -547,7 +547,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 
 	@Test
 	public void testGetScalesForTrait() {
-		final StandardVariable standardVariable = createStandardVariable("testVariable");
+		final StandardVariable standardVariable = this.createStandardVariable("testVariable");
 
 		final List<Term> terms = this.ontologyDataManager.getScalesForTrait(standardVariable.getProperty().getId());
 
@@ -842,7 +842,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	@Test
 	public void testGetStandardVariableIdByTermId() {
 
-		final StandardVariable standardVariable = createStandardVariable("testVariable");
+		final StandardVariable standardVariable = this.createStandardVariable("testVariable");
 
 		final Integer stdVariableId =
 			this.ontologyDataManager.getStandardVariableIdByTermId(standardVariable.getProperty().getId(), TermId.HAS_PROPERTY);

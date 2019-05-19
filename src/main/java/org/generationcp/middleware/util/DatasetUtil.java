@@ -14,7 +14,7 @@ public class DatasetUtil {
 	public static final String OLD_PLOT_DATASET_NAME_PREFIX = "MEASUREMENT EFEC";
 	public static final String OLD_PLOT_DATASET_NAME_SUFFIX = "-MEASUREMENT";
 	public static final String NEW_PLOT_DATASET_NAME_SUFFIX = "-PLOTDATA";
-	
+
 	public static final String OLD_ENVIRONMENT_DATASET_NAME_PREFIX = "TRIAL_";
 	public static final String OLD_ENVIRONMENT_DATASET_NAME_SUFFIX = "-TRIAL";
 	public static final String
@@ -24,22 +24,22 @@ public class DatasetUtil {
 		// a utility class should not have a public constructor
 	}
 
-	public static DataSet getTrialDataSet(StudyDataManager studyDataManager, int studyId) {
-		List<DataSet> summaryDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.SUMMARY_DATA);
+	public static DataSet getTrialDataSet(final StudyDataManager studyDataManager, final int studyId) {
+		final List<DataSet> summaryDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.SUMMARY_DATA);
 		if (summaryDatasets == null || summaryDatasets.isEmpty()) {
-			List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
-			for (DataSet dataSet : plotDatasets) {
-				String name = dataSet.getName();
+			final List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
+			for (final DataSet dataSet : plotDatasets) {
+				final String name = dataSet.getName();
 				if (name != null
-						&& (name.startsWith(DatasetUtil.OLD_ENVIRONMENT_DATASET_NAME_PREFIX) || name
-								.endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX))) {
+					&& (name.startsWith(DatasetUtil.OLD_ENVIRONMENT_DATASET_NAME_PREFIX) || name
+					.endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX))) {
 					return dataSet;
 				} else if ((name == null || name != null && !name.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX) && !name
 					.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX)) && (dataSet != null
 					&& dataSet.getVariableTypes().getVariableTypes() != null)) {
 
 					boolean aTrialDataset = true;
-					for (DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
+					for (final DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
 						if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
 							aTrialDataset = false;
 							break;
@@ -56,38 +56,38 @@ public class DatasetUtil {
 		return null;
 	}
 
-	public static DataSet getMeansDataSet(StudyDataManager studyDataManager, int studyId) {
+	public static DataSet getMeansDataSet(final StudyDataManager studyDataManager, final int studyId) {
 		return studyDataManager.getDataSetsByType(studyId, DatasetType.MEANS_DATA).get(0);
 	}
 
-	public static Integer getPlotDataSetId(StudyDataManager studyDataManager, int studyId) {
-		DataSet plotDataset = getPlotDataSet(studyDataManager, studyId);
+	public static Integer getPlotDataSetId(final StudyDataManager studyDataManager, final int studyId) {
+		final DataSet plotDataset = getPlotDataSet(studyDataManager, studyId);
 		if (plotDataset != null) {
 			return plotDataset.getId();
 		}
 		return null;
 	}
 
-	public static DataSet getPlotDataSet(StudyDataManager studyDataManager, int studyId) {
-		List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
+	public static DataSet getPlotDataSet(final StudyDataManager studyDataManager, final int studyId) {
+		final List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
 		if (plotDatasets == null) {
 			return null;
 		}
 		if (plotDatasets.size() == 1) {
 			return plotDatasets.get(0);
 		}
-		for (DataSet dataSet : plotDatasets) {
-			String name = dataSet.getName();
+		for (final DataSet dataSet : plotDatasets) {
+			final String name = dataSet.getName();
 			if (name != null
-					&& (name.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX) || name
-							.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX))) {
+				&& (name.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX) || name
+				.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX))) {
 				return dataSet;
 			} else if ((name == null || name != null && !name.startsWith(DatasetUtil.OLD_ENVIRONMENT_DATASET_NAME_PREFIX) && !name
 				.endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) && (dataSet != null
 				&& dataSet.getVariableTypes().getVariableTypes() != null)) {
 
 				boolean aPlotDataset = false;
-				for (DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
+				for (final DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
 						aPlotDataset = true;
 						break;

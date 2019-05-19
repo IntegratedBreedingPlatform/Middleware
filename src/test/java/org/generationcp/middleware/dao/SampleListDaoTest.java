@@ -1,9 +1,6 @@
 package org.generationcp.middleware.dao;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -29,7 +26,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +34,9 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.google.common.collect.Ordering;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SampleListDaoTest extends IntegrationTestBase {
 
@@ -93,7 +91,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.germplasmDao = new GermplasmDAO();
 		this.germplasmDao.setSession(this.sessionProvder.getSession());
 
@@ -130,12 +128,12 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetSampleListByParentAndNameOk() throws Exception {
 		final SampleList sampleList =
-				SampleListTestDataInitializer.createSampleList(this.userDao.getUserByUserName(SampleListDaoTest.ADMIN));
+			SampleListTestDataInitializer.createSampleList(this.userDao.getUserByUserName(SampleListDaoTest.ADMIN));
 		final SampleList parent = this.sampleListDao.getRootSampleList();
 		sampleList.setHierarchy(parent);
 		this.sampleListDao.save(sampleList);
 		final SampleList uSampleList =
-				this.sampleListDao.getSampleListByParentAndName(sampleList.getListName(), parent.getId(), PROGRAM_UUID);
+			this.sampleListDao.getSampleListByParentAndName(sampleList.getListName(), parent.getId(), PROGRAM_UUID);
 		Assert.assertEquals(sampleList.getId(), uSampleList.getId());
 		Assert.assertEquals(sampleList.getListName(), uSampleList.getListName());
 		Assert.assertEquals(sampleList.getDescription(), uSampleList.getDescription());
@@ -166,7 +164,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		final List<SampleList> topLevelLists = this.sampleListDao.getAllTopLevelLists(sampleList.getProgramUUID());
 
 		Assert.assertTrue(topLevelLists.contains(sampleList));
-		for (SampleList list : topLevelLists) {
+		for (final SampleList list : topLevelLists) {
 			Assert.assertNotNull(list.getProgramUUID());
 		}
 	}
@@ -183,7 +181,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		final List<SampleList> topLevelLists = this.sampleListDao.getAllTopLevelLists(null);
 
 		Assert.assertTrue(topLevelLists.contains(sampleList));
-		for (SampleList list : topLevelLists) {
+		for (final SampleList list : topLevelLists) {
 			Assert.assertNull(list.getProgramUUID());
 		}
 
@@ -227,13 +225,13 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public void testSearchSampleListsSortAscending() {
 
 		final Pageable pageable = Mockito.mock(Pageable.class);
-		Sort.Order order = new Sort.Order(Sort.Direction.ASC, "listName");
+		final Sort.Order order = new Sort.Order(Sort.Direction.ASC, "listName");
 		Mockito.when(pageable.getSort()).thenReturn(new Sort(order));
 
 		final List<SampleList> matchByListName = this.sampleListDao.searchSampleLists("TEST-LIST-", false, PROGRAM_UUID, pageable);
 
 		final List<String> result = new LinkedList<>();
-		for (SampleList sampleList : matchByListName) {
+		for (final SampleList sampleList : matchByListName) {
 			result.add(sampleList.getListName());
 		}
 
@@ -245,13 +243,13 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public void testSearchSampleListsSortDescending() {
 
 		final Pageable pageable = Mockito.mock(Pageable.class);
-		Sort.Order order = new Sort.Order(Sort.Direction.DESC, "listName");
+		final Sort.Order order = new Sort.Order(Sort.Direction.DESC, "listName");
 		Mockito.when(pageable.getSort()).thenReturn(new Sort(order));
 
 		final List<SampleList> matchByListName = this.sampleListDao.searchSampleLists("TEST-LIST-", false, PROGRAM_UUID, pageable);
 
 		final List<String> result = new LinkedList<>();
-		for (SampleList sampleList : matchByListName) {
+		for (final SampleList sampleList : matchByListName) {
 			result.add(sampleList.getListName());
 		}
 
@@ -293,7 +291,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		plotDmsProject.setName("Plot Dataset");
 		plotDmsProject.setDescription("Plot Dataset");
 		plotDmsProject.setDatasetType(new DatasetType(DatasetType.PLOT_DATA));
-		dmsProjectDao.save(plotDmsProject);
+		this.dmsProjectDao.save(plotDmsProject);
 
 		final User user = this.createTestUser();
 
@@ -301,7 +299,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.createTestStock(experimentModel);
 
 		this.createTestSampleList(listName, user, experimentModel);
-
 
 	}
 
@@ -349,20 +346,20 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Geolocation geolocation = new Geolocation();
-		geolocationDao.saveOrUpdate(geolocation);
+		this.geolocationDao.saveOrUpdate(geolocation);
 
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(project);
 		experimentModel.setObservationUnitNo(1);
-		experimentDao.saveOrUpdate(experimentModel);
+		this.experimentDao.saveOrUpdate(experimentModel);
 
 		final ExperimentProperty experimentProperty = new ExperimentProperty();
 		experimentProperty.setExperiment(experimentModel);
 		experimentProperty.setTypeId(TermId.PLOT_NO.getId());
 		experimentProperty.setValue("1");
 		experimentProperty.setRank(1);
-		experimentPropertyDao.saveOrUpdate(experimentProperty);
+		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
 
 		return experimentModel;
 
@@ -372,7 +369,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
 		this.germplasmDao.save(germplasm);
-		
+
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
 		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
@@ -386,8 +383,5 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		return stockModel;
 
 	}
-
-
-
 
 }

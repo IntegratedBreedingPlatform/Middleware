@@ -969,8 +969,7 @@ public class DatasetServiceImpl implements DatasetService {
 							phenotype =
 								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
 									observationUnitData.getValue(), null, null, draftMode);
-						}
-						else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
+						} else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
 							!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
 							/*imported value is different to stored value*/
 							phenotype =
@@ -1095,7 +1094,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private Phenotype updatePhenotype(
-		final Phenotype phenotype, final Integer categoricalValueId, final String value,final Integer draftCategoricalValueId,
+		final Phenotype phenotype, final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId,
 		final String draftvalue, final Boolean draftMode) {
 
 		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotype, draftMode);
@@ -1113,7 +1112,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	/**
 	 * @param draftMode False if either you are in Accepted view (e.g batch update in accepted view)
-	 *                     or you are going to accepted view (e.g accepting draft data)
+	 *                  or you are going to accepted view (e.g accepting draft data)
 	 *                  FIXME IBP-2694
 	 */
 	private Phenotype updatePhenotypeValues(
