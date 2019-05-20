@@ -221,21 +221,9 @@ public class WorkbookSaver extends Saver {
 			this.resetTrialObservations(workbook.getTrialObservations());
 		}
 
-		if (trialVariableTypeList != null && !isDeleteObservations) {
-			// multi-location for data loader
-			studyLocationId =
-					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap, false,
-							programUUID);
-		} else if (workbook.getTrialObservations().size() > 1) {
-			// also a multi-location
-			studyLocationId =
-					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap,
-							isDeleteTrialObservations, programUUID);
-		} else {
-			studyLocationId =
-					this.createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations,
-							programUUID);
-		}
+		studyLocationId =
+			this.createLocationIfNecessary(trialVariableTypeList, isDeleteObservations, locationIds, workbook, trialVariables, trialMV,
+				trialHeaders, trialVariatesMap, isDeleteTrialObservations, programUUID);
 
 		// GCP-6091 end
 		if (isDeleteTrialObservations) {
@@ -282,6 +270,24 @@ public class WorkbookSaver extends Saver {
 		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 		return studyId;
+	}
+
+	private int createLocationIfNecessary(final VariableTypeList trialVariableTypeList, final boolean isDeleteObservations,
+		final List<Integer> locationIds, final Workbook workbook, final VariableTypeList trialVariables, final List<MeasurementVariable> trialMV, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap, final boolean isDeleteTrialObservations, final String programUUID) {
+
+		final int studyLocationId;
+
+		if (trialVariableTypeList != null && !isDeleteObservations) {
+			// multi-location for data loader
+			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap, false, programUUID);
+		} else if (workbook.getTrialObservations().size() > 1) {
+			// also a multi-location
+			studyLocationId = this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap, isDeleteTrialObservations, programUUID);
+		} else {
+			studyLocationId = this.createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations, programUUID);
+		}
+
+		return studyLocationId;
 	}
 
 	public void removeDeletedVariablesAndObservations(final Workbook workbook) {
