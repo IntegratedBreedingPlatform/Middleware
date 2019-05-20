@@ -96,7 +96,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
 		final List<MeasurementVariable> traits =
-			datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
+			datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
 
 		if (!traits.isEmpty()) {
 			for (final MeasurementVariable trait : traits) {
@@ -135,7 +135,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	public Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int datasetId) {
 		final Map<Integer, MeasurementVariable> variableIdMeasurementVariableMap = new HashMap<>();
 		final List<MeasurementVariable> measurementVariables =
-			this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
+			this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
 		}
