@@ -44,7 +44,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -77,10 +76,12 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
+import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
 import org.slf4j.Logger;
@@ -325,6 +326,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Boolean hasOutOfSyncObservations(final Integer projectId) {
 		return this.getPhenotypeDao().hasOutOfSync(projectId);
+	}
+
+	@Override
+	public void saveExperimentalDesignGenerated(
+		final Workbook workbook, final String programUUID, final CropType crop) {
+		final TimerWatch timerWatch = new TimerWatch("saveExperimentalDesignGenerated (grand total)");
+		try {
+			this.getWorkbookSaver().saveWorkbookVariables(workbook);
+			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
+			this.getWorkbookSaver().savePlotDataset(workbook, variableMap, programUUID, crop);
+
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
+		} finally {
+			timerWatch.stop();
+		}
 	}
 
 	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
