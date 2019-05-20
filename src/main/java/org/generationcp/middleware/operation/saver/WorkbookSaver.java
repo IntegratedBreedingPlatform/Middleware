@@ -272,6 +272,55 @@ public class WorkbookSaver extends Saver {
 		return studyId;
 	}
 
+	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) throws Exception {
+
+		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,
+		// Maps of Lists of MeasurementVariable
+		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get(WorkbookSaver.HEADERMAP);
+		final Map<String, VariableTypeList> variableTypeMap =
+			(Map<String, VariableTypeList>) variableMap.get(WorkbookSaver.VARIABLETYPEMAP);
+		final Map<String, List<MeasurementVariable>> measurementVariableMap =
+			(Map<String, List<MeasurementVariable>>) variableMap.get(WorkbookSaver.MEASUREMENTVARIABLEMAP);
+
+		final List<MeasurementVariable> trialMV = measurementVariableMap.get(WorkbookSaver.TRIALMV);
+
+		// VariableTypeLists
+		final VariableTypeList trialVariableTypeList = variableTypeMap.get(WorkbookSaver.TRIALVARIABLETYPELIST);
+		final VariableTypeList trialVariables = variableTypeMap.get(WorkbookSaver.TRIALVARIABLES);
+		final List<String> trialHeaders = headerMap.get(WorkbookSaver.TRIALHEADERS);
+		final VariableTypeList effectVariables = variableTypeMap.get(WorkbookSaver.EFFECTVARIABLE);
+
+		final int studyLocationId;
+		final List<Integer> locationIds = new ArrayList<>();
+		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
+
+		final Integer environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+		final int studyId = this.getStudyId(workbook.getStudyDetails().getStudyName(), programUUID);
+
+		int savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
+		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
+
+		this.resetTrialObservations(workbook.getTrialObservations());
+
+		studyLocationId = this.createLocationIfNecessary(trialVariableTypeList, true, locationIds, workbook, trialVariables, trialMV,
+			trialHeaders, trialVariatesMap, true, programUUID);
+
+		final ExperimentModel studyExperiment =
+			this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(studyId)).get(0);
+		studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
+		this.getExperimentDao().saveOrUpdate(studyExperiment);
+
+		// delete trial observations
+		this.getExperimentDestroyer().deleteTrialExperimentsOfStudy(environmentDatasetId);
+
+		this.saveOrUpdateTrialObservations( crop, environmentDatasetId, workbook, locationIds, trialVariatesMap, studyLocationId, savedEnvironmentsCount, true, programUUID);
+
+		this.createStocksIfNecessary(plotDatasetId, workbook, effectVariables, trialHeaders);
+		this.createMeasurementEffectExperiments(crop, plotDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
+
+	}
+
 	private int createLocationIfNecessary(final VariableTypeList trialVariableTypeList, final boolean isDeleteObservations,
 		final List<Integer> locationIds, final Workbook workbook, final VariableTypeList trialVariables, final List<MeasurementVariable> trialMV, final List<String> trialHeaders, final Map<Integer, VariableList> trialVariatesMap, final boolean isDeleteTrialObservations, final String programUUID) {
 
