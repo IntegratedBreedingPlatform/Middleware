@@ -280,11 +280,7 @@ public interface DatasetService {
 	 * @param variableTypes
 	 * @return List of measurement variables
 	 *
-	 * @deprecated use {@link DatasetService#getObservationSetVariables(Integer, List)}
 	 */
-	@Deprecated
-	List<MeasurementVariable> getMeasurementVariables(Integer projectId, List<Integer> variableTypes);
-
 	List<MeasurementVariable> getObservationSetVariables(Integer projectId, List<Integer> variableTypes);
 
 	/**
