@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
@@ -41,6 +40,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import com.google.common.base.Optional;
@@ -996,5 +996,15 @@ public interface FieldbookService {
 	void updatePhenotypeStatus(final List<MeasurementRow> observations);
 
 	Boolean hasOutOfSyncObservations(Integer id);
+
+
+	/**
+	 * Save experimental Design
+	 *
+	 * @param workbook
+	 * @param programUUID the program UUID
+	 * @param crop
+	 */
+	void saveExperimentalDesignGenerated(final Workbook workbook, final String programUUID, final CropType crop);
 
 }
