@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SearchRequestServiceImpl implements SearchRequestService {
 
-	private final ObjectMapper jacksonMapper;
+	private ObjectMapper jacksonMapper;
 	private final HibernateSessionProvider sessionProvider;
 	private DaoFactory daoFactory;
 
@@ -49,5 +49,25 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 			throw new MiddlewareException("Error getting search request", e);
 		}
 
+	}
+
+	public ObjectMapper getJacksonMapper() {
+		return this.jacksonMapper;
+	}
+
+	public HibernateSessionProvider getSessionProvider() {
+		return this.sessionProvider;
+	}
+
+	public void setJacksonMapper(final ObjectMapper jacksonMapper) {
+		this.jacksonMapper = jacksonMapper;
+	}
+
+	public DaoFactory getDaoFactory() {
+		return this.daoFactory;
+	}
+
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 }
