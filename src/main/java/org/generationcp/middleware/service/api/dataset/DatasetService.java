@@ -269,8 +269,9 @@ public interface DatasetService {
 	 * @param projectId Id of the project
 	 * @param variableTypes
 	 * @return List of measurement variables
+	 *
 	 */
-	List<MeasurementVariable> getMeasurementVariables(Integer projectId, List<Integer> variableTypes);
+	List<MeasurementVariable> getObservationSetVariables(Integer projectId, List<Integer> variableTypes);
 
 	/**
 	 * It will reject all the draft data for a dataset
