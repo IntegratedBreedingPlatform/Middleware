@@ -56,8 +56,6 @@ import org.hibernate.annotations.NotFoundAction;
 		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
 		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name")
 })
-@NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
-		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
 @Entity
 @Table(name = "users")
 public class WorkbenchUser implements Serializable, BeanFormState {
@@ -68,7 +66,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
 	public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
-	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 
 	public static final String GET_USERS_BY_PROJECT_UUID =
 		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.description, users.ustatus, person.pemail \n"

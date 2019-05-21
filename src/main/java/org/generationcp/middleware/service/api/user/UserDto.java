@@ -5,6 +5,7 @@
 package org.generationcp.middleware.service.api.user;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.workbench.CropDto;
@@ -154,7 +155,10 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	}
 
 	public List<CropDto> getCrops() {
-		return crops;
+		if (this.crops == null) {
+			this.crops = new ArrayList<>();
+		}
+		return this.crops;
 	}
 
 	public void setCrops(final List<CropDto> crops) {

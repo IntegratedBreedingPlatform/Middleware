@@ -1,8 +1,5 @@
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -20,6 +17,9 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	
@@ -46,9 +46,16 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getAllActiveUsersSorted() {
+	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
 		try {
-			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_ALL_ACTIVE_USERS_SORTED);
+			final Query query = this.getSession().createQuery("SELECT u FROM WorkbenchUser u "
+				+ " INNER JOIN FETCH u.person p "
+				+ " INNER JOIN FETCH u.crops c "
+				+ " WHERE u.status = 0 "
+				+ " AND EXISTS(FROM WorkbenchUser wu INNER JOIN wu.crops ct WHERE ct.cropName = :cropName AND wu.userid = u.userid)"
+				+ " ORDER BY p.firstName, p.lastName");
+			query.setParameter("cropName", cropName);
+			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			return query.list();
 		} catch (final HibernateException e) {
 			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();

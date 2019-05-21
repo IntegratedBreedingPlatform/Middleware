@@ -425,8 +425,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchUser> getAllActiveUsersSorted() {
-		return this.getWorkbenchUserDao().getAllActiveUsersSorted();
+	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
+		return this.getWorkbenchUserDao().getUsersByCrop(cropName);
 	}
 
 	@Override
@@ -917,6 +917,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		// Add user roles to the particular user
 		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
+
+		final List<CropType> crops = new ArrayList<>();
+		for (final CropDto crop : userDto.getCrops()) {
+			final CropType cropType = new CropType();
+			cropType.setCropName(crop.getCropName());
+			crops.add(cropType);
+		}
+		user.setCrops(crops);
 
 		try {
 

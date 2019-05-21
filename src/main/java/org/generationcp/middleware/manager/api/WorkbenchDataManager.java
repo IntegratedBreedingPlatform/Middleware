@@ -305,8 +305,9 @@ public interface WorkbenchDataManager {
 	 * Returns all the Workbench users ordered by First Name then Last Name.
 	 *
 	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
+	 * @param cropName
 	 */
-	List<WorkbenchUser> getAllActiveUsersSorted();
+	List<WorkbenchUser> getUsersByCrop(final String cropName);
 
 	/**
 	 * Returns number of all Users.

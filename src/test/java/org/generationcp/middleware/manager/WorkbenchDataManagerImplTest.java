@@ -27,6 +27,7 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.data.initializer.UserDtoTestDataInitializer;
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
@@ -612,19 +613,25 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		}
 	}
 	@Test
-	public void testGetAllActiveUsers() {
-		final List<WorkbenchUser> prevListOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
+	public void testGetUsersByCrop() {
+		final String cropName = CropType.CropEnum.MAIZE.toString();
+		final List<WorkbenchUser> prevListOfActiveUsers = this.workbenchDataManager.getUsersByCrop(cropName);
 		UserDto userDto = UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", "Breeder", "username");
+		final ArrayList<CropDto> crops = new ArrayList<>();
+		final CropDto cropDto = new CropDto();
+		cropDto.setCropName(cropName);
+		crops.add(cropDto);
+		userDto.setCrops(crops);
 		final int id = this.workbenchDataManager.createUser(userDto);
 		userDto.setUserId(id);
-		List<WorkbenchUser> listOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
-		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size()+1 == listOfActiveUsers.size());
+		List<WorkbenchUser> users = this.workbenchDataManager.getUsersByCrop(cropName);
+		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size()+1 == users.size());
 		
 		//Deactivate the user to check if it's not retrieved
 		userDto.setStatus(1);
 		this.workbenchDataManager.updateUser(userDto);
-		listOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
-		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() == listOfActiveUsers.size());
+		users = this.workbenchDataManager.getUsersByCrop(cropName);
+		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() == users.size());
 		
 	}
 
