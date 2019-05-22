@@ -19,6 +19,7 @@
 			  `name` varchar(100) DEFAULT NULL,
 			  `description` varchar(1024) DEFAULT NULL,
 			  `cvterm_id` int(11) DEFAULT NULL,
+			  `is_subobs_type` tinyint(4) DEFAULT '0',
 			  PRIMARY KEY (`dataset_type_id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
@@ -26,19 +27,21 @@
 			(`dataset_type_id`,
 			`name`,
 			`description`,
+			`cvterm_id`,
+			`is_subobs_type`)
 			`cvterm_id`)
 			VALUES
-			(1,'STUDY','Study conditions',10060),
-			(2,'MEANS','Means data for each trial instance',10070),
-			(3,'SUMMARY','Environment conditions and summary data',10080),
-			(4,'PLOT','Plot data',10090),
-			(5,'PLANT','Plant Sub-Observation Dataset',10094),
-			(6,'QUADRAT','Quadrats Sub-Observation Dataset',10095),
-			(7,'TIMESERIES','Time Series Sub-Observation Dataset',10096),
-			(8,'CUSTOM','Custom Sub-Observation Dataset',10097),
-			(9,'SS','Sub-sample data',10091),
-			(10,'WD','Weather data',10092),
-			(11,'OM','Means over trial instances',10093);
+			(1,'STUDY','Study conditions',10060,0),
+			(2,'MEANS','Means data for each trial instance',10070,0),
+			(3,'SUMMARY','Environment conditions and summary data',10080,0),
+			(4,'PLOT','Plot data',10090,0),
+			(5,'PLANT','Plant Sub-Observation Dataset',10094,1),
+			(6,'QUADRAT','Quadrats Sub-Observation Dataset',10095,1),
+			(7,'TIMESERIES','Time Series Sub-Observation Dataset',10096,1),
+			(8,'CUSTOM','Custom Sub-Observation Dataset',10097,1),
+			(9,'SS','Sub-sample data',10091,0),
+			(10,'WD','Weather data',10092,0),
+			(11,'OM','Means over trial instances',10093,0);
 		</sql>
 	</changeSet>
 
