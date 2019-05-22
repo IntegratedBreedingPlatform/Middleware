@@ -1179,10 +1179,7 @@ public class WorkbookSaver extends Saver {
 		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
 		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
 
-		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
-		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
-		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
-		this.getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
+		this.saveProjectProperties(workbook);
 
 		final String description = workbook.getStudyDetails().getDescription();
 		final String startDate = workbook.getStudyDetails().getStartDate();
@@ -1193,6 +1190,21 @@ public class WorkbookSaver extends Saver {
 		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset, objective);
 		this.updateStudyDetails(description, startDate, endDate, study, objective, createdBy);
 		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset, objective);
+	}
+
+	public void saveProjectProperties(final Workbook workbook) {
+		final Integer studyId = workbook.getStudyDetails().getId();
+		final Integer trialDatasetId = workbook.getTrialDatasetId();
+		final Integer measurementDatasetId = workbook.getMeasurementDatesetId();
+
+		final DmsProject study = this.getDmsProjectDao().getById(studyId);
+		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
+		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
+
+		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
+		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
+		this.getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
 	}
 
 	private void updateStudyDetails(final String description, final String startDate, final String endDate, final DmsProject study,
