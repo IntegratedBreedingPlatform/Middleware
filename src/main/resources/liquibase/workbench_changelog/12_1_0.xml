@@ -34,8 +34,7 @@
 	</changeSet>
 
 	<changeSet author="nahuel" id="v12.1.0-2" runAlways="true">
-		<preConditions onFail="CONTINUE">
-			<sqlCheck expectedResult="1">select case when 'workbench' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
 					# for every combination of superadmins and crops
@@ -68,7 +67,6 @@
 
 	<changeSet author="nahuel" id="v12.1.0-3">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">select case when 'workbench' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
 			<not>
 				<sqlCheck expectedResult="0">
 					select count(distinct u.userid, wp.crop_type)
