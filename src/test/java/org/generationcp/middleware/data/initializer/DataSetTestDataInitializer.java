@@ -1,6 +1,7 @@
 package org.generationcp.middleware.data.initializer;
 
 import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class DataSetTestDataInitializer {
 		final DataSet dataSet = new DataSet();
 		dataSet.setName(datasetName);
 		dataSet.setDescription(datasetName);
-		dataSet.setDatasetType(new DatasetType(DatasetType.SUMMARY_DATA));
+		dataSet.setDatasetType(new DatasetType(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		dataSet.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
 		dataSet.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
 		return dataSet;
@@ -40,7 +41,7 @@ public class DataSetTestDataInitializer {
 		final DataSet plotDataset = new DataSet();
 		plotDataset.setName(datasetName);
 		plotDataset.setDescription(datasetName);
-		plotDataset.setDatasetType(new DatasetType(DatasetType.PLOT_DATA));
+		plotDataset.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
 		if (isStudy) {
 			plotDataset.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
 			plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
@@ -63,7 +64,7 @@ public class DataSetTestDataInitializer {
 		meansDataset.setId(DataSetTestDataInitializer.MEANS_DATASET_ID);
 		meansDataset.setName(datasetName);
 		meansDataset.setDescription(datasetName);
-		meansDataset.setDatasetType(new DatasetType(DatasetType.MEANS_DATA));
+		meansDataset.setDatasetType(new DatasetType(DatasetTypeEnum.MEANS_DATA.getId()));
 		meansDataset.setVariableTypes(VariableTypeListTestDataInitializer.createMeansVariableTypesTestData());
 		return meansDataset;
 	}

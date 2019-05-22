@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
@@ -205,7 +206,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
 			+ " WHERE gl.nd_geolocation_id = :studyDbId"
 			+ " AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-			+ " AND p.dataset_type_id = " + DatasetType.SUMMARY_DATA;
+			+ " AND p.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 
 	private static final String STUDY_DETAILS_SQL = " SELECT DISTINCT \n"
 		+ "   p.name                     AS name, \n"

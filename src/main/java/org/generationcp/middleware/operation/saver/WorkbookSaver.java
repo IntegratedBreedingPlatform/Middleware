@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -676,7 +677,7 @@ public class WorkbookSaver extends Saver {
 		Integer datasetId = null;
 		if (trialName == null || "".equals(trialName)) {
 
-			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetType.SUMMARY_DATA);
+			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 			if (dataSetsByType != null && !CollectionUtils.isEmpty(dataSetsByType)) {
 				datasetId = dataSetsByType.get(0).getId();
 			}
@@ -699,7 +700,7 @@ public class WorkbookSaver extends Saver {
 
 			watch.restart("save trial dataset");
 			final DmsProject trial =
-				this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID, DatasetType.SUMMARY_DATA);
+				this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID, DatasetTypeEnum.SUMMARY_DATA.getId());
 			datasetId = trial.getProjectId();
 		}
 
@@ -725,7 +726,7 @@ public class WorkbookSaver extends Saver {
 		Integer datasetId = null;
 
 		if (datasetName == null || "".equals(datasetName)) {
-			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetType.PLOT_DATA);
+			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 			if (dataSetsByType != null && !CollectionUtils.isEmpty(dataSetsByType)) {
 				datasetId = dataSetsByType.get(0).getId();
 			}
@@ -753,7 +754,7 @@ public class WorkbookSaver extends Saver {
 			// no need to add occ as it is already added in trialVariables
 			// fix for GCP-6436 end
 			final DmsProject dataset =
-				this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID, DatasetType.PLOT_DATA);
+				this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID, DatasetTypeEnum.PLOT_DATA.getId());
 			datasetId = dataset.getProjectId();
 		}
 
@@ -917,7 +918,7 @@ public class WorkbookSaver extends Saver {
 	private Integer getMeansDataset(final Integer studyId) {
 		Integer id = null;
 		final List<DmsProject> datasets = this.getDmsProjectDao()
-			.getByStudyAndDatasetType(studyId, DatasetType.MEANS_DATA);
+			.getByStudyAndDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (datasets != null && !datasets.isEmpty()) {
 			id = datasets.get(0).getProjectId();
 		}
@@ -963,7 +964,7 @@ public class WorkbookSaver extends Saver {
 		int measurementDatasetId = 0;
 		int meansDatasetId = 0;
 
-		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetType.MEANS_DATA) {
+		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetTypeEnum.MEANS_DATA.getId()) {
 			meansDatasetId = this.createMeansDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables, programUUID);
 		} else {
 			measurementDatasetId =
@@ -1002,7 +1003,7 @@ public class WorkbookSaver extends Saver {
 		final int meansDatasetId = workbook.getMeansDatasetId() != null ? workbook.getMeansDatasetId() : 0;
 
 		final boolean isMeansDataImport =
-			workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetType.MEANS_DATA;
+			workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetTypeEnum.MEANS_DATA.getId();
 
 		Map<String, ?> variableMap = workbook.getVariableMap();
 		if (variableMap == null || variableMap.isEmpty()) {
@@ -1206,7 +1207,7 @@ public class WorkbookSaver extends Saver {
 			watch.restart("save means dataset");
 			final VariableTypeList datasetVariables = this.getMeansData(effectVariables, trialVariables);
 			final DmsProject dataset =
-				this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID, DatasetType.MEANS_DATA);
+				this.getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues, programUUID, DatasetTypeEnum.MEANS_DATA.getId());
 			datasetId = dataset.getProjectId();
 		}
 

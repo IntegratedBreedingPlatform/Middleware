@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -244,7 +245,7 @@ public class StudyTestDataInitializer {
 		variableType.setLocalName("Plot No");
 		typeList.add(variableType);
 
-		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null, DatasetType.MEANS_DATA);
+		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null, DatasetTypeEnum.MEANS_DATA.getId());
 	}
 
 	public DatasetReference addTestDataset(final int studyId, final int datasetTypeId) throws Exception {
@@ -273,7 +274,7 @@ public class StudyTestDataInitializer {
 		datasetValues.setName("ENVIRONMENT " + StudyTestDataInitializer.DATASET_NAME);
 		datasetValues.setDescription("My Environment Dataset");
 		final DatasetReference dataSet =
-			this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null, DatasetType.SUMMARY_DATA);
+			this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null, DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		this.addEnvironmentToDataset(crop, dataSet.getId(), locationId, seasonId);
 

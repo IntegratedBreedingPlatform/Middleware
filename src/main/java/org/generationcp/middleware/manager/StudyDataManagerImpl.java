@@ -55,6 +55,7 @@ import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -1178,7 +1179,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public boolean isLocationIdVariable(final int studyId, final String variableName) {
 
-		final DataSet trialDataSet = this.findOneDataSetByType(studyId, DatasetType.SUMMARY_DATA);
+		final DataSet trialDataSet = this.findOneDataSetByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		final DMSVariableType dmsVariableType = trialDataSet.findVariableTypeByLocalName(variableName);
 

@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -76,11 +77,11 @@ public class DatasetProjectSaverTest {
 
 		final DmsProject
 			createdProject =
-			this.datasetProjectSaver.addDataSet(studyId, variableTypeList, datasetValues, this.programUUID, DatasetType.PLANT_SUBOBSERVATIONS);
+			this.datasetProjectSaver.addDataSet(studyId, variableTypeList, datasetValues, this.programUUID, DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 
 		assertEquals(datasetName, createdProject.getName());
 		assertEquals(datasetTitle, createdProject.getDescription());
-		assertEquals(DatasetType.PLANT_SUBOBSERVATIONS, createdProject.getDatasetType().getDatasetTypeId().intValue());
+		assertEquals(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), createdProject.getDatasetType().getDatasetTypeId().intValue());
 		assertNotNull(createdProject.getProperties());
 		assertNotNull(createdProject.getRelatedTos());
 

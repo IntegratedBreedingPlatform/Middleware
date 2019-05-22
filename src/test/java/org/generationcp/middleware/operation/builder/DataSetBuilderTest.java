@@ -3,6 +3,7 @@ package org.generationcp.middleware.operation.builder;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -44,7 +45,7 @@ public class DataSetBuilderTest {
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NO_STUDY)).thenReturn(this.generateDatasetReferences(false));
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NODATASETS)).thenReturn(new ArrayList<DatasetReference>());
 		Mockito.when(this.dmsProjectDao.getById(4)).thenReturn(this.generateDmsProject(4));
-		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NO_STUDY, DatasetType.SUMMARY_DATA))
+		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NO_STUDY, DatasetTypeEnum.SUMMARY_DATA.getId()))
 			.thenReturn(this.generateDatasetReference(3));
 		Mockito.when(this.dmsProjectDao.getById(3)).thenReturn(this.generateDmsProject(3));
 

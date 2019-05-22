@@ -19,20 +19,6 @@ import java.util.List;
 @AutoProperty
 public class DatasetType {
 
-	public static final int STUDY_CONDITIONS = 1;
-	public static final int MEANS_DATA = 2;
-	public static final int SUMMARY_DATA = 3;
-	public static final int PLOT_DATA = 4;
-	public static final int PLANT_SUBOBSERVATIONS = 5;
-	public static final int QUADRAT_SUBOBSERVATIONS = 6;
-	public static final int TIME_SERIES_SUBOBSERVATIONS = 7;
-	public static final int CUSTOM_SUBOBSERVATIONS = 8;
-	public static final int SUB_SAMPLE_DATA = 9;
-	public static final int WEATHER_DATA = 10;
-	public static final int MEANS_OVER_TRIAL_INSTANCES = 11;
-	public static final List<Integer> SUBOBSERVATIONS =
-		Arrays.asList(PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -102,11 +88,6 @@ public class DatasetType {
 
 	public boolean isSubObservationType() {
 		return this.isSubObservationType;
-	}
-
-	public boolean isObservationType() {
-		return Arrays.asList(PLOT_DATA, PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS)
-			.contains(this.datasetTypeId);
 	}
 
 	public void setSubObservationType(final boolean subObservationType) {

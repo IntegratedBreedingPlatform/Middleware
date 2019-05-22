@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -158,10 +159,10 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		final Conjunction plotNoConjunction = Restrictions.conjunction();
 		plotNoConjunction.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()));
-		plotNoConjunction.add(Restrictions.eq("dt.datasetTypeId", DatasetType.PLOT_DATA));
+		plotNoConjunction.add(Restrictions.eq("dt.datasetTypeId", DatasetTypeEnum.PLOT_DATA.getId()));
 
 		final Conjunction datasetConjunction = Restrictions.conjunction();
-		datasetConjunction.add(Restrictions.or(plotNoConjunction, Restrictions.ne("dt.datasetTypeId", DatasetType.PLOT_DATA)));
+		datasetConjunction.add(Restrictions.or(plotNoConjunction, Restrictions.ne("dt.datasetTypeId", DatasetTypeEnum.PLOT_DATA.getId())));
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample")
 			.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)

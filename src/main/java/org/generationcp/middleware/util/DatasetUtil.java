@@ -4,6 +4,7 @@ package org.generationcp.middleware.util;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 
@@ -25,9 +26,9 @@ public class DatasetUtil {
 	}
 
 	public static DataSet getTrialDataSet(final StudyDataManager studyDataManager, final int studyId) {
-		final List<DataSet> summaryDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.SUMMARY_DATA);
+		final List<DataSet> summaryDatasets = studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (summaryDatasets == null || summaryDatasets.isEmpty()) {
-			final List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
+			final List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 			for (final DataSet dataSet : plotDatasets) {
 				final String name = dataSet.getName();
 				if (name != null
@@ -57,7 +58,7 @@ public class DatasetUtil {
 	}
 
 	public static DataSet getMeansDataSet(final StudyDataManager studyDataManager, final int studyId) {
-		return studyDataManager.getDataSetsByType(studyId, DatasetType.MEANS_DATA).get(0);
+		return studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.MEANS_DATA.getId()).get(0);
 	}
 
 	public static Integer getPlotDataSetId(final StudyDataManager studyDataManager, final int studyId) {
@@ -69,7 +70,7 @@ public class DatasetUtil {
 	}
 
 	public static DataSet getPlotDataSet(final StudyDataManager studyDataManager, final int studyId) {
-		final List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetType.PLOT_DATA);
+		final List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		if (plotDatasets == null) {
 			return null;
 		}

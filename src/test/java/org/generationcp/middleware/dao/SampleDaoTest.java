@@ -15,6 +15,7 @@ import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
@@ -345,7 +346,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.ndExperimentId = null;
 
 		final DmsProject study = this.createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1));
-		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetType.PLOT_DATA, study);
+		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study);
 		final SampleList sampleListForPlotDataset =
 			this.createExperimentsWithSampleList(listName, plotDataset, user, sampleSize);
 
@@ -356,9 +357,9 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.ndExperimentId = null;
 
 		final DmsProject study = this.createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1));
-		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetType.PLOT_DATA, study);
+		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study);
 		final DmsProject subObservationDataset =
-			this.createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetType.PLANT_SUBOBSERVATIONS, plotDataset);
+			this.createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), plotDataset);
 		final SampleList sampleListForSubObservation =
 			this.createExperimentsWithSampleList(listName, subObservationDataset, user, sampleSize);
 

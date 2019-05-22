@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -145,7 +146,7 @@ public class DataSetBuilder extends Builder {
 			}
 		}
 		// if not found in the list using the name, get dataset reference with Summary Data type
-		final DatasetReference trialDatasetReference = this.studyDataManager.findOneDataSetReferenceByType(studyId, DatasetType.SUMMARY_DATA);
+		final DatasetReference trialDatasetReference = this.studyDataManager.findOneDataSetReferenceByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (trialDatasetReference != null) {
 			return this.getDmsProjectById(trialDatasetReference.getId());
 		}
@@ -155,7 +156,7 @@ public class DataSetBuilder extends Builder {
 	public Workbook buildCompleteDataset(final int datasetId)  {
 		final DataSet dataset = this.build(datasetId);
 		final List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
-		final boolean isMeasurementDataset = (dataset.getDatasetType() != null) ? dataset.getDatasetType().isObservationType() : Boolean.FALSE;
+		final boolean isMeasurementDataset = (dataset.getDatasetType() != null) ? DatasetTypeEnum.get(dataset.getDatasetType().getDatasetTypeId()).isObservationType() : Boolean.FALSE;
 		VariableTypeList variables;
 		if (isMeasurementDataset) {
 			variables = this.filterVariables(dataset.getVariableTypes(), siblingVariables);

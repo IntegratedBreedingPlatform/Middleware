@@ -11,6 +11,7 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -150,7 +151,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         this.instanceIds = new ArrayList<>(this.studyDataManager.getInstanceGeolocationIdsMap(this.studyId).values());
 
         final DatasetDTO datasetDTO = this.datasetService.generateSubObservationDataset(this.studyId, "TEST NURSERY SUB OBS",
-            DatasetType.PLANT_SUBOBSERVATIONS, instanceIds, 8206, 2, this.studyId + 2);
+            DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), instanceIds, 8206, 2, this.studyId + 2);
         this.subObsDatasetId = datasetDTO.getDatasetId();
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, TRAIT_NAME);
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, SELECTION_NAME);

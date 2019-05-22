@@ -36,6 +36,7 @@ import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -330,14 +331,14 @@ public class WorkbookBuilder extends Builder {
 
 		// if dataset is not found, get dataset with Plot Data type
 		if (dataSetId == null || dataSetId == 0) {
-			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetType.PLOT_DATA);
+			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.PLOT_DATA.getId());
 			if (dataset != null) {
 				dataSetId = dataset.getId();
 			}
 		}
 
 		if (trialDatasetId == null || trialDatasetId == 0) {
-			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetType.SUMMARY_DATA);
+			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.SUMMARY_DATA.getId());
 			if (dataset != null) {
 				trialDatasetId = dataset.getId();
 			}
@@ -973,7 +974,7 @@ public class WorkbookBuilder extends Builder {
 		// get dataset reference by dataset type in projectprops
 		final DatasetReference datasetRef = this.getStudyDataManager().findOneDataSetReferenceByType(
 			studyId,
-			DatasetType.PLOT_DATA);
+			DatasetTypeEnum.PLOT_DATA.getId());
 		if (datasetRef != null) {
 			return datasetRef.getId();
 		} else {
@@ -992,7 +993,7 @@ public class WorkbookBuilder extends Builder {
 		}
 		// if not found in the list using the name, get dataset with Summary
 		// Data type
-		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DatasetType.SUMMARY_DATA);
+		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (dataset != null) {
 			return dataset.getId();
 		} else {

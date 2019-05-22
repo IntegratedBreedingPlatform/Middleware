@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -946,25 +947,25 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 
 	@Test
 	public void testGetDatasetTypeById() {
-		final DatasetType datasetType = this.ontologyDataManager.getDatasetTypeById(DatasetType.SUMMARY_DATA);
-		Assert.assertEquals(DatasetType.SUMMARY_DATA, datasetType.getDatasetTypeId().intValue());
+		final DatasetType datasetType = this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.SUMMARY_DATA.getId());
+		Assert.assertEquals(DatasetTypeEnum.SUMMARY_DATA.getId(), datasetType.getDatasetTypeId().intValue());
 	}
 
 	@Test
 	public void testGetAllDatasetTypes() {
 		final Map<Integer, DatasetType> datasetTypeMap = this.ontologyDataManager.getAllDatasetTypes();
 		Assert.assertEquals(11, datasetTypeMap.size());
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.STUDY_CONDITIONS));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.MEANS_DATA));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.SUMMARY_DATA));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.PLOT_DATA));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.PLANT_SUBOBSERVATIONS));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.QUADRAT_SUBOBSERVATIONS));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.TIME_SERIES_SUBOBSERVATIONS));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.CUSTOM_SUBOBSERVATIONS));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.SUB_SAMPLE_DATA));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.WEATHER_DATA));
-		Assert.assertTrue(datasetTypeMap.containsKey(DatasetType.MEANS_OVER_TRIAL_INSTANCES));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.STUDY_CONDITIONS.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.SUB_SAMPLE_DATA.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.WEATHER_DATA.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.MEANS_OVER_TRIAL_INSTANCES.getId()));
 	}
 
 	private StandardVariable createStandardVariable(final String name) {

@@ -4,6 +4,7 @@ package org.generationcp.middleware.dao;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -159,7 +160,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.setParameter("STUDY_ID", studyId);
 			query.setParameterList("PLOT_NO", plotNumbers);
 			query.setParameter("INSTANCE_NUMBER", instanceNumber);
-			query.setParameter("DATASET_TYPE", DatasetType.PLOT_DATA);
+			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 			query.setParameterList(
 				"PLOT_NO_TERM_IDS",
 				new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});

@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -87,7 +88,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 		this.studyReference = this.studyTDI.addTestStudy();
 		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
-		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.PLOT_DATA.getId());
 	}
 
 	@Test

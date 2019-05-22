@@ -1,5 +1,6 @@
 package org.generationcp.middleware.data.initializer;
 
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 
 import java.util.HashMap;
@@ -11,14 +12,14 @@ public class DatasetTypeTestDataInitializer {
 
 		final Map<Integer, DatasetType> datasetTypes = new HashMap<>();
 
-		datasetTypes.put(DatasetType.STUDY_CONDITIONS, new DatasetType(DatasetType.STUDY_CONDITIONS, "STUDY"));
-		datasetTypes.put(DatasetType.MEANS_DATA, new DatasetType(DatasetType.MEANS_DATA, "MEANS"));
-		datasetTypes.put(DatasetType.SUMMARY_DATA, new DatasetType(DatasetType.SUMMARY_DATA, "SUMMARY"));
-		datasetTypes.put(DatasetType.PLOT_DATA, new DatasetType(DatasetType.PLOT_DATA, "PLOT"));
-		datasetTypes.put(DatasetType.PLANT_SUBOBSERVATIONS, new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS, "PLANT"));
-		datasetTypes.put(DatasetType.QUADRAT_SUBOBSERVATIONS, new DatasetType(DatasetType.QUADRAT_SUBOBSERVATIONS, "QUADRAT"));
-		datasetTypes.put(DatasetType.TIME_SERIES_SUBOBSERVATIONS, new DatasetType(DatasetType.TIME_SERIES_SUBOBSERVATIONS, "TIMESERIES"));
-		datasetTypes.put(DatasetType.CUSTOM_SUBOBSERVATIONS, new DatasetType(DatasetType.CUSTOM_SUBOBSERVATIONS, "CUSTOM"));
+		datasetTypes.put(DatasetTypeEnum.STUDY_CONDITIONS.getId(), new DatasetType(DatasetTypeEnum.STUDY_CONDITIONS.getId(), "STUDY"));
+		datasetTypes.put(DatasetTypeEnum.MEANS_DATA.getId(), new DatasetType(DatasetTypeEnum.MEANS_DATA.getId(), "MEANS"));
+		datasetTypes.put(DatasetTypeEnum.SUMMARY_DATA.getId(), new DatasetType(DatasetTypeEnum.SUMMARY_DATA.getId(), "SUMMARY"));
+		datasetTypes.put(DatasetTypeEnum.PLOT_DATA.getId(), new DatasetType(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT"));
+		datasetTypes.put(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT"));
+		datasetTypes.put(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT"));
+		datasetTypes.put(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), new DatasetType(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), "TIMESERIES"));
+		datasetTypes.put(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId(), new DatasetType(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId(), "CUSTOM"));
 
 		return datasetTypes;
 	}

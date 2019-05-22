@@ -8,6 +8,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
@@ -260,7 +261,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		Mockito.verify(mockQuery).setParameter("STUDY_ID", studyID);
 		Mockito.verify(mockQuery).setParameterList("PLOT_NO", plotNumbers);
 		Mockito.verify(mockQuery).setParameter("INSTANCE_NUMBER", instanceNumber);
-		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DatasetType.PLOT_DATA);
+		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 		Mockito.verify(mockQuery).setParameterList(
 			"PLOT_NO_TERM_IDS",
 			new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});
