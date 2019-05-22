@@ -1308,7 +1308,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "   (SELECT ld.source FROM listdata ld" //
 					+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
 					+ "   (SELECT a.aval FROM atributs a " //
-					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPANM' AND u.fldno = a.atype)" //
+					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
 					+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
 					+ "   (SELECT a.aval FROM atributs a " //
 					+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPAUTH' AND u.fldno = a.atype)" //
@@ -1362,7 +1362,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "   (SELECT ld.source FROM listdata ld" //
 				+ "   WHERE ld.gid = g.gid LIMIT 1) AS germplasmSeedSource, " //
 				+ "   (SELECT a.aval FROM atributs a " //
-				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPANM' AND u.fldno = a.atype)" //
+				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
 				+ "   WHERE (a.gid = g.gid) LIMIT 1) AS species, " //
 				+ "   (SELECT a.aval FROM atributs a " //
 				+ "   INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPAUTH' AND u.fldno = a.atype)" //
@@ -1430,7 +1430,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 				queryString = queryString + " AND EXISTS (SELECT 1" //
 					+ "         FROM atributs a" //
-					+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPANM' AND u.fldno = a.atype)" //
+					+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
 					+ "         WHERE a.gid = g.gid AND a.aval IN (:germplasmSpecies)) "; //
 			}
 
@@ -1542,7 +1542,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 			queryString = queryString + " AND EXISTS (SELECT 1" //
 				+ "         FROM atributs a" //
-				+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPANM' AND u.fldno = a.atype)" //
+				+ "                  INNER JOIN udflds u ON (u.ftable = 'ATRIBUTS' AND u.fcode = 'SPNAM' AND u.fldno = a.atype)" //
 				+ "         WHERE a.gid = g.gid AND a.aval IN (:germplasmSpecies)) "; //
 		}
 
