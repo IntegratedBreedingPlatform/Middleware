@@ -999,21 +999,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return this.getTermBuilder().findTermByName(name, cvId);
 	}
 
-	@Override
-	public DatasetType getDatasetTypeById(final int datasetTypeId) {
-		return this.daoFactory.getDatasetTypeDao().getById(datasetTypeId);
-	}
-
-	@Override
-	public Map<Integer, DatasetType> getAllDatasetTypes() {
-		final Map<Integer, DatasetType> datasetTypeMap = new HashMap<>();
-		final List<DatasetType> datasetTypes = this.daoFactory.getDatasetTypeDao().getAll();
-		for (final DatasetType datasetType : datasetTypes) {
-			datasetTypeMap.put(datasetType.getDatasetTypeId(), datasetType);
-		}
-		return datasetTypeMap;
-	}
-
 	public void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}

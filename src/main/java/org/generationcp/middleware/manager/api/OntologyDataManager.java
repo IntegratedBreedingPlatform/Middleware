@@ -560,7 +560,4 @@ public interface OntologyDataManager {
 
 	List<ProjectProperty> getProjectPropertiesByProjectId(int projectId);
 
-	DatasetType getDatasetTypeById(int datasetTypeId);
-
-	Map<Integer, DatasetType> getAllDatasetTypes();
 }
