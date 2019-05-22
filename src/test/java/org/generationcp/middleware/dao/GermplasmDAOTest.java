@@ -10,23 +10,9 @@
 
 package org.generationcp.middleware.dao;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Is.is;
-
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -34,6 +20,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
@@ -54,7 +41,19 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
@@ -433,10 +432,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		gids.add(germplasm1.getGid());
 		gids.add(germplasm2.getGid());
 
-		final Long result = this.dao.countMatchGermplasmInList(gids);
+		final long result = this.dao.countMatchGermplasmInList(gids);
 
 		Assert.assertEquals("The number of gids in list should match the count of records matched in the database.", gids.size(),
-				result.intValue());
+			(int) result);
 
 	}
 
@@ -456,9 +455,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		gids.add(germplasm1.getGid());
 		gids.add(dummyGid);
 
-		final Long result = this.dao.countMatchGermplasmInList(gids);
+		final long result = this.dao.countMatchGermplasmInList(gids);
 
-		Assert.assertEquals("Only one gid has a match in the database.", 1, result.intValue());
+		Assert.assertEquals("Only one gid has a match in the database.", 1, (int) result);
 
 	}
 
@@ -477,20 +476,20 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		// Add dummy gid that do not exist in the database
 		gids.add(dummyGid);
 
-		final Long result = this.dao.countMatchGermplasmInList(gids);
+		final long result = this.dao.countMatchGermplasmInList(gids);
 
-		Assert.assertEquals("The count should be zero because the gid in the list doesn't exist.", 0, result.intValue());
+		Assert.assertEquals("The count should be zero because the gid in the list doesn't exist.", 0, (int) result);
 
 	}
 
 	@Test
 	public void testCountMatchGermplasmInListGidListIsNullOrEmpty() {
 
-		final Long result1 = this.dao.countMatchGermplasmInList(null);
-		Assert.assertEquals("The count should be zero because the gid list is null", 0, result1.intValue());
+		final long result1 = this.dao.countMatchGermplasmInList(null);
+		Assert.assertEquals("The count should be zero because the gid list is null", 0, (int) result1);
 
-		final Long result2 = this.dao.countMatchGermplasmInList(new HashSet<Integer>());
-		Assert.assertEquals("The count should be zero because the gid list is empty", 0, result2.intValue());
+		final long result2 = this.dao.countMatchGermplasmInList(new HashSet<Integer>());
+		Assert.assertEquals("The count should be zero because the gid list is empty", 0, (int) result2);
 
 	}
 
@@ -540,7 +539,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetNextSequenceNumberForCrossNameWithSuffixSupplied() {
 		final String crossNamePrefix = "ABCDEFG";
-		final Integer lastCode = 99;
+		final int lastCode = 99;
 		final String suffix = "-XYZ";
 		final String existingGermplasmNameWithPrefixAndSuffix = crossNamePrefix + lastCode + suffix;
 
@@ -549,10 +548,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.insertGermplasmWithName(crossNamePrefix + "999");
 
 		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, suffix);
-		final Integer expectedNextCode = lastCode + 1;
+		final int expectedNextCode = lastCode + 1;
 		Assert.assertEquals(
 				"Germplasm with name " + existingGermplasmNameWithPrefixAndSuffix + " is existing so the next sequence number should be "
-						+ expectedNextCode, expectedNextCode.toString(), result);
+						+ expectedNextCode, Integer.toString(expectedNextCode), result);
 	}
 
 	@Test
@@ -561,23 +560,23 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String crossNamePrefix = "ABCDEFG";
 		final Integer lastCodeForPrefix = 9;
 		final String existingGermplasmNameWithPrefix = crossNamePrefix + lastCodeForPrefix;
-		final Integer lastCodeForPrefixWithSpace = 99;
+		final int lastCodeForPrefixWithSpace = 99;
 		final String existingGermplasmNameWithPrefixWithSpace = crossNamePrefix + " " + lastCodeForPrefixWithSpace;
 
 		this.insertGermplasmWithName(existingGermplasmNameWithPrefix);
 		this.insertGermplasmWithName(existingGermplasmNameWithPrefixWithSpace);
 
 		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
-		final Integer nextCodeForPrefix = lastCodeForPrefix + 1;
+		final int nextCodeForPrefix = lastCodeForPrefix + 1;
 		Assert.assertEquals(
 				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " is existing so the next sequence number should be "
-						+ nextCodeForPrefix, nextCodeForPrefix.toString(), result);
+						+ nextCodeForPrefix, Integer.toString(nextCodeForPrefix), result);
 
 		final String result2 = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix + " ", null);
-		final Integer nextCodeForPrefixWithSpace = lastCodeForPrefixWithSpace + 1;
+		final int nextCodeForPrefixWithSpace = lastCodeForPrefixWithSpace + 1;
 		Assert.assertEquals(
 				"Germplasm with prefix " + existingGermplasmNameWithPrefixWithSpace + " is existing so the next sequence number should be "
-						+ nextCodeForPrefixWithSpace, nextCodeForPrefixWithSpace.toString(), result2);
+						+ nextCodeForPrefixWithSpace, Integer.toString(nextCodeForPrefixWithSpace), result2);
 	}
 
 	@Test
@@ -586,34 +585,34 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String crossNamePrefix = "aBcDeFg";
 		final Integer lastCodeForMixedCasePrefix = 29;
 		final String nameWithMixedCasePrefix = crossNamePrefix + lastCodeForMixedCasePrefix;
-		final Integer lastCodeForUppercasePrefix = 19;
+		final int lastCodeForUppercasePrefix = 19;
 		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
 
 		this.insertGermplasmWithName(nameWithMixedCasePrefix);
 		this.insertGermplasmWithName(nameWithUppercasePrefix);
 
 		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
-		final Integer nextCodeForPrefix = lastCodeForMixedCasePrefix + 1;
+		final int nextCodeForPrefix = lastCodeForMixedCasePrefix + 1;
 		Assert.assertEquals("Germplasm with prefix " + nameWithMixedCasePrefix + " is existing so the next sequence number should be "
-				+ nextCodeForPrefix, nextCodeForPrefix.toString(), result);
+				+ nextCodeForPrefix, Integer.toString(nextCodeForPrefix), result);
 	}
 
 	@Test
 	public void testGetNextSequenceNumberForCrossNameForLowerCasePrefix() {
 
 		final String crossNamePrefix = "aBcDeFgHij";
-		final Integer lastCodeForLowercasePrefix = 49;
+		final int lastCodeForLowercasePrefix = 49;
 		final String nameWithLowercasePrefix = crossNamePrefix.toLowerCase() + lastCodeForLowercasePrefix;
-		final Integer lastCodeForUppercasePrefix = 39;
+		final int lastCodeForUppercasePrefix = 39;
 		final String nameWithUppercasePrefix = crossNamePrefix.toUpperCase() + lastCodeForUppercasePrefix;
 
 		this.insertGermplasmWithName(nameWithLowercasePrefix);
 		this.insertGermplasmWithName(nameWithUppercasePrefix);
 
 		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix, null);
-		final Integer nextCodeForPrefix = lastCodeForLowercasePrefix + 1;
+		final int nextCodeForPrefix = lastCodeForLowercasePrefix + 1;
 		Assert.assertEquals("Germplasm with prefix " + nameWithLowercasePrefix + " is existing so the next sequence number should be "
-				+ nextCodeForPrefix, nextCodeForPrefix.toString(), result);
+				+ nextCodeForPrefix, Integer.toString(nextCodeForPrefix), result);
 	}
 
 	@Test
@@ -675,8 +674,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(germplasm2);
 		this.dao.save(germplasm3);
 
-		List<Germplasm> listOfGermplasm =
-				dao.getGermplasmWithoutGroup(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
+		final List<Germplasm> listOfGermplasm =
+			this.dao.getGermplasmWithoutGroup(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
 		Assert.assertEquals("Only 2 germplasm from the gid list which are without group", 2, listOfGermplasm.size());
 
 	}
@@ -695,10 +694,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(germplasm2);
 
 		// Reset the germplasm group
-		dao.resetGermplasmGroup(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()));
+		this.dao.resetGermplasmGroup(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()));
 
-		dao.getSession().refresh(germplasm1);
-		dao.getSession().refresh(germplasm2);
+		this.dao.getSession().refresh(germplasm1);
+		this.dao.getSession().refresh(germplasm2);
 
 		Assert.assertEquals(0, germplasm1.getMgid().intValue());
 		Assert.assertEquals(0, germplasm2.getMgid().intValue());
@@ -726,7 +725,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
 
 			UserDefinedField attributeField =
-				userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", attributEntry.getKey());
+				this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", attributEntry.getKey());
 
 			if (attributeField == null) {
 				attributeField = new UserDefinedField(null, "ATRIBUTS", "ATTRIBUTE", attributEntry.getKey(), "", "", "", 0, 0, 0, 0);
@@ -752,7 +751,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		for (final Map.Entry<String, String> nameEntry : names.entrySet()) {
 			UserDefinedField attributeField =
-				userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", nameEntry.getKey());
+				this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", nameEntry.getKey());
 
 			if (attributeField == null) {
 				attributeField = new UserDefinedField(null, "NAMES", "NAME", nameEntry.getKey(), "", "", "", 0, 0, 0, 0);
@@ -767,9 +766,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			names.put(nameEntry.getKey(), name.getNval());
 		}
 
-		final GermplasmSearchRequestDTO request = new GermplasmSearchRequestDTO();
-		request.setGid(germplasmGID);
-		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request);
+		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
+		request.setGermplasmDbIds(Lists.newArrayList(germplasmGID.toString()));
+		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null, null);
 
 		final String displayName = germplasm.getPreferredName().getNval();
 		final GermplasmDTO germplasmDTO = result.get(0);
