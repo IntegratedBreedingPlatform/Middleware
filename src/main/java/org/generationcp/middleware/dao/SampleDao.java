@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
 import org.hibernate.Criteria;
@@ -243,7 +244,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.alias(Projections.property("sample.plateId"), "plateId"))
 				.add(Projections.alias(Projections.property("sample.well"), "well"))
 				.add(Projections.alias(Projections.property("datasetType.name"), "datasetTypeName"))
-				.add(Projections.alias(Projections.property("datasetType.isSubObservationType"), "subObservationDatasetType"))
+				.add(Projections.alias(Projections.property("datasetType.datasetTypeId"), "datasetTypeId"))
 				.add(Projections.alias(Projections.property("objectProject.projectId"), "projectId"))
 				.add(Projections.alias(Projections.property("objectProject.name"), "projectName"))
 				.add(Projections.alias(Projections.property("parentProject.projectId"), "parentProjectId"))
@@ -273,7 +274,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 				final SampleDTO sampleDTO = new SampleDTO();
 
-				if (sampleDetail.isSubObservationDatasetType()) {
+				if (DatasetTypeEnum.isSubObservationType(sampleDetail.getDatasetTypeId())) {
 					// If the sample was created from subobservation, we should get the study name and id
 					// from Observation/Plot dataset's parent project (which is the study)
 					sampleDTO.setStudyName(sampleDetail.getParentProjectName());
