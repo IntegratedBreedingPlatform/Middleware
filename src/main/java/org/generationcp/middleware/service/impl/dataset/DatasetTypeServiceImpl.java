@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.dataset;
 
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -20,18 +21,28 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 	}
 
 	@Override
-	public DatasetType getDatasetTypeById(final int datasetTypeId) {
-		return this.daoFactory.getDatasetTypeDao().getById(datasetTypeId);
+	public DatasetTypeDTO getDatasetTypeById(final int datasetTypeId) {
+		return this.convertToDatasetTypeDTO(this.daoFactory.getDatasetTypeDao().getById(datasetTypeId));
 	}
 
 	@Override
-	public Map<Integer, DatasetType> getAllDatasetTypes() {
-		final Map<Integer, DatasetType> datasetTypeMap = new HashMap<>();
+	public Map<Integer, DatasetTypeDTO> getAllDatasetTypes() {
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = new HashMap<>();
 		final List<DatasetType> datasetTypes = this.daoFactory.getDatasetTypeDao().getAll();
 		for (final DatasetType datasetType : datasetTypes) {
-			datasetTypeMap.put(datasetType.getDatasetTypeId(), datasetType);
+			datasetTypeMap.put(datasetType.getDatasetTypeId(), this.convertToDatasetTypeDTO(datasetType));
 		}
 		return datasetTypeMap;
+	}
+
+	DatasetTypeDTO convertToDatasetTypeDTO(final DatasetType datasetType) {
+		final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
+		datasetTypeDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
+		datasetTypeDTO.setCvTermId(datasetType.getCvTermId());
+		datasetTypeDTO.setDescription(datasetType.getDescription());
+		datasetTypeDTO.setName(datasetType.getName());
+		datasetTypeDTO.setSubObservationType(datasetType.isSubObservationType());
+		return datasetTypeDTO;
 	}
 
 }

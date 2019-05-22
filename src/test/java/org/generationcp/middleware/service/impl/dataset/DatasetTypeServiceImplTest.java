@@ -1,8 +1,8 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,13 +20,13 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetDatasetTypeById() {
-		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.SUMMARY_DATA.getId());
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.SUMMARY_DATA.getId());
 		Assert.assertEquals(DatasetTypeEnum.SUMMARY_DATA.getId(), datasetType.getDatasetTypeId().intValue());
 	}
 
 	@Test
 	public void testGetAllDatasetTypes() {
-		final Map<Integer, DatasetType> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
 		Assert.assertEquals(11, datasetTypeMap.size());
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.STUDY_CONDITIONS.getId()));
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId()));
