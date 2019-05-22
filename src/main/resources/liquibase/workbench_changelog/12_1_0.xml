@@ -66,4 +66,34 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v12.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when 'workbench' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(distinct u.userid, wp.crop_type)
+					from workbench_project_user_info wpui
+					       inner join users u on wpui.user_id = u.userid
+					       inner join workbench_project wp on wpui.project_id = wp.project_id
+					where not exists(
+					  select 1
+					  from users_crops uc
+					  where uc.user_id = u.userid and uc.crop_name = wp.crop_type)
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Associate all program users to the corresponding crop</comment>
+		<sql dbms="mysql" splitStatements="true">
+			insert into users_crops (user_id, crop_name)
+			select distinct u.userid, wp.crop_type
+			from workbench_project_user_info wpui
+			       inner join users u on wpui.user_id = u.userid
+			       inner join workbench_project wp on wpui.project_id = wp.project_id
+			where not exists(
+			  select 1
+			  from users_crops uc
+			  where uc.user_id = u.userid and uc.crop_name = wp.crop_type);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
