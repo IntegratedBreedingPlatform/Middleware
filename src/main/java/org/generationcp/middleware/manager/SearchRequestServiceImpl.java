@@ -23,11 +23,11 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 	}
 
 	@Override
-	public SearchRequest saveSearchRequest(final SearchRequestDto searchRequestDto,  final Class<? extends SearchRequestDto> searchRequestDtoClass) {
+	public Integer saveSearchRequest(final SearchRequestDto searchRequestDto,  final Class<? extends SearchRequestDto> searchRequestDtoClass) {
 		try {
 			final SearchRequest searchRequest = new SearchRequest();
 			searchRequest.setParameters(this.jacksonMapper.writeValueAsString(searchRequestDtoClass.cast(searchRequestDto)));
-			return this.daoFactory.getSearchRequestDAO().save(searchRequest);
+			return this.daoFactory.getSearchRequestDAO().save(searchRequest).getRequestId();
 		} catch (final Exception e) {
 			throw new MiddlewareException("Error saving search request", e);
 		}
