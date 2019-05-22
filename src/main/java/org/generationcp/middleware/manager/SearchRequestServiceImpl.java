@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.manager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

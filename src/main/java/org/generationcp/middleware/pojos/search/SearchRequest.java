@@ -2,6 +2,7 @@
 package org.generationcp.middleware.pojos.search;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@AutoProperty
 @Entity
 @Table(name = "search_request")
 public class SearchRequest {
