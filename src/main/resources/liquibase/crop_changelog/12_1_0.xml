@@ -26,8 +26,7 @@
 			(`dataset_type_id`,
 			`name`,
 			`description`,
-			`cvterm_id`,
-			`is_subobs_type`)
+			`cvterm_id`)
 			VALUES
 			(1,'STUDY','Study conditions',10060),
 			(2,'MEANS','Means data for each trial instance',10070),
@@ -128,7 +127,7 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT (1) FROM cvtermprop WHERE cvterm_id = 8160;
+					SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8160;
 				</sqlCheck>
 			</not>
 		</preConditions>
