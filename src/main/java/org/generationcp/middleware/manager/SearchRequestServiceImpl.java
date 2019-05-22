@@ -9,7 +9,6 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.search.SearchRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-@SuppressWarnings("FieldMayBeFinal")
 @Transactional
 public class SearchRequestServiceImpl implements SearchRequestService {
 
@@ -21,7 +20,6 @@ public class SearchRequestServiceImpl implements SearchRequestService {
 		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
 		this.jacksonMapper = new ObjectMapper();
-
 	}
 
 	@Override

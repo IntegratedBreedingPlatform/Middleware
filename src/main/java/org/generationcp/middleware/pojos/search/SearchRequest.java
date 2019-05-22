@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.pojos.search;
 
+import org.pojomatic.Pojomatic;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,30 +39,17 @@ public class SearchRequest {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || this.getClass() != o.getClass()) {
-			return false;
-		}
-
-		final SearchRequest that = (SearchRequest) o;
-
-		if (this.requestId != that.requestId) {
-			return false;
-		}
-		if (this.parameters != null ? !this.parameters.equals(that.parameters) : that.parameters != null) {
-			return false;
-		}
-
-		return true;
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
 	}
 
 	@Override
-	public int hashCode() {
-		int result = this.requestId;
-		result = 31 * result + (this.parameters != null ? this.parameters.hashCode() : 0);
-		return result;
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
