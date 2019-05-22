@@ -333,7 +333,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final Workbook workbook, final String programUUID, final CropType crop) {
 		final TimerWatch timerWatch = new TimerWatch("saveExperimentalDesignGenerated (grand total)");
 		try {
-			this.getWorkbookSaver().saveWorkbookVariables(workbook);
+			this.getWorkbookSaver().saveProjectProperties(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
 			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 			this.getWorkbookSaver().savePlotDataset(workbook, variableMap, programUUID, crop);
