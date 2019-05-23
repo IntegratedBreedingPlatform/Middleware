@@ -8,5 +8,5 @@ public interface DatasetTypeService {
 
 	DatasetTypeDTO getDatasetTypeById(int datasetTypeId);
 
-	Map<Integer, DatasetTypeDTO> getAllDatasetTypes();
+	Map<Integer, DatasetTypeDTO> getAllDatasetTypesMap();
 }

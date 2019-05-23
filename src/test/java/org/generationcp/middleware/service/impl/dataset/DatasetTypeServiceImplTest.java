@@ -26,7 +26,7 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllDatasetTypes() {
-		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypesMap();
 		Assert.assertEquals(11, datasetTypeMap.size());
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.STUDY_CONDITIONS.getId()));
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId()));

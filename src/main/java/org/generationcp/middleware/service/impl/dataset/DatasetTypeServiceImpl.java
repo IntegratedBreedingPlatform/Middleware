@@ -26,7 +26,7 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 	}
 
 	@Override
-	public Map<Integer, DatasetTypeDTO> getAllDatasetTypes() {
+	public Map<Integer, DatasetTypeDTO> getAllDatasetTypesMap() {
 		final Map<Integer, DatasetTypeDTO> datasetTypeMap = new HashMap<>();
 		final List<DatasetType> datasetTypes = this.daoFactory.getDatasetTypeDao().getAll();
 		for (final DatasetType datasetType : datasetTypes) {
