@@ -11,7 +11,6 @@ import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
