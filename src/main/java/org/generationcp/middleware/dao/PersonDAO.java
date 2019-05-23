@@ -19,9 +19,12 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -180,5 +183,35 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 					e);
 		}
 		return person;
+	}
+
+	public void updateCropPeron(final CropType cropType, final Integer userId, final Person person) {
+		try {
+
+			this.getSession().flush();
+			if (!StringUtils.isEmpty(person.getFirstName()) && !StringUtils.isEmpty(person.getLastName())) {
+				final String queryString = "UPDATE " + cropType.getDbName() +".persons cperson \n"
+				+ "SET cperson.fname = :fname, cperson.lname = :lname  \n"
+				+ "WHERE cperson.personid =  \n"
+				+ "		(select u.personid  \n"
+				+ "		from " + cropType.getDbName() +".users u  \n"
+				+ "		where userid =  \n"
+				+ "			(SELECT ibdb_user_id from workbench.workbench_ibdb_user_map wbmap  \n"
+				+ "			INNER JOIN workbench.workbench_project wbproj  WHERE wbmap.workbench_user_id = " + userId + " \n"
+				+ "			AND wbproj.crop_type = :crop  \n"
+				+ "			AND wbmap.project_id = wbproj.project_id LIMIT 1))";
+
+				final Session s = this.getSession();
+				final Query q = s.createSQLQuery(queryString);
+				q.setString("fname", person.getFirstName());
+				q.setString("lname", person.getLastName());
+				q.setString("crop", cropType.getCropName());
+				final int success = q.executeUpdate();
+			}
+		} catch (final Exception e) {
+			this.logAndThrowException(
+				String.format("Error with updateCropPeron(cropType=" + cropType + ", userId= "+ userId + ", person= " + person +") query from Person"),
+				e);
+		}
 	}
 }
