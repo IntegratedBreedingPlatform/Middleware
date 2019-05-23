@@ -42,6 +42,7 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 		datasetTypeDTO.setDescription(datasetType.getDescription());
 		datasetTypeDTO.setName(datasetType.getName());
 		datasetTypeDTO.setSubObservationType(datasetType.isSubObservationType());
+		datasetTypeDTO.setObservationType(datasetType.isObservationType());
 		return datasetTypeDTO;
 	}
 

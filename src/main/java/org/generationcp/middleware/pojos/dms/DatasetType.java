@@ -42,6 +42,11 @@ public class DatasetType {
 	@Column(name = "is_subobs_type", columnDefinition = "TINYINT")
 	private boolean isSubObservationType;
 
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Basic(optional = false)
+	@Column(name = "is_obs_type", columnDefinition = "TINYINT")
+	private boolean isObservationType;
+
 	public DatasetType() {
 	}
 
@@ -92,6 +97,14 @@ public class DatasetType {
 
 	public void setSubObservationType(final boolean subObservationType) {
 		this.isSubObservationType = subObservationType;
+	}
+
+	public boolean isObservationType() {
+		return this.isObservationType;
+	}
+
+	public void setObservationType(final boolean observationType) {
+		this.isObservationType = observationType;
 	}
 
 	@Override

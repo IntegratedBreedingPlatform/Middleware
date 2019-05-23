@@ -25,6 +25,8 @@ public class DatasetTypeDTO {
 
 	private boolean isSubObservationType;
 
+	private boolean isObservationType;
+
 	public Integer getDatasetTypeId() {
 		return this.datasetTypeId;
 	}
@@ -63,6 +65,14 @@ public class DatasetTypeDTO {
 
 	public void setSubObservationType(final boolean subObservationType) {
 		this.isSubObservationType = subObservationType;
+	}
+
+	public boolean isObservationType() {
+		return this.isObservationType;
+	}
+
+	public void setObservationType(final boolean observationType) {
+		this.isObservationType = observationType;
 	}
 
 	@Override

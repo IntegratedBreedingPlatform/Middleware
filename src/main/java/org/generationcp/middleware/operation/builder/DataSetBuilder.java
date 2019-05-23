@@ -156,7 +156,7 @@ public class DataSetBuilder extends Builder {
 	public Workbook buildCompleteDataset(final int datasetId)  {
 		final DataSet dataset = this.build(datasetId);
 		final List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
-		final boolean isMeasurementDataset = (dataset.getDatasetType() != null) ? DatasetTypeEnum.get(dataset.getDatasetType().getDatasetTypeId()).isObservationType() : Boolean.FALSE;
+		final boolean isMeasurementDataset = (dataset.getDatasetType() != null) ? dataset.getDatasetType().isObservationType() : Boolean.FALSE;
 		VariableTypeList variables;
 		if (isMeasurementDataset) {
 			variables = this.filterVariables(dataset.getVariableTypes(), siblingVariables);

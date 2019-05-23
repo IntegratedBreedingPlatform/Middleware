@@ -45,9 +45,4 @@ public enum DatasetTypeEnum {
 		return this.id;
 	}
 
-	public boolean isObservationType() {
-		return Arrays.asList(PLOT_DATA, PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS)
-			.contains(this);
-	}
-
 }
