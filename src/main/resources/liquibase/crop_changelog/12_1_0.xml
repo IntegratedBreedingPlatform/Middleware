@@ -178,6 +178,7 @@
 			CREATE TABLE search_request (
 			request_id INT(11) NOT NULL AUTO_INCREMENT,
 			parameters TEXT NOT NULL,
+			PRIMARY KEY (request_id));
 		</sql>
 	</changeSet>
 
