@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -200,9 +201,17 @@ public class DaoFactory {
 		return progenitorDao;
 	}
 
+
 	public DatasetTypeDAO getDatasetTypeDao() {
 		final DatasetTypeDAO datasetTypeDao = new DatasetTypeDAO();
 		datasetTypeDao.setSession(this.sessionProvider.getSession());
 		return datasetTypeDao;
+	}
+
+	public SearchRequestDAO getSearchRequestDAO() {
+		final SearchRequestDAO brapiSearchDAO = new SearchRequestDAO();
+		brapiSearchDAO.setSession(this.sessionProvider.getSession());
+		return brapiSearchDAO;
+
 	}
 }

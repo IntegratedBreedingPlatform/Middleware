@@ -111,5 +111,6 @@
         <!-- Derived variables -->
         <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>
 
+        <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
     </session-factory>
 </hibernate-configuration>
