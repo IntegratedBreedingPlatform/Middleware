@@ -22,7 +22,7 @@ public class SampleDetailsBean {
 	private String plateId;
 	private String well;
 	private String datasetTypeName;
-	private Integer datasetTypeId;
+	private boolean subObservationDatasetType;
 	private String projectName;
 	private Integer projectId;
 	private String parentProjectName;
@@ -129,14 +129,6 @@ public class SampleDetailsBean {
 		this.datasetTypeName = datasetTypeName;
 	}
 
-	public Integer getDatasetTypeId() {
-		return this.datasetTypeId;
-	}
-
-	public void setDatasetTypeId(final Integer datasetTypeId) {
-		this.datasetTypeId = datasetTypeId;
-	}
-
 	public String getProjectName() {
 		return this.projectName;
 	}
@@ -225,4 +217,11 @@ public class SampleDetailsBean {
 		this.entryNumber = entryNumber;
 	}
 
+	public boolean isSubObservationDatasetType() {
+		return this.subObservationDatasetType;
+	}
+
+	public void setSubObservationDatasetType(final boolean subObservationDatasetType) {
+		this.subObservationDatasetType = subObservationDatasetType;
+	}
 }

@@ -35,10 +35,6 @@ public enum DatasetTypeEnum {
 		return lookup.get(id);
 	}
 
-	public static boolean isSubObservationType(final Integer id) {
-		return SUBOBSERVATIONS.contains(id);
-	}
-
 	private final int id;
 
 	DatasetTypeEnum(final int id) {
