@@ -174,9 +174,10 @@
 			</and>
 		</preConditions>
 		<comment>
-			Remove "Type of DATASET_TYPE" variable from cvterm and its categorical values from cvterm_relationship table
+			Remove "Type of DATASET_TYPE" variable from cvterm and its categorical values from cvterm_relationship and cvterm tables
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM cvterm WHERE cvterm_id IN (SELECT object_id FROM cvterm_relationship WHERE subject_id=17267);
 			DELETE FROM cvterm_relationship WHERE subject_id = 17267;
 			DELETE FROM cvterm WHERE cvterm_id = 17267;
 		</sql>
