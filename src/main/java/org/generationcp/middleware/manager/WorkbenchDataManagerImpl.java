@@ -938,6 +938,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public void updateCropPerson(final Integer userId, final Person person) {
+		final List<CropType> cropTypes = this.getAvailableCropsForUser(userId);
+		if(cropTypes != null) {
+			for(final CropType cropType : cropTypes) {
+				this.getPersonDao().updateCropPeron(cropType, userId, person);
+			}
+		}
+	}
+
+	@Override
 	public Integer updateUser(final UserDto userDto) {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
 		WorkbenchUser user = null;
@@ -945,7 +955,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		try {
 			user = this.getUserById(userDto.getUserId());
-			this.setPerson(userDto, user.getPerson());
+			final Person person = this.setPerson(userDto, user.getPerson());
 
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
@@ -959,6 +969,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			}
 
 			this.getWorkbenchUserDao().saveOrUpdate(user);
+			this.updateCropPerson(user.getUserid(), person);
 			idUserSaved = user.getUserid();
 		} catch (final Exception e) {
 

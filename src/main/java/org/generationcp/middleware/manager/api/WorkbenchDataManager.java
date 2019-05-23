@@ -631,6 +631,8 @@ public interface WorkbenchDataManager {
 	 */
 	public void updateUser(WorkbenchUser user);
 
+	public void updateCropPerson(final Integer userId, final Person person);
+
 	/**
 	 * Gets the user by project_uuid.
 	 *
