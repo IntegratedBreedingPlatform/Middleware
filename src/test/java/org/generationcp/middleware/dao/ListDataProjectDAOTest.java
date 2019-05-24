@@ -5,10 +5,10 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
@@ -174,9 +174,11 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, userId);
 
 		Assert.assertEquals(String.format("There are only {0} check entries in the list", noOfCheckEntries), noOfCheckEntries,
-			this.listDataProjectDAO.countByListIdAndEntryType(listId, Arrays.asList(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
+			this.listDataProjectDAO
+				.countByListIdAndEntryType(listId, Arrays.asList(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
 		Assert.assertEquals(String.format("There are only {0} test entries in the list", noOfTestEntries), noOfTestEntries,
-			this.listDataProjectDAO.countByListIdAndEntryType(listId, Arrays.asList(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+			this.listDataProjectDAO
+				.countByListIdAndEntryType(listId, Arrays.asList(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 
 	}
 
@@ -234,10 +236,10 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 		final String expectedSql = "select ldp.* FROM nd_experiment e,"
 			+ " nd_experimentprop nd_ep, stock,"
-			+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms, nd_geolocation geo"
+			+ " listdata_project ldp, project_relationship pr, project p, listnms nms, nd_geolocation geo"
 			+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
-			+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
-			+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"
+			+ " AND nms.listid = ldp.list_id" + " AND p.project_id = pr.subject_project_id"
+			+ " AND nms.projectid = :STUDY_ID" + " AND p.dataset_type_id = :DATASET_TYPE"
 			+ " AND e.project_id = pr.subject_project_id"
 			+ " AND e.nd_experiment_id = nd_ep.nd_experiment_id"
 			+ " AND stock.stock_id = e.stock_id" + " AND ldp.germplasm_id = stock.dbxref_id"
@@ -258,7 +260,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		Mockito.verify(mockQuery).setParameter("STUDY_ID", studyID);
 		Mockito.verify(mockQuery).setParameterList("PLOT_NO", plotNumbers);
 		Mockito.verify(mockQuery).setParameter("INSTANCE_NUMBER", instanceNumber);
-		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DataSetType.PLOT_DATA.getId());
+		Mockito.verify(mockQuery).setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 		Mockito.verify(mockQuery).setParameterList(
 			"PLOT_NO_TERM_IDS",
 			new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});

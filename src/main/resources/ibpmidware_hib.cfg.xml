@@ -106,6 +106,7 @@
         <mapping class="org.generationcp.middleware.pojos.Sample"/>
         <mapping class="org.generationcp.middleware.pojos.SampleList"/>
         <mapping class="org.generationcp.middleware.pojos.dms.StudyType"/>
+        <mapping class="org.generationcp.middleware.pojos.dms.DatasetType"/>
 
         <!-- Derived variables -->
         <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>

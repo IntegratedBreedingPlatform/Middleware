@@ -1,10 +1,5 @@
 package org.generationcp.middleware.service.impl.gdms;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
@@ -32,6 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 /**
  * Created by clarysabel on 11/9/17.
  */
@@ -57,38 +56,38 @@ public class DatasetServiceImplTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		datasetService = new DatasetServiceImpl(session);
-		datasetService.setSampleService(sampleService);
-		datasetService.setDatasetDAO(datasetDAO);
-		datasetService.setMarkerDAO(markerDAO);
-		datasetService.setCharValuesDAO(charValuesDAO);
+		this.datasetService = new DatasetServiceImpl(this.session);
+		this.datasetService.setSampleService(this.sampleService);
+		this.datasetService.setDatasetDAO(this.datasetDAO);
+		this.datasetService.setMarkerDAO(this.markerDAO);
+		this.datasetService.setCharValuesDAO(this.charValuesDAO);
 	}
 
 	@Test (expected = Exception.class)
 	public void testSaveDataset_NullName() throws Exception {
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
 		datasetUploadDto.setName(null);
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 
 	@Test (expected = Exception.class)
 	public void testSaveDataset_NullMarkers() throws Exception {
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 	@Test (expected = Exception.class)
 	public void testSaveDataset_NullSamples() throws Exception {
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
 		datasetUploadDto.setSampleAccessions(null);
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 
 	@Test (expected = Exception.class)
 	public void testSaveDataset_NullDataset() throws Exception {
-		datasetService.saveDataset(null);
+		this.datasetService.saveDataset(null);
 	}
 
 	@Test (expected = Exception.class)
@@ -97,7 +96,7 @@ public class DatasetServiceImplTest {
 		datasetUploadDto.setName(RandomStringUtils.random(31));
 		datasetUploadDto.setSampleAccessions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
 		datasetUploadDto.setMarkers(new ArrayList<String>());
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 
@@ -111,9 +110,9 @@ public class DatasetServiceImplTest {
 		datasetUploadDto.setMarkers(markers);
 		final Dataset datasetFromDB = new Dataset();
 		datasetFromDB.setDatasetName("Dataset");
-		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(datasetFromDB);
+		Mockito.when(this.datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(datasetFromDB);
 		datasetUploadDto.setSampleAccessions(new LinkedHashSet<DatasetUploadDto.SampleKey>());
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 	@Test (expected = Exception.class)
@@ -125,8 +124,8 @@ public class DatasetServiceImplTest {
 		markers.add("a");
 		datasetUploadDto.setName("Dataset");
 		datasetUploadDto.setMarkers(markers);
-		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
-		datasetService.saveDataset(datasetUploadDto);
+		Mockito.when(this.datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 
@@ -138,7 +137,7 @@ public class DatasetServiceImplTest {
 		markers.add("b");
 		datasetUploadDto.setName("Dataset");
 		datasetUploadDto.setMarkers(markers);
-		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
+		Mockito.when(this.datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
 
 		final LinkedHashSet sampleAccesionSet = new LinkedHashSet<>();
 		final DatasetUploadDto.SampleKey sampleKey1 = new DatasetUploadDto().new SampleKey();
@@ -149,7 +148,7 @@ public class DatasetServiceImplTest {
 		final String[][] charValues = { {"A","B"}, {"C","D"}, {"E", "F"}};
 		datasetUploadDto.setCharValues(charValues);
 
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 	@Test (expected = Exception.class)
@@ -157,7 +156,7 @@ public class DatasetServiceImplTest {
 		final Set<String> sampleUIDs = new HashSet<>();
 		sampleUIDs.add("sampleKey1");
 		final Map<String, SampleDTO> sampleDTOMap = new HashMap<>();
-		Mockito.when(sampleService.getSamplesBySampleUID(sampleUIDs)).thenReturn(sampleDTOMap);
+		Mockito.when(this.sampleService.getSamplesBySampleUID(sampleUIDs)).thenReturn(sampleDTOMap);
 
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
 		final List<String> markers = new ArrayList<>();
@@ -172,12 +171,12 @@ public class DatasetServiceImplTest {
 		sampleAccesionSet.add(sampleKey1);
 		datasetUploadDto.setSampleAccessions(sampleAccesionSet);
 
-		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
+		Mockito.when(this.datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
 
 		final String[][] charValues = { {"A","B"}};
 		datasetUploadDto.setCharValues(charValues);
 
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 	@Test (expected = Exception.class)
@@ -186,7 +185,7 @@ public class DatasetServiceImplTest {
 		sampleUIDs.add("SampleUID1");
 		final Map<String, SampleDTO> sampleDTOMap = new HashMap<>();
 		sampleDTOMap.put("SampleUID1", new SampleDTO());
-		Mockito.when(sampleService.getSamplesBySampleUID(sampleUIDs)).thenReturn(sampleDTOMap);
+		Mockito.when(this.sampleService.getSamplesBySampleUID(sampleUIDs)).thenReturn(sampleDTOMap);
 		final DatasetUploadDto datasetUploadDto = new DatasetUploadDto();
 		final List<String> markers = new ArrayList<>();
 		markers.add("a");
@@ -198,24 +197,24 @@ public class DatasetServiceImplTest {
 		sampleKey1.setSampleUID("SampleUID1");
 		sampleAccesionSet.add(sampleKey1);
 		datasetUploadDto.setSampleAccessions(sampleAccesionSet);
-		Mockito.when(datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
+		Mockito.when(this.datasetDAO.getByName(datasetUploadDto.getName())).thenReturn(null);
 		final List<Marker> markersFromDB = new ArrayList<>();
-		Mockito.when(markerDAO.getByNames(datasetUploadDto.getMarkers(), 0, 0)).thenReturn(markersFromDB);
+		Mockito.when(this.markerDAO.getByNames(datasetUploadDto.getMarkers(), 0, 0)).thenReturn(markersFromDB);
 		final String[][] charValues = { {"A","B"}};
 		datasetUploadDto.setCharValues(charValues);
-		datasetService.saveDataset(datasetUploadDto);
+		this.datasetService.saveDataset(datasetUploadDto);
 	}
 
 	@Test (expected = NullPointerException.class)
 	public void testGetDataset_NullDatasetName() throws Exception{
-		datasetService.getDataset(null);
+		this.datasetService.getDataset(null);
 	}
 
 	@Test
 	public void testGetDataset_DatasetNotExist() throws Exception{
 		final String datasetName = "name";
-		Mockito.when(datasetDAO.getByName(datasetName)).thenReturn(null);
-		final DatasetRetrieveDto datasetRetrieveDto = datasetService.getDataset(datasetName);
+		Mockito.when(this.datasetDAO.getByName(datasetName)).thenReturn(null);
+		final DatasetRetrieveDto datasetRetrieveDto = this.datasetService.getDataset(datasetName);
 		assertThat(datasetRetrieveDto, is(nullValue()));
 	}
 
@@ -224,9 +223,9 @@ public class DatasetServiceImplTest {
 		final String datasetName = "name";
 		final Dataset dataset = new Dataset();
 		dataset.setDatasetId(1);
-		Mockito.when(datasetDAO.getByName(datasetName)).thenReturn(dataset);
-		Mockito.when(charValuesDAO.getCharValueElementsByDatasetId(1)).thenThrow(MiddlewareQueryException.class);
-		datasetService.getDataset(datasetName);
+		Mockito.when(this.datasetDAO.getByName(datasetName)).thenReturn(dataset);
+		Mockito.when(this.charValuesDAO.getCharValueElementsByDatasetId(1)).thenThrow(MiddlewareQueryException.class);
+		this.datasetService.getDataset(datasetName);
 	}
 
 }
