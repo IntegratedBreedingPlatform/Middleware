@@ -991,7 +991,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (requestDTO.getObservationLevel() != null) {
-			queryString.append(" AND pp_dataset_type.value = :datasetType ");
+			queryString.append(" AND dataset_type.dataset_type_id = :datasetType ");
 		}
 
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {
