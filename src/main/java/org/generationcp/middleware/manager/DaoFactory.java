@@ -1,6 +1,5 @@
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -12,7 +11,9 @@ import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
+import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
@@ -33,7 +34,7 @@ public class DaoFactory {
 
 	private HibernateSessionProvider sessionProvider;
 
-	public DaoFactory(){
+	public DaoFactory() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
@@ -94,7 +95,7 @@ public class DaoFactory {
 		transactionDao.setSession(this.sessionProvider.getSession());
 		return transactionDao;
 	}
-	
+
 	public StockDao getStockDao() {
 		final StockDao stockDao = new StockDao();
 		stockDao.setSession(this.sessionProvider.getSession());
@@ -136,14 +137,14 @@ public class DaoFactory {
 		personDao.setSession(this.sessionProvider.getSession());
 		return personDao;
 	}
-	
+
 	public PhenotypeDao getPhenotypeDAO() {
 		final PhenotypeDao phenotypeDao = new PhenotypeDao();
 		phenotypeDao.setSession(this.sessionProvider.getSession());
 		return phenotypeDao;
-				
+
 	}
-	
+
 	public DmsProjectDao getDmsProjectDAO() {
 		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.sessionProvider.getSession());
@@ -169,7 +170,7 @@ public class DaoFactory {
 		return experimentDao;
 
 	}
-	
+
 	public GeolocationDao getGeolocationDao() {
 		final GeolocationDao geolocationDao = new GeolocationDao();
 		geolocationDao.setSession(this.sessionProvider.getSession());
@@ -182,7 +183,7 @@ public class DaoFactory {
 		return geolocationPropertyDao;
 	}
 
-	public ProgramPresetDAO getProgramPresetDAO(){
+	public ProgramPresetDAO getProgramPresetDAO() {
 		final ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
 		programPresetDAO.setSession(this.sessionProvider.getSession());
 		return programPresetDAO;
@@ -200,9 +201,17 @@ public class DaoFactory {
 		return progenitorDao;
 	}
 
+
+	public DatasetTypeDAO getDatasetTypeDao() {
+		final DatasetTypeDAO datasetTypeDao = new DatasetTypeDAO();
+		datasetTypeDao.setSession(this.sessionProvider.getSession());
+		return datasetTypeDao;
+	}
+
 	public SearchRequestDAO getSearchRequestDAO() {
 		final SearchRequestDAO brapiSearchDAO = new SearchRequestDAO();
 		brapiSearchDAO.setSession(this.sessionProvider.getSession());
 		return brapiSearchDAO;
+
 	}
 }

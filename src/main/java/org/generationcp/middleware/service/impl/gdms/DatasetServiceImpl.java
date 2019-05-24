@@ -37,7 +37,7 @@ import java.util.Set;
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(DatasetServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DatasetServiceImpl.class);
 
 	private DatasetDAO datasetDAO;
 	private MarkerDAO markerDAO;
@@ -45,13 +45,13 @@ public class DatasetServiceImpl implements DatasetService {
 	private CharValuesDAO charValuesDAO;
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
-		datasetDAO = new DatasetDAO();
-		markerDAO = new MarkerDAO();
-		charValuesDAO = new CharValuesDAO();
+		this.datasetDAO = new DatasetDAO();
+		this.markerDAO = new MarkerDAO();
+		this.charValuesDAO = new CharValuesDAO();
 		this.datasetDAO.setSession(sessionProvider.getSession());
 		this.markerDAO.setSession(sessionProvider.getSession());
 		this.charValuesDAO.setSession(sessionProvider.getSession());
-		sampleService = new SampleServiceImpl(sessionProvider);
+		this.sampleService = new SampleServiceImpl(sessionProvider);
 	}
 
 	@Override
@@ -65,19 +65,19 @@ public class DatasetServiceImpl implements DatasetService {
 		if (datasetUploadDto.getName().length() > 30) {
 			throw new MiddlewareException("Dataset Name value exceeds max char size");
 		}
-		if (datasetDAO.getByName(datasetUploadDto.getName()) != null) {
+		if (this.datasetDAO.getByName(datasetUploadDto.getName()) != null) {
 			throw new MiddlewareException("Dataset Name already exists");
 		}
-		if (isDuplicatedMarkerNames(datasetUploadDto)) {
+		if (this.isDuplicatedMarkerNames(datasetUploadDto)) {
 			throw new MiddlewareException("Duplicated markers not allowed");
 		}
 
 		this.validateInput(datasetUploadDto);
 
 		final Set<String> sampleUIDSet = this.getSampleUIDList(datasetUploadDto);
-		final Map<String, SampleDTO> sampleDTOMap = sampleService.getSamplesBySampleUID(sampleUIDSet);
+		final Map<String, SampleDTO> sampleDTOMap = this.sampleService.getSamplesBySampleUID(sampleUIDSet);
 
-		validateSamples(sampleUIDSet, sampleDTOMap);
+		this.validateSamples(sampleUIDSet, sampleDTOMap);
 
 		final List<Marker> markers = this.markerDAO.getByNames(datasetUploadDto.getMarkers(), 0, 0);
 		final Map<String, Marker> markerMap = this.getMarkersMap(markers);
@@ -86,7 +86,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Dataset dataset = DatasetBuilder.build(datasetUploadDto, sampleDTOMap, markerMap);
 
 		try {
-			return datasetDAO.save(dataset).getDatasetId();
+			return this.datasetDAO.save(dataset).getDatasetId();
 		} catch (MiddlewareQueryException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new MiddlewareException("An error has occurred while saving the dataset");
@@ -186,7 +186,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	public DatasetDAO getDatasetDAO() {
-		return datasetDAO;
+		return this.datasetDAO;
 	}
 
 	public void setDatasetDAO(final DatasetDAO datasetDAO) {
@@ -194,7 +194,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	public MarkerDAO getMarkerDAO() {
-		return markerDAO;
+		return this.markerDAO;
 	}
 
 	public void setMarkerDAO(final MarkerDAO markerDAO) {
@@ -202,7 +202,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	public SampleService getSampleService() {
-		return sampleService;
+		return this.sampleService;
 	}
 
 	public void setSampleService(final SampleService sampleService) {
@@ -210,7 +210,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	public CharValuesDAO getCharValuesDAO() {
-		return charValuesDAO;
+		return this.charValuesDAO;
 	}
 
 	public void setCharValuesDAO(final CharValuesDAO charValuesDAO) {

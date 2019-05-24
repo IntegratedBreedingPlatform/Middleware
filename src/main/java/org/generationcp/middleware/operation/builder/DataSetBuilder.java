@@ -11,15 +11,11 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -27,19 +23,21 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.DatasetUtil;
 import org.generationcp.middleware.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 public class DataSetBuilder extends Builder {
 
@@ -47,9 +45,8 @@ public class DataSetBuilder extends Builder {
 	private final DmsProjectDao dmsProjectDao;
 	private final StudyDataManager studyDataManager;
 
-	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(),
-			TermId.DATASET_TYPE.getId());
-	
+	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId());
+
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetBuilder.class);
 
 	public DataSetBuilder(final HibernateSessionProvider sessionProviderForLocal) {
@@ -111,7 +108,7 @@ public class DataSetBuilder extends Builder {
 		dataSet.setName(project.getName());
 		dataSet.setDescription(project.getDescription());
 		dataSet.setStudyId(this.getStudyId(project));
-		dataSet.setDataSetType(this.getDataSetType(project));
+		dataSet.setDatasetType(project.getDatasetType());
 		dataSet.setVariableTypes(this.getVariableTypes(project));
 		dataSet.setLocationIds(this.getLocationIds(project.getProjectId()));
 		dataSet.setProgramUUID(project.getProgramUUID());
@@ -137,15 +134,6 @@ public class DataSetBuilder extends Builder {
 		return study.getProjectId();
 	}
 
-	private DataSetType getDataSetType(final DmsProject project) {
-		for (final ProjectProperty property : project.getProperties()) {
-			if (TermId.DATASET_TYPE.getId() == property.getVariableId()) {
-				return DataSetType.findById(Integer.valueOf(property.getValue()));
-			}
-		}
-		return null;
-	}
-
 	public DmsProject getTrialDataset(final int studyId) {
 		final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
 		if (datasetReferences == null || datasetReferences.isEmpty()) {
@@ -157,7 +145,7 @@ public class DataSetBuilder extends Builder {
 			}
 		}
 		// if not found in the list using the name, get dataset reference with Summary Data type
-		final DatasetReference trialDatasetReference = this.studyDataManager.findOneDataSetReferenceByType(studyId, DataSetType.SUMMARY_DATA);
+		final DatasetReference trialDatasetReference = this.studyDataManager.findOneDataSetReferenceByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (trialDatasetReference != null) {
 			return this.getDmsProjectById(trialDatasetReference.getId());
 		}
@@ -167,7 +155,7 @@ public class DataSetBuilder extends Builder {
 	public Workbook buildCompleteDataset(final int datasetId)  {
 		final DataSet dataset = this.build(datasetId);
 		final List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
-		final boolean isMeasurementDataset = this.isMeasurementDataset(dataset);
+		final boolean isMeasurementDataset = (dataset.getDatasetType() != null) ? dataset.getDatasetType().isObservationType() : Boolean.FALSE;
 		VariableTypeList variables;
 		if (isMeasurementDataset) {
 			variables = this.filterVariables(dataset.getVariableTypes(), siblingVariables);
@@ -212,14 +200,6 @@ public class DataSetBuilder extends Builder {
 			}
 		}
 		return newVariables;
-	}
-
-	private boolean isMeasurementDataset(final DataSet dataset) {
-		final String datasetName = dataset.getName();
-		final DataSetType datasetType = dataset.getDataSetType();
-
-		return datasetName.toUpperCase().startsWith("MEASUREMENT EFEC_") || datasetName.toUpperCase().startsWith("MEASUREMENT EFECT_")
-				|| !datasetName.toUpperCase().startsWith("TRIAL_") && datasetType == DataSetType.PLOT_DATA;
 	}
 
 	private List<Integer> getVariablesOfSiblingDatasets(final int datasetId) {

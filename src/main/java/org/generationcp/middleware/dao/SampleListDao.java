@@ -1,22 +1,16 @@
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import org.generationcp.middleware.domain.dms.DataSetType;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.workbench.DatasetType;
 import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -37,9 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
@@ -51,15 +48,15 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 	protected static final String SAMPLES = "samples";
 	protected static final Criterion RESTRICTED_LIST;
 	protected static final String SEARCH_SAMPLE_LIST_CONTAINS =
-			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
-					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
-					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name LIKE :searchString\n"
-					+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString) ";
+		"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
+			+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
+			+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name LIKE :searchString\n"
+			+ "OR sample.sample_name LIKE :searchString\n" + "OR sample.sample_bk LIKE :searchString) ";
 	protected static final String SEARCH_SAMPLE_LIST_EXACT_MATCH =
-			"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
-					+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
-					+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name = :searchString\n"
-					+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString) ";
+		"SELECT DISTINCT sample_list.list_id as id, sample_list.list_name as listName, sample_list.description as description FROM sample_list \n"
+			+ "LEFT JOIN sample ON sample.sample_list=sample_list.list_id\n"
+			+ "WHERE sample_list.type = :listType AND (sample_list.program_uuid = :program_uuid OR sample_list.program_uuid IS NULL) AND (sample_list.list_name = :searchString\n"
+			+ "OR sample.sample_name = :searchString\n" + "OR sample.sample_bk = :searchString) ";
 
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
@@ -98,7 +95,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 		} catch (final Exception e) {
 			final String message = "Error with getSampleListByParentAndName(sampleListName=" + sampleListName + ", parentId= " + parentId
-					+ " ) query from SampleList: " + e.getMessage();
+				+ " ) query from SampleList: " + e.getMessage();
 			SampleListDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message);
 		}
@@ -113,16 +110,18 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property(SampleListDao.LIST_NAME), SampleListDao.LIST_NAME);
 
 		criteria.createAlias(SampleListDao.SAMPLES, SampleListDao.SAMPLES)
-				.createAlias("samples.experiment", "experiment").createAlias("experiment.project", "project")
-				.add(Restrictions.in("project.projectId", datasetIds)).setProjection(projectionList)
-				.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class));
+			.createAlias("samples.experiment", "experiment").createAlias("experiment.project", "project")
+			.add(Restrictions.in("project.projectId", datasetIds)).setProjection(projectionList)
+			.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class));
 
 		return criteria.list();
 	}
 
-	public List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
+	public List<SampleList> searchSampleLists(
+		final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
 
-		final SQLQuery query = this.getSession().createSQLQuery(this.addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
+		final SQLQuery query = this.getSession()
+			.createSQLQuery(this.addOrder(exactMatch ? SEARCH_SAMPLE_LIST_EXACT_MATCH : SEARCH_SAMPLE_LIST_CONTAINS, pageable));
 
 		query.setParameter("searchString", searchString + (exactMatch ? "" : "%"));
 		query.setParameter("listType", SampleListType.SAMPLE_LIST.toString());
@@ -144,32 +143,39 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		final ProjectionList projectionList = Projections.projectionList();
 
 		projectionList.add(Projections.property("stock.name"), "designation");
+		projectionList.add(Projections.property("properties.value"), "plotNumber");
 		projectionList.add(Projections.property("sample.sampleNumber"), "sampleNumber");
 		projectionList.add(Projections.property("sample.sampleName"), "sampleName");
 		projectionList.add(Projections.property("sample.entryNumber"), "entryNumber");
-		projectionList.add(CustomProjections.concatProperties(" ","person.firstName", "person.lastName"), "takenBy");
+		projectionList.add(CustomProjections.concatProperties(" ", "person.firstName", "person.lastName"), "takenBy");
 		projectionList.add(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey");
 		projectionList.add(Projections.property("experiment.obsUnitId"), "obsUnitId");
-		// TODO move PLOT_NO to nd_exp observation_unit_no and change type to OBSERVATION_UNIT
-		projectionList.add(CustomProjections.coalesce("experiment.observationUnitNo", "properties.value"), "observationUnitNumber");
+		projectionList.add(Projections.property("experiment.observationUnitNo"), "observationUnitNumber");
 		projectionList.add(Projections.property("sample.samplingDate"), "sampleDate");
 		projectionList.add(Projections.property("germplasm.gid"), "gid");
 		projectionList.add(Projections.property("sample.plateId"), "plateId");
 		projectionList.add(Projections.property("sample.well"), "well");
 
+		final Conjunction plotNoConjunction = Restrictions.conjunction();
+		plotNoConjunction.add(Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()));
+		plotNoConjunction.add(Restrictions.eq("dt.datasetTypeId", DatasetTypeEnum.PLOT_DATA.getId()));
+
+		final Conjunction datasetConjunction = Restrictions.conjunction();
+		datasetConjunction.add(Restrictions.or(plotNoConjunction, Restrictions.ne("dt.datasetTypeId", DatasetTypeEnum.PLOT_DATA.getId())));
+
 		criteria.createAlias(SampleListDao.SAMPLES, "sample")
-				.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
-				.createAlias("user.person", "person", CriteriaSpecification.LEFT_JOIN)
-				.createAlias("samples.experiment", "experiment")
-				.createAlias("experiment.stock", "stock")
-				.createAlias("stock.germplasm", "germplasm")
-				.createAlias("experiment.properties", "properties",
-					CriteriaSpecification.LEFT_JOIN, Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()))
-				.add(Restrictions.eq("id", sampleListId))
-				.setProjection(projectionList)
-				.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class)).addOrder(Order.asc("sample.sampleId"));
-
-
+			.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
+			.createAlias("user.person", "person", CriteriaSpecification.LEFT_JOIN)
+			.createAlias("samples.experiment", "experiment")
+			.createAlias("experiment.stock", "stock")
+			.createAlias("stock.germplasm", "germplasm")
+			.createAlias("experiment.properties", "properties", CriteriaSpecification.LEFT_JOIN)
+			.createAlias("experiment.project", "project")
+			.createAlias("project.datasetType", "dt")
+			.add(Restrictions.eq("id", sampleListId))
+			.add(datasetConjunction)
+			.setProjection(projectionList)
+			.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class)).addOrder(Order.asc("sample.sampleId"));
 
 		return criteria.list();
 	}
@@ -219,7 +225,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 			}
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error with getByParentFolderId(parentId=" + parentId + ") query from SampleList: " + e.getMessage(), e);
+				"Error with getByParentFolderId(parentId=" + parentId + ") query from SampleList: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
@@ -236,10 +242,10 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		try {
 			final String folderMetaDataQuery = "SELECT parent.list_id AS listId," + "  COUNT(child.list_id) AS numberOfChildren, "
-					+ "  COUNT(s.sample_id) AS numberOfEntries " + " FROM sample_list parent"
-					+ "   LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
-					+ "   LEFT OUTER JOIN sample s ON s.sample_list = parent.list_id "
-					+ " WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
+				+ "  COUNT(s.sample_id) AS numberOfEntries " + " FROM sample_list parent"
+				+ "   LEFT OUTER JOIN sample_list child ON child.hierarchy = parent.list_id "
+				+ "   LEFT OUTER JOIN sample s ON s.sample_list = parent.list_id "
+				+ " WHERE parent.list_id IN (:folderIds) GROUP BY parent.list_id";
 			final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
 			setResultTransformer.setParameterList("folderIds", folderIds);
 			setResultTransformer.addScalar("listId", new IntegerType());
@@ -250,8 +256,8 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error with getSampleListMetadata(folderIds=" + folderIds.toString() + ") query from sample_list: " + e.getMessage(),
-					e);
+				"Error with getSampleListMetadata(folderIds=" + folderIds.toString() + ") query from sample_list: " + e.getMessage(),
+				e);
 		}
 		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {
 
@@ -283,8 +289,9 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getByUserID(userID=" + userID + ") query from GermplasmList: " + e.getMessage(),
-					e);
+			throw new MiddlewareQueryException(
+				"Error with getByUserID(userID=" + userID + ") query from GermplasmList: " + e.getMessage(),
+				e);
 		}
 		return null;
 	}
@@ -314,10 +321,11 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		stringBuilder.append("ORDER BY ");
 
 		final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-		while(iterator.hasNext()) {
+		while (iterator.hasNext()) {
 			final Sort.Order order = iterator.next();
 			stringBuilder.append(order.getProperty() + " " + order.getDirection().name());
-			if (iterator.hasNext()) stringBuilder.append(",");
+			if (iterator.hasNext())
+				stringBuilder.append(",");
 		}
 
 		return stringBuilder.toString();

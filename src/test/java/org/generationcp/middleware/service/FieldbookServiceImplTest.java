@@ -40,7 +40,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -53,7 +52,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -129,14 +127,14 @@ public class FieldbookServiceImplTest {
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
 		when(this.locationDataManager.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID))
-				.thenReturn(new ArrayList<Location>());
+			.thenReturn(new ArrayList<Location>());
 	}
 
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
 		final Integer out = this.fieldbookServiceImpl
-				.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes);
+			.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, this.germplasmAttributes);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 
 		// Make sure a call to save various things occur.
@@ -158,7 +156,7 @@ public class FieldbookServiceImplTest {
 		final Measurements measurements = Mockito.mock(Measurements.class);
 		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
 		final List<MeasurementRow> observations =
-				MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
+			MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
 		// Verify that the method is called
 		Mockito.verify(measurements).saveMeasurements(observations);
@@ -169,7 +167,7 @@ public class FieldbookServiceImplTest {
 		final Measurements measurements = Mockito.mock(Measurements.class);
 		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
 		final List<MeasurementRow> observations =
-				MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
+			MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
 		// Verify that the method is never called
 		Mockito.verify(measurements, Mockito.times(0)).saveMeasurements(observations);
@@ -201,7 +199,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-				.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(cValueId));
+			.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(cValueId));
 
 	}
 
@@ -223,7 +221,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
 
 		Mockito.verify(experimentPropertySaver)
-				.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(value));
+			.saveOrUpdateProperty(Matchers.any(ExperimentModel.class), Matchers.eq(termId), Matchers.eq(value));
 
 	}
 
@@ -236,19 +234,21 @@ public class FieldbookServiceImplTest {
 		final GermplasmList originalGermplasmList = new GermplasmList();
 		originalGermplasmList.setId(originalListId);
 
-		this.fieldbookServiceImpl.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, new ArrayList<ListDataProject>(),
+		this.fieldbookServiceImpl
+			.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, new ArrayList<ListDataProject>(),
 				userId);
 
-		Mockito.verify(listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
-				new ArrayList<ListDataProject>(), userId);
-
+		Mockito.verify(this.listDataProjectSaver).saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId,
+			new ArrayList<ListDataProject>(), userId);
 
 	}
 
 	@Test
 	public void testAddLocation() {
-		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode())).thenReturn(1001);
-		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode())).thenReturn(1002);
+		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode()))
+			.thenReturn(1001);
+		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode()))
+			.thenReturn(1002);
 
 		this.fieldbookServiceImpl.addLocation("LOCNAME", 1, 101, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
 
