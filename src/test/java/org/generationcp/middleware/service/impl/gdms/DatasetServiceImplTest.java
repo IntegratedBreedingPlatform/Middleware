@@ -1,10 +1,5 @@
 package org.generationcp.middleware.service.impl.gdms;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
@@ -31,6 +26,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
  * Created by clarysabel on 11/9/17.

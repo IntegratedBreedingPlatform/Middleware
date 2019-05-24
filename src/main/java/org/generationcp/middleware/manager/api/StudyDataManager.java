@@ -313,14 +313,13 @@ public interface StudyDataManager {
 	 * returned. If there are none, null is returned.
 	 *
 	 * @param studyId the study id
-	 * @param type    the type
+	 * @param datasetTypeId the dataset type id
 	 * @return the data set
 	 */
-
 	DataSet findOneDataSetByType(int studyId, int datasetTypeId);
 
 	/**
-	 * Light weight variant of {@link #findOneDataSetByType(int, DataSetType)} which does not load entire DataSet, just a DatasetReference.
+	 * Light weight variant of {@link #findOneDataSetByType(int, int)} which does not load entire DataSet, just a DatasetReference.
 	 * <p>
 	 * Returns a single dataset reference belonging to the study with the given type. If there is more than one matching dataset, only the
 	 * first one is returned. If there are none, null is returned.

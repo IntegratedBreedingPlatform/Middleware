@@ -12,7 +12,7 @@
 package org.generationcp.middleware.domain.dms;
 
 /**
- * Contains the name, description, type and variables of a dataset.
+ * Contains the name, description and variables of a dataset.
  */
 public class DatasetValues {
 

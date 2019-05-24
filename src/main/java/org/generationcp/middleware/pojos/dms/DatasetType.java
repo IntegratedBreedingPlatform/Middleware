@@ -11,8 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Table(name = "dataset_type")

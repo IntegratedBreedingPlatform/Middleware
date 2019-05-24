@@ -1,6 +1,5 @@
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -12,6 +11,7 @@ import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
+import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
