@@ -813,7 +813,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "           inner join project p2 on nde2.project_id = p2.project_id " //
 					+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid " //
-					+ "      where ph2." + filterByDraftOrValue + " is not null " //
+					+ "      where ph2." + filterByDraftOrValue + " is not null  and ph2." + filterByDraftOrValue + "!= 'missing'" //
 					+ filterByVariableSQL
 					+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
 					+ "        and case " //

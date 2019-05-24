@@ -20,7 +20,6 @@ import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializ
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -49,6 +48,7 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -298,7 +298,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DataSet dataset = this.manager.getDataSet(datasetReference.getId());
 		Assert.assertEquals("The dataset name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
 			dataset.getName());
-		Assert.assertEquals(DataSetType.MEANS_DATA, dataset.getDataSetType());
+		Assert.assertEquals(DatasetTypeEnum.MEANS_DATA.getId(), dataset.getDatasetType().getDatasetTypeId().intValue());
 	}
 
 	@Test
@@ -323,8 +323,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetDataSetsByType() throws Exception {
 		this.studyTDI.addTestDataset(this.studyReference.getId());
-		final DataSetType dataSetType = DataSetType.MEANS_DATA;
-		final List<DataSet> datasets = this.manager.getDataSetsByType(this.studyReference.getId(), dataSetType);
+		final List<DataSet> datasets = this.manager.getDataSetsByType(this.studyReference.getId(), DatasetTypeEnum.MEANS_DATA.getId());
 		Assert.assertTrue("Datasets' size should be greter than 0", datasets.size() > 0);
 		Assert.assertTrue(
 			"The size should be greater than 0 since we are sure that it will return at least one data set",
@@ -334,8 +333,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testFindOneDataSetByType() throws Exception {
 		this.studyTDI.addTestDataset(this.studyReference.getId());
-		final DataSetType dataSetType = DataSetType.MEANS_DATA;
-		final DataSet dataset = this.manager.findOneDataSetByType(this.studyReference.getId(), dataSetType);
+		final DataSet dataset = this.manager.findOneDataSetByType(this.studyReference.getId(), DatasetTypeEnum.MEANS_DATA.getId());
 		Assert.assertEquals("Dataset's name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
 			dataset.getName());
 	}
@@ -780,7 +778,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testIsLocationIdVariable() throws Exception {
-		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		Assert.assertTrue(this.manager.isLocationIdVariable(this.studyReference.getId(), "LOCATION_NAME"));
 		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "EXPERIMENT_DESIGN_FACTOR"));
@@ -794,7 +792,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String albaniaLocationId = "2";
 		final String algeriaLocationId = "3";
 
-		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), afghanistanLocationId, "1");
 		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), albaniaLocationId, "1");
@@ -865,7 +863,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
@@ -883,7 +881,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
@@ -901,7 +899,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		Assert.assertFalse(this.manager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(999)));
@@ -983,13 +981,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		return vtype;
 	}
 
-	private DatasetReference addTestDataset(final int studyId, final String name, final DataSetType dataSetType) throws Exception {
+	private DatasetReference addTestDataset(final int studyId, final String name, final int datasetTypeId) throws Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName(name);
 		datasetValues.setDescription("My Dataset Description");
-		datasetValues.setType(dataSetType);
 
 		DMSVariableType variableType =
 			this.createVariableType(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha", 4);
@@ -1005,8 +1002,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variableType.setLocalName("Plot No");
 		typeList.add(variableType);
 
-		return this.manager.addDataSet(studyId, typeList, datasetValues, null);
+		return this.manager.addDataSet(studyId, typeList, datasetValues, null, datasetTypeId);
 	}
+
 	@Test
 	public void testRenameStudy() throws Exception {
 		// Create project record
@@ -1019,11 +1017,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project = this.manager.getDmsProjectDao().save(project);
 
 		final DatasetReference plotdata =
-			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DataSetType.PLOT_DATA);
-
+			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DatasetTypeEnum.PLOT_DATA.getId());
 
 		final DatasetReference environment =
-			this.addTestDataset(project.getProjectId(), project.getName() + ENVIRONMENT, DataSetType.SUMMARY_DATA);
+			this.addTestDataset(project.getProjectId(), project.getName() + ENVIRONMENT, DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		final String newStudyName = "newStudyName";
 		this.manager.renameStudy(newStudyName, project.getProjectId(), programUUID);
@@ -1047,7 +1044,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
 		final StudyReference studyReference = this.manager.getStudyReference(studyId);
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());
@@ -1072,7 +1069,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
 		final StudyReference studyReference = this.manager.getStudyReference(studyId);
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());

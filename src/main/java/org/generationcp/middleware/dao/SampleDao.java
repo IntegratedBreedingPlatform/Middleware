@@ -2,7 +2,6 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -64,8 +63,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ " inner join sample sp on sp.nd_experiment_id = nde.nd_experiment_id"
 			+ " where nde.nd_experiment_id in (:experimentIds)  group by nde.nd_experiment_id";
 
-
-
 	private static final String SAMPLE = "sample";
 	private static final String SAMPLE_EXPERIMENT = "sample.experiment";
 	private static final String EXPERIMENT = "experiment";
@@ -74,7 +71,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	public List<SampleDTO> filter(final Integer ndExperimentId, final Integer listId, final Pageable pageable) {
 
-		final Criteria criteria = createSampleDetailsCriteria();
+		final Criteria criteria = this.createSampleDetailsCriteria();
 		final int pageSize = pageable.getPageSize();
 		final int start = pageSize * pageable.getPageNumber();
 
@@ -219,7 +216,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.project", "project")
 			.createAlias(
-				"project.properties", "projectProperty", Criteria.INNER_JOIN, Restrictions.eq("variableId", TermId.DATASET_TYPE.getId()))
+				"project.datasetType", "datasetType")
 			.createAlias(
 				"experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("typeId", TermId.PLOT_NO.getId()))
 			.createAlias("project.relatedTos", "relatedTos")
@@ -245,7 +242,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.alias(Projections.property("sample.samplingDate"), "samplingDate"))
 				.add(Projections.alias(Projections.property("sample.plateId"), "plateId"))
 				.add(Projections.alias(Projections.property("sample.well"), "well"))
-				.add(Projections.alias(Projections.property("projectProperty.value"), "datasetType"))
+				.add(Projections.alias(Projections.property("datasetType.name"), "datasetTypeName"))
+				.add(Projections.alias(Projections.property("datasetType.isSubObservationType"), "subObservationDatasetType"))
 				.add(Projections.alias(Projections.property("objectProject.projectId"), "projectId"))
 				.add(Projections.alias(Projections.property("objectProject.name"), "projectName"))
 				.add(Projections.alias(Projections.property("parentProject.projectId"), "parentProjectId"))
@@ -273,10 +271,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				}
 			} else {
 
-				final DataSetType dataSetType = DataSetType.findById(Integer.valueOf(sampleDetail.getDatasetType()));
 				final SampleDTO sampleDTO = new SampleDTO();
 
-				if (DataSetType.isSubObservationDatasetType(dataSetType)) {
+				if (sampleDetail.isSubObservationDatasetType()) {
 					// If the sample was created from subobservation, we should get the study name and id
 					// from Observation/Plot dataset's parent project (which is the study)
 					sampleDTO.setStudyName(sampleDetail.getParentProjectName());
@@ -300,7 +297,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				sampleDTO.setSamplingDate(sampleDetail.getSamplingDate());
 				sampleDTO.setPlateId(sampleDetail.getPlateId());
 				sampleDTO.setWell(sampleDetail.getWell());
-				sampleDTO.setDatasetType(dataSetType.getReadableName());
+				sampleDTO.setDatasetType(sampleDetail.getDatasetTypeName());
 
 				// Enumerator (a.k.a Observation Unit Number) is null if the sample was created from observation dataset, in that case,
 				// we should use PlotNo
@@ -443,8 +440,5 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return map;
 	}
-	
-	
-
 
 }

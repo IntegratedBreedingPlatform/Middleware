@@ -21,7 +21,8 @@ public class SampleDetailsBean {
 	private Date samplingDate;
 	private String plateId;
 	private String well;
-	private String datasetType;
+	private String datasetTypeName;
+	private boolean subObservationDatasetType;
 	private String projectName;
 	private Integer projectId;
 	private String parentProjectName;
@@ -33,7 +34,7 @@ public class SampleDetailsBean {
 	private String gdmsDatasetName;
 
 	public Integer getSampleId() {
-		return sampleId;
+		return this.sampleId;
 	}
 
 	public void setSampleId(final Integer sampleId) {
@@ -41,7 +42,7 @@ public class SampleDetailsBean {
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
@@ -49,7 +50,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getDesignation() {
-		return designation;
+		return this.designation;
 	}
 
 	public void setDesignation(final String designation) {
@@ -57,7 +58,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getSampleName() {
-		return sampleName;
+		return this.sampleName;
 	}
 
 	public void setSampleName(final String sampleName) {
@@ -65,7 +66,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getSampleBusinessKey() {
-		return sampleBusinessKey;
+		return this.sampleBusinessKey;
 	}
 
 	public void setSampleBusinessKey(final String sampleBusinessKey) {
@@ -73,7 +74,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getTakenByFirstName() {
-		return takenByFirstName;
+		return this.takenByFirstName;
 	}
 
 	public void setTakenByFirstName(final String takenByFirstName) {
@@ -81,7 +82,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getTakenByLastName() {
-		return takenByLastName;
+		return this.takenByLastName;
 	}
 
 	public void setTakenByLastName(final String takenByLastName) {
@@ -89,7 +90,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getSampleList() {
-		return sampleList;
+		return this.sampleList;
 	}
 
 	public void setSampleList(final String sampleList) {
@@ -97,7 +98,7 @@ public class SampleDetailsBean {
 	}
 
 	public Date getSamplingDate() {
-		return samplingDate;
+		return this.samplingDate;
 	}
 
 	public void setSamplingDate(final Date samplingDate) {
@@ -105,7 +106,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getPlateId() {
-		return plateId;
+		return this.plateId;
 	}
 
 	public void setPlateId(final String plateId) {
@@ -113,32 +114,31 @@ public class SampleDetailsBean {
 	}
 
 	public String getWell() {
-		return well;
+		return this.well;
 	}
 
 	public void setWell(final String well) {
 		this.well = well;
 	}
 
-	public String getDatasetType() {
-		return datasetType;
+	public String getDatasetTypeName() {
+		return this.datasetTypeName;
 	}
 
-	public void setDatasetType(final String datasetType) {
-		this.datasetType = datasetType;
+	public void setDatasetTypeName(final String datasetTypeName) {
+		this.datasetTypeName = datasetTypeName;
 	}
 
 	public String getProjectName() {
-		return projectName;
+		return this.projectName;
 	}
 
 	public void setProjectName(final String projectName) {
 		this.projectName = projectName;
 	}
 
-
 	public Integer getProjectId() {
-		return projectId;
+		return this.projectId;
 	}
 
 	public void setProjectId(final Integer projectId) {
@@ -146,7 +146,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getParentProjectName() {
-		return parentProjectName;
+		return this.parentProjectName;
 	}
 
 	public void setParentProjectName(final String parentProjectName) {
@@ -154,7 +154,7 @@ public class SampleDetailsBean {
 	}
 
 	public Integer getParentProjectId() {
-		return parentProjectId;
+		return this.parentProjectId;
 	}
 
 	public void setParentProjectId(final Integer parentProjectId) {
@@ -162,7 +162,7 @@ public class SampleDetailsBean {
 	}
 
 	public Integer getObservationUnitNo() {
-		return observationUnitNo;
+		return this.observationUnitNo;
 	}
 
 	public void setObservationUnitNo(final Integer observationUnitNo) {
@@ -170,7 +170,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getPlotNo() {
-		return plotNo;
+		return this.plotNo;
 	}
 
 	public void setPlotNo(final String plotNo) {
@@ -178,7 +178,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getObservationUnitId() {
-		return observationUnitId;
+		return this.observationUnitId;
 	}
 
 	public void setObservationUnitId(final String observationUnitId) {
@@ -186,7 +186,7 @@ public class SampleDetailsBean {
 	}
 
 	public Integer getGdmsDatasetId() {
-		return gdmsDatasetId;
+		return this.gdmsDatasetId;
 	}
 
 	public void setGdmsDatasetId(final Integer gdmsDatasetId) {
@@ -194,7 +194,7 @@ public class SampleDetailsBean {
 	}
 
 	public String getGdmsDatasetName() {
-		return gdmsDatasetName;
+		return this.gdmsDatasetName;
 	}
 
 	public void setGdmsDatasetName(final String gdmsDatasetName) {
@@ -202,7 +202,7 @@ public class SampleDetailsBean {
 	}
 
 	public Integer getSampleNumber() {
-		return sampleNumber;
+		return this.sampleNumber;
 	}
 
 	public void setSampleNumber(final Integer sampleNumber) {
@@ -210,11 +210,18 @@ public class SampleDetailsBean {
 	}
 
 	public Integer getEntryNumber() {
-		return entryNumber;
+		return this.entryNumber;
 	}
 
 	public void setEntryNumber(final Integer entryNumber) {
 		this.entryNumber = entryNumber;
 	}
 
+	public boolean isSubObservationDatasetType() {
+		return this.subObservationDatasetType;
+	}
+
+	public void setSubObservationDatasetType(final boolean subObservationDatasetType) {
+		this.subObservationDatasetType = subObservationDatasetType;
+	}
 }
