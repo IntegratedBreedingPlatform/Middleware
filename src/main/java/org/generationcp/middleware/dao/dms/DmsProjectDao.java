@@ -1370,7 +1370,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getByStudyAndDatasetType(final int studyId, final int datasetTypeId) {
+	public List<DmsProject> getDatasetsByTypeForStudy(final int studyId, final int datasetTypeId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("relatedTos", "pr");
@@ -1380,7 +1380,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("dt.datasetTypeId", datasetTypeId));
 			return criteria.list();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error getting getByStudyAndDatasetType for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
+			final String errorMessage = "Error getting getDatasetsByTypeForStudy for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}

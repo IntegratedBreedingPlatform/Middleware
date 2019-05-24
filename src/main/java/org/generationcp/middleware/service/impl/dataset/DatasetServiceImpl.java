@@ -223,7 +223,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
-		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO().getByStudyAndDatasetType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+		final List<DmsProject> plotDatasets = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 
 		if (plotDatasets == null || plotDatasets.isEmpty()) {
 			throw new MiddlewareException("Study does not have a plot dataset associated to it");
@@ -541,7 +541,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
 
 		final DmsProject environmentDataset =
-			this.daoFactory.getDmsProjectDAO().getByStudyAndDatasetType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
@@ -1014,7 +1014,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
 
 		final DmsProject environmentDataset =
-			this.daoFactory.getDmsProjectDAO().getByStudyAndDatasetType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));

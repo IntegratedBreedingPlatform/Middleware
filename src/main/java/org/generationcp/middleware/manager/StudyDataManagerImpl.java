@@ -329,7 +329,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<DataSet> getDataSetsByType(final int studyId, final int datasetTypeId) {
 
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getByStudyAndDatasetType(studyId, datasetTypeId);
+		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 		final List<DataSet> datasets = new ArrayList<>();
 
 		for (final DmsProject datasetProject : datasetProjects) {
@@ -379,7 +379,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public DatasetReference findOneDataSetReferenceByType(final int studyId, final int datasetTypeId) {
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getByStudyAndDatasetType(studyId, datasetTypeId);
+		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 		if (datasetProjects != null && !datasetProjects.isEmpty()) {
 			final DmsProject dataSetProject = datasetProjects.get(0);
 			return new DatasetReference(dataSetProject.getProjectId(), dataSetProject.getName(), dataSetProject.getDescription());
@@ -1007,7 +1007,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final int studyId, final int datasetTypeId,
 		final List<Integer> locationIds) {
 
-		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getByStudyAndDatasetType(studyId, datasetTypeId);
+		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDatasetsByTypeForStudy(studyId, datasetTypeId);
 
 		if (!datasetProjects.isEmpty()) {
 			final int dataSetId = datasetProjects.get(0).getProjectId();

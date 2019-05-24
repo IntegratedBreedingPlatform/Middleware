@@ -582,10 +582,10 @@ public class DatasetServiceImplTest {
 
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getAdditionalDesignFactors(studyId);
-		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getByStudyAndDatasetType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
+		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
-		Mockito.verify(this.dmsProjectDao).getByStudyAndDatasetType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
+		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
 

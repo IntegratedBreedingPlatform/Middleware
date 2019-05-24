@@ -917,7 +917,7 @@ public class WorkbookSaver extends Saver {
 	private Integer getMeansDataset(final Integer studyId) {
 		Integer id = null;
 		final List<DmsProject> datasets = this.getDmsProjectDao()
-			.getByStudyAndDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
+			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (datasets != null && !datasets.isEmpty()) {
 			id = datasets.get(0).getProjectId();
 		}

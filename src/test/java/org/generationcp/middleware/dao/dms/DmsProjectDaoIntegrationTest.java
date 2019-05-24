@@ -170,7 +170,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByStudyAndDatasetType() {
+	public void testGetDatasetsByTypeForStudy() {
 
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();
@@ -179,12 +179,12 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final DmsProject plot = this.createDataset(studyName + " - Plot Dataset", programUUID, DatasetTypeEnum.PLOT_DATA.getId());
 		this.createProjectRelationship(study, plot);
 
-		final List<DmsProject> resultPlot = this.dmsProjectDao.getByStudyAndDatasetType(study.getProjectId(), DatasetTypeEnum.PLOT_DATA.getId());
+		final List<DmsProject> resultPlot = this.dmsProjectDao.getDatasetsByTypeForStudy(study.getProjectId(), DatasetTypeEnum.PLOT_DATA.getId());
 		Assert.assertEquals(1, resultPlot.size());
 		Assert.assertEquals(plot.getProjectId(), resultPlot.get(0).getProjectId());
 
 		final List<DmsProject> result =
-			this.dmsProjectDao.getByStudyAndDatasetType(study.getProjectId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+			this.dmsProjectDao.getDatasetsByTypeForStudy(study.getProjectId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		Assert.assertEquals(0, result.size());
 
 	}
