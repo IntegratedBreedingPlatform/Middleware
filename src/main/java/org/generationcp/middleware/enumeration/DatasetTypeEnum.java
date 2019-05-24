@@ -1,6 +1,12 @@
 package org.generationcp.middleware.enumeration;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum DatasetTypeEnum {
@@ -17,12 +23,40 @@ public enum DatasetTypeEnum {
 	WEATHER_DATA(10),
 	MEANS_OVER_TRIAL_INSTANCES(11);
 
+	public static final Integer[] SUB_OBSERVATION_IDS;
+
+	public static final Integer[] OBSERVATION_IDS;
+
+	public static final List<DatasetTypeEnum> SUB_OBSERVATION =
+		Arrays.asList(PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
+
+
+	public static final List<DatasetTypeEnum> OBSERVATIONS =
+		Arrays.asList(PLOT_DATA, PLANT_SUBOBSERVATIONS, QUADRAT_SUBOBSERVATIONS, TIME_SERIES_SUBOBSERVATIONS, CUSTOM_SUBOBSERVATIONS);
 	private static final Map<Integer, DatasetTypeEnum> lookup = new HashMap<>();
 
 	static {
 		for (final DatasetTypeEnum datasetTypeEnum : DatasetTypeEnum.values()) {
 			lookup.put(datasetTypeEnum.getId(), datasetTypeEnum);
 		}
+
+		SUB_OBSERVATION_IDS = Lists.transform(SUB_OBSERVATION, new Function<DatasetTypeEnum, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final DatasetTypeEnum dataSetType) {
+				return dataSetType.getId();
+			}
+		}).toArray(new Integer[0]);
+
+		OBSERVATION_IDS = Lists.transform(OBSERVATIONS, new Function<DatasetTypeEnum, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final DatasetTypeEnum dataSetType) {
+				return dataSetType.getId();
+			}
+		}).toArray(new Integer[0]);
 	}
 
 	public static DatasetTypeEnum get(final Integer id) {
