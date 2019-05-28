@@ -54,6 +54,16 @@ public class VariableTypeList implements Serializable {
 		}
 	}
 
+	public VariableTypeList removeDuplicates(VariableTypeList variableTypes) {
+		VariableTypeList filtered = new VariableTypeList();
+		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
+			if(filtered.findById(variableType.getStandardVariable().getId()) == null) {
+				filtered.add(variableType);
+			}
+		}
+		return filtered;
+	}
+
 	public DMSVariableType findById(TermId termId) {
 		return this.findById(termId.getId());
 	}

@@ -163,6 +163,8 @@ public class DataSetBuilder extends Builder {
 			variables = dataset.getVariableTypes();
 		}
 
+		variables = variables.removeDuplicates(variables);
+
 		// We need to set the role of the variables based on the experiments before filtering them based on role
 		final long expCount = this.getStudyDataManager().countExperiments(datasetId);
 		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(datasetId, 0, (int) expCount, variables);
