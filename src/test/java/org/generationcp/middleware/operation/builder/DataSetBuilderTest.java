@@ -1,11 +1,7 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DMSVariableTypeTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -14,6 +10,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -25,6 +22,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataSetBuilderTest {
 
@@ -52,17 +52,18 @@ public class DataSetBuilderTest {
 
 		this.studyDataManager = Mockito.mock(StudyDataManagerImpl.class);
 		this.dmsProjectDao = Mockito.mock(DmsProjectDao.class);
-		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_WITH_STUDY)).thenReturn(generateDatasetReferences(true));
-		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NO_STUDY)).thenReturn(generateDatasetReferences(false));
+		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_WITH_STUDY)).thenReturn(this.generateDatasetReferences(true));
+		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NO_STUDY)).thenReturn(this.generateDatasetReferences(false));
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NODATASETS)).thenReturn(new ArrayList<DatasetReference>());
-		Mockito.when(this.dmsProjectDao.getById(4)).thenReturn(generateDmsProject(4));
-		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NO_STUDY, DataSetType.SUMMARY_DATA)).thenReturn(generateDatasetReference(3));
-		Mockito.when(this.dmsProjectDao.getById(3)).thenReturn(generateDmsProject(3));
+		Mockito.when(this.dmsProjectDao.getById(4)).thenReturn(this.generateDmsProject(4));
+		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NO_STUDY, DatasetTypeEnum.SUMMARY_DATA.getId()))
+			.thenReturn(this.generateDatasetReference(3));
+		Mockito.when(this.dmsProjectDao.getById(3)).thenReturn(this.generateDmsProject(3));
 
 		MockitoAnnotations.initMocks(this);
 
 		// Inject the mock services into the test class
-		dataSetBuilder = new DataSetBuilder(this.hibernateSessionProvider, dmsProjectDao, studyDataManager);
+		this.dataSetBuilder = new DataSetBuilder(this.hibernateSessionProvider, this.dmsProjectDao, this.studyDataManager);
 
 	}
 

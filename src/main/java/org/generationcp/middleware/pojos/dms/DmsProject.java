@@ -37,26 +37,27 @@ import java.util.List;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_project
- *
+ * <p>
  * A Study is captured using the Project table. Information stored at this level describes properties relevant for all field trials in a
  * Project (Study). Since it is important both that local breeders are free to use their nomenclature and that these local terms are mapped
  * to a central ontology, the properties table maps all terms to the Ontology at the project level.
  *
  * @author tippsgo
- *
  */
 @Entity()
 @Table(name = "project", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="project")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "project")
 public class DmsProject implements Serializable {
 
 	private static final long serialVersionUID = 464731947805951726L;
 
-	/** The project id of the SYSTEM root folder */
+	/**
+	 * The project id of the SYSTEM root folder
+	 */
 	public static final Integer SYSTEM_FOLDER_ID = 1;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "project_id")
 	private Integer projectId;
@@ -95,7 +96,7 @@ public class DmsProject implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "deleted", columnDefinition = "TINYINT")
 	private boolean deleted;
-	
+
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	@Basic(optional = false)
 	@Column(name = "locked", columnDefinition = "TINYINT")
@@ -105,6 +106,10 @@ public class DmsProject implements Serializable {
 	@JoinColumn(name = "study_type_id")
 	@NotFound(action = NotFoundAction.EXCEPTION)
 	private StudyType studyType;
+
+	@ManyToOne(targetEntity = DatasetType.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "dataset_type_id")
+	private DatasetType datasetType;
 
 	@Column(name = "start_date")
 	private String startDate;
@@ -118,7 +123,6 @@ public class DmsProject implements Serializable {
 	@Column(name = "objective")
 	private String objective;
 
-
 	@Column(name = "created_by")
 	private String createdBy;
 
@@ -126,10 +130,11 @@ public class DmsProject implements Serializable {
 		super();
 	}
 
-	public DmsProject(final String name, final String description, final String programUUID, final List<ProjectProperty> properties,
-			final List<ProjectRelationship> relatedTos, final List<ProjectRelationship> relatedBys, final boolean deleted,
-			final boolean locked, final StudyType studyType, final String startDate, final String endDate, final String studyUpdate,
-			final String objective, final String createdBy) {
+	public DmsProject(
+		final String name, final String description, final String programUUID, final List<ProjectProperty> properties,
+		final List<ProjectRelationship> relatedTos, final List<ProjectRelationship> relatedBys, final boolean deleted,
+		final boolean locked, final StudyType studyType, final String startDate, final String endDate, final String studyUpdate,
+		final String objective, final String createdBy) {
 		this.name = name;
 		this.description = description;
 		this.programUUID = programUUID;
@@ -209,7 +214,7 @@ public class DmsProject implements Serializable {
 	public void setDeleted(final Boolean deleted) {
 		this.deleted = deleted;
 	}
-	
+
 	public Boolean isLocked() {
 		return this.locked;
 	}
@@ -270,6 +275,14 @@ public class DmsProject implements Serializable {
 		if (this.createdBy == null || this.createdBy.isEmpty()) {
 			this.createdBy = createdBy;
 		}
+	}
+
+	public DatasetType getDatasetType() {
+		return this.datasetType;
+	}
+
+	public void setDatasetType(final DatasetType datasetType) {
+		this.datasetType = datasetType;
 	}
 
 	@Override

@@ -21,7 +21,8 @@ import java.util.Map;
  */
 public class DatasetBuilder {
 
-	public static Dataset build(final DatasetUploadDto datasetUploadDto, final Map<String, SampleDTO> sampleDTOMap,
+	public static Dataset build(
+		final DatasetUploadDto datasetUploadDto, final Map<String, SampleDTO> sampleDTOMap,
 		final Map<String, Marker> markerMap) {
 		final Dataset dataset = buildDataset(datasetUploadDto);
 		dataset.setDatasetUsers(buildDatasetUser(dataset, datasetUploadDto));
@@ -48,8 +49,9 @@ public class DatasetBuilder {
 		return ds;
 	}
 
-	private static List<CharValues> buildCharValues(final Dataset dataset, final DatasetUploadDto datasetUploadDto, final Map<String, SampleDTO> sampleDTOMap,
-			final Map<String, Marker> markerMap) {
+	private static List<CharValues> buildCharValues(
+		final Dataset dataset, final DatasetUploadDto datasetUploadDto, final Map<String, SampleDTO> sampleDTOMap,
+		final Map<String, Marker> markerMap) {
 
 		final List<CharValues> charValuesList = new ArrayList<>();
 
@@ -74,7 +76,6 @@ public class DatasetBuilder {
 		return charValuesList;
 	}
 
-
 	private static List<MarkerMetadataSet> buildMarkerMetadataSet(final Dataset dataset, final Map<String, Marker> markerMap) {
 		final List<MarkerMetadataSet> markerMetadataSetList = new ArrayList<>();
 		for (final Marker marker : markerMap.values()) {
@@ -94,8 +95,9 @@ public class DatasetBuilder {
 		return datasetUsers;
 	}
 
-	private static List<AccMetadataSet> buildAccessionMetadataset(final Dataset dataset, final DatasetUploadDto datasetUploadDto,
-			final Map<String, SampleDTO> sampleDTOMap) {
+	private static List<AccMetadataSet> buildAccessionMetadataset(
+		final Dataset dataset, final DatasetUploadDto datasetUploadDto,
+		final Map<String, SampleDTO> sampleDTOMap) {
 
 		final List<AccMetadataSet> accMetadataSetList = new ArrayList<>();
 

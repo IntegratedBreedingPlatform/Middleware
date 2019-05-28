@@ -1,11 +1,13 @@
 package org.generationcp.middleware.domain.germplasm;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GermplasmDTO {
 
 	private String germplasmDbId;
@@ -26,9 +28,50 @@ public class GermplasmDTO {
 	private String subtaxa;
 	private String subtaxaAuthority;
 	private Date acquisitionDate;
+	private String breedingMethodDbId;
+	private String germplasmGenus;
+	private String germplasmSpecies;
+	private String seedSource;
+	private final static String documentationURL = null;
+
+	public String getBreedingMethodDbId() {
+		return this.breedingMethodDbId;
+	}
+
+	public void setBreedingMethodDbId(final String breedingMethodDbId) {
+		this.breedingMethodDbId = breedingMethodDbId;
+	}
+
+	public String getGermplasmGenus() {
+		return this.germplasmGenus;
+	}
+
+	public void setGermplasmGenus(final String germplasmGenus) {
+		this.germplasmGenus = germplasmGenus;
+	}
+
+	public String getGermplasmSpecies() {
+		return this.germplasmSpecies;
+	}
+
+	public void setGermplasmSpecies(final String germplasmSpecies) {
+		this.germplasmSpecies = germplasmSpecies;
+	}
+
+	public String getSeedSource() {
+		return this.seedSource;
+	}
+
+	public void setSeedSource(final String seedSource) {
+		this.seedSource = seedSource;
+	}
+
+	public String getDocumentationURL() {
+		return this.documentationURL;
+	}
 
 	public String getGermplasmDbId() {
-		return germplasmDbId;
+		return this.germplasmDbId;
 	}
 
 	public void setGermplasmDbId(final String germplasmDbId) {
@@ -36,7 +79,7 @@ public class GermplasmDTO {
 	}
 
 	public String getDefaultDisplayName() {
-		return defaultDisplayName;
+		return this.defaultDisplayName;
 	}
 
 	public void setDefaultDisplayName(final String defaultDisplayName) {
@@ -45,7 +88,7 @@ public class GermplasmDTO {
 	}
 
 	public String getAccessionNumber() {
-		return accessionNumber;
+		return this.accessionNumber;
 	}
 
 	public void setAccessionNumber(final String accessionNumber) {
@@ -53,7 +96,7 @@ public class GermplasmDTO {
 	}
 
 	public String getGermplasmName() {
-		return germplasmName;
+		return this.germplasmName;
 	}
 
 	public void setGermplasmName(final String germplasmName) {
@@ -62,7 +105,7 @@ public class GermplasmDTO {
 	}
 
 	public String getGermplasmPUI() {
-		return germplasmPUI;
+		return this.germplasmPUI;
 	}
 
 	public void setGermplasmPUI(final String germplasmPUI) {
@@ -70,7 +113,7 @@ public class GermplasmDTO {
 	}
 
 	public String getPedigree() {
-		return pedigree;
+		return this.pedigree;
 	}
 
 	public void setPedigree(final String pedigree) {
@@ -78,15 +121,16 @@ public class GermplasmDTO {
 	}
 
 	public String getGermplasmSeedSource() {
-		return germplasmSeedSource;
+		return this.germplasmSeedSource;
 	}
 
 	public void setGermplasmSeedSource(final String germplasmSeedSource) {
 		this.germplasmSeedSource = germplasmSeedSource;
+		this.seedSource = germplasmSeedSource;
 	}
 
 	public String getCommonCropName() {
-		return commonCropName;
+		return this.commonCropName;
 	}
 
 	public void setCommonCropName(final String commonCropName) {
@@ -94,7 +138,7 @@ public class GermplasmDTO {
 	}
 
 	public String getInstituteCode() {
-		return instituteCode;
+		return this.instituteCode;
 	}
 
 	public void setInstituteCode(final String instituteCode) {
@@ -103,7 +147,7 @@ public class GermplasmDTO {
 	}
 
 	public String getInstituteName() {
-		return instituteName;
+		return this.instituteName;
 	}
 
 	public void setInstituteName(final String instituteName) {
@@ -112,7 +156,7 @@ public class GermplasmDTO {
 	}
 
 	public Integer getBiologicalStatusOfAccessionCode() {
-		return biologicalStatusOfAccessionCode;
+		return this.biologicalStatusOfAccessionCode;
 	}
 
 	public void setBiologicalStatusOfAccessionCode(final Integer biologicalStatusOfAccessionCode) {
@@ -120,7 +164,7 @@ public class GermplasmDTO {
 	}
 
 	public String getCountryOfOriginCode() {
-		return countryOfOriginCode;
+		return this.countryOfOriginCode;
 	}
 
 	public void setCountryOfOriginCode(final String countryOfOriginCode) {
@@ -128,23 +172,25 @@ public class GermplasmDTO {
 	}
 
 	public String getGenus() {
-		return genus;
+		return this.genus;
 	}
 
 	public void setGenus(final String genus) {
 		this.genus = genus;
+		this.germplasmGenus = genus;
 	}
 
 	public String getSpecies() {
-		return species;
+		return this.species;
 	}
 
 	public void setSpecies(final String species) {
 		this.species = species;
+		this.germplasmSpecies = species;
 	}
 
 	public String getSpeciesAuthority() {
-		return speciesAuthority;
+		return this.speciesAuthority;
 	}
 
 	public void setSpeciesAuthority(final String speciesAuthority) {
@@ -152,7 +198,7 @@ public class GermplasmDTO {
 	}
 
 	public String getSubtaxa() {
-		return subtaxa;
+		return this.subtaxa;
 	}
 
 	public void setSubtaxa(final String subtaxa) {
@@ -160,7 +206,7 @@ public class GermplasmDTO {
 	}
 
 	public String getSubtaxaAuthority() {
-		return subtaxaAuthority;
+		return this.subtaxaAuthority;
 	}
 
 	public void setSubtaxaAuthority(final String subtaxaAuthority) {
@@ -168,7 +214,7 @@ public class GermplasmDTO {
 	}
 
 	public Date getAcquisitionDate() {
-		return acquisitionDate;
+		return this.acquisitionDate;
 	}
 
 	public void setAcquisitionDate(final Date acquisitionDate) {
@@ -186,7 +232,7 @@ public class GermplasmDTO {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 

@@ -12,13 +12,13 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -370,9 +370,9 @@ public class DatasetServiceImplTest {
 
 	@Test
 	public void testGetDatasetsFilteringByDatasetTypeId() {
-		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(10094);
+		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		final Set<Integer> datasetTypeIds = new TreeSet<>();
-		datasetTypeIds.add(10094);
+		datasetTypeIds.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		final List<DatasetDTO> result = this.datasetService.getDatasets(25019, datasetTypeIds);
 		assertThat(datasetDTOList, equalTo(result));
 	}
@@ -398,13 +398,13 @@ public class DatasetServiceImplTest {
 
 		final boolean filterDataset = datasetTypeId == null || datasetTypeId == 0 ? false : true;
 
-		datasetDTO = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", 10080);
+		datasetDTO = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", DatasetTypeEnum.SUMMARY_DATA.getId());
 		datasetDTOs1.add(datasetDTO);
 		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
 			datasetDTOList.add(datasetDTO);
 
 		}
-		datasetDTO = createDataset(25021, 25019, "IBP-2015-PLOTDATA", 10090);
+		datasetDTO = createDataset(25021, 25019, "IBP-2015-PLOTDATA", DatasetTypeEnum.PLOT_DATA.getId());
 		datasetDTOs1.add(datasetDTO);
 		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
 			datasetDTOList.add(datasetDTO);
@@ -414,7 +414,7 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.dmsProjectDao.getDatasets(25019)).thenReturn(datasetDTOs1);
 		Mockito.when(this.dmsProjectDao.getDatasets(25020)).thenReturn(new ArrayList<DatasetDTO>());
 
-		datasetDTO = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", 10094);
+		datasetDTO = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs2.add(datasetDTO);
 		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
 			datasetDTOList.add(datasetDTO);
@@ -422,7 +422,7 @@ public class DatasetServiceImplTest {
 		}
 		Mockito.when(this.dmsProjectDao.getDatasets(25021)).thenReturn(datasetDTOs2);
 
-		datasetDTO = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", 10094);
+		datasetDTO = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs3.add(datasetDTO);
 		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
 			datasetDTOList.add(datasetDTO);
@@ -430,7 +430,7 @@ public class DatasetServiceImplTest {
 		}
 		Mockito.when(this.dmsProjectDao.getDatasets(25022)).thenReturn(datasetDTOs3);
 
-		datasetDTO = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", 10094);
+		datasetDTO = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs4.add(datasetDTO);
 		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
 			datasetDTOList.add(datasetDTO);
@@ -582,12 +582,10 @@ public class DatasetServiceImplTest {
 
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
 		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getAdditionalDesignFactors(studyId);
-		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
-			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
-		Mockito.verify(this.dmsProjectDao).getDataSetsByStudyAndProjectProperty(studyId,TermId.DATASET_TYPE.getId(),
-			String.valueOf(DataSetType.SUMMARY_DATA.getId()));
+		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
 
