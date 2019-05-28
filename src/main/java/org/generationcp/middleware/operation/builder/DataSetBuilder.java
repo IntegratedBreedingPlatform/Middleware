@@ -11,6 +11,11 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -183,7 +188,7 @@ public class DataSetBuilder extends Builder {
 		return workbook;
 	}
 
-	private VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
+	protected VariableTypeList filterDatasetVariables(final VariableTypeList variables, final boolean isMeasurementDataset) {
 		final VariableTypeList newVariables = new VariableTypeList();
 		if (variables != null) {
 			for (final DMSVariableType variable : variables.getVariableTypes()) {
@@ -193,7 +198,8 @@ public class DataSetBuilder extends Builder {
 				final boolean isMeasurementDatasetAndIsTrialFactors =
 						isMeasurementDataset && PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole();
 				final boolean isTrialAndOcc = variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId();
-				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors
+				final boolean isTreatmentFactorDuplicate = variable.getVariableType() == null && !StringUtils.isEmpty(variable.getTreatmentLabel());
+				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors && !isTreatmentFactorDuplicate
 						|| isTrialAndOcc) {
 					newVariables.add(variable);
 				}
