@@ -2,9 +2,7 @@ package org.generationcp.middleware.domain.workbench;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.pojomatic.annotations.AutoProperty;
 
-@AutoProperty
 public class CropDto {
 
 	private String cropName;
