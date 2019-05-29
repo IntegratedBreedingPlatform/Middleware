@@ -1,7 +1,6 @@
 package org.generationcp.middleware.domain.dms;
 
 import org.generationcp.middleware.domain.oms.TermId;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

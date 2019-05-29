@@ -1,12 +1,12 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import java.util.List;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.util.List;
 
 public class ExperimentalDesignVariable {
 
@@ -37,7 +37,7 @@ public class ExperimentalDesignVariable {
 		if (NumberUtils.toInt(variable.getValue()) == TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() && exptDesignSource != null) {
 			return ExperimentDesignType.ALPHA_LATTICE;
 		} else if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
-				&& NumberUtils.isNumber(variable.getValue())) {
+			&& NumberUtils.isNumber(variable.getValue())) {
 			for (final ValueReference ref : variable.getPossibleValues()) {
 				if (ref.getId().equals(Integer.valueOf(variable.getValue()))) {
 					return ref.getDescription();
@@ -73,7 +73,7 @@ public class ExperimentalDesignVariable {
 	public String getReplicationsMapDisplay() {
 		final MeasurementVariable variable = this.getReplicationsMap();
 		if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
-				&& NumberUtils.isNumber(variable.getValue())) {
+			&& NumberUtils.isNumber(variable.getValue())) {
 			for (final ValueReference ref : variable.getPossibleValues()) {
 				if (ref.getId().equals(Integer.valueOf(variable.getValue()))) {
 					return ref.getDescription();
@@ -111,11 +111,17 @@ public class ExperimentalDesignVariable {
 		return this.getByTermId(TermId.EXPT_DESIGN_SOURCE);
 	}
 
-	public MeasurementVariable getChecksStartingPosition() { return this.getByTermId(TermId.CHECK_START);}
+	public MeasurementVariable getChecksStartingPosition() {
+		return this.getByTermId(TermId.CHECK_START);
+	}
 
-	public MeasurementVariable getChecksSpacing() { return this.getByTermId(TermId.CHECK_INTERVAL);}
+	public MeasurementVariable getChecksSpacing() {
+		return this.getByTermId(TermId.CHECK_INTERVAL);
+	}
 
-	public MeasurementVariable getChecksMannerOfInsertion() { return this.getByTermId(TermId.CHECK_PLAN);}
+	public MeasurementVariable getChecksMannerOfInsertion() {
+		return this.getByTermId(TermId.CHECK_PLAN);
+	}
 
 	/**
 	 * @return the variables
