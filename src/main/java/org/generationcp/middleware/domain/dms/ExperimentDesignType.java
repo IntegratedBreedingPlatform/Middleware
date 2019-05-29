@@ -3,31 +3,33 @@ package org.generationcp.middleware.domain.dms;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
-public class DesignTypeItem {
+public class ExperimentDesignType {
 
 	// Constants for well known (e.g. BreedingView) design types.
-	public static final DesignTypeItem RANDOMIZED_COMPLETE_BLOCK = new DesignTypeItem(0, "Randomized Complete Block Design",
+	public static final ExperimentDesignType RANDOMIZED_COMPLETE_BLOCK = new ExperimentDesignType(0, "Randomized Complete Block Design",
 		TermId.RANDOMIZED_COMPLETE_BLOCK.getId(), 0,
 		"randomizedCompleteBlockParams.html", 0, 0);
 
-	public static final DesignTypeItem RESOLVABLE_INCOMPLETE_BLOCK =
-		new DesignTypeItem(1, "Resolvable Incomplete Block Design", TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId(),
+	public static final ExperimentDesignType RESOLVABLE_INCOMPLETE_BLOCK =
+		new ExperimentDesignType(1, "Resolvable Incomplete Block Design", TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId(),
 			TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId(),
 			"incompleteBlockParams.html", 0, 0);
 
-	public static final DesignTypeItem ROW_COL = new DesignTypeItem(2, "Row-and-Column", TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId(),
+	public static final ExperimentDesignType ROW_COL = new ExperimentDesignType(2, "Row-and-Column", TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId(),
 		TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId(), "rowAndColumnParams.html", 0, 0);
 
-	public static final DesignTypeItem CUSTOM_IMPORT = new DesignTypeItem(3, "Custom Import Design", TermId.OTHER_DESIGN.getId(), 0, null, 0, 0);
+	public static final ExperimentDesignType
+		CUSTOM_IMPORT = new ExperimentDesignType(3, "Custom Import Design", TermId.OTHER_DESIGN.getId(), 0, null, 0, 0);
 
-	public static final DesignTypeItem AUGMENTED_RANDOMIZED_BLOCK =
-		new DesignTypeItem(4, "Augmented Randomized Block design", TermId.AUGMENTED_RANDOMIZED_BLOCK.getId(), 0,
+	public static final ExperimentDesignType AUGMENTED_RANDOMIZED_BLOCK =
+		new ExperimentDesignType(4, "Augmented Randomized Block design", TermId.AUGMENTED_RANDOMIZED_BLOCK.getId(), 0,
 			"augmentedRandomizedBlockParams.html", 0, 0);
 
-	public static final DesignTypeItem ENTRY_LIST_ORDER = new DesignTypeItem(5, "Entry list order", TermId.ENTRY_LIST_ORDER.getId(), 0,
+	public static final ExperimentDesignType
+		ENTRY_LIST_ORDER = new ExperimentDesignType(5, "Entry list order", TermId.ENTRY_LIST_ORDER.getId(), 0,
 		"entryListOrderParams.html", 0, 0);
 
-	public static final DesignTypeItem P_REP = new DesignTypeItem(6, "P-Rep Design", TermId.P_REP.getId(), 0,
+	public static final ExperimentDesignType P_REP = new ExperimentDesignType(6, "P-Rep Design", TermId.P_REP.getId(), 0,
 		"pRepParams.html", 0, 0);
 
 	public static final String ALPHA_LATTICE = "Alpha Lattice";
@@ -43,7 +45,7 @@ public class DesignTypeItem {
 	private Integer totalNoOfEntries;
 	private String templateName;
 
-	public DesignTypeItem() {
+	public ExperimentDesignType() {
 		// do nothing
 	}
 
@@ -72,7 +74,7 @@ public class DesignTypeItem {
 		return 0;
 	}
 
-	public static DesignTypeItem getDesignTypeItemByTermId(final int termId) {
+	public static ExperimentDesignType getDesignTypeItemByTermId(final int termId) {
 		if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == termId) {
 			return RANDOMIZED_COMPLETE_BLOCK;
 		}
@@ -102,11 +104,11 @@ public class DesignTypeItem {
 			TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId() == termId;
 	}
 
-	public DesignTypeItem(final int id) {
+	public ExperimentDesignType(final int id) {
 		this.id = id;
 	}
 
-	public DesignTypeItem(
+	public ExperimentDesignType(
 		final Integer id, final String name, final Integer termId, final Integer termIdLatinized, final String params,
 		final Integer noOfReps, final Integer noOfEntries) {
 		this.id = id;

@@ -4,7 +4,7 @@ package org.generationcp.middleware.domain.etl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.DesignTypeItem;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.junit.Assert;
@@ -29,7 +29,7 @@ public class ExperimentalDesignVariableTest {
 	private static final String RRCDL_DESC = "Resolvable Row-and-Column Design (Latinized)";
 	private static final String ALPHA_LATTICE = "Alpha Lattice";
 	private static final int OTHER_DESIGN_ID = TermId.OTHER_DESIGN.getId();
-	private static final String OTHER_DESIGN_DESC = DesignTypeItem.CUSTOM_IMPORT.getName();
+	private static final String OTHER_DESIGN_DESC = ExperimentDesignType.CUSTOM_IMPORT.getName();
 
 	@Test
 	public void testGetExperimentalDesignDisplay_RCBD() {
