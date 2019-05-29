@@ -44,7 +44,19 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 		return false;
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public List<WorkbenchUser> getAllActiveUsersSorted() {
+		try {
+			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_ALL_ACTIVE_USERS_SORTED);
+			return query.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
 		try {

@@ -612,6 +612,24 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		}
 	}
+
+	@Test
+	public void testGetAllActiveUsers() {
+		final List<WorkbenchUser> prevListOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
+		UserDto userDto = UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", "Breeder", "username");
+		final int id = this.workbenchDataManager.createUser(userDto);
+		userDto.setUserId(id);
+		List<WorkbenchUser> listOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
+		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size()+1 == listOfActiveUsers.size());
+
+		//Deactivate the user to check if it's not retrieved
+		userDto.setStatus(1);
+		this.workbenchDataManager.updateUser(userDto);
+		listOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
+		Assert.assertTrue("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() == listOfActiveUsers.size());
+
+	}
+
 	@Test
 	public void testGetUsersByCrop() {
 		final String cropName = CropType.CropEnum.MAIZE.toString();

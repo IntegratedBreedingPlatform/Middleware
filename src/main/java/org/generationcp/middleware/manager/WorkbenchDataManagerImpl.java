@@ -425,6 +425,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public List<WorkbenchUser> getAllActiveUsersSorted() {
+		return this.getWorkbenchUserDao().getAllActiveUsersSorted();
+	}
+
+	@Override
 	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
 		return this.getWorkbenchUserDao().getUsersByCrop(cropName);
 	}
