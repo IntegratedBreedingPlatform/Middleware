@@ -64,7 +64,7 @@ public class ExperimentDesignType {
 	public static int getTermIdByDesignTypeId(final int designTypeId, final Boolean isLatinized) {
 		for (final ExperimentDesignType experimentDesignType : values) {
 			if (experimentDesignType.getId().intValue() == designTypeId) {
-				return isLatinized ? experimentDesignType.getTermIdLatinized() : experimentDesignType.getTermId();
+				return isLatinized == Boolean.TRUE ? experimentDesignType.getTermIdLatinized() : experimentDesignType.getTermId();
 			}
 		}
 		return 0;
