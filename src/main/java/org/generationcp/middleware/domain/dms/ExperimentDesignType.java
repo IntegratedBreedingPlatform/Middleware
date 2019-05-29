@@ -1,7 +1,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import com.google.common.collect.ImmutableList;
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.util.List;
 
 public class ExperimentDesignType {
 
@@ -15,8 +18,9 @@ public class ExperimentDesignType {
 			TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId(),
 			"incompleteBlockParams.html", 0, 0);
 
-	public static final ExperimentDesignType ROW_COL = new ExperimentDesignType(2, "Row-and-Column", TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId(),
-		TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId(), "rowAndColumnParams.html", 0, 0);
+	public static final ExperimentDesignType ROW_COL =
+		new ExperimentDesignType(2, "Row-and-Column", TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId(),
+			TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId(), "rowAndColumnParams.html", 0, 0);
 
 	public static final ExperimentDesignType
 		CUSTOM_IMPORT = new ExperimentDesignType(3, "Custom Import Design", TermId.OTHER_DESIGN.getId(), 0, null, 0, 0);
@@ -31,6 +35,10 @@ public class ExperimentDesignType {
 
 	public static final ExperimentDesignType P_REP = new ExperimentDesignType(6, "P-Rep Design", TermId.P_REP.getId(), 0,
 		"pRepParams.html", 0, 0);
+
+	private static final List<ExperimentDesignType> values = ImmutableList
+		.of(RANDOMIZED_COMPLETE_BLOCK, RESOLVABLE_INCOMPLETE_BLOCK, ROW_COL, CUSTOM_IMPORT, AUGMENTED_RANDOMIZED_BLOCK, ENTRY_LIST_ORDER,
+			P_REP);
 
 	public static final String ALPHA_LATTICE = "Alpha Lattice";
 
@@ -50,51 +58,19 @@ public class ExperimentDesignType {
 	}
 
 	public static int getTermIdByDesignTypeId(final int designTypeId, final Boolean isLatinized) {
-		if (designTypeId == 0) {
-			return RANDOMIZED_COMPLETE_BLOCK.getTermId();
-		}
-		if (designTypeId == 1) {
-			return isLatinized ? RESOLVABLE_INCOMPLETE_BLOCK.getTermIdLatinized() : RESOLVABLE_INCOMPLETE_BLOCK.getTermId();
-		}
-		if (designTypeId == 2) {
-			return isLatinized ? ROW_COL.getTermIdLatinized() : ROW_COL.getTermId();
-		}
-		if (designTypeId == 3) {
-			return CUSTOM_IMPORT.getTermId();
-		}
-		if (designTypeId == 4) {
-			return AUGMENTED_RANDOMIZED_BLOCK.getTermId();
-		}
-		if (designTypeId == 5) {
-			return ENTRY_LIST_ORDER.getTermId();
-		}
-		if (designTypeId == 6) {
-			return P_REP.getTermId();
+		for (final ExperimentDesignType experimentDesignType : values) {
+			if (experimentDesignType.getId().intValue() == designTypeId) {
+				return isLatinized ? experimentDesignType.getTermIdLatinized() : experimentDesignType.getTermId();
+			}
 		}
 		return 0;
 	}
 
 	public static ExperimentDesignType getDesignTypeItemByTermId(final int termId) {
-		if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == termId) {
-			return RANDOMIZED_COMPLETE_BLOCK;
-		}
-		if (TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() == termId || TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId() == termId) {
-			return RESOLVABLE_INCOMPLETE_BLOCK;
-		}
-		if (TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId() == termId || TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId() == termId) {
-			return ROW_COL;
-		}
-		if (TermId.OTHER_DESIGN.getId() == termId) {
-			return CUSTOM_IMPORT;
-		}
-		if (TermId.AUGMENTED_RANDOMIZED_BLOCK.getId() == termId) {
-			return AUGMENTED_RANDOMIZED_BLOCK;
-		}
-		if (TermId.ENTRY_LIST_ORDER.getId() == termId) {
-			return ENTRY_LIST_ORDER;
-		}
-		if (TermId.P_REP.getId() == termId) {
-			return P_REP;
+		for (final ExperimentDesignType experimentDesignType : values) {
+			if (experimentDesignType.getTermId().intValue() == termId || experimentDesignType.getTermIdLatinized().intValue() == termId) {
+				return experimentDesignType;
+			}
 		}
 		return null;
 	}

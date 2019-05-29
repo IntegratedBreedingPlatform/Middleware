@@ -20,6 +20,7 @@ public class ExperimentDesignTypeTest {
 		Assert.assertEquals(TermId.AUGMENTED_RANDOMIZED_BLOCK.getId(), ExperimentDesignType.getTermIdByDesignTypeId(4, false));
 		Assert.assertEquals(TermId.ENTRY_LIST_ORDER.getId(), ExperimentDesignType.getTermIdByDesignTypeId(5, false));
 		Assert.assertEquals(TermId.P_REP.getId(), ExperimentDesignType.getTermIdByDesignTypeId(6, false));
+		Assert.assertEquals(0, ExperimentDesignType.getTermIdByDesignTypeId(7, false));
 	}
 
 	@Test
@@ -33,16 +34,22 @@ public class ExperimentDesignTypeTest {
 		Assert.assertEquals(
 			ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK,
 			ExperimentDesignType.getDesignTypeItemByTermId(TermId.RESOLVABLE_INCOMPLETE_BLOCK_LATIN.getId()));
-		Assert.assertEquals(ExperimentDesignType.ROW_COL, ExperimentDesignType.getDesignTypeItemByTermId(TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId()));
+		Assert.assertEquals(
+			ExperimentDesignType.ROW_COL,
+			ExperimentDesignType.getDesignTypeItemByTermId(TermId.RESOLVABLE_INCOMPLETE_ROW_COL.getId()));
 		Assert.assertEquals(
 			ExperimentDesignType.ROW_COL,
 			ExperimentDesignType.getDesignTypeItemByTermId(TermId.RESOLVABLE_INCOMPLETE_ROW_COL_LATIN.getId()));
-		Assert.assertEquals(ExperimentDesignType.CUSTOM_IMPORT, ExperimentDesignType.getDesignTypeItemByTermId(TermId.OTHER_DESIGN.getId()));
+		Assert
+			.assertEquals(ExperimentDesignType.CUSTOM_IMPORT, ExperimentDesignType.getDesignTypeItemByTermId(TermId.OTHER_DESIGN.getId()));
 		Assert.assertEquals(
 			ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK,
 			ExperimentDesignType.getDesignTypeItemByTermId(TermId.AUGMENTED_RANDOMIZED_BLOCK.getId()));
-		Assert.assertEquals(ExperimentDesignType.ENTRY_LIST_ORDER, ExperimentDesignType.getDesignTypeItemByTermId(TermId.ENTRY_LIST_ORDER.getId()));
+		Assert.assertEquals(
+			ExperimentDesignType.ENTRY_LIST_ORDER,
+			ExperimentDesignType.getDesignTypeItemByTermId(TermId.ENTRY_LIST_ORDER.getId()));
 		Assert.assertEquals(ExperimentDesignType.P_REP, ExperimentDesignType.getDesignTypeItemByTermId(TermId.P_REP.getId()));
+		Assert.assertEquals(null, ExperimentDesignType.getDesignTypeItemByTermId(1010101));
 	}
 
 }
