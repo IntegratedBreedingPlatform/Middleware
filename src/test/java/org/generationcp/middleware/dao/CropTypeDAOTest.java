@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.dao;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -46,9 +47,6 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetAvailableCropsForUser() {
 
-		final int workbenchUserId1 = this.createWorkbenchUser("User999");
-		final int workbenchUserId2 = this.createWorkbenchUser("User1000");
-
 		// Create dummy crops
 		final String crop1 = "Crop1";
 		final String crop2 = "Crop2";
@@ -56,6 +54,9 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		final CropType customCrop1 = this.createCropType(crop1);
 		final CropType customCrop2 = this.createCropType(crop2);
 		final CropType customCrop3 = this.createCropType(crop3);
+
+		final int workbenchUserId1 = this.createWorkbenchUser("User999", Lists.newArrayList(customCrop1, customCrop2));
+		final int workbenchUserId2 = this.createWorkbenchUser("User1000", Lists.newArrayList(customCrop3));
 
 		// Create dummy projects
 		this.createProject("Project1", customCrop1, workbenchUserId1);
@@ -74,7 +75,7 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 
 	}
 
-	int createWorkbenchUser(final String userName) {
+	int createWorkbenchUser(final String userName, final List<CropType> crops) {
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setName(userName);
 		workbenchUser.setPersonid(1);
@@ -86,6 +87,7 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		workbenchUser.setAssignDate(20190101);
 		workbenchUser.setCloseDate(20190101);
 		workbenchUser.setPassword("password");
+		workbenchUser.setCrops(crops);
 		return this.workbenchDataManager.addUser(workbenchUser);
 	}
 

@@ -1,10 +1,9 @@
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -13,13 +12,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	
@@ -44,11 +44,30 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 		return false;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getAllActiveUsersSorted() {
 		try {
 			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_ALL_ACTIVE_USERS_SORTED);
+			return query.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
+		try {
+			final Query query = this.getSession().createQuery("SELECT u FROM WorkbenchUser u "
+				+ " INNER JOIN FETCH u.person p "
+				+ " INNER JOIN FETCH u.crops c "
+				+ " WHERE u.status = 0 "
+				+ " AND EXISTS(FROM WorkbenchUser wu INNER JOIN wu.crops ct WHERE ct.cropName = :cropName AND wu.userid = u.userid)"
+				+ " ORDER BY p.firstName, p.lastName");
+			query.setParameter("cropName", cropName);
+			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			return query.list();
 		} catch (final HibernateException e) {
 			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
@@ -129,24 +148,41 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 			criteria.createAlias("person", "person");
 			criteria.createAlias("roles", "roles");
-
-			final ProjectionList projectionList = Projections.projectionList();
-
-			projectionList.add(Projections.property("userid"), "userId");
-			projectionList.add(Projections.property("name"), "username");
-			projectionList.add(Projections.property("person.firstName"), "firstName");
-			projectionList.add(Projections.property("person.lastName"), "lastName");
-			projectionList.add(Projections.property("roles.role"), "role");
-			projectionList.add(Projections.property("status"), "status");
-			projectionList.add(Projections.property("person.email"), "email");
-
-			criteria.setProjection(projectionList);
-
+			criteria.createAlias("crops", "crops", CriteriaSpecification.LEFT_JOIN);
 			criteria.addOrder(Order.asc("person.lastName"));
+			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 
-			criteria.setResultTransformer(Transformers.aliasToBean(UserDto.class));
+			final List<WorkbenchUser> workbenchUsers = criteria.list();
 
-			return criteria.list();
+			final List<UserDto> users = new ArrayList<>();
+			if (workbenchUsers != null) {
+				for (final WorkbenchUser workbenchUser : workbenchUsers) {
+					final UserDto user = new UserDto();
+					if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
+						// TODO get n roles
+						user.setRole(workbenchUser.getRoles().get(0).getRole());
+					}
+					user.setUserId(workbenchUser.getUserid());
+					if (workbenchUser.getPerson() != null) {
+						user.setEmail(workbenchUser.getPerson().getEmail());
+						user.setFirstName(workbenchUser.getPerson().getFirstName());
+						user.setLastName(workbenchUser.getPerson().getLastName());
+					}
+					user.setStatus(workbenchUser.getStatus());
+					user.setUsername(workbenchUser.getName());
+					if (workbenchUser.getCrops() != null) {
+						final List<CropDto> crops = new ArrayList<>();
+						for (final CropType cropType : workbenchUser.getCrops()) {
+							final CropDto crop = new CropDto();
+							crop.setCropName(cropType.getCropName());
+							crops.add(crop);
+						}
+						user.setCrops(crops);
+					}
+					users.add(user);
+				}
+			}
+			return users;
 		} catch (final HibernateException e) {
 			final String message = "Error with getAllUserDtosSorted() query from User: " + e.getMessage();
 			WorkbenchUserDAO.LOG.error(message, e);
