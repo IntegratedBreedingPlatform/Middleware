@@ -345,8 +345,8 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private Integer createStudyWithPlot(final User user, final String listName, final int sampleSize) {
 		this.ndExperimentId = null;
 
-		final DmsProject study = this.createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1));
-		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study);
+		final DmsProject study = this.createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1), null);
+		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study, study);
 		final SampleList sampleListForPlotDataset =
 			this.createExperimentsWithSampleList(listName, plotDataset, user, sampleSize);
 
@@ -356,10 +356,10 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private Integer createStudyWithPlotAndSubObservation(final User user, final String listName, final int sampleSize) {
 		this.ndExperimentId = null;
 
-		final DmsProject study = this.createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1));
-		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study);
+		final DmsProject study = this.createDmsProject(STUDY_NAME, STUDY_DESCRIPTION, null, this.dmsProjectDao.getById(1), null);
+		final DmsProject plotDataset = this.createDmsProject("PLOT DATASET", "PLOT DATASET DESCRIPTION", DatasetTypeEnum.PLOT_DATA.getId(), study, study);
 		final DmsProject subObservationDataset =
-			this.createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), plotDataset);
+			this.createDmsProject("SUB-OBSERVATION DATASET", "UB-OBSERVATION DATASET", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), plotDataset, study);
 		final SampleList sampleListForSubObservation =
 			this.createExperimentsWithSampleList(listName, subObservationDataset, user, sampleSize);
 
@@ -367,19 +367,18 @@ public class SampleDaoTest extends IntegrationTestBase {
 	}
 
 	private DmsProject createDmsProject(
-		final String name, final String description, final Integer datasetTypeId, final DmsProject parent) {
+		final String name, final String description, final Integer datasetTypeId, final DmsProject parent, final DmsProject study) {
 
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setName(name);
 		dmsProject.setDescription(description);
 		dmsProject.setDatasetType((datasetTypeId != null) ? new DatasetType(datasetTypeId) : null);
+		dmsProject.setParent(parent);
+		if (study != null) {
+			dmsProject.setStudy(study);
+		}
 		this.dmsProjectDao.save(dmsProject);
 
-		final ProjectRelationship plotDmsProjectToStudyProjectRelationship = new ProjectRelationship();
-		plotDmsProjectToStudyProjectRelationship.setSubjectProject(dmsProject);
-		plotDmsProjectToStudyProjectRelationship.setObjectProject(parent);
-		plotDmsProjectToStudyProjectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-		this.projectRelationshipDao.save(plotDmsProjectToStudyProjectRelationship);
 
 		return dmsProject;
 	}

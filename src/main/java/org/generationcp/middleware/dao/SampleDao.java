@@ -219,11 +219,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				"project.datasetType", "datasetType")
 			.createAlias(
 				"experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("typeId", TermId.PLOT_NO.getId()))
-			.createAlias("project.relatedTos", "relatedTos")
-			.createAlias("relatedTos.objectProject", "objectProject")
-			.createAlias("objectProject.relatedTos", "parentProjectRelatedTos")
-			.createAlias("parentProjectRelatedTos.objectProject", "parentProject")
-			.createAlias("objectProject.studyType", "studyType", Criteria.LEFT_JOIN)
+			.createAlias("project.study", "study")
+			.createAlias("study.studyType", "studyType", Criteria.LEFT_JOIN)
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
@@ -244,10 +241,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.alias(Projections.property("sample.well"), "well"))
 				.add(Projections.alias(Projections.property("datasetType.name"), "datasetTypeName"))
 				.add(Projections.alias(Projections.property("datasetType.isSubObservationType"), "subObservationDatasetType"))
-				.add(Projections.alias(Projections.property("objectProject.projectId"), "projectId"))
-				.add(Projections.alias(Projections.property("objectProject.name"), "projectName"))
-				.add(Projections.alias(Projections.property("parentProject.projectId"), "parentProjectId"))
-				.add(Projections.alias(Projections.property("parentProject.name"), "parentProjectName"))
+				.add(Projections.alias(Projections.property("study.projectId"), "studyId"))
+				.add(Projections.alias(Projections.property("study.name"), "studyName"))
 				.add(Projections.alias(Projections.property("experiment.observationUnitNo"), "observationUnitNo"))
 				.add(Projections.alias(Projections.property("experimentProperty.value"), "plotNo"))
 				.add(Projections.alias(Projections.property("experiment.obsUnitId"), "observationUnitId"))
@@ -273,15 +268,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 				final SampleDTO sampleDTO = new SampleDTO();
 
-				if (sampleDetail.isSubObservationDatasetType()) {
-					// If the sample was created from subobservation, we should get the study name and id
-					// from Observation/Plot dataset's parent project (which is the study)
-					sampleDTO.setStudyName(sampleDetail.getParentProjectName());
-					sampleDTO.setStudyId(sampleDetail.getParentProjectId());
-				} else {
-					sampleDTO.setStudyName(sampleDetail.getProjectName());
-					sampleDTO.setStudyId(sampleDetail.getProjectId());
-				}
+
+				sampleDTO.setStudyName(sampleDetail.getStudyName());
+				sampleDTO.setStudyId(sampleDetail.getStudyId());
 
 				sampleDTO.setSampleId(sampleDetail.getSampleId());
 				sampleDTO.setEntryNo(sampleDetail.getEntryNumber());
