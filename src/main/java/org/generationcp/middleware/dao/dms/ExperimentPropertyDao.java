@@ -101,25 +101,20 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append (" , geo.obs_unit_id as obsUnitId ")
 							.append(" FROM ")
 							.append(" nd_experiment nde ")
-							.append(" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ")
-							.append(TermId.BELONGS_TO_STUDY.getId())
-							.append("       AND nde.project_id = pr.subject_project_id ")
-							.append(" INNER JOIN project st ON st.project_id = pr.object_project_id ")
+							.append(" INNER JOIN project proj on proj.project_id = nde.project_id ")
+							.append(" INNER JOIN project st ON st.project_id = proj.study_id ")
 							.append(" INNER JOIN stock s ON s.stock_id = nde.stock_id ")
 							.append(" LEFT JOIN nd_experimentprop epropRep ON nde.nd_experiment_id = epropRep.nd_experiment_id ")
-							.append("       AND epropRep.type_id =  " + TermId.REP_NO.getId()
-									+ "  AND nde.project_id = pr.subject_project_id ")
+							.append("       AND epropRep.type_id =  " + TermId.REP_NO.getId())
 							// 8210
 							.append("       AND epropRep.value IS NOT NULL  AND epropRep.value <> '' ")
 							.append(" LEFT JOIN nd_experimentprop epropBlock ON nde.nd_experiment_id = epropBlock.nd_experiment_id ")
-							.append("       AND epropBlock.type_id =  " + TermId.BLOCK_NO.getId()
-									+ "  AND nde.project_id = pr.subject_project_id ")
+							.append("       AND epropBlock.type_id =  " + TermId.BLOCK_NO.getId())
 							// 8220
 							.append("       AND epropBlock.value IS NOT NULL  AND epropBlock.value <> '' ")
 							.append(" INNER JOIN nd_experimentprop epropPlot ON nde.nd_experiment_id = epropPlot.nd_experiment_id ")
 							.append("       AND epropPlot.type_id IN (" + TermId.PLOT_NO.getId() + ", " + TermId.PLOT_NNO.getId() + ")  ")
 							// 8200, 8380
-							.append("       AND nde.project_id = pr.subject_project_id ")
 							.append("       AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
 							.append(" INNER JOIN nd_experiment geo ON nde.nd_experiment_id = geo.nd_experiment_id ")
 							.append("       AND geo.type_id = ").append(TermId.PLOT_EXPERIMENT.getId())
@@ -130,15 +125,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("    AND siteId.type_id = ").append(TermId.LOCATION_ID.getId())
 							.append(" LEFT JOIN nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ")
 							.append("       AND blk.type_id = ").append(TermId.BLOCK_ID.getId())
-							.append(" INNER JOIN project proj on proj.project_id = nde.project_id ")
 							.append(" LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = nde.nd_experiment_id ")
 							.append("       AND row.type_id = ").append(TermId.RANGE_NO.getId())
 							.append(" LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = nde.nd_experiment_id ")
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" LEFT JOIN listnms lnms ON lnms.projectid = pr.object_project_id AND lnms.listtype in ('STUDY')")
+							.append(" LEFT JOIN listnms lnms ON lnms.projectid = st.project_id AND lnms.listtype in ('STUDY')")
 							.append(" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND ldp.entry_id = s.uniqueName AND ldp.germplasm_id  = s.dbxref_id")
+							.append(" WHERE st.project_id = :studyId")
 							.append(" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ").append(order);
 
 			final SQLQuery query =
@@ -148,7 +143,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("obsUnitId", Hibernate.STRING);
-			query.setParameter("projectId", projectId);
+			query.setParameter("studyId", projectId);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
 				datasets = this.createFieldMapDatasetInfo(list);
@@ -186,9 +181,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ")
 							.append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
 							.append("  INNER JOIN project p ON p.project_id = e.project_id ")
-							.append("  INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id ")
-							.append("     AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
-							.append("  INNER JOIN project st ON st.project_id = pr.object_project_id ")
+							.append("  INNER JOIN project st ON st.project_id = p.study_id ")
 							.append("  INNER JOIN stock s ON e.stock_id = s.stock_id ")
 							.append("  LEFT JOIN nd_experimentprop epropRep ON epropRep.nd_experiment_id = e.nd_experiment_id ")
 							.append("    AND epropRep.type_id = ").append(TermId.REP_NO.getId()).append(" AND epropRep.value <> '' ")

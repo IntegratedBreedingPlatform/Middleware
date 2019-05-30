@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -86,13 +87,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			" sample.sample_id," +
 			" sample.sample_no " +
 			" FROM nd_experiment experiment " +
-			" INNER JOIN project_relationship pr ON (pr.subject_project_id = experiment.project_id) " +
-			" INNER JOIN project p ON (p.project_id = pr.subject_project_id) " +
+			" INNER JOIN project p ON (p.project_id = experiment.project_id) " +
 			" INNER JOIN sample sample ON (sample.nd_experiment_id = experiment.nd_experiment_id) " +
-			" WHERE p.project_id = (SELECT p.project_id " +
-			" FROM project_relationship pr " +
-			" INNER JOIN project p ON p.project_id = pr.subject_project_id " +
-			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
+			" WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId();
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
 	public static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
@@ -210,10 +207,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		try {
 			final String sql =
 					"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
-							+ " INNER JOIN project_relationship pr ON pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-							+ "   AND pr.object_project_id = " + studyId + "   AND pr.subject_project_id = e.project_id ";
+						+ " INNER JOIN project p ON p.project_id = e.project_id "
+						+ " WHERE p.study_id = :studyId ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("studyId", studyId);
 			return query.list();
 
 		} catch (final HibernateException e) {
@@ -228,12 +226,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		try {
 			final String sql =
 					"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
-							+ " INNER JOIN project_relationship pr ON pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-							+ "   AND pr.object_project_id = " + studyId + "   AND pr.subject_project_id = e.project_id "
-							+ " WHERE EXISTS (SELECT 1 FROM nd_experimentprop eprop " + "   WHERE eprop.type_id = "
-							+ TermId.COLUMN_NO.getId() + "     AND eprop.nd_experiment_id = e.nd_experiment_id  AND eprop.value <> '') ";
+						+ " INNER JOIN project p ON p.project_id = e.project_id "
+						+ " WHERE p.study_id = :studyId "
+						+ " AND EXISTS (SELECT 1 FROM nd_experimentprop eprop " + "   WHERE eprop.type_id = "
+						+ TermId.COLUMN_NO.getId() + "     AND eprop.nd_experiment_id = e.nd_experiment_id  AND eprop.value <> '') ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("studyId", studyId);
 			return query.list();
 
 		} catch (final HibernateException e) {
@@ -729,8 +728,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		sql.append("nde.observation_unit_no AS OBSERVATION_UNIT_NO, ");
 		sql.append(" 1=1 FROM " //
 			+ "	project p " //
-			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id " //
-			+ "	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id " //
+			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
@@ -1527,8 +1525,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		sql.append(" 1 FROM " //
 			+ "	project p " //
-			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id " //
-			+ "	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id " //
+			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
