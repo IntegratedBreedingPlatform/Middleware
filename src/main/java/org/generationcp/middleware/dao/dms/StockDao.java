@@ -64,10 +64,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
+					.createSQLQuery("select count(distinct p.study_id) " + "FROM stock s "
 							+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = e.project_id "
-							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
+							+ "LEFT JOIN project p ON e.project_id= p.project_id " + "WHERE s.dbxref_id = " + gid
 							+ " AND p.deleted = 0");
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -86,8 +85,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "u.userId, CONCAT(fname, ' ', lname) as ownerName "
 				+ "FROM stock s "
 				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
-				+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = e.project_id "
-				+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
+				+ "LEFT JOIN project ds ON ds.project_id = e.project_id "
+				+ "LEFT JOIN project p ON ds.study_id = p.project_id "
 				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
 				+ "LEFT JOIN users u ON u.userid = p.created_by "
 				+ "LEFT JOIN persons per ON per.personid = u.personid "

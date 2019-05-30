@@ -12,12 +12,9 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -40,16 +37,17 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class StockDaoTest extends IntegrationTestBase {
 	
@@ -60,7 +58,6 @@ public class StockDaoTest extends IntegrationTestBase {
 	private GeolocationDao geolocationDao;
 	private StockDao stockDao;
 	private StockPropertyDao stockPropertyDao;
-	private ProjectRelationshipDao projectRelationshipDao;
 	private CVTermDao cvtermDao;
 	private PhenotypeDao phenotypeDao;
 	private StudyTypeDAO studyTypeDAO;
@@ -98,9 +95,6 @@ public class StockDaoTest extends IntegrationTestBase {
 		this.phenotypeDao = new PhenotypeDao();
 		this.phenotypeDao.setSession(this.sessionProvder.getSession());
 		
-		this.projectRelationshipDao = new ProjectRelationshipDao();
-		this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
-		
 		this.stockPropertyDao = new StockPropertyDao();
 		this.stockPropertyDao.setSession(this.sessionProvder.getSession());
 
@@ -120,14 +114,14 @@ public class StockDaoTest extends IntegrationTestBase {
 			this.testUser = this.userDao.save(user);
 		}
 
-		this.project = this.createProject();
+		this.project = this.createProject(null);
 		this.testStocks = new ArrayList<>();
 		this.experiments = new ArrayList<>();
 		
 		this.createSampleStocks(TEST_COUNT, project);
 	}
 
-	private DmsProject createProject() {
+	private DmsProject createProject(final DmsProject parent) {
 		final DmsProject project = new DmsProject();
 		project.setName("Test Project Name " + RandomStringUtils.randomAlphanumeric(5));
 		project.setDescription("Test Project " + RandomStringUtils.randomAlphanumeric(5));
@@ -135,16 +129,12 @@ public class StockDaoTest extends IntegrationTestBase {
 		project.setProgramUUID(RandomStringUtils.randomAlphanumeric(20));
 		project.setCreatedBy(this.testUser.getUserid().toString());
 		project.setLocked(true);
+		if (parent != null) {
+			project.setParent(parent);
+			project.setStudy(parent);
+		}
 		dmsProjectDao.save(project);
 		return project;
-	}
-	
-	private void saveProjectRelationship(final DmsProject object, final DmsProject subject) {
-		final ProjectRelationship rel = new ProjectRelationship();
-		rel.setObjectProject(object);
-		rel.setSubjectProject(subject);
-		rel.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-		projectRelationshipDao.save(rel);
 	}
 	
 	@Test
@@ -231,9 +221,9 @@ public class StockDaoTest extends IntegrationTestBase {
 	public void testCountStudiesByGid() {
 		final Germplasm germplasm = this.testStocks.get(0).getGermplasm();
 		final StockModel stock = this.createTestStock(germplasm);
-		final DmsProject parent1 = this.createProject();
-		final DmsProject parent2 = this.createProject();
-		this.setupTestProjectsWithRelationship(parent1, parent2, stock);
+		final DmsProject parent1 = this.createProject(null);
+		final DmsProject parent2 = this.createProject(null);
+		this.setupParentProjects(parent1, parent2, stock);
 		
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
@@ -245,9 +235,9 @@ public class StockDaoTest extends IntegrationTestBase {
 	public void testGetStudiesByGid() {
 		final Germplasm germplasm = this.testStocks.get(0).getGermplasm();
 		final StockModel stock = this.createTestStock(germplasm);
-		final DmsProject parent1 = this.createProject();
-		final DmsProject parent2 = this.createProject();
-		this.setupTestProjectsWithRelationship(parent1, parent2, stock);
+		final DmsProject parent1 = this.createProject(null);
+		final DmsProject parent2 = this.createProject(null);
+		this.setupParentProjects(parent1, parent2, stock);
 		
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
@@ -275,11 +265,16 @@ public class StockDaoTest extends IntegrationTestBase {
 		}
 	}
 	
-	private void setupTestProjectsWithRelationship(final DmsProject parent1, final DmsProject parent2, final StockModel stockToReuse) {
-		this.saveProjectRelationship(parent1, project);
-		final DmsProject project2 = this.createProject();
-		this.saveProjectRelationship(parent2, project2);
+	private void setupParentProjects(final DmsProject parent1, final DmsProject parent2, final StockModel stockToReuse) {
+		this.saveParents(this.project, parent1);
+		final DmsProject project2 = this.createProject(parent2);
 		this.createTestExperiment(project2, stockToReuse);
+	}
+
+	private void saveParents(final DmsProject project, final DmsProject parent) {
+		project.setParent(parent);
+		project.setStudy(parent);
+		this.dmsProjectDao.save(project);
 	}
 	
 	private void createTestObservations(final ExperimentModel experiment, final CVTerm variateTerm) {
