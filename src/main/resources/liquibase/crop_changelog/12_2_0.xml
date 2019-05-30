@@ -22,7 +22,7 @@
 			UPDATE  `project` p
 			LEFT JOIN `project_relationship` prParent ON p.project_id = prParent.subject_project_id
 			LEFT JOIN `project_relationship` prStudy ON prParent.object_project_id = prStudy.subject_project_id AND prStudy.type_id = 1145
-			LEFT JOIN `project_relationship` prSubObsStudy ON prParent.object_project_id = prSubObsStudy.subject_project_id
+			LEFT JOIN `project_relationship` prSubObsStudy ON prParent.object_project_id = prSubObsStudy.subject_project_id AND prSubObsStudy.type_id = 1150
 			SET p.parent_project_id = prParent.object_project_id,
 			p.study_id = (CASE WHEN prStudy.subject_project_id IS NULL THEN prSubObsStudy.object_project_id ELSE prStudy.subject_project_id END);
 		</sql>
