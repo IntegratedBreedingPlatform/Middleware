@@ -23,10 +23,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DatasetProjectSaver {
 
@@ -59,7 +55,9 @@ public class DatasetProjectSaver {
 		this.addDescriptionVariableTypeIfNecessary(variableTypeList, programUUID);
 
 		datasetProject.setProperties(this.projectPropertySaver.create(datasetProject, variableTypeList, datasetValues.getVariables()));
-		datasetProject.setRelatedTos(this.createProjectRelationship(studyId, datasetProject));
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		datasetProject.setParent(study);
+		datasetProject.setStudy(study);
 		this.daoFactory.getDmsProjectDAO().save(datasetProject);
 
 		return datasetProject;
@@ -118,18 +116,6 @@ public class DatasetProjectSaver {
 			}
 		}
 		return null;
-	}
-
-	private List<ProjectRelationship> createProjectRelationship(final int studyId, final DmsProject datasetProject) {
-		final ProjectRelationship relationship = new ProjectRelationship();
-		relationship.setSubjectProject(datasetProject);
-		relationship.setObjectProject(this.daoFactory.getDmsProjectDAO().getById(studyId));
-		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-
-		final List<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
-		relationships.add(relationship);
-
-		return relationships;
 	}
 
 }

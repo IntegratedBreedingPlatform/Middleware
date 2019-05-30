@@ -122,11 +122,11 @@ public class SampleServiceImpl implements SampleService {
 		}
 
 		final ExperimentModel experiment = sample.getExperiment();
-		final DmsProject objectProject = experiment.getProject().getRelatedTos().get(0).getObjectProject();
-		final Integer studyId = objectProject.getProjectId();
+		final DmsProject study = experiment.getProject().getStudy();
+		final Integer studyId = study.getProjectId();
 		final String takenBy = (sample.getTakenBy() != null) ? sample.getTakenBy().getPerson().getDisplayName() : null;
 		final String obsUnitId = experiment.getObsUnitId();
-		final String studyName = objectProject.getName();
+		final String studyName = study.getName();
 		final StockModel stock = experiment.getStock();
 		final String entryNo = stock.getUniqueName();
 		final Integer gid = (stock.getGermplasm() != null) ? stock.getGermplasm().getGid() : null;
@@ -141,7 +141,7 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setDesignation(stock.getName());
 
 		this.fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
-		this.fillProjectProperties(objectProject.getProperties(), samplesDetailsDto);
+		this.fillProjectProperties(study.getProperties(), samplesDetailsDto);
 		this.fillLocationByGeoLocationProperties(experiment.getGeoLocation().getProperties(), samplesDetailsDto);
 
 		return samplesDetailsDto;

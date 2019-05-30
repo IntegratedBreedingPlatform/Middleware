@@ -135,7 +135,7 @@ public class DataSetBuilder extends Builder {
 	}
 
 	private int getStudyId(final DmsProject project) {
-		final DmsProject study = project.getRelatedTos().get(0).getObjectProject();
+		final DmsProject study = project.getStudy();
 		return study.getProjectId();
 	}
 

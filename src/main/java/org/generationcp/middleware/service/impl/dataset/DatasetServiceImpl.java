@@ -36,7 +36,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -250,7 +249,7 @@ public class DatasetServiceImpl implements DatasetService {
 		subObservationDataset.setLocked(false);
 		subObservationDataset.setProperties(projectProperties);
 		subObservationDataset.setDatasetType(new DatasetType(datasetTypeId));
-		subObservationDataset.setRelatedTos(this.buildProjectRelationships(parentDataset, subObservationDataset));
+		subObservationDataset.setParent(parentDataset);
 
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().save(subObservationDataset);
 
@@ -328,19 +327,6 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
 		}
 		return new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
-	}
-
-	private List<ProjectRelationship> buildProjectRelationships(final DmsProject parentDataset, final DmsProject childDataset)
-		throws MiddlewareQueryException {
-		final ProjectRelationship relationship = new ProjectRelationship();
-		relationship.setSubjectProject(childDataset);
-		relationship.setObjectProject(parentDataset);
-		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-
-		final List<ProjectRelationship> relationships = new ArrayList<>();
-		relationships.add(relationship);
-
-		return relationships;
 	}
 
 	@Override

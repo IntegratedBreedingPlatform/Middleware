@@ -49,7 +49,6 @@ public class ProjectRelationshipSaver extends Saver {
 			relationships.set(index, relationship);
 			index++;
 		}
-		project.setRelatedTos(relationships);
 	}
 
 	private List<ProjectRelationship> mapProjectParentRelationships(DmsProject project, DmsProject parent, boolean isAStudy)

@@ -86,12 +86,6 @@ public class DmsProject implements Serializable {
 	@BatchSize(size = 1000)
 	private List<ProjectProperty> properties;
 
-	@OneToMany(mappedBy = "subjectProject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<ProjectRelationship> relatedTos;
-
-	@OneToMany(mappedBy = "objectProject", fetch = FetchType.LAZY)
-	private List<ProjectRelationship> relatedBys;
-
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	@Basic(optional = false)
 	@Column(name = "deleted", columnDefinition = "TINYINT")
@@ -140,15 +134,13 @@ public class DmsProject implements Serializable {
 
 	public DmsProject(
 		final String name, final String description, final String programUUID, final List<ProjectProperty> properties,
-		final List<ProjectRelationship> relatedTos, final List<ProjectRelationship> relatedBys, final boolean deleted,
+		final boolean deleted,
 		final boolean locked, final StudyType studyType, final String startDate, final String endDate, final String studyUpdate,
 		final String objective, final String createdBy) {
 		this.name = name;
 		this.description = description;
 		this.programUUID = programUUID;
 		this.properties = properties;
-		this.relatedTos = relatedTos;
-		this.relatedBys = relatedBys;
 		this.deleted = deleted;
 		this.locked = locked;
 		this.studyType = studyType;
@@ -197,22 +189,6 @@ public class DmsProject implements Serializable {
 
 	public void setProperties(final List<ProjectProperty> properties) {
 		this.properties = properties;
-	}
-
-	public List<ProjectRelationship> getRelatedTos() {
-		return this.relatedTos;
-	}
-
-	public void setRelatedTos(final List<ProjectRelationship> relatedTos) {
-		this.relatedTos = relatedTos;
-	}
-
-	public List<ProjectRelationship> getRelatedBys() {
-		return this.relatedBys;
-	}
-
-	public void setRelatedBys(final List<ProjectRelationship> relatedBys) {
-		this.relatedBys = relatedBys;
 	}
 
 	public Boolean isDeleted() {
