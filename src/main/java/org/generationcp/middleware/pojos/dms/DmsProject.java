@@ -111,6 +111,14 @@ public class DmsProject implements Serializable {
 	@JoinColumn(name = "dataset_type_id")
 	private DatasetType datasetType;
 
+	@ManyToOne(targetEntity = DmsProject.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "parent_project_id")
+	private DmsProject parent;
+
+	@ManyToOne(targetEntity = DmsProject.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "study_id")
+	private DmsProject study;
+
 	@Column(name = "start_date")
 	private String startDate;
 
@@ -291,6 +299,22 @@ public class DmsProject implements Serializable {
 		int result = 1;
 		result = prime * result + (this.projectId == null ? 0 : this.projectId.hashCode());
 		return result;
+	}
+
+	public DmsProject getParent() {
+		return parent;
+	}
+
+	public void setParent(final DmsProject parent) {
+		this.parent = parent;
+	}
+
+	public DmsProject getStudy() {
+		return study;
+	}
+
+	public void setStudy(final DmsProject study) {
+		this.study = study;
 	}
 
 	@Override
