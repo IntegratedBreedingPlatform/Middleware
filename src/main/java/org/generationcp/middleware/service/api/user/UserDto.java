@@ -5,7 +5,10 @@
 package org.generationcp.middleware.service.api.user;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.workbench.Role;
 
 /**
@@ -17,20 +20,15 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private static final long serialVersionUID = -9173433479366395632L;
 
 	private Integer userId;
-
 	private String username;
-
 	private String firstName;
-
 	private String lastName;
-	
+	// TODO n roles
 	private Role role;
-
 	private Integer status;
-
 	private String email;
-
 	private String password;
+	private List<CropDto> crops;
 
 	public UserDto() {
 		this.userId = 0;
@@ -42,7 +40,8 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.status = 0;
 	}
 
-	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final Role role, Integer status, String email) {
+	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final Role role,
+		Integer status, String email) {
 		this.userId = userId;
 		this.username = username;
 		this.firstName = firstName;
@@ -51,7 +50,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.status = status;
 		this.email = email;
 	}
-	
+
 	public Integer getUserId() {
 		return this.userId;
 	}
@@ -84,12 +83,10 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.lastName = lastName;
 	}
 
-	
 	public Role getRole() {
 		return role;
 	}
 
-	
 	public void setRole(final Role role) {
 		this.role = role;
 	}
@@ -157,4 +154,14 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		return true;
 	}
 
+	public List<CropDto> getCrops() {
+		if (this.crops == null) {
+			this.crops = new ArrayList<>();
+		}
+		return this.crops;
+	}
+
+	public void setCrops(final List<CropDto> crops) {
+		this.crops = crops;
+	}
 }
