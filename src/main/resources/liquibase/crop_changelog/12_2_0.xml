@@ -1,0 +1,31 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v12.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+                <columnExists tableName="project" columnName="study_id"/>
+            </not>
+		</preConditions>
+		<comment>
+			Add new study_id and parent_project_id columns to project table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `project`
+			ADD COLUMN `study_id` INT NULL AFTER `created_by`,
+			ADD COLUMN `parent_project_id` INT NULL AFTER `study_type_id`;
+
+			-- Populate study_id and parent_project_id
+			UPDATE  `project` p
+			LEFT JOIN `project_relationship` prParent ON p.project_id = prParent.subject_project_id
+			LEFT JOIN `project_relationship` prStudy ON prParent.object_project_id = prStudy.subject_project_id AND prStudy.type_id = 1145
+			LEFT JOIN `project_relationship` prSubObsStudy ON prParent.object_project_id = prSubObsStudy.subject_project_id
+			SET p.parent_project_id = prParent.object_project_id,
+			p.study_id = (CASE WHEN prStudy.subject_project_id IS NULL THEN prSubObsStudy.object_project_id ELSE prStudy.subject_project_id END);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
