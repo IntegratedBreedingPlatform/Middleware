@@ -124,8 +124,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			// statement
 			this.getSession().flush();
 
-			this.executeDeleteStatement(studyId, termId, "pr.object_project_id");
-			this.executeDeleteStatement(studyId, termId, "pr.subject_project_id");
+			this.deleteValues(studyId, termId);
 
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error at deleteGeolocationPropertyValueInProject=" + studyId + ", " + termId
@@ -133,17 +132,15 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	private void executeDeleteStatement(final int studyId,final int termId,final String joinCriteria) {
+	private void deleteValues(final int studyId,final int termId) {
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
 				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id = :termId "
-				+ "INNER JOIN project_relationship pr ON pr.type_id = :belongsToTypeId "
-				+ "			  AND ").append(joinCriteria).append(" = e.project_id "
-				+ "WHERE pr.object_project_id = :studyId");
+				+ "INNER JOIN project p ON p.project_id = e.project_id "
+				+ "WHERE (p.study_id = :studyId OR p.project_id = :studyId)");
 
 		final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(sql1.toString());
 		sqlQuery1.setParameter("studyId", studyId);
 		sqlQuery1.setParameter("termId", termId);
-		sqlQuery1.setParameter("belongsToTypeId", TermId.BELONGS_TO_STUDY.getId());
 
 		sqlQuery1.executeUpdate();
 	}

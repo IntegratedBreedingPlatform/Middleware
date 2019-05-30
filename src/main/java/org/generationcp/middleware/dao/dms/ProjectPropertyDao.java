@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -162,12 +164,13 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public List<Integer> getVariablesOfSiblingDatasets(final int datasetId) {
 		final List<Integer> ids;
 		try {
-			final String sql = "SELECT dprop.variable_id " + " FROM project_relationship mpr "
-					+ " INNER JOIN project_relationship pr ON pr.object_project_id = mpr.object_project_id " + "   AND pr.type_id = "
-					+ TermId.BELONGS_TO_STUDY.getId() + " AND pr.subject_project_id <> " + datasetId
-					+ " INNER JOIN projectprop dprop ON dprop.project_id = pr.subject_project_id " + " WHERE mpr.subject_project_id = "
-					+ datasetId + " AND mpr.type_id = " + TermId.BELONGS_TO_STUDY.getId();
+			final String sql = "SELECT dprop.variable_id "
+					+ " FROM project ds "
+					+ " INNER JOIN project sib ON sib.study_id = ds.study_id AND sib.parent_project_id = ds.parent_project_id AND sib.project_id <> ds.project_id "
+					+ " INNER JOIN projectprop dprop ON dprop.project_id = sib.project_id " +
+					" WHERE ds.project_id = :datasetId";
 			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("datasetId", datasetId);
 			ids = query.list();
 
 		} catch (final HibernateException e) {
@@ -286,20 +289,9 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	@SuppressWarnings("unchecked")
 	private List<String> executeQueryGermplasmDescriptors(final int studyIdentifier) {
-		final String germplasmDescriptorsQuery = " SELECT name" +
-			" FROM  projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id " +
-			" WHERE pp.type_id = " + VariableType.GERMPLASM_DESCRIPTOR.getId() +
-			" AND project_id = ( " +
-			"		SELECT p.project_id " +
-			"        FROM project_relationship pr " +
-			"		 INNER JOIN  project p ON p.project_id = pr.subject_project_id " +
-			"        WHERE pr.object_project_id = :studyId AND p.name LIKE '%PLOTDATA' " +
-			" )";
-		;
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(germplasmDescriptorsQuery);
-		sqlQuery.addScalar("name");
-		sqlQuery.setParameter("studyId", studyIdentifier);
-		return sqlQuery.list();
+		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
+
 	}
 
 	public List<String> getDesignFactors(final int studyIdentifier) {
@@ -312,18 +304,24 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	@SuppressWarnings("unchecked")
 	private List<String> executeDesignFactorsQuery(final int studyIdentifier) {
-		final String designFactorsQuery = " SELECT name" +
-			" FROM  projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id " +
-			" WHERE pp.type_id IN (" + VariableType.EXPERIMENTAL_DESIGN.getId() + "," + VariableType.TREATMENT_FACTOR.getId() + ") " +
-			" AND project_id = ( " +
-			"		SELECT p.project_id " +
-			"        FROM project_relationship pr " +
-			"		 INNER JOIN  project p ON p.project_id = pr.subject_project_id " +
-			"        WHERE pr.object_project_id = :studyId AND p.name LIKE '%PLOTDATA' " +
-			" )";
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(designFactorsQuery);
+		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId()));
+	}
+
+	private List<String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
+		final String variablesQuery = " SELECT name" +
+			" FROM  projectprop pp "
+			+ "INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+			+ "INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
+			+ " WHERE pp.type_id IN (:variableTypeIds)"
+			+ " AND ds.study_id = :studyId";
+		;
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(variablesQuery);
 		sqlQuery.addScalar("name");
 		sqlQuery.setParameter("studyId", studyIdentifier);
+		sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
 		return sqlQuery.list();
 	}
+
+
 }
