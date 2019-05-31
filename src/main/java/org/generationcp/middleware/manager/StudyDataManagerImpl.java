@@ -136,7 +136,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Integer getStudyIdByNameAndProgramUUID(final String studyName, final String programUUID) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(studyName, programUUID, TermId.IS_STUDY);
+		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(studyName, programUUID);
 	}
 
 	@Override

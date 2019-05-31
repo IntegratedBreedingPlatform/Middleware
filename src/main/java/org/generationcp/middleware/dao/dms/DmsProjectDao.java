@@ -106,24 +106,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
 
 	/**
-	 * Type of study is stored in projectprops table.
-	 * Which folder the study is in, is defined in the project_relationship table.
+	 * Type of study is stored in project.study_type_id
+	 * Which folder the study is in is defined in project.parent_project_id
 	 */
 	static final String GET_CHILDREN_OF_FOLDER =
 		"SELECT subject.project_id AS project_id, "
 			+ "subject.name AS name,  subject.description AS description, "
-			+ "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, "
+			+ "	(CASE WHEN study_type_id IS NOT NULL THEN 1 ELSE 0 END) AS is_study, "
 			+ "    subject.program_uuid AS program_uuid, "
 			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
 			+ "st.visible as visible, st.cvterm_id as cvtermId, subject.locked as isLocked, "
 			+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
 			+ "  FROM project subject "
-			+ "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "
 			+ "  LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
 			+ "  LEFT JOIN users u ON u.userid = subject.created_by "
 			+ "  LEFT JOIN persons p ON p.personid = u.personid "
-			+ " WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
-			+ "   AND pr.object_project_id = :folderId "
+			+ " WHERE subject.parent_project_id = :folderId "
 			+ "   AND subject.deleted != " + DELETED_STUDY
 			+ "   AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
 			+ "   AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
@@ -143,22 +141,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " WHERE pr.project_id = :studyId and pr.deleted != " + DELETED_STUDY;
 
 	private static final String GET_STUDIES_OF_FOLDER =
-		"SELECT  DISTINCT pr.subject_project_id " + "FROM    project_relationship pr, project p " + "WHERE   pr.type_id = "
-			+ TermId.IS_STUDY.getId() + " " + "        AND pr.subject_project_id = p.project_id "
-			+ "        AND pr.object_project_id = :folderId " + "		AND p.deleted != " + DELETED_STUDY + " "
+		"SELECT  DISTINCT project_id "
+			+ "FROM project "
+			+ "WHERE parent_project_id = :folderId AND p.study_type_id IS NOT NULL AND p.deleted != " + DELETED_STUDY + " "
 			+ "ORDER BY p.name ";
 
 	private static final String GET_ALL_FOLDERS =
-		"SELECT pr.object_project_id, pr.subject_project_id, p.name, p.description " + " FROM project_relationship pr "
-			+ " INNER JOIN project p ON p.project_id = pr.subject_project_id " + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER
-			.getId();
+		" SELECT p.project_id FROM project p "
+			+ " WHERE study_type_id IS NULL "
+			+ " AND study_id IS NULL AND p.project_id != " + DmsProject.SYSTEM_FOLDER_ID
+			+ " AND p.deleted != " + DELETED_STUDY;
 
 	private static final String GET_ALL_PROGRAM_STUDIES_AND_FOLDERS =
-		"SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = " + TermId.IS_STUDY.getId()
-			+ " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid " + "AND p.deleted != "
-			+ DELETED_STUDY + "  " + "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p "
-			+ "WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id "
-			+ "AND p.program_uuid = :program_uuid ";
+		" SELECT p.project_id FROM project p "
+			+ " WHERE study_id IS NULL AND p.project_id != " + DmsProject.SYSTEM_FOLDER_ID
+			+ " AND p.deleted != " + DELETED_STUDY
+			+ " AND p.program_uuid = :program_uuid ";
 
 	static final String GET_STUDY_METADATA_BY_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
@@ -184,10 +182,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         INNER JOIN "
 		+ "     project proj ON proj.project_id = nde.project_id "
 		+ "         INNER JOIN "
-		+ "     project_relationship pr ON proj.project_id = pr.subject_project_id "
-		+ "         INNER JOIN "
-		+ "     project pmain ON pmain.project_id = pr.object_project_id "
-		+ "         AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
+		+ "     project pmain ON pmain.project_id = proj.study_id "
 		+ "         LEFT OUTER JOIN "
 		+ "     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id "
 		+ "         LEFT OUTER JOIN "
@@ -198,13 +193,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
 	private static final String GET_PROJECTID_BY_STUDYDBID =
-		"SELECT DISTINCT pr.object_project_id"
-			+ " FROM project_relationship pr"
-			+ " INNER JOIN project p ON p.project_id = pr.subject_project_id"
-			+ " INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id"
+		"SELECT DISTINCT p.study_id"
+			+ " FROM project p "
+			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
 			+ " INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
 			+ " WHERE gl.nd_geolocation_id = :studyDbId"
-			+ " AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
 			+ " AND p.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 
 	private static final String STUDY_DETAILS_SQL = " SELECT DISTINCT \n"
@@ -221,7 +214,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   p.project_id               AS id, \n"
 		+ "   ppPIid.value               AS piId, \n"
 		+ "   gpSiteId.value             AS siteId, \n"
-		+ "   ppFolder.object_project_id AS folderId, \n"
+		+ "   p.parent_project_id 		 AS folderId, \n"
 		+ "   p.program_uuid             AS programUUID, \n"
 		+ "	  p.study_update 			 AS studyUpdate, \n"
 		+ "	  p.created_by               AS createdBy, \n"
@@ -229,7 +222,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " FROM \n"
 		+ "   project p \n"
 		+ "   INNER JOIN study_type stype on stype.study_type_id = p.study_type_id"
-		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
 		+ "   LEFT JOIN nd_experiment e ON e.project_id = p.project_id \n"
@@ -389,21 +381,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID, final TermId relationship) {
-		try {
-			final String sql = "SELECT s.project_id FROM project s " + " WHERE name = :name AND program_uuid = :program_uuid"
-				+ " AND EXISTS (SELECT 1 FROM project_relationship pr WHERE pr.subject_project_id = s.project_id "
-				+ "   AND pr.type_id = " + relationship.getId() + ") " + "	AND s.deleted !=  " + DELETED_STUDY + " LIMIT 1";
-
-			final Query query =
-				this.getSession().createSQLQuery(sql).setParameter("name", name).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-			return (Integer) query.uniqueResult();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStudyIdByName=" + name + " query in DmsProjectDao: " + e.getMessage(), e);
-		}
-	}
-
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
 		return this.getAllStudyDetails(studyType, programUUID, -1, -1);
 	}
@@ -427,8 +404,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
 			.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-			.append("       LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id and pr.type_id = ")
-			.append(TermId.BELONGS_TO_STUDY.getId()).append(" WHERE p.deleted != " + DELETED_STUDY + " ")
+			.append(" WHERE p.deleted != " + DELETED_STUDY + " ")
 			.append(" AND p.study_type_id = '" + studyType.getId() + "'")
 			.append(" AND (p.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR p.program_uuid IS NULL) ")
 			.append(" ORDER BY p.name ");
@@ -1260,14 +1236,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			// statement
 			this.getSession().flush();
 
-			// Delete from project relationship
-			SQLQuery statement =
-				this.getSession().createSQLQuery(
-					"delete pr " + "from project_relationship pr " + "where pr.subject_project_id = " + datasetId);
-			statement.executeUpdate();
-
 			// Delete experiments
-			statement =
+			SQLQuery statement =
 				this.getSession().createSQLQuery(
 					"delete e, pheno, eprop " + "from nd_experiment e, "
 						+ "phenotype pheno, nd_experimentprop eprop "
