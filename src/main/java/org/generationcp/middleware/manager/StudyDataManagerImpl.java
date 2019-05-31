@@ -639,6 +639,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Templates can't be moved");
 		}
 
+		source.setParent(target);
+		this.getDmsProjectDao().saveOrUpdate(source);
+
 		try {
 
 			// disassociate the source project from any parent it had previously

@@ -1121,10 +1121,15 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
+
+		final int studyId = workbook.getStudyDetails().getId();
+		final int parentFolderId = (int) workbook.getStudyDetails().getParentFolderId();
+
 		this.getProjectRelationshipSaver().saveOrUpdateStudyToFolder(
-			workbook.getStudyDetails().getId(),
-			Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
+			studyId,
+			parentFolderId);
 		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
+		study.setParent(this.getDmsProjectDao().getById(parentFolderId));
 		Integer trialDatasetId = workbook.getTrialDatasetId();
 		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
