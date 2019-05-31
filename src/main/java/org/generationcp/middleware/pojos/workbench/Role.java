@@ -1,7 +1,8 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
+import org.apache.commons.lang.WordUtils;
+import org.pojomatic.Pojomatic;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,12 +10,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.commons.lang.WordUtils;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "role")
 public class Role implements Serializable {
+
 	public static final String ADMIN = "ADMIN";
 	public static final String SUPERADMIN = "SUPERADMIN";
 
@@ -24,57 +25,74 @@ public class Role implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", nullable = false)
 	private Integer id;
-	
+
 	@Column(name = "description", nullable = false)
 	private String description;
 
+	@Column(name = "name", nullable = false)
+	private String name;
+
 	public Role() {
 	}
-	
+
+	public Role(final String description, final String name) {
+		this.description = description;
+		this.name = name;
+	}
+
 	public Role(final Integer id) {
 		this.id = id;
 	}
-	
-	public Role(final String description) {
-		this.description = description;
+
+	public Role(final String name) {
+		this.name = name;
 	}
-	
-	public Role(final Integer id, final String description) {
+
+	public Role(final Integer id, final String name) {
 		this.id = id;
-		this.description = description;
+		this.name = name;
+	}
+
+	public static String getADMIN() {
+		return ADMIN;
+	}
+
+	public static String getSUPERADMIN() {
+		return SUPERADMIN;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+		return Pojomatic.hashCode(this);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Role other = (Role) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
-	
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -86,17 +104,12 @@ public class Role implements Serializable {
 		this.description = description;
 	}
 
-	@Override
-	public String toString() {
-		return "Role [id=" + this.id + ", description=" + this.description + "]";
+	public String getCapitalizedRole() {
+		return WordUtils.capitalize(this.getName().toUpperCase());
 	}
 
-	public String getCapitalizedRole() {
-		return WordUtils.capitalize(this.getDescription().toUpperCase());
-	}
-	
-	public boolean isSuperAdminUser(){
-		return SUPERADMIN.equalsIgnoreCase(this.description);
+	public boolean isSuperAdminUser() {
+		return SUPERADMIN.equalsIgnoreCase(this.name);
 	}
 
 }

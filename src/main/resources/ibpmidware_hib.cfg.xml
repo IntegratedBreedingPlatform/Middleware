@@ -60,7 +60,9 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectActivity"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.UserRole"/>
-         <mapping class="org.generationcp.middleware.pojos.workbench.Role"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.Role"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.RoleType"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.Permission"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchUser"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.UserInfo"/>
