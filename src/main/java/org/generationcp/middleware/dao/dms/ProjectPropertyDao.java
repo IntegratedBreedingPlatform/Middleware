@@ -280,39 +280,28 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	public List<String> getGermplasmDescriptors(final int studyIdentifier) {
-		final List<String> list = this.executeQueryGermplasmDescriptors(studyIdentifier);
+		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 		if (list != null && !list.isEmpty()) {
 			return Collections.unmodifiableList(list);
 		}
 		return Collections.unmodifiableList(Collections.<String>emptyList());
-	}
-
-	@SuppressWarnings("unchecked")
-	private List<String> executeQueryGermplasmDescriptors(final int studyIdentifier) {
-		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
-			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
-
 	}
 
 	public List<String> getDesignFactors(final int studyIdentifier) {
-		final List<String> list = this.executeDesignFactorsQuery(studyIdentifier);
+		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId()));
 		if (list != null && !list.isEmpty()) {
 			return Collections.unmodifiableList(list);
 		}
 		return Collections.unmodifiableList(Collections.<String>emptyList());
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<String> executeDesignFactorsQuery(final int studyIdentifier) {
-		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
-			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId()));
-	}
-
 	private List<String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
-		final String variablesQuery = " SELECT name" +
+		final String variablesQuery = " SELECT cvt.name" +
 			" FROM  projectprop pp "
-			+ "INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-			+ "INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
+			+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
 			+ " WHERE pp.type_id IN (:variableTypeIds)"
 			+ " AND ds.study_id = :studyId";
 		;
