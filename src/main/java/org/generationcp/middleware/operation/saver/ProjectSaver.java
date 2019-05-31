@@ -34,15 +34,23 @@ public class ProjectSaver extends Saver {
 	}
 
 	public DmsProject create(final StudyValues studyValues, final StudyTypeDto studyType, final String description, final String startDate,
-		final String endDate, final String objective, final String name, final String createdBy) throws ParseException {
+		final String endDate, final String objective, final String name, final String createdBy, final int parentId) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			final StudyTypeDAO studyTypeDAO = this.getStudyTypeDao();
+			final DmsProject parentProject = this.getDmsProjectDao().getById(parentId);
+
 			project = new DmsProject();
 			project.setName(name);
 			project.setStudyType(studyTypeDAO.getById(studyType.getId()));
 			project.setCreatedBy(createdBy);
+			project.setParent(parentProject);
+
+			if (parentProject.getProjectId().intValue() != DmsProject.SYSTEM_FOLDER_ID) {
+				project.setStudy(parentProject);
+			}
+
 			if (startDate != null && startDate.contains("-")) {
 				project.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 			} else {

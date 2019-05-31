@@ -112,7 +112,7 @@ public class DataSetBuilder extends Builder {
 		dataSet.setId(project.getProjectId());
 		dataSet.setName(project.getName());
 		dataSet.setDescription(project.getDescription());
-		dataSet.setStudyId(this.getStudyId(project));
+		dataSet.setStudyId(project.getStudy().getProjectId());
 		dataSet.setDatasetType(project.getDatasetType());
 		dataSet.setVariableTypes(this.getVariableTypes(project));
 		dataSet.setLocationIds(this.getLocationIds(project.getProjectId()));
@@ -132,11 +132,6 @@ public class DataSetBuilder extends Builder {
 			variableTypes.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
 		}
 		return variableTypes.sort();
-	}
-
-	private int getStudyId(final DmsProject project) {
-		final DmsProject study = project.getStudy();
-		return study.getProjectId();
 	}
 
 	public DmsProject getTrialDataset(final int studyId) {

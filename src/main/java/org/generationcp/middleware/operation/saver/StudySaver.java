@@ -40,7 +40,7 @@ public class StudySaver extends Saver {
 		final String endDate, final String objective, final String name, final String createdBy) throws Exception {
 
 		DmsProject project = this.getProjectSaver().create(studyValues, studyType, description, startDate, endDate, objective, name,
-			createdBy);
+			createdBy, parentId);
 
 		project.setProgramUUID(programUUID);
 

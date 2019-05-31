@@ -146,8 +146,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(subObservationSetId).getParent();
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
@@ -198,8 +197,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(subObservationSetId).getParent();
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
@@ -250,6 +248,7 @@ public class DatasetServiceImpl implements DatasetService {
 		subObservationDataset.setProperties(projectProperties);
 		subObservationDataset.setDatasetType(new DatasetType(datasetTypeId));
 		subObservationDataset.setParent(parentDataset);
+		subObservationDataset.setStudy(study);
 
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().save(subObservationDataset);
 
