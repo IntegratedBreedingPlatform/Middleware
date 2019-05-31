@@ -54,7 +54,7 @@ public class User implements Serializable, BeanFormState {
 			+ "  person.lname    AS lName, \n"
 			+ "  person.pemail   AS email, \n"
 			+ "  role.id    AS roleId, \n"
-			+ "  role.description       AS roleName \n"
+			+ "  role.name       AS roleName \n"
 			+ "FROM cvterm scale INNER JOIN cvterm_relationship r ON (r.object_id = scale.cvterm_id) \n"
 			+ "  INNER JOIN cvterm variable ON (r.subject_id = variable.cvterm_id) \n"
 			+ "  INNER JOIN projectprop pp ON (pp.variable_id = variable.cvterm_id) \n"

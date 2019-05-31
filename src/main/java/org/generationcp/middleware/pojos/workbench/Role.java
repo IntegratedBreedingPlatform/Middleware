@@ -26,8 +26,8 @@ public class Role implements Serializable {
 	@Column(name = "id", nullable = false)
 	private Integer id;
 
-	@Column(name = "description", nullable = false)
-	private String description;
+//	@Column(name = "description", nullable = false)
+//	private String description;
 
 	@Column(name = "name", nullable = false)
 	private String name;
@@ -36,7 +36,7 @@ public class Role implements Serializable {
 	}
 
 	public Role(final String description, final String name) {
-		this.description = description;
+//		this.description = description;
 		this.name = name;
 	}
 
@@ -96,13 +96,13 @@ public class Role implements Serializable {
 		this.id = id;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
+//	public String getDescription() {
+//		return this.description;
+//	}
+//
+//	public void setDescription(final String description) {
+//		this.description = description;
+//	}
 
 	public String getCapitalizedRole() {
 		return WordUtils.capitalize(this.getName().toUpperCase());

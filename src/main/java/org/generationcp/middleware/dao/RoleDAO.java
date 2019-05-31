@@ -21,7 +21,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 		
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Role.class);
-			criteria.add(Restrictions.ne("description", Role.SUPERADMIN));
+			criteria.add(Restrictions.ne("name", Role.SUPERADMIN));
 			toReturn = criteria.list();
 			
 		} catch (final HibernateException e) {

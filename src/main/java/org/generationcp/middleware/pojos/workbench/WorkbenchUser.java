@@ -71,7 +71,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 
 	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.description, users.ustatus, person.pemail \n"
+		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.name, users.ustatus, person.pemail \n"
 		+ "FROM users \n"
 		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
 		+ "INNER JOIN persons person ON person.personid = users.personid \n "

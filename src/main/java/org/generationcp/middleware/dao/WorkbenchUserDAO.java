@@ -241,7 +241,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
 			criteria.createAlias("roles.role", "role");
-			criteria.add(Restrictions.eq("role.description", Role.SUPERADMIN));
+			criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
 			return criteria.list();
 			
 		} catch (final HibernateException e) {
@@ -257,7 +257,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			if (userId != null) {
 				final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
 				criteria.createAlias("roles.role", "role");
-				criteria.add(Restrictions.eq("role.description", Role.SUPERADMIN));
+				criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
 				criteria.add(Restrictions.eq("userid", userId));
 				
 				final List<WorkbenchUser> users = criteria.list();
