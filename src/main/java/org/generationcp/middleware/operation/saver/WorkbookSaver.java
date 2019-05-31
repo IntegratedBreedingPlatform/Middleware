@@ -632,7 +632,7 @@ public class WorkbookSaver extends Saver {
 
 		Integer studyId = null;
 		if (workbook.getStudyDetails() != null) {
-			studyId = this.getStudyId(workbook.getStudyDetails().getStudyName(), programUUID);
+			studyId = this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(workbook.getStudyDetails().getStudyName(), programUUID);
 		}
 
 		if (studyId == null) {
@@ -684,8 +684,6 @@ public class WorkbookSaver extends Saver {
 			if (datasetId == null) {
 				final String studyName = workbook.getStudyDetails().getStudyName();
 				trialName = this.generateTrialDatasetName(studyName);
-				datasetId = this.getDatasetId(trialName, this.generateTrialDatasetName(studyName),
-					programUUID);
 			}
 		}
 
@@ -733,9 +731,6 @@ public class WorkbookSaver extends Saver {
 			if (datasetId == null) {
 				final String studyName = workbook.getStudyDetails().getStudyName();
 				datasetName = this.generatePlotDatasetName(studyName);
-				datasetId =
-					this.getDatasetId(datasetName, this.generatePlotDatasetName(studyName),
-						programUUID);
 			}
 		}
 
@@ -896,22 +891,6 @@ public class WorkbookSaver extends Saver {
 		newList.addAll(effectVariables);
 
 		return newList;
-	}
-
-	private Integer getStudyId(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.IS_STUDY);
-	}
-
-	private Integer getDatasetId(final String name, final String generatedName, final String programUUID) {
-		Integer id = this.getProjectId(name, programUUID, TermId.BELONGS_TO_STUDY);
-		if (id == null && !name.equals(generatedName)) {
-			id = this.getProjectId(generatedName, programUUID, TermId.BELONGS_TO_STUDY);
-		}
-		return id;
-	}
-
-	private Integer getProjectId(final String name, final String programUUID, final TermId relationship) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
 	}
 
 	private Integer getMeansDataset(final Integer studyId) {
