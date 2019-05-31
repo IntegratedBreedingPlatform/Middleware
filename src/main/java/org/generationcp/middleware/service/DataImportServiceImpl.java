@@ -428,7 +428,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * Remove obsolete variables in specified measuremnt variable list. Returns
 	 * the list of all obsolete variable names that are removed.
 	 *
-	 * @param workbook
+	 * @param measurementVariables
 	 * @param programUUID
 	 * @return
 	 */
@@ -605,8 +605,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 		} else {
 			final boolean isExisting = this.checkIfProjectNameIsExistingInProgram(studyName, programUUID);
-			// existing and is study or folder.
-			if (isExisting && (this.isStudy(studyName, programUUID) || this.isFolder(studyName, programUUID))) {
+			if (isExisting) {
 				messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 			}
 			// else we will create a new study or append the data sets to the
@@ -776,18 +775,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return "1";
 	}
 
-	private boolean isStudy(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.IS_STUDY) != null;
-	}
-
-	private boolean isFolder(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.HAS_PARENT_FOLDER) != null;
-	}
-
-	private Integer getProjectId(final String name, final String programUUID, final TermId relationship) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
-	}
-
 	Set<Integer> getTermIdsOfMeasurementVariables(final List<MeasurementVariable> measurementVariables) {
 
 		final HashSet<Integer> termIds = new HashSet<>();
@@ -852,7 +839,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * MeasurementVariable to true.
 	 *
 	 * @param termId
-	 * @param ontology
 	 * @param list
 	 */
 	void setRequiredField(final int termId, final List<MeasurementVariable> list) {
@@ -888,7 +874,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * Returns true if the gids in the list are all existing records in the
 	 * database.
 	 *
-	 * @param germplasmDataManager
 	 * @param gids
 	 * @return
 	 */
@@ -925,7 +910,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	/**
 	 * Gets a list of gids extracted from observation.
 	 *
-	 * @param workbook
 	 * @return
 	 */
 	Set<Integer> extractGidsFromObservations(final String gidLabel, final List<MeasurementRow> observations) {
