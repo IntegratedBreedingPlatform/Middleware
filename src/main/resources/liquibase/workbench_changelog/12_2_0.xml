@@ -56,7 +56,8 @@
 			ALTER TABLE users_roles
 			CHANGE COLUMN id id INT(11) NOT NULL,
 			ADD COLUMN crop_name VARCHAR(32) NULL,
-			ADD COLUMN workbench_project_id INT(10) UNSIGNED NULL DEFAULT NULL;
+			ADD COLUMN workbench_project_id INT(10) UNSIGNED NULL DEFAULT NULL,
+			ADD COLUMN created_by VARCHAR(255) NULL;
 			ALTER TABLE users_roles
 			ADD CONSTRAINT fk_workbenck_project
 			FOREIGN KEY (workbench_project_id)
@@ -78,9 +79,9 @@
 			name VARCHAR(100) NOT NULL,
 			PRIMARY KEY (role_type_id));
 
-			INSERT INTO role_type VALUES (0, "INSTANCE");
-			INSERT INTO role_type VALUES (1, "CROP");
-			INSERT INTO role_type VALUES (2, "PROGRAM");
+			INSERT INTO role_type VALUES (1, "INSTANCE");
+			INSERT INTO role_type VALUES (2, "CROP");
+			INSERT INTO role_type VALUES (3, "PROGRAM");
 		</sql>
 	</changeSet>
 
@@ -96,7 +97,11 @@
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			CHANGE COLUMN description name VARCHAR(100) NOT NULL ,
-			ADD COLUMN description VARCHAR(255) NOT NULL;
+			ADD COLUMN description VARCHAR(255) NOT NULL,
+			ADD COLUMN active TINYINT(1) NULL,
+			ADD COLUMN editable TINYINT(1) NULL,
+			ADD COLUMN assignable TINYINT(1) NULL,
+			ADD COLUMN created_by VARCHAR(255) NULL;
 		</sql>
 	</changeSet>
 
@@ -109,17 +114,17 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE permission (
 			permission_id INT(11) NOT NULL AUTO_INCREMENT,
-			name VARCHAR(45) NOT NULL,
-			description VARCHAR(45) NULL,
+			name VARCHAR(255) NOT NULL,
+			description VARCHAR(255) NULL,
 			parent_id INT(11) NULL,
-			workbench_sidebar_category_id INT(11) NOT NULL,
+			workbench_workbench_sidebar_category_id INT(11) NULL,
 			PRIMARY KEY (permission_id)
 			);
 
 
 			ALTER TABLE permission
 			ADD INDEX fk_permission_1_idx (parent_id ASC),
-			ADD INDEX fk_permission_2_idx (workbench_sidebar_category_id ASC);
+			ADD INDEX fk_permission_2_idx (workbench_workbench_sidebar_category_id ASC);
 			ALTER TABLE permission
 			ADD CONSTRAINT fk_permission_1
 			FOREIGN KEY (parent_id)
@@ -127,7 +132,7 @@
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION,
 			ADD CONSTRAINT fk_permission_2
-			FOREIGN KEY (workbench_sidebar_category_id)
+			FOREIGN KEY (workbench_workbench_sidebar_category_id)
 			REFERENCES workbench_sidebar_category_link (sidebar_category_link_id)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
@@ -168,9 +173,9 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE role_type_permission (
 			role_type_id INT(11) NOT NULL,
-			permission_id INT(11) NULL,
-			selectable TINYINT(1) NULL,
-			PRIMARY KEY (role_type_id),
+			permission_id INT(11) NOT NULL,
+			selectable TINYINT(1) NULL,c
+			PRIMARY KEY (role_type_id, permission_id),
 			INDEX fk_role_type_permission_2_idx (permission_id ASC),
 			CONSTRAINT fk_role_type_permission_1
 			FOREIGN KEY (role_type_id)
@@ -185,5 +190,130 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v12.2.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1)
+				from permission
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (1, 'ADMIN','Full',null,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (2, 'ADMINISTRATION','Administration',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (3, 'CROP_MANAGEMENT','Crop Management',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (4, 'BREEDING_ACTIVITIES','Breeding Activities',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (5, 'INFORMATION_MANAGEMENT','Information Management',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (6, 'STATISTICAL_ANALYSIS','Statistical Analysis',1,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (7, 'SITE_ADMIN','Site Admin',2,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (8, 'MANAGE_ONTOLOGIES','Manage Ontologies',3,10);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (9, 'IMPORT_GERMPLASM','Import Germplasm',3,5);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (10, 'MANAGE_GENOTYPING_DATA','Manage Genotyping Data',3,6);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (11, 'MANAGE_PROGRAMS','Manage programs',3,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (12, 'ADD_PROGRAM','Add Program',11,null);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (13, 'MANAGE_PROGRAM_SETTINGS','Manage Program Settings',11,24);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (14, 'MANAGE_GERMPLASM','Manage Germplasm',4,1);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (15, 'MANAGE_SAMPLES','Manage Samples',4,28);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (16, 'MANAGE_STUDIES','Manage Studies',4,23);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (17, 'BROWSE_STUDIES','Browse Studies',5,7);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (18, 'HEAD_TO_HEAD_QUERY','Head to Head Query',5,8);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (19, 'MULTI_TRAIT_QUERY','Multi-trait Query',5,27);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (20, 'IMPORT_DATASETS','Import Datasets',5,19);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (21, 'SINGLE_SITE_ANALYSIS','Single-Site Analysis',6,11);
+			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (22, 'MULTI_SITE_ANALYSIS','Multi-Site Analysis',6,12);
+		</sql>
+	</changeSet>
 
+	<changeSet author="vanina" id="v12.2.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1)
+				from role_type_permission
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (1,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (2,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (3,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (4,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (5,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (6,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (7,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (8,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (9,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (10,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (11,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (14,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (15,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (16,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (17,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (18,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (19,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (20,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (21,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (22,1,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (1,2,0);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (3,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (4,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (5,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (7,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (8,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (9,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (10,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (11,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (14,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (15,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (16,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (17,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (18,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (19,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (20,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (21,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (22,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (1,3,0);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (3,3,0);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (4,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (5,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (6,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (11,3,0);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (13,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (14,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (15,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (16,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (17,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (18,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (19,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (20,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (21,3,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (22,3,1);
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="vanina" id="v12.2.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1)
+				from role_permission
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO role_permission (permission_id, role_id) VALUES (1,1);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (1,5);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (10,2);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (4,2);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (5,2);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (6,2);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (10,3);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (4,3);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (5,3);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (6,3);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (14,4);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (17,4);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (18,4);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (19,4);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (20,4);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (21,4);
+			INSERT INTO role_permission (permission_id, role_id) VALUES (22,4);
+		</sql>
+	</changeSet>
 </databaseChangeLog>
