@@ -202,10 +202,10 @@ public class WorkbookSaver extends Saver {
 		int savedEnvironmentsCount = 0;
 		boolean isDeleteTrialObservations = false;
 		if (environmentDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+			environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId());
 		}
 		if (plotDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+			plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		}
 
 		if (environmentDatasetId != null) {
@@ -1099,7 +1099,6 @@ public class WorkbookSaver extends Saver {
 
 	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
 
-		final int studyId = workbook.getStudyDetails().getId();
 		final int parentFolderId = (int) workbook.getStudyDetails().getParentFolderId();
 
 		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
@@ -1107,18 +1106,9 @@ public class WorkbookSaver extends Saver {
 		Integer trialDatasetId = workbook.getTrialDatasetId();
 		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
-			measurementDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(study.getProjectId(), workbook.getStudyName());
-
-			// TODO: Check if this logic to get trialDatasetId can be simplified.
-			final List<DmsProject> datasets = this.getDmsProjectDao().getDatasetsByParent(study.getProjectId());
-			if (datasets != null) {
-				for (final DmsProject dataset : datasets) {
-					if (!dataset.getProjectId().equals(measurementDatasetId)) {
-						trialDatasetId = dataset.getProjectId();
-						break;
-					}
-				}
-			}
+			final Integer studyId = study.getProjectId();
+			measurementDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
+			trialDatasetId = this.getWorkbookBuilder().getTrialDataSetId(studyId);
 		}
 		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
 		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);

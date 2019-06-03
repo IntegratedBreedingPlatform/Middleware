@@ -131,7 +131,7 @@ public class WorkbookBuilder extends Builder {
 
 		// DA if name not conventional
 		// FIXME : this heavy id fetch pattern needs changing
-		final int dataSetId = this.getMeasurementDataSetId(id, studyDetails.getStudyName());
+		final int dataSetId = this.getMeasurementDataSetId(id);
 		// validation, bring inline
 		this.checkMeasurementDataset(Integer.valueOf(dataSetId));
 		workbook.setMeasurementDatesetId(dataSetId);
@@ -310,36 +310,16 @@ public class WorkbookBuilder extends Builder {
 		final Workbook workbook = new Workbook();
 		final Study study = this.getStudyBuilder().createStudy(id);
 		Integer dataSetId = null, trialDatasetId = null;
-		// get observation dataset
 
-		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(id);
-		if (datasetRefList != null) {
 
-			final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(id);
-			workbook.setStudyDetails(studyDetails);
-			for (final DatasetReference datasetRef : datasetRefList) {
-				if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName())
-					|| datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
-					dataSetId = datasetRef.getId();
-				} else if (datasetRef.getName().equals("TRIAL_" + studyDetails.getStudyName())) {
-					trialDatasetId = datasetRef.getId();
-				}
-			}
+		final DataSet plotDataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.PLOT_DATA.getId());
+		if (plotDataset != null) {
+			dataSetId = plotDataset.getId();
 		}
 
-		// if dataset is not found, get dataset with Plot Data type
-		if (dataSetId == null || dataSetId == 0) {
-			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.PLOT_DATA.getId());
-			if (dataset != null) {
-				dataSetId = dataset.getId();
-			}
-		}
-
-		if (trialDatasetId == null || trialDatasetId == 0) {
-			final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.SUMMARY_DATA.getId());
-			if (dataset != null) {
-				trialDatasetId = dataset.getId();
-			}
+		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.SUMMARY_DATA.getId());
+		if (dataset != null) {
+			trialDatasetId = dataset.getId();
 		}
 
 		this.checkMeasurementDataset(dataSetId);
@@ -949,8 +929,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	// FIXME IBP-2716 Remove studyName parameter
-	public int getMeasurementDataSetId(final int studyId, final String studyName) {
+	public int getMeasurementDataSetId(final int studyId) {
 		// Get dataset reference by dataset type
 		final DatasetReference datasetRef = this.getStudyDataManager().findOneDataSetReferenceByType(
 			studyId,
@@ -962,17 +941,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	public int getTrialDataSetId(final int studyId, final String studyName) {
-		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
-		if (datasetRefList != null) {
-			for (final DatasetReference datasetRef : datasetRefList) {
-				if (datasetRef.getName().equals("TRIAL_" + studyName)) {
-					return datasetRef.getId();
-				}
-			}
-		}
-		// if not found in the list using the name, get dataset with Summary
-		// Data type
+	public int getTrialDataSetId(final int studyId) {
 		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (dataset != null) {
 			return dataset.getId();
