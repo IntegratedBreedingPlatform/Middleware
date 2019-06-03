@@ -11,13 +11,9 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -34,7 +30,6 @@ import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.util.DatasetUtil;
 import org.generationcp.middleware.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,16 +130,7 @@ public class DataSetBuilder extends Builder {
 	}
 
 	public DmsProject getTrialDataset(final int studyId) {
-		final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
-		if (datasetReferences == null || datasetReferences.isEmpty()) {
-			throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
-		}
-		for (final DatasetReference datasetReference : datasetReferences) {
-			if (datasetReference.getName().endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) {
-				return this.getDmsProjectById(datasetReference.getId());
-			}
-		}
-		// if not found in the list using the name, get dataset reference with Summary Data type
+		// Get dataset reference with Summary Data type
 		final DatasetReference trialDatasetReference = this.studyDataManager.findOneDataSetReferenceByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		if (trialDatasetReference != null) {
 			return this.getDmsProjectById(trialDatasetReference.getId());

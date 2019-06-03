@@ -42,7 +42,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.util.DatasetUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
@@ -1135,9 +1134,9 @@ public class WorkbookSaver extends Saver {
 		final String objective = workbook.getStudyDetails().getObjective();
 		final String createdBy = workbook.getStudyDetails().getCreatedBy();
 
-		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset, objective);
+		this.updateStudyDetails(description + WorkbookSaver.ENVIRONMENT, trialDataset, objective);
 		this.updateStudyDetails(description, startDate, endDate, study, objective, createdBy);
-		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset, objective);
+		this.updateStudyDetails(description + WorkbookSaver.PLOTDATA, measurementDataset, objective);
 	}
 
 	private void updateStudyDetails(

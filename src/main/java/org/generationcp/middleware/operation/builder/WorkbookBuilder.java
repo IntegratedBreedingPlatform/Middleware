@@ -47,7 +47,6 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.util.DatasetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -950,27 +949,9 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
+	// FIXME IBP-2716 Remove studyName parameter
 	public int getMeasurementDataSetId(final int studyId, final String studyName) {
-		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
-		for (final DatasetReference datasetRef : datasetRefList) {
-			final String datasetName = datasetRef.getName();
-			if (datasetName.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX)) {
-				return datasetRef.getId();
-			}
-
-			// Legacy daatset naming convention handling
-			if (datasetName.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX)) {
-				return datasetRef.getId();
-			}
-
-			// Legacy daatset naming convention handling
-			if (datasetName.endsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_SUFFIX)) {
-				return datasetRef.getId();
-			}
-		}
-		// if not found (which should be extremely rare) in the dataset ref list
-		// using the name,
-		// get dataset reference by dataset type in projectprops
+		// Get dataset reference by dataset type
 		final DatasetReference datasetRef = this.getStudyDataManager().findOneDataSetReferenceByType(
 			studyId,
 			DatasetTypeEnum.PLOT_DATA.getId());
