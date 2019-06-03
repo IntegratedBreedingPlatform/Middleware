@@ -1103,17 +1103,15 @@ public class WorkbookSaver extends Saver {
 		final int studyId = workbook.getStudyDetails().getId();
 		final int parentFolderId = (int) workbook.getStudyDetails().getParentFolderId();
 
-		this.getProjectRelationshipSaver().saveOrUpdateStudyToFolder(
-			studyId,
-			parentFolderId);
 		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
 		study.setParent(this.getDmsProjectDao().getById(parentFolderId));
 		Integer trialDatasetId = workbook.getTrialDatasetId();
 		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
 			measurementDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(study.getProjectId(), workbook.getStudyName());
-			final List<DmsProject> datasets =
-				this.getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
+
+			// TODO: Check if this logic to get trialDatasetId can be simplified.
+			final List<DmsProject> datasets = this.getDmsProjectDao().getDatasetsByParent(study.getProjectId());
 			if (datasets != null) {
 				for (final DmsProject dataset : datasets) {
 					if (!dataset.getProjectId().equals(measurementDatasetId)) {

@@ -35,8 +35,6 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 
 	private DmsProjectDao dmsProjectDao;
 	
-	private ProjectRelationshipDao projRelDao;
-	
 	private DmsProject study;
 
 	@Before
@@ -72,11 +70,6 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		if (this.dmsProjectDao == null) {
 			this.dmsProjectDao = new DmsProjectDao();
 			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		}
-		
-		if (this.projRelDao == null) {
-			this.projRelDao = new ProjectRelationshipDao();
-			this.projRelDao.setSession(this.sessionProvder.getSession());
 		}
 		
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);

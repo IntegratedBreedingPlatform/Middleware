@@ -6,7 +6,6 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
@@ -26,7 +25,6 @@ import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,7 +60,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 	private PersonDAO personDAO;
 	private DmsProjectDao dmsProjectDao;
 	private GermplasmDAO germplasmDao;
-	private ProjectRelationshipDao projectRelationshipDao;
 	private ProjectPropertyDao projectPropertyDao;
 
 	private DaoFactory daoFactory;
@@ -96,9 +93,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 
 		this.germplasmDao = new GermplasmDAO();
 		this.germplasmDao.setSession(this.sessionProvder.getSession());
-
-		this.projectRelationshipDao = new ProjectRelationshipDao();
-		this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
 
 		this.projectPropertyDao = new ProjectPropertyDao();
 		this.projectPropertyDao.setSession(this.sessionProvder.getSession());

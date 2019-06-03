@@ -47,7 +47,6 @@ import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
 import org.generationcp.middleware.operation.saver.LocdesSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
-import org.generationcp.middleware.operation.saver.ProjectRelationshipSaver;
 import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
@@ -583,10 +582,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final ProjectSaver getProjectSaver() {
 		return new ProjectSaver(this.sessionProvider);
-	}
-
-	protected final ProjectRelationshipSaver getProjectRelationshipSaver() {
-		return new ProjectRelationshipSaver(this.sessionProvider);
 	}
 
 	protected final ProjectPropertySaver getProjectPropertySaver() {

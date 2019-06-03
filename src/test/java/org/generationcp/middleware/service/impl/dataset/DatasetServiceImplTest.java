@@ -9,7 +9,6 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -122,9 +121,6 @@ public class DatasetServiceImplTest {
 	private MeasurementVariableService measurementVariableService;
 
 	@Mock
-	private ProjectRelationshipDao projectRelationshipDao;
-
-	@Mock
 	private StudyService studyService;
 
 	@Mock
@@ -151,7 +147,6 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
-		when(this.daoFactory.getProjectRelationshipDao()).thenReturn(this.projectRelationshipDao);
 	}
 
 	@Test

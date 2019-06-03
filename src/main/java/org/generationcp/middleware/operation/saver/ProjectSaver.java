@@ -97,19 +97,12 @@ public class ProjectSaver extends Saver {
 	/**
 	 * Saves a folder. Creates an entry in project table
 	 */
-	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) throws Exception {
-		DmsProject project = new DmsProject();
+	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) {
+		final DmsProject project = new DmsProject();
 		project.setProgramUUID(programUUID);
 		project.setParent(this.getDmsProjectDao().getById(parentId));
 		this.mapStudytoProject(name, description, project, objective);
-
-		try {
-			project = this.save(project);
-			this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, false);
-		} catch (final Exception e) {
-			throw e;
-		}
-		return project;
+		return this.save(project);
 
 	}
 

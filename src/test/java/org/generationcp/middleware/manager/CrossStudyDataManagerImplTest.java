@@ -19,7 +19,6 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
-import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.Debug;
@@ -63,8 +61,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	private CrossStudyDataManager crossStudyDataManager;
 
 	private DmsProjectDao dmsProjectDao;
-
-	private ProjectRelationshipDao projectRelationshipDao;
 
 	private ExperimentDao experimentDao;
 
@@ -118,11 +114,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		if (this.dmsProjectDao == null) {
 			this.dmsProjectDao = new DmsProjectDao();
 			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		}
-
-		if (this.projectRelationshipDao == null) {
-			this.projectRelationshipDao = new ProjectRelationshipDao();
-			this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
 		}
 
 		if (this.phenotypeDao == null) {
@@ -277,12 +268,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		plot.setDescription(studyName + " - Plot Dataset");
 		plot.setProgramUUID(programUUID);
 		this.dmsProjectDao.save(plot);
-
-		final ProjectRelationship projectRelationship = new ProjectRelationship();
-		projectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-		projectRelationship.setObjectProject(study);
-		projectRelationship.setSubjectProject(plot);
-		this.projectRelationshipDao.save(projectRelationship);
 
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription("1");
