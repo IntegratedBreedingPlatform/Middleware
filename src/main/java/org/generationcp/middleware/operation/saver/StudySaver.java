@@ -32,7 +32,7 @@ public class StudySaver extends Saver {
 	}
 
 	/**
-	 * Saves a study. Creates an entry in project, projectprop and project_relationship tables (default) Creates an entry in nd_experiment
+	 * Saves a study. Creates an entry in project and projectprop tables. Creates an entry in nd_experiment
 	 * table if saveStudyExperiment is true.
 	 */
 	public DmsProject saveStudy(final CropType crop, final int parentId, final VariableTypeList variableTypeList, final StudyValues studyValues, final boolean saveStudyExperiment,

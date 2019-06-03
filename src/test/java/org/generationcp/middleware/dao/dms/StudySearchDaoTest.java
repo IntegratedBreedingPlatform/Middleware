@@ -514,7 +514,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager, this.userDataManager);
 
 		// First 3 studies have location and season variables at study level
-		// We need to add datasets to studies because search queries expect "Belongs to Study" record in project_relationship
+		// We need to add datasets to studies
 		final StudyReference studyReference1 = studyTestDataInitializer.addTestStudy(StudySearchDaoTest.TEST_STUDY_NAME_1, StudyTypeDto.getTrialDto(),
 				String.valueOf(TermId.SEASON_DRY.getId()), String.valueOf(StudySearchDaoTest.LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101");
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());

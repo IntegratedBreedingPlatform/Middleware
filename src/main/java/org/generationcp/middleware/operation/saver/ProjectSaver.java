@@ -95,7 +95,7 @@ public class ProjectSaver extends Saver {
 	}
 
 	/**
-	 * Saves a folder. Creates an entry in project and project_relationship
+	 * Saves a folder. Creates an entry in project table
 	 */
 	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) throws Exception {
 		DmsProject project = new DmsProject();

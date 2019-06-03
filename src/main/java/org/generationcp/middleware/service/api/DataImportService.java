@@ -132,8 +132,7 @@ public interface DataImportService {
 			throws MiddlewareException;
 
 	/**
-	 * Saves the project ontology from the Workbook Tables: project,
-	 * project_relationship, project_properties
+	 * Saves the project ontology from the Workbook Tables: project and projectprop
 	 *
 	 * @param workbook
 	 * @param programUUID
@@ -144,8 +143,7 @@ public interface DataImportService {
 			throws MiddlewareQueryException;
 
 	/**
-	 * Saves the project ontology from the Workbook Tables: project,
-	 * project_relationship, project_properties
+	 * Saves the project ontology from the Workbook Tables: project and projectprop
 	 *
 	 * @param workbook
 	 * @param programUUID

@@ -904,8 +904,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	/**
-	 * Saves project ontology creating entries in the following tables: project,
-	 * projectprop and project_relationship
+	 * Saves project ontology creating entries in the following tables: project and projectprop tables
 	 *
 	 * @param workbook
 	 * @return study id
