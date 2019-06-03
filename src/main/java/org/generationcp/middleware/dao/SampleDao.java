@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
 import org.hibernate.Criteria;
@@ -37,18 +38,17 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM \n"
 			+ "            						sample AS sp \n" + "        WHERE\n"
 			+ "            						nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
-			+ "		FROM project p INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
-			+ "		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
-			+ "								INNER JOIN project p ON p.project_id = pr.subject_project_id\n"
-			+ "        						WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n"
-			+ "GROUP BY nde.nd_experiment_id";
+			+ "		FROM project p "
+			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
+			+ "		WHERE p.study_id = :studyID and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+			+ " GROUP BY nde.nd_experiment_id";
 
-	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample FROM project p INNER JOIN\n"
-		+ "    nd_experiment nde ON nde.project_id = p.project_id INNER JOIN\n"
-		+ "    sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id WHERE p.project_id = (SELECT \n"
-		+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
-		+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
-		+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n" + "GROUP BY sp.nd_experiment_id";
+	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample "
+		+ "		FROM project p "
+		+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+		+ "		INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
+		+ "		WHERE p.study_id = :studyID and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+		+ " GROUP BY sp.nd_experiment_id";
 
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           0,"
