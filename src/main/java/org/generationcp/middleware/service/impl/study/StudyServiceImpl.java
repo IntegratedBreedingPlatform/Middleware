@@ -11,6 +11,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -66,20 +67,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 			+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
-			+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
+			+ "	proj.study_id = :studyIdentifier AND proj.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ "    and gl.nd_geolocation_id = :instanceId ";
 
 	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
 			"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
-					+ " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
 					+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 					+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 					+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
 					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
-					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
-					+ "							INNER JOIN project p ON p.project_id = pr.subject_project_id "
-					+ "  WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
+					+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 					+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
@@ -358,8 +356,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 					+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
 					+ " where \n"
-					+ "    proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id "
-					+ "    		where (pr.object_project_id = :studyId and name like '%ENVIRONMENT')) \n"
+					+ "    proj.study_id = :studyId and proj.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId() + " \n"
 					+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
 
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
@@ -382,7 +379,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return instances;
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-					"Unexpected error in executing getAllStudyInstanceNumbers(studyId = " + studyId + ") query: " + he.getMessage(), he);
+					"Unexpected error in executing getStudyInstances(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 	}
 

@@ -20,6 +20,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * The class <code>MeasurementVariableServiceImplTest</code> contains tests for the class <code>{@link MeasurementVariableServiceImpl}</code>.
  */
+// FIXME IBP-2716 Convert to IntegrationTest
 public class MeasurementVariableServiceImplTest {
 
 	private static final int TEST_STUDY_ID = 4062;
