@@ -237,15 +237,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@SuppressWarnings("unchecked")
+	// TODO: MARK FOR DELETE IBP-2689
 	@Override
 	public void saveMeasurementRows(final Workbook workbook, final String programUUID, final boolean saveVariates) {
 
 		final long startTime = System.currentTimeMillis();
 
 		try {
-			final List<MeasurementVariable> variates = workbook.getVariates();
+			/*final List<MeasurementVariable> variates = workbook.getVariates();
 			final List<MeasurementVariable> factors = workbook.getFactors();
-			final List<MeasurementRow> observations = workbook.getObservations();
+			final List<MeasurementRow> observations = workbook.getObservations();*/
 
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
@@ -256,28 +257,28 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			// unpack maps first level - Maps of Strings, Maps of
 			// VariableTypeList , Maps of Lists of MeasurementVariable
-			final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
-			final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+			//final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+			//final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 
 			// unpack maps
 			// Strings
-			final List<String> trialHeaders = headerMap.get("trialHeaders");
+			//final List<String> trialHeaders = headerMap.get("trialHeaders");
 
 			// VariableTypeLists
-			final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+			//final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
 
 			// save trial observations
 			this.getWorkbookSaver().saveTrialObservations(workbook, programUUID);
 
-			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
+			/*Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
 				measurementDatasetId =
 						this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
-			}
+			}*/
 
 			// save factors
 			// TODO: Possible improvement
-			this.getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
+			/*this.getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
 
 			if (factors != null) {
 				for (final MeasurementVariable factor : factors) {
@@ -298,7 +299,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final Measurements measurements =
 					new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
 
-			this.saveMeasurements(saveVariates, variates, observations, measurements);
+			this.saveMeasurements(saveVariates, variates, observations, measurements);*/
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
