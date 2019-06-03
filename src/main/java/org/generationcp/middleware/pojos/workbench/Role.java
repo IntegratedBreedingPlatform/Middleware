@@ -3,6 +3,7 @@ package org.generationcp.middleware.pojos.workbench;
 
 import org.apache.commons.lang.WordUtils;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "role")
+@AutoProperty
 public class Role implements Serializable {
 
 	public static final String ADMIN = "ADMIN";
