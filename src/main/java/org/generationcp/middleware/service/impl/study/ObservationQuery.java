@@ -6,6 +6,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 
 import javax.annotation.Nullable;
@@ -22,8 +23,8 @@ class ObservationQuery {
 	public static final String OBSERVATIONS_FOR_SAMPLES = "SELECT  " + "    nde.nd_experiment_id as nd_experiment_id, "
 		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name, " + "    ph.value"
 		+ " as value, s.dbxref_id as gid"
-		+ " FROM  " + "    project p  " + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id  "
-		+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id  "
+		+ " FROM  " + "    project p  "
+		+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id  "
 		+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id  "
 		+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id  "
 		+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  "
@@ -41,9 +42,9 @@ class ObservationQuery {
 	}
 
 	/**
-	 * TODO BMS-4061 Merge with {@link ObservationQuery#getObservationsMainQuery(List, List)}
+	 * TODO BMS-4061 Merge with {@link ObservationQuery#getObservationsMainQuery(List, List, List)}
 	 *
-	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List)}
+	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List, List)}
 	 * which is used Trial and Nursery Manager
 	 */
 	public String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
@@ -51,7 +52,7 @@ class ObservationQuery {
 		final String orderByText =
 			(null == measurementVariables || measurementVariables.isEmpty() ? "" : " ORDER BY " + orderByMeasurementVariableId);
 
-		String whereText = " where (pr.object_project_id = :projectId and name LIKE '%PLOTDATA')) ";
+		String whereText = " WHERE p.study_id = :projectId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n";
 
 		if (instanceId != null) {
 			whereText += " AND gl.nd_geolocation_id = :instanceId ";
@@ -132,9 +133,8 @@ class ObservationQuery {
 			+ "FieldMapRow.value AS FieldMapRow, " //
 			+ 	getColumnNamesFromTraitNames(measurementVariables) //
 			+ " FROM Project p " //
-			+ "    INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id " //
-			+ "    INNER JOIN project proj ON proj.project_id =  pr.object_project_id " //
-			+ "    INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id " //
+			+ "    INNER JOIN project proj ON proj.project_id =  p.study_id " //
+			+ "    INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
 			+ "    INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "    INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
@@ -143,7 +143,6 @@ class ObservationQuery {
 			+ TermId.RANGE_NO.getId() //
 			+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " //
 			+ TermId.COLUMN_NO.getId() //
-			+ " WHERE p.project_id = (select p.project_id from project_relationship pr INNER JOIN project p on p.project_id = pr.subject_project_id " //
 			+ whereText + " GROUP BY nde.nd_experiment_id " + orderByText;
 	}
 
@@ -225,13 +224,12 @@ class ObservationQuery {
 
 		sqlBuilder.append(" 1=1 FROM  ")
 			.append("	project p  ")
-			.append("	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id  ")
-			.append("	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id  ")
+			.append("	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id  ")
 			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id  ")
 			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id  ")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  ")
-			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  ")
-			.append("		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))  ");
+			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variab	le.cvterm_id = ph.observable_id  ")
+			.append("		WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n");
 
 		return sqlBuilder.toString();
 	}

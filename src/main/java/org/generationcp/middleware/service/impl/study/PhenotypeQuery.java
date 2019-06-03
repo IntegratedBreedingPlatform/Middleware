@@ -32,8 +32,7 @@ public class PhenotypeQuery {
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //
 		+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
-		+ "  INNER JOIN project_relationship pr ON dataset.project_id = pr.subject_project_id " //
-		+ "  INNER JOIN project p ON pr.object_project_id = p.project_id " //
+		+ "  INNER JOIN project p ON p.project_id = dataset.study_id " //
 		+ "  INNER JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
