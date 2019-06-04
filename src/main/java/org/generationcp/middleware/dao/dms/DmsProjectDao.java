@@ -787,12 +787,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			locationCriteria.add(Restrictions.eq("typeId", TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()));
 			locationCriteria.createAlias("geoLocation", "g");
 			locationCriteria.createAlias("g.properties", "gp");
-			locationCriteria.createAlias("project.study", "study");
+			locationCriteria.createAlias("project", "p");
+			locationCriteria.createAlias("p.study", "st");
 			locationCriteria.add(Restrictions.and(
 				Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
 				Restrictions.eq("gp.value", parameters.get(StudyFilters.LOCATION_ID))));
-			locationCriteria.setProjection(Projections.property("study.projectId"));
-
+			locationCriteria.setProjection(Projections.property("st.projectId"));
 			criteria.add(Property.forName("projectId").in(locationCriteria));
 		}
 
