@@ -228,7 +228,7 @@ class ObservationQuery {
 			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id  ")
 			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id  ")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  ")
-			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variab	le.cvterm_id = ph.observable_id  ")
+			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  ")
 			.append("		WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n");
 
 		return sqlBuilder.toString();
