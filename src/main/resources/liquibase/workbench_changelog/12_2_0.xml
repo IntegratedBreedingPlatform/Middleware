@@ -92,6 +92,19 @@
 				<not>
 					<columnExists tableName="role" columnName="name"/>
 				</not>
+				<not>
+					<columnExists tableName="role" columnName="active"/>
+				</not>
+				<not>
+					<columnExists tableName="role" columnName="editable"/>
+				</not>
+				<not>
+					<columnExists tableName="role" columnName="assignable"/>
+				</not>
+				<not>
+					<columnExists tableName="role" columnName="created_by"/>
+				</not>
+
 			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
@@ -117,14 +130,14 @@
 			name VARCHAR(255) NOT NULL,
 			description VARCHAR(255) NULL,
 			parent_id INT(11) NULL,
-			workbench_workbench_sidebar_category_id INT(11) NULL,
+			workbench_sidebar_category_id INT(11) NULL,
 			PRIMARY KEY (permission_id)
 			);
 
 
 			ALTER TABLE permission
 			ADD INDEX fk_permission_1_idx (parent_id ASC),
-			ADD INDEX fk_permission_2_idx (workbench_workbench_sidebar_category_id ASC);
+			ADD INDEX fk_permission_2_idx (workbench_sidebar_category_id ASC);
 			ALTER TABLE permission
 			ADD CONSTRAINT fk_permission_1
 			FOREIGN KEY (parent_id)
@@ -132,7 +145,7 @@
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION,
 			ADD CONSTRAINT fk_permission_2
-			FOREIGN KEY (workbench_workbench_sidebar_category_id)
+			FOREIGN KEY (workbench_sidebar_category_id)
 			REFERENCES workbench_sidebar_category_link (sidebar_category_link_id)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
@@ -174,7 +187,7 @@
 			CREATE TABLE role_type_permission (
 			role_type_id INT(11) NOT NULL,
 			permission_id INT(11) NOT NULL,
-			selectable TINYINT(1) NULL,c
+			selectable TINYINT(1) NULL,
 			PRIMARY KEY (role_type_id, permission_id),
 			INDEX fk_role_type_permission_2_idx (permission_id ASC),
 			CONSTRAINT fk_role_type_permission_1
