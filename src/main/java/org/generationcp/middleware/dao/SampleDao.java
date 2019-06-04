@@ -40,14 +40,14 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ "            						nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
 			+ "		FROM project p "
 			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
-			+ "		WHERE p.study_id = :studyID and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+			+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
 			+ " GROUP BY nde.nd_experiment_id";
 
 	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample "
 		+ "		FROM project p "
 		+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
 		+ "		INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
-		+ "		WHERE p.study_id = :studyID and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+		+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
 		+ " GROUP BY sp.nd_experiment_id";
 
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
