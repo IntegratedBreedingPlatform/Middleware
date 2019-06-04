@@ -46,6 +46,10 @@
 				<and>
 					<columnExists tableName="users_roles" columnName="crop_name"/>
 					<columnExists tableName="users_roles" columnName="workbench_project_id"/>
+					<columnExists tableName="users_roles" columnName="created_by"/>
+					<columnExists tableName="users_roles" columnName="updated_by"/>
+					<columnExists tableName="users_roles" columnName="updated_date"/>
+					<columnExists tableName="users_roles" columnName="created_date"/>
 				</and>
 			</not>
 		</preConditions>
@@ -54,7 +58,6 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE users_roles
-			CHANGE COLUMN id id INT(11) NOT NULL,
 			ADD COLUMN crop_name VARCHAR(32) NULL,
 			ADD COLUMN workbench_project_id INT(10) UNSIGNED NULL DEFAULT NULL,
 			ADD COLUMN created_by VARCHAR(255) NULL,
@@ -96,21 +99,17 @@
 			<and>
 				<columnExists tableName="role" columnName="description"/>
 				<not>
-					<columnExists tableName="role" columnName="name"/>
+					<and>
+						<columnExists tableName="role" columnName="created_by"/>
+						<columnExists tableName="role" columnName="updated_by"/>
+						<columnExists tableName="role" columnName="updated_date"/>
+						<columnExists tableName="role" columnName="created_date"/>
+						<columnExists tableName="role" columnName="name"/>
+						<columnExists tableName="role" columnName="active"/>
+						<columnExists tableName="role" columnName="editable"/>
+						<columnExists tableName="role" columnName="assignable"/>
+					</and>
 				</not>
-				<not>
-					<columnExists tableName="role" columnName="active"/>
-				</not>
-				<not>
-					<columnExists tableName="role" columnName="editable"/>
-				</not>
-				<not>
-					<columnExists tableName="role" columnName="assignable"/>
-				</not>
-				<not>
-					<columnExists tableName="role" columnName="created_by"/>
-				</not>
-
 			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
