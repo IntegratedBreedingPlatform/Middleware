@@ -112,7 +112,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	static final String GET_CHILDREN_OF_FOLDER =
 		"SELECT subject.project_id AS project_id, "
 			+ "subject.name AS name,  subject.description AS description, "
-			+ "	(CASE WHEN study_type_id IS NOT NULL THEN 1 ELSE 0 END) AS is_study, "
+			+ "	(CASE WHEN subject.study_type_id IS NOT NULL THEN 1 ELSE 0 END) AS is_study, "
 			+ "    subject.program_uuid AS program_uuid, "
 			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
 			+ "st.visible as visible, st.cvterm_id as cvtermId, subject.locked as isLocked, "
