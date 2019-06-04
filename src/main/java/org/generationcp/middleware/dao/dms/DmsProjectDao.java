@@ -141,13 +141,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " WHERE pr.project_id = :studyId and pr.deleted != " + DELETED_STUDY;
 
 	private static final String GET_STUDIES_OF_FOLDER =
-		"SELECT  DISTINCT project_id "
-			+ "FROM project "
-			+ "WHERE parent_project_id = :folderId AND p.study_type_id IS NOT NULL AND p.deleted != " + DELETED_STUDY + " "
+		"SELECT DISTINCT p.project_id "
+			+ "FROM project p "
+			+ "WHERE p.parent_project_id = :folderId AND p.study_type_id IS NOT NULL AND p.deleted != " + DELETED_STUDY + " "
 			+ "ORDER BY p.name ";
 
 	private static final String GET_ALL_FOLDERS =
-		" SELECT p.project_id FROM project p "
+		" SELECT p.study_id, p.project_id, p.name, p.description FROM project p "
 			+ " WHERE study_type_id IS NULL "
 			+ " AND study_id IS NULL AND p.project_id != " + DmsProject.SYSTEM_FOLDER_ID
 			+ " AND p.deleted != " + DELETED_STUDY;
