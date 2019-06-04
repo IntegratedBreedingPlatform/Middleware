@@ -87,40 +87,112 @@
 	<changeSet author="vanina" id="v12.2.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<and>
-					<columnExists tableName="users_roles" columnName="crop_name"/>
-					<columnExists tableName="users_roles" columnName="workbench_project_id"/>
-					<columnExists tableName="users_roles" columnName="created_by"/>
-					<columnExists tableName="users_roles" columnName="updated_by"/>
-					<columnExists tableName="users_roles" columnName="updated_date"/>
-					<columnExists tableName="users_roles" columnName="created_date"/>
-				</and>
+				<columnExists tableName="users_roles" columnName="crop_name"/>
 			</not>
 		</preConditions>
 		<comment>
-			Alter table users_roles to add crop_name and workbench_project_id
+			Alter table users_roles to add crop_name
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE users_roles
-			ADD COLUMN crop_name VARCHAR(32) NULL,
-			ADD COLUMN workbench_project_id INT(10) UNSIGNED NULL DEFAULT NULL,
-			ADD COLUMN created_by VARCHAR(255) NULL,
-			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL,
-			ADD COLUMN updated_by VARCHAR(255) NULL,
-			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
+			ADD COLUMN crop_name VARCHAR(32) NULL;
+			ALTER TABLE workbench.users_roles 
+			ADD INDEX fk_crop_name_idx (crop_name ASC);
+			ALTER TABLE workbench.users_roles 
+			ADD CONSTRAINT fk_crop_name
+			  FOREIGN KEY (crop_name)
+			  REFERENCES workbench.workbench_crop (crop_name)
+			  ON DELETE NO ACTION
+			  ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users_roles" columnName="workbench_project_id"/>
+			</not>
+		</preConditions>
+		<comment>
+			Alter table users_roles to add workbench_project_id
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE users_roles
+			ADD COLUMN workbench_project_id INT(10) UNSIGNED NULL DEFAULT NULL;
 			ALTER TABLE users_roles
 			ADD CONSTRAINT fk_workbenck_project
 			FOREIGN KEY (workbench_project_id)
 			REFERENCES workbench_project (project_id)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users_roles" columnName="created_by"/>
+			</not>
+		</preConditions>
+		<comment>
+			Alter table users_roles to add created_by
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE users_roles
+			ADD COLUMN created_by VARCHAR(255) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users_roles" columnName="updated_by"/>
+			</not>
+		</preConditions>
+		<comment>
+			Alter table users_roles to add updated_by
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE users_roles
+			ADD COLUMN updated_by VARCHAR(255) NULL; 
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="vanina" id="v12.2.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users_roles" columnName="updated_date"/>
+			</not>
+		</preConditions>
+		<comment>
+			Alter table users_roles to add updated_date
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE users_roles
+			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users_roles" columnName="created_date"/>
+			</not>
+		</preConditions>
+		<comment>
+			Alter table users_roles to add created_date
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE users_roles
+			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
 
 			alter table users_roles
 			  modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-2">
+	<changeSet author="vanina" id="v12.2.0-7">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="role_type"/>
@@ -138,42 +210,106 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-3">
+		<changeSet author="vanina" id="v12.2.0-8">
 		<preConditions onFail="MARK_RAN">
 			<and>
-				<columnExists tableName="role" columnName="description"/>
 				<not>
-					<and>
-						<columnExists tableName="role" columnName="created_by"/>
-						<columnExists tableName="role" columnName="updated_by"/>
-						<columnExists tableName="role" columnName="updated_date"/>
-						<columnExists tableName="role" columnName="created_date"/>
-						<columnExists tableName="role" columnName="name"/>
-						<columnExists tableName="role" columnName="active"/>
-						<columnExists tableName="role" columnName="editable"/>
-						<columnExists tableName="role" columnName="assignable"/>
-					</and>
+					<columnExists tableName="role" columnName="created_by"/>
 				</not>
 			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			CHANGE COLUMN description name VARCHAR(100) NOT NULL ,
-			ADD COLUMN description VARCHAR(255) NOT NULL,
-			ADD COLUMN active TINYINT(1) NULL,
-			ADD COLUMN editable TINYINT(1) NULL,
-			ADD COLUMN assignable TINYINT(1) NULL,
-			ADD COLUMN created_by VARCHAR(255) NULL,
-			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL,
-			ADD COLUMN updated_by VARCHAR(255) NULL,
+			ADD COLUMN created_by VARCHAR(255) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-9">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="role" columnName="description"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			CHANGE COLUMN description name VARCHAR(100) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="updated_by"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN updated_by VARCHAR(255) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-11">
+		<preConditions onFail="MARK_RAN">
+				<not>
+					<columnExists tableName="role" columnName="updated_date"/>
+				</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
 			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-12">
+		<preConditions onFail="MARK_RAN">
+				<not>
+					<columnExists tableName="role" columnName="created_date"/>
+				</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
 
 			alter table role
 			  modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-4">
+	<changeSet author="vanina" id="v12.2.0-13">
+		<preConditions onFail="MARK_RAN">
+				<not>
+					<columnExists tableName="role" columnName="active"/>
+				</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN active TINYINT(1) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-14">
+		<preConditions onFail="MARK_RAN">
+				<not>
+					<columnExists tableName="role" columnName="editable"/>
+				</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN editable TINYINT(1) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-15">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="assignable"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN assignable TINYINT(1) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-16">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="permission"/>
@@ -207,7 +343,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-5">
+	<changeSet author="vanina" id="v12.2.0-17">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="role_permission"/>
@@ -232,7 +368,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-6">
+	<changeSet author="vanina" id="v12.2.0-18">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="role_type_permission"/>
@@ -258,7 +394,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-7">
+	<changeSet author="vanina" id="v12.2.0-19">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1)
@@ -291,7 +427,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-8">
+	<changeSet author="vanina" id="v12.2.0-20">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1)
@@ -357,7 +493,7 @@
 	</changeSet>
 
 
-	<changeSet author="vanina" id="v12.2.0-9">
+	<changeSet author="vanina" id="v12.2.0-21">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1)
@@ -382,6 +518,33 @@
 			INSERT INTO role_permission (permission_id, role_id) VALUES (20,4);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (21,4);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (22,4);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-22">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="description"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN description VARCHAR(255) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-23">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="5">
+				select count(1) from role where editable is null or assignable is null or active is null;
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 1;
+			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 2;
+			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 3;
+			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 4;
+			UPDATE workbench.role SET active = 1, editable = 1, assignable = 0 WHERE id = 5;
 		</sql>
 	</changeSet>
 </databaseChangeLog>
