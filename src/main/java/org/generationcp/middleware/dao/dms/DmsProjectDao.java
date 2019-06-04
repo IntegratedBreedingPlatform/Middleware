@@ -121,7 +121,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "  LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
 			+ "  LEFT JOIN users u ON u.userid = subject.created_by "
 			+ "  LEFT JOIN persons p ON p.personid = u.personid "
+			+ " LEFT JOIN project parent ON subject.parent_project_id = parent.project_id "
 			+ " WHERE subject.parent_project_id = :folderId "
+			+ "   AND parent.study_type_id IS NULL "
 			+ "   AND subject.deleted != " + DELETED_STUDY
 			+ "   AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
 			+ "   AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
