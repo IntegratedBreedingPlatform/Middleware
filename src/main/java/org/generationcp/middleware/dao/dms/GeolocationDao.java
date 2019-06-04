@@ -425,7 +425,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					" FROM nd_geolocation g " + //
 					" INNER JOIN nd_experiment exp ON (exp.nd_geolocation_id = g.nd_geolocation_id) " + //
 					" INNER JOIN project envdataset on (envdataset.project_id = exp.project_ID) " + //
-					" WHERE envdataset.study_id = :studyId and envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA;
+					" WHERE envdataset.study_id = :studyId and envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("g", Geolocation.class);
 				query.setParameter("studyId", studyId);

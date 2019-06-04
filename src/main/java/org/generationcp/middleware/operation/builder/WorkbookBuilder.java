@@ -311,6 +311,8 @@ public class WorkbookBuilder extends Builder {
 		final Study study = this.getStudyBuilder().createStudy(id);
 		Integer dataSetId = null, trialDatasetId = null;
 
+		final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(id);
+		workbook.setStudyDetails(studyDetails);
 
 		final DataSet plotDataset = this.getStudyDataManager().findOneDataSetByType(id, DatasetTypeEnum.PLOT_DATA.getId());
 		if (plotDataset != null) {
