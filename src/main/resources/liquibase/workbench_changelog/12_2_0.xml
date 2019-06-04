@@ -57,13 +57,19 @@
 			CHANGE COLUMN id id INT(11) NOT NULL,
 			ADD COLUMN crop_name VARCHAR(32) NULL,
 			ADD COLUMN workbench_project_id INT(10) UNSIGNED NULL DEFAULT NULL,
-			ADD COLUMN created_by VARCHAR(255) NULL;
+			ADD COLUMN created_by VARCHAR(255) NULL,
+			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL,
+			ADD COLUMN updated_by VARCHAR(255) NULL,
+			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
 			ALTER TABLE users_roles
 			ADD CONSTRAINT fk_workbenck_project
 			FOREIGN KEY (workbench_project_id)
 			REFERENCES workbench_project (project_id)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
+
+			alter table users_roles
+			  modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
@@ -114,7 +120,13 @@
 			ADD COLUMN active TINYINT(1) NULL,
 			ADD COLUMN editable TINYINT(1) NULL,
 			ADD COLUMN assignable TINYINT(1) NULL,
-			ADD COLUMN created_by VARCHAR(255) NULL;
+			ADD COLUMN created_by VARCHAR(255) NULL,
+			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL,
+			ADD COLUMN updated_by VARCHAR(255) NULL,
+			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
+
+			alter table role
+			  modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
