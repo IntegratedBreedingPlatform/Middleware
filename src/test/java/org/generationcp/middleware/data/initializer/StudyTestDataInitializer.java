@@ -55,6 +55,8 @@ public class StudyTestDataInitializer {
 	private final LocationDataManager locationDataManager;
 	private final UserDataManager userDataManager;
 	private Integer gid;
+	private Integer stockId;
+	private Integer geolocationId;
 
 	public StudyTestDataInitializer(
 		final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
@@ -146,13 +148,15 @@ public class StudyTestDataInitializer {
 		studyValues.setVariableList(variableList);
 
 		final VariableList locationVariableList = this.createEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
-		studyValues.setLocationId(this.studyDataManager.addTrialEnvironment(locationVariableList));
+		this.geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
+		studyValues.setLocationId(this.geolocationId);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		this.gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 		final VariableList germplasmVariableList =
 			this.createGermplasm("unique name", String.valueOf(this.gid), "name", "2000", "prop1", "prop2");
-		studyValues.setGermplasmId(this.studyDataManager.addStock(germplasmVariableList));
+		this.stockId = this.studyDataManager.addStock(germplasmVariableList);
+		studyValues.setGermplasmId(this.stockId);
 
 		return studyValues;
 	}
@@ -308,6 +312,14 @@ public class StudyTestDataInitializer {
 
 	public Integer getGid() {
 		return this.gid;
+	}
+
+	public Integer getStockId() {
+		return stockId;
+	}
+
+	public Integer getGeolocationId() {
+		return geolocationId;
 	}
 
 	public Integer addTestLocation(final String locationName) {

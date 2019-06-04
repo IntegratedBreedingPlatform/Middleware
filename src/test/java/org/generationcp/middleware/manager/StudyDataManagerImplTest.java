@@ -216,12 +216,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchStudiesByGid() {
+	public void testSearchStudiesByGid() throws Exception {
+		final Integer gid = this.studyTDI.getGid();
+		final Integer geolocationId = this.studyTDI.getGeolocationId();
+		final Integer stockId = this.studyTDI.getStockId();
+
+		// Create test dataset
+		final DatasetReference dataset = this.studyTDI.addTestDataset(this.studyReference.getId());
+		final ExperimentValues values = new ExperimentValues();
+		values.setLocationId(geolocationId);
+		values.setGermplasmId(stockId);
+		this.manager.addExperiment(this.crop, dataset.getId(), ExperimentType.PLOT, values);
+
 		// Flushing to force Hibernate to synchronize with the underlying database before the search
 		// Without this the inserted experiment is not retrieved properly
 		this.manager.getActiveSession().flush();
 
-		final Integer gid = this.studyTDI.getGid();
 		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
 		final StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
 		// We are sure that the result set will contain the test study we added in the set up
@@ -233,6 +243,18 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(rootFolders);
 		Assert.assertFalse("Root folders should not be empty because it contains the templates for Studies.", rootFolders.isEmpty());
+	}
+
+	@Test
+	public void testMoveDmsProject() {
+		final String uniqueId = this.commonTestProject.getUniqueID();
+		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
+		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId());
+		this.sessionProvder.getSession().flush();
+
+		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), uniqueId);
+		Assert.assertNotNull(childrenNodes);
+		Assert.assertEquals("Study should have been moved to new folder.", 1, childrenNodes.size());
 	}
 
 	@Test
@@ -249,7 +271,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), uniqueId);
 		Assert.assertNotNull(childrenNodes);
-		Assert.assertEquals("The size should be one.", 2, childrenNodes.size());
+		Assert.assertEquals(2, childrenNodes.size());
 		for (final Reference reference : childrenNodes) {
 			if (reference.isFolder()) {
 				Assert.assertEquals(subFolderID, reference.getId().intValue());
