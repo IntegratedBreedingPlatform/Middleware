@@ -622,7 +622,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean moveDmsProject(final int sourceId, final int targetId, final boolean isAStudy) {
+	public boolean moveDmsProject(final int sourceId, final int targetId) {
 
 		final DmsProject source = this.getDmsProjectDao().getById(sourceId);
 		final DmsProject target = this.getDmsProjectDao().getById(targetId);

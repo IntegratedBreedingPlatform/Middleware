@@ -457,10 +457,9 @@ public interface StudyDataManager {
 	 *
 	 * @param sourceId the source id
 	 * @param targetId the target id
-	 * @param isAStudy the is a study
 	 * @return true, if successful
 	 */
-	boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy);
+	boolean moveDmsProject(int sourceId, int targetId);
 
 	/**
 	 * Retrieves the study details of the given study type from from both selected DB instance ordered by db instance then study name.

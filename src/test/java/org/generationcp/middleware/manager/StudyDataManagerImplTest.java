@@ -244,8 +244,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String subFolderDescription = "Sub Folder Description";
 		final int subFolderID =
 			this.manager.addSubFolder(mainFolder.getProjectId(), subFolderName, subFolderDescription, uniqueId, "objective");
-		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId(), true);
+		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId());
 
+		this.sessionProvder.getSession().flush();
 		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), uniqueId);
 		Assert.assertNotNull(childrenNodes);
 		Assert.assertEquals("The size should be one.", 2, childrenNodes.size());
