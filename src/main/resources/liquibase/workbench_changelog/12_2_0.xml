@@ -40,6 +40,50 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v12.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM information_schema.routines
+				WHERE routine_schema = DATABASE() AND specific_name = 'assignCropsToSuperAdmin';
+			</sqlCheck>
+		</preConditions>
+		<comment>Create sp to associate all superadmins to every crop</comment>
+		<sql dbms="mysql" splitStatements="false">
+			# Create an stored procedure instead of just a simple sql statement with runAlways
+			# so that it can be altered in the future if the schema changes
+			# without the need to remove the changeset
+
+			create procedure assignCropsToSuperAdmin()
+			begin
+			    # for every combination of superadmins and crops
+			    # filter those that don't have a users_crops association
+			    # and insert them into users_crops
+			    insert into users_crops (user_id, crop_name)
+			    select u.userid, wc.crop_name
+			    from workbench_crop wc
+			           cross join users u
+			           left join users_crops uc on wc.crop_name = uc.crop_name and u.userid = uc.user_id
+			           inner join users_roles ur on u.userid = ur.userid
+			           inner join role r on ur.role_id = r.id
+			    where uc.user_id is null and r.id = 5;
+			end;
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v12.2.0-5" runAlways="true">
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM information_schema.routines
+				WHERE routine_schema = DATABASE() AND specific_name = 'assignCropsToSuperAdmin';
+			</sqlCheck>
+		</preConditions>
+		<comment>Run sp to associate all superadmins to every crop</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# Run always to populate new crops
+			call assignCropsToSuperAdmin();
+		</sql>
+	</changeSet>
+
 	<changeSet author="vanina" id="v12.2.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
