@@ -517,13 +517,6 @@ public interface StudyDataManager {
 	long countAllNurseryAndTrialStudyDetails(String programUUID);
 
 	/**
-	 * Retrieves the folder tree.
-	 *
-	 * @return the folder tree
-	 */
-	List<FolderReference> getFolderTree();
-
-	/**
 	 * Retrieves a flat list (no tree structuring) of all folders.
 	 */
 	List<FolderReference> getAllFolders();

@@ -382,17 +382,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetFolderTree() {
-		List<FolderReference> tree = this.manager.getFolderTree();
-		final int sizeBefore = tree.size();
-		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
-		tree = this.manager.getFolderTree();
-		final int newSize = tree.size();
-		// Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
-		Assert.assertEquals("The new size should be equal the  size before + the newly added folder", newSize, (sizeBefore + 1));
-	}
-
-	@Test
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
 		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 

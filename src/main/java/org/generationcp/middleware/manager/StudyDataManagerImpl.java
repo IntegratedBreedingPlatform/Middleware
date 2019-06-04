@@ -744,11 +744,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FolderReference> getFolderTree() {
-		return this.getFolderBuilder().buildFolderTree();
-	}
-
-	@Override
 	public List<FolderReference> getAllFolders() {
 		return this.getDmsProjectDao().getAllFolders();
 	}
