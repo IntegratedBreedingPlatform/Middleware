@@ -281,7 +281,7 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN active TINYINT(1) NULL;
+			ADD COLUMN active TINYINT(1) NULL DEFAULT 1;
 		</sql>
 	</changeSet>
 
@@ -293,7 +293,7 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN editable TINYINT(1) NULL;
+			ADD COLUMN editable TINYINT(1) NULL DEFAULT 1;
 		</sql>
 	</changeSet>
 
@@ -305,7 +305,7 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN assignable TINYINT(1) NULL;
+			ADD COLUMN assignable TINYINT(1) NULL DEFAULT 1;
 		</sql>
 	</changeSet>
 
@@ -536,15 +536,11 @@
 	<changeSet author="vanina" id="v12.2.0-23">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="5">
-				select count(1) from role where editable is null or assignable is null or active is null;
+				select count(1) from role where id = 5;
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 1;
-			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 2;
-			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 3;
-			UPDATE workbench.role SET active = 1, editable = 1, assignable = 1 WHERE id = 4;
-			UPDATE workbench.role SET active = 1, editable = 1, assignable = 0 WHERE id = 5;
+			UPDATE workbench.role SET active = 1, editable = 0, assignable = 0 WHERE id = 5;
 		</sql>
 	</changeSet>
 </databaseChangeLog>
