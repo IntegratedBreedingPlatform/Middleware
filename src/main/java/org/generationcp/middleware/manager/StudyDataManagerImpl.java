@@ -663,6 +663,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			// modify the folder label
 			final String name = project.getName() + "#" + Math.random();
 			project.setName(name);
+			project.setDeleted(true);
 			dmsProjectDao.saveOrUpdate(project);
 
 		} catch (final Exception e) {
