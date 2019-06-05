@@ -28,4 +28,13 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="aldrin" id="v12.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="project_relationship"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE `project_relationship`;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
