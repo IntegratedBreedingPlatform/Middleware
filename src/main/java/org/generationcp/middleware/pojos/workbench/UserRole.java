@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "users_roles")
@@ -34,6 +35,13 @@ public class UserRole {
 	@ManyToOne
 	@JoinColumn(name = "workbench_project_id", nullable = true)
 	private Project workbenchProject;
+
+	@ManyToOne
+	@JoinColumn(name = "created_by", nullable = true)
+	private WorkbenchUser createdBy;
+
+	@Column(name = "created_date")
+	private Timestamp createdDate;
 
 	public UserRole() {
 	}
@@ -93,6 +101,22 @@ public class UserRole {
 
 	public void setWorkbenchProject(final Project workbenchProject) {
 		this.workbenchProject = workbenchProject;
+	}
+
+	public WorkbenchUser getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final WorkbenchUser createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Timestamp getCreatedDate() {
+		return this.createdDate;
+	}
+
+	public void setCreatedDate(final Timestamp createdDate) {
+		this.createdDate = createdDate;
 	}
 
 	@Override
