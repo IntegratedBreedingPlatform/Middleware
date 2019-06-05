@@ -96,12 +96,12 @@
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE users_roles
 			ADD COLUMN crop_name VARCHAR(32) NULL;
-			ALTER TABLE workbench.users_roles 
+			ALTER TABLE users_roles 
 			ADD INDEX fk_crop_name_idx (crop_name ASC);
-			ALTER TABLE workbench.users_roles 
+			ALTER TABLE users_roles 
 			ADD CONSTRAINT fk_crop_name
 			  FOREIGN KEY (crop_name)
-			  REFERENCES workbench.workbench_crop (crop_name)
+			  REFERENCES workbench_crop (crop_name)
 			  ON DELETE NO ACTION
 			  ON UPDATE NO ACTION;
 		</sql>
@@ -139,7 +139,16 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE users_roles
-			ADD COLUMN created_by VARCHAR(255) NULL;
+			ADD COLUMN created_by INT(11) NULL;
+
+			ALTER TABLE users_roles
+			ADD INDEX fk_users_roles_2_idx (created_by ASC);
+			ALTER TABLE users_roles
+			ADD CONSTRAINT fk_users_roles_2
+			FOREIGN KEY (created_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
 		</sql>
 	</changeSet>
 
@@ -220,7 +229,16 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN created_by VARCHAR(255) NULL;
+			ADD COLUMN created_by INT(11) NULL;
+
+			ALTER TABLE role
+			ADD INDEX fk_role_1_idx (created_by ASC);
+			ALTER TABLE role
+			ADD CONSTRAINT fk_role_1
+			FOREIGN KEY (created_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
 		</sql>
 	</changeSet>
 
@@ -540,7 +558,7 @@
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE workbench.role SET active = 1, editable = 0, assignable = 0 WHERE id = 5;
+			UPDATE role SET active = 1, editable = 0, assignable = 0 WHERE id = 5;
 		</sql>
 	</changeSet>
 </databaseChangeLog>
