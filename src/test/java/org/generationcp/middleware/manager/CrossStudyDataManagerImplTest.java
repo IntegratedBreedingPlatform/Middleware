@@ -267,6 +267,8 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		plot.setName(studyName + " - Plot Dataset");
 		plot.setDescription(studyName + " - Plot Dataset");
 		plot.setProgramUUID(programUUID);
+		plot.setParent(study);
+		plot.setStudy(study);
 		this.dmsProjectDao.save(plot);
 
 		final Geolocation geolocation = new Geolocation();

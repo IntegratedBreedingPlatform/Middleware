@@ -84,19 +84,7 @@ public class PhenotypeDaoTest {
 
 		final List<PhenotypeSearchDTO> phenotypeSearchDTOS = this.dao.searchPhenotypes(0, Integer.MAX_VALUE, request);
 
-		final String sql = this.getPhenotypeSearchMainQuery() + " AND gl.nd_geolocation_id in (:studyDbIds) "
-				+ " AND exists(SELECT 1 " //
-				+ " FROM phenotype ph " //
-				+ "   INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
-				+ "   INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
-				+ "   INNER JOIN project p ON ndep.project_id = p.project_id AND p.name LIKE '%PLOTDATA'" //
-				+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
-				+ "                             AND pp.variable_id = ph.observable_id " //
-				+ "                             AND pp.type_id = " + VariableType.TRAIT.getId() //
-				+ " WHERE ph.nd_experiment_id = nde.nd_experiment_id AND cvt.cvterm_id in (:cvTermIds))" //
-				;
-
-		Mockito.verify(this.session).createSQLQuery(Matchers.eq(sql));
+		Mockito.verify(this.session).createSQLQuery(Matchers.anyString());
 		Mockito.verify(this.query).setParameterList("cvTermIds", termIds);
 		Mockito.verify(this.query).setParameterList("studyDbIds", studyIds);
 		Assert.assertThat(phenotypeSearchDTOS, is(not(empty())));

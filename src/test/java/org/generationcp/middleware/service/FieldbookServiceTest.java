@@ -8,6 +8,7 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -116,8 +117,10 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetCompleteDataset() {
-		final Workbook workbook = this.fieldbookMiddlewareService.getCompleteDataset(this.studyReference.getId());
+	public void testGetCompleteDataset() throws Exception {
+		final Integer id = this.studyReference.getId();
+		final DatasetReference datasetReference = this.studyTDI.addTestDataset(id);
+		final Workbook workbook = this.fieldbookMiddlewareService.getCompleteDataset(datasetReference.getId());
 		Assert.assertNotNull(workbook.getObservations());
 		Assert.assertNotNull(workbook.getFactors());
 		Assert.assertNotNull(workbook.getVariates());
