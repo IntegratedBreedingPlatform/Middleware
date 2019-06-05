@@ -174,7 +174,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-6">
+	<changeSet author="vanina" id="v12.2.0-5">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="users_roles" columnName="created_date"/>
@@ -192,7 +192,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-7">
+	<changeSet author="vanina" id="v12.2.0-6">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="role_type"/>
@@ -210,7 +210,7 @@
 		</sql>
 	</changeSet>
 
-		<changeSet author="vanina" id="v12.2.0-8">
+		<changeSet author="vanina" id="v12.2.0-7">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<not>
@@ -233,7 +233,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-9">
+	<changeSet author="vanina" id="v12.2.0-8">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="role" columnName="description"/>
@@ -248,7 +248,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-10">
+	<changeSet author="vanina" id="v12.2.0-9">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="role" columnName="updated_by"/>
@@ -269,7 +269,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-11">
+	<changeSet author="vanina" id="v12.2.0-10">
 		<preConditions onFail="MARK_RAN">
 				<not>
 					<columnExists tableName="role" columnName="updated_date"/>
@@ -281,7 +281,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-12">
+	<changeSet author="vanina" id="v12.2.0-11">
 		<preConditions onFail="MARK_RAN">
 				<not>
 					<columnExists tableName="role" columnName="created_date"/>
@@ -296,7 +296,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-13">
+	<changeSet author="vanina" id="v12.2.0-12">
 		<preConditions onFail="MARK_RAN">
 				<not>
 					<columnExists tableName="role" columnName="active"/>
@@ -308,7 +308,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-14">
+	<changeSet author="vanina" id="v12.2.0-13">
 		<preConditions onFail="MARK_RAN">
 				<not>
 					<columnExists tableName="role" columnName="editable"/>
@@ -320,7 +320,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-15">
+	<changeSet author="vanina" id="v12.2.0-14">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="role" columnName="assignable"/>
@@ -329,6 +329,18 @@
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN assignable TINYINT(1) NULL DEFAULT 1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-15">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="description"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN description VARCHAR(255) NOT NULL;
 		</sql>
 	</changeSet>
 
@@ -544,19 +556,8 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-22">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="role" columnName="description"/>
-			</not>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE role
-			ADD COLUMN description VARCHAR(255) NOT NULL;
-		</sql>
-	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-23">
+	<changeSet author="vanina" id="v12.2.0-22">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="5">
 				select count(1) from role where id = 5;
