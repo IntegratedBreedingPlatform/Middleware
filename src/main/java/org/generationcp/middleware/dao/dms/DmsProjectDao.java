@@ -198,8 +198,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		"SELECT DISTINCT p.study_id"
 			+ " FROM project p "
 			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
-			+ " INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
-			+ " WHERE gl.nd_geolocation_id = :studyDbId"
+			+ " WHERE nde.nd_geolocation_id = :studyDbId"
 			+ " AND p.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 
 	private static final String STUDY_DETAILS_SQL = " SELECT DISTINCT \n"
