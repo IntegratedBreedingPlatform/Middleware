@@ -155,28 +155,6 @@
 	<changeSet author="vanina" id="v12.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="users_roles" columnName="updated_by"/>
-			</not>
-		</preConditions>
-		<comment>
-			Alter table users_roles to add updated_by
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE users_roles
-			ADD COLUMN updated_by INT(11) NULL;
-
-			ALTER TABLE users_roles
-			ADD CONSTRAINT fk_users_roles_1
-			FOREIGN KEY (updated_by)
-			REFERENCES users (userid)
-			ON DELETE NO ACTION
-			ON UPDATE NO ACTION;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v12.2.0-5">
-		<preConditions onFail="MARK_RAN">
-			<not>
 				<columnExists tableName="users_roles" columnName="created_date"/>
 			</not>
 		</preConditions>
@@ -192,7 +170,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-6">
+	<changeSet author="vanina" id="v12.2.0-5">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="role_type"/>
@@ -210,7 +188,90 @@
 		</sql>
 	</changeSet>
 
-		<changeSet author="vanina" id="v12.2.0-7">
+	<changeSet author="vanina" id="v12.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="role" columnName="description"/>
+				<not>
+					<columnExists tableName="role" columnName="name"/>
+				</not>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			CHANGE COLUMN description name VARCHAR(100) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="description"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN description VARCHAR(255) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="role_type"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN role_type INT(11) NOT NULL;
+			ALTER TABLE role
+			ADD INDEX fk_role_3_idx (role_type ASC);
+			ALTER TABLE role
+			ADD CONSTRAINT fk_role_3
+			FOREIGN KEY (role_type)
+			REFERENCES role_type (role_type_id)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="active"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN active TINYINT(1) NULL DEFAULT 1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="editable"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN editable TINYINT(1) NULL DEFAULT 1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-11">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="assignable"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN assignable TINYINT(1) NULL DEFAULT 1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-12">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<not>
@@ -233,22 +294,34 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-8">
+	<changeSet author="vanina" id="v12.2.0-13">
 		<preConditions onFail="MARK_RAN">
-			<and>
-				<columnExists tableName="role" columnName="description"/>
-				<not>
-					<columnExists tableName="role" columnName="name"/>
-				</not>
-			</and>
+			<not>
+				<columnExists tableName="role" columnName="created_date"/>
+			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			CHANGE COLUMN description name VARCHAR(100) NOT NULL;
+			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
+
+			alter table role
+			modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v12.2.0-9">
+	<changeSet author="vanina" id="v12.2.0-14">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="role" columnName="updated_date"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE role
+			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v12.2.0-15">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="role" columnName="updated_by"/>
@@ -266,81 +339,6 @@
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
 
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v12.2.0-10">
-		<preConditions onFail="MARK_RAN">
-				<not>
-					<columnExists tableName="role" columnName="updated_date"/>
-				</not>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE role
-			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v12.2.0-11">
-		<preConditions onFail="MARK_RAN">
-				<not>
-					<columnExists tableName="role" columnName="created_date"/>
-				</not>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE role
-			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL;
-
-			alter table role
-			  modify COLUMN created_date TIMESTAMP NULL default CURRENT_TIMESTAMP;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v12.2.0-12">
-		<preConditions onFail="MARK_RAN">
-				<not>
-					<columnExists tableName="role" columnName="active"/>
-				</not>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE role
-			ADD COLUMN active TINYINT(1) NULL DEFAULT 1;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v12.2.0-13">
-		<preConditions onFail="MARK_RAN">
-				<not>
-					<columnExists tableName="role" columnName="editable"/>
-				</not>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE role
-			ADD COLUMN editable TINYINT(1) NULL DEFAULT 1;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v12.2.0-14">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="role" columnName="assignable"/>
-			</not>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE role
-			ADD COLUMN assignable TINYINT(1) NULL DEFAULT 1;
-		</sql>
-	</changeSet>
-
-	<changeSet author="vanina" id="v12.2.0-15">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="role" columnName="description"/>
-			</not>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE role
-			ADD COLUMN description VARCHAR(255) NOT NULL;
 		</sql>
 	</changeSet>
 
