@@ -155,7 +155,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<DatasetReference> getDatasetReferences(final int studyId) {
-		return this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		return this.getDmsProjectDao().getDirectChildDatasetsOfStudy(studyId);
 	}
 
 	@Override

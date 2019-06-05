@@ -165,7 +165,7 @@ public class ExperimentModelSaver {
 	}
 
 	public int moveStudyToNewGeolocation(final int studyId) {
-		final List<DatasetReference> datasets = this.daoFactory.getDmsProjectDAO().getDatasetNodesByStudyId(studyId);
+		final List<DatasetReference> datasets = this.daoFactory.getDmsProjectDAO().getDirectChildDatasetsOfStudy(studyId);
 		final List<Integer> ids = new ArrayList<>();
 		ids.add(studyId);
 		if (datasets != null) {

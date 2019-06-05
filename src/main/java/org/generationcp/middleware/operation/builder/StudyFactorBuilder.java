@@ -29,7 +29,7 @@ public class StudyFactorBuilder extends Builder {
 		VariableTypeList factors = new VariableTypeList();
 		this.addFactors(studyId, factors);
 
-		List<DatasetReference> dataSetReferences = this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		List<DatasetReference> dataSetReferences = this.getDmsProjectDao().getDirectChildDatasetsOfStudy(studyId);
 		for (DatasetReference dataSetReference : dataSetReferences) {
 			this.addFactors(dataSetReference.getId(), factors);
 		}

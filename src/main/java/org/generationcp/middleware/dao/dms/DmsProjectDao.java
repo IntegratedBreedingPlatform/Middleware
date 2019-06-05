@@ -273,7 +273,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return childrenNodes;
 	}
 
-	public List<DatasetReference> getDatasetNodesByStudyId(final Integer studyId) {
+	public List<DatasetReference> getDirectChildDatasetsOfStudy(final Integer studyId) {
 
 		final List<DatasetReference> datasetReferences = new ArrayList<>();
 
@@ -281,6 +281,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("study.projectId", studyId));
+			// Exclude sub-observation datasets of study
+			criteria.add(Restrictions.eq("parent.projectId", studyId));
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property(DmsProjectDao.PROJECT_ID));
@@ -301,7 +303,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error with getDatasetNodesByStudyId query from Project: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDirectChildDatasetsOfStudy query from Project: " + e.getMessage(), e);
 		}
 
 		return datasetReferences;
