@@ -174,22 +174,6 @@
 		</sql>
 	</changeSet>
 
-
-	<changeSet author="vanina" id="v12.2.0-5">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="users_roles" columnName="updated_date"/>
-			</not>
-		</preConditions>
-		<comment>
-			Alter table users_roles to add updated_date
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE users_roles
-			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL;
-		</sql>
-	</changeSet>
-
 	<changeSet author="vanina" id="v12.2.0-6">
 		<preConditions onFail="MARK_RAN">
 			<not>
