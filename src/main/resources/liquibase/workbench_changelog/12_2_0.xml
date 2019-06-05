@@ -218,18 +218,18 @@
 	<changeSet author="vanina" id="v12.2.0-8">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="role" columnName="role_type"/>
+				<columnExists tableName="role" columnName="role_type_id"/>
 			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN role_type_id INT(11) NULL AFTER DESCRIPTION;
 
-			update role set role_type_id = 1 where role_id = 1;
-			update role set role_type_id = 2 where role_id = 2;
-			update role set role_type_id = 2 where role_id = 3;
-			update role set role_type_id = 3 where role_id = 4;
-			update role set role_type_id = 1 where role_id = 5;
+			update role set role_type_id = 1 where id = 1;
+			update role set role_type_id = 2 where id = 2;
+			update role set role_type_id = 2 where id = 3;
+			update role set role_type_id = 3 where id = 4;
+			update role set role_type_id = 1 where id = 5;
 
 			ALTER TABLE role
 			ADD INDEX fk_role_3_idx (role_type_id ASC);
@@ -348,7 +348,6 @@
 			REFERENCES users (userid)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
-
 		</sql>
 	</changeSet>
 
@@ -367,7 +366,6 @@
 			workbench_sidebar_category_id INT(11) NULL,
 			PRIMARY KEY (permission_id)
 			);
-
 
 			ALTER TABLE permission
 			ADD INDEX fk_permission_1_idx (parent_id ASC),
