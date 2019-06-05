@@ -253,7 +253,7 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN active TINYINT(1) NULL DEFAULT 1 AFTER ROLE_TYPE;
+			ADD COLUMN active TINYINT(1) NULL DEFAULT 1 AFTER role_type_id;
 		</sql>
 	</changeSet>
 
