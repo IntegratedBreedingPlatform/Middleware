@@ -215,13 +215,21 @@ public class StudyTestDataInitializer {
 		return variableList;
 	}
 
-	public DmsProject createFolderTestData(final String uniqueId) throws MiddlewareQueryException {
+	public DmsProject createFolderTestData(final String uniqueId) {
+		return createFolderTestData(uniqueId, null);
+	}
+
+	public DmsProject createFolderTestData(final String uniqueId, final Integer parentId) {
 		final int randomInt = new Random().nextInt(10000);
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setName(StudyTestDataInitializer.TEST_FOLDER_NAME + randomInt);
 		dmsProject.setDescription(StudyTestDataInitializer.TEST_FOLDER_DESC + randomInt);
 		dmsProject.setProgramUUID(uniqueId);
-		final int folderId = this.studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, dmsProject.getName(),
+		final Integer parentFolderId = parentId != null ? parentId : DmsProject.SYSTEM_FOLDER_ID;
+		final DmsProject parent = new DmsProject();
+		parent.setProjectId(parentFolderId);
+		dmsProject.setParent(parent);
+		final int folderId = this.studyDataManager.addSubFolder(parentFolderId, dmsProject.getName(),
 			dmsProject.getDescription(), dmsProject.getProgramUUID(), StudyTestDataInitializer.OBJECTIVE);
 		dmsProject.setProjectId(folderId);
 		return dmsProject;

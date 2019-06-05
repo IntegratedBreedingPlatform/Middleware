@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -297,12 +299,45 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllFolders() {
 		final int originalSize = this.manager.getAllFolders().size();
-		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
-		this.studyTDI.createFolderTestData(null);
+		final String uniqueID = this.commonTestProject.getUniqueID();
+		final DmsProject folder1 = this.studyTDI.createFolderTestData(uniqueID);
+		final DmsProject folder2 = this.studyTDI.createFolderTestData(null);
+		final DmsProject folder3 = this.studyTDI.createFolderTestData(uniqueID, folder1.getProjectId());
+		this.sessionProvder.getSession().flush();
 
-		final int newSize = this.manager.getAllFolders().size();
+		final List<FolderReference> allFolders = this.manager.getAllFolders();
+		final int newSize = allFolders.size();
+		final List<Integer> idList = Lists.transform(allFolders, new Function<FolderReference, Integer>() {
+
+			@Override
+			public Integer apply(final FolderReference dataset) {
+				return dataset.getId();
+			}
+		});
 		// We only assert that there are two folders added.
-		Assert.assertEquals("The new size should be equal to the original size + 2", originalSize + 2, newSize);
+		Assert.assertEquals("The new size should be equal to the original size + 3", originalSize + 3, newSize);
+		Assert.assertTrue(idList.contains(folder1.getProjectId()));
+		Assert.assertTrue(idList.contains(folder2.getProjectId()));
+		Assert.assertTrue(idList.contains(folder3.getProjectId()));
+		for (final FolderReference folder : allFolders) {
+			final Integer id = folder.getId();
+			if (id.equals(folder1.getProjectId())) {
+				Assert.assertEquals(folder1.getProjectId(), id);
+				Assert.assertEquals(folder1.getName(), folder.getName());
+				Assert.assertEquals(folder1.getDescription(), folder.getDescription());
+				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
+			} else if (id.equals(folder2.getProjectId())) {
+				Assert.assertEquals(folder2.getProjectId(), id);
+				Assert.assertEquals(folder2.getName(), folder.getName());
+				Assert.assertEquals(folder2.getDescription(), folder.getDescription());
+				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
+			} else if (id.equals(folder3.getProjectId())) {
+				Assert.assertEquals(folder3.getProjectId(), id);
+				Assert.assertEquals(folder3.getName(), folder.getName());
+				Assert.assertEquals(folder3.getDescription(), folder.getDescription());
+				Assert.assertEquals(folder1.getProjectId(), folder.getParentFolderId());
+			}
+		}
 	}
 
 	@Test

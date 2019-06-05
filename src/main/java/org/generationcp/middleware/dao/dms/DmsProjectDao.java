@@ -149,7 +149,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "ORDER BY p.name ";
 
 	private static final String GET_ALL_FOLDERS =
-		" SELECT p.study_id, p.project_id, p.name, p.description FROM project p "
+		" SELECT p.parent_project_id, p.project_id, p.name, p.description FROM project p "
 			+ " WHERE study_type_id IS NULL "
 			+ " AND study_id IS NULL AND p.project_id != " + DmsProject.SYSTEM_FOLDER_ID
 			+ " AND p.deleted != " + DELETED_STUDY;
