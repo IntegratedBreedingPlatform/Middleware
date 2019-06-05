@@ -163,7 +163,14 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE users_roles
-			ADD COLUMN updated_by VARCHAR(255) NULL; 
+			ADD COLUMN updated_by INT(11) NULL;
+
+			ALTER TABLE users_roles
+			ADD CONSTRAINT fk_users_roles_1
+			FOREIGN KEY (updated_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
 		</sql>
 	</changeSet>
 
@@ -244,7 +251,12 @@
 
 	<changeSet author="vanina" id="v12.2.0-9">
 		<preConditions onFail="MARK_RAN">
-			<columnExists tableName="role" columnName="description"/>
+			<and>
+				<columnExists tableName="role" columnName="description"/>
+				<not>
+					<columnExists tableName="role" columnName="name"/>
+				</not>
+			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
@@ -260,7 +272,16 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN updated_by VARCHAR(255) NULL;
+			ADD COLUMN updated_by INT(11) NULL;
+			ALTER TABLE role
+			ADD INDEX fk_role_2_idx (updated_by ASC);
+			ALTER TABLE role
+			ADD CONSTRAINT fk_role_2
+			FOREIGN KEY (updated_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+
 		</sql>
 	</changeSet>
 
