@@ -559,7 +559,7 @@
 
 	<changeSet author="vanina" id="v12.2.0-22">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="5">
+			<sqlCheck expectedResult="1">
 				select count(1) from role where id = 5;
 			</sqlCheck>
 		</preConditions>
