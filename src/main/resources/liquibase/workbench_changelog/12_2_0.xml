@@ -176,6 +176,9 @@
 				<tableExists tableName="role_type"/>
 			</not>
 		</preConditions>
+		<comment>
+			Create table role_type
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE role_type (
 			role_type_id INT(11) NOT NULL,
@@ -197,6 +200,9 @@
 				</not>
 			</and>
 		</preConditions>
+		<comment>
+			Alter table role to changing name by description
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			CHANGE COLUMN description name VARCHAR(100) NOT NULL;
@@ -209,6 +215,9 @@
 				<columnExists tableName="role" columnName="description"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add description
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN description VARCHAR(255) NULL AFTER NAME;
@@ -221,6 +230,9 @@
 				<columnExists tableName="role" columnName="role_type_id"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add role_type_id
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN role_type_id INT(11) NULL AFTER DESCRIPTION;
@@ -251,6 +263,9 @@
 				<columnExists tableName="role" columnName="active"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add active column
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN active TINYINT(1) NULL DEFAULT 1 AFTER role_type_id;
@@ -263,6 +278,9 @@
 				<columnExists tableName="role" columnName="editable"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add editable column
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN editable TINYINT(1) NULL DEFAULT 1 AFTER ACTIVE;
@@ -275,6 +293,9 @@
 				<columnExists tableName="role" columnName="assignable"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add active column
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN assignable TINYINT(1) NULL DEFAULT 1 AFTER EDITABLE;
@@ -289,6 +310,9 @@
 				</not>
 			</and>
 		</preConditions>
+		<comment>
+			Alter table role to add created_by column
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN created_by INT(11) NULL AFTER ASSIGNABLE;
@@ -310,6 +334,9 @@
 				<columnExists tableName="role" columnName="created_date"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add created_date column
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN created_date TIMESTAMP NULL DEFAULT NULL AFTER CREATED_BY;
@@ -325,6 +352,9 @@
 				<columnExists tableName="role" columnName="updated_by"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add updated_by column
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN updated_by INT(11) NULL AFTER CREATED_DATE;
@@ -345,6 +375,9 @@
 				<columnExists tableName="role" columnName="updated_date"/>
 			</not>
 		</preConditions>
+		<comment>
+			Alter table role to add updated_date column
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
 			ADD COLUMN updated_date TIMESTAMP NULL DEFAULT NULL AFTER UPDATED_BY;
@@ -357,6 +390,9 @@
 				<tableExists tableName="permission"/>
 			</not>
 		</preConditions>
+		<comment>
+			Create table permission
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE permission (
 			permission_id INT(11) NOT NULL AUTO_INCREMENT,
@@ -390,6 +426,9 @@
 				<tableExists tableName="role_permission"/>
 			</not>
 		</preConditions>
+		<comment>
+			Create table role_permission
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE role_permission (
 			role_id INT(11) NOT NULL,
@@ -415,6 +454,9 @@
 				<tableExists tableName="role_type_permission"/>
 			</not>
 		</preConditions>
+		<comment>
+			Create table role_type_permission
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE role_type_permission (
 			role_type_id INT(11) NOT NULL,
@@ -442,6 +484,9 @@
 				from permission
 			</sqlCheck>
 		</preConditions>
+		<comment>
+			INSERT INTO table permission
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (1, 'ADMIN','Full',null,null);
 			INSERT INTO permission (permission_id, name, description, parent_id, workbench_sidebar_category_id) values (2, 'ADMINISTRATION','Administration',1,null);
@@ -475,6 +520,9 @@
 				from role_type_permission
 			</sqlCheck>
 		</preConditions>
+		<comment>
+			INSERT INTO table role_type_permission
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (1,1,1);
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (2,1,1);
@@ -533,7 +581,6 @@
 		</sql>
 	</changeSet>
 
-
 	<changeSet author="vanina" id="v12.2.0-21">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
@@ -541,6 +588,9 @@
 				from role_permission
 			</sqlCheck>
 		</preConditions>
+		<comment>
+			INSERT INTO table role_permission
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO role_permission (permission_id, role_id) VALUES (1,1);
 			INSERT INTO role_permission (permission_id, role_id) VALUES (1,5);
@@ -569,6 +619,9 @@
 				select count(1) from role where id = 5;
 			</sqlCheck>
 		</preConditions>
+		<comment>
+			Update table role where row is SUPERADMIN
+		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE role SET active = 1, editable = 0, assignable = 0 WHERE id = 5;
 		</sql>
