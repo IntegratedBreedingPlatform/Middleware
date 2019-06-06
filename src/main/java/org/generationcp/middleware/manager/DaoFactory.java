@@ -13,6 +13,7 @@ import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -213,5 +214,11 @@ public class DaoFactory {
 		brapiSearchDAO.setSession(this.sessionProvider.getSession());
 		return brapiSearchDAO;
 
+	}
+
+	public WorkbenchUserDAO getWorkbenchUserDAO() {
+		final WorkbenchUserDAO workbenchUserDAO = new WorkbenchUserDAO();
+		workbenchUserDAO.setSession(this.sessionProvider.getSession());
+		return  workbenchUserDAO;
 	}
 }

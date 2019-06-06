@@ -2,10 +2,18 @@ package org.generationcp.middleware.domain.workbench;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.workbench.CropType;
 
 public class CropDto {
 
 	private String cropName;
+
+	public CropDto() {
+	}
+
+	public CropDto(final CropType cropType) {
+		this.cropName = cropType.getCropName();
+	}
 
 	public String getCropName() {
 		return cropName;
