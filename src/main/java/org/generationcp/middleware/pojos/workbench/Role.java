@@ -208,14 +208,6 @@ public class Role implements Serializable {
 		this.id = id;
 	}
 
-//	public String getDescription() {
-//		return this.description;
-//	}
-//
-//	public void setDescription(final String description) {
-//		this.description = description;
-//	}
-
 	public String getCapitalizedRole() {
 		return WordUtils.capitalize(this.getName().toUpperCase());
 	}

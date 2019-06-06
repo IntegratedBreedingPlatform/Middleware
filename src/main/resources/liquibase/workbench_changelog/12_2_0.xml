@@ -573,4 +573,50 @@
 			UPDATE role SET active = 1, editable = 0, assignable = 0 WHERE id = 5;
 		</sql>
 	</changeSet>
+
+	<changeSet author="clarysabel" id="v12.2.0-23">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1) from users_roles
+					where role_id in (2, 3) and crop_name is null;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Expand breeder and technician roles rows to apply to all user crops, removing rows with empty crop_name</comment>
+		<sql dbms="mysql" splitStatements="true">
+			insert into users_roles (userid, role_id, crop_name)
+			select ur.userid, ur.role_id, uc.crop_name
+			from users_roles ur
+			inner join users_crops uc on (uc.user_id = ur.userid)
+			where ur.role_id in (2, 3);
+			delete from users_roles
+			where role_id in (2, 3) and crop_name is null;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v12.2.0-24">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(1) from users_roles
+					where role_id = 4 and crop_name is null
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Associate the readonly role to the crop and programs which user is member of, given that readonly role is a program role</comment>
+		<sql dbms="mysql" splitStatements="true">
+			insert into users_roles (userid, role_id, crop_name, workbench_project_id)
+			select ur.userid, ur.role_id, wp.crop_type, wpui.project_id
+			from users_roles ur
+				   inner join workbench_project_user_info wpui on (wpui.user_id = ur.userid)
+				   inner join workbench_project wp on (wp.project_id = wpui.project_id)
+				   inner join workbench_crop wc on wp.crop_type = wc.crop_name
+			where ur.role_id = 4;
+			delete
+			from users_roles
+			where role_id = 4 and crop_name is null;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
