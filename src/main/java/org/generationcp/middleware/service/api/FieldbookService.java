@@ -1007,4 +1007,11 @@ public interface FieldbookService {
 	 */
 	void saveExperimentalDesignGenerated(final Workbook workbook, final String programUUID, final CropType crop);
 
+
+	/**
+	 * Delete experimental Design
+	 *
+	 * @param measurementDatasetId
+	 */
+	void deleteExperimentalDesignGenerated(final Integer measurementDatasetId);
 }

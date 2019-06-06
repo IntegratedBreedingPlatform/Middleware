@@ -275,6 +275,10 @@ public class WorkbookSaver extends Saver {
 		return studyId;
 	}
 
+	public void deleteExperimentalDesign(final Integer measurementDatasetId) {
+		this.getExperimentDestroyer().deleteExperimentsByStudy(measurementDatasetId);
+	}
+
 	public void savePlotDataset(final Workbook workbook, final Map<String, ?> variableMap, final String programUUID, final CropType crop) throws Exception {
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList ,

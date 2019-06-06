@@ -33,7 +33,6 @@ import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -339,6 +337,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 			this.getWorkbookSaver().savePlotDataset(workbook, variableMap, programUUID, crop);
 
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
+		} finally {
+			timerWatch.stop();
+		}
+	}
+
+	@Override
+	public void deleteExperimentalDesignGenerated(final Integer measurementDatasetId) {
+		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesignGenerated (grand total)");
+		try {
+			this.getWorkbookSaver().deleteExperimentalDesign(measurementDatasetId);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		} finally {
