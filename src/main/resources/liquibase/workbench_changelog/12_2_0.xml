@@ -96,9 +96,9 @@
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE users_roles
 			ADD COLUMN crop_name VARCHAR(32) NULL;
-			ALTER TABLE users_roles 
+			ALTER TABLE users_roles
 			ADD INDEX fk_crop_name_idx (crop_name ASC);
-			ALTER TABLE users_roles 
+			ALTER TABLE users_roles
 			ADD CONSTRAINT fk_crop_name
 			  FOREIGN KEY (crop_name)
 			  REFERENCES workbench_crop (crop_name)

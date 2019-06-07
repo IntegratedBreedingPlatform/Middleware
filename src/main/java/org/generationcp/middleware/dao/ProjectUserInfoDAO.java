@@ -11,22 +11,24 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link ProjectUserInfo}.
@@ -55,22 +57,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			+ "JOIN users ON users.personid = persons.personid "
 			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
 			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
-	
-	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByUser(WorkbenchUser user) {
-		try {
-			if (user != null) {
-				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
-				criteria.add(Restrictions.eq("userId", user.getUserid()));
-				criteria.setProjection(Projections.distinct(Projections.property("project")));
-				return criteria.list();
-			}
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProjectsByUser(user=" + user + ") query from ProjectUserInfoDao: " + e.getMessage(), e);
-		}
-		return new ArrayList<>();
-	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		final List<WorkbenchUser> users = new ArrayList<>();
@@ -101,7 +88,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return users;
 	}
-	
+
 	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
 		final List<Integer> userIDs = new ArrayList<>();
 		try {
@@ -117,15 +104,15 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		return userIDs;
 	}
 
-	public ProjectUserInfo getByProjectIdAndUserId(Long projectId, Integer userId) {
+	public ProjectUserInfo getByProjectIdAndUserId(final Long projectId, final Integer userId) {
 		try {
 			if (projectId != null && userId != null) {
-				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
+				final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 				criteria.add(Restrictions.eq("project.projectId", projectId));
 				criteria.add(Restrictions.eq("userId", userId));
 				return (ProjectUserInfo) criteria.uniqueResult();
 			}
-		} catch (HibernateException ex) {
+		} catch (final HibernateException ex) {
 			throw new MiddlewareQueryException("Error in getByProjectIdAndUserId(projectId = " + projectId + ", userId = " + userId + "):"
 					+ ex.getMessage(), ex);
 		}
@@ -133,28 +120,28 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ProjectUserInfo> getByProjectId(Long projectId) {
+	public List<ProjectUserInfo> getByProjectId(final Long projectId) {
 		try {
 			if (projectId != null) {
-				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
+				final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 				criteria.add(Restrictions.eq("project.projectId", projectId));
 
 				return criteria.list();
 			}
-		} catch (HibernateException ex) {
+		} catch (final HibernateException ex) {
 			throw new MiddlewareQueryException("Error in getByProjectId(projectId = " + projectId + "):" + ex.getMessage(), ex);
 		}
 		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ProjectUserInfo> getByProjectIdAndUserIds(Long projectId, List<Integer> userIds) {
+	public List<ProjectUserInfo> getByProjectIdAndUserIds(final Long projectId, final List<Integer> userIds) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
+			final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 			criteria.add(Restrictions.eq("project.projectId", projectId));
 			criteria.add(Restrictions.in("userId", userIds));
 			return criteria.list();
-		} catch (HibernateException ex) {
+		} catch (final HibernateException ex) {
 			throw new MiddlewareQueryException("Error in getByProjectIdAndUserIds(projectId = " + projectId + ", userIds = " + userIds + "):"
 					+ ex.getMessage(), ex);
 		}

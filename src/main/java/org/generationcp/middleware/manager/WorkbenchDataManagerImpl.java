@@ -199,7 +199,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<Project> getProjectsByUser(final WorkbenchUser user) {
-		return this.getProjectUserInfoDao().getProjectsByUser(user);
+		return this.getProjectDao().getProjectsByUser(user);
 	}
 
 	@Override

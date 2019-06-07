@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,17 +20,59 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 
 /**
  * DAO class for {@link Project}.
  *
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
+
+	public static final String GET_PROJECTS_BY_USER_ID =
+		"SELECT  "
+			+ "    p.* "
+			+ "FROM "
+			+ "    workbench_project p "
+			+ "        INNER JOIN "
+			+ "    workbench_crop wc ON p.crop_type = wc.crop_name "
+			+ "        INNER JOIN "
+			+ "    users_crops uc ON uc.crop_name = wc.crop_name "
+			+ "WHERE "
+			+ "    uc.user_id = :userId "
+			+ "UNION      "
+			+ "SELECT  "
+			+ "    p.* "
+			+ "FROM "
+			+ "    workbench_project p "
+			+ "        INNER JOIN "
+			+ "    workbench_crop wc ON p.crop_type = wc.crop_name "
+			+ "        INNER JOIN "
+			+ "    users_crops uc ON uc.crop_name = wc.crop_name "
+			+ " 		INNER JOIN "
+			+ "    users_roles ur ON ur.userid = uc.user_id"
+			+ " WHERE "
+			+ "    uc.user_id = :userId "
+			+ "AND ur.workbench_project_id = p.project_id "
+			+ "UNION      "
+			+ "SELECT  "
+			+ "    p.* "
+			+ "FROM "
+			+ "    workbench_project p "
+			+ "        INNER JOIN "
+			+ "    workbench_crop wc ON p.crop_type = wc.crop_name "
+			+ "        INNER JOIN "
+			+ "    users_crops uc ON uc.crop_name = wc.crop_name "
+			+ "        INNER JOIN "
+			+ "    users_roles ur ON ur.userid = uc.user_id "
+			+ "        AND ur.workbench_project_id = p.project_id "
+			+ "WHERE "
+			+ "    uc.user_id = :userId";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
@@ -177,4 +221,45 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			throw new MiddlewareException("Error in countProjectsByFilter(): " + e.getMessage(), e);
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<Project> getProjectsByUser(final WorkbenchUser user) {
+		final List<Project> projects = new ArrayList<>();
+		try {
+			if (user != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID);
+				query.setParameter("userId", user.getUserid());
+				query
+					.addScalar("project_id")
+					.addScalar("project_uuid")
+					.addScalar("project_name")
+					.addScalar("start_date")
+					.addScalar("user_id")
+					.addScalar("crop_type")
+					.addScalar("last_open_date");
+				query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+				final List<Map<String, Object>> results = query.list();
+
+				for (final Map<String, Object> result : results) {
+					final Long project_id = Long.valueOf((Integer) result.get("project_id"));
+					final String project_uuid = (String) result.get("project_uuid");
+					final String project_name = (String) result.get("project_name");
+					final Date start_date = (Date) result.get("start_date");
+					final Integer user_id = (Integer) result.get("user_id");
+					final CropType crop_type = new CropType((String) result.get("crop_type"));
+					final Date last_open_date = (Date) result.get("last_open_date");
+					final Project u = new Project(project_id, project_uuid,
+						project_name, start_date,
+						user_id, crop_type, last_open_date);
+					projects.add(u);
+				}
+				return projects;
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error in getProjectsByUser(user=" + user + ") query from ProjectUserInfoDao: " + e.getMessage(), e);
+		}
+		return new ArrayList<>();
+	}
+
 }

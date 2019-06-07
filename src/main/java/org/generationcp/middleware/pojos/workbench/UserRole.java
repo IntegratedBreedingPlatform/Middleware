@@ -30,7 +30,7 @@ public class UserRole {
 
 	@ManyToOne
 	@JoinColumn(name = "crop_name", nullable = true)
-	private CropType cropName;
+	private CropType cropType;
 
 	@ManyToOne
 	@JoinColumn(name = "workbench_project_id", nullable = true)
@@ -56,10 +56,10 @@ public class UserRole {
 		this.role = role;
 	}
 
-	public UserRole(final WorkbenchUser user, final Role role, final CropType cropName, final Project workbenchProject) {
+	public UserRole(final WorkbenchUser user, final Role role, final CropType cropType, final Project workbenchProject) {
 		this.user = user;
 		this.role = role;
-		this.cropName = cropName;
+		this.cropType = cropType;
 		this.workbenchProject = workbenchProject;
 	}
 
@@ -87,12 +87,12 @@ public class UserRole {
 		this.role = role;
 	}
 
-	public CropType getCropName() {
-		return this.cropName;
+	public CropType getCropType() {
+		return this.cropType;
 	}
 
-	public void setCropName(final CropType cropName) {
-		this.cropName = cropName;
+	public void setCropType(final CropType cropName) {
+		this.cropType = cropName;
 	}
 
 	public Project getWorkbenchProject() {
