@@ -7,6 +7,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleMapper;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -131,7 +132,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 					final String roleName = (String) user[5];
 					final Integer status = (Integer) user[6];
 					final String email = (String) user[7];
-					final UserDto u = new UserDto(userId, username, firstName, lastName, new Role(roleId, roleName), status, email);
+					final UserDto u = new UserDto(userId, username, firstName, lastName, new Role(roleId, roleName),null, status, email);
 					users.add(u);
 				}
 			}
@@ -160,6 +161,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 					if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
 						// TODO get n roles
 						user.setRole(workbenchUser.getRoles().get(0).getRole());
+						user.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
 					}
 					user.setUserId(workbenchUser.getUserid());
 					if (workbenchUser.getPerson() != null) {

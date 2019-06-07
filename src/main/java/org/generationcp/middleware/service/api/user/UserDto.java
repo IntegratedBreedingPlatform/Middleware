@@ -26,6 +26,8 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String lastName;
 	// TODO should not use an entity class in a Dto
 	private Role role;
+
+	private List<UserRoleDto> userRoles;
 	private Integer status;
 	private String email;
 	private String password;
@@ -42,13 +44,14 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.status = 0;
 	}
 
-	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final Role role,
+	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final Role role, List<UserRoleDto> userRoles,
 		Integer status, String email) {
 		this.userId = userId;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.role = role;
+		this.userRoles = userRoles;
 		this.status = status;
 		this.email = email;
 	}
@@ -130,7 +133,8 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		result = prime * result + (this.username == null ? 0 : this.username.hashCode());
 		result = prime * result + (this.firstName == null ? 0 : this.firstName.hashCode());
 		result = prime * result + (this.lastName == null ? 0 : this.lastName.hashCode());
-		result = prime * result + (this.role == null ? 0 : this.role.hashCode());
+		result = prime * result + (this.userRoles == null ? 0 : this.userRoles.hashCode());
+
 		result = prime * result + (this.email == null ? 0 : this.email.hashCode());
 
 		result = prime * result + (int) (this.status ^ this.status >>> 32);
@@ -173,5 +177,13 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 
 	public void setAuthorities(final Set<String> authorities) {
 		this.authorities = authorities;
+	}
+
+	public List<UserRoleDto> getUserRoles() {
+		return userRoles;
+	}
+
+	public void setUserRoles(final List<UserRoleDto> userRoles) {
+		this.userRoles = userRoles;
 	}
 }
