@@ -24,7 +24,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String username;
 	private String firstName;
 	private String lastName;
-	// TODO n roles
+	// TODO should not use an entity class in a Dto
 	private Role role;
 	private Integer status;
 	private String email;

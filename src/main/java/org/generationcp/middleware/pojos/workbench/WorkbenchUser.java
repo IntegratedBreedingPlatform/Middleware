@@ -114,6 +114,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Column(name = "cdate")
 	private Integer cdate;
 
+	@Fetch(FetchMode.SUBSELECT)
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<UserRole> roles;

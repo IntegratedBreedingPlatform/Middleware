@@ -967,10 +967,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			user.setStatus(userDto.getStatus());
 
 			// update user roles to the particular user
-			final UserRole role = user.getRoles().get(0);
-			if (!role.getRole().equals(userDto.getRole())) {
-				role.setRole(userDto.getRole());
-			}
+			final UserRole role = (!user.getRoles().isEmpty()) ? user.getRoles().get(0) : new UserRole();
+			role.setRole(userDto.getRole());
 
 			final List<CropType> crops = new ArrayList<>();
 			for (final CropDto crop : userDto.getCrops()) {
@@ -985,7 +983,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+				"Error encountered while saving User: UserDataManager.updateUser(user=" + user + "): " + e.getMessage(), e);
 		}
 
 		return idUserSaved;

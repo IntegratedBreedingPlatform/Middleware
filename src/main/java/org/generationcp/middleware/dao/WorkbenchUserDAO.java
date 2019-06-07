@@ -147,7 +147,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
 
 			criteria.createAlias("person", "person");
-			criteria.createAlias("roles", "roles");
 			criteria.createAlias("crops", "crops", CriteriaSpecification.LEFT_JOIN);
 			criteria.addOrder(Order.asc("person.lastName"));
 			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
