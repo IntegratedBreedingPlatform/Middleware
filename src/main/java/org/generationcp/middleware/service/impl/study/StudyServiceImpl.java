@@ -528,9 +528,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetails(final Integer studyId) {
+	public StudyDetailsDto getStudyDetailsForGeolocation(final Integer geolocationId) {
 		try {
-			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadata(studyId);
+			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadataForGeolocationId(geolocationId);
 			if (studyMetadata != null) {
 				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 				studyDetailsDto.setMetadata(studyMetadata);
@@ -539,7 +539,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 				users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
 				users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
+				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
 				studyDetailsDto.setAdditionalInfo(properties);
@@ -547,7 +547,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			}
 			return null;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getStudyDetails() query from study: " + studyId;
+			final String message = "Error with getStudyDetailsForGeolocation() query with geolocationId: " + geolocationId;
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

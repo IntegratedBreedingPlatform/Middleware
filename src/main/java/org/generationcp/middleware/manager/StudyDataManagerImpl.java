@@ -1079,13 +1079,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyMetadata getStudyMetadata(final Integer studyId) {
-		return this.getDmsProjectDao().getStudyMetadata(studyId);
+	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
+		return this.getDmsProjectDao().getStudyMetadataForGeolocationId(geolocationId);
 	}
 
 	@Override
-	public Map<String, String> getGeolocationPropsAndValuesByStudy(final Integer studyId) {
-		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByStudy(studyId);
+	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId) {
+		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId);
 	}
 
 	@Override

@@ -677,9 +677,9 @@ public interface StudyDataManager {
 	void saveOrUpdatePhenotypeValue(
 		int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId, Phenotype.ValueStatus valueStatus);
 
-	StudyMetadata getStudyMetadata(Integer studyId);
+	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
 
-	Map<String, String> getGeolocationPropsAndValuesByStudy(Integer studyId);
+	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId);
 
 	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId);
 

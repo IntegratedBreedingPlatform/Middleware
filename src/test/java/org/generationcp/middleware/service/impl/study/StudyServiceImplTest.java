@@ -274,11 +274,11 @@ public class StudyServiceImplTest {
 		final Map<String, String> properties = new HashMap<>();
 		properties.put("p1", "v1");
 
-		Mockito.when(this.studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
+		Mockito.when(this.studyDataManager.getStudyMetadataForGeolocationId(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(this.userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users);
 		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties);
 
-		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
+		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetailsForGeolocation(metadata.getStudyDbId());
 
 		assertThat(studyDetailsDto.getMetadata().getActive(), equalTo(metadata.getActive()));
 		assertThat(studyDetailsDto.getMetadata().getEndDate(), equalTo(metadata.getEndDate()));
@@ -322,14 +322,14 @@ public class StudyServiceImplTest {
 		final Map<String, String> properties2 = new HashMap<>();
 		properties2.put("p2", "v2");
 
-		Mockito.when(this.studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
+		Mockito.when(this.studyDataManager.getStudyMetadataForGeolocationId(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(this.userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users1);
 		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties1);
 		Mockito.when(this.userDataManager.getUsersForEnvironment(metadata.getNurseryOrTrialId())).thenReturn(users2);
-		Mockito.when(this.studyDataManager.getGeolocationPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties2);
+		Mockito.when(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(metadata.getNurseryOrTrialId())).thenReturn(properties2);
 
 
-		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetails(metadata.getStudyDbId());
+		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetailsForGeolocation(metadata.getStudyDbId());
 
 		assertThat(studyDetailsDto.getMetadata().getActive(), equalTo(metadata.getActive()));
 		assertThat(studyDetailsDto.getMetadata().getEndDate(), equalTo(metadata.getEndDate()));

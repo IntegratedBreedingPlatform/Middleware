@@ -145,16 +145,17 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		sqlQuery1.executeUpdate();
 	}
 
-	public Map<String, String> getGeolocationPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
-		Preconditions.checkNotNull(studyId);
+	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer geolocationId) {
+		Preconditions.checkNotNull(geolocationId);
 		final Map<String, String> geoProperties = new HashMap<>();
-		final StringBuilder sql = new StringBuilder().append("SELECT  ").append("    cv.definition as name, geo.value as value ").append("FROM ")
+		final StringBuilder sql =
+			new StringBuilder().append("SELECT  ").append("    cv.definition as name, geo.value as value ").append("FROM ")
 				.append("    nd_geolocationprop geo ").append("        INNER JOIN ")
-				.append("    cvterm cv ON (cv.cvterm_id = geo.type_id) ").append("WHERE ").append("    geo.nd_geolocation_id = :studyId ")
+				.append("    cvterm cv ON (cv.cvterm_id = geo.type_id) ").append("WHERE ").append("    geo.nd_geolocation_id = :geolocationId ")
 				.append("        AND geo.type_id NOT IN (8371, 8190, 8070, 8180) ");
 		try {
 			final Query query =
-					this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("studyId", studyId);
+				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("studyId", geolocationId);
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
@@ -162,7 +163,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			}
 			return geoProperties;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getGeolocationPropsAndValuesByStudy() query from studyId: " + studyId;
+			final String message = "Error with getGeolocationPropsAndValuesByGeolocation() query from geolocationId: " + geolocationId;
 			GeolocationPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

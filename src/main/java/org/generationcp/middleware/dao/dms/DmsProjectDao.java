@@ -160,7 +160,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " AND p.deleted != " + DELETED_STUDY
 			+ " AND p.program_uuid = :program_uuid ";
 
-	static final String GET_STUDY_METADATA_BY_ID = " SELECT  "
+	static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, "
@@ -191,7 +191,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
 		+ " WHERE "
 		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-		+ "         AND geoloc.nd_geolocation_id = :studyId "
+		+ "         AND geoloc.nd_geolocation_id = :geolocationId "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
 	private static final String GET_PROJECTID_BY_STUDYDBID =
@@ -803,10 +803,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria;
 	}
 
-	public StudyMetadata getStudyMetadata(final Integer studyId) {
-		Preconditions.checkNotNull(studyId);
+	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
+		Preconditions.checkNotNull(geolocationId);
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID);
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_GEOLOCATION_ID);
 			query.addScalar("studyDbId");
 			query.addScalar("trialOrNurseryId");
 			query.addScalar("studyName");
@@ -818,12 +818,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("endDate");
 			query.addScalar("deleted");
 			query.addScalar("locationID");
-			query.setParameter("studyId", studyId);
+			query.setParameter("geolocationId", geolocationId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
 				final Object[] row = (Object[]) result;
 				final StudyMetadata studyMetadata = new StudyMetadata();
-				studyMetadata.setStudyDbId(studyId);
+				studyMetadata.setStudyDbId(geolocationId);
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
 				studyMetadata.setStudyType((row[3] instanceof String) ? (String) row[3] : null);
@@ -842,7 +842,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return null;
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getStudyMetadata() query from study: " + studyId;
+			final String message = "Error with getStudyMetadataForGeolocationId() query from study with geoloCationId: " + geolocationId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
