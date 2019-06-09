@@ -57,78 +57,6 @@ public class PhenotypeDaoTest {
 	}
 
 	@Test
-	@Ignore // FIXME Rewrite to remove query string dependency
-	public void testSearchPhenotypes() {
-		final PhenotypeSearchRequestDTO request = new PhenotypeSearchRequestDTO();
-		request.setPage(0);
-		request.setPageSize(10);
-		final String studyDbId = "1";
-		final List<String> studyIds = Arrays.asList(studyDbId);
-		request.setStudyDbIds(studyIds);
-		final List<String> termIds = Arrays.asList("111", "222");
-		request.setObservationVariableDbIds(termIds);
-
-		// Headers (Observation units)
-		final List<Object[]> searchPhenotypeMockResults = this.getSearchPhenotypeMockResults();
-		Mockito.when(this.query.list()).thenReturn(searchPhenotypeMockResults);
-
-		// Observations
-		final SQLQuery objsQuery = Mockito.mock(SQLQuery.class);
-		Mockito.when(this.session.createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS)).thenReturn(objsQuery);
-
-		Mockito.when(objsQuery.addScalar(Matchers.anyString(), Matchers.any(Type.class))).thenReturn(objsQuery);
-		Mockito.when(objsQuery.addScalar(Matchers.anyString())).thenReturn(objsQuery);
-
-		final List<Object[]> searchPhenotypeObservationMockResults = this.getSearchPhenotypeObservationMockResults();
-		Mockito.when(objsQuery.list()).thenReturn(searchPhenotypeObservationMockResults);
-
-		final List<PhenotypeSearchDTO> phenotypeSearchDTOS = this.dao.searchPhenotypes(0, Integer.MAX_VALUE, request);
-
-		Mockito.verify(this.session).createSQLQuery(Matchers.anyString());
-		Mockito.verify(this.query).setParameterList("cvTermIds", termIds);
-		Mockito.verify(this.query).setParameterList("studyDbIds", studyIds);
-		Assert.assertThat(phenotypeSearchDTOS, is(not(empty())));
-		
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getObservationUnitDbId(), is(searchPhenotypeMockResults.get(0)[1]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getObservationUnitName(), is(searchPhenotypeMockResults.get(0)[2]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getObservationLevel(), is(searchPhenotypeMockResults.get(0)[3]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getPlantNumber(), is(searchPhenotypeMockResults.get(0)[4]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getGermplasmDbId(), is(searchPhenotypeMockResults.get(0)[5]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getGermplasmName(), is(searchPhenotypeMockResults.get(0)[6]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getStudyDbId(), is(searchPhenotypeMockResults.get(0)[7]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getStudyName(), is(searchPhenotypeMockResults.get(0)[8]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getProgramName(), is(searchPhenotypeMockResults.get(0)[9]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getX(), is(searchPhenotypeMockResults.get(0)[10]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getY(), is(searchPhenotypeMockResults.get(0)[11]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getPlotNumber(), is(searchPhenotypeMockResults.get(0)[12]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getBlockNumber(), is(searchPhenotypeMockResults.get(0)[13]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getReplicate(), is(searchPhenotypeMockResults.get(0)[14]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getStudyLocationDbId(), is(searchPhenotypeMockResults.get(0)[17]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getStudyLocation(), is(searchPhenotypeMockResults.get(0)[18]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getEntryType(), is(searchPhenotypeMockResults.get(0)[19]));
-		Assert.assertThat(phenotypeSearchDTOS.get(0).getEntryNumber(), is(searchPhenotypeMockResults.get(0)[20]));
-
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getObservationUnitDbId(), is(searchPhenotypeMockResults.get(1)[1]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getObservationUnitName(), is(searchPhenotypeMockResults.get(1)[2]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getObservationLevel(), is(searchPhenotypeMockResults.get(1)[3]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getPlantNumber(), is(searchPhenotypeMockResults.get(1)[4]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getGermplasmDbId(), is(searchPhenotypeMockResults.get(1)[5]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getGermplasmName(), is(searchPhenotypeMockResults.get(1)[6]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getStudyDbId(), is(searchPhenotypeMockResults.get(1)[7]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getStudyName(), is(searchPhenotypeMockResults.get(1)[8]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getProgramName(), is(searchPhenotypeMockResults.get(1)[9]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getX(), is(searchPhenotypeMockResults.get(1)[15])); // fieldMapRow
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getY(), is(searchPhenotypeMockResults.get(1)[16])); // fieldMapCol
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getPlotNumber(), is(searchPhenotypeMockResults.get(1)[12]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getBlockNumber(), is(searchPhenotypeMockResults.get(1)[13]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getReplicate(), is(searchPhenotypeMockResults.get(1)[14]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getStudyLocationDbId(), is(searchPhenotypeMockResults.get(1)[17]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getStudyLocation(), is(searchPhenotypeMockResults.get(1)[18]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getEntryType(), is(searchPhenotypeMockResults.get(1)[19]));
-		Assert.assertThat(phenotypeSearchDTOS.get(1).getEntryNumber(), is(searchPhenotypeMockResults.get(1)[20]));
-	}
-	
-	@Test
 	public void testCountPhenotypes() {
 		Mockito.doReturn(new BigInteger("100")).when(this.query).uniqueResult();
 		final PhenotypeSearchRequestDTO request = new PhenotypeSearchRequestDTO();
@@ -147,46 +75,7 @@ public class PhenotypeDaoTest {
 		Mockito.verify(this.query).setParameterList("studyDbIds", studyIds);
 		Assert.assertEquals(100L, count);
 	}
-	
-	private String getPhenotypeSearchMainQuery() {
-		return " SELECT " //
-				+ "  nde.nd_experiment_id AS nd_experiment_id, " //
-				+ "  nde.obs_unit_id AS observationUnitDbId, " //
-				+ "  '' AS observationUnitName, " //
-				+ "  'plot' AS observationLevel, " //
-				+ "  NULL AS plantNumber, " // Until we have plant level observation
-				+ "  s.dbxref_id AS germplasmDbId, " //
-				+ "  s.name AS germplasmName, " //
-				+ "  gl.nd_geolocation_id AS studyDbId, " //
-				+ "  p.name AS studyName, " //
-				+ "  wp.project_name AS programName, " //
-				+ "  FieldMapRow.value AS FieldMapRow, " //
-				+ "  FieldMapCol.value AS FieldMapCol, " //
-				+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'PLOT_NO') AS plotNumber, " //
-				+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') AS blockNumber, " //
-				+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'REP_NO') AS replicate, " //
-				+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'COL') AS COL, " //
-				+ "  (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'ROW') AS ROW, " //
-				+ "  (SELECT l.locid FROM nd_geolocationprop gp INNER JOIN location l ON l.locid = gp.value WHERE gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS studyLocationDbId, " //
-				+ "  (SELECT l.lname FROM nd_geolocationprop gp INNER JOIN location l ON l.locid = gp.value WHERE gp.type_id = " + TermId.LOCATION_ID.getId() + " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS studyLocation, " //
-				+ "  (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, " //
-				+ "  s.uniquename AS entryNumber " //
-				+ " FROM " //
-				+ "  project plotdata_project " //
-				+ "  INNER JOIN nd_experiment nde ON nde.project_id = plotdata_project.project_id " //
-				+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
-				+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
-				+ "  INNER JOIN project_relationship pr ON plotdata_project.project_id = pr.subject_project_id " //
-				+ "  INNER JOIN project p ON pr.object_project_id = p.project_id " //
-				+ "  INNER JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
-				+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
-				+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
-				+ " WHERE plotdata_project.name LIKE '%PLOTDATA' " //
-				; //
 
-	}
-	
-	
 	@Test
 	public void testGetObservationForTraitOnGermplasms() {
 		final List<Integer> traitIds = Arrays.asList(5134, 7645);
@@ -385,76 +274,5 @@ public class PhenotypeDaoTest {
 				+ "AND p.observable_id IN (:traitIds) ";
 	}
 
-	private List<Object[]> getSearchPhenotypeObservationMockResults() {
-		return Arrays.asList(new Object[][] {  //
-			new Object[] { //
-				1, // row[0]
-				1, // row[1]
-				"", // row[2]
-				"observationVariableName1", // row[3]
-				"value1", // row[4]
-				"" // row[5]
-			}, //
-			new Object[] { //
-				2, // row[0]
-				2, // row[1]
-				"", // row[2]
-				"observationVariableName2", // row[3]
-				"value2", // row[4]
-				"", // row[5]
-			} //
-		});
-	}
-
-	private List<Object[]> getSearchPhenotypeMockResults() {
-		return Arrays.asList(new Object[][] {  //
-			new Object[] { //
-				1, // row[0]
-				"setObservationUnitDbId1", // row[1]
-				"observationUnitNameRow1", // row[2]
-				"observationLevelRow1", // row[3]
-				"plantNumberRow1", // row[4]
-				"germplasmDbIdRow1", // row[5]
-				"germplasmNameRow1", // row[6]
-				"studyDbIdRow1", // row[7]
-				"studyNameRow1", // row[8]
-				"programNameRow1", // row[9]
-				"xRow1", // row[10]
-				"yRow1", // row[11]
-				"plotNumberRow1", // row[12]
-				"blockNumberRow1", // row[13]
-				"replicateRow1", // row[14]
-				"", // row[15]
-				"", // row[16]
-				"studyLocationDbIdRow1", // row[17]
-				"studyLocationRow1", // row[18]
-				"entryTypeRow1", // row[19]
-				"entryNumberRow1", // row[20]
-			}, //
-			new Object[] { //
-				2, // row[0]
-				"setObservationUnitDbId2", // row[1]
-				"observationUnitNameRow2", // row[2]
-				"observationLevelRow2", // row[3]
-				"plantNumberRow2", // row[4]
-				"germplasmDbIdRow2", // row[5]
-				"germplasmNameRow2", // row[6]
-				"studyDbIdRow2", // row[7]
-				"studyNameRow2", // row[8]
-				"programNameRow2", // row[9]
-				"", // row[10]
-				"", // row[11]
-				"plotNumberRow2", // row[12]
-				"blockNumberRow2", // row[13]
-				"replicateRow2", // row[14]
-				"fieldMapRow2", // row[15]
-				"fieldMapCol2", // row[16]
-				"studyLocationDbIdRow2", // row[17]
-				"studyLocationRow2", // row[18]
-				"entryTypeRow2", // row[19]
-				"entryNumberRow2", // row[20]
-			} //
-		});
-	}
 
 }

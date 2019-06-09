@@ -33,7 +33,7 @@ public class PhenotypeQuery {
 		+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 		+ "  INNER JOIN project p ON p.project_id = dataset.study_id " //
-		+ "  INNER JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
+		+ "  LEFT JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " + TermId.FIELDMAP_COLUMN.getId() //
 		+ "  LEFT JOIN dataset_type ON dataset_type.dataset_type_id = dataset.dataset_type_id " //
@@ -67,8 +67,7 @@ public class PhenotypeQuery {
 		+ "  phenotype ph  " //
 		+ "  INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
 		+ "  INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
-		+ "  INNER JOIN project p ON ndep.project_id = p.project_id " //
-		+ "  INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
+		+ "  INNER JOIN projectprop pp ON pp.project_id = ndep.project_id " //
 		+ "                            AND pp.variable_id = ph.observable_id " //
 		+ "                            AND pp.type_id = " + VariableType.TRAIT.getId() //
 		+ "  LEFT JOIN cvtermprop cvp on (cvp.cvterm_id = cvt.cvterm_id and cvp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() + ")"
