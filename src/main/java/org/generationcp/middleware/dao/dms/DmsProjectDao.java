@@ -538,10 +538,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<StudyDetails> getAllStudyDetails(final String programUUID) {
-		return this.getAllStudyDetails(programUUID, 0, -1);
-	}
-
 	public List<StudyDetails> getAllStudyDetails(final String programUUID, final int start, final int numOfRows) {
 		final List<StudyDetails> studyDetails = new ArrayList<>();
 		try {
