@@ -1,5 +1,6 @@
 package org.generationcp.middleware.data.initializer;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class CVTermTestDataInitializer {
@@ -7,7 +8,7 @@ public class CVTermTestDataInitializer {
 
 		CVTerm term = new CVTerm();
 		term.setName(name);
-		term.setDefinition("Test description");
+		term.setDefinition("Test description " + RandomStringUtils.randomAlphanumeric(10));
 		term.setCv(cvId);
 		term.setIsObsolete(false);
 		term.setIsRelationshipType(false);

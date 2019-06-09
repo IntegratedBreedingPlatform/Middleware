@@ -155,7 +155,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 				.append("        AND geo.type_id NOT IN (8371, 8190, 8070, 8180) ");
 		try {
 			final Query query =
-				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("studyId", geolocationId);
+				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("geolocationId", geolocationId);
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
