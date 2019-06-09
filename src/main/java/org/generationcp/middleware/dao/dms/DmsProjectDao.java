@@ -826,12 +826,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setStudyDbId(geolocationId);
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
-				studyMetadata.setStudyType((row[3] instanceof String) ? (String) row[3] : null);
+				studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
 				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
 					studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[4])).toString());
 				}
 				studyMetadata.setTrialDbId(
-					(row[5] instanceof String && StringUtils.isNumeric((String) row[5])) ? Integer.parseInt((String) row[5]) : null);
+					(row[5] instanceof Integer) ? (Integer) row[5] : null);
 				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
 				studyMetadata.setStartDate((row[7] instanceof String) ? (String) row[7] : null);
 				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
