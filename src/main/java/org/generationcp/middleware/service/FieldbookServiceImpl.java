@@ -356,10 +356,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteExperimentalDesignGenerated(final Integer measurementDatasetId) {
+	public void deleteExperimentalDesignGenerated(
+		final Workbook workbook, final String programUUID, final CropType crop) {
 		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesignGenerated (grand total)");
 		try {
-			this.getWorkbookSaver().deleteExperimentalDesign(measurementDatasetId);
+			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
+			this.getWorkbookSaver().deleteExperimentalDesign(workbook, variableMap, programUUID, crop);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		} finally {
