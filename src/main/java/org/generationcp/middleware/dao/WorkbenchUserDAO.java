@@ -159,7 +159,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 				for (final WorkbenchUser workbenchUser : workbenchUsers) {
 					final UserDto user = new UserDto();
 					if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
-						// TODO get n roles
+						// TODO remove single role
 						user.setRole(workbenchUser.getRoles().get(0).getRole());
 						user.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
 					}

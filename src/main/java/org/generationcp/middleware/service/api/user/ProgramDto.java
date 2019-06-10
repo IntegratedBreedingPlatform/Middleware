@@ -5,40 +5,28 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class UserRoleDto {
+public class ProgramDto {
 
-	private Integer id;
+	private Long id;
 
-	private RoleDto role;
+	private String name;
 
 	private CropDto crop;
 
-	private ProgramDto program;
-
-	public UserRoleDto() {
-	}
-
-	public UserRoleDto(final Integer id, final RoleDto role, final CropDto crop, final ProgramDto program) {
-		this.id = id;
-		this.role = role;
-		this.crop = crop;
-		this.program = program;
-	}
-
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(final Integer id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
-	public RoleDto getRole() {
-		return role;
+	public String getName() {
+		return name;
 	}
 
-	public void setRole(final RoleDto role) {
-		this.role = role;
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	public CropDto getCrop() {
@@ -47,14 +35,6 @@ public class UserRoleDto {
 
 	public void setCrop(final CropDto crop) {
 		this.crop = crop;
-	}
-
-	public ProgramDto getProgram() {
-		return program;
-	}
-
-	public void setProgram(final ProgramDto program) {
-		this.program = program;
 	}
 
 	@Override

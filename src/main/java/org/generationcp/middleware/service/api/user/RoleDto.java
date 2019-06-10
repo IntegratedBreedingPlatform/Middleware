@@ -12,7 +12,7 @@ public class RoleDto {
 
 	private String description;
 
-	private String roleType;
+	private String type;
 
 	private Boolean active;
 
@@ -44,12 +44,12 @@ public class RoleDto {
 		this.description = description;
 	}
 
-	public String getRoleType() {
-		return roleType;
+	public String getType() {
+		return type;
 	}
 
-	public void setRoleType(final String roleType) {
-		this.roleType = roleType;
+	public void setType(final String type) {
+		this.type = type;
 	}
 
 	public Boolean getActive() {

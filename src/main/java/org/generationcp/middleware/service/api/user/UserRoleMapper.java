@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 
 import java.util.ArrayList;
@@ -10,9 +11,8 @@ public class UserRoleMapper {
 	public static UserRoleDto map (final UserRole userRole){
 		final UserRoleDto userRoleDto = new UserRoleDto();
 		userRoleDto.setRole(RoleMapper.map(userRole.getRole()));
-		userRoleDto.setProgramName((userRole.getWorkbenchProject()!=null)?userRole.getWorkbenchProject().getProjectName():"");
-		userRoleDto.setProgramId((userRole.getWorkbenchProject()!=null)?userRole.getWorkbenchProject().getProjectId():null);
-		userRoleDto.setCropName((userRole.getCropType()!=null)?userRole.getCropType().getCropName():"");
+		userRoleDto.setProgram(ProgramMapper.map(userRole.getWorkbenchProject()));
+		userRoleDto.setCrop((userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null);
 		userRoleDto.setId(userRole.getId());
 		return userRoleDto;
 	}
