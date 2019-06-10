@@ -12,122 +12,293 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import com.google.common.base.Optional;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.UUID;
 
-public class GeolocationDaoTest {
+public class GeolocationDaoTest extends IntegrationTestBase {
 
-	private static final String LOCATION_DESCRIPTION = "LOCATION_DESCRIPTION";
-	private static final String LOCATION_NAME = "LOCATION_NAME";
-	private static final String ALGERIA = "ALGERIA";
-	private static final String ADRAR = "ADRAR";
-	private static final String STUDY_DESCRIPTION = "STUDY DESCRIPTION";
-	private static final Integer STUDY_ID = 1001;
-	private static final Integer LOCATION_ID = 3005;
-	private static final String STUDY_NAME = "STUDY NAME";
-	private static final String AFRICA_RICE_CENTER = "AFRICA RICE CENTER";
-	private static final int ENVIRONMENT_ID = 5822;
-	private GeolocationDao dao;
-	private Session session;
+	private static final int NO_OF_GERMPLASM = 5;
+	public static final Integer LOCATION_ID = 9001;
+
+	private GeolocationDao geolocationDao;
+	private GeolocationPropertyDao geolocationPropertyDao;
+	private ExperimentDao experimentDao;
+	private StockDao stockDao;
+	private GermplasmDAO germplasmDao;
+	private DmsProjectDao dmsProjectDao;
+	private CVTermDao cvTermDao;
+	private PhenotypeDao phenotypeDao;
+
+	private DmsProject study;
+	private DmsProject dataset;
+	private Geolocation geolocation;
+	private List<Germplasm> germplasm;
 
 	@Before
 	public void setUp() throws Exception {
-		this.session = Mockito.mock(Session.class);
-		this.dao = new GeolocationDao();
-		this.dao.setSession(this.session);
+		if (this.geolocationDao == null) {
+			this.geolocationDao = new GeolocationDao();
+			this.geolocationDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.germplasmDao == null) {
+			this.germplasmDao = new GermplasmDAO();
+			this.germplasmDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.experimentDao == null) {
+			this.experimentDao = new ExperimentDao();
+			this.experimentDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.stockDao == null) {
+			this.stockDao = new StockDao();
+			this.stockDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.dmsProjectDao == null) {
+			this.dmsProjectDao = new DmsProjectDao();
+			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.cvTermDao == null) {
+			this.cvTermDao = new CVTermDao();
+			this.cvTermDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.phenotypeDao == null) {
+			this.phenotypeDao = new PhenotypeDao();
+			this.phenotypeDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.geolocationPropertyDao == null) {
+			this.geolocationPropertyDao = new GeolocationPropertyDao();
+			this.geolocationPropertyDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.study == null) {
+			this.study = this.createStudy();
+			this.dataset =
+				this.createDataset(this.study.getName() + " - Environment Dataset", this.study.getProgramUUID(),
+					DatasetTypeEnum.SUMMARY_DATA.getId(),
+					study, study);
+			this.createGermplasm();
+			this.geolocation = this.createEnvironmentData(this.dataset, "1", Collections.<Integer>emptyList());
+		}
+	}
+
+	private DmsProject createStudy() {
+		final DmsProject study = new DmsProject();
+		study.setName("Test Project " + RandomStringUtils.randomAlphanumeric(10));
+		study.setDescription("Test Project");
+		study.setProgramUUID(UUID.randomUUID().toString());
+		this.dmsProjectDao.save(study);
+		return study;
 	}
 
 	@Test
 	public void testGetStudyEnvironmentDetails() {
-		final Set<Integer> environmentIds = new HashSet<Integer>();
-		environmentIds.add(5822);
-		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
-		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
-		final Object[] result = new Object[] {
-			GeolocationDaoTest.ENVIRONMENT_ID, GeolocationDaoTest.AFRICA_RICE_CENTER,
-			GeolocationDaoTest.LOCATION_ID, GeolocationDaoTest.STUDY_ID, GeolocationDaoTest.STUDY_NAME,
-			GeolocationDaoTest.STUDY_DESCRIPTION, GeolocationDaoTest.ADRAR, GeolocationDaoTest.ALGERIA};
-		mockQueryResult.add(result);
-		Mockito.when(mockQuery.list()).thenReturn(mockQueryResult);
-
-		Mockito.when(this.session.createSQLQuery(Matchers.anyString())).thenReturn(mockQuery);
-		final List<TrialEnvironment> environments = this.dao.getTrialEnvironmentDetails(environmentIds);
-		Assert.assertEquals("The environments should contain 1 trial environment.", 1, environments.size());
+		final Integer geolocationId = this.geolocation.getLocationId();
+		final List<TrialEnvironment> environments =
+			this.geolocationDao.getTrialEnvironmentDetails(Collections.singleton(geolocationId));
+		Assert.assertNotNull(environments);
+		Assert.assertEquals(1, environments.size());
 
 		final TrialEnvironment trialEnvironment = environments.get(0);
-		Assert.assertEquals("The environment id should be " + GeolocationDaoTest.ENVIRONMENT_ID,
-			GeolocationDaoTest.ENVIRONMENT_ID, trialEnvironment.getId());
+		Assert.assertEquals(geolocationId.intValue(), trialEnvironment.getId());
 
 		final LocationDto locationDto = trialEnvironment.getLocation();
-		Assert.assertEquals(Integer.valueOf(GeolocationDaoTest.LOCATION_ID), locationDto.getId());
-		Assert.assertEquals(GeolocationDaoTest.AFRICA_RICE_CENTER, locationDto.getLocationName());
-		Assert.assertEquals(GeolocationDaoTest.ADRAR, locationDto.getProvinceName());
-		Assert.assertEquals(GeolocationDaoTest.ALGERIA, locationDto.getCountryName());
+		Assert.assertEquals(LOCATION_ID, locationDto.getId());
+		Assert.assertEquals("Africa Rice Centre", locationDto.getLocationName());
 
 		final StudyReference studyReference = trialEnvironment.getStudy();
-		Assert.assertEquals(GeolocationDaoTest.STUDY_ID, studyReference.getId());
-		Assert.assertEquals(GeolocationDaoTest.STUDY_NAME, studyReference.getName());
-		Assert.assertEquals(GeolocationDaoTest.STUDY_DESCRIPTION, studyReference.getDescription());
+		Assert.assertEquals(this.study.getProjectId(), studyReference.getId());
+		Assert.assertEquals(this.study.getName(), studyReference.getName());
+		Assert.assertEquals(this.study.getDescription(), studyReference.getDescription());
 	}
 
 	@Test
 	public void testGetPropertiesForStudyEnvironments() {
-		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
-		final List<Object[]> mockQueryResult = new ArrayList<Object[]>();
-		final Object[] result = new Object[] {
-			GeolocationDaoTest.LOCATION_ID, GeolocationDaoTest.LOCATION_NAME,
-			GeolocationDaoTest.LOCATION_DESCRIPTION, GeolocationDaoTest.ENVIRONMENT_ID,
-			GeolocationDaoTest.AFRICA_RICE_CENTER};
-		mockQueryResult.add(result);
-		Mockito.when(mockQuery.list()).thenReturn(mockQueryResult);
-		Mockito.when(this.session.createSQLQuery(Matchers.anyString())).thenReturn(mockQuery);
-		final List<TrialEnvironmentProperty> properties = this.dao
-			.getPropertiesForTrialEnvironments(Arrays.asList(GeolocationDaoTest.ENVIRONMENT_ID));
-		final TrialEnvironmentProperty property = properties.get(0);
-		Assert.assertEquals(GeolocationDaoTest.LOCATION_ID, property.getId());
-		Assert.assertEquals(GeolocationDaoTest.LOCATION_NAME, property.getName());
-		Assert.assertEquals(GeolocationDaoTest.LOCATION_DESCRIPTION, property.getDescription());
-		final Map<Integer, String> environmentValuesMap = property.getEnvironmentValuesMap();
+		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		this.cvTermDao.save(trait);
+		final String traitValue = String.valueOf(new Random().nextDouble());
+		this.createGeolocationProperty(this.geolocation, trait.getCvTermId(), traitValue);
+
+		final Integer geolocationId = this.geolocation.getLocationId();
+		final List<TrialEnvironmentProperty> properties = this.geolocationDao
+			.getPropertiesForTrialEnvironments(Collections.singletonList(geolocationId));
+		Assert.assertNotNull(properties);
+		Assert.assertEquals(2, properties.size());
+		final TrialEnvironmentProperty property1 = properties.get(0);
+		Assert.assertEquals(TermId.LOCATION_ID.getId(), property1.getId().intValue());
+		Assert.assertEquals("LOCATION_ID", property1.getName());
+		Assert.assertEquals("Location - selected (DBID)", property1.getDescription());
+		final Map<Integer, String> environmentValuesMap = property1.getEnvironmentValuesMap();
 		Assert.assertEquals(
-			GeolocationDaoTest.AFRICA_RICE_CENTER,
-			environmentValuesMap.get(GeolocationDaoTest.ENVIRONMENT_ID));
+			LOCATION_ID.toString(), environmentValuesMap.get(geolocationId));
+		final TrialEnvironmentProperty property2 = properties.get(1);
+		Assert.assertEquals(trait.getCvTermId(), property2.getId());
+		Assert.assertEquals(trait.getName(), property2.getName());
+		Assert.assertEquals(trait.getDefinition(), property2.getDescription());
+		final Map<Integer, String> environmentValuesMap2 = property2.getEnvironmentValuesMap();
+		Assert.assertEquals(
+			traitValue, environmentValuesMap2.get(geolocationId));
 	}
 
 	@Test
-	public void testGetInstanceMetadataByInstanceId() {
+	public void testGetEnvironmentGeolocations() {
+		Assert.assertEquals(Collections.singletonList(this.geolocation),
+			this.geolocationDao.getEnvironmentGeolocations(this.study.getProjectId()));
+	}
 
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final int instanceId = random.nextInt();
-		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
-		final InstanceMetadata mockQueryResult = new InstanceMetadata();
+	@Test
+	public void testGetLocationIdByProjectNameAndDescriptionAndProgramUUID() {
+		Assert.assertEquals(this.geolocation.getLocationId(), this.geolocationDao
+			.getLocationIdByProjectNameAndDescriptionAndProgramUUID(this.study.getName(), "1", this.study.getProgramUUID()));
+	}
 
-		Mockito.when(mockQuery.uniqueResult()).thenReturn(mockQueryResult);
-		Mockito.when(this.session.createSQLQuery(Matchers.anyString())).thenReturn(mockQuery);
+	@Test
+	public void testGetAllTrialEnvironments() {
+		final long previousCount = this.geolocationDao.getAllTrialEnvironments().size();
+		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", Collections.<Integer>emptyList());
 
-		final Optional<InstanceMetadata> result = this.dao.getInstanceMetadataByInstanceId(studyId, instanceId);
+		final List<TrialEnvironment> allTrialEnvironments = this.geolocationDao.getAllTrialEnvironments();
+		Assert.assertEquals(previousCount + 1, allTrialEnvironments.size());
+		final List<Integer> environmentIds = Lists.transform(allTrialEnvironments, new Function<TrialEnvironment, Integer>() {
 
-		Assert.assertSame(result.get(), mockQueryResult);
-		Mockito.verify(mockQuery).setParameter("studyId", studyId);
-		Mockito.verify(mockQuery).setParameter("instanceId", instanceId);
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final TrialEnvironment input) {
+				return input.getId();
+			}
+		});
+		Assert.assertTrue(environmentIds.contains(geolocation.getLocationId()));
+		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
+	}
 
+	@Test
+	public void testGetEnvironmentsForTraits() {
+		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
+		this.cvTermDao.save(trait);
+		final List<Integer> traitIds = Collections.singletonList(trait.getCvTermId());
+		final Geolocation geolocation2 = this.createEnvironmentData(this.dataset, "2", traitIds);
+		final Geolocation geolocation3 = this.createEnvironmentData(this.dataset, "3", traitIds);
+
+		final TrialEnvironments environmentsForTraits = this.geolocationDao.getEnvironmentsForTraits(traitIds, this.study.getProgramUUID());
+		Assert.assertNotNull(environmentsForTraits);
+		final List<Integer> environmentIds =
+			Lists.transform(Lists.newArrayList(environmentsForTraits.getTrialEnvironments()), new Function<TrialEnvironment, Integer>() {
+
+				@Nullable
+				@Override
+				public Integer apply(@Nullable final TrialEnvironment input) {
+					return input.getId();
+				}
+			});
+		Assert.assertFalse(environmentIds.contains(geolocation.getLocationId()));
+		Assert.assertTrue(environmentIds.contains(geolocation2.getLocationId()));
+		Assert.assertTrue(environmentIds.contains(geolocation3.getLocationId()));
+	}
+
+	private DmsProject createDataset(final String name, final String programUUID, final int datasetType, final DmsProject parent,
+		final DmsProject study) {
+		final DmsProject dataset = new DmsProject();
+		dataset.setName(name);
+		dataset.setDescription(name);
+		dataset.setProgramUUID(programUUID);
+		dataset.setDatasetType(new DatasetType(datasetType));
+		dataset.setParent(parent);
+		dataset.setStudy(study);
+		this.dmsProjectDao.save(dataset);
+		return dataset;
+	}
+
+	private void createGermplasm() {
+		this.germplasm = new ArrayList<>();
+		for (int i = 0; i < NO_OF_GERMPLASM; i++) {
+			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+			germplasm.setGid(null);
+			this.germplasmDao.save(germplasm);
+			this.germplasm.add(germplasm);
+		}
+	}
+
+	private Geolocation createEnvironmentData(final DmsProject project, final String instance, final List<Integer> traitIds) {
+		final Geolocation geolocation = new Geolocation();
+		geolocation.setDescription(instance);
+		this.geolocationDao.saveOrUpdate(geolocation);
+
+		this.createGeolocationProperty(geolocation, TermId.LOCATION_ID.getId(), LOCATION_ID.toString());
+
+		for (final Germplasm germplasm : this.germplasm) {
+			final StockModel stockModel = new StockModel();
+			stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
+			stockModel.setIsObsolete(false);
+			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
+			stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
+			stockModel.setGermplasm(germplasm);
+			this.stockDao.saveOrUpdate(stockModel);
+
+			final ExperimentModel experimentModel = new ExperimentModel();
+			experimentModel.setGeoLocation(geolocation);
+			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+			experimentModel.setProject(project);
+			experimentModel.setStock(stockModel);
+			this.experimentDao.saveOrUpdate(experimentModel);
+
+			for (final Integer traitId : traitIds) {
+				final Phenotype phenotype = new Phenotype();
+				phenotype.setObservableId(traitId);
+				phenotype.setExperiment(experimentModel);
+				phenotype.setValue(String.valueOf(new Random().nextDouble()));
+				this.phenotypeDao.save(phenotype);
+			}
+
+		}
+
+		return geolocation;
+	}
+
+	private void createGeolocationProperty(final Geolocation geolocation, final Integer variableId, final String value) {
+		final GeolocationProperty geolocationProperty = new GeolocationProperty();
+		geolocationProperty.setType(variableId);
+		geolocationProperty.setValue(value);
+		geolocationProperty.setRank(1);
+		geolocationProperty.setGeolocation(geolocation);
+		this.geolocationPropertyDao.save(geolocationProperty);
 	}
 }

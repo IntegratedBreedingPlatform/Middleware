@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import com.google.common.base.Optional;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
@@ -27,7 +26,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,12 +227,13 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 				"SELECT DISTINCT e.nd_geolocation_id, l.lname, gp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
 					+ "FROM nd_experiment e "
 					+ "	LEFT JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id "
-					+ "	AND gp.type_id =  " + TermId.LOCATION_ID.getId() + " AND e.nd_geolocation_id IN (:locationIds) "
+					+ "	AND gp.type_id =  " + TermId.LOCATION_ID.getId()
 					+ "	LEFT JOIN location l ON l.locid = gp.value "
 					+ " LEFT JOIN location prov ON prov.locid = l.snl1id "
 					+ "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
 					+ " INNER JOIN project ds ON ds.project_id = e.project_id "
-					+ "	INNER JOIN project p ON p.project_id = ds.study_id ";
+					+ "	INNER JOIN project p ON p.project_id = ds.study_id "
+					+ " WHERE e.nd_geolocation_id IN (:locationIds) ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("locationIds", environmentIds);
@@ -421,7 +420,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		List<Geolocation> returnList = new ArrayList<>();
 		if (studyId != null) {
 			try {
-				final String sql = "SELECT g.* " + //
+				final String sql = "SELECT DISTINCT g.* " + //
 					" FROM nd_geolocation g " + //
 					" INNER JOIN nd_experiment exp ON (exp.nd_geolocation_id = g.nd_geolocation_id) " + //
 					" INNER JOIN project envdataset on (envdataset.project_id = exp.project_ID) " + //
@@ -435,47 +434,6 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 		}
 		return returnList;
-	}
-
-	public Optional<InstanceMetadata> getInstanceMetadataByInstanceId(final int studyId, final int instanceId) {
-
-		if (studyId != 0 && instanceId != 0) {
-			final String queryString = "select \n" + "    geoloc.nd_geolocation_id as instanceDbId, \n"
-				+ "    geoloc.description as instanceNumber, \n" + "    pmain.project_id trialDbId, \n"
-				+ "    pmain.name as trialName, \n" + "    proj.name as instanceDatasetName, \n"
-				+ "    pmain.program_uuid as programDbId, \n"
-				+ "    max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n"
-				+ "    max(if(geoprop.type_id = 8190, geoprop.value, null)) as locationDbId, \n"
-				+ "    max(if(geoprop.type_id = 8189, geoprop.value, null)) as locationAbbreviation, \n"
-				+ "    max(if(geoprop.type_id = 8370, geoprop.value, null)) as season \n" + " from  \n"
-				+ " nd_geolocation geoloc \n"
-				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "    inner join project proj on proj.project_id = nde.project_id \n"
-				+ "    inner join project pmain on pmain.project_id = proj.study_id \n"
-				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-				+ " where nde.type_id = 1020 and pmain.project_id = :studyId and geoloc.nd_geolocation_id = :instanceId \n"
-				+ "    group by geoloc.nd_geolocation_id";
-
-			final SQLQuery query = this.getSession().createSQLQuery(queryString);
-			query.addScalar("instanceDbId", new IntegerType());
-			query.addScalar("instanceNumber");
-			query.addScalar("trialDbId", new IntegerType());
-			query.addScalar("trialName");
-			query.addScalar("instanceDatasetName");
-			query.addScalar("programDbId");
-			query.addScalar("locationName");
-			query.addScalar("locationDbId", new IntegerType());
-			query.addScalar("locationAbbreviation");
-			query.addScalar("season");
-			query.setParameter("studyId", studyId);
-			query.setParameter("instanceId", instanceId);
-			query.setResultTransformer(Transformers.aliasToBean(InstanceMetadata.class));
-			return Optional.fromNullable((InstanceMetadata) query.uniqueResult());
-		}
-
-		return Optional.absent();
-
 	}
 
 	public Boolean existInstances(final Set<Integer> instanceIds) {
