@@ -12,7 +12,7 @@ public class UserRoleMapper {
 		userRoleDto.setRole(RoleMapper.map(userRole.getRole()));
 		userRoleDto.setProgramName((userRole.getWorkbenchProject()!=null)?userRole.getWorkbenchProject().getProjectName():"");
 		userRoleDto.setProgramId((userRole.getWorkbenchProject()!=null)?userRole.getWorkbenchProject().getProjectId():null);
-		userRoleDto.setCropName((userRole.getCropName()!=null)?userRole.getCropName().getCropName():"");
+		userRoleDto.setCropName((userRole.getCropType()!=null)?userRole.getCropType().getCropName():"");
 		userRoleDto.setId(userRole.getId());
 		return userRoleDto;
 	}
