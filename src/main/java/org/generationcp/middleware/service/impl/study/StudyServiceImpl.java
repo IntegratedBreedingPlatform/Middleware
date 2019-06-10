@@ -62,28 +62,28 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT = "select count(*) as totalObservationUnits from "
-			+ "nd_experiment nde \n"
-			+ "    inner join project proj on proj.project_id = nde.project_id \n"
-			+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
+		+ "nd_experiment nde \n"
+		+ "    inner join project proj on proj.project_id = nde.project_id \n"
+		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
-			+ "	proj.study_id = :studyIdentifier AND proj.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
-			+ "    and gl.nd_geolocation_id = :instanceId ";
+		+ "	proj.study_id = :studyIdentifier AND proj.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
+		+ "    and gl.nd_geolocation_id = :instanceId ";
 
 	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED =
-			"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
-					+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
-					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
-					+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
-					+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
-					+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
+		"SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n" + " FROM \n" + " project p \n"
+			+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
+			+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+			+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
+			+ "        LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
+			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
+			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
 
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
-			StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
-					+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
+		StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
+			+ "		LEFT JOIN phenotype ph ON ph.nd_experiment_id = nde.nd_experiment_id \n"
+			+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE + " and ph.value is not null ";
 
 	private MeasurementVariableService measurementVariableService;
 
@@ -111,7 +111,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.studyMeasurements = new StudyMeasurements(currentSession);
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(currentSession);
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(),
-				this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
+			this.getOntologyPropertyDataManager(), this.getOntologyScaleDataManager(), this.getFormulaService(), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
 
@@ -125,7 +125,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			}
 		};
 		StudyServiceImpl.studyIdToProgramIdCache =
-				CacheBuilder.newBuilder().expireAfterWrite(100, TimeUnit.MINUTES).build(studyKeyCacheBuilder);
+			CacheBuilder.newBuilder().expireAfterWrite(100, TimeUnit.MINUTES).build(studyKeyCacheBuilder);
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
@@ -136,7 +136,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialMeasurements
 	 */
 	StudyServiceImpl(final MeasurementVariableService measurementVariableService, final StudyMeasurements trialMeasurements,
-			final StudyGermplasmListService studyGermplasmListServiceImpl) {
+		final StudyGermplasmListService studyGermplasmListServiceImpl) {
 		this.measurementVariableService = measurementVariableService;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
@@ -221,16 +221,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 
 			final SQLQuery query =
-					this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES);
+				this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
 			query.setParameter("instanceId", instanceId);
 			return (int) query.uniqueResult() > 0;
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-					String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-							studyIdentifier, instanceId) + he.getMessage(),
-					he);
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+					studyIdentifier, instanceId) + he.getMessage(),
+				he);
 		}
 	}
 
@@ -238,29 +238,29 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		try {
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
-					+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE);
+				+ StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
 			query.setParameter("instanceId", instanceId);
 			return (int) query.uniqueResult();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-					String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-							studyIdentifier, instanceId) + he.getMessage(),
-					he);
+				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+					studyIdentifier, instanceId) + he.getMessage(),
+				he);
 		}
 	}
 
 	@Override
 	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
-			final String sortBy, final String sortOrder) {
+		final String sortBy, final String sortOrder) {
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits = this.measurementVariableService.getVariables(studyIdentifier,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+			VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
 		return this.studyMeasurements.getAllMeasurements(studyIdentifier, selectionMethodsAndTraits,
-				this.getGenericGermplasmDescriptors(studyIdentifier), this.getAdditionalDesignFactors(studyIdentifier), instanceId,
-				pageNumber, pageSize, sortBy, sortOrder);
+			this.getGenericGermplasmDescriptors(studyIdentifier), this.getAdditionalDesignFactors(studyIdentifier), instanceId,
+			pageNumber, pageSize, sortBy, sortOrder);
 	}
 
 	@Override
@@ -272,7 +272,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
 		 */
 		final List<String> fixedGermplasmDescriptors =
-				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID");
+			Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID");
 		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
 
 		for (final String gpDescriptor : allGermplasmDescriptors) {
@@ -292,7 +292,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 * EXPERIMENTAL_DESIGN and TREATMENT FACTOR variables
 		 */
 		final List<String> fixedDesignFactors =
-				Lists.newArrayList("REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE");
+			Lists.newArrayList("REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE");
 		final List<String> additionalDesignFactors = Lists.newArrayList();
 
 		for (final String designFactor : allDesignFactors) {
@@ -306,9 +306,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
 		final List<MeasurementVariableDto> traits =
-				this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
+			this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, this.getGenericGermplasmDescriptors(studyIdentifier),
-				this.getAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
+			this.getAdditionalDesignFactors(studyIdentifier), measurementIdentifier);
 	}
 
 	@Override
@@ -318,10 +318,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final Observations observations = new Observations(currentSession, this.ontologyVariableDataManager);
 		try {
 			return observations.updataObsevationTraits(middlewareMeasurement,
-					StudyServiceImpl.studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop())));
+				StudyServiceImpl.studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop())));
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Unexpected error updating observations. Please contact support for " + "further assistence.", e); // or
+				"Unexpected error updating observations. Please contact support for " + "further assistence.", e); // or
 		}
 	}
 
@@ -336,7 +336,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return StudyServiceImpl.studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop()));
 		} catch (final ExecutionException e) {
 			throw new MiddlewareQueryException(
-					"Unexpected error updating observations. Please contact support for " + "further assistence.", e);
+				"Unexpected error updating observations. Please contact support for " + "further assistence.", e);
 		}
 	}
 
@@ -346,18 +346,20 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		try {
 			final String sql = "select \n" + "	geoloc.nd_geolocation_id as INSTANCE_DBID, \n"
-					+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
-					"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
-					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" + // 8189 = cvterm for CUSTOM_LOCATION_ABBR
-					"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" + // 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
-					"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
-					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-					+ "    inner join project proj on proj.project_id = nde.project_id \n"
-					+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-					+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-					+ " where \n"
-					+ "    proj.study_id = :studyId and proj.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId() + " \n"
-					+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
+				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
+				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as CUSTOM_LOCATION_ABBR, \n" +
+				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
+				"	max(if(geoprop.type_id = 8583, geoprop.value, null)) as FIELDMAP_BLOCK, \n" +
+				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
+				"   geoloc.description as INSTANCE_NUMBER \n" + " from \n" + "	nd_geolocation geoloc \n"
+				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "    inner join project proj on proj.project_id = nde.project_id \n"
+				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
+				+ " where \n"
+				+ "    proj.study_id = :studyId and proj.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId() + " \n"
+				+ "    group by geoloc.nd_geolocation_id \n" + "    order by (1 * geoloc.description) asc ";
 
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.setParameter("studyId", studyId);
@@ -372,14 +374,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {
 				final Object[] row = (Object[]) result;
-				final boolean hasFieldmap = !StringUtils.isEmpty((String)row[4]);
-				final StudyInstance instance = new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[5],(String) row[3], hasFieldmap);
+				final boolean hasFieldmap = !StringUtils.isEmpty((String) row[4]);
+				final StudyInstance instance =
+					new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[5], (String) row[3], hasFieldmap);
 				instances.add(instance);
 			}
 			return instances;
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-					"Unexpected error in executing getStudyInstances(studyId = " + studyId + ") query: " + he.getMessage(), he);
+				"Unexpected error in executing getStudyInstances(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 	}
 
@@ -391,7 +394,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, final Integer instanceDbId) {
 		final List<MeasurementVariableDto> traits =
-				this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
+			this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
 		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
 
@@ -402,13 +405,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}).immutableSortedCopy(traits);
 
 		final List<Object[]> results =
-				this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
+			this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
 
 		final List<Integer> observationVariableDbIds = new ArrayList<>();
 
 		final List<String> observationVariableNames = new ArrayList<>();
 
-		for (final Iterator<MeasurementVariableDto> iterator = measurementVariables.iterator(); iterator.hasNext();) {
+		for (final Iterator<MeasurementVariableDto> iterator = measurementVariables.iterator(); iterator.hasNext(); ) {
 			final MeasurementVariableDto measurementVariableDto = iterator.next();
 			observationVariableDbIds.add(measurementVariableDto.getId());
 			observationVariableNames.add(measurementVariableDto.getName());
@@ -434,7 +437,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final String locationAbbreviation = (String) row[14];
 
 				// studyName
-				final String studyName =  row[lastFixedColumn] + " Environment Number " + row[1];
+				final String studyName = row[lastFixedColumn] + " Environment Number " + row[1];
 				entry.add(studyName);
 
 				// locationDbId
@@ -518,11 +521,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		final TrialObservationTable dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier)
-				.setObservationVariableDbIds(observationVariableDbIds).setObservationVariableNames(observationVariableNames).setData(data);
+			.setObservationVariableDbIds(observationVariableDbIds).setObservationVariableNames(observationVariableNames).setData(data);
 
 		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
-				"germplasmName", "observationUnitDbId", "plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X",
-				"Y", "obsUnitId"));
+			"germplasmName", "observationUnitDbId", "plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X",
+			"Y", "obsUnitId"));
 
 		return dto;
 	}
@@ -564,14 +567,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-					"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
+				"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 
 		return !queryResults.isEmpty();
 	}
 
 	@Override
-	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
+	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber,
+		final PhenotypeSearchRequestDTO requestDTO) {
 		return this.getPhenotypeDao().searchPhenotypes(pageSize, pageNumber, requestDTO);
 	}
 
@@ -580,28 +584,26 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return this.getPhenotypeDao().countPhenotypes(requestDTO);
 	}
 
-	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {
+	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
-		return this;
 	}
 
-	public StudyServiceImpl setUserDataManager(final UserDataManager userDataManager) {
+	public void setUserDataManager(final UserDataManager userDataManager) {
 		this.userDataManager = userDataManager;
-		return this;
 	}
 
 	String getYearFromStudy(final int studyIdentifier) {
 		final String startDate = this.studyDataManager.getProjectStartDateByProjectId(studyIdentifier);
-		if(startDate != null) {
+		if (startDate != null) {
 			return startDate.substring(0, 4);
 		}
 		return startDate;
 	}
-	
+
 	public void setMeasurementVariableService(final MeasurementVariableService measurementVariableService) {
 		this.measurementVariableService = measurementVariableService;
 	}
-	
+
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
 		this.studyMeasurements = studyMeasurements;
 	}
