@@ -234,6 +234,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return false;
 	}
 
+	public void saveWorkbookVariablesAndObservations(final Workbook workbook) {
+		try {
+
+			this.getWorkbookSaver().saveWorkbookVariables(workbook);
+			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	// TODO: MARK FOR DELETE IBP-2689
 	@Override

@@ -1014,4 +1014,6 @@ public interface FieldbookService {
 	 * @param measurementDatasetId
 	 */
 	void deleteExperimentalDesignGenerated(final Integer measurementDatasetId);
+
+	void saveWorkbookVariablesAndObservations(final Workbook workbook);
 }
