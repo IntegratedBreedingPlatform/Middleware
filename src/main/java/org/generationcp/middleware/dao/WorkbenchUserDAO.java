@@ -246,6 +246,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	public List<WorkbenchUser> getSuperAdminUsers() {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+			criteria.createAlias("roles", "roles");
 			criteria.createAlias("roles.role", "role");
 			criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
 			return criteria.list();
@@ -262,6 +263,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		try {
 			if (userId != null) {
 				final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+				criteria.createAlias("roles", "roles");
 				criteria.createAlias("roles.role", "role");
 				criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
 				criteria.add(Restrictions.eq("userid", userId));
