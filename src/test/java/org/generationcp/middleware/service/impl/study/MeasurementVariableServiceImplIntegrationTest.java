@@ -1,21 +1,14 @@
 package org.generationcp.middleware.service.impl.study;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,27 +20,23 @@ import java.util.List;
  */
 public class MeasurementVariableServiceImplIntegrationTest extends IntegrationTestBase {
 
-	private DaoFactory daoFactory;
-
 	private DmsProjectDao dmsProjectDao;
-	private CVTermDao cvTermDao;
-	private ProjectPropertyDao projectPropertyDao;
-
 	private MeasurementVariableService measurementVariableService;
+	private IntegrationTestDataInitializer testDataInitializer;
 
 	private DmsProject study;
 	private DmsProject plot;
 
 	@Before
 	public void setUp() {
-		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.measurementVariableService = new MeasurementVariableServiceImpl(this.sessionProvder.getSession());
-		this.dmsProjectDao = this.daoFactory.getDmsProjectDAO();
-		this.cvTermDao = this.daoFactory.getCvTermDao();
-		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 
-		this.study = this.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
-		this.plot = this.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
+		this.dmsProjectDao = new DmsProjectDao();
+		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.measurementVariableService = new MeasurementVariableServiceImpl(this.sessionProvder.getSession());
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder);
+		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
+		this.plot = this.testDataInitializer
+			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
 	}
 
 	@Test
@@ -55,11 +44,11 @@ public class MeasurementVariableServiceImplIntegrationTest extends IntegrationTe
 
 		final String trait1Name = "Trait1";
 		final String trait2Name = "Trait2";
-		final CVTerm trait1 = this.createVariable(trait1Name);
-		final CVTerm trait2 = this.createVariable(trait2Name);
+		final CVTerm trait1 = this.testDataInitializer.createTrait(trait1Name);
+		final CVTerm trait2 = this.testDataInitializer.createTrait(trait2Name);
 
-		this.addProjectProp(this.plot, trait1.getCvTermId(), trait1Name, VariableType.TRAIT);
-		this.addProjectProp(this.plot, trait2.getCvTermId(), trait2Name, VariableType.TRAIT);
+		this.testDataInitializer.addProjectProp(this.plot, trait1.getCvTermId(), trait1Name, VariableType.TRAIT, "", 1);
+		this.testDataInitializer.addProjectProp(this.plot, trait2.getCvTermId(), trait2Name, VariableType.TRAIT, "", 2);
 
 		final List<MeasurementVariableDto> returnedTraits =
 			this.measurementVariableService.getVariables(this.study.getProjectId(), VariableType.TRAIT.getId());
@@ -77,11 +66,11 @@ public class MeasurementVariableServiceImplIntegrationTest extends IntegrationTe
 
 		final String variable1Name = "TraitVariable";
 		final String variable2Name = "DesignVariable";
-		final CVTerm trait1 = this.createVariable(variable1Name);
-		final CVTerm trait2 = this.createVariable(variable2Name);
+		final CVTerm trait1 = this.testDataInitializer.createTrait(variable1Name);
+		final CVTerm trait2 = this.testDataInitializer.createTrait(variable2Name);
 
-		this.addProjectProp(this.plot, trait1.getCvTermId(), variable1Name, VariableType.TRAIT);
-		this.addProjectProp(this.plot, trait2.getCvTermId(), variable2Name, VariableType.EXPERIMENTAL_DESIGN);
+		this.testDataInitializer.addProjectProp(this.plot, trait1.getCvTermId(), variable1Name, VariableType.TRAIT, "", 1 );
+		this.testDataInitializer.addProjectProp(this.plot, trait2.getCvTermId(), variable2Name, VariableType.EXPERIMENTAL_DESIGN, "", 2);
 
 		final List<MeasurementVariableDto> returnedVariablesFromPlotDataset = this.measurementVariableService
 			.getVariablesForDataset(this.plot.getProjectId(), VariableType.TRAIT.getId(), VariableType.EXPERIMENTAL_DESIGN.getId());
@@ -95,41 +84,6 @@ public class MeasurementVariableServiceImplIntegrationTest extends IntegrationTe
 		final List<MeasurementVariableDto> returnedVariablesFromStudyDataset = this.measurementVariableService
 			.getVariablesForDataset(this.study.getProjectId(), VariableType.TRAIT.getId(), VariableType.EXPERIMENTAL_DESIGN.getId());
 		Assert.assertTrue(returnedVariablesFromStudyDataset.isEmpty());
-
-	}
-
-	private DmsProject createDmsProject(final String name, final String description, final DmsProject study, final DmsProject parent,
-		final DatasetTypeEnum datasetTypeEnum) {
-		final DmsProject dmsProject = new DmsProject();
-		dmsProject.setName(name);
-		dmsProject.setDescription(description);
-		dmsProject.setStudy(study);
-		dmsProject.setParent(parent);
-		if (datasetTypeEnum != null) {
-			dmsProject.setDatasetType(new DatasetType(datasetTypeEnum.getId()));
-		}
-		this.dmsProjectDao.save(dmsProject);
-		this.dmsProjectDao.refresh(dmsProject);
-		return dmsProject;
-	}
-
-	private CVTerm createVariable(final String name) {
-		final CVTerm trait = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
-		trait.setName(name);
-		this.cvTermDao.save(trait);
-		return trait;
-	}
-
-	private void addProjectProp(final DmsProject project, final int variableId, final String alias, final VariableType variableType) {
-
-		final ProjectProperty projectProperty = new ProjectProperty();
-		projectProperty.setVariableId(variableId);
-		projectProperty.setProject(project);
-		projectProperty.setRank(1);
-		projectProperty.setAlias(alias);
-		projectProperty.setTypeId(variableType.getId());
-
-		this.projectPropertyDao.save(projectProperty);
 
 	}
 
