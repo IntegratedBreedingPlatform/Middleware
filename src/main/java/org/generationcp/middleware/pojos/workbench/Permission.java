@@ -32,8 +32,9 @@ public class Permission {
 	private Permission parent;
 
 	@OneToMany
-	@JoinColumn(name = "workbench_sidebar_category_id", nullable = true)
-	private List<WorkbenchSidebarCategory> sidebarCategory;
+	@JoinColumn(name = "workbench_sidebar_category_link_id", nullable = true)
+	private List<WorkbenchSidebarCategoryLink> sidebarCategoryLink;
+
 
 	public Integer getPermissionId() {
 		return this.permissionId;
@@ -67,11 +68,11 @@ public class Permission {
 		this.parent = parent;
 	}
 
-	public List<WorkbenchSidebarCategory> getSidebarCategory() {
-		return this.sidebarCategory;
+	public List<WorkbenchSidebarCategoryLink> getSidebarCategoryLink() {
+		return this.sidebarCategoryLink;
 	}
 
-	public void setSidebarCategory(final List<WorkbenchSidebarCategory> sidebarCategory) {
-		this.sidebarCategory = sidebarCategory;
+	public void setSidebarCategoryLink(final List<WorkbenchSidebarCategoryLink> sidebarCategoryLink) {
+		this.sidebarCategoryLink = sidebarCategoryLink;
 	}
 }
