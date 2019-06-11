@@ -314,7 +314,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				return dataset.getId();
 			}
 		});
-		// We only assert that there are two folders added.
 		Assert.assertEquals("The new size should be equal to the original size + 3", originalSize + 3, newSize);
 		Assert.assertTrue(idList.contains(folder1.getProjectId()));
 		Assert.assertTrue(idList.contains(folder2.getProjectId()));
@@ -1147,6 +1146,14 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, study1.getInstanceMetaData().size());
 		Assert.assertEquals(location1, study1.getInstanceMetaData().get(0).getLocationDbId().toString());
+	}
+
+	@Test
+	public void testIsStudy() {
+		Assert.assertTrue(this.manager.isStudy(this.studyReference.getId()));
+		final String uniqueId = this.commonTestProject.getUniqueID();
+		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
+		Assert.assertFalse(this.manager.isStudy(mainFolder.getProjectId()));
 	}
 
 }
