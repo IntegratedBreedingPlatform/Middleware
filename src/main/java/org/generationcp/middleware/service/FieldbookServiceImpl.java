@@ -363,6 +363,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final Workbook workbook, final String programUUID, final CropType crop) {
 		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesignGenerated (grand total)");
 		try {
+			this.getWorkbookSaver().saveProjectProperties(workbook);
+			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
 			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 			this.getWorkbookSaver().deleteExperimentalDesign(workbook, variableMap, programUUID, crop);
 		} catch (final Exception e) {
