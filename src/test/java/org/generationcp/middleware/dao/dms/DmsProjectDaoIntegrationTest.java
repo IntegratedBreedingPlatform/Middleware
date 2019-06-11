@@ -421,7 +421,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		dataset.setParent(parent);
 		dataset.setStudy(study);
 		this.dmsProjectDao.save(dataset);
-		System.out.println("## Dataset ID " + dataset.getProjectId() + " with parent " + dataset.getStudy().getProjectId());
 		return dataset;
 	}
 
@@ -494,7 +493,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 			experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
 			experimentModel.setProject(project);
-			System.out.println("## Experiment proj=" + project.getProjectId() + " , geoloc=" + geolocation.getLocationId());
 			experimentModel.setStock(stockModel);
 			this.experimentDao.saveOrUpdate(experimentModel);
 		}

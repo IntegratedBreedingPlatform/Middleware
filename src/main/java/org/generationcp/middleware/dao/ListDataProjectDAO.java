@@ -30,16 +30,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	private static final String ENTRY_ID = "entryId";
 
-	static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
-
-	static final String GERMPLASM_TABLE = "germplasm";
-
-	static final String GERMPLASM_TABLE_ALIAS = "g";
-
-	static final String GERMPLASM_LIST_NAME_TABLE = "list";
-
-	static final String GERMPLASM_LIST_NAME_TABLE_ALIAS = "l";
-
 	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n" + "   ldp.germplasm_id, \n"
 		+ "   group_concat(p.name) \n" + " FROM listnms l \n"
 		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
@@ -201,22 +191,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			throw new MiddlewareQueryException(
 				"Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}
-	}
-
-	public long countByListId(final Integer id) {
-		try {
-			if (id != null) {
-				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
-				criteria.createAlias("list", "l");
-				criteria.add(Restrictions.eq("l.id", id));
-				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue(); // count
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error with countByListId(id=" + id + ") query from ListDataProject " + e.getMessage(), e);
-		}
-		return 0;
 	}
 
 	public long countByListIdAndEntryType(final Integer id, final List<Integer> systemDefinedEntryTypeIds) {
