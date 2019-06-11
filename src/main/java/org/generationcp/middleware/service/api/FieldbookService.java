@@ -1019,5 +1019,5 @@ public interface FieldbookService {
 	 */
 	void deleteExperimentalDesignGenerated(final Workbook workbook, final String programUUID, final CropType crop);
 
-	void saveWorkbookVariablesAndObservations(final Workbook workbook);
+	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
 }
