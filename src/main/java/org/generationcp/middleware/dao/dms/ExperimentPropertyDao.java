@@ -243,25 +243,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		return fieldmaps;
 	}
 
-	public int countExperimentPropObservations(final int datasetId, final String nonEditableFactors) {
-		try {
-
-			final StringBuilder sql =
-					new StringBuilder().append("SELECT COUNT(eprop.nd_experimentprop_id) ").append("FROM nd_experiment e ")
-							.append("INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id ")
-							.append("WHERE e.project_id = ").append(datasetId).append(" AND eprop.type_id NOT IN (")
-							.append(nonEditableFactors).append(")");
-			final Query query = this.getSession().createSQLQuery(sql.toString());
-
-			return ((BigInteger) query.uniqueResult()).intValue();
-
-		} catch (final HibernateException e) {
-			final String message = "Error at countExperimentPropObservations=" + datasetId + " at ExperimentPropertyDao: " + e.getMessage();
-			ExperimentPropertyDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	private List<FieldMapDatasetInfo> createFieldMapDatasetInfo(final List<Object[]> list) {
 		final List<FieldMapDatasetInfo> datasets = new ArrayList<>();
 		FieldMapDatasetInfo dataset = null;
