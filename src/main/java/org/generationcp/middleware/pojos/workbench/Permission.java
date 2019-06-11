@@ -8,9 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
 
 @Entity
 @Table(name = "permission")
@@ -31,9 +29,8 @@ public class Permission {
 	@JoinColumn(name = "parent_id", nullable = true)
 	private Permission parent;
 
-	@OneToMany
-	@JoinColumn(name = "workbench_sidebar_category_link_id", nullable = true)
-	private List<WorkbenchSidebarCategoryLink> sidebarCategoryLink;
+	@Column(name = "workbench_sidebar_category_link_id", nullable = true)
+	private WorkbenchSidebarCategoryLink sidebarCategoryLink;
 
 
 	public Integer getPermissionId() {
@@ -68,11 +65,11 @@ public class Permission {
 		this.parent = parent;
 	}
 
-	public List<WorkbenchSidebarCategoryLink> getSidebarCategoryLink() {
+	public WorkbenchSidebarCategoryLink getSidebarCategoryLink() {
 		return this.sidebarCategoryLink;
 	}
 
-	public void setSidebarCategoryLink(final List<WorkbenchSidebarCategoryLink> sidebarCategoryLink) {
+	public void setSidebarCategoryLink(final WorkbenchSidebarCategoryLink sidebarCategoryLink) {
 		this.sidebarCategoryLink = sidebarCategoryLink;
 	}
 }
