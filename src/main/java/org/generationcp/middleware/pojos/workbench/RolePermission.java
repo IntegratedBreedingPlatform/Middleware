@@ -1,8 +1,9 @@
 package org.generationcp.middleware.pojos.workbench;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -11,11 +12,13 @@ import java.io.Serializable;
 public class RolePermission implements Serializable {
 
 	@Id
-	@Column(name = "role_id", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "role_id", nullable = false)
 	private Role role;
 
 	@Id
-	@Column(name = "permission_id", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "permission_id", nullable = false)
 	private Permission permission;
 
 	public Role getRole() {
