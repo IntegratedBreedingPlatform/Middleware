@@ -12,25 +12,25 @@ public class RolePermission implements Serializable {
 
 	@Id
 	@Column(name = "role_id", nullable = false)
-	private Integer roleId;
+	private Role role;
 
 	@Id
 	@Column(name = "permission_id", nullable = false)
-	private Integer permissionId;
+	private Permission permission;
 
-	public Integer getRoleId() {
-		return this.roleId;
+	public Role getRole() {
+		return this.role;
 	}
 
-	public void setRoleId(final Integer roleId) {
-		this.roleId = roleId;
+	public void setRole(final Role role) {
+		this.role = role;
 	}
 
-	public Integer getPermissionId() {
-		return this.permissionId;
+	public Permission getPermission() {
+		return this.permission;
 	}
 
-	public void setPermissionId(final Integer permissionId) {
-		this.permissionId = permissionId;
+	public void setPermission(final Permission permission) {
+		this.permission = permission;
 	}
 }
