@@ -399,7 +399,7 @@
 			name VARCHAR(255) NOT NULL,
 			description VARCHAR(255) NULL,
 			parent_id INT(11) NULL,
-			workbench_sidebar_category_id INT(11) NULL,
+			workbench_sidebar_category_link_id INT(11) NULL,
 			PRIMARY KEY (permission_id)
 			);
 
