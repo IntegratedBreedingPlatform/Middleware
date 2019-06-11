@@ -295,6 +295,13 @@ public class WorkbookSaver extends Saver {
 		final Integer environmentDatasetId = workbook.getTrialDatasetId();
 		final Integer plotDatasetId = workbook.getMeasurementDatesetId();
 
+		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
+		final DmsProject trialDataset = this.getDmsProjectDao().getById(workbook.getTrialDatasetId());
+		final DmsProject measurementDataset = this.getDmsProjectDao().getById(plotDatasetId);
+
+		this.getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
+		this.removeDeletedVariables(workbook.getConditions());
+
 		final int savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
 
 		// delete measurement data
