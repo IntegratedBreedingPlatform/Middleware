@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+
 @Entity
 @Table(name = "permission")
 public class Permission {
@@ -19,7 +20,7 @@ public class Permission {
 	@Column(name = "permission_id", nullable = false)
 	private Integer permissionId;
 
-	@Column(name = "userid", nullable = false)
+	@Column(name = "name", nullable = false)
 	private String name;
 
 	@Column(name = "description", nullable = false)
@@ -32,9 +33,8 @@ public class Permission {
 	@Column(name = "workbench_sidebar_category_link_id", nullable = true)
 	private WorkbenchSidebarCategoryLink sidebarCategoryLink;
 
-
 	public Integer getPermissionId() {
-		return this.permissionId;
+		return permissionId;
 	}
 
 	public void setPermissionId(final Integer permissionId) {
