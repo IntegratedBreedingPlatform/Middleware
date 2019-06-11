@@ -10,6 +10,7 @@
 
 package org.generationcp.middleware.service.api;
 
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -26,7 +27,6 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
@@ -42,8 +42,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-
-import com.google.common.base.Optional;
 
 import java.util.List;
 import java.util.Map;
@@ -521,11 +519,9 @@ public interface FieldbookService {
 	 *
 	 * @param studyId
 	 *            the study id
-	 * @param studyName
-	 *            the study name
 	 * @return the measurement dataset id
 	 */
-	int getMeasurementDatasetId(int studyId, String studyName);
+	int getMeasurementDatasetId(int studyId);
 
 	/**
 	 * count the number of observations.
@@ -919,7 +915,7 @@ public interface FieldbookService {
 	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
 			boolean isApplyNewGroupToPreviousCrosses);
 
-	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds);
+	void saveStudyColumnOrdering(Integer studyId, List<Integer> orderedTermIds);
 
 	boolean setOrderVariableByRank(Workbook workbook);
 
