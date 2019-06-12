@@ -6,7 +6,9 @@ import java.util.Set;
 
 public interface PermissionService {
 
-	Set<PermissionDto> getSidebarLinks(final Integer userId, final String cropName, final Integer programId);
+	List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId);
+
+	List<PermissionDto> getPermissionLinks(final Integer userId, final String cropName, final Integer programId);
 
 	/**
 	 * Close the sessionProvider
