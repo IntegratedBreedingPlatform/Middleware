@@ -950,7 +950,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
 			final String matchClause = performLikeOperation? "LIKE :" + variableId + "_text " : "IN (:" + variableId + "_values) ";
 			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
-				+ "WHERE xp.nd_experiment_id = parent.nd_experiment_id AND xp.type_id = :" + variableId
+				+ "WHERE xp.nd_experiment_id = nde.parent_id AND xp.type_id = :" + variableId
 				+ "_Id AND value ").append(matchClause).append(" )");
 
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
