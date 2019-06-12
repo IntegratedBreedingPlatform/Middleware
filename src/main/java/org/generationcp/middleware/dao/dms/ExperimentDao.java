@@ -862,12 +862,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
 					sql.append(
-						" and nde.nd_experiment_id in ( " //
-							+ "    select ph2.nd_experiment_id " //
-							+ "    from phenotype ph2 " //
-							+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-							+ "    where ph2.observable_id = :" + observableId + "_Id" //
-							+ "    and nde2.project_id = p.project_id " //
+						" and EXISTS ( " //
+							+ "    SELECT 1 " //
+							+ "    FROM phenotype ph2 " //
+							+ "    WHERE ph2.observable_id = :" + observableId + "_Id"
+							+ "    AND ph2.nd_experiment_id = nde.nd_experiment_id " //
 							+ "    and ph2." + filterByDraftOrValue + " in (:" + observableId + "_values ))"); //
 				} else {
 					this.applyFactorsFilter(sql, observableId, variableTypeString, false);
@@ -884,13 +883,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
 					sql.append(
-						" and nde.nd_experiment_id in ( " //
-							+ "    select ph2.nd_experiment_id " //
-							+ "    from phenotype ph2 " //
-							+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-							+ "    where ph2.observable_id = :" + observableId + "_Id"
-							+ "    and nde2.project_id = p.project_id " //
-							+ "    and nde2.project_id = p.project_id " //
+						" and EXISTS ( " //
+							+ "    SELECT 1 " //
+							+ "    FROM phenotype ph2 " //
+							+ "    WHERE ph2.observable_id = :" + observableId + "_Id"
+							+ "    AND ph2.nd_experiment_id = nde.nd_experiment_id " //
 							+ "    and ph2." + filterByDraftOrValue + " LIKE :" //
 							+ observableId + "_text )" //;
 					);
@@ -902,34 +899,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (Boolean.TRUE.equals(filter.getByOverwritten())) {
 			sql.append(
-				" and nde.nd_experiment_id in ( " //
-					+ "    select ph2.nd_experiment_id " //
-					+ "    from phenotype ph2 " //
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-					+ "    where nde2.project_id = p.project_id " //
+				" and EXISTS ( " //
+					+ "    SELECT 1 " //
+					+ "    FROM phenotype ph2 " //
+					+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id " //
 					+ filterByVariableSQL
 					+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOutOfSync())) {
 			sql.append(
-				" and nde.nd_experiment_id in ( " //
-					+ "    select ph2.nd_experiment_id " //
-					+ "    from phenotype ph2 " //
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-					+ "    where nde2.project_id = p.project_id " //
+				" and EXISTS ( " //
+					+ "    SELECT 1 " //
+					+ "    FROM phenotype ph2 " //
+					+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id " //
 					+ filterByVariableSQL
 					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )"); //
 		}
 
+		// TODO check if missing also applies to draft mode
 		if (Boolean.TRUE.equals(filter.getByMissing())) {
 			// filter by missing
 			sql.append(
-				" and nde.nd_experiment_id in ( " //
-					+ "    select ph2.nd_experiment_id " //
-					+ "    from phenotype ph2 " //
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-					+ "    where nde2.project_id = p.project_id " //
+				" and EXISTS ( " //
+					+ "    SELECT 1 " //
+					+ "    FROM phenotype ph2 " //
+					+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id " //
 					+ filterByVariableSQL
 					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )"); //
 		}
