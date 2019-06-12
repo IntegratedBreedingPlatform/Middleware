@@ -371,7 +371,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Integer addPerson(final Person person) {
 
-		Integer idPersonSaved = null;
+		Integer idPersonSaved;
 		try {
 
 			final Person recordSaved = this.getPersonDao().saveOrUpdate(person);
@@ -388,7 +388,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Integer addUser(final WorkbenchUser user) {
 
-		Integer idUserSaved = null;
+		Integer idUserSaved;
 		try {
 
 			final WorkbenchUser recordSaved = this.getWorkbenchUserDao().saveOrUpdate(user);
@@ -538,7 +538,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			throw new MiddlewareQueryException("Crop type already exists.");
 		}
 
-		String idSaved = null;
+		String idSaved;
 		try {
 
 			final CropType recordSaved = dao.saveOrUpdate(cropType);
@@ -655,7 +655,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public IbdbUserMap getIbdbUserMap(final Integer workbenchUserId, final Long projectId) {
 
-		IbdbUserMap ibdbUserMap = null;
+		IbdbUserMap ibdbUserMap;
 		try {
 
 			ibdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
@@ -672,7 +672,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Integer getLocalIbdbUserId(final Integer workbenchUserId, final Long projectId) {
 
-		Integer ibdbUserId = null;
+		Integer ibdbUserId;
 		try {
 
 			ibdbUserId = this.getIbdbUserMapDao().getLocalIbdbUserId(workbenchUserId, projectId);
@@ -899,7 +899,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Integer createUser(final UserDto userDto) {
 
-		Integer idUserSaved = null;
+		Integer idUserSaved;
 		// user.access = 0 - Default User
 		// user.instalid = 0 - Access all areas (legacy from the ICIS system) (not used)
 		// user.status = 0 - Unassigned
@@ -955,7 +955,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public Integer updateUser(final UserDto userDto) {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
 		WorkbenchUser user = null;
-		Integer idUserSaved = null;
+		Integer idUserSaved;
 
 		try {
 			user = this.getUserById(userDto.getUserId());
@@ -1045,4 +1045,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.getRoleDao().getAll();
 	}
 
+	@Override
+	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(final Integer workbenchSidebarCategoryLink) {
+		return this.getWorkbenchSidebarCategoryLinkDao().getById(workbenchSidebarCategoryLink);
+	}
 }

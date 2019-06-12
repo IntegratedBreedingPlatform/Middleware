@@ -22,18 +22,29 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	@Override
-	public List<PermissionDto> getPermissionLinks(
+	public Set<PermissionDto> getSidebarLinks(
 		final Integer userId, final String cropName, final Integer programId) {
-		Set<PermissionDto> links = new HashSet();
+		final Set<PermissionDto> result = new HashSet<>();
 		final List<PermissionDto> permissions = this.daoFactory.getPermissionDAO().getPermissions(userId, cropName, programId);
-		for (PermissionDto permissionDto: permissions) {
-			links.addAll(this.getLinks(permissionDto));
+		for (final PermissionDto permissionDto: permissions) {
+			this.getLinks(result, permissionDto);
 		}
-		return permissions;
+		return result;
 	}
 
-	private List<PermissionDto> getLinks(final PermissionDto permissionDto) {
-		return this.daoFactory.getPermissionDAO().getChildrenOfPermission(permissionDto);
+	private void getLinks(final Set<PermissionDto> permissionDtoList, final PermissionDto permissionDto ) {
+		final List<PermissionDto> children = this.daoFactory.getPermissionDAO().getChildrenOfPermission(permissionDto);
+		if (children.size() != 0) {
+			for (final PermissionDto dto : children) {
+				if (dto.getWorkbenchCategoryLinkId() != null) {
+					permissionDtoList.add(dto);
+				}
+				this.getLinks(permissionDtoList, dto);
+			}
+		}
+		else {
+			permissionDtoList.add(permissionDto);
+		}
 	}
 
 	@Override
