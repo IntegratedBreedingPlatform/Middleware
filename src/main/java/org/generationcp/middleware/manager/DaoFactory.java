@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.PermissionDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
@@ -220,5 +221,11 @@ public class DaoFactory {
 		final WorkbenchUserDAO workbenchUserDAO = new WorkbenchUserDAO();
 		workbenchUserDAO.setSession(this.sessionProvider.getSession());
 		return  workbenchUserDAO;
+	}
+
+	public PermissionDAO getPermissionDAO() {
+		final PermissionDAO permissionDAO = new PermissionDAO();
+		permissionDAO.setSession(this.sessionProvider.getSession());
+		return  permissionDAO;
 	}
 }

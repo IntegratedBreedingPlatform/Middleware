@@ -10,7 +10,11 @@ public class PermissionDto {
 
 	private String name;
 
+	private String description;
+
 	private Integer parentId;
+
+	private Integer workbenchCategoryLinkId;
 
 	public Integer getId() {
 		return id;
@@ -34,6 +38,22 @@ public class PermissionDto {
 
 	public void setParentId(final Integer parentId) {
 		this.parentId = parentId;
+	}
+
+	public Integer getWorkbenchCategoryLinkId() {
+		return workbenchCategoryLinkId;
+	}
+
+	public void setWorkbenchCategoryLinkId(final Integer workbenchCategoryLinkId) {
+		this.workbenchCategoryLinkId = workbenchCategoryLinkId;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	@Override
