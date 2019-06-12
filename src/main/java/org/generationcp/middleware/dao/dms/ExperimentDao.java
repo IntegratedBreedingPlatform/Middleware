@@ -936,25 +936,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType, final boolean performLikeOperation) {
+		// Check if the variable to be filtered is in one of the columns in stock or nd_experiment
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
-
-		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
-		final String matchClause = performLikeOperation? "LIKE :" + variableId + "_text " : "IN (:" + variableId + "_values) ";
 		if (filterClause != null || observationUnitClause != null) {
 			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(" LIKE :")
 				.append(variableId).append("_text ");
 			return;
-		} else if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
+		}
+
+		// Otherwise, look in "props" tables
+		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
+		if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
+			final String matchClause = performLikeOperation? "LIKE :" + variableId + "_text " : "IN (:" + variableId + "_values) ";
 			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
 				+ "WHERE xp.nd_experiment_id = parent.nd_experiment_id AND xp.type_id = :" + variableId
 				+ "_Id AND value ").append(matchClause).append(" )");
 
-		// TODO handle categorical values
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
+			// IF searching by list of values, treat as categorical and search for the values in cvterm.name
+			// Otherwise, search the value like a text by LIKE operation
+			final String matchClause = performLikeOperation? "sp.value LIKE :" + variableId + "_text " :
+				" cvt.name IN (:"+ variableId + "_values )";
 			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
+				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
-				+ "_Id AND value ").append(matchClause).append(" )");;
+				+ "_Id AND ").append(matchClause).append(" )");;
 		}
 	}
 
