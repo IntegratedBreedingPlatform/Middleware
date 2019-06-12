@@ -16,6 +16,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -135,6 +136,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		geolocSpecialFactorsMap.put("SITE_LONG", "gl.longitude");
 		geolocSpecialFactorsMap.put("SITE_ALT", "gl.altitude");
 		geolocSpecialFactorsMap.put("SITE_DATUM", "gl.geodetic_datum");
+	}
+
+	private static final Map<String, String> factorsFilterMap = new HashMap<>();
+
+	static {
+		factorsFilterMap.put("8240", "s.dbxref_id");
+		factorsFilterMap.put("8250", "s.name");
+		factorsFilterMap.put("8230", "s.uniquename");
+		factorsFilterMap.put("8300", "s.value");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -846,40 +856,47 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (filter.getFilteredValues() != null && !filter.getFilteredValues().isEmpty()) {
-			for (final String observationId : filter.getFilteredValues().keySet()) {
-				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+			for (final String observableId : filter.getFilteredValues().keySet()) {
+				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 					continue;
 				}
+
 				sql.append(
 					" and nde.nd_experiment_id in ( " //
 						+ "    select ph2.nd_experiment_id " //
 						+ "    from phenotype ph2 " //
 						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-						+ "    where ph2.observable_id = :" + observationId + "_Id" //
+						+ "    where ph2.observable_id = :" + observableId + "_Id" //
 						+ "    and nde2.project_id = p.project_id " //
-						+ "    and ph2." + filterByDraftOrValue + " in (:" + observationId + "_values ))"); //
+						+ "    and ph2." + filterByDraftOrValue + " in (:" + observableId + "_values ))"); //
 			}
 		}
 
 		if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
 			// filter by column value (text)
-			for (final String observationId : filter.getFilteredTextValues().keySet()) {
-				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+			for (final String observableId : filter.getFilteredTextValues().keySet()) {
+				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 					continue;
 				}
-				// TODO Add hibernate parameters as in filteredValues
-				sql.append(
-					" and nde.nd_experiment_id in ( " //
-						+ "    select ph2.nd_experiment_id " //
-						+ "    from phenotype ph2 " //
-						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-						+ "    where ph2.observable_id = " + observationId //
-						+ "    and nde2.project_id = p.project_id " //
-						+ "    and nde2.project_id = p.project_id " //
-						+ "    and ph2." + filterByDraftOrValue + " like '%" //
-						+ filter.getFilteredTextValues().get(observationId) //
-						+ "%')" //
-				);
+				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
+				final String value = filter.getFilteredTextValues().get(observableId);
+				if (VariableType.TRAIT.name().equals(variableTypeString)) {
+					// FIXME Add hibernate parameters as in filteredValues
+					sql.append(
+						" and nde.nd_experiment_id in ( " //
+							+ "    select ph2.nd_experiment_id " //
+							+ "    from phenotype ph2 " //
+							+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+							+ "    where ph2.observable_id = " + observableId //
+							+ "    and nde2.project_id = p.project_id " //
+							+ "    and nde2.project_id = p.project_id " //
+							+ "    and ph2." + filterByDraftOrValue + " like '%" //
+							+ value //
+							+ "%')" //
+					);
+				} else {
+					this.applyFactorsFilter(sql, observableId, variableTypeString, value);
+				}
 			}
 		}
 
@@ -915,6 +932,27 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    where nde2.project_id = p.project_id " //
 					+ filterByVariableSQL
 					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )"); //
+		}
+	}
+
+	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType, final String value) {
+		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
+		final String filterClause = factorsFilterMap.get(variableId);
+
+		// FIXME use query params not string concatenation
+		if (filterClause != null || observationUnitClause != null) {
+			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(" LIKE '%")
+				.append(value).append("%' ");
+
+		} else if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
+			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
+				+ "WHERE xp.nd_experiment_id = nde.nd_experiment_id AND xp.type_id = " + variableId
+				+ " AND value LIKE '% " + value + "%' ) ");
+
+		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
+			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
+				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = " + variableId
+				+ " AND value LIKE '% " + value + "%' ) ");
 		}
 	}
 
@@ -1050,8 +1088,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (filteredValues != null && !filteredValues.isEmpty()) {
 			final Integer variableId = filter.getVariableId();
-
+			ExperimentDao.LOG.info("## Filter Variable ID " + variableId);
 			for (final String observationId : filteredValues.keySet()) {
+				ExperimentDao.LOG.info(">>> Filter " + observationId + " :: " + filteredValues.get(observationId));
 				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
 					continue;
 				}
