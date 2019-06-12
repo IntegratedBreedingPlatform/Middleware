@@ -17,7 +17,7 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PermissionDAO.class);
 
-	private static String SQL_FILTERED_PERMISSIONS = "select p.permission_id as id, "
+	private static final String SQL_FILTERED_PERMISSIONS = "select p.permission_id as id, "
 		+ "p.name as name, p.parent_id as parentId "
 		+ "from permission p "
 		+ "inner join role_permission rp on p.permission_id = rp.permission_id "
@@ -29,8 +29,6 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "and ur.userid = :userId and r.active = 1";
 
 	private static final String PERMISSION_CHILDREN = "select "
-		+ " p.permission_id as id, "
-	private static String PERMISSION_CHILDREN = "select "
 		+ "p.permission_id as id, "
 		+ "p.name as name, "
 		+ "p.description as description, "

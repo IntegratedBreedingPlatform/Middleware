@@ -27,7 +27,7 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	@Override
-	public Set<PermissionDto> getSidebarLinks(
+	public Set<PermissionDto> getPermissionLinks(
 		final Integer userId, final String cropName, final Integer programId) {
 		final Set<PermissionDto> result = new HashSet<>();
 		final List<PermissionDto> permissions = this.daoFactory.getPermissionDAO().getPermissions(userId, cropName, programId);
