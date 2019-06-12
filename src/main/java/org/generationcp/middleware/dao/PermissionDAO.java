@@ -1,9 +1,9 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.domain.workbench.PermissionDto;
+import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Permission;
-import org.generationcp.middleware.domain.workbench.RoleType;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
@@ -29,7 +29,7 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "and ur.userid = :userId and r.active = 1";
 
 	private static String PERMISSION_CHILDREN = "select "
-		+ " p.permission_id as id, "
+		+ "p.permission_id as id, "
 		+ "p.name as name, "
 		+ "p.description as description, "
 		+ "p.parent_id as parentId,"
@@ -68,8 +68,8 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 	public List<PermissionDto> getChildrenOfPermission(final PermissionDto permissionDto) {
 		final SQLQuery query = this.getSession().createSQLQuery(PermissionDAO.PERMISSION_CHILDREN);
 		query.setParameter("parentId", permissionDto.getParentId());
-		query.addScalar("id").addScalar("name").addScalar("parentId")
-			.addScalar("description").addScalar("workbenchCategoryLinkId");
+		query.addScalar("id").addScalar("name").addScalar("description")
+			.addScalar("parentId").addScalar("workbenchCategoryLinkId");
 		query.setResultTransformer(Transformers.aliasToBean(PermissionDto.class));
 		final List<PermissionDto> results = query.list();
 		return results;
