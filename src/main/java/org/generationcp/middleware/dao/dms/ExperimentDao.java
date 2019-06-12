@@ -16,7 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -881,21 +880,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 				final String value = filter.getFilteredTextValues().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
-					// FIXME Add hibernate parameters as in filteredValues
 					sql.append(
 						" and nde.nd_experiment_id in ( " //
 							+ "    select ph2.nd_experiment_id " //
 							+ "    from phenotype ph2 " //
 							+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-							+ "    where ph2.observable_id = " + observableId //
+							+ "    where ph2.observable_id = :" + observableId + "_Id"
 							+ "    and nde2.project_id = p.project_id " //
 							+ "    and nde2.project_id = p.project_id " //
-							+ "    and ph2." + filterByDraftOrValue + " like '%" //
-							+ value //
-							+ "%')" //
+							+ "    and ph2." + filterByDraftOrValue + " LIKE :" //
+							+ observableId + "_text )" //;
 					);
 				} else {
-					this.applyFactorsFilter(sql, observableId, variableTypeString, value);
+					this.applyFactorsFilter(sql, observableId, variableTypeString);
 				}
 			}
 		}
@@ -935,24 +932,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType, final String value) {
+	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType) {
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
 
-		// FIXME use query params not string concatenation
 		if (filterClause != null || observationUnitClause != null) {
-			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(" LIKE '%")
-				.append(value).append("%' ");
+			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(" LIKE :")
+				.append(variableId).append("_text ");
 
 		} else if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
 			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
-				+ "WHERE xp.nd_experiment_id = nde.nd_experiment_id AND xp.type_id = " + variableId
-				+ " AND value LIKE '% " + value + "%' ) ");
+				+ "WHERE xp.nd_experiment_id = nde.nd_experiment_id AND xp.type_id = :" + variableId
+				+ "_Id AND value LIKE :" + variableId + "_text ) ");
 
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
 			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
-				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = " + variableId
-				+ " AND value LIKE '% " + value + "%' ) ");
+				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
+				+ "_Id AND value LIKE :" + variableId + "_text ) ");
 		}
 	}
 
@@ -1088,14 +1084,27 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (filteredValues != null && !filteredValues.isEmpty()) {
 			final Integer variableId = filter.getVariableId();
-			ExperimentDao.LOG.info("## Filter Variable ID " + variableId);
 			for (final String observationId : filteredValues.keySet()) {
-				ExperimentDao.LOG.info(">>> Filter " + observationId + " :: " + filteredValues.get(observationId));
 				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
 					continue;
 				}
 				query.setParameter(observationId + "_Id", observationId);
 				query.setParameterList(observationId + "_values", filteredValues.get(observationId));
+			}
+		}
+
+		final Map<String, String> filteredTextValues = filter.getFilteredTextValues();
+		if (filteredTextValues != null && !filteredTextValues.isEmpty()) {
+			final Integer variableId = filter.getVariableId();
+			for (final String observableId : filteredTextValues.keySet()) {
+				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
+					continue;
+				}
+				final String variableType = filter.getVariableTypeMap().get(observableId);
+				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
+					query.setParameter(observableId + "_Id", observableId);
+				}
+				query.setParameter(observableId + "_text", "%" + filteredTextValues.get(observableId) + "%");
 			}
 		}
 	}
