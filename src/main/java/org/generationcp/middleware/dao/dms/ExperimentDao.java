@@ -861,13 +861,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
-					sql.append(
-						" and EXISTS ( " //
-							+ "    SELECT 1 " //
-							+ "    FROM phenotype ph2 " //
-							+ "    WHERE ph2.observable_id = :" + observableId + "_Id"
-							+ "    AND ph2.nd_experiment_id = nde.nd_experiment_id " //
-							+ "    and ph2." + filterByDraftOrValue + " in (:" + observableId + "_values ))"); //
+					appendTraitFilteringToQuery(sql, filterByDraftOrValue, observableId, false);
 				} else {
 					this.applyFactorsFilter(sql, observableId, variableTypeString, false);
 				}
@@ -882,15 +876,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
-					sql.append(
-						" and EXISTS ( " //
-							+ "    SELECT 1 " //
-							+ "    FROM phenotype ph2 " //
-							+ "    WHERE ph2.observable_id = :" + observableId + "_Id"
-							+ "    AND ph2.nd_experiment_id = nde.nd_experiment_id " //
-							+ "    and ph2." + filterByDraftOrValue + " LIKE :" //
-							+ observableId + "_text )" //;
-					);
+					appendTraitFilteringToQuery(sql, filterByDraftOrValue, observableId, true);
 				} else {
 					this.applyFactorsFilter(sql, observableId, variableTypeString, true);
 				}
@@ -928,6 +914,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ filterByVariableSQL
 					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )"); //
 		}
+	}
+
+	private void appendTraitFilteringToQuery(final StringBuilder sql, final String filterByDraftOrValue, final String variableId,
+		final boolean performLikeOperation) {
+		final String matchClause = performLikeOperation? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
+		sql.append(
+			" and EXISTS ( " //
+				+ "    SELECT 1 " //
+				+ "    FROM phenotype ph2 " //
+				+ "    WHERE ph2.observable_id = :" + variableId + "_Id"
+				+ "    AND ph2.nd_experiment_id = nde.nd_experiment_id " //
+				+ "    and ph2.").append(filterByDraftOrValue).append(matchClause).append(") ");
 	}
 
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType, final boolean performLikeOperation) {
