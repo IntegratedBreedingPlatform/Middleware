@@ -859,15 +859,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 					continue;
 				}
-
-				sql.append(
-					" and nde.nd_experiment_id in ( " //
-						+ "    select ph2.nd_experiment_id " //
-						+ "    from phenotype ph2 " //
-						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-						+ "    where ph2.observable_id = :" + observableId + "_Id" //
-						+ "    and nde2.project_id = p.project_id " //
-						+ "    and ph2." + filterByDraftOrValue + " in (:" + observableId + "_values ))"); //
+				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
+				if (VariableType.TRAIT.name().equals(variableTypeString)) {
+					sql.append(
+						" and nde.nd_experiment_id in ( " //
+							+ "    select ph2.nd_experiment_id " //
+							+ "    from phenotype ph2 " //
+							+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+							+ "    where ph2.observable_id = :" + observableId + "_Id" //
+							+ "    and nde2.project_id = p.project_id " //
+							+ "    and ph2." + filterByDraftOrValue + " in (:" + observableId + "_values ))"); //
+				} else {
+					this.applyFactorsFilter(sql, observableId, variableTypeString, false);
+				}
 			}
 		}
 
@@ -878,7 +882,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					continue;
 				}
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
-				final String value = filter.getFilteredTextValues().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
 					sql.append(
 						" and nde.nd_experiment_id in ( " //
@@ -892,7 +895,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 							+ observableId + "_text )" //;
 					);
 				} else {
-					this.applyFactorsFilter(sql, observableId, variableTypeString);
+					this.applyFactorsFilter(sql, observableId, variableTypeString, true);
 				}
 			}
 		}
@@ -932,23 +935,26 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType) {
+	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType, final boolean performLikeOperation) {
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
 
+		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
+		final String matchClause = performLikeOperation? "LIKE :" + variableId + "_text " : "IN (:" + variableId + "_values) ";
 		if (filterClause != null || observationUnitClause != null) {
 			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(" LIKE :")
 				.append(variableId).append("_text ");
-
+			return;
 		} else if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
 			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
-				+ "WHERE xp.nd_experiment_id = nde.nd_experiment_id AND xp.type_id = :" + variableId
-				+ "_Id AND value LIKE :" + variableId + "_text ) ");
+				+ "WHERE xp.nd_experiment_id = parent.nd_experiment_id AND xp.type_id = :" + variableId
+				+ "_Id AND value ").append(matchClause).append(" )");
 
+		// TODO handle categorical values
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
 			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
-				+ "_Id AND value LIKE :" + variableId + "_text ) ");
+				+ "_Id AND value ").append(matchClause).append(" )");;
 		}
 	}
 
