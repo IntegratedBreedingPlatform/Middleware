@@ -861,7 +861,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
-					appendTraitFilteringToQuery(sql, filterByDraftOrValue, observableId, false);
+					appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, false);
 				} else {
 					this.applyFactorsFilter(sql, observableId, variableTypeString, false);
 				}
@@ -876,7 +876,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 				if (VariableType.TRAIT.name().equals(variableTypeString)) {
-					appendTraitFilteringToQuery(sql, filterByDraftOrValue, observableId, true);
+					appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, true);
 				} else {
 					this.applyFactorsFilter(sql, observableId, variableTypeString, true);
 				}
@@ -884,39 +884,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOverwritten())) {
-			sql.append(
-				" and EXISTS ( " //
-					+ "    SELECT 1 " //
-					+ "    FROM phenotype ph2 " //
-					+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id " //
-					+ filterByVariableSQL
-					+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
+			appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " and ph2.value is not null and ph2.draft_value is not null");
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOutOfSync())) {
-			sql.append(
-				" and EXISTS ( " //
-					+ "    SELECT 1 " //
-					+ "    FROM phenotype ph2 " //
-					+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id " //
-					+ filterByVariableSQL
-					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )"); //
+			appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "'");
 		}
 
 		// TODO check if missing also applies to draft mode
 		if (Boolean.TRUE.equals(filter.getByMissing())) {
-			// filter by missing
-			sql.append(
-				" and EXISTS ( " //
-					+ "    SELECT 1 " //
-					+ "    FROM phenotype ph2 " //
-					+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id " //
-					+ filterByVariableSQL
-					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )"); //
+			appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.value =  '" + Phenotype.MISSING_VALUE + "'");
 		}
 	}
 
-	private void appendTraitFilteringToQuery(final StringBuilder sql, final String filterByDraftOrValue, final String variableId,
+	private void appendTraitStatusFilterToQuery(final StringBuilder sql, final String filterByVariableSQL, final String filterClause) {
+		sql.append(
+			" and EXISTS ( " //
+				+ "    SELECT 1 " //
+				+ "    FROM phenotype ph2 " //
+				+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id " //
+				+ filterByVariableSQL
+				+ filterClause + ") "); //
+	}
+
+	private void appendTraitValueFilteringToQuery(final StringBuilder sql, final String filterByDraftOrValue, final String variableId,
 		final boolean performLikeOperation) {
 		final String matchClause = performLikeOperation? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
 		sql.append(
