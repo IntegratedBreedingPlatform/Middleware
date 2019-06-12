@@ -27,6 +27,16 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "  or (r.role_type_id = 3 and ur.crop_name = :cropName and ur.workbench_project_id = :projectId))\n"
 		+ "and ur.userid = :userId and r.active = 1";
 
+	private static String PERMISSION_CHILDREN = "select "
+		+ " p.permission_id as id, "
+		+ "p.name as name, "
+		+ "p.description as description, "
+		+ "p.parent_id as parentId,"
+		+ "p.workbench_sidebar_category_link_id as workbenchCategoryLinkId "
+		+ "from workbench.permission p "
+		+ "where  p.parent_id = :parentId "
+		+ "and p.workbench_sidebar_category_link_id is not null";
+
 	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId) {
 
 		try {
@@ -54,4 +64,13 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		}
 	}
 
+	public List<PermissionDto> getChildrenOfPermission(final PermissionDto permissionDto) {
+		final SQLQuery query = this.getSession().createSQLQuery(PermissionDAO.PERMISSION_CHILDREN);
+		query.setParameter("parentId", permissionDto.getParentId());
+		query.addScalar("id").addScalar("name").addScalar("parentId")
+			.addScalar("description").addScalar("workbenchCategoryLinkId");
+		query.setResultTransformer(Transformers.aliasToBean(PermissionDto.class));
+		final List<PermissionDto> results = query.list();
+		return results;
+	}
 }
