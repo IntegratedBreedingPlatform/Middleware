@@ -1034,6 +1034,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				+ "nd_experiment nde " //
 				+ "    inner join project p on p.project_id = nde.project_id " //
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+				+ "    inner join stock s ON s.stock_id = nde.stock_id " //
 				+ " where " //
 				+ "	p.project_id = :datasetId ");
 
