@@ -144,6 +144,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		factorsFilterMap.put("8250", "s.name");
 		factorsFilterMap.put("8230", "s.uniquename");
 		factorsFilterMap.put("8300", "s.value");
+		factorsFilterMap.put("8170", "gl.description");
 	}
 
 	@SuppressWarnings("unchecked")
