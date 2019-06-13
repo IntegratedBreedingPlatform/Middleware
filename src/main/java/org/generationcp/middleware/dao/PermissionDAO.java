@@ -17,8 +17,12 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PermissionDAO.class);
 
-	private static final String SQL_FILTERED_PERMISSIONS = "select p.permission_id as id, "
-		+ "p.name as name, p.parent_id as parentId "
+	private static final String SQL_FILTERED_PERMISSIONS = "select "
+		+ "p.permission_id as id, "
+		+ "p.name as name, "
+		+ "p.description as description, "
+		+ "p.parent_id as parentId,"
+		+ "p.workbench_sidebar_category_link_id as workbenchCategoryLinkId "
 		+ "from permission p "
 		+ "inner join role_permission rp on p.permission_id = rp.permission_id "
 		+ "inner join role r on rp.role_id = r.id "
@@ -69,7 +73,8 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		final SQLQuery query = this.getSession().createSQLQuery(PermissionDAO.PERMISSION_CHILDREN);
 		query.setParameter("parentId", permissionDto.getId());
 		query.addScalar("id").addScalar("name").addScalar("description")
-			.addScalar("parentId").addScalar("workbenchCategoryLinkId");		query.setResultTransformer(Transformers.aliasToBean(PermissionDto.class));
+			.addScalar("parentId").addScalar("workbenchCategoryLinkId");
+		query.setResultTransformer(Transformers.aliasToBean(PermissionDto.class));
 		final List<PermissionDto> results = query.list();
 		return results;
 	}
