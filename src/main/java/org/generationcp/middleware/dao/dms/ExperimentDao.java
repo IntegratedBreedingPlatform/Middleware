@@ -923,16 +923,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		// Check if the variable to be filtered is in one of the columns in stock or nd_experiment
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
+		final String matchClause = performLikeOperation? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
 		if (filterClause != null || observationUnitClause != null) {
-			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(" LIKE :")
-				.append(variableId).append("_text ");
+			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
 			return;
 		}
 
 		// Otherwise, look in "props" tables
 		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
 		if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
-			final String matchClause = performLikeOperation? "LIKE :" + variableId + "_text " : "IN (:" + variableId + "_values) ";
 			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
 				+ "WHERE xp.nd_experiment_id = nde.parent_id AND xp.type_id = :" + variableId
 				+ "_Id AND value ").append(matchClause).append(" )");
@@ -940,12 +939,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
 			// IF searching by list of values, treat as categorical and search for the values in cvterm.name
 			// Otherwise, search the value like a text by LIKE operation
-			final String matchClause = performLikeOperation? "sp.value LIKE :" + variableId + "_text " :
+			final String stockMatchClause = performLikeOperation? "sp.value LIKE :" + variableId + "_text " :
 				" cvt.name IN (:"+ variableId + "_values )";
 			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
 				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
-				+ "_Id AND ").append(matchClause).append(" )");;
+				+ "_Id AND ").append(stockMatchClause).append(" )");;
 		}
 	}
 
@@ -1082,12 +1081,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (filteredValues != null && !filteredValues.isEmpty()) {
 			final Integer variableId = filter.getVariableId();
-			for (final String observationId : filteredValues.keySet()) {
-				if (variableId != null && !variableId.equals(Integer.valueOf(observationId))) {
+			for (final String observableId : filteredValues.keySet()) {
+				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 					continue;
 				}
-				query.setParameter(observationId + "_Id", observationId);
-				query.setParameterList(observationId + "_values", filteredValues.get(observationId));
+				final String variableType = filter.getVariableTypeMap().get(observableId);
+				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
+					query.setParameter(observableId + "_Id", observableId);
+				}
+				query.setParameterList(observableId + "_values", filteredValues.get(observableId));
 			}
 		}
 
