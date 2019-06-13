@@ -1117,4 +1117,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	}
 
+	public int getMaxRowLimit() {
+		return maxRowLimit;
+	}
+
+	public void setMaxRowLimit(final int maxRowLimit) {
+		this.maxRowLimit = maxRowLimit;
+	}
 }
