@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.permission;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -27,14 +28,14 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	@Override
-	public Set<PermissionDto> getPermissionLinks(
+	public List<PermissionDto> getPermissionLinks(
 		final Integer userId, final String cropName, final Integer programId) {
 		final Set<PermissionDto> result = new HashSet<>();
 		final List<PermissionDto> permissions = this.daoFactory.getPermissionDAO().getPermissions(userId, cropName, programId);
 		for (final PermissionDto permissionDto: permissions) {
 			this.getLinks(result, permissionDto);
 		}
-		return result;
+		return Lists.newArrayList(result);
 	}
 
 	private void getLinks(final Set<PermissionDto> permissionDtoList, final PermissionDto permissionDto ) {

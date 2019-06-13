@@ -697,4 +697,6 @@ public interface WorkbenchDataManager {
 	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
 
 	WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(Integer workbenchSidebarCategoryLink);
+
+	List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds);
 }
