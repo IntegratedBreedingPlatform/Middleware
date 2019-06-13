@@ -49,6 +49,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -140,13 +141,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 
+	public static final String SUM_OF_SAMPLES_ID = "-2";
+
 	static {
 		factorsFilterMap.put("8240", "s.dbxref_id");
 		factorsFilterMap.put("8250", "s.name");
 		factorsFilterMap.put("8230", "s.uniquename");
 		factorsFilterMap.put("8300", "s.value");
 		factorsFilterMap.put("8170", "gl.description");
-		factorsFilterMap.put("-2", "EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
+		factorsFilterMap.put(SUM_OF_SAMPLES_ID, "EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -938,7 +941,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (filterClause != null || observationUnitClause != null) {
 			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
 			// If Sum of Samples, append extra closing parenthesis for the EXISTS clause it uses
-			if ("-2".equals(variableId)) {
+			if (SUM_OF_SAMPLES_ID.equals(variableId)) {
 				sql.append(") ");
 			}
 			return;
@@ -1106,7 +1109,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 				// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
 				final String finalId = observableId.replace("-", "");
-				query.setParameterList(finalId + "_values", filteredValues.get(observableId));
+				final List<String> values = filteredValues.get(observableId);
+				// Treat "-" as "0: for Sum of Samples variable value
+				if (SUM_OF_SAMPLES_ID.equals(observableId)) {
+					Collections.replaceAll(values, "-", "0");
+				}
+				query.setParameterList(finalId + "_values", values);
 			}
 		}
 
