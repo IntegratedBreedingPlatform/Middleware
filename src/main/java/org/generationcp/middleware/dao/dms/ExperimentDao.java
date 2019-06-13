@@ -815,73 +815,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOutOfBound())) {
-			sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
-				+ "      from cvterm_relationship cvtrscale " //
-				+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id " //
-				+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = "
-				+ TermId.HAS_TYPE.getId()
-				+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
-				+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = "
-				+ TermId.MAX_VALUE.getId()
-				+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = "
-				+ TermId.MIN_VALUE.getId()
-				+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
-				+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-				+ "           inner join project p2 on nde2.project_id = p2.project_id " //
-				+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid " //
-				+ "      where ph2." + filterByDraftOrValue + " is not null  and ph2." + filterByDraftOrValue + "!= 'missing'" //
-				+ filterByVariableSQL
-				+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
-				+ "        and case " //
-				+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId() //
-					/* get the categoricals whose value != category value (out-of-bound)
-					in other words, the set where ph.value = category value NOT exists*/
-				+ "          then not exists( " //
-				+ "          select 1 " //
-				+ "            from cvterm_relationship cvtrcategory " //
-				+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id " //
-				+ "            where scale.cvterm_id = cvtrcategory.subject_id " //
-				+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
-				+ "              and ph2." + filterByDraftOrValue + " = category.name " //
-				+ "          ) " //
-				+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
-				// get the numericals whose value is not within bounds
-				+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue
-				+ " > scaleMaxRange.value " //
-				+ "            or ph2." + filterByDraftOrValue + " < vo.expected_min or ph2." + filterByDraftOrValue + " > vo.expected_max "
-				//
-				+ "        else false " //
-				+ "        end " //
-				+ "    )"); //
+			appendOutOfBoundsTraitsFilteringToQuery(sql, filterByDraftOrValue, filterByVariableSQL);
 		}
 
 		if (filter.getFilteredValues() != null && !filter.getFilteredValues().isEmpty()) {
-			for (final String observableId : filter.getFilteredValues().keySet()) {
-				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
-					continue;
-				}
-				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
-				if (VariableType.TRAIT.name().equals(variableTypeString)) {
-					appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, false);
-				} else {
-					this.applyFactorsFilter(sql, observableId, variableTypeString, false);
-				}
-			}
+			// Perform IN operation on variable values
+			this.appendVariableIdAndOperationToFilterQuery(sql, filter, filterByDraftOrValue, filter.getFilteredValues().keySet(),
+				false);
 		}
 
 		if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
-			// filter by column value (text)
-			for (final String observableId : filter.getFilteredTextValues().keySet()) {
-				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
-					continue;
-				}
-				final String variableTypeString = filter.getVariableTypeMap().get(observableId);
-				if (VariableType.TRAIT.name().equals(variableTypeString)) {
-					appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, true);
-				} else {
-					this.applyFactorsFilter(sql, observableId, variableTypeString, true);
-				}
-			}
+			// Perform LIKE operation on variable value
+			this.appendVariableIdAndOperationToFilterQuery(sql, filter, filterByDraftOrValue,
+				filter.getFilteredTextValues().keySet(), true);
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOverwritten())) {
@@ -896,6 +842,65 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (Boolean.TRUE.equals(filter.getByMissing())) {
 			appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.value =  '" + Phenotype.MISSING_VALUE + "'");
 		}
+	}
+
+	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter,
+		final String filterByDraftOrValue, final Set<String> variableIds, final boolean performLikeOperation) {
+		final Integer variableId = filter.getVariableId();
+		for (final String observableId : variableIds) {
+			if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
+				continue;
+			}
+			final String variableTypeString = filter.getVariableTypeMap().get(observableId);
+			if (VariableType.TRAIT.name().equals(variableTypeString)) {
+				appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, performLikeOperation);
+
+			} else {
+				this.applyFactorsFilter(sql, observableId, variableTypeString, performLikeOperation);
+			}
+		}
+	}
+
+	private void appendOutOfBoundsTraitsFilteringToQuery(final StringBuilder sql, final String filterByDraftOrValue,
+		final String filterByVariableSQL) {
+		sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
+			+ "      from cvterm_relationship cvtrscale " //
+			+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id " //
+			+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = "
+			+ TermId.HAS_TYPE.getId()
+			+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
+			+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = "
+			+ TermId.MAX_VALUE.getId()
+			+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = "
+			+ TermId.MIN_VALUE.getId()
+			+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
+			+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+			+ "           inner join project p2 on nde2.project_id = p2.project_id " //
+			+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid " //
+			+ "      where ph2." + filterByDraftOrValue + " is not null  and ph2." + filterByDraftOrValue + "!= 'missing'" //
+			+ filterByVariableSQL
+			+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
+			+ "        and case " //
+			+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId() //
+				/* get the categoricals whose value != category value (out-of-bound)
+				in other words, the set where ph.value = category value NOT exists*/
+			+ "          then not exists( " //
+			+ "          select 1 " //
+			+ "            from cvterm_relationship cvtrcategory " //
+			+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id " //
+			+ "            where scale.cvterm_id = cvtrcategory.subject_id " //
+			+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
+			+ "              and ph2." + filterByDraftOrValue + " = category.name " //
+			+ "          ) " //
+			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
+			// get the numericals whose value is not within bounds
+			+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue
+			+ " > scaleMaxRange.value " //
+			+ "            or ph2." + filterByDraftOrValue + " < vo.expected_min or ph2." + filterByDraftOrValue + " > vo.expected_max "
+			//
+			+ "        else false " //
+			+ "        end " //
+			+ "    )"); //
 	}
 
 	private void appendTraitStatusFilterToQuery(final StringBuilder sql, final String filterByVariableSQL, final String filterClause) {
