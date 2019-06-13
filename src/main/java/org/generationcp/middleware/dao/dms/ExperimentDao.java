@@ -145,6 +145,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		factorsFilterMap.put("8230", "s.uniquename");
 		factorsFilterMap.put("8300", "s.value");
 		factorsFilterMap.put("8170", "gl.description");
+		factorsFilterMap.put("-2", "EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -926,12 +927,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType, final boolean performLikeOperation) {
-		// Check if the variable to be filtered is in one of the columns in stock or nd_experiment
+		// Check if the variable to be filtered is in one of the columns in stock, nd_experiment, geolocation or sum of samples
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
-		final String matchClause = performLikeOperation? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
+		// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
+		final String finalId = variableId.replace("-", "");
+		final String matchClause = performLikeOperation? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
 		if (filterClause != null || observationUnitClause != null) {
 			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
+			// If Sum of Samples, append extra closing parenthesis for the EXISTS clause it uses
+			if ("-2".equals(variableId)) {
+				sql.append(") ");
+			}
 			return;
 		}
 
@@ -1095,7 +1102,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
 					query.setParameter(observableId + "_Id", observableId);
 				}
-				query.setParameterList(observableId + "_values", filteredValues.get(observableId));
+				// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
+				final String finalId = observableId.replace("-", "");
+				query.setParameterList(finalId + "_values", filteredValues.get(observableId));
 			}
 		}
 
