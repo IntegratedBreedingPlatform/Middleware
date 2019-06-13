@@ -47,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -848,12 +849,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter,
 		final String filterByDraftOrValue, final Set<String> variableIds, final boolean performLikeOperation) {
 		final Integer variableId = filter.getVariableId();
+		final List<String> traitAndSelectionVariableTypes = Arrays.asList(VariableType.TRAIT.name(), VariableType.SELECTION_METHOD.name());
 		for (final String observableId : variableIds) {
 			if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 				continue;
 			}
 			final String variableTypeString = filter.getVariableTypeMap().get(observableId);
-			if (VariableType.TRAIT.name().equals(variableTypeString)) {
+			if (traitAndSelectionVariableTypes.contains(variableTypeString)) {
 				appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, performLikeOperation);
 
 			} else {
