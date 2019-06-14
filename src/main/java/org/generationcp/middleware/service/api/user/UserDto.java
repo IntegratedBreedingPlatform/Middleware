@@ -4,13 +4,12 @@
 
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.domain.workbench.CropDto;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.generationcp.middleware.domain.workbench.CropDto;
-import org.generationcp.middleware.pojos.workbench.Role;
 
 /**
  * @author vmaletta
@@ -24,9 +23,6 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String username;
 	private String firstName;
 	private String lastName;
-	// TODO should not use an entity class in a Dto
-	private Role role;
-
 	private List<UserRoleDto> userRoles;
 	private Integer status;
 	private String email;
@@ -44,13 +40,12 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.status = 0;
 	}
 
-	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final Role role, List<UserRoleDto> userRoles,
+	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, List<UserRoleDto> userRoles,
 		Integer status, String email) {
 		this.userId = userId;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.role = role;
 		this.userRoles = userRoles;
 		this.status = status;
 		this.email = email;
@@ -86,14 +81,6 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public Role getRole() {
-		return role;
-	}
-
-	public void setRole(final Role role) {
-		this.role = role;
 	}
 
 	public Integer getStatus() {

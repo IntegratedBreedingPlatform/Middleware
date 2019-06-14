@@ -118,6 +118,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		final List<UserDto> users = new ArrayList<>();
 		try {
 			if (projectUUID != null) {
+				//TODO Review query. It is getting users from workbench_project_user_info, fix tests
 				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_UUID);
 				query.setParameter("project_uuid", projectUUID);
 
@@ -128,11 +129,10 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 					final String username = (String) user[1];
 					final String firstName = (String) user[2];
 					final String lastName = (String) user[3];
-					final Integer roleId = (Integer) user[4];
-					final String roleName = (String) user[5];
 					final Integer status = (Integer) user[6];
 					final String email = (String) user[7];
-					final UserDto u = new UserDto(userId, username, firstName, lastName, new Role(roleId, roleName),null, status, email);
+					//TODO load list of userRoles if needed
+					final UserDto u = new UserDto(userId, username, firstName, lastName, null, status, email);
 					users.add(u);
 				}
 			}
@@ -159,8 +159,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 				for (final WorkbenchUser workbenchUser : workbenchUsers) {
 					final UserDto user = new UserDto();
 					if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
-						// TODO remove single role
-						user.setRole(workbenchUser.getRoles().get(0).getRole());
 						user.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
 					}
 					user.setUserId(workbenchUser.getUserid());

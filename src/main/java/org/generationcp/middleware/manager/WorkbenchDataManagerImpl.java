@@ -38,7 +38,6 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -54,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -921,7 +919,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		user.setType(0);
 
 		// Add user roles to the particular user
-		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
+		//		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
+		//TODO Add list of userRoles
 
 		final List<CropType> crops = new ArrayList<>();
 		for (final CropDto crop : userDto.getCrops()) {
@@ -967,8 +966,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			user.setStatus(userDto.getStatus());
 
 			// update user roles to the particular user
-			final UserRole role = (!user.getRoles().isEmpty()) ? user.getRoles().get(0) : new UserRole();
-			role.setRole(userDto.getRole());
+			//			final UserRole role = (!user.getRoles().isEmpty()) ? user.getRoles().get(0) : new UserRole();
+			//			role.setRole(userDto.getRole());
+			//TODO Fix based on new structure
 
 			final List<CropType> crops = new ArrayList<>();
 			for (final CropDto crop : userDto.getCrops()) {

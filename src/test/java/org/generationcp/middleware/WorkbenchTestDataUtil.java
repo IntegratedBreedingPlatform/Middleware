@@ -1,12 +1,6 @@
 
 package org.generationcp.middleware;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -18,8 +12,16 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 public class WorkbenchTestDataUtil {
 
@@ -182,7 +184,13 @@ public class WorkbenchTestDataUtil {
 		userdto.setFirstName(firstName);
 		final String lastName = RandomStringUtils.randomAlphanumeric(50);
 		userdto.setLastName(lastName);
-		userdto.setRole(new Role(1, "ADMIN"));
+		final UserRoleDto userRoleDto = new UserRoleDto(1,
+			new RoleDto(1, "Admin", "",
+				"instance", true, true,
+				true), null,
+			null);
+		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
+		userRoleDtos.add(userRoleDto);
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		userdto.setEmail("test" + email + "@leafnode.io");

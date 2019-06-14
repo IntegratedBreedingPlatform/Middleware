@@ -11,10 +11,15 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.BeanFormState;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -34,16 +39,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.BeanFormState;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * POJO for users table in Workbench Database. 
@@ -66,18 +65,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
-	public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
-	public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 
 	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, role.id, role.name, users.ustatus, person.pemail \n"
+		"SELECT users.userid, users.uname, person.fname, person.lname, users.ustatus, person.pemail \n"
 		+ "FROM users \n"
 		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
 		+ "INNER JOIN persons person ON person.personid = users.personid \n "
 		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
-		+ "INNER JOIN users_roles ur ON ur.userid = users.userid "
-		+ "INNER JOIN role ON role.id = ur.role_id "
 		+ "WHERE pp.project_uuid = :project_uuid \n "
 		+ "GROUP BY users.userid";
 

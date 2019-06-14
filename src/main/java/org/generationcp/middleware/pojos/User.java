@@ -11,7 +11,10 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -26,11 +29,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
 
 /**
  * POJO for users table.
@@ -52,16 +51,12 @@ public class User implements Serializable, BeanFormState {
 			+ "  person.personid AS personId, \n"
 			+ "  person.fname    AS fName, \n"
 			+ "  person.lname    AS lName, \n"
-			+ "  person.pemail   AS email, \n"
-			+ "  role.id    AS roleId, \n"
-			+ "  role.name       AS roleName \n"
+		+ "  person.pemail   AS email \n"
 			+ "FROM cvterm scale INNER JOIN cvterm_relationship r ON (r.object_id = scale.cvterm_id) \n"
 			+ "  INNER JOIN cvterm variable ON (r.subject_id = variable.cvterm_id) \n"
 			+ "  INNER JOIN projectprop pp ON (pp.variable_id = variable.cvterm_id) \n"
 			+ "  INNER JOIN workbench.persons person ON (pp.value = person.personid) \n"
 			+ "  INNER JOIN workbench.users user ON (user.personid = person.personid) \n"
-			+ "  LEFT JOIN workbench.users_roles urole ON (urole.userid = user.userid) \n"
-			+ "  LEFT JOIN workbench.role ON (role.id = urole.role_id) \n"
 			+ "WHERE pp.project_id = :studyId AND r.object_id = 1901";
 
 	@Id

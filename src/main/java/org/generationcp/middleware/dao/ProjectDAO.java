@@ -11,11 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -28,12 +23,18 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 /**
  * DAO class for {@link Project}.
  *
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
+	//TODO Fix query, it is joining with users_roles expecting only one role
 	public static final String GET_PROJECTS_BY_USER_ID =
 		"SELECT  "
 			+ "    p.* "

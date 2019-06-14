@@ -20,6 +20,20 @@ public class RoleDto {
 
 	private Boolean assignable;
 
+	public RoleDto() {
+	}
+
+	public RoleDto(final Integer id, final String name, final String description, final String type, final Boolean active,
+		final Boolean editable, final Boolean assignable) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.type = type;
+		this.active = active;
+		this.editable = editable;
+		this.assignable = assignable;
+	}
+
 	public Integer getId() {
 		return id;
 	}

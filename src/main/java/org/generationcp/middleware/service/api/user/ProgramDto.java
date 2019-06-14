@@ -13,6 +13,15 @@ public class ProgramDto {
 
 	private CropDto crop;
 
+	public ProgramDto() {
+	}
+
+	public ProgramDto(final Long id, final String name, final CropDto crop) {
+		this.id = id;
+		this.name = name;
+		this.crop = crop;
+	}
+
 	public Long getId() {
 		return id;
 	}
