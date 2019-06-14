@@ -955,10 +955,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				+ "_Id AND value ").append(matchClause).append(" )");
 
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
-			// IF searching by list of values, treat as categorical and search for the values in cvterm.name
+			// IF searching by list of values, search for the values in 1)cvterm.name or 2)perform IN operation on stockprop.value
 			// Otherwise, search the value like a text by LIKE operation
 			final String stockMatchClause = performLikeOperation? "sp.value LIKE :" + variableId + "_text " :
-				" cvt.name IN (:"+ variableId + "_values )";
+				" (cvt.name IN (:"+ variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
 			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
 				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
