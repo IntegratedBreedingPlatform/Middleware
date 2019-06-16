@@ -770,7 +770,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		category.setSidebarCategoryId(7);
 		final List<WorkbenchSidebarCategoryLink> sidebarLinks = this.workbenchDataManager.getAllWorkbenchSidebarLinksByCategoryId(category);
 		Assert.assertNotNull(sidebarLinks);
-		Assert.assertEquals(3, sidebarLinks.size());
+		Assert.assertEquals(2, sidebarLinks.size());
 		
 		// Verify the roles allowed to access per link
 		for (final WorkbenchSidebarCategoryLink link : sidebarLinks) {
@@ -784,11 +784,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
 				Assert.assertTrue(roles.isEmpty());
 				
-			} else if ("about_bms".equals(link.getSidebarLinkName())) {
-				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
-				Assert.assertEquals(5, roles.size());
 			}
-			
 		}
 	}@Test
 	public void testGetAllRoles() {
