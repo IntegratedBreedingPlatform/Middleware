@@ -53,7 +53,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String ENTRY_TYPE = "ENTRY_TYPE";
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	protected static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
-	protected static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	protected static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
@@ -517,6 +517,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final String sortBy = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getSortBy() : "";
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)) {
 			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
+		} else if (SUM_OF_SAMPLES_ID.equals(sortBy)) {
+			orderColumn = ObservationUnitsSearchDao.SUM_OF_SAMPLES;
 		} else {
 			orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : "PLOT_NO";
 		}

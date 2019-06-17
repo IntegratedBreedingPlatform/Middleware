@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -506,8 +507,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 		if (searchDTO.getSortedRequest() != null && searchDTO.getSortedRequest().getSortBy() != null) {
-			searchDTO.getSortedRequest()
-				.setSortBy(this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy())).getName());
+			final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy()));
+			if (term != null) {
+				searchDTO.getSortedRequest()
+					.setSortBy(term.getName());
+			}
 		}
 
 		searchDTO.setDatasetId(datasetId);
