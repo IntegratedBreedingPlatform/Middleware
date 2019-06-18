@@ -37,4 +37,21 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="darla" id="v12.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT count(1) FROM cvterm WHERE cvterm_id IN (1140, 1145, 1150);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Delete cvterm records used to denote relationship type for project_relationship table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM cvterm_relationship WHERE subject_id IN (1140, 1145, 1150);
+			DELETE FROM cvterm WHERE cvterm_id IN (1140, 1145, 1150);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
