@@ -5,14 +5,13 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, String> {
 
 	@SuppressWarnings("unchecked")
-	public KeySequenceRegister getByPrefixAndSuffix(final String keyPrefix, final String suffix){
+	public KeySequenceRegister getByPrefix(final String keyPrefix){
 		if (keyPrefix != null) {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("keyPrefix", keyPrefix));
@@ -22,26 +21,26 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 			 */
 			criteria.addOrder(Order.desc("lastUsedSequence"));
 
-			final List<Object[]> result = criteria.list();;
+			final List<Object[]> result = criteria.list();
 			if (result != null && !result.isEmpty()) {
 				return (KeySequenceRegister) criteria.list().get(0);
 			}
 		}
 		return null;
 	}
-	
-	public int getNextSequence(final String keyPrefix, final String suffix) {
-		final KeySequenceRegister keySequenceRegister = this.getByPrefixAndSuffix(keyPrefix, suffix);
+
+	public int getNextSequence(final String keyPrefix) {
+		final KeySequenceRegister keySequenceRegister = this.getByPrefix(keyPrefix);
 
 		if (keySequenceRegister != null) {
 			return keySequenceRegister.getLastUsedSequence() + 1;
-		} 
+		}
 		return 1;
 	}
-	
+
 	public int incrementAndGetNextSequence(final String keyPrefix, final String suffix) {
 
-		final KeySequenceRegister keySequenceRegister = this.getByPrefixAndSuffix(keyPrefix, suffix);
+		final KeySequenceRegister keySequenceRegister = this.getByPrefix(keyPrefix);
 
 		if (keySequenceRegister != null) {
 			int newLastUsedSequence = keySequenceRegister.getLastUsedSequence() + 1;
@@ -53,10 +52,10 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 			return 1;
 		}
 	}
-	
+
 	public void saveLastSequenceUsed(final String keyPrefix, final String suffix, final Integer lastSequence) {
 
-		final KeySequenceRegister keySequenceRegister = this.getByPrefixAndSuffix(keyPrefix, suffix);
+		final KeySequenceRegister keySequenceRegister = this.getByPrefix(keyPrefix);
 
 		if (keySequenceRegister != null) {
 			final Integer lastUsedSequence = keySequenceRegister.getLastUsedSequence();

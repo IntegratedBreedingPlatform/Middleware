@@ -388,11 +388,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
-	
+
 	public Map<Integer, List<GermplasmParent>> getParentsFromProgenitorsForGIDsMap(final List<Integer> gids) {
 		Preconditions.checkNotNull(gids);
 		Preconditions.checkArgument(!gids.isEmpty());
-		
+
 		final Map<Integer, List<GermplasmParent>> map = new HashMap<>();
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PROGENITORS_BY_GIDS_WITH_PREF_NAME);
@@ -402,7 +402,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.addScalar("malePedigree");
 			query.setParameterList("gidList", gids);
 			final List<Object[]> results = query.list();
-			
+
 			List<GermplasmParent> progenitors = new ArrayList<>();
 			Integer lastGid = 0;
 			for (final Object[] result : results) {
@@ -878,7 +878,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public String getNextSequenceNumberForCrossName(String prefix, final String suffix) {
+	public String getNextSequenceNumberForCrossName(String prefix) {
 		String nextInSequence = "1";
 
 		if (!prefix.isEmpty()) {
@@ -888,12 +888,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				sb.append("SELECT CONVERT(REPLACE(UPPER(nval), :prefix, ''), SIGNED)+1 as next_number ");
 
 				// We used LIKE when matching names so as not to do full table scan when using REGEXP matching
-				// We do a second REGEXP matching on the matched records so that only those matching prefix and suffix will be parsed
+				// We do a second REGEXP matching on the matched records so that only those matching prefix will be parsed
 				sb.append(" FROM ( " + " 	SELECT  distinct nval " + "		FROM names " + "		WHERE names.nval LIKE :prefixLike "
 						+ "   	AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)" + " ) matches ");
 				sb.append("WHERE nval REGEXP '");
-				// need to append prefix and suffix manually. setParameter does not work because of enclosing quotes for REGEXP string
-				this.buildCrossNameRegularExpression(prefix, suffix, sb);
+				// need to append prefix manually. setParameter does not work because of enclosing quotes for REGEXP string
+				this.buildCrossNameRegularExpression(prefix, sb);
 				sb.append("' ");
 				sb.append(" ORDER BY next_number desc LIMIT 1");
 
@@ -917,7 +917,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return nextInSequence;
 	}
 
-	void buildCrossNameRegularExpression(final String prefix, final String suffix, final StringBuilder sb) {
+	void buildCrossNameRegularExpression(final String prefix, final StringBuilder sb) {
 		sb.append("^(");
 		sb.append(prefix);
 		sb.append(")");
