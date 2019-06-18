@@ -17,22 +17,11 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("keyPrefix", keyPrefix));
 			/*
-			 * We need to check length of prefix as well to filter out prefix with space at the end.
-			 * MySQL returns prefix matches with and without trailing spaces at the end
-			 */
-			criteria.add(Restrictions.sqlRestriction("length({alias}.key_prefix) = ? ", keyPrefix.length(), Hibernate.INTEGER));
-			// If the suffix parameter is null or empty, filter suffix values that are either null or empty in DB
-			if (suffix != null && !suffix.isEmpty()) {
-				criteria.add(Restrictions.eq("suffix", suffix));
-			} else {
-				criteria.add(Restrictions.or(Restrictions.isNull("suffix"), Restrictions.eq("suffix","")));
-			}
-			/*
 			 *  There can be multiple results (eg. same prefix but both null and empty string suffix will be returned from DB)
 			 *  So order by the record with the greater last sequence # used
 			 */
 			criteria.addOrder(Order.desc("lastUsedSequence"));
-			
+
 			final List<Object[]> result = criteria.list();;
 			if (result != null && !result.isEmpty()) {
 				return (KeySequenceRegister) criteria.list().get(0);

@@ -878,11 +878,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public String getNextSequenceNumberForCrossName(final String prefix, final String suffix) {
+	public String getNextSequenceNumberForCrossName(String prefix, final String suffix) {
 		String nextInSequence = "1";
 
 		if (!prefix.isEmpty()) {
 			try {
+				prefix = prefix.trim();
 				final StringBuilder sb = new StringBuilder();
 				sb.append("SELECT CONVERT(REPLACE(UPPER(nval), :prefix, ''), SIGNED)+1 as next_number ");
 
@@ -920,14 +921,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		sb.append("^(");
 		sb.append(prefix);
 		sb.append(")");
+		sb.append("[[:blank:]]*");
 		// only match names with number after the prefix. Other names will not be considered
 		sb.append("[0-9]+");
-		if (suffix != null && !suffix.isEmpty()) {
-			sb.append("(");
-			sb.append(suffix);
-			sb.append(")");
-		}
-		sb.append("$");
+		sb.append(".*$");
 	}
 
 	@SuppressWarnings("unchecked")
