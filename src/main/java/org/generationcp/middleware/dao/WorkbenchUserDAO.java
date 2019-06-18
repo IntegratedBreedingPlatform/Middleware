@@ -209,11 +209,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return null;
 	}
 
-	public WorkbenchUser getUserWithAuthorities(final String userName, final String crop, final String program) {
-		// TODO get Role with Authorities
-		return this.getUserByUserName(userName);
-	}
-
 	public boolean changePassword(final String username, final String password) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out

@@ -4,5 +4,5 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
 public interface UserService {
 
-	WorkbenchUser getUserWithAuthorities(final String userName, final String crop, final String program);
+	WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid);
 }

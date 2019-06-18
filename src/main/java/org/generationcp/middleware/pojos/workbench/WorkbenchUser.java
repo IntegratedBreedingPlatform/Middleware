@@ -13,6 +13,7 @@ package org.generationcp.middleware.pojos.workbench;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.pojos.BeanFormState;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -135,6 +136,9 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	@Transient
 	private Boolean enabled = true;
+
+	@Transient
+	private List<PermissionDto> permissions = new ArrayList<>();
 
 	public WorkbenchUser() {
 	}
@@ -407,4 +411,11 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		this.crops = crops;
 	}
 
+	public List<PermissionDto> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(final List<PermissionDto> permissions) {
+		this.permissions = permissions;
+	}
 }
