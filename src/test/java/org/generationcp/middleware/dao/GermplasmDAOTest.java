@@ -12,6 +12,7 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -37,7 +38,7 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -465,7 +466,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testCountMatchGermplasmInListNoGidExists() {
 
 		final Integer dummyGid = Integer.MIN_VALUE + 1;
-		;
 
 		final Set<Integer> gids = new HashSet<>();
 
@@ -533,7 +533,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.setSession(mockSession);
 		this.dao.getNextSequenceNumberForCrossName("");
 		// Verify that no query was made if the prefix is empty
-		Mockito.verify(mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
+		Mockito.verify(mockSession, Mockito.never()).createSQLQuery(ArgumentMatchers.anyString());
 	}
 
 	@Test
@@ -593,7 +593,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String prefix = "QWERTY";
 		final StringBuilder sb = new StringBuilder();
 		this.dao.buildCrossNameRegularExpression(prefix, sb);
-		Assert.assertEquals("^(" + prefix + ")[[[:blank:]]*[0-9]+.*]$", sb.toString());
+		Assert.assertEquals("^(" + prefix + ")[[:blank:]]*[0-9]+.*$", sb.toString());
 	}
 
 	@Test
@@ -720,7 +720,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		// Assert.assertThat(germplasmDTO.getGermplasmPUI(), is());
 		// Assert.assertThat(germplasmDTO.getPedigree(), is());
 		// Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is());
-		Assert.assertThat(germplasmDTO.getCommonCropName(), isEmptyOrNullString());
+		Assert.assertTrue(StringUtils.isEmpty(germplasmDTO.getCommonCropName()));
 		 Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("PROGM")));
 		 Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("PROGM")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
@@ -823,9 +823,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer
 				.createGermplasmWithPreferredName(existingGermplasmNameWithPrefix);
 		germplasm.setDeleted(isDeleted);
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-
-		return gid;
+		return this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
 	}
 
 	private Integer insertGermplasmWithName(final String existingGermplasmNameWithPrefix) {
