@@ -537,49 +537,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetNextSequenceNumberForCrossNameWithSuffixSupplied() {
-		final String crossNamePrefix = "ABCDEFG";
-		final int lastCode = 99;
-		final String suffix = "-XYZ";
-		final String existingGermplasmNameWithPrefixAndSuffix = crossNamePrefix + lastCode + suffix;
-
-		// Also insert a name without the suffix to verify that the last code in sequence will not come from it
-		this.insertGermplasmWithName(existingGermplasmNameWithPrefixAndSuffix);
-		this.insertGermplasmWithName(crossNamePrefix + "999");
-
-		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
-		final int expectedNextCode = lastCode + 1;
-		Assert.assertEquals(
-				"Germplasm with name " + existingGermplasmNameWithPrefixAndSuffix + " is existing so the next sequence number should be "
-						+ expectedNextCode, Integer.toString(expectedNextCode), result);
-	}
-
-	@Test
-	public void testGetNextSequenceNumberForCrossNameWithSpaceAfterPrefix() {
-
-		final String crossNamePrefix = "ABCDEFG";
-		final Integer lastCodeForPrefix = 9;
-		final String existingGermplasmNameWithPrefix = crossNamePrefix + lastCodeForPrefix;
-		final int lastCodeForPrefixWithSpace = 99;
-		final String existingGermplasmNameWithPrefixWithSpace = crossNamePrefix + " " + lastCodeForPrefixWithSpace;
-
-		this.insertGermplasmWithName(existingGermplasmNameWithPrefix);
-		this.insertGermplasmWithName(existingGermplasmNameWithPrefixWithSpace);
-
-		final String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
-		final int nextCodeForPrefix = lastCodeForPrefix + 1;
-		Assert.assertEquals(
-				"Germplasm with prefix " + existingGermplasmNameWithPrefix + " is existing so the next sequence number should be "
-						+ nextCodeForPrefix, Integer.toString(nextCodeForPrefix), result);
-
-		final String result2 = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix + " ");
-		final int nextCodeForPrefixWithSpace = lastCodeForPrefixWithSpace + 1;
-		Assert.assertEquals(
-				"Germplasm with prefix " + existingGermplasmNameWithPrefixWithSpace + " is existing so the next sequence number should be "
-						+ nextCodeForPrefixWithSpace, Integer.toString(nextCodeForPrefixWithSpace), result2);
-	}
-
-	@Test
 	public void testGetNextSequenceNumberForCrossNameForMixedCasePrefix() {
 
 		final String crossNamePrefix = "aBcDeFg";
@@ -636,24 +593,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String prefix = "QWERTY";
 		final StringBuilder sb = new StringBuilder();
 		this.dao.buildCrossNameRegularExpression(prefix, sb);
-		Assert.assertEquals("^(" + prefix + ")[0-9]+$", sb.toString());
-	}
-
-	@Test
-	public void testBuildCrossNameRegularExpressionWithSpaceAfterPrefix() {
-		final String prefix = "QWERTY ";
-		final StringBuilder sb = new StringBuilder();
-		this.dao.buildCrossNameRegularExpression(prefix, sb);
-		Assert.assertEquals("^(" + prefix + ")[0-9]+$", sb.toString());
-	}
-
-	@Test
-	public void testBuildCrossNameRegularExpressionWithSuffix() {
-		final String prefix = "QWERTY";
-		final String suffix = "-LTD";
-		final StringBuilder sb = new StringBuilder();
-		this.dao.buildCrossNameRegularExpression(prefix, sb);
-		Assert.assertEquals("^(" + prefix + ")[0-9]+(" + suffix + ")$", sb.toString());
+		Assert.assertEquals("^(" + prefix + ")[[[:blank:]]*[0-9]+.*]$", sb.toString());
 	}
 
 	@Test
