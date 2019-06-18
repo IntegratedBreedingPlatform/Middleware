@@ -593,7 +593,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final String prefix = "QWERTY";
 		final StringBuilder sb = new StringBuilder();
 		this.dao.buildCrossNameRegularExpression(prefix, sb);
-		Assert.assertEquals("^(" + prefix + ")[[[:blank:]]*[0-9]+.*]$", sb.toString());
+		Assert.assertEquals("^(" + prefix + ")[[[[:blank:]]*[0-9]+.*]]$", sb.toString());
 	}
 
 	@Test
