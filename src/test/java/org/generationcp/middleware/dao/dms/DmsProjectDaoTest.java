@@ -112,29 +112,6 @@ public class DmsProjectDaoTest {
 	}
 
 	@Test
-	public void testGetStudyMetadata() {
-		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID)).thenReturn(this.mockQuery);
-
-		final Object[] mockDBRow1 =
-			new Object[] {"31", 2088, "TR", StudyTypeDto.TRIAL_NAME, "10300", "2088", "TR", "20161212", "", "9006", "2"};
-		Mockito.when(this.mockQuery.uniqueResult()).thenReturn(mockDBRow1);
-		final StudyMetadata studyMetadata = this.dao.getStudyMetadata(31);
-
-		assertThat(studyMetadata.getStudyDbId(), equalTo(Integer.parseInt((String) mockDBRow1[0])));
-		assertThat(studyMetadata.getNurseryOrTrialId(), equalTo(mockDBRow1[1]));
-		assertThat(studyMetadata.getStudyName(), equalTo(mockDBRow1[2]));
-		assertThat(studyMetadata.getStudyType(), equalTo(mockDBRow1[3]));
-		assertThat(studyMetadata.getSeasons().get(0), equalTo(TermId.getById(Integer.parseInt((String) mockDBRow1[4])).toString()));
-		assertThat(studyMetadata.getTrialDbId(), equalTo(Integer.parseInt((String) mockDBRow1[5])));
-		assertThat(studyMetadata.getTrialName(), equalTo(mockDBRow1[6]));
-		assertThat(studyMetadata.getStartDate(), equalTo((mockDBRow1[7])));
-		assertThat(studyMetadata.getEndDate(), equalTo(mockDBRow1[8]));
-		assertThat(studyMetadata.getActive(), equalTo(Boolean.FALSE));
-		assertThat(studyMetadata.getLocationId(), equalTo(Integer.parseInt((String) mockDBRow1[10])));
-
-	}
-
-	@Test
 	public void testCountCalculatedVariablesInDatasets() {
 		final BigInteger expectedCount = BigInteger.valueOf(new Random().nextInt());
 		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.COUNT_CALCULATED_VARIABLES_IN_DATASETS)).thenReturn(this.mockQuery);

@@ -457,10 +457,9 @@ public interface StudyDataManager {
 	 *
 	 * @param sourceId the source id
 	 * @param targetId the target id
-	 * @param isAStudy the is a study
 	 * @return true, if successful
 	 */
-	boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy);
+	boolean moveDmsProject(int sourceId, int targetId);
 
 	/**
 	 * Retrieves the study details of the given study type from from both selected DB instance ordered by db instance then study name.
@@ -515,13 +514,6 @@ public interface StudyDataManager {
 	 * @return The list of study details from the currently selected program
 	 */
 	long countAllNurseryAndTrialStudyDetails(String programUUID);
-
-	/**
-	 * Retrieves the folder tree.
-	 *
-	 * @return the folder tree
-	 */
-	List<FolderReference> getFolderTree();
 
 	/**
 	 * Retrieves a flat list (no tree structuring) of all folders.
@@ -685,9 +677,9 @@ public interface StudyDataManager {
 	void saveOrUpdatePhenotypeValue(
 		int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId, Phenotype.ValueStatus valueStatus);
 
-	StudyMetadata getStudyMetadata(Integer studyId);
+	StudyMetadata getStudyMetadataForGeolocationId(Integer geolocationId);
 
-	Map<String, String> getGeolocationPropsAndValuesByStudy(Integer studyId);
+	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId);
 
 	Map<String, String> getProjectPropsAndValuesByStudy(Integer studyId);
 

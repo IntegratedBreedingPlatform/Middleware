@@ -1083,7 +1083,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final List<String> list = new ArrayList<>();
 		for (final Germplasm g : results) {
-			System.out.println(">> Germplasm " + g.getGid() + " with name: " + g.getGermplasmNamesString());
 			list.add(g.getGermplasmNamesString());
 		}
 
