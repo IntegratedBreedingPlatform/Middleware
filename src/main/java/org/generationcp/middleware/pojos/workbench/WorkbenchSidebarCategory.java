@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "workbench_sidebar_category")
-public class WorkbenchSidebarCategory implements Serializable {
+public class WorkbenchSidebarCategory implements Serializable, Comparable<WorkbenchSidebarCategory> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -79,5 +79,10 @@ public class WorkbenchSidebarCategory implements Serializable {
 	public void setWorkbenchSidebarCategoryLinks(
 		final List<WorkbenchSidebarCategoryLink> workbenchSidebarCategoryLinks) {
 		this.workbenchSidebarCategoryLinks = workbenchSidebarCategoryLinks;
+	}
+
+	@Override
+	public int compareTo(WorkbenchSidebarCategory d) {
+		return this.sidebarCategoryId - d.getSidebarCategoryId();
 	}
 }

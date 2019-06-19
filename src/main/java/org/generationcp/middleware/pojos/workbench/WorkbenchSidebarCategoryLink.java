@@ -16,11 +16,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "workbench_sidebar_category_link")
-public class WorkbenchSidebarCategoryLink implements Serializable {
+public class WorkbenchSidebarCategoryLink implements Serializable, Comparable<WorkbenchSidebarCategoryLink> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -142,6 +143,9 @@ public class WorkbenchSidebarCategoryLink implements Serializable {
 			return false;
 		return true;
 	}
-	
-	
+
+	@Override
+	public int compareTo(WorkbenchSidebarCategoryLink d) {
+		return this.sidebarCategoryLinkId - d.getSidebarCategoryLinkId();
+	}
 }
