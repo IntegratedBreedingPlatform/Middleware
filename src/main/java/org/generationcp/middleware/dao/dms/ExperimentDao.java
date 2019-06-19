@@ -741,7 +741,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ " LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
 			// FIXME won't work for sub-sub-obs
-			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR plot.nd_experiment_id = nde.nd_experiment_id " //
+			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " //
 			+ " WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
