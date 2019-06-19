@@ -23,10 +23,8 @@ public class SampleDetailsBean {
 	private String well;
 	private String datasetTypeName;
 	private boolean subObservationDatasetType;
-	private String projectName;
-	private Integer projectId;
-	private String parentProjectName;
-	private Integer parentProjectId;
+	private String studyName;
+	private Integer studyId;
 	private Integer observationUnitNo;
 	private String plotNo;
 	private String observationUnitId;
@@ -129,38 +127,6 @@ public class SampleDetailsBean {
 		this.datasetTypeName = datasetTypeName;
 	}
 
-	public String getProjectName() {
-		return this.projectName;
-	}
-
-	public void setProjectName(final String projectName) {
-		this.projectName = projectName;
-	}
-
-	public Integer getProjectId() {
-		return this.projectId;
-	}
-
-	public void setProjectId(final Integer projectId) {
-		this.projectId = projectId;
-	}
-
-	public String getParentProjectName() {
-		return this.parentProjectName;
-	}
-
-	public void setParentProjectName(final String parentProjectName) {
-		this.parentProjectName = parentProjectName;
-	}
-
-	public Integer getParentProjectId() {
-		return this.parentProjectId;
-	}
-
-	public void setParentProjectId(final Integer parentProjectId) {
-		this.parentProjectId = parentProjectId;
-	}
-
 	public Integer getObservationUnitNo() {
 		return this.observationUnitNo;
 	}
@@ -175,6 +141,22 @@ public class SampleDetailsBean {
 
 	public void setPlotNo(final String plotNo) {
 		this.plotNo = plotNo;
+	}
+
+	public String getStudyName() {
+		return studyName;
+	}
+
+	public void setStudyName(final String studyName) {
+		this.studyName = studyName;
+	}
+
+	public Integer getStudyId() {
+		return studyId;
+	}
+
+	public void setStudyId(final Integer studyId) {
+		this.studyId = studyId;
 	}
 
 	public String getObservationUnitId() {

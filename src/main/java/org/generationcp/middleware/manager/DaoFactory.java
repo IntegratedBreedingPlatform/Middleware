@@ -20,7 +20,6 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
@@ -156,12 +155,6 @@ public class DaoFactory {
 		final ProjectPropertyDao projectPropDao = new ProjectPropertyDao();
 		projectPropDao.setSession(this.sessionProvider.getSession());
 		return projectPropDao;
-	}
-
-	public ProjectRelationshipDao getProjectRelationshipDao() {
-		final ProjectRelationshipDao projectRelationshipDao = new ProjectRelationshipDao();
-		projectRelationshipDao.setSession(this.sessionProvider.getSession());
-		return projectRelationshipDao;
 	}
 
 	public ExperimentDao getExperimentDao() {
