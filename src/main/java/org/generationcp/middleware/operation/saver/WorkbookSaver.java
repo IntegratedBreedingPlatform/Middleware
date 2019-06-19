@@ -341,9 +341,9 @@ public class WorkbookSaver extends Saver {
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 
-		final Integer environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
-		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
-		final int studyId = this.getStudyId(workbook.getStudyDetails().getStudyName(), programUUID);
+		final Integer environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId());
+		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId());
+		final int studyId = workbook.getStudyDetails().getId();
 
 		int savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
 		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
