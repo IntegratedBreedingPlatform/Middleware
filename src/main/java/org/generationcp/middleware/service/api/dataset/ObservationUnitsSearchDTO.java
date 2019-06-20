@@ -40,6 +40,7 @@ public class ObservationUnitsSearchDTO {
 		private Boolean byMissing;
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
+		private Map<String, String> variableTypeMap;
 		private Integer variableId;
 
 		public Filter() {
@@ -106,6 +107,14 @@ public class ObservationUnitsSearchDTO {
 
 		public void setVariableId(final Integer variableId) {
 			this.variableId = variableId;
+		}
+
+		public Map<String, String> getVariableTypeMap() {
+			return variableTypeMap;
+		}
+
+		public void setVariableTypeMap(final Map<String, String> variableTypeMap) {
+			this.variableTypeMap = variableTypeMap;
 		}
 	}
 

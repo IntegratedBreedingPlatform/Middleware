@@ -18,6 +18,7 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -205,6 +206,11 @@ public class DaoFactory {
 		final SearchRequestDAO brapiSearchDAO = new SearchRequestDAO();
 		brapiSearchDAO.setSession(this.sessionProvider.getSession());
 		return brapiSearchDAO;
+	}
 
+	public ObservationUnitsSearchDao getObservationUnitsSearchDAO() {
+		final ObservationUnitsSearchDao obsUnitsSearchDao = new ObservationUnitsSearchDao();
+		obsUnitsSearchDao.setSession(this.sessionProvider.getSession());
+		return obsUnitsSearchDao;
 	}
 }
