@@ -65,7 +65,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
 		factorsFilterMap.put(String.valueOf(TermId.ENTRY_CODE.getId()), "s.value");
 		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "gl.description");
-		factorsFilterMap.put(SUM_OF_SAMPLES_ID, "EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
+		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
+			"EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
 	}
 
 	static {
@@ -216,7 +217,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			throw new MiddlewareException(error, e);
 		}
 	}
-
 
 	private String getObservationUnitsByVariableQuery(final ObservationUnitsSearchDTO searchDto) {
 
@@ -566,7 +566,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOutOfBound())) {
-			appendOutOfBoundsTraitsFilteringToQuery(sql, filterByDraftOrValue, filterByVariableSQL);
+			this.appendOutOfBoundsTraitsFilteringToQuery(sql, filterByDraftOrValue, filterByVariableSQL);
 		}
 
 		if (filter.getFilteredValues() != null && !filter.getFilteredValues().isEmpty()) {
@@ -582,16 +582,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOverwritten())) {
-			appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " and ph2.value is not null and ph2.draft_value is not null");
+			this.appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " and ph2.value is not null and ph2.draft_value is not null");
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOutOfSync())) {
-			appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "'");
+			this.appendTraitStatusFilterToQuery(sql, filterByVariableSQL,
+				" AND ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "'");
 		}
 
 		// TODO check if missing also applies to draft mode
 		if (Boolean.TRUE.equals(filter.getByMissing())) {
-			appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.value =  '" + Phenotype.MISSING_VALUE + "'");
+			this.appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.value =  '" + Phenotype.MISSING_VALUE + "'");
 		}
 	}
 
@@ -605,7 +606,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 			final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 			if (traitAndSelectionVariableTypes.contains(variableTypeString)) {
-				appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, performLikeOperation);
+				this.appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, performLikeOperation);
 
 			} else {
 				this.applyFactorsFilter(sql, observableId, variableTypeString, performLikeOperation);
@@ -667,7 +668,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private void appendTraitValueFilteringToQuery(final StringBuilder sql, final String filterByDraftOrValue, final String variableId,
 		final boolean performLikeOperation) {
-		final String matchClause = performLikeOperation? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
+		final String matchClause = performLikeOperation ? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
 		sql.append(
 			" and EXISTS ( " //
 				+ "    SELECT 1 " //
@@ -677,15 +678,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "    and ph2.").append(filterByDraftOrValue).append(matchClause).append(") ");
 	}
 
-
-
-	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType, final boolean performLikeOperation) {
+	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
+		final boolean performLikeOperation) {
 		// Check if the variable to be filtered is in one of the columns in stock, nd_experiment, geolocation or sum of samples
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
 		// Sum of Samples, whose Id is -2, will cause an error as query parameter. Remove the "-" from the ID as workaround
 		final String finalId = variableId.replace("-", "");
-		final String matchClause = performLikeOperation? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
+		final String matchClause = performLikeOperation ? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
 		if (filterClause != null || observationUnitClause != null) {
 			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
 			// If Sum of Samples, append extra closing parenthesis for the EXISTS clause it uses
@@ -705,12 +705,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
 			// IF searching by list of values, search for the values in 1)cvterm.name or 2)perform IN operation on stockprop.value
 			// Otherwise, search the value like a text by LIKE operation
-			final String stockMatchClause = performLikeOperation? "sp.value LIKE :" + variableId + "_text " :
-				" (cvt.name IN (:"+ variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
+			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
+				" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
 			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
 				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
-				+ "_Id AND ").append(stockMatchClause).append(" )");;
+				+ "_Id AND ").append(stockMatchClause).append(" )");
+			;
 		}
 	}
 
@@ -757,7 +758,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 	}
-
 
 	private String addScalarForSpecificTrait(final ObservationUnitsSearchDTO params, final SQLQuery query) {
 		for (final MeasurementVariableDto measurementVariable : params.getSelectionMethodsAndTraits()) {
