@@ -891,10 +891,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				// We do a second REGEXP matching on the matched records so that only those matching prefix will be parsed
 				sb.append(" FROM ( " + " 	SELECT  distinct nval " + "		FROM names " + "		WHERE names.nval LIKE :prefixLike "
 						+ "   	AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)" + " ) matches ");
-				sb.append("WHERE nval REGEXP '");
-				// need to append prefix manually. setParameter does not work because of enclosing quotes for REGEXP string
-				this.buildCrossNameRegularExpression(prefix, sb);
-				sb.append("' ");
 				sb.append(" ORDER BY next_number desc LIMIT 1");
 
 				final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
@@ -915,16 +911,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 
 		return nextInSequence;
-	}
-
-	void buildCrossNameRegularExpression(final String prefix, final StringBuilder sb) {
-		sb.append("^(");
-		sb.append(prefix);
-		sb.append(")");
-		sb.append("[[:blank:]]*");
-		// only match names with number after the prefix. Other names will not be considered
-		sb.append("[0-9]+");
-		sb.append(".*$");
 	}
 
 	@SuppressWarnings("unchecked")

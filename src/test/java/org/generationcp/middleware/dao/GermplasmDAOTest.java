@@ -589,14 +589,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testBuildCrossNameRegularExpression() {
-		final String prefix = "QWERTY";
-		final StringBuilder sb = new StringBuilder();
-		this.dao.buildCrossNameRegularExpression(prefix, sb);
-		Assert.assertEquals("^(" + prefix + ")[[:blank:]]*[0-9]+.*$", sb.toString());
-	}
-
-	@Test
 	public void testGermplasmWithoutGroup() {
 
 		// Create 2 germplasm without group
