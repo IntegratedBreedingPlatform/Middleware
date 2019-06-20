@@ -82,7 +82,8 @@ public class DatasetProjectSaverTest {
 		assertEquals(datasetTitle, createdProject.getDescription());
 		assertEquals(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), createdProject.getDatasetType().getDatasetTypeId().intValue());
 		assertNotNull(createdProject.getProperties());
-		assertNotNull(createdProject.getRelatedTos());
+		assertNotNull(createdProject.getParent());
+		assertNotNull(createdProject.getStudy());
 
 	}
 

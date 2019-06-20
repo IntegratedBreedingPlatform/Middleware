@@ -10,16 +10,7 @@
 
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -44,7 +35,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -88,7 +78,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -271,7 +268,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
 				measurementDatasetId =
-						this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+						this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId());
 			}
 
 			// save factors
@@ -891,8 +888,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int getMeasurementDatasetId(final int studyId, final String studyName) {
-		return this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+	public int getMeasurementDatasetId(final int studyId) {
+		return this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
 	}
 
 	@Override
@@ -1190,8 +1187,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void saveStudyColumnOrdering(final Integer studyId, final String studyName, final List<Integer> orderedTermIds) {
-		final int plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+	public void saveStudyColumnOrdering(final Integer studyId, final List<Integer> orderedTermIds) {
+		final int plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 
@@ -1199,9 +1196,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public boolean setOrderVariableByRank(final Workbook workbook) {
 		if (workbook != null) {
 			final Integer studyId = workbook.getStudyDetails().getId();
-			final String studyName = workbook.getStudyDetails().getStudyName();
 			if (studyId != null) {
-				final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+				final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
 				this.setOrderVariableByRank(workbook, plotDatasetId);
 			}
 			return true;

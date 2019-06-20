@@ -36,7 +36,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -147,8 +146,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(subObservationSetId).getParent();
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
@@ -199,8 +197,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(subObservationSetId).getParent();
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
@@ -250,7 +247,8 @@ public class DatasetServiceImpl implements DatasetService {
 		subObservationDataset.setLocked(false);
 		subObservationDataset.setProperties(projectProperties);
 		subObservationDataset.setDatasetType(new DatasetType(datasetTypeId));
-		subObservationDataset.setRelatedTos(this.buildProjectRelationships(parentDataset, subObservationDataset));
+		subObservationDataset.setParent(parentDataset);
+		subObservationDataset.setStudy(study);
 
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().save(subObservationDataset);
 
@@ -328,19 +326,6 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
 		}
 		return new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
-	}
-
-	private List<ProjectRelationship> buildProjectRelationships(final DmsProject parentDataset, final DmsProject childDataset)
-		throws MiddlewareQueryException {
-		final ProjectRelationship relationship = new ProjectRelationship();
-		relationship.setSubjectProject(childDataset);
-		relationship.setObjectProject(parentDataset);
-		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-
-		final List<ProjectRelationship> relationships = new ArrayList<>();
-		relationships.add(relationship);
-
-		return relationships;
 	}
 
 	@Override

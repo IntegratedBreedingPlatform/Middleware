@@ -40,10 +40,10 @@ public interface StudyService {
 
 	/**
 	 *
-	 * @param studyId
+	 * @param geolocationId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetails(Integer studyId);
+	StudyDetailsDto getStudyDetailsForGeolocation(Integer geolocationId);
 	
 	/**
 	 *

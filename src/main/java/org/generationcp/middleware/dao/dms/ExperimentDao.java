@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -57,7 +58,6 @@ import java.util.UUID;
 
 /**
  * DAO class for {@link ExperimentModel}.
- *
  */
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
@@ -82,53 +82,54 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
 	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	public static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
-			" experiment.nd_experiment_id, " +
-			" sample.sample_id," +
-			" sample.sample_no " +
-			" FROM nd_experiment experiment " +
-			" INNER JOIN project_relationship pr ON (pr.subject_project_id = experiment.project_id) " +
-			" INNER JOIN project p ON (p.project_id = pr.subject_project_id) " +
-			" INNER JOIN sample sample ON (sample.nd_experiment_id = experiment.nd_experiment_id) " +
-			" WHERE p.project_id = (SELECT p.project_id " +
-			" FROM project_relationship pr " +
-			" INNER JOIN project p ON p.project_id = pr.subject_project_id " +
-			" WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))";
+		" experiment.nd_experiment_id, " +
+		" sample.sample_id," +
+		" sample.sample_no " +
+		" FROM nd_experiment experiment " +
+		" INNER JOIN project p ON (p.project_id = experiment.project_id) " +
+		" INNER JOIN sample sample ON (sample.nd_experiment_id = experiment.nd_experiment_id) " +
+		" WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId();
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentDao.class);
 	public static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP = "SELECT count(e.nd_experiment_id) "
-			+ "FROM nd_experiment e INNER JOIN projectprop pp ON pp.project_id = e.project_id "
-			+ "AND pp.value = :variableId";
+		+ "FROM nd_experiment e INNER JOIN projectprop pp ON pp.project_id = e.project_id "
+		+ "AND pp.value = :variableId";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION = "SELECT count(e.nd_experiment_id) "
-			+ "FROM nd_experiment e INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id "
-			+ "WHERE (" + TermId.TRIAL_INSTANCE_FACTOR.getId() + " = :variableId AND g.description IS NOT NULL)  OR (" + TermId.LATITUDE.getId() + " = :variableId AND g.latitude IS NOT NULL) "
-			+ "OR (" + TermId.LONGITUDE.getId() + "= :variableId AND g.longitude IS NOT NULL) OR (" + TermId.GEODETIC_DATUM.getId() + " = :variableId AND g.geodetic_datum IS NOT NULL) "
-			+ "OR ("+ TermId.ALTITUDE.getId()+" = :variableId AND g.altitude IS NOT NULL) ";
+		+ "FROM nd_experiment e INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id "
+		+ "WHERE (" + TermId.TRIAL_INSTANCE_FACTOR.getId() + " = :variableId AND g.description IS NOT NULL)  OR (" + TermId.LATITUDE.getId()
+		+ " = :variableId AND g.latitude IS NOT NULL) "
+		+ "OR (" + TermId.LONGITUDE.getId() + "= :variableId AND g.longitude IS NOT NULL) OR (" + TermId.GEODETIC_DATUM.getId()
+		+ " = :variableId AND g.geodetic_datum IS NOT NULL) "
+		+ "OR (" + TermId.ALTITUDE.getId() + " = :variableId AND g.altitude IS NOT NULL) ";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP = "SELECT count(e.nd_experiment_id) "
-			+ "FROM nd_experiment e INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
-			+ "WHERE gp.type_id = :variableId AND gp.value IS NOT NULL";
+		+ "FROM nd_experiment e INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
+		+ "WHERE gp.type_id = :variableId AND gp.value IS NOT NULL";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP = "SELECT count(e.nd_experiment_id) "
-			+ "FROM nd_experiment e INNER JOIN nd_experimentprop ep ON ep.nd_experiment_id = e.nd_experiment_id "
-			+ "WHERE ep.type_id = :variableId AND ep.value IS NOT NULL";
+		+ "FROM nd_experiment e INNER JOIN nd_experimentprop ep ON ep.nd_experiment_id = e.nd_experiment_id "
+		+ "WHERE ep.type_id = :variableId AND ep.value IS NOT NULL";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK = "SELECT count(e.nd_experiment_id) "
-			+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id "
-			+ "WHERE ("+ TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR ("+ TermId.GID.getId() +" = :variableId AND s.dbxref_id IS NOT NULL) "
-			+ "OR ("+TermId.DESIG.getId()+" = :variableId AND s.name IS NOT NULL) OR ("+TermId.ENTRY_CODE.getId()+" = :variableId AND s.value IS NOT NULL)";
+		+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id "
+		+ "WHERE (" + TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR (" + TermId.GID.getId()
+		+ " = :variableId AND s.dbxref_id IS NOT NULL) "
+		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND s.name IS NOT NULL) OR (" + TermId.ENTRY_CODE.getId()
+		+ " = :variableId AND s.value IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(e.nd_experiment_id) "
-			+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id "
-			+ "WHERE sp.type_id = :variableId AND sp.value IS NOT NULL";
+		+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id "
+		+ "WHERE sp.type_id = :variableId AND sp.value IS NOT NULL";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE = "SELECT count(e.nd_experiment_id) "
-			+ "FROM nd_experiment e  INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id "
-			+ "AND p.observable_id = :variableId AND (p.value IS NOT NULL  OR p.cvalue_id IS NOT NULL)";
+		+ "FROM nd_experiment e  INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id "
+		+ "AND p.observable_id = :variableId AND (p.value IS NOT NULL  OR p.cvalue_id IS NOT NULL)";
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
+
 	static {
 		geolocSpecialFactorsMap.put("SITE_LAT", "gl.latitude");
 		geolocSpecialFactorsMap.put("SITE_LONG", "gl.longitude");
@@ -147,7 +148,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error at getExperimentIdsByGeolocationIds=" + geolocationIds + " query at ExperimentDao: " + e.getMessage();
+			final String message =
+				"Error at getExperimentIdsByGeolocationIds=" + geolocationIds + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -165,7 +167,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String message = "Error at getExperimentByProjectIdAndLocation=" + projectId + "," + locationId
-					+ " query at ExperimentDao: " + e.getMessage();
+				+ " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -189,10 +191,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public boolean hasFieldmap(final int datasetId) {
 		try {
 			final String sql =
-					"SELECT COUNT(eprop.value) " + " FROM nd_experiment ep "
-							+ " INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = ep.nd_experiment_id "
-							+ "    AND eprop.type_id = " + TermId.RANGE_NO.getId() + " AND eprop.value <> '' " + " WHERE ep.project_id = "
-							+ datasetId + "  LIMIT 1 ";
+				"SELECT COUNT(eprop.value) " + " FROM nd_experiment ep "
+					+ " INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = ep.nd_experiment_id "
+					+ "    AND eprop.type_id = " + TermId.RANGE_NO.getId() + " AND eprop.value <> '' " + " WHERE ep.project_id = "
+					+ datasetId + "  LIMIT 1 ";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			final BigInteger count = (BigInteger) query.uniqueResult();
 			return count != null && count.longValue() > 0;
@@ -209,11 +211,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<Integer> getLocationIdsOfStudy(final int studyId) {
 		try {
 			final String sql =
-					"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
-							+ " INNER JOIN project_relationship pr ON pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-							+ "   AND pr.object_project_id = " + studyId + "   AND pr.subject_project_id = e.project_id ";
+				"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
+					+ " INNER JOIN project p ON p.project_id = e.project_id "
+					+ " WHERE p.study_id = :studyId ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("studyId", studyId);
 			return query.list();
 
 		} catch (final HibernateException e) {
@@ -227,13 +230,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public List<Integer> getLocationIdsOfStudyWithFieldmap(final int studyId) {
 		try {
 			final String sql =
-					"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
-							+ " INNER JOIN project_relationship pr ON pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-							+ "   AND pr.object_project_id = " + studyId + "   AND pr.subject_project_id = e.project_id "
-							+ " WHERE EXISTS (SELECT 1 FROM nd_experimentprop eprop " + "   WHERE eprop.type_id = "
-							+ TermId.COLUMN_NO.getId() + "     AND eprop.nd_experiment_id = e.nd_experiment_id  AND eprop.value <> '') ";
+				"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
+					+ " INNER JOIN project p ON p.project_id = e.project_id "
+					+ " WHERE p.study_id = :studyId "
+					+ " AND EXISTS (SELECT 1 FROM nd_experimentprop eprop " + "   WHERE eprop.type_id = "
+					+ TermId.COLUMN_NO.getId() + "     AND eprop.nd_experiment_id = e.nd_experiment_id  AND eprop.value <> '') ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("studyId", studyId);
 			return query.list();
 
 		} catch (final HibernateException e) {
@@ -281,7 +285,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// statement
 			this.getSession().flush();
 
-		  // Delete phenotypes first because the foreign key with nd_experiment
+			// Delete phenotypes first because the foreign key with nd_experiment
 			Query statement =
 				this.getSession()
 					.createSQLQuery("DELETE pheno FROM nd_experiment e"
@@ -346,8 +350,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		try {
 			final String sql =
-					"SELECT count(*) FROM nd_experiment exp "
-							+ "WHERE exp.nd_geolocation_id in (:locationIds) " + "AND exp.project_id = :dataSetId ";
+				"SELECT count(*) FROM nd_experiment exp "
+					+ "WHERE exp.nd_geolocation_id in (:locationIds) " + "AND exp.project_id = :dataSetId ";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("locationIds", locationIds);
@@ -363,7 +367,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error at checkIfLocationIDsExistInExperiments=" + locationIds + "," + dataSetId + ","
-					+ " query at ExperimentDao: " + e.getMessage();
+				+ " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -419,7 +423,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ExperimentModel> getExperiments(final int projectId, final List<TermId> types, final int start, final int numOfRows, final boolean firstInstance) {
+	public List<ExperimentModel> getExperiments(final int projectId, final List<TermId> types, final int start, final int numOfRows,
+		final boolean firstInstance) {
 		try {
 
 			final List<Integer> lists = new ArrayList<>();
@@ -433,7 +438,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
 			queryString.append("left outer join exp.stock as st ");
 			queryString.append("where exp.project.projectId =:p_id and exp.typeId in (:type_ids) ");
-			if(firstInstance) {
+			if (firstInstance) {
 				queryString.append("and exp.geoLocation.description = 1 ");
 			}
 			queryString.append("order by (exp.geoLocation.description * 1) ASC, ");
@@ -459,7 +464,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public long count(final int dataSetId) {
 		try {
 			return (Long) this.getSession().createQuery("select count(*) from ExperimentModel where project_id = " + dataSetId)
-					.uniqueResult();
+				.uniqueResult();
 		} catch (final HibernateException e) {
 			final String message = "Error at countExperiments=" + dataSetId;
 			ExperimentDao.LOG.error(message, e);
@@ -470,10 +475,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public int getExperimentIdByLocationIdStockId(final int projectId, final Integer locationId, final Integer stockId) {
 		try {
 			final String sql =
-					"SELECT exp.nd_experiment_id " + "FROM nd_experiment exp "
-							+ " WHERE exp.project_id = " + projectId
-							+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND exp.stock_id = "
-							+ stockId;
+				"SELECT exp.nd_experiment_id " + "FROM nd_experiment exp "
+					+ " WHERE exp.project_id = " + projectId
+					+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND exp.stock_id = "
+					+ stockId;
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
 			final Integer returnVal = (Integer) statement.uniqueResult();
@@ -511,7 +516,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByStockIds(final Collection<Integer> stockIds) {
 		try {
@@ -543,7 +548,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 
 		final String sql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id " + "FROM nd_experiment e "
-				+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) ";
+			+ "     INNER JOIN stock s ON e.stock_id = s.stock_id AND s.dbxref_id IN (:gids) ";
 		final StringBuilder sb = new StringBuilder();
 		sb.append(sql);
 		if (programUUID != null) {
@@ -570,7 +575,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		} catch (final HibernateException e) {
 			final String error = "Error at getEnvironmentsOfGermplasms(programUUID=" + programUUID + " ,gids=" + gids
-					+ ") query on ExperimentDao: " + e.getMessage();
+				+ ") query on ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(error);
 			throw new MiddlewareQueryException(error, e);
 		}
@@ -583,7 +588,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(DISTINCT e.stock_id) FROM nd_experiment e ")
-				.append(" WHERE e.project_id = :datasetId");
+			.append(" WHERE e.project_id = :datasetId");
 
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
@@ -597,7 +602,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(error, e);
 		}
 	}
-	
+
 	public boolean isValidExperiment(final Integer projectId, final Integer experimentId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("project.projectId", projectId));
@@ -606,7 +611,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final Integer id = (Integer) criteria.uniqueResult();
 		return id != null;
 	}
-	
+
 	public boolean areAllInstancesExistInDataset(final int datasetId, final Set<Integer> instanceIds) {
 
 		final StringBuilder sql = new StringBuilder();
@@ -631,7 +636,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private String getObservationUnitTableQuery(
-			final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
+		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName) {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
@@ -703,9 +708,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final String envFactorFormat =
 				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s',  ";
 			final String geolocEnvFactorFormat =
-					" %s AS '%s',  ";
+				" %s AS '%s',  ";
 			for (final String envFactor : searchDto.getEnvironmentDetails()) {
-				if(geolocSpecialFactorsMap.containsKey(envFactor)) {
+				if (geolocSpecialFactorsMap.containsKey(envFactor)) {
 					final String column = geolocSpecialFactorsMap.get(envFactor);
 					sql.append(String.format(geolocEnvFactorFormat, column, envFactor));
 				} else {
@@ -713,7 +718,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				}
 			}
 		}
-
 
 		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
 			final String envConditionFormat =
@@ -729,8 +733,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		sql.append("nde.observation_unit_no AS OBSERVATION_UNIT_NO, ");
 		sql.append(" 1=1 FROM " //
 			+ "	project p " //
-			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id " //
-			+ "	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id " //
+			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
@@ -788,7 +791,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private void addFilters(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter, final Boolean draftMode) {
-		
+
 		if (filter == null) {
 			return;
 		}
@@ -803,38 +806,43 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		if (Boolean.TRUE.equals(filter.getByOutOfBound())) {
 			sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id " //
-					+ "      from cvterm_relationship cvtrscale " //
-					+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id " //
-					+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = " + TermId.HAS_TYPE.getId()
-					+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
-					+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId()
-					+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = " + TermId.MIN_VALUE.getId()
-					+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
-					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-					+ "           inner join project p2 on nde2.project_id = p2.project_id " //
-					+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid " //
-					+ "      where ph2." + filterByDraftOrValue + " is not null  and ph2." + filterByDraftOrValue + "!= 'missing'" //
-					+ filterByVariableSQL
-					+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
-					+ "        and case " //
-					+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId() //
+				+ "      from cvterm_relationship cvtrscale " //
+				+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id " //
+				+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = "
+				+ TermId.HAS_TYPE.getId()
+				+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id " //
+				+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = "
+				+ TermId.MAX_VALUE.getId()
+				+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = "
+				+ TermId.MIN_VALUE.getId()
+				+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id " //
+				+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+				+ "           inner join project p2 on nde2.project_id = p2.project_id " //
+				+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid " //
+				+ "      where ph2." + filterByDraftOrValue + " is not null  and ph2." + filterByDraftOrValue + "!= 'missing'" //
+				+ filterByVariableSQL
+				+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId() //
+				+ "        and case " //
+				+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId() //
 					/* get the categoricals whose value != category value (out-of-bound)
 					in other words, the set where ph.value = category value NOT exists*/
-					+ "          then not exists( " //
-					+ "          select 1 " //
-					+ "            from cvterm_relationship cvtrcategory " //
-					+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id " //
-					+ "            where scale.cvterm_id = cvtrcategory.subject_id " //
-					+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
-					+ "              and ph2." + filterByDraftOrValue + " = category.name " //
-					+ "          ) " //
-					+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
-					// get the numericals whose value is not within bounds
-					+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue + " > scaleMaxRange.value " //
-					+ "            or ph2." + filterByDraftOrValue + " < vo.expected_min or ph2." + filterByDraftOrValue + " > vo.expected_max " //
-					+ "        else false " //
-					+ "        end " //
-					+ "    )"); //
+				+ "          then not exists( " //
+				+ "          select 1 " //
+				+ "            from cvterm_relationship cvtrcategory " //
+				+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id " //
+				+ "            where scale.cvterm_id = cvtrcategory.subject_id " //
+				+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId() //
+				+ "              and ph2." + filterByDraftOrValue + " = category.name " //
+				+ "          ) " //
+				+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId() //
+				// get the numericals whose value is not within bounds
+				+ "          then ph2." + filterByDraftOrValue + " < scaleMinRange.value or ph2." + filterByDraftOrValue
+				+ " > scaleMaxRange.value " //
+				+ "            or ph2." + filterByDraftOrValue + " < vo.expected_min or ph2." + filterByDraftOrValue + " > vo.expected_max "
+				//
+				+ "        else false " //
+				+ "        end " //
+				+ "    )"); //
 		}
 
 		if (filter.getFilteredValues() != null && !filter.getFilteredValues().isEmpty()) {
@@ -871,19 +879,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 						+ "    and ph2." + filterByDraftOrValue + " like '%" //
 						+ filter.getFilteredTextValues().get(observationId) //
 						+ "%')" //
-					);
+				);
 			}
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOverwritten())) {
 			sql.append(
-					" and nde.nd_experiment_id in ( " //
-						+ "    select ph2.nd_experiment_id " //
-						+ "    from phenotype ph2 " //
-						+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
-						+ "    where nde2.project_id = p.project_id " //
-						+ filterByVariableSQL
-						+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
+				" and nde.nd_experiment_id in ( " //
+					+ "    select ph2.nd_experiment_id " //
+					+ "    from phenotype ph2 " //
+					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
+					+ "    where nde2.project_id = p.project_id " //
+					+ filterByVariableSQL
+					+ "    and ph2.value is not null and ph2.draft_value is not null )"); //
 		}
 
 		if (Boolean.TRUE.equals(filter.getByOutOfSync())) {
@@ -894,7 +902,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "    where nde2.project_id = p.project_id " //
 					+ filterByVariableSQL
-					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )" ); //
+					+ "    and ph2.status = '" + Phenotype.ValueStatus.OUT_OF_SYNC.getName() + "' )"); //
 		}
 
 		if (Boolean.TRUE.equals(filter.getByMissing())) {
@@ -906,7 +914,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id " //
 					+ "    where nde2.project_id = p.project_id " //
 					+ filterByVariableSQL
-					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )" ); //
+					+ "    and ph2.value =  '" + Phenotype.MISSING_VALUE + "' )"); //
 		}
 	}
 
@@ -954,7 +962,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		query.addScalar(OBSERVATION_UNIT_NO);
 		return query;
 	}
-
 
 	private void addScalar(final SQLQuery createSQLQuery) {
 		createSQLQuery.addScalar(ExperimentDao.OBSERVATION_UNIT_ID);
@@ -1062,12 +1069,13 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		Preconditions.checkNotNull(filter.getVariableId());
 
 		try {
-			final StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits, count(distinct(gl.nd_geolocation_id)) as totalInstances from " //
-				+ "nd_experiment nde " //
-				+ "    inner join project p on p.project_id = nde.project_id " //
-				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
-				+ " where " //
-				+ "	p.project_id = :datasetId ");
+			final StringBuilder sql = new StringBuilder(
+				"select count(*) as totalObservationUnits, count(distinct(gl.nd_geolocation_id)) as totalInstances from " //
+					+ "nd_experiment nde " //
+					+ "    inner join project p on p.project_id = nde.project_id " //
+					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
+					+ " where " //
+					+ "	p.project_id = :datasetId ");
 
 			if (observationUnitsSearchDTO.getInstanceId() != null) {
 				sql.append(" and gl.nd_geolocation_id = :instanceId ");
@@ -1101,7 +1109,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 			final Object[] result = (Object[]) query.uniqueResult();
 
-			final FilteredPhenotypesInstancesCountDTO response = new FilteredPhenotypesInstancesCountDTO((Integer) result[0], (Integer) result[1]);
+			final FilteredPhenotypesInstancesCountDTO response =
+				new FilteredPhenotypesInstancesCountDTO((Integer) result[0], (Integer) result[1]);
 
 			return response;
 
@@ -1121,7 +1130,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			final String message =
-					"Error at getObservationUnits=" + projectId + "," + instanceIds + " query at ExperimentDao: " + e.getMessage();
+				"Error at getObservationUnits=" + projectId + "," + instanceIds + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1141,16 +1150,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		final List<MeasurementVariable> measurementVariables, final List<String> observationUnitIds) {
 
 		final Function<MeasurementVariable, MeasurementVariableDto> measurementVariableFullToDto =
-				new Function<MeasurementVariable,MeasurementVariableDto>() {
-					public MeasurementVariableDto apply(final MeasurementVariable i) { return new MeasurementVariableDto(i.getTermId(), i.getName()); }
-				};
+			new Function<MeasurementVariable, MeasurementVariableDto>() {
+
+				public MeasurementVariableDto apply(final MeasurementVariable i) {
+					return new MeasurementVariableDto(i.getTermId(), i.getName());
+				}
+			};
 
 		final List<MeasurementVariableDto> measurementVariableDtos = Lists.transform(measurementVariables, measurementVariableFullToDto);
 
 		try {
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				datasetId,
-					measurementVariableDtos, observationUnitIds);
+				measurementVariableDtos, observationUnitIds);
 			return this.mapResultsToMap(results, measurementVariableDtos);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -1232,7 +1244,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO params, final String observationVariableName) {
+	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO params,
+		final String observationVariableName) {
 		try {
 
 			final String observationUnitTableQuery = this.getObservationUnitTableQuery(params, observationVariableName);
@@ -1243,7 +1256,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				query.setParameter("instanceId", String.valueOf(params.getInstanceId()));
 			}
 
-			if(!CollectionUtils.isEmpty(params.getEnvironmentConditions())){
+			if (!CollectionUtils.isEmpty(params.getEnvironmentConditions())) {
 				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
 			}
 
@@ -1275,7 +1288,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
 
-
 				final Map<String, ObservationUnitData> variables = new HashMap<>();
 
 				for (final MeasurementVariableDto variable : selectionMethodsAndTraits) {
@@ -1304,7 +1316,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	}
 
 	private List<ObservationUnitRow> mapResults(final List<Map<String, Object>> results, final ObservationUnitsSearchDTO searchDto,
-			final String observationVariableName) {
+		final String observationVariableName) {
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 
 		if (results != null && !results.isEmpty()) {
@@ -1361,8 +1373,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		variables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
 		variables.put(FIELD_MAP_COLUMN, new ObservationUnitData((String) row.get(FIELD_MAP_COLUMN)));
 		variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
-		variables.put(LOCATION_ID,  new ObservationUnitData((String) row.get(LOCATION_ID)));
-		variables.put(EXPT_DESIGN,  new ObservationUnitData((String) row.get(EXPT_DESIGN)));
+		variables.put(LOCATION_ID, new ObservationUnitData((String) row.get(LOCATION_ID)));
+		variables.put(EXPT_DESIGN, new ObservationUnitData((String) row.get(EXPT_DESIGN)));
 		variables.put(
 			observationVariableName,
 			new ObservationUnitData(((Integer) row.get(OBSERVATION_UNIT_NO)).toString()));
@@ -1403,21 +1415,21 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (VariableType.STUDY_DETAIL.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP;
 			} else if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId || TermId.LATITUDE.getId() == variableId
-					|| TermId.LONGITUDE.getId() == variableId || TermId.GEODETIC_DATUM.getId() == variableId
-					|| TermId.ALTITUDE.getId() == variableId) {
+				|| TermId.LONGITUDE.getId() == variableId || TermId.GEODETIC_DATUM.getId() == variableId
+				|| TermId.ALTITUDE.getId() == variableId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION;
 			} else if (VariableType.ENVIRONMENT_DETAIL.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP;
 			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId
-					|| VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
+				|| VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP;
 			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId
-					|| TermId.ENTRY_CODE.getId() == variableId) {
+				|| TermId.ENTRY_CODE.getId() == variableId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK;
 			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
 			} else if (VariableType.TRAIT.getId() == variableTypeId || VariableType.ANALYSIS.getId() == variableTypeId
-					|| VariableType.STUDY_CONDITION.getId() == variableTypeId || VariableType.SELECTION_METHOD.getId() == variableTypeId) {
+				|| VariableType.STUDY_CONDITION.getId() == variableTypeId || VariableType.SELECTION_METHOD.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE;
 			}
 
@@ -1436,7 +1448,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public ExperimentModel saveOrUpdate(final ExperimentModel experiment) {
 		try {
@@ -1444,7 +1456,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			super.saveOrUpdate(experiment);
 			return experiment;
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in saveOrUpdate(ExperimentModel): " + experiment + ",  "+ e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in saveOrUpdate(ExperimentModel): " + experiment + ",  " + e.getMessage(), e);
 		}
 	}
 
@@ -1456,7 +1468,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			experiment.setObsUnitId(UUID.randomUUID().toString());
 		}
 	}
-	
+
 	@Override
 	public ExperimentModel save(final ExperimentModel entity) {
 		this.generateObsUnitId(entity);
@@ -1527,8 +1539,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		sql.append(" 1 FROM " //
 			+ "	project p " //
-			+ "	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id " //
-			+ "	INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id " //
+			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //

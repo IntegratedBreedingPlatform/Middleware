@@ -42,7 +42,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.util.DatasetUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
@@ -203,10 +202,10 @@ public class WorkbookSaver extends Saver {
 		int savedEnvironmentsCount = 0;
 		boolean isDeleteTrialObservations = false;
 		if (environmentDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+			environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId());
 		}
 		if (plotDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+			plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		}
 
 		if (environmentDatasetId != null) {
@@ -632,7 +631,7 @@ public class WorkbookSaver extends Saver {
 
 		Integer studyId = null;
 		if (workbook.getStudyDetails() != null) {
-			studyId = this.getStudyId(workbook.getStudyDetails().getStudyName(), programUUID);
+			studyId = this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(workbook.getStudyDetails().getStudyName(), programUUID);
 		}
 
 		if (studyId == null) {
@@ -684,8 +683,6 @@ public class WorkbookSaver extends Saver {
 			if (datasetId == null) {
 				final String studyName = workbook.getStudyDetails().getStudyName();
 				trialName = this.generateTrialDatasetName(studyName);
-				datasetId = this.getDatasetId(trialName, this.generateTrialDatasetName(studyName),
-					programUUID);
 			}
 		}
 
@@ -733,9 +730,6 @@ public class WorkbookSaver extends Saver {
 			if (datasetId == null) {
 				final String studyName = workbook.getStudyDetails().getStudyName();
 				datasetName = this.generatePlotDatasetName(studyName);
-				datasetId =
-					this.getDatasetId(datasetName, this.generatePlotDatasetName(studyName),
-						programUUID);
 			}
 		}
 
@@ -898,22 +892,6 @@ public class WorkbookSaver extends Saver {
 		return newList;
 	}
 
-	private Integer getStudyId(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.IS_STUDY);
-	}
-
-	private Integer getDatasetId(final String name, final String generatedName, final String programUUID) {
-		Integer id = this.getProjectId(name, programUUID, TermId.BELONGS_TO_STUDY);
-		if (id == null && !name.equals(generatedName)) {
-			id = this.getProjectId(generatedName, programUUID, TermId.BELONGS_TO_STUDY);
-		}
-		return id;
-	}
-
-	private Integer getProjectId(final String name, final String programUUID, final TermId relationship) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
-	}
-
 	private Integer getMeansDataset(final Integer studyId) {
 		Integer id = null;
 		final List<DmsProject> datasets = this.getDmsProjectDao()
@@ -925,8 +903,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	/**
-	 * Saves project ontology creating entries in the following tables: project,
-	 * projectprop and project_relationship
+	 * Saves project ontology creating entries in the following tables: project and projectprop tables
 	 *
 	 * @param workbook
 	 * @return study id
@@ -1121,24 +1098,17 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void saveWorkbookVariables(final Workbook workbook) throws ParseException {
-		this.getProjectRelationshipSaver().saveOrUpdateStudyToFolder(
-			workbook.getStudyDetails().getId(),
-			Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
+
+		final int parentFolderId = (int) workbook.getStudyDetails().getParentFolderId();
+
 		final DmsProject study = this.getDmsProjectDao().getById(workbook.getStudyDetails().getId());
+		study.setParent(this.getDmsProjectDao().getById(parentFolderId));
 		Integer trialDatasetId = workbook.getTrialDatasetId();
 		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
-			measurementDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(study.getProjectId(), workbook.getStudyName());
-			final List<DmsProject> datasets =
-				this.getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
-			if (datasets != null) {
-				for (final DmsProject dataset : datasets) {
-					if (!dataset.getProjectId().equals(measurementDatasetId)) {
-						trialDatasetId = dataset.getProjectId();
-						break;
-					}
-				}
-			}
+			final Integer studyId = study.getProjectId();
+			measurementDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
+			trialDatasetId = this.getWorkbookBuilder().getTrialDataSetId(studyId);
 		}
 		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
 		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);
@@ -1154,9 +1124,9 @@ public class WorkbookSaver extends Saver {
 		final String objective = workbook.getStudyDetails().getObjective();
 		final String createdBy = workbook.getStudyDetails().getCreatedBy();
 
-		this.updateStudyDetails(description + DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX, trialDataset, objective);
+		this.updateStudyDetails(description + WorkbookSaver.ENVIRONMENT, trialDataset, objective);
 		this.updateStudyDetails(description, startDate, endDate, study, objective, createdBy);
-		this.updateStudyDetails(description + DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX, measurementDataset, objective);
+		this.updateStudyDetails(description + WorkbookSaver.PLOTDATA, measurementDataset, objective);
 	}
 
 	private void updateStudyDetails(

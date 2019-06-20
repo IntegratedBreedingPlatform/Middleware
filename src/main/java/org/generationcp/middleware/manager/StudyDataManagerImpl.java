@@ -56,7 +56,6 @@ import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFi
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -136,7 +135,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public Integer getStudyIdByNameAndProgramUUID(final String studyName, final String programUUID) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(studyName, programUUID, TermId.IS_STUDY);
+		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(studyName, programUUID);
 	}
 
 	@Override
@@ -156,7 +155,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<DatasetReference> getDatasetReferences(final int studyId) {
-		return this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		return this.getDmsProjectDao().getDirectChildDatasetsOfStudy(studyId);
 	}
 
 	@Override
@@ -354,7 +353,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int datasetId) {
-		final DmsProject study = this.getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
+		final DmsProject study = this.getDmsProjectDao().getById(datasetId).getStudy();
 		return this.getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
 	}
 
@@ -541,7 +540,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public boolean isStudy(final int id) {
-		return this.getProjectRelationshipDao().isSubjectTypeExisting(id, TermId.STUDY_HAS_FOLDER.getId());
+		return this.getDmsProjectDao().getById(id).getStudyType() != null;
 	}
 
 	@Override
@@ -623,7 +622,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean moveDmsProject(final int sourceId, final int targetId, final boolean isAStudy) {
+	public boolean moveDmsProject(final int sourceId, final int targetId) {
 
 		final DmsProject source = this.getDmsProjectDao().getById(sourceId);
 		final DmsProject target = this.getDmsProjectDao().getById(targetId);
@@ -639,19 +638,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Templates can't be moved");
 		}
 
-		try {
+		source.setParent(target);
+		this.getDmsProjectDao().saveOrUpdate(source);
 
-			// disassociate the source project from any parent it had previously
-			this.getProjectRelationshipDao().deleteChildAssociation(sourceId);
-
-			this.getProjectRelationshipSaver().saveProjectParentRelationship(source, targetId, isAStudy);
-
-			return true;
-		} catch (final MiddlewareException e) {
-
-			StudyDataManagerImpl.LOG.error(e.getMessage(), e);
-			return false;
-		}
+		return true;
 	}
 
 	@Override
@@ -673,11 +663,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			// modify the folder label
 			final String name = project.getName() + "#" + Math.random();
 			project.setName(name);
+			project.setDeleted(true);
 			dmsProjectDao.saveOrUpdate(project);
-			this.getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
 
 		} catch (final Exception e) {
-
 			throw new MiddlewareQueryException("Error encountered with deleteEmptyFolder(id=" + id + "): " + e.getMessage(), e);
 		}
 	}
@@ -693,15 +682,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public DmsProject getParentFolder(final int id) {
-
-		final DmsProject folderParentFolder =
-			this.getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
-		final DmsProject studyParentFolder =
-			this.getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
-		if (studyParentFolder != null) {
-			return studyParentFolder;
-		}
-		return folderParentFolder;
+		return this.getDmsProjectDao().getById(id).getParent();
 	}
 
 	@Override
@@ -761,11 +742,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		long count = 0;
 		count += this.getDmsProjectDao().countAllStudyDetails(programUUID);
 		return count;
-	}
-
-	@Override
-	public List<FolderReference> getFolderTree() {
-		return this.getFolderBuilder().buildFolderTree();
 	}
 
 	@Override
@@ -1103,13 +1079,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyMetadata getStudyMetadata(final Integer studyId) {
-		return this.getDmsProjectDao().getStudyMetadata(studyId);
+	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
+		return this.getDmsProjectDao().getStudyMetadataForGeolocationId(geolocationId);
 	}
 
 	@Override
-	public Map<String, String> getGeolocationPropsAndValuesByStudy(final Integer studyId) {
-		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByStudy(studyId);
+	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId) {
+		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId);
 	}
 
 	@Override

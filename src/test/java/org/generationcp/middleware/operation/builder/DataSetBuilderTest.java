@@ -2,14 +2,14 @@
 package org.generationcp.middleware.operation.builder;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DMSVariableTypeTestDataInitializer;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DMSVariableTypeTestDataInitializer;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -48,7 +48,7 @@ public class DataSetBuilderTest {
 	DmsProjectDao dmsProjectDao;
 
 	@Before
-	public void setUp() throws MiddlewareQueryException {
+	public void setUp() {
 
 		this.studyDataManager = Mockito.mock(StudyDataManagerImpl.class);
 		this.dmsProjectDao = Mockito.mock(DmsProjectDao.class);
@@ -65,12 +65,6 @@ public class DataSetBuilderTest {
 		// Inject the mock services into the test class
 		this.dataSetBuilder = new DataSetBuilder(this.hibernateSessionProvider, this.dmsProjectDao, this.studyDataManager);
 
-	}
-
-	@Test
-	public void testGetStudyDataSetByUsingName() {
-		final DmsProject dataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID_WITH_STUDY);
-		Assert.assertEquals("The Study Dataset's project id should be 4", "4", dataset.getProjectId().toString());
 	}
 
 	@Test
