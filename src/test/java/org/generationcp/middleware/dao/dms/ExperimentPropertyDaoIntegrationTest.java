@@ -100,7 +100,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		assertEquals(experimentModel.getNdExperimentId(), fieldMapLabel.getExperimentId());
 		assertNotNull(fieldMapLabel.getObsUnitId());
 		assertEquals(1, fieldMapLabel.getEntryNumber().intValue());
-		assertEquals("Germplasm 1", fieldMapLabel.getGermplasmName());
+		assertEquals(experimentModel.getStock().getName(), fieldMapLabel.getGermplasmName());
 		assertNotNull(fieldMapLabel.getRep());
 		assertNotNull(fieldMapLabel.getBlockNo());
 		assertNotNull(fieldMapLabel.getColumn());
