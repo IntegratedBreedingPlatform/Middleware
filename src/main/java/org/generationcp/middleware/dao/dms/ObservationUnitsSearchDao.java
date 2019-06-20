@@ -60,11 +60,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 
 	static {
-		factorsFilterMap.put("8240", "s.dbxref_id");
-		factorsFilterMap.put("8250", "s.name");
-		factorsFilterMap.put("8230", "s.uniquename");
-		factorsFilterMap.put("8300", "s.value");
-		factorsFilterMap.put("8170", "gl.description");
+		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
+		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "s.name");
+		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
+		factorsFilterMap.put(String.valueOf(TermId.ENTRY_CODE.getId()), "s.value");
+		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "gl.description");
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID, "EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
 	}
 
