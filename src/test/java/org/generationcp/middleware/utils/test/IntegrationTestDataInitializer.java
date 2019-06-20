@@ -1,5 +1,6 @@
 package org.generationcp.middleware.utils.test;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -172,7 +173,7 @@ public class IntegrationTestDataInitializer {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
 		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
-		stockModel.setName("Germplasm 1");
+		stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 

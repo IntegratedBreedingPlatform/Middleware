@@ -447,7 +447,7 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public String getObservationVariableName(final Integer sampleListId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDatasetOfSampleList(sampleListId);
-		return this.daoFactory.getExperimentDao().getObservationVariableName(datasetDTO.getDatasetId());
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationVariableName(datasetDTO.getDatasetId());
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {

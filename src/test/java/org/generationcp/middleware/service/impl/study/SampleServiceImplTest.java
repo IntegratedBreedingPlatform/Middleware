@@ -60,7 +60,7 @@ public class SampleServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("BUSINESS-KEY-List11", sampleDetailsDTO.getSampleBusinessKey());
 		Assert.assertEquals("FirstName LastName", sampleDetailsDTO.getTakenBy());
 		Assert.assertEquals("SAMPLE-List1:1", sampleDetailsDTO.getSampleName());
-		Assert.assertEquals("Germplasm 1", sampleDetailsDTO.getDesignation());
+		Assert.assertEquals(experimentModel.getStock().getName(), sampleDetailsDTO.getDesignation());
 		Assert.assertEquals(sampleDetailsDTO.getSampleDate(), sampleDetailsDTO.getSampleDate());
 		Assert.assertEquals(1, sampleDetailsDTO.getEntryNo().intValue());
 		Assert.assertEquals(1, sampleDetailsDTO.getPlotNo().intValue());
