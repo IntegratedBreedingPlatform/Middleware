@@ -751,7 +751,7 @@ public interface GermplasmDataManager {
 	List<Location> getAllBreedingLocations();
 
 	/**
-	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix and suffix
+	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix
 	 *
 	 * @param prefix - String used as prefix for Germplasm Names querying
 	 * @return next available sequence number for a germplasm with given prefix

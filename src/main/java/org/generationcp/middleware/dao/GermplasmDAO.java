@@ -887,8 +887,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				final StringBuilder sb = new StringBuilder();
 				sb.append("SELECT CONVERT(REPLACE(UPPER(nval), :prefix, ''), SIGNED)+1 as next_number ");
 
-				// We used LIKE when matching names so as not to do full table scan when using REGEXP matching
-				// We do a second REGEXP matching on the matched records so that only those matching prefix will be parsed
+				// We used LIKE when matching names by prefix
 				sb.append(" FROM ( " + " 	SELECT  distinct nval " + "		FROM names " + "		WHERE names.nval LIKE :prefixLike "
 						+ "   	AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)" + " ) matches ");
 				sb.append(" ORDER BY next_number desc LIMIT 1");
