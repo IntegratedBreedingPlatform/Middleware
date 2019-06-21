@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -36,7 +37,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -147,8 +147,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(subObservationSetId).getParent();
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
@@ -199,8 +198,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(final Integer subObservationSetId) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final DmsProject plotDataset = this.daoFactory.getProjectRelationshipDao()
-			.getObjectBySubjectIdAndTypeId(subObservationSetId, TermId.BELONGS_TO_STUDY.getId());
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(subObservationSetId).getParent();
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(plotDataset.getProjectId(), PLOT_COLUMNS_VARIABLE_TYPES);
@@ -250,7 +248,8 @@ public class DatasetServiceImpl implements DatasetService {
 		subObservationDataset.setLocked(false);
 		subObservationDataset.setProperties(projectProperties);
 		subObservationDataset.setDatasetType(new DatasetType(datasetTypeId));
-		subObservationDataset.setRelatedTos(this.buildProjectRelationships(parentDataset, subObservationDataset));
+		subObservationDataset.setParent(parentDataset);
+		subObservationDataset.setStudy(study);
 
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().save(subObservationDataset);
 
@@ -328,19 +327,6 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new MiddlewareException("Specified type does not match with the list of types associated to the variable");
 		}
 		return new ProjectProperty(dmsProject, typeId, value, rank, variableId, (alias == null) ? variable.getName() : alias);
-	}
-
-	private List<ProjectRelationship> buildProjectRelationships(final DmsProject parentDataset, final DmsProject childDataset)
-		throws MiddlewareQueryException {
-		final ProjectRelationship relationship = new ProjectRelationship();
-		relationship.setSubjectProject(childDataset);
-		relationship.setObjectProject(parentDataset);
-		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-
-		final List<ProjectRelationship> relationships = new ArrayList<>();
-		relationships.add(relationship);
-
-		return relationships;
 	}
 
 	@Override
@@ -516,13 +502,16 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
-		return this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
+		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 	}
 
 	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 		if (searchDTO.getSortedRequest() != null && searchDTO.getSortedRequest().getSortBy() != null) {
-			searchDTO.getSortedRequest()
-				.setSortBy(this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy())).getName());
+			final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(searchDTO.getSortedRequest().getSortBy()));
+			if (term != null) {
+				searchDTO.getSortedRequest()
+					.setSortBy(term.getName());
+			}
 		}
 
 		searchDTO.setDatasetId(datasetId);
@@ -552,7 +541,7 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 
-		final List<ObservationUnitRow> observationUnits = this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
+		final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
 		return observationUnits;
@@ -593,14 +582,14 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Integer countAllObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.daoFactory.getExperimentDao().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
 	}
 
 	@Override
 	public long countFilteredObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
-		return this.daoFactory.getExperimentDao().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
 	}
 
 	@Override
@@ -797,7 +786,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.fillSearchDTO(studyId, datasetId, searchDTO);
 
 		final List<ObservationUnitRow> observationUnitsByVariable =
-			this.daoFactory.getExperimentDao().getObservationUnitsByVariable(searchDTO);
+			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(searchDTO);
 
 		if (!observationUnitsByVariable.isEmpty()) {
 
@@ -834,7 +823,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
 		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
 		final List<ObservationUnitRow> observationUnitsByVariable =
-			this.daoFactory.getExperimentDao().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
+			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
 
 		if (!observationUnitsByVariable.isEmpty()) {
 
@@ -1027,7 +1016,7 @@ public class DatasetServiceImpl implements DatasetService {
 			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
 
-			final List<ObservationUnitRow> observationUnits = this.daoFactory.getExperimentDao().getObservationUnitTable(searchDTO);
+			final List<ObservationUnitRow> observationUnits = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO);
 			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 			instanceMap.put(instanceId, observationUnits);
 		}
@@ -1189,6 +1178,6 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
 		final Integer datasetId, final ObservationUnitsSearchDTO filter) {
-		return this.daoFactory.getExperimentDao().countFilteredInstancesAndPhenotypes(datasetId, filter);
+		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, filter);
 	}
 }

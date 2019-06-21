@@ -6,6 +6,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.jdbc.util.BasicFormatterImpl;
 import org.junit.Assert;
@@ -66,12 +68,13 @@ public class ObservationQueryTest {
 		final String sql = "SELECT \n" + "    nde.nd_experiment_id as nd_experiment_id,\n"
 				+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value"
 				+ " as value, s.dbxref_id as gid"
-				+ " FROM \n" + "    project p \n" + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
-				+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
+				+ " FROM \n" + "    project p \n"
+				+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 				+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 				+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 				+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
-				+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + " WHERE \n"
+				+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+				+ " WHERE \n"
 				+ "\tp.project_id = :datasetId \n" + " AND gl.description IN (:instanceIds) \n"
 				+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 		assertEquals("The generated query must match the expected query.", this.formatString(sql),
@@ -118,13 +121,12 @@ public class ObservationQueryTest {
 				+ "   (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '" + ObservationQueryTest.FACT1 + "') '" + ObservationQueryTest.FACT1 + "', \n"
 				+ " 1=1 FROM \n"
 				+ "    project p \n"
-				+ "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
-				+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
+				+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 				+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 				+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 				+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
-					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
+					+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() +  " \n"
 				+ "		AND gl.nd_geolocation_id = :instanceId \n"
 				+ " GROUP BY nde.nd_experiment_id "
 				+ " ORDER BY (1*PLOT_NO) asc ";
@@ -155,13 +157,12 @@ public class ObservationQueryTest {
 				+ "   (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '" + ObservationQueryTest.FACT1 + "') '" + ObservationQueryTest.FACT1 + "', \n"
 				+ " 1=1 FROM \n"
 				+ "    project p \n"
-				+ "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
-				+ "        INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id \n"
+				+ "        INNER JOIN nd_experiment nde ON nde.project_id = p.project_id \n"
 				+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 				+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 				+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
 				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id"
-				+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
+				+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 				+ "		AND nde.nd_experiment_id=:experiment_id \n"
 				+ " GROUP BY nde.nd_experiment_id ";
 

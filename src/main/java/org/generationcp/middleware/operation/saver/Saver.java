@@ -59,10 +59,6 @@ public class Saver extends DatabaseBroker {
 		return new ProjectPropertySaver(this.sessionProvider);
 	}
 
-	protected final ProjectRelationshipSaver getProjectRelationshipSaver() {
-		return new ProjectRelationshipSaver(this.sessionProvider);
-	}
-
 	protected final GeolocationSaver getGeolocationSaver() {
 		return new GeolocationSaver(this.sessionProvider);
 	}

@@ -71,7 +71,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 	private static final String LOCATION_ID_DOESNT_EXISTS = "error.location.id.doesnt.exists";
-	public static final int NURSERY_STUDY_TYPE_ID = 1;
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
 
@@ -201,7 +200,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<>();
 
-		final Set<Integer> conditionsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getConditions());
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
 
@@ -428,7 +426,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * Remove obsolete variables in specified measuremnt variable list. Returns
 	 * the list of all obsolete variable names that are removed.
 	 *
-	 * @param workbook
+	 * @param measurementVariables
 	 * @param programUUID
 	 * @return
 	 */
@@ -597,7 +595,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		throws WorkbookParserException {
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
-		final String locationDescription = this.getLocationDescription(workbook, programUUID);
+		final String locationDescription = this.getLocationDescription(workbook);
 		final Integer locationId = this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, locationDescription, programUUID);
 
 		// same location and study
@@ -605,8 +603,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 		} else {
 			final boolean isExisting = this.checkIfProjectNameIsExistingInProgram(studyName, programUUID);
-			// existing and is study or folder.
-			if (isExisting && (this.isStudy(studyName, programUUID) || this.isFolder(studyName, programUUID))) {
+			if (isExisting) {
 				messages.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_STUDY_NAME));
 			}
 			// else we will create a new study or append the data sets to the
@@ -659,9 +656,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private void checkForDuplicatePSMCombo(final Workbook workbook, final List<Message> messages) throws WorkbookParserException {
-		Map<String, List<MeasurementVariable>> stdVarMap = this.checkForDuplicates(workbook.getNonVariateVariables(), false);
+		Map<String, List<MeasurementVariable>> stdVarMap = this.checkForDuplicates(workbook.getNonVariateVariables());
 		this.addErrorForDuplicates(messages, stdVarMap);
-		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables(), true);
+		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables());
 		this.addErrorForDuplicates(messages, stdVarMap);
 		if (!messages.isEmpty()) {
 			throw new WorkbookParserException(messages);
@@ -669,15 +666,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private void checkForDuplicatePSMCombo(final Workbook workbook, final Map<String, List<Message>> errors) {
-		Map<String, List<MeasurementVariable>> stdVarMap = this.checkForDuplicates(workbook.getNonVariateVariables(), false);
+		Map<String, List<MeasurementVariable>> stdVarMap = this.checkForDuplicates(workbook.getNonVariateVariables());
 		this.addErrorForDuplicates(errors, stdVarMap);
-		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables(), true);
+		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables());
 		this.addErrorForDuplicates(errors, stdVarMap);
 	}
 
 	private Map<String, List<MeasurementVariable>> checkForDuplicates(
-		final List<MeasurementVariable> workbookVariables,
-		final boolean isVariate) {
+		final List<MeasurementVariable> workbookVariables) {
 		final Map<String, List<MeasurementVariable>> stdVarMap = new LinkedHashMap<>();
 		for (final MeasurementVariable measurementVariable : workbookVariables) {
 			// need to retrieve standard variable because of synonyms
@@ -757,7 +753,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	// for single location
-	private String getLocationDescription(final Workbook workbook, final String programUUID) {
+	private String getLocationDescription(final Workbook workbook) {
 
 		// check if single location
 		// it means the location is defined in the description sheet)
@@ -774,18 +770,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 
 		return "1";
-	}
-
-	private boolean isStudy(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.IS_STUDY) != null;
-	}
-
-	private boolean isFolder(final String name, final String programUUID) {
-		return this.getProjectId(name, programUUID, TermId.HAS_PARENT_FOLDER) != null;
-	}
-
-	private Integer getProjectId(final String name, final String programUUID, final TermId relationship) {
-		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
 	}
 
 	Set<Integer> getTermIdsOfMeasurementVariables(final List<MeasurementVariable> measurementVariables) {
@@ -852,7 +836,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * MeasurementVariable to true.
 	 *
 	 * @param termId
-	 * @param ontology
 	 * @param list
 	 */
 	void setRequiredField(final int termId, final List<MeasurementVariable> list) {
@@ -888,7 +871,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * Returns true if the gids in the list are all existing records in the
 	 * database.
 	 *
-	 * @param germplasmDataManager
 	 * @param gids
 	 * @return
 	 */
@@ -925,7 +907,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	/**
 	 * Gets a list of gids extracted from observation.
 	 *
-	 * @param workbook
 	 * @return
 	 */
 	Set<Integer> extractGidsFromObservations(final String gidLabel, final List<MeasurementRow> observations) {
@@ -1137,13 +1118,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	public int getMaxRowLimit() {
-		return this.maxRowLimit;
+		return maxRowLimit;
 	}
 
-	public void setMaxRowLimit(final int value) {
-
-		if (value > 0) {
-			this.maxRowLimit = value;
-		}
+	public void setMaxRowLimit(final int maxRowLimit) {
+		this.maxRowLimit = maxRowLimit;
 	}
 }

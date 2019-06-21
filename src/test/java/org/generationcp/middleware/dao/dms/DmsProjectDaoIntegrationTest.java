@@ -1,6 +1,8 @@
 package org.generationcp.middleware.dao.dms;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -14,6 +16,8 @@ import org.generationcp.middleware.data.initializer.SampleListTestDataInitialize
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -27,8 +31,9 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,6 +45,7 @@ import java.util.UUID;
 public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 	private static final int NO_OF_GERMPLASM = 5;
+	public static final int STUDY_TYPE_ID = 6;
 
 	private ExperimentPropertyDao experimentPropertyDao;
 
@@ -54,8 +60,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	private GermplasmDAO germplasmDao;
 
 	private DmsProjectDao dmsProjectDao;
-
-	private ProjectRelationshipDao projectRelationshipDao;
 
 	private PersonDAO personDao;
 
@@ -102,11 +106,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 		}
 
-		if (this.projectRelationshipDao == null) {
-			this.projectRelationshipDao = new ProjectRelationshipDao();
-			this.projectRelationshipDao.setSession(this.sessionProvder.getSession());
-		}
-
 		if (this.personDao == null) {
 			this.personDao = new PersonDAO();
 			this.personDao.setSession(this.sessionProvder.getSession());
@@ -128,10 +127,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.study == null) {
-			this.study = new DmsProject();
-			this.study.setName("Test Project");
-			this.study.setDescription("Test Project");
-			this.dmsProjectDao.save(this.study);
+			this.study = this.createProject("Study " + UUID.randomUUID().toString(), UUID.randomUUID().toString());
 		}
 	}
 
@@ -175,9 +171,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();
 
-		final DmsProject study = this.createStudy(studyName, programUUID);
-		final DmsProject plot = this.createDataset(studyName + " - Plot Dataset", programUUID, DatasetTypeEnum.PLOT_DATA.getId());
-		this.createProjectRelationship(study, plot);
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject plot = this.createDataset(studyName + " - Plot Dataset", programUUID, DatasetTypeEnum.PLOT_DATA.getId(), study, study);
 
 		final List<DmsProject> resultPlot = this.dmsProjectDao.getDatasetsByTypeForStudy(study.getProjectId(), DatasetTypeEnum.PLOT_DATA.getId());
 		Assert.assertEquals(1, resultPlot.size());
@@ -195,9 +190,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();
 
-		final DmsProject study = this.createStudy(studyName, programUUID);
-		final DmsProject summary = this.createDataset(studyName + " - Summary Dataset", programUUID, DatasetTypeEnum.SUMMARY_DATA.getId());
-		this.createProjectRelationship(study, summary);
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject summary = this.createDataset(studyName + " - Summary Dataset", programUUID, DatasetTypeEnum.SUMMARY_DATA.getId(), study, study);
 
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription("1");
@@ -222,9 +216,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();
 
-		final DmsProject study = this.createStudy(studyName, programUUID);
-		final DmsProject summary = this.createDataset(studyName + " - Summary Dataset", programUUID, DatasetTypeEnum.SUMMARY_DATA.getId());
-		this.createProjectRelationship(study, summary);
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject summary = this.createDataset(studyName + " - Summary Dataset", programUUID, DatasetTypeEnum.SUMMARY_DATA.getId(), study, study);
 
 		final DatasetDTO retrievedProject = this.dmsProjectDao.getDataset(summary.getProjectId());
 		Assert.assertNotNull(retrievedProject);
@@ -237,9 +230,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();
 
-		final DmsProject study = this.createStudy(studyName, programUUID);
-		final DmsProject summary = this.createDataset(studyName + " - Summary Dataset", programUUID, DatasetTypeEnum.SUMMARY_DATA.getId());
-		this.createProjectRelationship(study, summary);
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject summary = this.createDataset(studyName + " - Summary Dataset", programUUID, DatasetTypeEnum.SUMMARY_DATA.getId(), study, study);
 
 		final List<DatasetDTO> retrievedProject = this.dmsProjectDao.getDatasets(study.getProjectId());
 		Assert.assertFalse(retrievedProject.isEmpty());
@@ -252,9 +244,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();
 
-		final DmsProject study = this.createStudy(studyName, programUUID);
-		final DmsProject plot = this.createDataset(studyName + " - Plot Dataset", programUUID, DatasetTypeEnum.PLOT_DATA.getId());
-		this.createProjectRelationship(study, plot);
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject plot = this.createDataset(studyName + " - Plot Dataset", programUUID, DatasetTypeEnum.PLOT_DATA.getId(), study, study);
 
 		final Person person = PersonTestDataInitializer.createPerson();
 		person.setFirstName("John");
@@ -322,29 +313,113 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(plot.getDatasetType().getDatasetTypeId(), retrievedProject.getDatasetTypeId());
 	}
 
-	private void createProjectRelationship(final DmsProject study, final DmsProject subject) {
-		final ProjectRelationship projectRelationship = new ProjectRelationship();
-		projectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-		projectRelationship.setObjectProject(study);
-		projectRelationship.setSubjectProject(subject);
-		this.projectRelationshipDao.save(projectRelationship);
+	@Test
+	public void testGetAllProgramStudiesAndFolders() {
+		final String studyName = "Study " +  UUID.randomUUID().toString();
+		final String folderName =  "Folder " +  UUID.randomUUID().toString();
+		final String programUUID = UUID.randomUUID().toString();
+
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject folder = this.createProject(folderName, programUUID, false);
+		final List<Integer> list = this.dmsProjectDao.getAllProgramStudiesAndFolders(programUUID);
+		Assert.assertNotNull(list);
+		Assert.assertEquals(2, list.size());
+		Assert.assertTrue(list.contains(study.getProjectId()));
+		Assert.assertTrue(list.contains(folder.getProjectId()));
 	}
 
-	private DmsProject createStudy(final String studyName, final String programUUID) {
-		final DmsProject study = new DmsProject();
-		study.setName(studyName);
-		study.setDescription(studyName);
-		study.setProgramUUID(programUUID);
-		this.dmsProjectDao.save(study);
-		return study;
+	@Test
+	public void testGetDatasetNodesByStudyId() {
+		final String studyName = "Study " +  UUID.randomUUID().toString();
+		final String programUUID = UUID.randomUUID().toString();
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject dataset1 =
+			this.createDataset("Dataset1 of " + studyName, programUUID, DatasetTypeEnum.PLOT_DATA.getId(), study, study);
+		final DmsProject dataset2 =
+			this.createDataset("Dataset2 of " + studyName, programUUID, DatasetTypeEnum.MEANS_DATA.getId(), study, study);
+		final DmsProject subobsDataset =
+			this.createDataset("Subobs Dataset of Dataset 2", programUUID, DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), dataset2, study);
+		final List<DatasetReference> list = this.dmsProjectDao.getDirectChildDatasetsOfStudy(study.getProjectId());
+		Assert.assertNotNull(list);
+		Assert.assertEquals(2, list.size());
+		final List<Integer> idList = Lists.transform(list, new Function<DatasetReference, Integer>() {
+
+			@Override
+			public Integer apply(final DatasetReference dataset) {
+				return dataset.getId();
+			}
+		});
+		Assert.assertTrue(idList.contains(dataset1.getProjectId()));
+		Assert.assertTrue(idList.contains(dataset2.getProjectId()));
+		Assert.assertFalse(idList.contains(subobsDataset.getProjectId()));
 	}
 
-	private DmsProject createDataset(final String studyName, final String programUUID, final int datasetType) {
+	@Test
+	public void testGetStudyDetails() {
+		final StudyDetails studyDetails = this.dmsProjectDao.getStudyDetails(study.getProjectId());
+		Assert.assertEquals(study.getProjectId(), studyDetails.getId());
+		Assert.assertEquals(study.getDescription(), studyDetails.getDescription());
+		Assert.assertEquals(study.getObjective(), studyDetails.getObjective());
+		Assert.assertEquals(study.getStartDate(), studyDetails.getStartDate());
+		Assert.assertEquals(study.getEndDate(), studyDetails.getEndDate());
+		Assert.assertEquals(study.getProgramUUID(), studyDetails.getProgramUUID());
+		Assert.assertEquals(study.getStudyType().getStudyTypeId(), studyDetails.getStudyType().getId());
+		Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID.longValue(), studyDetails.getParentFolderId());
+		Assert.assertFalse(studyDetails.getIsLocked());
+	}
+
+	@Test
+	public void testGetStudyMetadataForGeolocationId() {
+		final DmsProject plot =
+			this.createDataset(this.study.getName() + " - Plot Dataset", this.study.getProgramUUID(), DatasetTypeEnum.PLOT_DATA.getId(),
+				study, study);
+		final Integer locationId = 3;
+		final Integer envId = this.createEnvironmentData(plot, "1", locationId, Optional.<String>absent(), Optional.<Integer>absent());
+		final StudyMetadata studyMetadata = this.dmsProjectDao.getStudyMetadataForGeolocationId(envId);
+		Assert.assertNotNull(studyMetadata);
+		Assert.assertEquals(envId, studyMetadata.getStudyDbId());
+		Assert.assertEquals(locationId, studyMetadata.getLocationId());
+		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getTrialDbId());
+		Assert.assertEquals(this.study.getProjectId(), studyMetadata.getNurseryOrTrialId());
+		Assert.assertEquals(this.study.getName(), studyMetadata.getTrialName());
+		Assert.assertEquals(this.study.getName() + " Environment Number " + 1, studyMetadata.getStudyName());
+		Assert.assertEquals(String.valueOf(STUDY_TYPE_ID), studyMetadata.getStudyType());
+	}
+
+	private DmsProject createProject(final String name, final String programUUID) {
+		return this.createProject(name, programUUID, true);
+	}
+
+	private DmsProject createProject(final String name, final String programUUID, final boolean isStudy) {
+		final DmsProject project = new DmsProject();
+		project.setName(name);
+		project.setDescription(name + RandomStringUtils.randomAlphabetic(20));
+		project.setProgramUUID(programUUID);
+		if (isStudy) {
+			final StudyType studyType = new StudyType();
+			studyType.setStudyTypeId(STUDY_TYPE_ID);
+			project.setStudyType(studyType);
+
+			final DmsProject parent = new DmsProject();
+			parent.setProjectId(DmsProject.SYSTEM_FOLDER_ID);
+			project.setParent(parent);
+
+			project.setObjective(RandomStringUtils.randomAlphabetic(20));
+			project.setStartDate("20190101");
+			project.setEndDate("20190630");
+		}
+		this.dmsProjectDao.save(project);
+		return project;
+	}
+
+	private DmsProject createDataset(final String name, final String programUUID, final int datasetType, final DmsProject parent, final DmsProject study) {
 		final DmsProject dataset = new DmsProject();
-		dataset.setName(studyName);
-		dataset.setDescription(studyName);
+		dataset.setName(name);
+		dataset.setDescription(name);
 		dataset.setProgramUUID(programUUID);
 		dataset.setDatasetType(new DatasetType(datasetType));
+		dataset.setParent(parent);
+		dataset.setStudy(study);
 		this.dmsProjectDao.save(dataset);
 		return dataset;
 	}
@@ -354,24 +429,9 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final String studyName = "Study1";
 		final String programUUID = UUID.randomUUID().toString();
 
-		final DmsProject study = new DmsProject();
-		study.setName(studyName);
-		study.setDescription(studyName);
-		study.setProgramUUID(programUUID);
-		this.dmsProjectDao.save(study);
 
-		final DmsProject summary = new DmsProject();
-		summary.setName(studyName + " - Summary Dataset");
-		summary.setDescription(studyName + " - Summary Dataset");
-		summary.setProgramUUID(programUUID);
-		summary.setDatasetType(new DatasetType(DatasetTypeEnum.SUMMARY_DATA.getId()));
-		this.dmsProjectDao.save(summary);
-
-		final ProjectRelationship projectRelationship = new ProjectRelationship();
-		projectRelationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
-		projectRelationship.setObjectProject(study);
-		projectRelationship.setSubjectProject(summary);
-		this.projectRelationshipDao.save(projectRelationship);
+		final DmsProject study = this.createProject(studyName, programUUID);
+		final DmsProject summary = this.createDataset(studyName, programUUID, DatasetTypeEnum.SUMMARY_DATA.getId(), study, study);
 
 		final List<DatasetDTO> datasets = this.dmsProjectDao.getDatasets(study.getProjectId());
 		Assert.assertEquals(1, datasets.size());
@@ -380,6 +440,11 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Integer createEnvironmentData(
+		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
+		return this.createEnvironmentData(this.study, instanceNumber, locationId, customAbbev, blockId);
+	}
+
+	private Integer createEnvironmentData(final DmsProject project,
 		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(instanceNumber);
@@ -425,9 +490,9 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setGeoLocation(geolocation);
-			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+			experimentModel.setTypeId(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 			experimentModel.setObsUnitId(RandomStringUtils.randomAlphabetic(13));
-			experimentModel.setProject(this.study);
+			experimentModel.setProject(project);
 			experimentModel.setStock(stockModel);
 			this.experimentDao.saveOrUpdate(experimentModel);
 		}

@@ -34,15 +34,23 @@ public class ProjectSaver extends Saver {
 	}
 
 	public DmsProject create(final StudyValues studyValues, final StudyTypeDto studyType, final String description, final String startDate,
-		final String endDate, final String objective, final String name, final String createdBy) throws ParseException {
+		final String endDate, final String objective, final String name, final String createdBy, final int parentId) throws ParseException {
 		DmsProject project = null;
 
 		if (studyValues != null) {
 			final StudyTypeDAO studyTypeDAO = this.getStudyTypeDao();
+			final DmsProject parentProject = this.getDmsProjectDao().getById(parentId);
+
 			project = new DmsProject();
 			project.setName(name);
 			project.setStudyType(studyTypeDAO.getById(studyType.getId()));
 			project.setCreatedBy(createdBy);
+			project.setParent(parentProject);
+
+			if (parentProject.getProjectId().intValue() != DmsProject.SYSTEM_FOLDER_ID) {
+				project.setStudy(parentProject);
+			}
+
 			if (startDate != null && startDate.contains("-")) {
 				project.setStartDate(Util.convertDate(startDate, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT));
 			} else {
@@ -87,20 +95,14 @@ public class ProjectSaver extends Saver {
 	}
 
 	/**
-	 * Saves a folder. Creates an entry in project and project_relationship
+	 * Saves a folder. Creates an entry in project table
 	 */
-	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) throws Exception {
-		DmsProject project = new DmsProject();
+	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) {
+		final DmsProject project = new DmsProject();
 		project.setProgramUUID(programUUID);
+		project.setParent(this.getDmsProjectDao().getById(parentId));
 		this.mapStudytoProject(name, description, project, objective);
-
-		try {
-			project = this.save(project);
-			this.getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, false);
-		} catch (final Exception e) {
-			throw e;
-		}
-		return project;
+		return this.save(project);
 
 	}
 

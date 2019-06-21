@@ -17,7 +17,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
-import org.generationcp.middleware.operation.builder.FolderBuilder;
 import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.NameBuilder;
@@ -47,7 +46,6 @@ import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
 import org.generationcp.middleware.operation.saver.LocdesSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
-import org.generationcp.middleware.operation.saver.ProjectRelationshipSaver;
 import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
@@ -585,10 +583,6 @@ public abstract class DataManager extends DatabaseBroker {
 		return new ProjectSaver(this.sessionProvider);
 	}
 
-	protected final ProjectRelationshipSaver getProjectRelationshipSaver() {
-		return new ProjectRelationshipSaver(this.sessionProvider);
-	}
-
 	protected final ProjectPropertySaver getProjectPropertySaver() {
 		return new ProjectPropertySaver(this.sessionProvider);
 	}
@@ -619,10 +613,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final ListDataPropertySaver getListDataPropertySaver() {
 		return new ListDataPropertySaver(this.sessionProvider);
-	}
-
-	protected final FolderBuilder getFolderBuilder() {
-		return new FolderBuilder(this.sessionProvider);
 	}
 
 	protected final LocdesSaver getLocdesSaver() {

@@ -21,9 +21,9 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
@@ -161,12 +161,6 @@ public class DaoFactory {
 		return projectPropDao;
 	}
 
-	public ProjectRelationshipDao getProjectRelationshipDao() {
-		final ProjectRelationshipDao projectRelationshipDao = new ProjectRelationshipDao();
-		projectRelationshipDao.setSession(this.sessionProvider.getSession());
-		return projectRelationshipDao;
-	}
-
 	public ExperimentDao getExperimentDao() {
 		final ExperimentDao experimentDao = new ExperimentDao();
 		experimentDao.setSession(this.sessionProvider.getSession());
@@ -215,7 +209,12 @@ public class DaoFactory {
 		final SearchRequestDAO brapiSearchDAO = new SearchRequestDAO();
 		brapiSearchDAO.setSession(this.sessionProvider.getSession());
 		return brapiSearchDAO;
+	}
 
+	public ObservationUnitsSearchDao getObservationUnitsSearchDAO() {
+		final ObservationUnitsSearchDao obsUnitsSearchDao = new ObservationUnitsSearchDao();
+		obsUnitsSearchDao.setSession(this.sessionProvider.getSession());
+		return obsUnitsSearchDao;
 	}
 
 	public WorkbenchUserDAO getWorkbenchUserDAO() {
