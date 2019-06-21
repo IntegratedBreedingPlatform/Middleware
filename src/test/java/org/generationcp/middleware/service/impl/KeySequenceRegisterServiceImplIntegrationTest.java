@@ -35,7 +35,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * This test is just an integration test harness that enables testing of the service without worrying about deploying the user interface
  * that calls it in real-life, but still simulating the way the UI calls it. Must disable the auto transaction rollback
  * (@TransactionConfiguration(defaultRollback = false)) in IntegrationTestBase to use this test.
- * 
+ *
  * Intentionally not added to Middleware pom so that it does not run as part of maven builds.
  */
 public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTestBase {
@@ -44,16 +44,16 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	private static final String PREFIX = "QWERTY" + new Random().nextInt();
 	private static final String SUFFIX = "XYZ" + new Random().nextInt();
 	private static final Integer LAST_SEQUENCE_USED = 9;
-	
+
 	@Autowired
 	@Qualifier(value = "IBDBV2_MAIZE_MERGED_SessionFactory")
 	private SessionFactory sessionFactory;
 
 	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
-	
+
 	private KeySequenceRegisterDAO keySequenceRegisterDao;
-	
+
 	@Before
 	public void setup() {
 		final Session session = this.sessionProvder.getSession();
@@ -94,7 +94,7 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		}
 		Assert.assertEquals("Each thread must return a unique sequence.", threads, uniqueSequences.size());
 	}
-	
+
 	@Test
 	public void testGetNextSequence() {
 		final KeySequenceRegister keyRegister = new KeySequenceRegister();
@@ -102,12 +102,12 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		keyRegister.setSuffix(KeySequenceRegisterServiceImplIntegrationTest.SUFFIX);
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
-		
+
 		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
-		final int nextSequence = keySequenceRegisterService.getNextSequence(PREFIX, SUFFIX);
+		final int nextSequence = keySequenceRegisterService.getNextSequence(PREFIX);
 		Assert.assertEquals(LAST_SEQUENCE_USED + 1, nextSequence);
 	}
-	
+
 	@Test
 	public void testSaveLastSequenceUsed() {
 		final KeySequenceRegister keyRegister = new KeySequenceRegister();
@@ -115,11 +115,11 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		keyRegister.setSuffix(KeySequenceRegisterServiceImplIntegrationTest.SUFFIX);
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
-		
+
 		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
 		final Integer newLastSequenceUsed = 51;
 		keySequenceRegisterService.saveLastSequenceUsed(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, KeySequenceRegisterServiceImplIntegrationTest.SUFFIX, newLastSequenceUsed);
-		Assert.assertEquals(newLastSequenceUsed + 1, keySequenceRegisterService.getNextSequence(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, KeySequenceRegisterServiceImplIntegrationTest.SUFFIX));
+		Assert.assertEquals(newLastSequenceUsed + 1, keySequenceRegisterService.getNextSequence(KeySequenceRegisterServiceImplIntegrationTest.PREFIX));
 	}
 
 	/**

@@ -7,6 +7,7 @@ import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
@@ -118,6 +119,9 @@ public class DatasetServiceImplTest {
 	private ExperimentDao experimentDao;
 
 	@Mock
+	private ObservationUnitsSearchDao obsUnitsSearchDao;
+
+	@Mock
 	private MeasurementVariableService measurementVariableService;
 
 	@Mock
@@ -147,6 +151,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
+		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
 	}
 
 	@Test
@@ -493,11 +498,11 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setVariables(variables);
 
 		final List<ObservationUnitRow> testMeasurements = Collections.<ObservationUnitRow>singletonList(observationUnitRow);
-		Mockito.when(this.experimentDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
+		Mockito.when(this.obsUnitsSearchDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		final ObservationUnitsSearchDTO
 			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
 		searchDTO.setSortedRequest(new SortedPageRequest(1, 100, null, null));
-		Mockito.when(this.experimentDao.getObservationUnitTable(searchDTO)).thenReturn(testMeasurements);
+		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO)).thenReturn(testMeasurements);
 
 		Mockito.when(this.mockSession.createSQLQuery(Mockito.anyString())).thenReturn(mockQuery);
 		final List<Map<String, Object>> results = new ArrayList<>();
@@ -582,7 +587,7 @@ public class DatasetServiceImplTest {
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId,Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.experimentDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
+		Mockito.verify(this.obsUnitsSearchDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class));
 
 	}
 
