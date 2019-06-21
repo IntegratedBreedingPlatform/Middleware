@@ -55,8 +55,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
 	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	protected static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
-
-	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 
 	static {
@@ -68,6 +66,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
 			"EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
 	}
+
+	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
 
 	static {
 		geolocSpecialFactorsMap.put("SITE_LAT", "gl.latitude");
@@ -287,12 +287,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	public String getObservationVariableName(final int datasetId) {
-		final SQLQuery query = this.getSession()
-			.createSQLQuery(
-				"SELECT pp.alias AS OBSERVATION_UNIT_NO_NAME FROM projectprop pp INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.type_id WHERE pp.project_id = :datasetId AND cvt.cvterm_id = 1812 ");
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT pp.alias AS OBSERVATION_UNIT_NO_NAME" //
+			+ " FROM projectprop pp" //
+			+ "        INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.type_id" //
+			+ " WHERE pp.project_id = :datasetId  AND cvt.cvterm_id = " + TermId.OBSERVATION_UNIT.getId()
+			+ " LIMIT 1");
 		query.addScalar("OBSERVATION_UNIT_NO_NAME", new StringType());
 		query.setParameter("datasetId", datasetId);
-		return (query.list() != null && !query.list().isEmpty() ? (String) query.list().get(0) : null);
+		final String result = (String) query.uniqueResult();
+		// TODO change type_id of PLOT_NO to OBSERVATION_UNIT
+		if (result == null) {
+			return TermId.PLOT_NO.name();
+		}
+		return result;
 	}
 
 	public List<ObservationUnitRow> getObservationUnitTable(final ObservationUnitsSearchDTO searchDto) {
@@ -309,26 +316,26 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO params,
+	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto,
 		final String observationVariableName) {
 		try {
 
-			final String observationUnitTableQuery = this.getObservationUnitTableQuery(params, observationVariableName);
-			final SQLQuery query = this.createQueryAndAddScalar(params, observationUnitTableQuery);
-			query.setParameter("datasetId", params.getDatasetId());
+			final String observationUnitTableQuery = this.getObservationUnitTableQuery(searchDto, observationVariableName);
+			final SQLQuery query = this.createQueryAndAddScalar(searchDto, observationUnitTableQuery);
+			query.setParameter("datasetId", searchDto.getDatasetId());
 
-			if (params.getInstanceId() != null) {
-				query.setParameter("instanceId", String.valueOf(params.getInstanceId()));
+			if (searchDto.getInstanceId() != null) {
+				query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
 			}
 
-			if (!CollectionUtils.isEmpty(params.getEnvironmentConditions())) {
-				query.setParameter("datasetEnvironmentId", String.valueOf(params.getEnvironmentDatasetId()));
+			if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())){
+				query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
 			}
 
-			addFilteredValueParams(query, params.getFilter());
+			addFilteredValueParams(query, searchDto.getFilter());
 
-			final Integer pageNumber = params.getSortedRequest() != null ? params.getSortedRequest().getPageNumber() : null;
-			final Integer pageSize = params.getSortedRequest() != null ? params.getSortedRequest().getPageSize() : null;
+			final Integer pageNumber = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageNumber() : null;
+			final Integer pageSize = searchDto.getSortedRequest() != null ? searchDto.getSortedRequest().getPageSize() : null;
 			if (pageNumber != null && pageSize != null) {
 				query.setFirstResult(pageSize * (pageNumber - 1));
 				query.setMaxResults(pageSize);
@@ -410,13 +417,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "    s.name DESIGNATION, " //
 			+ "    s.uniquename ENTRY_NO, " //
 			+ "    s.value as ENTRY_CODE, " //
-			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO,  "
-			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO,  "
-			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO,  "
-			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'ROW') ROW,  "
-			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'COL') COL,  "
-			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
-			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = parent.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'ROW') ROW,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'COL') COL,  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  "
+			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
 			+ "    nde.obs_unit_id as OBS_UNIT_ID,  " //
 			+ "    parent.obs_unit_id as PARENT_OBS_UNIT_ID,  " //
 			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id ) 'SUM_OF_SAMPLES',");
@@ -457,7 +464,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (!CollectionUtils.isEmpty(searchDto.getAdditionalDesignFactors())) {
 			final String designFactorClauseFormat =
-				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = parent.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = plot.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
 			for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
 				sql.append(String.format(designFactorClauseFormat, designFactor, designFactor));
 			}
@@ -489,15 +496,21 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 
-		sql.append("nde.observation_unit_no AS OBSERVATION_UNIT_NO, ");
-		sql.append(" 1=1 FROM " //
+		// TODO move PLOT_NO to nd_exp
+		sql.append(" COALESCE(nde.observation_unit_no, ("
+			+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'PLOT_NO' "
+			+ " )) AS OBSERVATION_UNIT_NO ");
+
+		sql.append(" FROM " //
 			+ "	project p " //
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
-			+ "   INNER JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
+			+ " LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
+			// FIXME won't work for sub-sub-obs
+			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " //
 			+ " WHERE p.project_id = :datasetId "); //
 
 		if (searchDto.getInstanceId() != null) {
@@ -893,7 +906,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		variables.put(EXPT_DESIGN, new ObservationUnitData((String) row.get(EXPT_DESIGN)));
 		variables.put(
 			observationVariableName,
-			new ObservationUnitData(((Integer) row.get(OBSERVATION_UNIT_NO)).toString()));
+			new ObservationUnitData((String)row.get(OBSERVATION_UNIT_NO)));
 
 		for (final String gpDesc : searchDto.getGenericGermplasmDescriptors()) {
 			variables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
