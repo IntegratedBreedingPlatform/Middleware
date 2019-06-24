@@ -30,6 +30,15 @@ public enum DatasetTypeEnum {
 		return lookup.get(id);
 	}
 
+	public static Integer getIdByName(final String name) {
+		for( DatasetTypeEnum datasetType : DatasetTypeEnum.values()) {
+			if(StringUtils.equalsIgnoreCase(datasetType.getName(), name)) {
+				return datasetType.getId();
+			}
+		}
+		return 0;
+	}
+
 	private final int id;
 	private final String name;
 
