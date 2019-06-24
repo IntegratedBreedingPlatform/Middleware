@@ -1,6 +1,9 @@
 package org.generationcp.middleware.service.api.user;
 
 import org.generationcp.middleware.domain.workbench.CropDto;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -23,6 +26,22 @@ public class UserRoleDto {
 		this.role = role;
 		this.crop = crop;
 		this.program = program;
+	}
+
+	public UserRoleDto(final UserRole userRole) {
+
+		final CropType cropType = userRole.getCropType();
+		final CropDto cropDto = (cropType != null) ? new CropDto(cropType) : null;
+
+		final Project project = userRole.getWorkbenchProject();
+		final Long projectId = (project != null) ? project.getProjectId() : null;
+		final String projectName = (project != null) ? project.getProjectName() : null;
+		final ProgramDto programDto = (project != null) ? new ProgramDto(projectId, projectName, cropDto) : null;
+
+		this.id = userRole.getId();
+		this.role = new RoleDto(userRole);
+		this.crop = cropDto;
+		this.program = programDto;
 	}
 
 	public Integer getId() {
