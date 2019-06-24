@@ -284,6 +284,13 @@ public interface DatasetService {
 	List<MeasurementVariable> getObservationSetVariables(Integer projectId, List<Integer> variableTypes);
 
 	/**
+	 * Get the list of traits present in all subobsevations under the specified plot dataset
+	 * @param plotDatasetId Id of the plot dataset
+	 * @return List of measurement variables
+	 */
+	List<MeasurementVariable> getAllSubObservationsTraits(Integer plotDatasetId);
+
+	/**
 	 * It will reject all the draft data for a dataset
 	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset

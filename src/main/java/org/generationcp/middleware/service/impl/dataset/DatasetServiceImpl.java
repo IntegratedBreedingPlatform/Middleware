@@ -214,6 +214,23 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public List<MeasurementVariable> getAllSubObservationsTraits(final Integer plotDatasetId) {
+		final Set<Integer> datasetTypeIds = new HashSet<>();
+		datasetTypeIds.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+		datasetTypeIds.add(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
+		datasetTypeIds.add(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId());
+		datasetTypeIds.add(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId());
+
+		final List<DatasetDTO> subobsDatasets = this.getDatasets(plotDatasetId, datasetTypeIds);
+		List<Integer> subobsDatasetIds =  new ArrayList<>();
+		for(DatasetDTO subobsDataset: subobsDatasets) {
+			subobsDatasetIds.add(subobsDataset.getDatasetId());
+		}
+
+		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(subobsDatasetIds, Arrays.asList(VariableType.TRAIT.getId()));
+	}
+
+	@Override
 	public DatasetDTO generateSubObservationDataset(
 		final Integer studyId, final String datasetName, final Integer datasetTypeId,
 		final List<Integer> instanceIds,

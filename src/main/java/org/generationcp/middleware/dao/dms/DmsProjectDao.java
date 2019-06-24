@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -980,6 +981,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId, final List<Integer> variableTypes) {
+		return this.getObservationSetVariables(Arrays.asList(observationSetId), variableTypes);
+	}
+
+	public List<MeasurementVariable> getObservationSetVariables(final List<Integer> observationSetIds, final List<Integer> variableTypes) {
 
 		try {
 			final String query = " SELECT distinct "  //
@@ -1032,12 +1037,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   LEFT JOIN cvtermprop cropOntology ON cropOntology.cvterm_id = variable.cvterm_id" //
 				+ "        AND cropOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
 				+ " WHERE " //
-				+ "   dataset.project_id = :observationSetId " //
+				+ "   dataset.project_id in (:observationSetIds) " //
 				+ "   AND pp.type_id in (:variableTypes) "
 				+ " ORDER BY pp.rank ";
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
-			sqlQuery.setParameter("observationSetId", observationSetId);
+			sqlQuery.setParameterList("observationSetIds", observationSetIds);
 			sqlQuery.setParameterList("variableTypes", variableTypes);
 			sqlQuery
 				.addScalar(OBS_SET_VARIABLE_ID)
@@ -1144,7 +1149,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return new ArrayList<>(variables.values());
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error getting datasets variables for dataset=" + observationSetId + ": " + e.getMessage(), e);
+				"Error getting datasets variables for dataset=" + observationSetIds + ": " + e.getMessage(), e);
 		}
 	}
 
