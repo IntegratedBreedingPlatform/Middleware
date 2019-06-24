@@ -379,7 +379,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			query.addScalar(envCondition, new StringType());
 		}
 
-		query.addScalar(ObservationUnitsSearchDao.OBSERVATION_UNIT_NO);
+		query.addScalar(ObservationUnitsSearchDao.OBSERVATION_UNIT_NO, new StringType());
 		return query;
 	}
 
@@ -904,9 +904,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		variables.put(FIELD_MAP_RANGE, new ObservationUnitData((String) row.get(FIELD_MAP_RANGE)));
 		variables.put(LOCATION_ID, new ObservationUnitData((String) row.get(LOCATION_ID)));
 		variables.put(EXPT_DESIGN, new ObservationUnitData((String) row.get(EXPT_DESIGN)));
-		variables.put(
-			observationVariableName,
-			new ObservationUnitData((String)row.get(OBSERVATION_UNIT_NO)));
+		variables.put(observationVariableName,new ObservationUnitData((String)row.get(OBSERVATION_UNIT_NO)));
 
 		for (final String gpDesc : searchDto.getGenericGermplasmDescriptors()) {
 			variables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
