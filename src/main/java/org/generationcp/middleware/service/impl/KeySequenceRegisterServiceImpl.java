@@ -16,7 +16,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 
 	}
 
-	public KeySequenceRegisterServiceImpl(HibernateSessionProvider sessionProvider) {
+	public KeySequenceRegisterServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDAO.setSession(sessionProvider.getSession());
 	}
@@ -28,20 +28,20 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public int incrementAndGetNextSequence(final String keyPrefix, final String suffix) {
-		return this.keySequenceRegisterDAO.incrementAndGetNextSequence(keyPrefix, suffix);
+	public int incrementAndGetNextSequence(final String keyPrefix) {
+		return this.keySequenceRegisterDAO.incrementAndGetNextSequence(keyPrefix);
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public int getNextSequence(String keyPrefix) {
+	public int getNextSequence(final String keyPrefix) {
 		return this.keySequenceRegisterDAO.getNextSequence(keyPrefix);
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public void saveLastSequenceUsed(String keyPrefix, String suffix, Integer lastSequenceUsed) {
-		this.keySequenceRegisterDAO.saveLastSequenceUsed(keyPrefix, suffix, lastSequenceUsed);
+	public void saveLastSequenceUsed(final String keyPrefix, final Integer lastSequenceUsed) {
+		this.keySequenceRegisterDAO.saveLastSequenceUsed(keyPrefix, lastSequenceUsed);
 	}
 
 }

@@ -4,7 +4,7 @@ package org.generationcp.middleware.service.api;
 public interface KeySequenceRegisterService {
 
 	/**
-	 * Finds next available sequence number for a given combination of keyPrefix and suffix and increments the last known sequence number in the key sequence
+	 * Finds next available sequence number for a given keyPrefix and increments the last known sequence number in the key sequence
 	 * registry.
 	 *
 	 * <p>
@@ -24,7 +24,7 @@ public interface KeySequenceRegisterService {
 	 * <strong>HibernateOptimisticLockingFailureException</strong> to occur. This is a re-triable exception. Callers can catch it and
 	 * operation can be retried.
 	 */
-	int incrementAndGetNextSequence(String keyPrefix, String suffix);
+	int incrementAndGetNextSequence(String keyPrefix);
 
 	/**
 	 * Finds next available sequence number for a given the keyPrefix in key sequence registry
@@ -39,10 +39,10 @@ public interface KeySequenceRegisterService {
 	int getNextSequence(String keyPrefix);
 
 	/**
-	 * If combination of keyPrefix and suffix exists in key sequence registry, update the last sequence number
+	 * If keyPrefix exists in key sequence registry, update the last sequence number
 	 * with lastSequenceUsed parameter if it is greater than the value of last sequence saved for that sequence.
 	 *
-	 * If combination of keyPrefix and suffix does not yet exist in key sequence registry, create a new record in registry
+	 * If keyPrefix does not yet exist in key sequence registry, create a new record in registry
 	 * and save lastSequenceUsed parameter as the last sequence number used.
 	 *
 	 * <p>
@@ -52,8 +52,7 @@ public interface KeySequenceRegisterService {
 	 * operation can be retried.
 	 *
 	 * @param keyPrefix
-	 * @param suffix
 	 * @param lastSequenceUsed
 	 */
-	void saveLastSequenceUsed(String keyPrefix, String suffix, Integer lastSequenceUsed);
+	void saveLastSequenceUsed(String keyPrefix, Integer lastSequenceUsed);
 }
