@@ -68,14 +68,84 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 
-	public static final String GET_USERS_BY_PROJECT_UUID =
-		"SELECT users.userid, users.uname, person.fname, person.lname, users.ustatus, person.pemail \n"
-		+ "FROM users \n"
-		+ "INNER JOIN workbench_project_user_info pu ON users.userid = pu.user_id \n"
-		+ "INNER JOIN persons person ON person.personid = users.personid \n "
-		+ "INNER JOIN workbench_project pp ON pu.project_id = pp.project_id \n "
-		+ "WHERE pp.project_uuid = :project_uuid \n "
-		+ "GROUP BY users.userid";
+	public static final String GET_USERS_BY_PROJECT_UUID = "SELECT "
+		+ "    users.userid,"
+		+ "    users.uname,"
+		+ "    person.fname,"
+		+ "    person.lname,"
+		+ "    role.id,"
+		+ "    role.description,"
+		+ "    users.ustatus,"
+		+ "    person.pemail"
+		+ " yo FROM"
+		+ "    workbench_project p"
+		+ "        INNER JOIN"
+		+ "    workbench_crop wc ON p.crop_type = wc.crop_name"
+		+ "        INNER JOIN"
+		+ "    users_crops uc ON uc.crop_name = wc.crop_name"
+		+ "        INNER JOIN"
+		+ "    users ON uc.user_id = users.userid"
+		+ "        INNER JOIN"
+		+ "    persons person ON person.personid = users.personid"
+		+ "        INNER JOIN"
+		+ "    users_roles ur ON ur.userid = users.userid"
+		+ "        INNER JOIN"
+		+ "    role ON role.id = ur.role_id"
+		+ " WHERE"
+		+ "    p.project_uuid = :project_uuid  "
+		+ " UNION SELECT "
+		+ "    users.userid,"
+		+ "    users.uname,"
+		+ "    person.fname,"
+		+ "    person.lname,"
+		+ "    role.id,"
+		+ "    role.description,"
+		+ "    users.ustatus,"
+		+ "    person.pemail"
+		+ " FROM"
+		+ "    workbench_project p"
+		+ "        INNER JOIN"
+		+ "    workbench_crop wc ON p.crop_type = wc.crop_name"
+		+ "        INNER JOIN"
+		+ "    users_crops uc ON uc.crop_name = wc.crop_name"
+		+ "        INNER JOIN"
+		+ "    users_roles ur ON ur.userid = uc.user_id"
+		+ "        INNER JOIN"
+		+ "    users ON uc.user_id = users.userid"
+		+ "        INNER JOIN"
+		+ "    persons person ON person.personid = users.personid"
+		+ "        INNER JOIN"
+		+ "    role ON role.id = ur.role_id"
+		+ " WHERE"
+		+ "    p.project_uuid = :project_uuid "
+		+ "        AND ur.workbench_project_id = p.project_id "
+		+ " UNION SELECT "
+		+ "    users.userid,"
+		+ "    users.uname,"
+		+ "    person.fname,"
+		+ "    person.lname,"
+		+ "    role.id,"
+		+ "    role.description,"
+		+ "    users.ustatus,"
+		+ "    person.pemail"
+		+ " FROM"
+		+ "    workbench_project p"
+		+ "        INNER JOIN"
+		+ "    workbench_crop wc ON p.crop_type = wc.crop_name"
+		+ "        INNER JOIN"
+		+ "    users_crops uc ON uc.crop_name = wc.crop_name"
+		+ "        INNER JOIN"
+		+ "    users_roles ur ON ur.userid = uc.user_id"
+		+ "        AND ur.workbench_project_id = p.project_id"
+		+ "        INNER JOIN"
+		+ "    users ON uc.user_id = users.userid"
+		+ "        INNER JOIN"
+		+ "    persons person ON person.personid = users.personid"
+		+ "        INNER JOIN"
+		+ "    role ON role.id = ur.role_id"
+		+ " WHERE"
+		+ "    p.project_uuid = :project_uuid "
+		+ " GROUP BY users.userid";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -143,13 +213,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public WorkbenchUser() {
 	}
 
-	public WorkbenchUser(Integer userid) {
+	public WorkbenchUser(final Integer userid) {
 		super();
 		this.userid = userid;
 	}
 
-	public WorkbenchUser(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password,
-			Integer personid, Integer adate, Integer cdate) {
+	public WorkbenchUser(
+		final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type, final String name, final String password,
+			final Integer personid, final Integer adate, final Integer cdate) {
 		super();
 		this.userid = userid;
 		this.instalid = instalid;
@@ -170,7 +241,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	 * @return the copy of the User object
 	 */
 	public WorkbenchUser copy() {
-		WorkbenchUser user = new WorkbenchUser();
+		final WorkbenchUser user = new WorkbenchUser();
 		user.setInstalid(this.instalid);
 		user.setStatus(this.status);
 		user.setAccess(this.access);
@@ -192,7 +263,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	 * @return the copy of the User object
 	 */
 	public User copyToUser() {
-		User user = new User();
+		final User user = new User();
 		user.setInstalid(this.instalid);
 		user.setStatus(this.status);
 		user.setAccess(this.access);
@@ -212,7 +283,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.userid;
 	}
 
-	public void setUserid(Integer userid) {
+	public void setUserid(final Integer userid) {
 		this.userid = userid;
 	}
 
@@ -220,7 +291,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.instalid;
 	}
 
-	public void setInstalid(Integer instalid) {
+	public void setInstalid(final Integer instalid) {
 		this.instalid = instalid;
 	}
 
@@ -228,7 +299,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 
@@ -236,7 +307,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.access;
 	}
 
-	public void setAccess(Integer access) {
+	public void setAccess(final Integer access) {
 		this.access = access;
 	}
 
@@ -244,7 +315,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(final Integer type) {
 		this.type = type;
 	}
 
@@ -252,7 +323,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -260,7 +331,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.password = password;
 	}
 
@@ -268,7 +339,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.personid;
 	}
 
-	public void setPersonid(Integer personid) {
+	public void setPersonid(final Integer personid) {
 		this.personid = personid;
 	}
 
@@ -276,7 +347,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.adate;
 	}
 
-	public void setAssignDate(Integer adate) {
+	public void setAssignDate(final Integer adate) {
 		this.adate = adate;
 	}
 
@@ -284,7 +355,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.cdate;
 	}
 
-	public void setCloseDate(Integer cdate) {
+	public void setCloseDate(final Integer cdate) {
 		this.cdate = cdate;
 	}
 
@@ -292,7 +363,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.person;
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(final Person person) {
 		this.person = person;
 	}
 
@@ -300,7 +371,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.isnew;
 	}
 
-	public void setIsNew(Boolean val) {
+	public void setIsNew(final Boolean val) {
 		this.isnew = val;
 	}
 
@@ -308,7 +379,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		return this.roles;
 	}
 
-	public void setRoles(List<UserRole> roles) {
+	public void setRoles(final List<UserRole> roles) {
 		this.roles = roles;
 	}
 
@@ -318,25 +389,25 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (obj == this) {
 			return true;
 		}
-		if (!WorkbenchUser.class.isInstance(obj)) {
+		if (!(obj instanceof WorkbenchUser)) {
 			return false;
 		}
 
-		WorkbenchUser otherObj = (WorkbenchUser) obj;
+		final WorkbenchUser otherObj = (WorkbenchUser) obj;
 
 		return new EqualsBuilder().append(this.userid, otherObj.userid).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("User [userid=");
 		builder.append(this.userid);
 		builder.append(", instalid=");
@@ -376,7 +447,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public void setActive(Boolean val) {
+	public void setActive(final Boolean val) {
 		this.active = val;
 	}
 
@@ -386,14 +457,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	@Override
-	public void setEnabled(Boolean val) {
+	public void setEnabled(final Boolean val) {
 		this.enabled = val;
 
 	}
 
-	public boolean hasRole(String role) {
+	public boolean hasRole(final String role) {
 		if (!Objects.equals(this.roles,null)) {
-			for (UserRole userRole : this.roles) {
+			for (final UserRole userRole : this.roles) {
 				if (userRole.getRole().getCapitalizedRole().equalsIgnoreCase(role)) {
 					return true;
 				}
@@ -404,7 +475,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	public List<CropType> getCrops() {
-		return crops;
+		return this.crops;
 	}
 
 	public void setCrops(final List<CropType> crops) {
@@ -412,7 +483,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	}
 
 	public List<PermissionDto> getPermissions() {
-		return permissions;
+		return this.permissions;
 	}
 
 	public void setPermissions(final List<PermissionDto> permissions) {
