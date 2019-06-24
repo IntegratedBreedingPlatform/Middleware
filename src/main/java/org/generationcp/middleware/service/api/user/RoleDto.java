@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -32,6 +34,17 @@ public class RoleDto {
 		this.active = active;
 		this.editable = editable;
 		this.assignable = assignable;
+	}
+
+	public RoleDto(final UserRole userRole) {
+		final Role role = userRole.getRole();
+		this.id = role.getId();
+		this.name = role.getName();
+		this.description = role.getDescription();
+		this.type = role.getRoleType().getName();
+		this.active = role.getActive();
+		this.editable = role.getEditable();
+		this.assignable = role.getAssignable();
 	}
 
 	public Integer getId() {
