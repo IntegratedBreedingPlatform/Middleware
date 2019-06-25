@@ -77,7 +77,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "    role.description,"
 		+ "    users.ustatus,"
 		+ "    person.pemail"
-		+ " yo FROM"
+		+ "  FROM"
 		+ "    workbench_project p"
 		+ "        INNER JOIN"
 		+ "    workbench_crop wc ON p.crop_type = wc.crop_name"
