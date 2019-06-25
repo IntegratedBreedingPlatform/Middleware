@@ -387,7 +387,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		// for all other installed crops, except for maize, create projects and retrieve projects for that crop
 		final int NUM_NEW_PROJECTS = 3;
 		final List<CropType> installedCrops = this.workbenchDataManager.getInstalledCropDatabses();
-		for (CropType crop : installedCrops) {
+		for (final CropType crop : installedCrops) {
 			if (!crop.equals(maizeCropType)) {
 				final List<Project> projectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(crop);
 				this.createTestProjectsForCrop(crop, NUM_NEW_PROJECTS);
@@ -561,15 +561,15 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Integer> prevListOfUserIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 		
 		//Set up data
-		UserDto userDto = UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", null, "username");
+		final UserDto userDto = UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", null, "username");
 		final int id = this.workbenchDataManager.createUser(userDto);
-		ProjectUserInfo pui = new ProjectUserInfo();
+		final ProjectUserInfo pui = new ProjectUserInfo();
 		pui.setProject(this.commonTestProject);
 		pui.setUserId(id);
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 		
-		List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
+		final List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 		Assert.assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
 	}
 
@@ -610,10 +610,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
 		final Map<ProgramFilters, Object> filters = new HashMap<>();
 		if(!projects.isEmpty()){
-			Project project = projects.get(0);
+			final Project project = projects.get(0);
 			filters.put(ProgramFilters.CROP_TYPE, project.getCropType());
 			filters.put(ProgramFilters.PROGRAM_NAME, project.getProjectName());
-			List<Project> Projects = this.workbenchDataManager.getProjects(1, 100, filters);
+			final List<Project> Projects = this.workbenchDataManager.getProjects(1, 100, filters);
 			assertThat(project.getProjectId(),is(equalTo(Projects.get(0).getProjectId())));
 			assertThat(project.getCropType().getCropName(),is(equalTo(Projects.get(0).getCropType().getCropName())));
 			assertThat(project.getProjectName(),is(equalTo(Projects.get(0).getProjectName())));
@@ -624,7 +624,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllActiveUsers() {
 		final List<WorkbenchUser> prevListOfActiveUsers = this.workbenchDataManager.getAllActiveUsersSorted();
-		UserDto userDto =
+		final UserDto userDto =
 			UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", null, "username");
 		final int id = this.workbenchDataManager.createUser(userDto);
 		userDto.setUserId(id);
@@ -643,7 +643,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetUsersByCrop() {
 		final String cropName = CropType.CropEnum.MAIZE.toString();
 		final List<WorkbenchUser> prevListOfActiveUsers = this.workbenchDataManager.getUsersByCrop(cropName);
-		UserDto userDto =
+		final UserDto userDto =
 			UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", null, "username");
 		final ArrayList<CropDto> crops = new ArrayList<>();
 		final CropDto cropDto = new CropDto();
@@ -669,7 +669,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
 
-		WorkbenchUser userToBeUpdated = workbenchDataManager.getUserById(this.workbenchDataManager.createUser(userDto));
+		final WorkbenchUser userToBeUpdated = this.workbenchDataManager.getUserById(this.workbenchDataManager.createUser(userDto));
 
 		final String password = "password1111";
 		final String firstName = "John";
@@ -684,7 +684,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		this.workbenchDataManager.updateUser(userToBeUpdated);
 
-		WorkbenchUser updatedUser = workbenchDataManager.getUserById(userToBeUpdated.getUserid());
+		final WorkbenchUser updatedUser = this.workbenchDataManager.getUserById(userToBeUpdated.getUserid());
 
 		Assert.assertEquals(password, updatedUser.getPassword());
 		Assert.assertEquals(firstName, updatedUser.getPerson().getFirstName());
@@ -696,9 +696,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Ignore
 	public void testGetUsersByProjectUUID() {
 		//TODO Fix after query is reviewed
-		final String projectUUID = commonTestProject.getUniqueID();
-		
-		final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
+		final String projectUUID = this.commonTestProject.getUniqueID();
+
+		final String cropName = "maize";
+		final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName);
 		Assert.assertEquals(this.testUser1.getUserid(), users.get(0).getUserId());
 	}
 	
@@ -753,7 +754,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testDeleteProjectDependencies() {
 		// Create new project - for deletion later
-		WorkbenchTestDataUtil workbenchUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+		final WorkbenchTestDataUtil workbenchUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
 		workbenchUtil.setUpWorkbench();
 		final Project testProject = workbenchUtil.getCommonTestProject();
 		final Long id = testProject.getProjectId();

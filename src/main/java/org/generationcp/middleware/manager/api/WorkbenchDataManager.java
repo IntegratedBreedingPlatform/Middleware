@@ -638,9 +638,10 @@ public interface WorkbenchDataManager {
 	 * Gets the user by project_uuid.
 	 *
 	 * @param projectUuid
+	 * @param cropName
 	 * @return the user matching the given project_uuid
 	 */
-	List<UserDto> getUsersByProjectUuid(final String projectUuid);
+	List<UserDto> getUsersByProjectUuid(final String projectUuid, final String cropName);
 
 
 	/**

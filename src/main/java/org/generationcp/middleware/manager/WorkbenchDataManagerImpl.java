@@ -64,6 +64,7 @@ import java.util.UUID;
 @Transactional
 public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
+
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
 	private HibernateSessionProvider sessionProvider;
@@ -506,7 +507,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
-		return this.getProjectUserInfoDao().getUsersByProjectId(projectId);
+		return this.getWorkbenchUserDao().getUsersByProjectId(projectId);
 	}
 
 	@Override
@@ -890,8 +891,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<UserDto> getUsersByProjectUuid(final String projectUuid) {
-		return this.getWorkbenchUserDao().getUsersByProjectUUId(projectUuid);
+	public List<UserDto> getUsersByProjectUuid(final String projectUuid, final String cropName) {
+		return this.getWorkbenchUserDao().getUsersByProjectUUId(projectUuid, cropName);
 
 	}
 
@@ -1023,7 +1024,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
-		return this.getProjectUserInfoDao().getActiveUserIDsByProjectId(projectId);
+		return this.getWorkbenchUserDao().getActiveUserIDsByProjectId(projectId);
 	}
 
 	@Override

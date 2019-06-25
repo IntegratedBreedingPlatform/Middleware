@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbenchUserDAO.class);
 	
 	public boolean isUsernameExists(final String username) {
@@ -114,13 +114,15 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	}
 	
 	@SuppressWarnings({"unchecked"})
-	public List<UserDto> getUsersByProjectUUId(final String projectUUID) {
+	public List<UserDto> getUsersByProjectUUId(final String projectUUID, final String cropName) {
 		final List<UserDto> users = new ArrayList<>();
 		try {
 			if (projectUUID != null) {
-				//TODO Review query. It is getting users from workbench_project_user_info, fix tests
+				//TODO fix tests
+
 				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_UUID);
 				query.setParameter("project_uuid", projectUUID);
+				query.setParameter("cropName", cropName);
 
 				final List<Object> results = query.list();
 				for (final Object o : results) {
@@ -272,4 +274,49 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
+		final List<WorkbenchUser> users = new ArrayList<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] user = (Object[]) o;
+					final Integer userId = (Integer) user[0];
+					final Integer instalId = (Integer) user[1];
+					final Integer uStatus = (Integer) user[2];
+					final Integer uAccess = (Integer) user[3];
+					final Integer uType = (Integer) user[4];
+					final String uName = (String) user[5];
+					final String upswd = (String) user[6];
+					final Integer personId = (Integer) user[7];
+					final Integer aDate = (Integer) user[8];
+					final Integer cDate = (Integer) user[9];
+					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
+					users.add(u);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUserInfoDao: "
+				+ e.getMessage(), e);
+		}
+		return users;
+	}
+
+	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
+		final List<Integer> userIDs = new ArrayList<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+				+ e.getMessage(), e);
+		}
+		return userIDs;
+	}
 }
