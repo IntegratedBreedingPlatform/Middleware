@@ -268,7 +268,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN active TINYINT(1) NULL DEFAULT 1 AFTER role_type_id;
+			ADD COLUMN active TINYINT(1) DEFAULT 1 AFTER role_type_id;
 		</sql>
 	</changeSet>
 
@@ -283,7 +283,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN editable TINYINT(1) NULL DEFAULT 1 AFTER ACTIVE;
+			ADD COLUMN editable TINYINT(1) DEFAULT 1 AFTER ACTIVE;
 		</sql>
 	</changeSet>
 
@@ -298,7 +298,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE role
-			ADD COLUMN assignable TINYINT(1) NULL DEFAULT 1 AFTER EDITABLE;
+			ADD COLUMN assignable TINYINT(1) DEFAULT 1 AFTER EDITABLE;
 		</sql>
 	</changeSet>
 
@@ -623,7 +623,7 @@
 			Update table role where row is SUPERADMIN
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE role SET active = 1, editable = 0, assignable = 0 WHERE id = 5;
+			UPDATE role SET editable = 0, assignable = 0 WHERE id = 5;
 		</sql>
 	</changeSet>
 
