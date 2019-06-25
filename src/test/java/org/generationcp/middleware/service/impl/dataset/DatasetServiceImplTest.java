@@ -411,16 +411,12 @@ public class DatasetServiceImplTest {
 
 		}
 
-		Mockito.when(this.dmsProjectDao.getDatasets(25019)).thenReturn(datasetDTOs1);
-		Mockito.when(this.dmsProjectDao.getDatasets(25020)).thenReturn(new ArrayList<DatasetDTO>());
-
 		datasetDTO = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs2.add(datasetDTO);
 		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
 			datasetDTOList.add(datasetDTO);
 
 		}
-		Mockito.when(this.dmsProjectDao.getDatasets(25021)).thenReturn(datasetDTOs2);
 
 		datasetDTO = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs3.add(datasetDTO);
@@ -428,7 +424,6 @@ public class DatasetServiceImplTest {
 			datasetDTOList.add(datasetDTO);
 
 		}
-		Mockito.when(this.dmsProjectDao.getDatasets(25022)).thenReturn(datasetDTOs3);
 
 		datasetDTO = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs4.add(datasetDTO);
@@ -436,7 +431,7 @@ public class DatasetServiceImplTest {
 			datasetDTOList.add(datasetDTO);
 
 		}
-		Mockito.when(this.dmsProjectDao.getDatasets(25023)).thenReturn(datasetDTOs4);
+		Mockito.when(this.dmsProjectDao.getDatasets(25019)).thenReturn(datasetDTOList);
 
 		return datasetDTOList;
 	}
