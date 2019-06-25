@@ -129,8 +129,8 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 					final String username = (String) user[1];
 					final String firstName = (String) user[2];
 					final String lastName = (String) user[3];
-					final Integer status = (Integer) user[6];
-					final String email = (String) user[7];
+					final Integer status = (Integer) user[4];
+					final String email = (String) user[5];
 					//TODO load list of userRoles if needed
 					final UserDto u = new UserDto(userId, username, firstName, lastName, null, status, email);
 					users.add(u);
