@@ -42,6 +42,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
@@ -1026,11 +1027,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Role> getAssignableRoles() {
-		return this.getRoleDao().getAssignableRoles();
-	}
-
-	@Override
 	public List<WorkbenchUser> getSuperAdminUsers() {
 		return this.getWorkbenchUserDao().getSuperAdminUsers();
 	}
@@ -1043,6 +1039,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Role> getAllRoles() {
 		return this.getRoleDao().getAll();
+	}
+
+	@Override
+	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
+		return this.getRoleDao().getRoles(roleSearchDto);
 	}
 
 	@Override

@@ -804,19 +804,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetAllRoles() {
 		final List<Role> roles = this.workbenchDataManager.getAllRoles();
 		Assert.assertNotNull(roles);
-		Assert.assertEquals(5, roles.size());
 	}
-	
-	@Test
-	public void testGetAssignableRoles() {
-		final List<Role> assignableRoles = this.workbenchDataManager.getAssignableRoles();
-		Assert.assertNotNull(assignableRoles);
-		Assert.assertEquals(4, assignableRoles.size());
-		for (final Role role : assignableRoles){
-			Assert.assertNotEquals(Role.SUPERADMIN, role.getCapitalizedRole());
-		}
-	}
-	
+
 	@Test
 	public void testGetSuperAdminUsers() {
 		final List<WorkbenchUser> superAdminUsers = this.workbenchDataManager.getSuperAdminUsers();

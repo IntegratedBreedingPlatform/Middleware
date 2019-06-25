@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.util.List;
@@ -641,12 +642,6 @@ public interface WorkbenchDataManager {
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
 
-	/**
-	 * Returns list of roles that can be assigned to a new user
-	 *
-	 * @return
-	 */
-	List<Role> getAssignableRoles();
 
 	/**
 	 * Returns list of roles
@@ -654,6 +649,13 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<Role> getAllRoles();
+
+	/**
+	 * Returns list of roles filtered according to roleSearchDto
+	 *
+	 * @return
+	 */
+	List<Role> getRoles(RoleSearchDto roleSearchDto);
 
 	/**
 	 * Return users with SUPERADMIN role
