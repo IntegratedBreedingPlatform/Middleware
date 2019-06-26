@@ -20,9 +20,12 @@ public enum DatasetTypeEnum {
 
 	private static final Map<Integer, DatasetTypeEnum> lookup = new HashMap<>();
 
+	private static final Map<String, DatasetTypeEnum> lookupByName = new HashMap<>();
+
 	static {
 		for (final DatasetTypeEnum datasetTypeEnum : DatasetTypeEnum.values()) {
 			lookup.put(datasetTypeEnum.getId(), datasetTypeEnum);
+			lookupByName.put(datasetTypeEnum.getName(), datasetTypeEnum);
 		}
 	}
 
@@ -30,14 +33,7 @@ public enum DatasetTypeEnum {
 		return lookup.get(id);
 	}
 
-	public static Integer getIdByName(final String name) {
-		for( DatasetTypeEnum datasetType : DatasetTypeEnum.values()) {
-			if(StringUtils.equalsIgnoreCase(datasetType.getName(), name)) {
-				return datasetType.getId();
-			}
-		}
-		return 0;
-	}
+	public static DatasetTypeEnum getByName(final String name) { return lookupByName.get(name); }
 
 	private final int id;
 	private final String name;
