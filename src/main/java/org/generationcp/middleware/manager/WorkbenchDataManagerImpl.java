@@ -511,8 +511,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
-		return this.getProjectUserInfoDao().getPersonsByProjectId(projectId);
+	public Map<Integer, Person> getPersonsByProjectId(final Long projectId, final String cropName) {
+		return this.getWorkbenchUserDao().getPersonsByProjectId(projectId, cropName);
 	}
 
 	@Override
@@ -1023,8 +1023,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
-		return this.getWorkbenchUserDao().getActiveUserIDsByProjectId(projectId);
+	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
+		return this.getWorkbenchUserDao().getActiveUserIDsByProjectId(projectId, cropName );
 	}
 
 	@Override

@@ -113,12 +113,28 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 				+ "    AND p.project_id = :projectId "
 				+ "  AND users.ustatus = 0 ";
 
-	public static final String GET_PERSONS_BY_PROJECT_ID = "SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
-			+ "persons.lname "
-			+ "FROM persons "
-			+ "JOIN users ON users.personid = persons.personid "
-			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
-			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
+	public static final String GET_PERSONS_BY_PROJECT_ID =
+		"SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
+			+ " persons.lname "
+			+ "   FROM "
+			+ "      workbench_project p "
+			+ "          INNER JOIN "
+			+ "      workbench_crop wc ON p.crop_type = wc.crop_name "
+			+ "          INNER JOIN "
+			+ "      users_crops uc ON uc.crop_name = wc.crop_name "
+			+ "          INNER JOIN "
+			+ "      users_roles ur ON ur.userid = uc.user_id "
+			+ "          INNER JOIN "
+			+ "      users ON uc.user_id = users.userid "
+			+ "          INNER JOIN "
+			+ "		 role r ON ur.role_id = r.id  "
+			+ "			 INNER JOIN "
+			+ "      persons ON users.personid = persons.personid "
+			+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
+			+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
+			+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
+			+ "    AND p.project_id = :projectId "
+			+ " GROUP BY users.userid ";
 
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";

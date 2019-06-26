@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -20,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
@@ -306,12 +309,13 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return users;
 	}
 
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
+	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
 		final List<Integer> userIDs = new ArrayList<>();
 		try {
 			if (projectId != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
+				query.setParameter("cropName", cropName);
 				return query.list();
 			}
 		} catch (final HibernateException e) {
@@ -319,5 +323,32 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 				+ e.getMessage(), e);
 		}
 		return userIDs;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Person> getPersonsByProjectId(final Long projectId, final String cropName) {
+		final Map<Integer, Person> persons = new HashMap<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_PERSONS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				query.setParameter("cropName", cropName);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] person = (Object[]) o;
+					final Integer userId = (Integer) person[0];
+					final Integer personId = (Integer) person[1];
+					final String firstName = (String) person[2];
+					final String middleName = (String) person[3];
+					final String lastName = (String) person[4];
+					final Person p = new Person(personId, firstName, middleName, lastName);
+					persons.put(userId, p);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getPersonsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+				+ e.getMessage(), e);
+		}
+		return persons;
 	}
 }

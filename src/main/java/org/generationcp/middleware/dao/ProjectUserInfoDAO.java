@@ -12,18 +12,13 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * DAO class for {@link ProjectUserInfo}.
@@ -74,31 +69,5 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			throw new MiddlewareQueryException("Error in getByProjectIdAndUserIds(projectId = " + projectId + ", userIds = " + userIds + "):"
 					+ ex.getMessage(), ex);
 		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
-		final Map<Integer, Person> persons = new HashMap<>();
-		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_PERSONS_BY_PROJECT_ID);
-				query.setParameter("projectId", projectId);
-				final List<Object> results = query.list();
-				for (final Object o : results) {
-					final Object[] person = (Object[]) o;
-					final Integer userId = (Integer) person[0];
-					final Integer personId = (Integer) person[1];
-					final String firstName = (String) person[2];
-					final String middleName = (String) person[3];
-					final String lastName = (String) person[4];
-					final Person p = new Person(personId, firstName, middleName, lastName);
-					persons.put(userId, p);
-				}
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getPersonsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
-					+ e.getMessage(), e);
-		}
-		return persons;
 	}
 }

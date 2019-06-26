@@ -401,9 +401,10 @@ public interface WorkbenchDataManager {
 	 * Retrieves the user ids of the program members using the project id
 	 *
 	 * @param projectId
+	 * @param cropName
 	 * @return
 	 */
-	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
+	List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName);
 
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
@@ -417,9 +418,10 @@ public interface WorkbenchDataManager {
 	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id
+	 * @param cropName
 	 * @return the Maps of {@link Person} records identified by {@link WorkbenchUser} ids
 	 */
-	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
+	Map<Integer, Person> getPersonsByProjectId(final Long projectId, final String cropName);
 
 	/**
 	 * Get the list of all installed central crop databases.

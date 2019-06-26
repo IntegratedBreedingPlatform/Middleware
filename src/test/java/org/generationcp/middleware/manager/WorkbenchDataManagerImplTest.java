@@ -560,7 +560,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetActiveUserIDsByProjectId() {
-		final List<Integer> prevListOfUserIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
+		final List<Integer> prevListOfUserIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId(),
+			CROP_NAME );
 		
 		//Set up data
 		final UserDto userDto = UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", null, "username");
@@ -571,7 +572,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 		
-		final List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
+		final List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId(),
+			CROP_NAME );
 		Assert.assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
 	}
 
@@ -734,7 +736,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetPersonsByProjectId() {
-		final Map<Integer, Person> personsMap = this.workbenchDataManager.getPersonsByProjectId(this.commonTestProject.getProjectId());
+		final Map<Integer, Person> personsMap = this.workbenchDataManager.getPersonsByProjectId(this.commonTestProject.getProjectId(),
+			CROP_NAME );
 
 		Assert.assertNotNull(personsMap);
 		Assert.assertEquals(2, personsMap.keySet().size());
