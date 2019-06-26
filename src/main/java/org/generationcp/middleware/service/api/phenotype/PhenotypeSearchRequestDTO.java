@@ -1,6 +1,6 @@
 package org.generationcp.middleware.service.api.phenotype;
 
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,13 +24,7 @@ public class PhenotypeSearchRequestDTO implements Serializable {
 	}
 
 	public void setObservationLevel(final String observationLevel) {
-		final Integer datasetTypeId = DatasetTypeEnum.getIdByName(observationLevel);
-		if(datasetTypeId > 0) {
-			this.observationLevel = Integer.toString(datasetTypeId);
-		}
-		else {
-			this.observationLevel = observationLevel;
-		}
+		this.observationLevel = observationLevel;
 	}
 
 	public List<String> getObservationVariableDbIds() {
