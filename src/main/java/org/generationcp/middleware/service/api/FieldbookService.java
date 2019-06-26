@@ -221,19 +221,6 @@ public interface FieldbookService {
 	boolean loadAllObservations(final Workbook workbook);
 
 	/**
-	 * Saves the measurement rows of a workbook as a local trial or nursery on
-	 * the new CHADO schema.
-	 *
-	 * @param workbook
-	 *            that contains the measurement rows to save
-	 * @param programUUID
-	 *            unique id of the program
-	 * @param saveVariates
-	 *            flag that indicates if the measurement data should be saved
-	 */
-	void saveMeasurementRows(Workbook workbook, String programUUID, boolean saveVariates);
-
-	/**
 	 * Saves germplasm list advanced nursery types. This method saves the
 	 * germplasms (and corresponding name) if not found in the database.
 	 * ListData items are always added to the database, before saving the
