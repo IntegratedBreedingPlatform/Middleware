@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -872,4 +873,62 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public Map<Integer, Map<String, List<Object>>> getExperimentValuesAsMap(final int studyId, final List<Integer> datasetTypeIds,
+		final Map<Integer, Integer> inputVariableDatasetMap) {
+
+		final StringBuilder queryString = new StringBuilder("SELECT \n"
+			+ "CASE WHEN e.parent_id IS NULL THEN e.nd_experiment_id ELSE e.parent_id END as `experimentId`,\n"
+			+ "p.observable_id as `variableId`, \n"
+			+ "p.value \n"
+			+ "FROM ibdbv2_maize_merged.nd_experiment e \n"
+			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
+			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id \n"
+			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) AND (");
+
+		final Iterator<Map.Entry<Integer, Integer>> iterator = inputVariableDatasetMap.entrySet().iterator();
+		while (iterator.hasNext()) {
+			final Map.Entry<Integer, Integer> entry = iterator.next();
+			queryString.append(String.format("(p.observable_id = %s AND e.project_id = %s %n)", entry.getKey(), entry.getValue()));
+			if (iterator.hasNext()) {
+				queryString.append(" OR ");
+			} else {
+				queryString.append(") \n");
+			}
+		}
+
+		queryString.append("ORDER BY `experimentId`, `variableId` ;");
+
+		final SQLQuery q = this.getSession().createSQLQuery(queryString.toString());
+		q.addScalar("experimentId", new IntegerType());
+		q.addScalar("variableId", new StringType());
+		q.addScalar("value", new StringType());
+		q.setParameter("studyId", studyId);
+		q.setParameterList("datasetTypeIds", datasetTypeIds);
+		q.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = q.list();
+
+		return this.convertResultsListAsMap(results);
+	}
+
+	private Map<Integer, Map<String, List<Object>>> convertResultsListAsMap(final List<Map<String, Object>> results) {
+
+		final Map<Integer, Map<String, List<Object>>> map = new HashMap<>();
+
+
+		for (final Map<String, Object> row : results) {
+			final Integer experimentId = (Integer) row.get("experimentId");
+			final String variableId = (String) row.get("variableId");
+			final Object value = row.get("value");
+			if (!map.containsKey(experimentId)) {
+				map.put(experimentId, new HashMap<String, List<Object>>());
+			}
+			if (!map.get(experimentId).containsKey(variableId)) {
+				map.get(experimentId).put(variableId, new ArrayList<Object>());
+			}
+			// Group values per variable and experimentId.
+			map.get(experimentId).get(variableId).add(value);
+		}
+
+		return map;
+	}
 }

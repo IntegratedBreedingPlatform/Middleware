@@ -142,6 +142,22 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return variableIdMeasurementVariableMap;
 	}
 
+	/**
+	 * Gets the aggregate values of variables grouped by experimentId and variableId. This method can only retrieve values for TRAIT and ENVIRONMENT DETAIL variables.
+	 *
+	 * @param studyId
+	 * @param datasetTypeIds
+	 * @param inputVariableDatasetMap - contains input variable id and dataset id from which input variable data will be read from.
+	 *                                This is to ensure that even if the input variable has multiple occurrences in study, the data will only
+	 *                                come from the dataset specified in this map.
+	 * @return
+	 */
+	@Override
+	public Map<Integer, Map<String, List<Object>>> getInputVariableValuesMap(final int studyId, final List<Integer> datasetTypeIds,
+		final Map<Integer, Integer> inputVariableDatasetMap) {
+		return this.daoFactory.getExperimentDao().getExperimentValuesAsMap(studyId, datasetTypeIds, inputVariableDatasetMap);
+	}
+
 	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
