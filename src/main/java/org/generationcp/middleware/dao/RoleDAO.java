@@ -14,22 +14,6 @@ import java.util.List;
 public class RoleDAO extends GenericDAO<Role, Integer> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RoleDAO.class);
-	
-	public List<Role> getAssignableRoles() {
-		List<Role> toReturn;
-		
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Role.class);
-			criteria.add(Restrictions.ne("name", Role.SUPERADMIN));
-			toReturn = criteria.list();
-			
-		} catch (final HibernateException e) {
-			final String message = "Error with getAssignableRoles query from RoleDAO: " + e.getMessage();
-			RoleDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return toReturn;
-	}
 
 	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
 		List<Role> toReturn;
