@@ -275,12 +275,13 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
+	public List<WorkbenchUser> getUsersByProjectId(final Long projectId, final String cropName) {
 		final List<WorkbenchUser> users = new ArrayList<>();
 		try {
 			if (projectId != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
+				query.setParameter("cropName", cropName);
 				final List<Object> results = query.list();
 				for (final Object o : results) {
 					final Object[] user = (Object[]) o;
