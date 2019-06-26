@@ -645,14 +645,6 @@ public interface WorkbenchDataManager {
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid, final String cropName);
 
-
-	/**
-	 * Returns list of roles
-	 *
-	 * @return
-	 */
-	List<Role> getAllRoles();
-
 	/**
 	 * Returns list of roles filtered according to roleSearchDto
 	 *

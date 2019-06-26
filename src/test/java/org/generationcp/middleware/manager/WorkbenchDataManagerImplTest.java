@@ -806,10 +806,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 				
 			}
 		}
-	}@Test
-	public void testGetAllRoles() {
-		final List<Role> roles = this.workbenchDataManager.getAllRoles();
-		Assert.assertNotNull(roles);
 	}
 
 	@Test

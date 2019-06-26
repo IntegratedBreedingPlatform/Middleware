@@ -10,6 +10,9 @@ public class RoleSearchDto {
 
 	private Integer roleTypeId;
 
+	public RoleSearchDto() {
+	}
+
 	public RoleSearchDto(final Boolean assignable, final Integer roleTypeId) {
 		this.assignable = assignable;
 		this.roleTypeId = roleTypeId;
