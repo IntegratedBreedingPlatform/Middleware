@@ -411,7 +411,7 @@ public interface WorkbenchDataManager {
 	 * @param projectId - the project id
 	 * @return the List of {@link WorkbenchUser} records
 	 */
-	List<WorkbenchUser> getUsersByProjectId(Long projectId);
+	List<WorkbenchUser> getUsersByProjectId(Long projectId, final String cropName);
 
 	/**
 	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.

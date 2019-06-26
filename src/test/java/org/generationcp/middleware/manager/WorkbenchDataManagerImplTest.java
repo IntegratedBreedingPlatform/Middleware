@@ -59,6 +59,8 @@ import static org.hamcrest.core.Is.is;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
+	private final static String CROP_NAME = "maize";
+
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
@@ -720,7 +722,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetUsersByProjectId() {
-		final List<WorkbenchUser> results = this.workbenchDataManager.getUsersByProjectId(this.commonTestProject.getProjectId());
+		final List<WorkbenchUser> results = this.workbenchDataManager.getUsersByProjectId(this.commonTestProject.getProjectId(), CROP_NAME);
 
 		Assert.assertNotNull(results);
 		Assert.assertEquals(2, results.size());
@@ -763,7 +765,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<ProjectActivity> projectActiviesBefore = this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
 		Assert.assertNotNull(projectActiviesBefore);
 		Assert.assertFalse(projectActiviesBefore.isEmpty());
-		final List<WorkbenchUser> usersBefore = this.workbenchDataManager.getUsersByProjectId(id);
+		final List<WorkbenchUser> usersBefore = this.workbenchDataManager.getUsersByProjectId(id, CROP_NAME);
 		Assert.assertNotNull(usersBefore);
 		Assert.assertFalse(usersBefore.isEmpty());
 		
@@ -773,7 +775,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<ProjectActivity> projectActiviesAfter = this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
 		Assert.assertNotNull(projectActiviesAfter);
 		Assert.assertTrue(projectActiviesAfter.isEmpty());
-		final List<WorkbenchUser> usersAfter = this.workbenchDataManager.getUsersByProjectId(id);
+		final List<WorkbenchUser> usersAfter = this.workbenchDataManager.getUsersByProjectId(id, CROP_NAME);
 		Assert.assertNotNull(usersAfter);
 		Assert.assertTrue(usersAfter.isEmpty());
 	}
