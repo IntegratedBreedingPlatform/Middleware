@@ -5,6 +5,7 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 					criteria.add(Restrictions.eq("roleType.roleTypeId", roleSearchDto.getRoleTypeId()));
 				}
 			}
+			criteria.addOrder(Order.asc("id"));
 			toReturn = criteria.list();
 
 		} catch (final HibernateException e) {
