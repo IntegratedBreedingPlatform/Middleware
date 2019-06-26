@@ -1038,11 +1038,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Role> getAllRoles() {
-		return this.getRoleDao().getAll();
-	}
-
-	@Override
 	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
 		return this.getRoleDao().getRoles(roleSearchDto);
 	}
