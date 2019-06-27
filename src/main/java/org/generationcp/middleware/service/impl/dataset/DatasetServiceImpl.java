@@ -196,18 +196,12 @@ public class DatasetServiceImpl implements DatasetService {
 				}));
 		}
 
-		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		sampleColumn.setName(TermId.SAMPLES.name());
-		sampleColumn.setAlias(TermId.SAMPLES.name());
-		sampleColumn.setTermId(TermId.SAMPLES.getId());
-		sampleColumn.setFactor(true);
-
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
-			factorColumns.add(sampleColumn);
+			factorColumns.add(buildSampleColumn());
 		} else if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())
 			&& this.daoFactory.getSampleDao().countByPlotDatasetId(observationSetId) > 0) {
-			factorColumns.add(sampleColumn);
+			factorColumns.add(buildSampleColumn());
 		}
 
 
@@ -224,6 +218,15 @@ public class DatasetServiceImpl implements DatasetService {
 		factorColumns.addAll(variateColumns);
 
 		return factorColumns;
+	}
+
+	private MeasurementVariable buildSampleColumn() {
+		final MeasurementVariable sampleColumn = new MeasurementVariable();
+		sampleColumn.setName(TermId.SAMPLES.name());
+		sampleColumn.setAlias(TermId.SAMPLES.name());
+		sampleColumn.setTermId(TermId.SAMPLES.getId());
+		sampleColumn.setFactor(true);
+		return sampleColumn;
 	}
 
 	@Override
