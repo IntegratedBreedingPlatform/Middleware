@@ -989,7 +989,7 @@ public interface FieldbookService {
 	 * @param programUUID the program UUID
 	 * @param crop
 	 */
-	void saveExperimentalDesignGenerated(final Workbook workbook, final String programUUID, final CropType crop);
+	void saveExperimentalDesign(final Workbook workbook, final String programUUID, final CropType crop);
 
 
 	/**
@@ -1001,7 +1001,13 @@ public interface FieldbookService {
 	 *            the program UUID
 	 * @param crop
 	 */
-	void deleteExperimentalDesignGenerated(final Workbook workbook, final String programUUID, final CropType crop);
+	void deleteExperimentalDesign(final Workbook workbook, final String programUUID, final CropType crop);
 
+	/**
+	 * Save workbook variables and Observations
+	 *
+	 * @param workbook
+	 * @param programUUID
+	 */
 	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
 }

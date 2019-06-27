@@ -265,9 +265,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void saveExperimentalDesignGenerated(
+	public void saveExperimentalDesign(
 		final Workbook workbook, final String programUUID, final CropType crop) {
-		final TimerWatch timerWatch = new TimerWatch("saveExperimentalDesignGenerated (grand total)");
+		final TimerWatch timerWatch = new TimerWatch("saveExperimentalDesign (grand total)");
 		try {
 			this.getWorkbookSaver().saveProjectProperties(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
@@ -282,9 +282,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteExperimentalDesignGenerated(
+	public void deleteExperimentalDesign(
 		final Workbook workbook, final String programUUID, final CropType crop) {
-		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesignGenerated (grand total)");
+		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesign (grand total)");
 		try {
 
 			this.getWorkbookSaver().saveProjectProperties(workbook);
