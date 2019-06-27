@@ -46,4 +46,14 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 		return datasetTypeDTO;
 	}
 
+	@Override
+	public List<Integer> getObservationDatasetTypeIds() {
+		return this.daoFactory.getDatasetTypeDao().getObservationDatasetTypeIds();
+	}
+
+
+	@Override
+	public List<Integer> getSubObservationDatasetTypeIds() {
+		return this.daoFactory.getDatasetTypeDao().getSubObservationDatasetTypeIds();
+	}
 }

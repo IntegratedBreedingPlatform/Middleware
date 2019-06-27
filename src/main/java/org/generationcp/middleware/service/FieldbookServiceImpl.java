@@ -24,7 +24,6 @@ import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -33,7 +32,6 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -67,10 +65,12 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
+import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
 import org.slf4j.Logger;
@@ -232,78 +232,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void saveMeasurementRows(final Workbook workbook, final String programUUID, final boolean saveVariates) {
-
-		final long startTime = System.currentTimeMillis();
-
+	public void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID) {
 		try {
-			final List<MeasurementVariable> variates = workbook.getVariates();
-			final List<MeasurementVariable> factors = workbook.getFactors();
-			final List<MeasurementRow> observations = workbook.getObservations();
 
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
 
-
-
-			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
-
-			// unpack maps first level - Maps of Strings, Maps of
-			// VariableTypeList , Maps of Lists of MeasurementVariable
-			final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
-			final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
-
-			// unpack maps
-			// Strings
-			final List<String> trialHeaders = headerMap.get("trialHeaders");
-
-			// VariableTypeLists
-			final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
-
 			// save trial observations
 			this.getWorkbookSaver().saveTrialObservations(workbook, programUUID);
 
-			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
-			if (measurementDatasetId == null) {
-				measurementDatasetId =
-						this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId());
-			}
-
-			// save factors
-			// TODO: Possible improvement
-			this.getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
-
-			if (factors != null) {
-				for (final MeasurementVariable factor : factors) {
-					if (NonEditableFactors.find(factor.getTermId()) == null) {
-						for (final MeasurementRow row : observations) {
-							for (final MeasurementData field : row.getDataList()) {
-								if (factor.getName().equals(field.getLabel()) && factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
-
-									this.saveOrUpdateTrialDesignData(this.getExperimentPropertySaver(),
-											this.getExperimentDao().getById(row.getExperimentId()), field, factor.getTermId());
-
-								}
-							}
-						}
-					}
-				}
-			}
-			final Measurements measurements =
-					new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
-
-			this.saveMeasurements(saveVariates, variates, observations, measurements);
-
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
-		} finally {
-			this.getActiveSession().setFlushMode(FlushMode.AUTO);
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		}
-
-		FieldbookServiceImpl.LOG.debug("========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
-
 	}
 
 	//TODO find a better way to mark variable as OUT_OF_SYNC when inputs are deleted
@@ -322,6 +262,41 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Boolean hasOutOfSyncObservations(final Integer projectId) {
 		return this.getPhenotypeDao().hasOutOfSync(projectId);
+	}
+
+	@Override
+	public void saveExperimentalDesign(
+		final Workbook workbook, final String programUUID, final CropType crop) {
+		final TimerWatch timerWatch = new TimerWatch("saveExperimentalDesign (grand total)");
+		try {
+			this.getWorkbookSaver().saveProjectProperties(workbook);
+			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
+			this.getWorkbookSaver().savePlotDataset(workbook, variableMap, programUUID, crop);
+
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
+		} finally {
+			timerWatch.stop();
+		}
+	}
+
+	@Override
+	public void deleteExperimentalDesign(
+		final Workbook workbook, final String programUUID, final CropType crop) {
+		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesign (grand total)");
+		try {
+
+			this.getWorkbookSaver().saveProjectProperties(workbook);
+			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
+
+			this.getWorkbookSaver().deleteExperimentalDesign(workbook, variableMap, programUUID, crop);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
+		} finally {
+			timerWatch.stop();
+		}
 	}
 
 	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
