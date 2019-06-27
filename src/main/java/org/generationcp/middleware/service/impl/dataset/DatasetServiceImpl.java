@@ -196,15 +196,21 @@ public class DatasetServiceImpl implements DatasetService {
 				}));
 		}
 
+		final MeasurementVariable sampleColumn = new MeasurementVariable();
+		sampleColumn.setName(TermId.SAMPLES.name());
+		sampleColumn.setAlias(TermId.SAMPLES.name());
+		sampleColumn.setTermId(TermId.SAMPLES.getId());
+		sampleColumn.setFactor(true);
+
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
-			final MeasurementVariable sampleColumn = new MeasurementVariable();
-			sampleColumn.setName(TermId.SAMPLES.name());
-			sampleColumn.setAlias(TermId.SAMPLES.name());
-			sampleColumn.setTermId(TermId.SAMPLES.getId());
-			sampleColumn.setFactor(true);
+			factorColumns.add(sampleColumn);
+		} else if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())
+			&& this.daoFactory.getSampleDao().countByPlotDatasetId(observationSetId) > 0) {
 			factorColumns.add(sampleColumn);
 		}
+
+
 
 		// Other edge cases
 		// Let's consider it as a special case instead of getting ENVIRONMENT_DETAILS for plot dataset
