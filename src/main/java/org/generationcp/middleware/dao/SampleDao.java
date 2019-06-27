@@ -138,6 +138,15 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return (Long) criteria.uniqueResult();
 	}
 
+	public long countByPlotDatasetId(final Integer plotDatasetId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
+		criteria.createAlias("experiment.project", "project");
+		criteria.add(Restrictions.eq("project.parent.projectId", plotDatasetId));
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<SampleDTO> getSampleDTOS(final Criteria criteria) {
 		if (criteria == null) {
