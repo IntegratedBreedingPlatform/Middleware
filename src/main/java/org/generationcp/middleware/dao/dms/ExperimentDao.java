@@ -874,54 +874,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public Map<Integer, Map<String, Object>> getValuesFromSummaryObservation(final int studyId) {
-
-		final StringBuilder queryString = new StringBuilder("SELECT \n"
-			+ "e.nd_geolocation_id as `geoLocationId`,\n"
-			+ "geoprop.type_id as `variableId`,\n"
-			+ "geoprop.value as `value`\n"
-			+ "FROM ibdbv2_maize_merged.nd_experiment e\n"
-			+ "LEFT JOIN nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = e.nd_geolocation_id\n"
-			+ "LEFT JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
-			+ "WHERE proj.dataset_type_id = " + + DatasetTypeEnum.SUMMARY_DATA.getId() + "\n"
-			+ "UNION ALL\n"
-			+ "SELECT \n"
-			+ "e.nd_geolocation_id as `geoLocationId`,\n"
-			+ "p.observable_id as `variableId`, \n"
-			+ "p.value \n"
-			+ "FROM ibdbv2_maize_merged.nd_experiment e \n"
-			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
-			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id\n"
-			+ "WHERE proj.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
-
-		final SQLQuery q = this.getSession().createSQLQuery(queryString.toString());
-		q.addScalar("geoLocationId", new IntegerType());
-		q.addScalar("variableId", new StringType());
-		q.addScalar("value", new StringType());
-		q.setParameter("studyId", studyId);
-		q.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-		final List<Map<String, Object>> results = q.list();
-
-		final Map<Integer, Map<String, Object>> map = new HashMap<>();
-
-		for (final Map<String, Object> row : results) {
-			final Integer experimentId = (Integer) row.get("geoLocationId");
-			final String variableId = (String) row.get("variableId");
-			final Object value = row.get("value");
-			if (!map.containsKey(experimentId)) {
-				map.put(experimentId, new HashMap<String, Object>());
-			}
-			if (!map.get(experimentId).containsKey(variableId)) {
-				map.get(experimentId).put(variableId, new ArrayList<Object>());
-			}
-			// Group values per variable and experimentId.
-			map.get(experimentId).put(variableId, value);
-		}
-
-		return map;
-
-	}
-
 	public Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int studyId, final List<Integer> datasetTypeIds,
 		final Map<Integer, Integer> inputVariableDatasetMap) {
 

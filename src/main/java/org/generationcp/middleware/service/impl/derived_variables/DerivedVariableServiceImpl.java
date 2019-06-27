@@ -167,17 +167,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return this.daoFactory.getExperimentDao().getValuesFromObservations(studyId, datasetTypeIds, inputVariableDatasetMap);
 	}
 
-	/**
-	 * Gets the value of variables in Summary Observation, grouped by geolocationId and variableId.
-	 *
-	 * @param studyId
-	 * @return
-	 */
-	@Override
-	public Map<Integer, Map<String, Object>> getValuesFromSummaryObservation(final int studyId) {
-		return this.daoFactory.getExperimentDao().getValuesFromSummaryObservation(studyId);
-	}
-
 	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
