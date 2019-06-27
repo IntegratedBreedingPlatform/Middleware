@@ -323,6 +323,19 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+	public List<DmsProject> getDatasetsByStudy(final Integer studyId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("study.projectId", studyId));
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				"Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
+		}
+	}
+
 	public List<DmsProject> getByIds(final Collection<Integer> projectIds) {
 		final List<DmsProject> studyNodes = new ArrayList<>();
 		try {

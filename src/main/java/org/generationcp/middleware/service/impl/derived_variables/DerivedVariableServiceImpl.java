@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.service.api.derived_variables.DerivedVariable
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -132,10 +134,17 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int datasetId) {
+	public Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int studyId) {
 		final Map<Integer, MeasurementVariable> variableIdMeasurementVariableMap = new HashMap<>();
+
+		final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getDatasetsByStudy(studyId);
+		final List<Integer> projectIds = new ArrayList<>();
+		for (final DmsProject dmsProject : projects) {
+			projectIds.add(dmsProject.getProjectId());
+		}
 		final List<MeasurementVariable> measurementVariables =
-			this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
+				Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
 		}
