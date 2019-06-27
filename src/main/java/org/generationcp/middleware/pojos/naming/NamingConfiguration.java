@@ -5,7 +5,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "naming_config")
@@ -38,9 +37,6 @@ public class NamingConfiguration {
 	@Basic
 	@Column(name = "separator")
 	private String separator;
-
-	@Transient
-	private int sequenceCounter;
 
 	public String getPrefix() {
 		return prefix;
@@ -98,11 +94,4 @@ public class NamingConfiguration {
 		this.name = name;
 	}
 
-	public int getSequenceCounter() {
-		return sequenceCounter;
-	}
-
-	public void setSequenceCounter(final int sequenceCounter) {
-		this.sequenceCounter = sequenceCounter;
-	}
 }
