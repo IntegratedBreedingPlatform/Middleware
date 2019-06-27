@@ -34,16 +34,15 @@ public interface DatasetService {
 
 	/**
 	 * Adds a variable to the dataset. Variable type MUST be Trait or Selection
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
-	 * @param datasetVariable Variable to be added
-	 * @return A measurement variable.
+	 * @param variableId If of the variable                    
+	 * @param type Variable type
+	 * @param alias Assigned to the variable in the dataset               
 	 */
 	void addDatasetVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 
 	/**
 	 * Given a dataset and a list of variables, it will de-associated them from the dataset
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param variableIds List of variables
 	 */
@@ -68,9 +67,6 @@ public interface DatasetService {
 	/**
 	 * Create a new observation for the specified dataset and observation unit id
 	 * Notice that status, updated date and created date are internally set so values in observation object will be discarded
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
-	 * @param observationUnitId Id of the observation unit
 	 * @param observation Observation to be added
 	 * @return The new created ObservationDto
 	 */
@@ -89,27 +85,27 @@ public interface DatasetService {
 	 * It will always return the union between the factors of the parent dataset, the variables of the specified dataset
 	 * and some virtual columns that needs to be shown in the observations table (i.e. SAMPLES)
 	 * draftMode == TRUE indicates that the dataset variables will only retrieve only the variables that contains draft data
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
 	 * @param draftMode Will only retrieve variables with draft data if TRUE
 	 * @return List of Measurement Variables
 	 */
-	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
+	List<MeasurementVariable> getObservationSetColumns(Integer subObservationSetId, Boolean draftMode);
 
 	/**
 	 * Given a dataset, it will retrieve the union between the parent dataset variables and the dataset variables
-	 * @param studyId Id of the Study
-	 * @param datasetId Id of the Dataset
+	 * @param observationSetId Id of the Dataset
 	 * @return List of Measurement Variables.
 	 */
-	List<MeasurementVariable> getSubObservationSetVariables(Integer subObservationSetId);
+	List<MeasurementVariable> getObservationSetVariables(Integer observationSetId);
 
 	/**
 	 * Generates a sub-observation dataset for the indicated parent id
-	 * @param cropName Crop name
 	 * @param studyId Id of the study
+	 * @param datasetName Name of the new dataset
+	 * @param datasetTypeId Type of the new dataset
+	 * @param instanceIds List of instances to which new experiments will be created
+	 * @param observationUnitVariableId Variable to define the sequence number
+	 * @param numberOfSubObservationUnits Number of sub-obs to be created per experiment                                    
 	 * @param parentId Id of the parent dataset
-	 * @param datasetGeneratorInput Dataset Generator Input.
 	 * @return The new created dataset
 	 */
 	DatasetDTO generateSubObservationDataset(
@@ -132,8 +128,6 @@ public interface DatasetService {
 
 	/**
 	 * Return a dataset given the id
-	 * @param crop Crop name
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 * @return
 	 */
@@ -175,7 +169,6 @@ public interface DatasetService {
 	 * Returns the list of observation unit rows for datasetId
 	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
-	 * @param searchDTO Search DTO
 	 * @return List of ObservationUnitRow
 	 */
 	List<ObservationUnitRow> getAllObservationUnitRows(int studyId, int datasetId);
@@ -197,7 +190,6 @@ public interface DatasetService {
 
 	/**
 	 * Return the list of instances for an specific dataset
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 * @return List of StudyInstances
 	 */
@@ -211,7 +203,6 @@ public interface DatasetService {
 
 	/**
 	 * Get the list of dataset variables of an specific variable type
-	 * @param studyId Id of the study
 	 * @param datasetId If of the dataset
 	 * @param variableType Variable Type
 	 * @return List of variables
@@ -220,7 +211,6 @@ public interface DatasetService {
 
 	/**
 	 * It will accept all the draft data even when there are out of bounds values for numerical types.
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 */
 	void acceptAllDatasetDraftData(Integer datasetId);
@@ -292,14 +282,12 @@ public interface DatasetService {
 
 	/**
 	 * It will reject all the draft data for a dataset
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 */
 	void rejectDatasetDraftData(Integer datasetId);
 
 	/**
 	 *
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 * @return a boolean indicating if the dataset draft data has out of bound values or not
 	 */
@@ -307,14 +295,12 @@ public interface DatasetService {
 
 	/**
 	 * Accepts the in bounds values for the draft data and set as missing the out of bounds values
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 */
 	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer datasetId);
 
 	/**
 	 * Count how many instances and observations are filtered given a filter with a not null variable
-	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param filter Filter
 	 * @return FilteredPhenotypesInstancesCountDTO

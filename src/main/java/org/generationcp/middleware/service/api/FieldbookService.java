@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -218,19 +219,6 @@ public interface FieldbookService {
 	 * before using this method.
 	 */
 	boolean loadAllObservations(final Workbook workbook);
-
-	/**
-	 * Saves the measurement rows of a workbook as a local trial or nursery on
-	 * the new CHADO schema.
-	 *
-	 * @param workbook
-	 *            that contains the measurement rows to save
-	 * @param programUUID
-	 *            unique id of the program
-	 * @param saveVariates
-	 *            flag that indicates if the measurement data should be saved
-	 */
-	void saveMeasurementRows(Workbook workbook, String programUUID, boolean saveVariates);
 
 	/**
 	 * Saves germplasm list advanced nursery types. This method saves the
@@ -993,4 +981,33 @@ public interface FieldbookService {
 
 	Boolean hasOutOfSyncObservations(Integer id);
 
+
+	/**
+	 * Save experimental Design
+	 *
+	 * @param workbook
+	 * @param programUUID the program UUID
+	 * @param crop
+	 */
+	void saveExperimentalDesign(final Workbook workbook, final String programUUID, final CropType crop);
+
+
+	/**
+	 * Delete experimental Design
+	 *
+	 * @param workbook
+	 *
+	 * @param programUUID
+	 *            the program UUID
+	 * @param crop
+	 */
+	void deleteExperimentalDesign(final Workbook workbook, final String programUUID, final CropType crop);
+
+	/**
+	 * Save workbook variables and Observations
+	 *
+	 * @param workbook
+	 * @param programUUID
+	 */
+	void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID);
 }
