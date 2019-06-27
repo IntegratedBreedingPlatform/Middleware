@@ -414,7 +414,7 @@
 			ON UPDATE NO ACTION,
 			ADD CONSTRAINT fk_permission_2
 			FOREIGN KEY (workbench_sidebar_category_link_id)
-			REFERENCES workbench_sidebar_category_link_id (sidebar_category_link_id)
+			REFERENCES workbench_sidebar_category_link (sidebar_category_link_id)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
 		</sql>
