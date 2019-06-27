@@ -158,7 +158,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariable> factorColumns;
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
 
-		if (DatasetTypeEnum.PLOT_DATA.getId() == datasetDTO.getDatasetTypeId()) {
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			//PLOTDATA
 			factorColumns = this.daoFactory.getDmsProjectDAO()
 				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
@@ -173,7 +173,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		List<MeasurementVariable> variateColumns;
-		if (DatasetTypeEnum.PLOT_DATA.getId() == datasetDTO.getDatasetTypeId()) {
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			//PLOTDATA
 			variateColumns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, MEASUREMENT_VARIABLE_TYPES);
 		} else {
@@ -226,7 +226,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
 
 		final List<MeasurementVariable> plotDataSetColumns;
-		if (DatasetTypeEnum.PLOT_DATA.getId() == datasetDTO.getDatasetTypeId()) {
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			plotDataSetColumns =
 					this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetDTO.getDatasetId(), PLOT_COLUMNS_ALL_VARIABLE_TYPES);
 
