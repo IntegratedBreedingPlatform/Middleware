@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.pojos.workbench;
 
 import javax.persistence.Column;
@@ -15,17 +14,17 @@ public class RoleType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "role_type_id", nullable = false)
-	private Integer roleTypeId;
+	private Integer id;
 
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	public Integer getRoleTypeId() {
-		return this.roleTypeId;
+	public Integer getId() {
+		return this.id;
 	}
 
-	public void setRoleTypeId(final Integer roleTypeId) {
-		this.roleTypeId = roleTypeId;
+	public void setId(final Integer roleTypeId) {
+		this.id = roleTypeId;
 	}
 
 	public String getName() {

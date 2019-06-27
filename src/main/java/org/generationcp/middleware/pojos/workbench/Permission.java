@@ -30,7 +30,8 @@ public class Permission {
 	@JoinColumn(name = "parent_id", nullable = true)
 	private Permission parent;
 
-	@Column(name = "workbench_sidebar_category_link_id", nullable = true)
+	@ManyToOne
+	@JoinColumn(name = "workbench_sidebar_category_link_id", nullable = true)
 	private WorkbenchSidebarCategoryLink sidebarCategoryLink;
 
 	public Integer getPermissionId() {

@@ -1,7 +1,8 @@
-
 package org.generationcp.middleware.pojos.workbench;
 
 import org.apache.commons.lang.WordUtils;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -9,14 +10,19 @@ import org.pojomatic.annotations.AutoProperty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "role")
@@ -71,6 +77,14 @@ public class Role implements Serializable {
 
 	@Column(name = "created_date")
 	private Timestamp createdDate;
+
+	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+		name = "role_permission",
+		joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
+		inverseJoinColumns = @JoinColumn(name = "permission_id"))
+	private List<Permission> permissions = new ArrayList<>();
 
 	public Role() {
 	}
@@ -183,6 +197,14 @@ public class Role implements Serializable {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public List<Permission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(final List<Permission> permissions) {
+		this.permissions = permissions;
 	}
 
 	@Override

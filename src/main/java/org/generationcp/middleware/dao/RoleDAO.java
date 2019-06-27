@@ -27,7 +27,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 				}
 				if (roleSearchDto.getRoleTypeId() != null) {
 					criteria.createAlias("roleType", "roleType");
-					criteria.add(Restrictions.eq("roleType.roleTypeId", roleSearchDto.getRoleTypeId()));
+					criteria.add(Restrictions.eq("roleType.id", roleSearchDto.getRoleTypeId()));
 				}
 			}
 			criteria.addOrder(Order.asc("id"));
