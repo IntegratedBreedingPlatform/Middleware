@@ -9,7 +9,9 @@ import java.util.Set;
 
 public interface DerivedVariableService {
 
-	Map<Integer, Map<String, List<Object>>> getInputVariableValuesMap(final int datasetId, final List<Integer> datasetTypeIds, final Map<Integer, Integer> inputVariableDatasetMap);
+	Map<Integer, Map<String, Object>> getValuesFromSummaryObservation(int studyId);
+
+	Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int datasetId, final List<Integer> datasetTypeIds, final Map<Integer, Integer> inputVariableDatasetMap);
 
 	Set<String> getDependencyVariables(final int datasetId);
 
@@ -22,4 +24,5 @@ public interface DerivedVariableService {
 		final MeasurementVariable measurementVariable);
 
 	Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int datasetId);
+
 }

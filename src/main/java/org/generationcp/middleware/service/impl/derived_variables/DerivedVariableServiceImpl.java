@@ -143,7 +143,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	/**
-	 * Gets the aggregate values of variables grouped by experimentId and variableId. This method can only retrieve values for TRAIT and ENVIRONMENT DETAIL variables.
+	 * Gets the aggregate values of TRAIT variables, grouped by experimentId and variableId.
 	 *
 	 * @param studyId
 	 * @param datasetTypeIds
@@ -153,9 +153,20 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	 * @return
 	 */
 	@Override
-	public Map<Integer, Map<String, List<Object>>> getInputVariableValuesMap(final int studyId, final List<Integer> datasetTypeIds,
+	public Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int studyId, final List<Integer> datasetTypeIds,
 		final Map<Integer, Integer> inputVariableDatasetMap) {
-		return this.daoFactory.getExperimentDao().getExperimentValuesAsMap(studyId, datasetTypeIds, inputVariableDatasetMap);
+		return this.daoFactory.getExperimentDao().getValuesFromObservations(studyId, datasetTypeIds, inputVariableDatasetMap);
+	}
+
+	/**
+	 * Gets the value of variables in Summary Observation, grouped by geolocationId and variableId.
+	 *
+	 * @param studyId
+	 * @return
+	 */
+	@Override
+	public Map<Integer, Map<String, Object>> getValuesFromSummaryObservation(final int studyId) {
+		return this.daoFactory.getExperimentDao().getValuesFromSummaryObservation(studyId);
 	}
 
 	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
