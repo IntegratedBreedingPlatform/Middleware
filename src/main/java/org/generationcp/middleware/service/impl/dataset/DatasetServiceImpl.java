@@ -198,12 +198,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
-			final MeasurementVariable sampleColumn = new MeasurementVariable();
-			sampleColumn.setName(TermId.SAMPLES.name());
-			sampleColumn.setAlias(TermId.SAMPLES.name());
-			sampleColumn.setTermId(TermId.SAMPLES.getId());
-			sampleColumn.setFactor(true);
-			factorColumns.add(sampleColumn);
+			factorColumns.add(buildSampleColumn());
 		}
 
 		// Other edge cases
@@ -218,6 +213,15 @@ public class DatasetServiceImpl implements DatasetService {
 		factorColumns.addAll(variateColumns);
 
 		return factorColumns;
+	}
+
+	private MeasurementVariable buildSampleColumn() {
+		final MeasurementVariable sampleColumn = new MeasurementVariable();
+		sampleColumn.setName(TermId.SAMPLES.name());
+		sampleColumn.setAlias(TermId.SAMPLES.name());
+		sampleColumn.setTermId(TermId.SAMPLES.getId());
+		sampleColumn.setFactor(true);
+		return sampleColumn;
 	}
 
 	@Override
