@@ -199,12 +199,7 @@ public class DatasetServiceImpl implements DatasetService {
 		// Virtual columns
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
 			factorColumns.add(buildSampleColumn());
-		} else if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())
-			&& this.daoFactory.getSampleDao().countByPlotDatasetId(observationSetId) > 0) {
-			factorColumns.add(buildSampleColumn());
 		}
-
-
 
 		// Other edge cases
 		// Let's consider it as a special case instead of getting ENVIRONMENT_DETAILS for plot dataset
