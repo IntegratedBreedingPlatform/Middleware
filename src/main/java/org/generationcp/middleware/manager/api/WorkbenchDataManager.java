@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
@@ -651,6 +652,13 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<Role> getRoles(RoleSearchDto roleSearchDto);
+
+	/**
+	 * Returns list of roleTypes
+	 *
+	 * @return
+	 */
+	List<RoleType> getRoleTypes();
 
 	/**
 	 * Return users with SUPERADMIN role
