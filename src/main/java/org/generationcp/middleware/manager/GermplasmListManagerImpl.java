@@ -170,9 +170,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public long countListDataProjectGermplasmListDataByListId(final Integer id) {
-
-		return this.countFromInstanceByIdAndMethod(this.getListDataProjectDAO(), id, "countByListId", new Object[] {id},
-			new Class[] {Integer.class});
+		return this.getListDataProjectDAO().countByListId(id);
 	}
 
 	@Override

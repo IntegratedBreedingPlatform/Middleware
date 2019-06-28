@@ -1172,8 +1172,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.datasetType", "dt");
-			criteria.createAlias("project.parent", "parent");
-			criteria.add(Restrictions.eq("parent.projectId", parentId));
+			criteria.createAlias("project.study", "study");
+			criteria.add(Restrictions.eq("study.projectId", parentId));
 			criteria.setProjection(projectionList);
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
 			datasetDTOS = criteria.list();
