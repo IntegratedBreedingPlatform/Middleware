@@ -1,12 +1,12 @@
 package org.generationcp.middleware.util.projection;
 
-public class CustomProjections {
+public abstract class CustomProjections {
 
-	private CustomProjections() {
+	public static ConcatProperties concatProperties(final String separator, final String... properties) {
+		return new ConcatProperties(separator, properties);
 	}
 
-	public static ConcatProperties concatProperties(final String separator, final String... property) {
-		return new ConcatProperties(separator, property);
+	public static CoalesceProjection coalesce(final String... properties) {
+        return new CoalesceProjection(properties);
 	}
-
 }

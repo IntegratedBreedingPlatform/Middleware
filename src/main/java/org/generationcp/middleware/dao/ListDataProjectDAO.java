@@ -193,6 +193,23 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		}
 	}
 
+	public long countByListId(final Integer id) {
+		try {
+			if (id != null) {
+				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
+				criteria.createAlias("list", "l");
+				criteria.add(Restrictions.eq("l.id", id));
+				criteria.setProjection(Projections.rowCount());
+				return ((Long) criteria.uniqueResult()).longValue(); // count
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with countByListId(id=" + id + ") query from ListDataProject " + e.getMessage(), e);
+		}
+		return 0;
+	}
+
+
 	public long countByListIdAndEntryType(final Integer id, final List<Integer> systemDefinedEntryTypeIds) {
 		try {
 			if (id != null) {
