@@ -392,46 +392,6 @@ public abstract class DataManager extends DatabaseBroker {
 		return count;
 	}
 
-	/**
-	 * A generic implementation of the countByXXXX(Integer id, ...) method that calls a specific count method from a DAO. <br/>
-	 * Calls the corresponding count method as specified in the parameter methodName. <br/>
-	 * <br/>
-	 * Sample usage: <br/>
-	 *
-	 * <pre>
-	 * <code>
-	 *      public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
-	 *            {
-	 *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition",
-	 *                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
-	 *    }
-	 * </code>
-	 * </pre>
-	 *
-	 * @param dao            The DAO to call the method from
-	 * @param id             The entity id
-	 * @param methodName     The method to call
-	 * @param parameters     The parameters to be passed to the method
-	 * @param parameterTypes The types of the parameters to be passed to the method
-	 * @return The count
-	 * @
-	 */
-	@SuppressWarnings("rawtypes")
-	public long countFromInstanceByIdAndMethod(
-		final GenericDAO dao, final Integer id, final String methodName, final Object[] parameters, final Class[] parameterTypes) {
-		long count = 0;
-		try {
-			final java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
-			dao.setSession(this.getActiveSession());
-			count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-			// NoSuchMethodException
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in counting: " + e.getMessage(), e);
-		}
-		return count;
-	}
-
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object save(final GenericDAO dao, final Object entity) {
 
