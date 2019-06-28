@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Table(name = "users_roles")
@@ -41,7 +41,7 @@ public class UserRole {
 	private WorkbenchUser createdBy;
 
 	@Column(name = "created_date")
-	private Timestamp createdDate;
+	private Date createdDate;
 
 	public UserRole() {
 	}
@@ -111,11 +111,11 @@ public class UserRole {
 		this.createdBy = createdBy;
 	}
 
-	public Timestamp getCreatedDate() {
+	public Date getCreatedDate() {
 		return this.createdDate;
 	}
 
-	public void setCreatedDate(final Timestamp createdDate) {
+	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
