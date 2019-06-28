@@ -63,6 +63,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private static final int NO_OF_GERMPLASM = 5;
 
+	private static final String PLOT = "PLOT";
+
 	private PhenotypeDao phenotypeDao;
 
 	private GeolocationDao geolocationDao;
@@ -389,7 +391,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by Dataset Type, just for current program
 		final PhenotypeSearchRequestDTO dto6 = new PhenotypeSearchRequestDTO();
 		dto6.setProgramDbIds(Collections.singletonList(uniqueID));
-		dto6.setObservationLevel(String.valueOf(DatasetTypeEnum.PLOT_DATA.getId()));
+		dto6.setObservationLevel(PLOT);
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypes(dto6));
 	}
 
