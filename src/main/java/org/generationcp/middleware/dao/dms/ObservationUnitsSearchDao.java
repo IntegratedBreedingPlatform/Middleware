@@ -371,11 +371,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			query.addScalar(designFactor, new StringType());
 		}
 
-		for (final String envFactor : searchDto.getEnvironmentDetails()) {
-			query.addScalar(envFactor, new StringType());
+		for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
+			query.addScalar(envFactor.getName(), new StringType());
 		}
-		for (final String envCondition : searchDto.getEnvironmentConditions()) {
-			query.addScalar(envCondition, new StringType());
+		for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
+			query.addScalar(envCondition.getName(), new StringType());
 		}
 
 		query.addScalar(ObservationUnitsSearchDao.OBSERVATION_UNIT_NO, new StringType());
@@ -474,12 +474,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s',  ";
 			final String geolocEnvFactorFormat =
 				" %s AS '%s',  ";
-			for (final String envFactor : searchDto.getEnvironmentDetails()) {
-				if (geolocSpecialFactorsMap.containsKey(envFactor)) {
-					final String column = geolocSpecialFactorsMap.get(envFactor);
-					sql.append(String.format(geolocEnvFactorFormat, column, envFactor));
+			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
+				if (geolocSpecialFactorsMap.containsKey(envFactor.getName())) {
+					final String column = geolocSpecialFactorsMap.get(envFactor.getName());
+					sql.append(String.format(geolocEnvFactorFormat, column, envFactor.getName()));
 				} else {
-					sql.append(String.format(envFactorFormat, envFactor, envFactor));
+					sql.append(String.format(envFactorFormat, envFactor.getName(), envFactor.getName()));
 				}
 			}
 		}
@@ -490,8 +490,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
 					+ "		INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId "
 					+ "		WHERE envnde.nd_geolocation_id = gl.nd_geolocation_id) '%s',  ";
-			for (final String envCondition : searchDto.getEnvironmentConditions()) {
-				sql.append(String.format(envConditionFormat, envCondition, envCondition));
+			for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
+				sql.append(String.format(envConditionFormat, envCondition.getName(), envCondition.getName()));
 			}
 		}
 
@@ -911,11 +911,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
 			variables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
 		}
-		for (final String envFactor : searchDto.getEnvironmentDetails()) {
-			variables.put(envFactor, new ObservationUnitData((String) row.get(envFactor)));
+		for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
+			final ObservationUnitData observationUnitData = new ObservationUnitData();
+			observationUnitData.setVariableId(envFactor.getId());
+			observationUnitData.setValue((String) row.get(envFactor.getName()));
+			variables.put(envFactor.getName(), observationUnitData);
 		}
-		for (final String envCondition : searchDto.getEnvironmentConditions()) {
-			variables.put(envCondition, new ObservationUnitData((String) row.get(envCondition)));
+		for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
+			final ObservationUnitData observationUnitData = new ObservationUnitData();
+			observationUnitData.setVariableId(envCondition.getId());
+			observationUnitData.setValue((String) row.get(envCondition.getName()));
+			variables.put(envCondition.getName(), observationUnitData);
 		}
 
 		observationUnitRow.setVariables(variables);

@@ -983,12 +983,13 @@ public class DatasetServiceImplTest {
 		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
 			VariableType.ENVIRONMENT_DETAIL.getId()))).thenReturn(observationSetVariables);
 
-		final List<String> result = this.datasetService.findAdditionalEnvironmentFactors(datasetId);
+		final List<MeasurementVariableDto> result = this.datasetService.findAdditionalEnvironmentFactors(datasetId);
 
 		// Only 1 variable is expected to be returned. Standard Environment Variables
 		// (TRIAL_INSTANCE, LOCATION_ID and EXPERIMENT_DESIGN should be ignored.
 		Assert.assertEquals(1, result.size());
-		Assert.assertTrue(result.contains(measurementVariable.getName()));
+		Assert.assertEquals(result.get(0).getName(), measurementVariable.getName());
+		Assert.assertEquals(result.get(0).getId().intValue(), measurementVariable.getTermId());
 	}
 
 
@@ -1009,10 +1010,11 @@ public class DatasetServiceImplTest {
 		when(this.dmsProjectDao.getObservationSetVariables(datasetId, Lists.newArrayList(
 			VariableType.STUDY_CONDITION.getId()))).thenReturn(observationSetVariables);
 
-		final List<String> result = this.datasetService.getEnvironmentConditionVariableNames(datasetId);
+		final List<MeasurementVariableDto> result = this.datasetService.getEnvironmentConditionVariableNames(datasetId);
 
 		Assert.assertEquals(1, result.size());
-		Assert.assertTrue(result.contains(measurementVariable.getName()));
+		Assert.assertEquals(result.get(0).getName(), measurementVariable.getName());
+		Assert.assertEquals(result.get(0).getId().intValue(), measurementVariable.getTermId());
 	}
 
 	@Test

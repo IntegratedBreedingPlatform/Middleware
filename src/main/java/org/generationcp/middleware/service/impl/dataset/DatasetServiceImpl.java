@@ -588,24 +588,24 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.studyService.getAdditionalDesignFactors(studyId);
 	}
 
-	List<String> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
+	List<MeasurementVariableDto> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
 			.getObservationSetVariables(trialDatasetId, Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
-		final List<String> factors = new ArrayList<>();
+		final List<MeasurementVariableDto> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentConditions) {
-			factors.add(variable.getName());
+			factors.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
 		}
 		return factors;
 	}
 
-	List<String> findAdditionalEnvironmentFactors(final Integer trialDatasetId) {
+	List<MeasurementVariableDto> findAdditionalEnvironmentFactors(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentDetailsVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(trialDatasetId, Lists.newArrayList(
 				VariableType.ENVIRONMENT_DETAIL.getId()));
-		final List<String> factors = new ArrayList<>();
+		final List<MeasurementVariableDto> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentDetailsVariables) {
 			if (!STANDARD_ENVIRONMENT_FACTORS.contains(variable.getTermId())) {
-				factors.add(variable.getName());
+				factors.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
 			}
 		}
 		return factors;
