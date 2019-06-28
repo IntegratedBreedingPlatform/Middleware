@@ -167,6 +167,42 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return this.daoFactory.getExperimentDao().getValuesFromObservations(studyId, datasetTypeIds, inputVariableDatasetMap);
 	}
 
+	@Override
+	public Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(final Integer studyId,
+		final Integer variableId) {
+
+		final Map<Integer, Map<String, Object>> inputVariableDatasetMap = new HashMap<>();
+		final Set<FormulaVariable> formulaVariables =
+			this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(variableId)));
+		final List<Integer> variableIds = new ArrayList<>();
+		for (final FormulaVariable formulaVariable : formulaVariables) {
+			variableIds.add(formulaVariable.getId());
+		}
+
+		final List<ProjectProperty> projectProperties =
+			this.daoFactory.getProjectPropertyDAO().getByStudyAndStandardVariableIds(studyId, variableIds);
+
+		final String variableNameProperty = "variableName";
+		final String datasetsProperty = "datasets";
+
+		for (final ProjectProperty projectProperty : projectProperties) {
+			final Integer projectPropertyVariableId = projectProperty.getVariableId();
+			final DmsProject project = projectProperty.getProject();
+
+			if (!inputVariableDatasetMap.containsKey(projectPropertyVariableId)) {
+				final Map<String, Object> variableDatasetInfo = new HashMap<>();
+				variableDatasetInfo.put(variableNameProperty, projectProperty.getAlias());
+				variableDatasetInfo.put(datasetsProperty, new ArrayList<DatasetReference>());
+				inputVariableDatasetMap.put(projectPropertyVariableId, variableDatasetInfo);
+			}
+			final List<DatasetReference> datasets = (List<DatasetReference>) inputVariableDatasetMap.get(projectPropertyVariableId).get(
+				datasetsProperty);
+			datasets.add(new DatasetReference(project.getProjectId(), project.getName()));
+		}
+
+		return inputVariableDatasetMap;
+	}
+
 	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		final Phenotype phenotype = phenotypeDao.getById(observationId);

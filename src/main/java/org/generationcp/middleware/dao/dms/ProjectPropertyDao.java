@@ -313,4 +313,21 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 
+	public List<ProjectProperty> getByStudyAndStandardVariableIds(final int studyId, final List<Integer> standardVariableIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("project.study", "study");
+			criteria.add(Restrictions.eq("study.projectId", studyId));
+			criteria.add(Restrictions.in("variableId", standardVariableIds));
+
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error in getByStudyAndStandardVariableIds(" + standardVariableIds + ")";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+
 }
