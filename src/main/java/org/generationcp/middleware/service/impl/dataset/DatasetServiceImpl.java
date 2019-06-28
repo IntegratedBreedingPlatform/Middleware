@@ -376,7 +376,6 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetDTO.getDatasetId()) > 0);
 				filtered.add(datasetDTO);
 			}
-			this.filterDatasets(filtered, datasetDTO.getDatasetId(), datasetTypeIds);
 		}
 	}
 
