@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.derived_variables;
 
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
