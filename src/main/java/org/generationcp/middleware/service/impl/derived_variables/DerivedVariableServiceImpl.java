@@ -45,45 +45,23 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	/**
-	 * Gets the list of formula dependencies of all derived variables that are not yet loaded in a dataset.
+	 * Gets the list of names of input variables that are not yet included in a study.
 	 *
 	 * @param studyId
 	 * @param datasetId
+	 * @param variableId - the ID of calculated (derived) variable
 	 * @return
 	 */
 	@Override
-	public Set<String> getDependencyVariables(final int datasetId) {
+	public Set<String> getMissingInputVariablesInStudy(final int studyId, final int derivedVariableId) {
 
-		final Set<Integer> variableIdsOfTraitsInStudy = this.getVariableIdsOfTraitsInDataset(datasetId);
-		final Set<String> derivedVariablesDependencies = new HashSet<>();
+		// Get variableIds of all traits, environment detail, environment condition in a study.
+		final Set<Integer> variableIds = this.createVariableIdMeasurementVariableMap(studyId).keySet();
 
-		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(variableIdsOfTraitsInStudy);
-		for (final FormulaVariable formulaVariable : formulaVariables) {
-			if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
-				derivedVariablesDependencies.add(formulaVariable.getName());
-			}
-		}
-
-		return derivedVariablesDependencies;
-	}
-
-	/**
-	 * Gets the list of formula dependencies of specific derived variables that are not yet loaded in a dataset.
-	 *
-	 * @param studyId
-	 * @param datasetId
-	 * @param variableId
-	 * @return
-	 */
-	@Override
-	public Set<String> getDependencyVariables(final int datasetId, final int variableId) {
-
-		final List<Integer> variableIds = Arrays.asList(variableId);
-		final Set<Integer> variableIdsOfTraitsInStudy = this.getVariableIdsOfTraitsInDataset(datasetId);
 		final Set<String> derivedVariablesDependencies = new HashSet<>();
 		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(new HashSet<Integer>(variableIds));
 		for (final FormulaVariable formulaVariable : formulaVariables) {
-			if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
+			if (!variableIds.contains(formulaVariable.getId())) {
 				derivedVariablesDependencies.add(formulaVariable.getName());
 			}
 		}
@@ -94,22 +72,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Override
 	public int countCalculatedVariablesInDatasets(final Set<Integer> datasetIds) {
 		return this.daoFactory.getDmsProjectDAO().countCalculatedVariablesInDatasets(datasetIds);
-	}
-
-	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
-
-		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
-		final List<MeasurementVariable> traits =
-			datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
-
-		if (!traits.isEmpty()) {
-			for (final MeasurementVariable trait : traits) {
-				variableIdsOfTraitsInDataset.add(trait.getTermId());
-			}
-		}
-
-		return variableIdsOfTraitsInDataset;
-
 	}
 
 	@Override

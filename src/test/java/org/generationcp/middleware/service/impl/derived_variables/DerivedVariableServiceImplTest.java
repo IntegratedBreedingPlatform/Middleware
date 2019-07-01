@@ -83,12 +83,13 @@ public class DerivedVariableServiceImplTest {
 
 		final Set<FormulaVariable> formulaVariables = this.createFormulaVariables();
 
+		final int studyId = this.random.nextInt(10);
 		final int datasetId = this.random.nextInt(10);
 		when(this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(traits);
 		when(this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID, VARIABLE2_TERMID))))
 			.thenReturn(formulaVariables);
 
-		final Set<String> dependencies = this.derivedVariableService.getDependencyVariables(datasetId);
+		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(studyId, datasetId);
 
 		assertEquals(formulaVariables.size(), dependencies.size());
 		for (final FormulaVariable formulaVariable : formulaVariables) {
@@ -111,6 +112,7 @@ public class DerivedVariableServiceImplTest {
 		trait3.setTermId(VARIABLE3_TERMID);
 		trait4.setTermId(VARIABLE4_TERMID);
 
+		final int studyId = this.random.nextInt(10);
 		final int datasetId = this.random.nextInt(10);
 		when(this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
 			.thenReturn(Arrays.asList(trait1, trait2, trait3, trait4));
@@ -118,7 +120,7 @@ public class DerivedVariableServiceImplTest {
 			new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID, VARIABLE2_TERMID, VARIABLE3_TERMID, VARIABLE4_TERMID))))
 			.thenReturn(this.createFormulaVariables());
 
-		final Set<String> dependencies = this.derivedVariableService.getDependencyVariables(datasetId);
+		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(studyId, datasetId);
 
 		assertTrue(dependencies.isEmpty());
 
@@ -144,7 +146,7 @@ public class DerivedVariableServiceImplTest {
 		when(this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID))))
 			.thenReturn(formulaVariables);
 
-		final Set<String> dependencies = this.derivedVariableService.getDependencyVariables(datasetId, VARIABLE1_TERMID);
+		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(datasetId, VARIABLE1_TERMID);
 
 		assertEquals(formulaVariables.size(), dependencies.size());
 		for (final FormulaVariable formulaVariable : formulaVariables) {
@@ -174,7 +176,7 @@ public class DerivedVariableServiceImplTest {
 			new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID))))
 			.thenReturn(this.createFormulaVariables());
 
-		final Set<String> dependencies = this.derivedVariableService.getDependencyVariables(datasetId, VARIABLE1_TERMID);
+		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(datasetId, VARIABLE1_TERMID);
 
 		assertTrue(dependencies.isEmpty());
 
