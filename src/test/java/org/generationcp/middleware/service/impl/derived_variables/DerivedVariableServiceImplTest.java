@@ -97,7 +97,7 @@ public class DerivedVariableServiceImplTest {
 			.thenReturn(formulaVariables);
 
 		final Set<FormulaVariable> missingFormulaVariablesInStudy =
-			this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, VARIABLE1_TERMID);
+			this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, VARIABLE1_TERMID);
 
 		assertEquals(formulaVariables.size(), missingFormulaVariablesInStudy.size());
 		for (final FormulaVariable formulaVariable : formulaVariables) {
@@ -134,7 +134,7 @@ public class DerivedVariableServiceImplTest {
 			.thenReturn(this.createFormulaVariables());
 
 		final Set<FormulaVariable> missingFormulaVariablesInStudy =
-			this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, VARIABLE1_TERMID);
+			this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, VARIABLE1_TERMID);
 
 		assertTrue(missingFormulaVariablesInStudy.isEmpty());
 

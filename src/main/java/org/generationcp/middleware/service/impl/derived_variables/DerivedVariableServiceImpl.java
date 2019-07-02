@@ -53,11 +53,16 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	 * @return
 	 */
 	@Override
-	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId) {
-
-		// Get variableIds of all traits, environment detail, environment condition in a study.
-		final Set<Integer> variableIds = this.createVariableIdMeasurementVariableMap(studyId).keySet();
-
+	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int datasetId, final int variableId) {
+		Integer plotDatasetId = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+		final Set<Integer> variableIds;
+		if(plotDatasetId.equals(datasetId)) {
+			// Get all possible input variables from Environment Detail, Study Condition, and Plot/Subobs Traits
+			 variableIds = this.createVariableIdMeasurementVariableMap(studyId).keySet();
+		} else {
+			// Get all possible input variables from Subobs Traits
+			variableIds = this.getVariableIdsOfTraitsInDataset(datasetId);
+		}
 		final Set<FormulaVariable> missingFormulaVariablesInStudy = new HashSet<>();
 		final Set<FormulaVariable> formulaVariablesOfCalculatedVariable =
 			this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(variableId)));
@@ -184,6 +189,21 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 
 		return inputVariableDatasetMap;
+	}
+
+	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
+		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
+		final List<MeasurementVariable> traits =
+			datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
+
+		if (!traits.isEmpty()) {
+			for (final MeasurementVariable trait : traits) {
+				variableIdsOfTraitsInDataset.add(trait.getTermId());
+			}
+		}
+
+		return variableIdsOfTraitsInDataset;
+
 	}
 
 	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {

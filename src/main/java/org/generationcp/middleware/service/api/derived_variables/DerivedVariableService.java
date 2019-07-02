@@ -11,7 +11,7 @@ public interface DerivedVariableService {
 
 	Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int datasetId, final List<Integer> datasetTypeIds, final Map<Integer, Integer> inputVariableDatasetMap);
 
-	Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId);
+	Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int datasetId, final int variableId);
 
 	Set<FormulaVariable> getFormulaVariablesInStudy(final Integer studyId);
 
