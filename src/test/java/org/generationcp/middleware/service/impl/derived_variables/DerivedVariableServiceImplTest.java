@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -69,7 +70,7 @@ public class DerivedVariableServiceImplTest {
 	}
 
 	@Test
-	public void testDependencyVariablesInputVariablesAreNotPresent() {
+	public void testGetMissingFormulaVariablesInStudy_FormulaVariablesAreNotPresent() {
 
 		final List<MeasurementVariable> traits = new ArrayList<>();
 		final MeasurementVariable trait1 = new MeasurementVariable();
@@ -85,78 +86,28 @@ public class DerivedVariableServiceImplTest {
 
 		final int studyId = this.random.nextInt(10);
 		final int datasetId = this.random.nextInt(10);
-		when(this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(traits);
-		when(this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID, VARIABLE2_TERMID))))
-			.thenReturn(formulaVariables);
+		final DmsProject dataset = new DmsProject();
+		dataset.setProjectId(datasetId);
 
-		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(studyId, datasetId);
-
-		assertEquals(formulaVariables.size(), dependencies.size());
-		for (final FormulaVariable formulaVariable : formulaVariables) {
-			dependencies.contains(formulaVariable.getName());
-		}
-
-	}
-
-	@Test
-	public void testDependencyVariablesInputVariablesArePresent() {
-
-		final MeasurementVariable trait1 = new MeasurementVariable();
-		final MeasurementVariable trait2 = new MeasurementVariable();
-		final MeasurementVariable trait3 = new MeasurementVariable();
-		final MeasurementVariable trait4 = new MeasurementVariable();
-		trait1.setTermId(VARIABLE1_TERMID);
-		trait2.setTermId(VARIABLE2_TERMID);
-
-		// Add the formula/input variables to the list of available variables in a dataset
-		trait3.setTermId(VARIABLE3_TERMID);
-		trait4.setTermId(VARIABLE4_TERMID);
-
-		final int studyId = this.random.nextInt(10);
-		final int datasetId = this.random.nextInt(10);
-		when(this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
-			.thenReturn(Arrays.asList(trait1, trait2, trait3, trait4));
-		when(this.formulaService.getAllFormulaVariables(
-			new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID, VARIABLE2_TERMID, VARIABLE3_TERMID, VARIABLE4_TERMID))))
-			.thenReturn(this.createFormulaVariables());
-
-		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(studyId, datasetId);
-
-		assertTrue(dependencies.isEmpty());
-
-	}
-
-	@Test
-	public void testDependencyVariablesForSpecificTraitInputVariablesAreNotPresent() {
-
-		final List<MeasurementVariable> traits = new ArrayList<>();
-		final MeasurementVariable trait1 = new MeasurementVariable();
-		final MeasurementVariable trait2 = new MeasurementVariable();
-		trait1.setTermId(VARIABLE1_TERMID);
-		trait2.setTermId(VARIABLE2_TERMID);
-
-		// Only add variables that are not formula/input variables.
-		traits.add(trait1);
-		traits.add(trait2);
-
-		final Set<FormulaVariable> formulaVariables = this.createFormulaVariables();
-
-		final int datasetId = this.random.nextInt(10);
-		when(this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(traits);
+		when(this.dmsProjectDao.getDatasetsByStudy(studyId)).thenReturn(Arrays.asList(dataset));
+		when(this.dmsProjectDao.getObservationSetVariables(Arrays.asList(datasetId),
+			Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId())))
+			.thenReturn(traits);
 		when(this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID))))
 			.thenReturn(formulaVariables);
 
-		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(datasetId, VARIABLE1_TERMID);
+		final Set<FormulaVariable> missingFormulaVariablesInStudy =
+			this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, VARIABLE1_TERMID);
 
-		assertEquals(formulaVariables.size(), dependencies.size());
+		assertEquals(formulaVariables.size(), missingFormulaVariablesInStudy.size());
 		for (final FormulaVariable formulaVariable : formulaVariables) {
-			dependencies.contains(formulaVariable.getName());
+			missingFormulaVariablesInStudy.contains(formulaVariable.getName());
 		}
 
 	}
 
 	@Test
-	public void testDependencyVariablesForSpecificTraitInputVariablesArePresent() {
+	public void testGetMissingFormulaVariablesInStudy_FormulaVariablesArePresent() {
 
 		final MeasurementVariable trait1 = new MeasurementVariable();
 		final MeasurementVariable trait2 = new MeasurementVariable();
@@ -169,16 +120,23 @@ public class DerivedVariableServiceImplTest {
 		trait3.setTermId(VARIABLE3_TERMID);
 		trait4.setTermId(VARIABLE4_TERMID);
 
+		final int studyId = this.random.nextInt(10);
 		final int datasetId = this.random.nextInt(10);
-		when(this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
+		final DmsProject dataset = new DmsProject();
+		dataset.setProjectId(datasetId);
+
+		when(this.dmsProjectDao.getDatasetsByStudy(studyId)).thenReturn(Arrays.asList(dataset));
+		when(this.dmsProjectDao.getObservationSetVariables(Arrays.asList(datasetId),
+			Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId())))
 			.thenReturn(Arrays.asList(trait1, trait2, trait3, trait4));
 		when(this.formulaService.getAllFormulaVariables(
 			new HashSet<Integer>(Arrays.asList(VARIABLE1_TERMID))))
 			.thenReturn(this.createFormulaVariables());
 
-		final Set<String> dependencies = this.derivedVariableService.getMissingInputVariablesInStudy(datasetId, VARIABLE1_TERMID);
+		final Set<FormulaVariable> missingFormulaVariablesInStudy =
+			this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, VARIABLE1_TERMID);
 
-		assertTrue(dependencies.isEmpty());
+		assertTrue(missingFormulaVariablesInStudy.isEmpty());
 
 	}
 

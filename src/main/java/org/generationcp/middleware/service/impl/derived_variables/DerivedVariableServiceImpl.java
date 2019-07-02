@@ -45,28 +45,28 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	/**
-	 * Gets the list of names of input variables that are not yet included in a study.
+	 * Gets the list of formula variables that are not yet included in a study.
 	 *
 	 * @param studyId
-	 * @param datasetId
 	 * @param variableId - the ID of calculated (derived) variable
 	 * @return
 	 */
 	@Override
-	public Set<String> getMissingInputVariablesInStudy(final int studyId, final int derivedVariableId) {
+	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId) {
 
 		// Get variableIds of all traits, environment detail, environment condition in a study.
 		final Set<Integer> variableIds = this.createVariableIdMeasurementVariableMap(studyId).keySet();
 
-		final Set<String> derivedVariablesDependencies = new HashSet<>();
-		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(new HashSet<Integer>(variableIds));
-		for (final FormulaVariable formulaVariable : formulaVariables) {
+		final Set<FormulaVariable> missingFormulaVariablesInStudy = new HashSet<>();
+		final Set<FormulaVariable> formulaVariablesOfCalculatedVariable =
+			this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(variableId)));
+		for (final FormulaVariable formulaVariable : formulaVariablesOfCalculatedVariable) {
 			if (!variableIds.contains(formulaVariable.getId())) {
-				derivedVariablesDependencies.add(formulaVariable.getName());
+				missingFormulaVariablesInStudy.add(formulaVariable);
 			}
 		}
 
-		return derivedVariablesDependencies;
+		return missingFormulaVariablesInStudy;
 	}
 
 	@Override

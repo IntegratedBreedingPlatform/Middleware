@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api.derived_variables;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ public interface DerivedVariableService {
 
 	Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int datasetId, final List<Integer> datasetTypeIds, final Map<Integer, Integer> inputVariableDatasetMap);
 
-	Set<String> getMissingInputVariablesInStudy(final int studyId, final int variableId);
+	Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId);
 
 	int countCalculatedVariablesInDatasets(final Set<Integer> datasetIds);
 
