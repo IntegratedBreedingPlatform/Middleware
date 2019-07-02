@@ -206,8 +206,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjectsByUser(final WorkbenchUser user) {
-		return this.getProjectDao().getProjectsByUser(user);
+	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
+		return this.getProjectDao().getProjectsByUser(user, cropName);
 	}
 
 	@Override

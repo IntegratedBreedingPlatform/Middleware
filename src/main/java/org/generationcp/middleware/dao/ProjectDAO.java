@@ -206,7 +206,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByUser(final WorkbenchUser user) {
+	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
 		final List<Project> projects = new ArrayList<>();
 		try {
 			if (user != null) {
