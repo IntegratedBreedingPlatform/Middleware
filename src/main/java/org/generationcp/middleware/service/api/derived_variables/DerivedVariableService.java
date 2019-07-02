@@ -13,6 +13,8 @@ public interface DerivedVariableService {
 
 	Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId);
 
+	Set<FormulaVariable> getFormulaVariablesInStudy(final Integer studyId);
+
 	int countCalculatedVariablesInDatasets(final Set<Integer> datasetIds);
 
 	void saveCalculatedResult(

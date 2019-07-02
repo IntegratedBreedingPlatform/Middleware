@@ -69,6 +69,19 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return missingFormulaVariablesInStudy;
 	}
 
+	/**
+	 * Gets all formula variables in a study
+	 *
+	 * @param studyId
+	 * @return
+	 */
+	@Override
+	public Set<FormulaVariable> getFormulaVariablesInStudy(final Integer studyId) {
+		// Get variableIds of all traits, environment detail, environment condition in a study.
+		final Set<Integer> variableIds = this.createVariableIdMeasurementVariableMap(studyId).keySet();
+		return this.formulaService.getAllFormulaVariables(variableIds);
+	}
+
 	@Override
 	public int countCalculatedVariablesInDatasets(final Set<Integer> datasetIds) {
 		return this.daoFactory.getDmsProjectDAO().countCalculatedVariablesInDatasets(datasetIds);
