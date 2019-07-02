@@ -34,7 +34,6 @@ import java.util.Map;
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
-	//TODO Fix query, it is joining with users_roles expecting only one role
 	public static final String GET_PROJECTS_BY_USER_ID =
 		"SELECT  "
 			+ "    p.* "
