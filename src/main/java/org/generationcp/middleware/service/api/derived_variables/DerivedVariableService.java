@@ -23,5 +23,5 @@ public interface DerivedVariableService {
 
 	Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int studyId);
 
-	Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(Integer studyId, Integer variableId);
+	Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(Integer studyId, Integer datasetId, Integer variableId);
 }

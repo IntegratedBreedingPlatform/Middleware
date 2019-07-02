@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -145,7 +146,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(final Integer studyId,
+	public Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(final Integer studyId, final Integer datasetId,
 		final Integer variableId) {
 
 		final Map<Integer, Map<String, Object>> inputVariableDatasetMap = new HashMap<>();
@@ -155,9 +156,14 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		for (final FormulaVariable formulaVariable : formulaVariables) {
 			variableIds.add(formulaVariable.getId());
 		}
-
-		final List<ProjectProperty> projectProperties =
-			this.daoFactory.getProjectPropertyDAO().getByStudyAndStandardVariableIds(studyId, variableIds);
+		Integer plotDatasetId = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+		final List<ProjectProperty> projectProperties;
+		if(plotDatasetId.equals(datasetId)) {
+			projectProperties = this.daoFactory.getProjectPropertyDAO().getByStudyAndStandardVariableIds(studyId, variableIds);
+		} else {
+			//TODO Call the proper method that gets the input variables for calculated variables in subobservations
+			projectProperties = this.daoFactory.getProjectPropertyDAO().getByProjectIdAndVariableIds(datasetId, variableIds);
+		}
 
 		final String variableNameProperty = "variableName";
 		final String datasetsProperty = "datasets";
