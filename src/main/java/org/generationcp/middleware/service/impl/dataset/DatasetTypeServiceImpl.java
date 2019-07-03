@@ -56,4 +56,14 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 	public List<Integer> getSubObservationDatasetTypeIds() {
 		return this.daoFactory.getDatasetTypeDao().getSubObservationDatasetTypeIds();
 	}
+
+	@Override
+	public List<String> getObservationLevels(Integer pageSize, Integer pageNumber) {
+		return this.daoFactory.getDatasetTypeDao().getObservationLevels(pageSize,pageNumber);
+	}
+
+	@Override
+	public Long countObservationLevels() {
+		return this.daoFactory.getDatasetTypeDao().countSubObservationLevels();
+	}
 }
