@@ -127,7 +127,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 		final List<MeasurementVariable> measurementVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
-				Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+				Arrays.asList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
 		}

@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import com.beust.jcommander.internal.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -54,6 +55,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -295,14 +297,15 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testUpdateOutOfSyncPhenotypes(){
-		this.createEnvironmentData(1, true);	
+	public void testUpdateOutOfSyncPhenotypes() {
+		this.createEnvironmentData(1, true);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		final Integer datasetId = this.study.getProjectId();
 		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
-		
-		this.phenotypeDao.updateOutOfSyncPhenotypes(experimentId, Arrays.asList(variableId));
+
+		this.phenotypeDao
+			.updateOutOfSyncPhenotypes(new HashSet<Integer>(Arrays.asList(experimentId)), new HashSet<Integer>(Arrays.asList(variableId)));
 		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
 		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());
