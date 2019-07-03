@@ -36,7 +36,9 @@ public class UserRoleDto {
 		final Project project = userRole.getWorkbenchProject();
 		final Long projectId = (project != null) ? project.getProjectId() : null;
 		final String projectName = (project != null) ? project.getProjectName() : null;
-		final ProgramDto programDto = (project != null) ? new ProgramDto(projectId, projectName, cropDto) : null;
+		final String projectUuid = (project != null) ? project.getUniqueID() : null;
+
+		final ProgramDto programDto = (project != null) ? new ProgramDto(projectId, projectUuid, projectName, cropDto) : null;
 
 		this.id = userRole.getId();
 		this.role = new RoleDto(userRole);

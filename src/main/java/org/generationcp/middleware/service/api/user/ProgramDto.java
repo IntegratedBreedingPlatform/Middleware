@@ -9,6 +9,8 @@ public class ProgramDto {
 
 	private Long id;
 
+	private String uuid;
+
 	private String name;
 
 	private CropDto crop;
@@ -16,10 +18,11 @@ public class ProgramDto {
 	public ProgramDto() {
 	}
 
-	public ProgramDto(final Long id, final String name, final CropDto crop) {
+	public ProgramDto(final Long id, String uuid, final String name, final CropDto crop) {
 		this.id = id;
 		this.name = name;
 		this.crop = crop;
+		this.uuid = uuid;
 	}
 
 	public Long getId() {
@@ -44,6 +47,14 @@ public class ProgramDto {
 
 	public void setCrop(final CropDto crop) {
 		this.crop = crop;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(final String uuid) {
+		this.uuid = uuid;
 	}
 
 	@Override
