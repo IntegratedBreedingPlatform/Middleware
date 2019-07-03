@@ -45,24 +45,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	/**
-	 * Gets the list of formula variables that are not yet included in a study.
-	 *
-	 * @param studyId
-	 * @param variableId - the ID of calculated (derived) variable
-	 * @return
-	 */
 	@Override
 	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int datasetId, final int variableId) {
-		Integer plotDatasetId = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
-		final Set<Integer> variableIds;
-		if(plotDatasetId.equals(datasetId)) {
-			// Get all possible input variables from Environment Detail, Study Condition, and Plot/Subobs Traits
-			 variableIds = this.createVariableIdMeasurementVariableMap(studyId).keySet();
-		} else {
-			// Get all possible input variables from Subobs Traits
-			variableIds = this.getVariableIdsOfTraitsInDataset(datasetId);
-		}
+
+		final Set<Integer> variableIds = this.extractVariableIdsFromDataset(studyId, datasetId);
 		final Set<FormulaVariable> missingFormulaVariablesInStudy = new HashSet<>();
 		final Set<FormulaVariable> formulaVariablesOfCalculatedVariable =
 			this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(variableId)));
@@ -75,16 +61,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return missingFormulaVariablesInStudy;
 	}
 
-	/**
-	 * Gets all formula variables in a study
-	 *
-	 * @param studyId
-	 * @return
-	 */
 	@Override
-	public Set<FormulaVariable> getFormulaVariablesInStudy(final Integer studyId) {
+	public Set<FormulaVariable> getFormulaVariablesInStudy(final Integer studyId, final Integer datasetId) {
 		// Get variableIds of all traits, environment detail, environment condition in a study.
-		final Set<Integer> variableIds = this.createVariableIdMeasurementVariableMap(studyId).keySet();
+		final Set<Integer> variableIds = this.extractVariableIdsFromDataset(studyId, datasetId);
 		return this.formulaService.getAllFormulaVariables(variableIds);
 	}
 
@@ -127,23 +107,50 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 		final List<MeasurementVariable> measurementVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
-				Arrays.asList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+				Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
 		}
 		return variableIdMeasurementVariableMap;
 	}
 
-	/**
-	 * Gets the aggregate values of TRAIT variables, grouped by experimentId and variableId.
-	 *
-	 * @param studyId
-	 * @param datasetTypeIds
-	 * @param inputVariableDatasetMap - contains input variable id and dataset id from which input variable data will be read from.
-	 *                                This is to ensure that even if the input variable has multiple occurrences in study, the data will only
-	 *                                come from the dataset specified in this map.
-	 * @return
-	 */
+	@Override
+	public Set<Integer> extractVariableIdsFromDataset(final Integer studyId, final Integer datasetId) {
+
+		final Set<Integer> variableIds = new HashSet<>();
+
+		boolean isPlotDataset = false;
+		final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getDatasetsByStudy(studyId);
+		final List<Integer> projectIds = new ArrayList<>();
+		for (final DmsProject dmsProject : projects) {
+			projectIds.add(dmsProject.getProjectId());
+			if (dmsProject.getProjectId().equals(datasetId)
+				&& dmsProject.getDatasetType().getDatasetTypeId().intValue() == DatasetTypeEnum.PLOT_DATA.getId()) {
+				isPlotDataset = true;
+			}
+		}
+
+		final List<MeasurementVariable> measurementVariables;
+		if (isPlotDataset) {
+			// If dataset is plot dataset, we should get all variables (ENVIRONMENT DETAIL, STUDY_CONDITION and TRAIT) across all datasets in study.
+			measurementVariables =
+				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
+					Arrays
+						.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+		} else {
+			// Else, we assume that the dataset is sub-observation, in that case, we should only get the TRAIT variables within the sub-ob dataset.
+			measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
+				Arrays
+					.asList(VariableType.TRAIT.getId()));
+		}
+
+		for (final MeasurementVariable measurementVariable : measurementVariables) {
+			variableIds.add(measurementVariable.getTermId());
+		}
+		return variableIds;
+
+	}
+
 	@Override
 	public Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int studyId, final List<Integer> datasetTypeIds,
 		final Map<Integer, Integer> inputVariableDatasetMap) {
@@ -161,9 +168,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		for (final FormulaVariable formulaVariable : formulaVariables) {
 			variableIds.add(formulaVariable.getId());
 		}
-		Integer plotDatasetId = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+		Integer plotDatasetId =
+			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 		final List<ProjectProperty> projectProperties;
-		if(plotDatasetId.equals(datasetId)) {
+		if (plotDatasetId.equals(datasetId)) {
 			projectProperties = this.daoFactory.getProjectPropertyDAO().getByStudyAndStandardVariableIds(studyId, variableIds);
 		} else {
 			//TODO Call the proper method that gets the input variables for calculated variables in subobservations
@@ -189,21 +197,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 
 		return inputVariableDatasetMap;
-	}
-
-	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
-		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
-		final List<MeasurementVariable> traits =
-			datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
-
-		if (!traits.isEmpty()) {
-			for (final MeasurementVariable trait : traits) {
-				variableIdsOfTraitsInDataset.add(trait.getTermId());
-			}
-		}
-
-		return variableIdsOfTraitsInDataset;
-
 	}
 
 	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
