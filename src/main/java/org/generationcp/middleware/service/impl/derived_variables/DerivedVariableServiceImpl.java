@@ -139,7 +139,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 						.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 		} else {
 			// Else, we assume that the dataset is sub-observation, in that case, we should only get the TRAIT variables within the sub-ob dataset.
-			measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
+			measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(Arrays.asList(datasetId),
 				Arrays
 					.asList(VariableType.TRAIT.getId()));
 		}
