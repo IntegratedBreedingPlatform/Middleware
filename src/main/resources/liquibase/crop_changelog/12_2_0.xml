@@ -54,4 +54,23 @@
 		</sql>
 	</changeSet>
 
+
+	<changeSet author="marie" id="v12.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="1">
+					SELECT count(1) FROM dataset_type WHERE dataset_type_id = 2;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Configure means type as observation
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE dataset_type
+			SET is_obs_type = 1
+			WHERE dataset_type_id = 2;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
