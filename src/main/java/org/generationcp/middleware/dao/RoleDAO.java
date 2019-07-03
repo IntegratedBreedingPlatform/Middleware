@@ -22,6 +22,9 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Role.class);
 			if (roleSearchDto != null) {
+				if (roleSearchDto.getRoleIds() != null && !roleSearchDto.getRoleIds().isEmpty()) {
+					criteria.add(Restrictions.in("id", roleSearchDto.getRoleIds()));
+				}
 				if (roleSearchDto.getAssignable() != null) {
 					criteria.add(Restrictions.eq("assignable", roleSearchDto.getAssignable()));
 				}

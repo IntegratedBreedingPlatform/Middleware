@@ -3,8 +3,12 @@ package org.generationcp.middleware.service.api.user;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Set;
+
 @AutoProperty
 public class RoleSearchDto {
+
+	private Set<Integer> roleIds;
 
 	private Boolean assignable;
 
@@ -13,9 +17,10 @@ public class RoleSearchDto {
 	public RoleSearchDto() {
 	}
 
-	public RoleSearchDto(final Boolean assignable, final Integer roleTypeId) {
+	public RoleSearchDto(final Boolean assignable, final Integer roleTypeId, final Set<Integer> roleIds) {
 		this.assignable = assignable;
 		this.roleTypeId = roleTypeId;
+		this.roleIds = roleIds;
 	}
 
 	public Boolean getAssignable() {
@@ -32,6 +37,14 @@ public class RoleSearchDto {
 
 	public void setRoleTypeId(final Integer roleTypeId) {
 		this.roleTypeId = roleTypeId;
+	}
+
+	public Set<Integer> getRoleIds() {
+		return roleIds;
+	}
+
+	public void setRoleIds(final Set<Integer> roleIds) {
+		this.roleIds = roleIds;
 	}
 
 	@Override
