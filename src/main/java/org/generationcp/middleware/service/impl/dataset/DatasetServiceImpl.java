@@ -518,6 +518,22 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void updateDependentPhenotypesStatusByGeolocation(final Integer geolocation, final List<Integer> variableIds) {
+		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputIds(variableIds);
+		if (!formulaList.isEmpty()) {
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
+
+				@Override
+				public Integer apply(final Formula formula) {
+					return formula.getTargetCVTerm().getCvTermId();
+				}
+			});
+			this.daoFactory.getPhenotypeDAO()
+				.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
+		}
+	}
+
+	@Override
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		if (datasetDTO != null) {

@@ -89,4 +89,28 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 
 		return formulas;
 	}
+
+	/**
+	 * Get active and inactive. This is useful to identify where an input is used, and it's necessary to know it even for inactive formulas
+	 */
+	public List<Formula> getByInputIds(final List<Integer> inputIds) {
+
+		List<Formula> formulas = new ArrayList<>();
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("inputs", "input");
+			criteria.add(Restrictions.in("input.cvTermId", inputIds));
+			criteria.setFetchMode("inputs", FetchMode.JOIN);
+
+			formulas = criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error in getByInputIds(" + inputIds + ")";
+			FormulaDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+		return formulas;
+	}
 }

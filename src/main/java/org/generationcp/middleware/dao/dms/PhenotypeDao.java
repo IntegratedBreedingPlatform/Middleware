@@ -1156,6 +1156,20 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		statement.setParameterList("variableIds", targetVariableIds);
 		statement.executeUpdate();
 	}
+
+	public void updateOutOfSyncPhenotypesByGeolocation(final int geoLocationId, final Set<Integer> targetVariableIds) {
+		final String sql = "UPDATE nd_experiment experiment\n"
+			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
+			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
+			+ "SET pheno.status = :status \n"
+			+ "WHERE experiment.nd_geolocation_id = :geoLocationId  AND pheno.observable_id in (:variableIds) ;";
+
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
+		statement.setParameter("geoLocationId", geoLocationId);
+		statement.setParameterList("variableIds", targetVariableIds);
+		statement.executeUpdate();
+	}
 	
 	public Phenotype getPhenotype(final Integer experimentId, final Integer phenotypeId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
