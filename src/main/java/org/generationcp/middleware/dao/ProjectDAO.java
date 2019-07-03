@@ -34,46 +34,27 @@ import java.util.Map;
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
-	//TODO Fix query, it is joining with users_roles expecting only one role
 	public static final String GET_PROJECTS_BY_USER_ID =
 		"SELECT  "
 			+ "    p.* "
-			+ "FROM "
-			+ "    workbench_project p "
-			+ "        INNER JOIN "
-			+ "    workbench_crop wc ON p.crop_type = wc.crop_name "
-			+ "        INNER JOIN "
-			+ "    users_crops uc ON uc.crop_name = wc.crop_name "
-			+ "WHERE "
-			+ "    uc.user_id = :userId "
-			+ "UNION      "
-			+ "SELECT  "
-			+ "    p.* "
-			+ "FROM "
-			+ "    workbench_project p "
-			+ "        INNER JOIN "
-			+ "    workbench_crop wc ON p.crop_type = wc.crop_name "
-			+ "        INNER JOIN "
-			+ "    users_crops uc ON uc.crop_name = wc.crop_name "
-			+ " 		INNER JOIN "
-			+ "    users_roles ur ON ur.userid = uc.user_id"
-			+ " WHERE "
-			+ "    uc.user_id = :userId "
-			+ "AND ur.workbench_project_id = p.project_id "
-			+ "UNION      "
-			+ "SELECT  "
-			+ "    p.* "
-			+ "FROM "
-			+ "    workbench_project p "
-			+ "        INNER JOIN "
-			+ "    workbench_crop wc ON p.crop_type = wc.crop_name "
-			+ "        INNER JOIN "
-			+ "    users_crops uc ON uc.crop_name = wc.crop_name "
-			+ "        INNER JOIN "
-			+ "    users_roles ur ON ur.userid = uc.user_id "
-			+ "        AND ur.workbench_project_id = p.project_id "
-			+ "WHERE "
-			+ "    uc.user_id = :userId";
+			+ "	FROM "
+			+ "    	workbench_project p "
+			+ "        	INNER JOIN "
+			+ "    	workbench_crop wc ON p.crop_type = wc.crop_name "
+			+ "        	INNER JOIN "
+			+ "    	users_crops uc ON uc.crop_name = wc.crop_name "
+			+ "			INNER JOIN "
+			+ "		users_roles ur ON ur.userid = uc.user_id "
+			+ "			INNER JOIN "
+			+ "		role r on ur.role_id = r.id "
+			+ "	WHERE "
+			+ "		uc.user_id = :userId and r.active = 1 "
+			+ "		AND ( r.role_type_id = 1 "
+			+ "				OR ( r.role_type_id = 2 and ur.crop_name = p.crop_type ) "
+			+ "				OR ( r.role_type_id = 3 and ur.crop_name = p.crop_type "
+			+ "						and ur.workbench_project_id = p.project_id ) "
+			+ "			) "
+			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) ";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
@@ -224,12 +205,13 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByUser(final WorkbenchUser user) {
+	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
 		final List<Project> projects = new ArrayList<>();
 		try {
 			if (user != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID);
 				query.setParameter("userId", user.getUserid());
+				query.setParameter("cropName", cropName);
 				query
 					.addScalar("project_id")
 					.addScalar("project_uuid")

@@ -749,7 +749,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Ignore
 	public void testGetProjectsByUserId() {
 		//TODO Fix after query is reviewed.
-		final List<Project> projects = this.workbenchDataManager.getProjectsByUser(this.testUser1);
+		final List<Project> projects = this.workbenchDataManager.getProjectsByUser(this.testUser1, null);
 
 		Assert.assertNotNull(projects);
 		Assert.assertNotNull(projects.get(0));

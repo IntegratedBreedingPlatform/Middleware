@@ -54,4 +54,124 @@
 		</sql>
 	</changeSet>
 
+	<!-- A lot of functionality in BMS still expect and depends
+	     on the users and persons tables per crop.
+	     Under the new Permissions model, some roles don't need to be specifically assigned to a program
+	     to have access to it, so they'll have no entry on those tables.
+	     This changeset creates those entries until the refactor is done (IBP-2784) -->
+	<changeSet author="nahuel" id="v12.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="users" />
+			<tableExists tableName="persons" />
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(1) FROM information_schema.routines
+				WHERE routine_schema = DATABASE() AND specific_name = 'populate_local_users';
+			</sqlCheck>
+		</preConditions>
+		<comment>Create sp to Associate all instance and crop roles to every program in their crops</comment>
+		<sql dbms="mysql" splitStatements="false">
+			create procedure populate_local_users()
+			begin
+			  # assign instance roles (superadmin, admin, others)
+			  # and crop roles (breeders, technicians, others)
+			  # to ALL programs of the corresponding crop
+
+			  declare userid int;
+
+			  DECLARE done BOOLEAN DEFAULT FALSE;
+
+			  # Get missing users in crop users table
+			  declare cur cursor for
+			    select u.userid
+			    from workbench.users u
+			           inner join workbench.users_crops uc on u.userid = uc.user_id
+			           inner join workbench.users_roles ur on ur.userid = u.userid
+			           inner join workbench.role on ur.role_id = role.id
+			    where uc.crop_name = (
+			      # get users for current crop
+			      select crop_name
+			      from workbench.workbench_crop
+			      where db_name = database()
+			    ) and not exists(
+			      # that are not yet in the crop users db
+			      select 1
+			      from users usersLocal
+			      where usersLocal.uname = u.uname
+			      )
+			      # and has role instance or crop
+			      and role.role_type_id in (1, 2);
+
+			  declare continue handler for not found set done = true;
+
+			  open cur;
+			  read_loop:
+			    loop
+			      fetch cur into userid;
+
+			      IF done = true
+			      THEN
+			        LEAVE read_loop;
+			      END IF;
+
+			      # noinspection SqlUnreachable
+			      insert into persons
+			        (fname, lname, ioname, institid, ptitle, poname, plangu, pphone, pextent, pfax, pemail, prole, sperson, eperson, pstatus, pnotes, contact)
+			      select fname, lname, ioname, institid, ptitle, poname, plangu, pphone, pextent, pfax, pemail, prole, sperson, eperson, pstatus, pnotes, contact
+			      from workbench.persons p
+			             inner join workbench.users wu on wu.personid = p.personid
+			      where wu.userid = userid;
+
+			      # noinspection SqlUnreachable
+			      insert into users
+			        (instalid, ustatus, uaccess, utype, uname, upswd, personid, adate, cdate)
+			      select instalid, ustatus, uaccess, utype, uname, upswd, last_insert_id(), adate, cdate
+			      from workbench.users wu
+			      where wu.userid = userid;
+
+			    end loop read_loop;
+			  close cur;
+
+			  # Insert all missing entries in workbench_ibdb_user_map at once based on the username
+			  insert into workbench.workbench_ibdb_user_map
+			    (workbench_user_id, project_id, ibdb_user_id)
+			  select distinct wu.userid,
+			    wp.project_id,
+			    u.userid
+			  from workbench.users wu
+			         inner join workbench.users_crops uc on uc.user_id = wu.userid
+			         inner join workbench.users_roles ur on ur.userid = wu.userid
+			         inner join workbench.role on ur.role_id = role.id
+			         inner join users u on u.uname = wu.uname # associate every user in the current crop...
+			         inner join workbench.workbench_project wp # with every project...
+			         inner join workbench.workbench_crop wc on wp.crop_type = wc.crop_name
+			    # that is not yet associated through workbench_ibdb_user_map...
+			  where not exists(
+			    select 1
+			    from workbench.workbench_ibdb_user_map wium
+			    where wium.workbench_user_id = wu.userid and wium.project_id = wp.project_id
+			    )
+			    # for the current crop...
+			    and wc.db_name = database()
+			    # and has role instance or crop
+			    and role.role_type_id in (1, 2);
+
+			end;
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v12.2.0-2" runAlways="true">
+		<preConditions onFail="CONTINUE">
+			<tableExists tableName="users" />
+			<tableExists tableName="persons" />
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) FROM information_schema.routines
+				WHERE routine_schema = DATABASE() AND specific_name = 'populate_local_users';
+			</sqlCheck>
+		</preConditions>
+		<comment>Execute populate_local_users</comment>
+		<sql splitStatements="false">
+			call populate_local_users();
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
