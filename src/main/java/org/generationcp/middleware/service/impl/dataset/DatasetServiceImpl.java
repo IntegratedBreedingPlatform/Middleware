@@ -373,12 +373,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds) {
+
+		final Map<Integer, Long> countOutOfSyncPerDatasetMap =
+			this.daoFactory.getPhenotypeDAO().countOutOfSyncDataOfDatasetsInStudy(parentId);
 		final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(parentId);
 
 		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			if (datasetTypeIds.isEmpty() || datasetTypeIds.contains(datasetDTO.getDatasetTypeId())) {
-				datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetDTO.getDatasetId()) > 0);
-				datasetDTO.setHasOutOfSyncData(this.daoFactory.getPhenotypeDAO().hasOutOfSync(datasetDTO.getDatasetId()));
+				final Integer datasetId = datasetDTO.getDatasetId();
+				datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetId) > 0);
+				datasetDTO.setHasOutOfSyncData(
+					countOutOfSyncPerDatasetMap.containsKey(datasetId) ? countOutOfSyncPerDatasetMap.get(datasetDTO.getDatasetId()) > 0 :
+						Boolean.FALSE);
 				filtered.add(datasetDTO);
 			}
 		}

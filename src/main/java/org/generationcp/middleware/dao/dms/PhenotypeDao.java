@@ -40,6 +40,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
@@ -1213,6 +1214,25 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		criteria.setProjection(Projections.rowCount());
 		final Long count = (Long) criteria.uniqueResult();
 		return count;
+	}
+
+	public Map<Integer, Long> countOutOfSyncDataOfDatasetsInStudy(final Integer studyId) {
+		final Map<Integer, Long> countOutOfSyncPerProjectMap = new HashMap<>();
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
+		criteria.createAlias("experiment.project", "project");
+		criteria.createAlias("project.study", "study");
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.add(Restrictions.eq("valueStatus", ValueStatus.OUT_OF_SYNC));
+		final ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(Projections.groupProperty("project.projectId"))
+			.add(Projections.rowCount());
+		criteria.setProjection(projectionList);
+		final List<Object[]> results = criteria.list();
+		for (final Object[] row : results) {
+			countOutOfSyncPerProjectMap.put((Integer) row[0], (Long) row[1]);
+		}
+		return countOutOfSyncPerProjectMap;
 	}
 
 	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
