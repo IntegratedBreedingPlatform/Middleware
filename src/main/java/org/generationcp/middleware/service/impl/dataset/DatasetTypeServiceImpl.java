@@ -58,12 +58,12 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 	}
 
 	@Override
-	public List<String> getObservationLevels(Integer pageSize, Integer pageNumber) {
-		return this.daoFactory.getDatasetTypeDao().getObservationLevels(pageSize,pageNumber);
+	public List<String> getObservationLevels(final Integer pageSize, final Integer pageNumber) {
+		return this.daoFactory.getDatasetTypeDao().getObservationLevels(pageSize, pageNumber);
 	}
 
 	@Override
 	public Long countObservationLevels() {
-		return this.daoFactory.getDatasetTypeDao().countSubObservationLevels();
+		return this.daoFactory.getDatasetTypeDao().countObservationLevels();
 	}
 }
