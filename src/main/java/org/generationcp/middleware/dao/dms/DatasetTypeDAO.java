@@ -1,16 +1,15 @@
 package org.generationcp.middleware.dao.dms;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import org.hibernate.SQLQuery;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.HibernateException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DatasetTypeDAO extends GenericDAO<DatasetType, Integer> {
@@ -27,39 +26,34 @@ public class DatasetTypeDAO extends GenericDAO<DatasetType, Integer> {
 			.add(Restrictions.eq("datasetType.isSubObservationType", true)).list();
 	}
 
-	public List<String> getObservationLevels(final Integer pageSize, final Integer pageNumber) {
-		final StringBuilder sqlString = new StringBuilder();
-		try {
-			sqlString
-				.append(" SELECT name")
-				.append(" FROM dataset_type ").append(" WHERE is_subobs_type = true  ").append(" OR is_obs_type = true  ")
-				.append(" ORDER BY dataset_type_id ");
-			;
+	public Criteria getObservationLevelsCriteria() {
 
-			final SQLQuery query =
-				this.getSession().createSQLQuery(sqlString.toString()).addScalar("name");
+		Criteria criteria = this.getSession().createCriteria(DatasetType.class, "datasetType");
+		criteria.setProjection(Projections.property("datasetType.name"));
 
-			if (pageNumber != null && pageSize != null) {
-				query.setFirstResult(pageSize * (pageNumber - 1));
-				query.setMaxResults(pageSize);
-			}
+		Criterion isSubObs = Restrictions.eq("datasetType.isSubObservationType", true);
+		Criterion isObsType = Restrictions.eq("datasetType.isObservationType", true);
 
-			return query.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getObservationLevels(): " + e.getMessage(), e);
-		}
+		LogicalExpression orExp = Restrictions.or(isSubObs, isObsType);
+		criteria.add(orExp);
+
+		return criteria;
 	}
 
+	public List<String> getObservationLevels(final Integer pageSize, final Integer pageNumber) {
+		final Criteria criteria = this.getObservationLevelsCriteria();
+		criteria.setFirstResult(pageSize * (pageNumber - 1));
+		criteria.setMaxResults(pageSize);
+		return criteria.list();
+	}
 
-	public long countSubObservationLevels() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(DatasetType.class, "datasetType");
-			criteria.setProjection(Projections.rowCount())
-				.add(Restrictions.eq("datasetType.isSubObservationType", true));
-
-			return ((Long) criteria.uniqueResult()).longValue();
+	public long countObservationLevels() {
+		try{
+			final Criteria criteria = this.getObservationLevelsCriteria();
+			criteria.setProjection(Projections.rowCount());
+			return	((Long) criteria.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in countSubObservationLevels(): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countObservationLevels(): " + e.getMessage(), e);
 		}
 	}
 }
