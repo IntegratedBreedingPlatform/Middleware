@@ -507,19 +507,25 @@ public class DatasetServiceImpl implements DatasetService {
 					return formula.getTargetCVTerm().getCvTermId();
 				}
 			});
-			this.daoFactory.getPhenotypeDAO()
-				.updateOutOfSyncPhenotypes(Sets.newHashSet(observationUnitId), Sets.newHashSet(targetVariableIds));
+			if (!targetVariableIds.isEmpty()) {
+				this.daoFactory.getPhenotypeDAO()
+					.updateOutOfSyncPhenotypes(Sets.newHashSet(observationUnitId), Sets.newHashSet(targetVariableIds));
+			}
 		}
 
 	}
 
 	@Override
 	public void updateDependentPhenotypesStatus(final Set<Integer> targetVariableIds, final Set<Integer> observationUnitIds) {
-		this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds);
+		if (!targetVariableIds.isEmpty()) {
+			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds);
+		}
+
 	}
 
 	@Override
 	public void updateDependentPhenotypesStatusByGeolocation(final Integer geolocation, final List<Integer> variableIds) {
+
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputIds(variableIds);
 		if (!formulaList.isEmpty()) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
@@ -529,8 +535,10 @@ public class DatasetServiceImpl implements DatasetService {
 					return formula.getTargetCVTerm().getCvTermId();
 				}
 			});
-			this.daoFactory.getPhenotypeDAO()
-				.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
+			if (!targetVariableIds.isEmpty()) {
+				this.daoFactory.getPhenotypeDAO()
+					.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
+			}
 		}
 	}
 
