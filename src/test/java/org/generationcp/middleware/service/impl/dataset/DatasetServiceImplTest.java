@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -47,12 +48,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,6 +74,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DatasetServiceImplTest {
 
 	private static final int STUDY_ID = 1234;
@@ -137,12 +141,14 @@ public class DatasetServiceImplTest {
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Mock
+	private DerivedVariableService derivedVariableService;
+
 	@InjectMocks
-	private DatasetServiceImpl datasetService;
+	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
 
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
 
 		this.datasetService.setDaoFactory(this.daoFactory);
 		this.datasetService.setStudyService(this.studyService);
@@ -303,8 +309,6 @@ public class DatasetServiceImplTest {
 		final int variableId = ran.nextInt();
 
 		final Phenotype phenotype = new Phenotype();
-		when(this.formulaDao.getByTargetVariableId(variableId)).thenReturn(new Formula());
-
 		Assert.assertNull(phenotype.getValueStatus());
 	}
 
@@ -614,6 +618,7 @@ public class DatasetServiceImplTest {
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
+		Mockito.when(this.derivedVariableService.createVariableIdMeasurementVariableMap(studyId)).thenReturn(new HashMap<Integer, MeasurementVariable>());
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		this.datasetService.acceptAllDatasetDraftData(studyId, datasetId);
 
@@ -846,7 +851,6 @@ public class DatasetServiceImplTest {
 
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getPhenotypes(datasetId)).thenReturn(phenotypes);
-		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
 		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES)).thenReturn(variables);
 		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 

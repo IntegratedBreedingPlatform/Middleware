@@ -6,7 +6,9 @@ import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -88,6 +90,7 @@ public class DerivedVariableServiceImplTest {
 		final int datasetId = this.random.nextInt(10);
 		final DmsProject dataset = new DmsProject();
 		dataset.setProjectId(datasetId);
+		dataset.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
 
 		when(this.dmsProjectDao.getDatasetsByStudy(studyId)).thenReturn(Arrays.asList(dataset));
 		when(this.dmsProjectDao.getObservationSetVariables(Arrays.asList(datasetId),
@@ -124,6 +127,7 @@ public class DerivedVariableServiceImplTest {
 		final int datasetId = this.random.nextInt(10);
 		final DmsProject dataset = new DmsProject();
 		dataset.setProjectId(datasetId);
+		dataset.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
 
 		when(this.dmsProjectDao.getDatasetsByStudy(studyId)).thenReturn(Arrays.asList(dataset));
 		when(this.dmsProjectDao.getObservationSetVariables(Arrays.asList(datasetId),
