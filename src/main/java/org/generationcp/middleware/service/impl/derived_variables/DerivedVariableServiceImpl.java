@@ -63,8 +63,17 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	@Override
 	public Set<FormulaVariable> getFormulaVariablesInStudy(final Integer studyId, final Integer datasetId) {
-		// Get variableIds of all traits, environment detail, environment condition in a study.
-		final Set<Integer> variableIds = this.extractVariableIdsFromDataset(studyId, datasetId);
+		// Get variableIds of all traits, environment detail, environment condition in plot dataset and specified datasetId.
+		final Set<Integer> variableIds = new HashSet<>();
+		final Integer plotDatasetId =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
+		final List<MeasurementVariable> measurementVariables =
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(Arrays.asList(plotDatasetId, datasetId),
+				Arrays
+					.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+		for (final MeasurementVariable measurementVariable : measurementVariables) {
+			variableIds.add(measurementVariable.getTermId());
+		}
 		return this.formulaService.getAllFormulaVariables(variableIds);
 	}
 
