@@ -586,7 +586,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			new RoleDto(1, "Admin", "",
 				"instance", true, true,
 				true), null,
-			null);
+			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		userRoleDtos.add(userRoleDto);
 		final Integer result = this.workbenchDataManager.updateUser(userDto);

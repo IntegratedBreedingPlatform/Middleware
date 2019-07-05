@@ -40,12 +40,14 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -56,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -929,8 +932,26 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		user.setType(0);
 
 		// Add user roles to the particular user
-		//		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
-		//TODO Add list of userRoles
+		final List<UserRole> userRoles = new ArrayList<>();
+		for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
+			final UserRole userRole = new UserRole();
+			final Role role = new Role();
+			role.setId(userRoleDto.getRole().getId());
+			userRole.setRole(role);
+			userRole.setUser(user);
+			if (userRoleDto.getCrop() != null) {
+				userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
+			}
+			if (userRoleDto.getProgram() != null) {
+				final Project project =
+					this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
+				userRole.setWorkbenchProject(project);
+			}
+			userRole.setCreatedDate(new Date());
+			userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
+			userRoles.add(userRole);
+		}
+		user.setRoles(userRoles);
 
 		final List<CropType> crops = new ArrayList<>();
 		for (final CropDto crop : userDto.getCrops()) {
@@ -974,6 +995,42 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
 			user.setStatus(userDto.getStatus());
+
+			final List<UserRole> userRoles = new ArrayList<>();
+			for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
+				boolean found = false;
+				for (final UserRole userRole : user.getRoles()) {
+					if (userRole.getRole().getId().equals(userRoleDto.getRole().getId()) &&
+						(userRole.getCropType() == null && userRoleDto.getCrop() == null || userRole.getCropType().getCropName()
+							.equals(userRoleDto.getCrop().getCropName())) &&
+						(userRole.getWorkbenchProject() == null && userRoleDto.getProgram() == null || userRole.getWorkbenchProject()
+							.getUniqueID().equals(userRoleDto.getProgram().getUuid()))) {
+						userRoles.add(userRole);
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					final UserRole userRole = new UserRole();
+					final Role role = new Role();
+					role.setId(userRoleDto.getRole().getId());
+					userRole.setRole(role);
+					userRole.setUser(user);
+					if (userRoleDto.getCrop() != null) {
+						userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
+					}
+					if (userRoleDto.getProgram() != null) {
+						final Project project =
+							this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
+						userRole.setWorkbenchProject(project);
+					}
+					userRole.setCreatedDate(new Date());
+					userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
+					userRoles.add(userRole);
+				}
+			}
+			user.getRoles().clear();
+			user.getRoles().addAll(userRoles);
 
 			// update user roles to the particular user
 			//			final UserRole role = (!user.getRoles().isEmpty()) ? user.getRoles().get(0) : new UserRole();

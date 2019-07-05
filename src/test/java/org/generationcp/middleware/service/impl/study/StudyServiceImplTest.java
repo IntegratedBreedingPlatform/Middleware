@@ -271,7 +271,7 @@ public class StudyServiceImplTest {
 			new RoleDto(1, "Admin", "",
 				"instance", true, true,
 				true), null,
-			null);
+			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		userRoleDtos.add(userRoleDto);
 		user.setUserId(1);
@@ -319,7 +319,7 @@ public class StudyServiceImplTest {
 			new RoleDto(1, "Admin", "",
 				"instance", true, true,
 				true), null,
-			null);
+			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		userRoleDtos.add(userRoleDto);
 		user.setUserId(1);
