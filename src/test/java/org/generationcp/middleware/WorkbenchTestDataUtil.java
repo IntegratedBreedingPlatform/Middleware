@@ -188,7 +188,7 @@ public class WorkbenchTestDataUtil {
 			new RoleDto(1, "Admin", "",
 				"instance", true, true,
 				true), null,
-			null);
+			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		userRoleDtos.add(userRoleDto);
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
