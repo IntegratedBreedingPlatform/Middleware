@@ -444,8 +444,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationDto updatePhenotype(
-		final Integer observationId, final ObservationDto observationDto) {
+	public ObservationDto updatePhenotype(final Integer observationId, final ObservationDto observationDto) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
@@ -675,29 +674,8 @@ public class DatasetServiceImpl implements DatasetService {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
 				this.deletePhenotype(phenotype.getPhenotypeId());
 			} else {
-				this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getcValueId(), phenotype.getValue(), null, null, true);
+				this.updatePhenotype(phenotype, phenotype.getcValueId(), phenotype.getValue(), null, null, true);
 			}
-		}
-	}
-
-	@Override
-	public void acceptAllDatasetDraftData(final Integer datasetId) {
-
-		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
-
-		if (!draftPhenotypes.isEmpty()) {
-
-			for (final Phenotype phenotype : draftPhenotypes) {
-				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
-					this.deletePhenotype(phenotype.getPhenotypeId());
-				} else {
-					this.updatePhenotype(
-						phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null, false);
-				}
-			}
-
-			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
-			this.reorganizePhenotypesStatus(datasetId, draftPhenotypes, allPhenotypes);
 		}
 	}
 
@@ -764,6 +742,27 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void acceptAllDatasetDraftData(final Integer datasetId) {
+		final PhenotypeDao phenotypeDAO = this.daoFactory.getPhenotypeDAO();
+		final List<Phenotype> draftPhenotypes = phenotypeDAO.getDatasetDraftData(datasetId);
+
+		if (!draftPhenotypes.isEmpty()) {
+
+			for (final Phenotype phenotype : draftPhenotypes) {
+				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
+					this.deletePhenotype(phenotype.getPhenotypeId());
+				} else {
+					this.updatePhenotype(
+						phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null, false);
+				}
+			}
+
+			final List<Phenotype> allPhenotypes = phenotypeDAO.getPhenotypes(datasetId);
+			this.reorganizePhenotypesStatus(datasetId, draftPhenotypes, allPhenotypes);
+		}
+	}
+
+	@Override
 	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer datasetId) {
 		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
@@ -798,7 +797,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 				for (final Phenotype phenotype : selectedPhenotypes) {
 					if (!ExportImportUtils.isValidValue(measurementVariable, phenotype.getDraftValue(), possibleValues)) {
-						this.updatePhenotype(phenotype.getPhenotypeId(), null, Phenotype.MISSING, null, null, false);
+						this.updatePhenotype(phenotype, null, Phenotype.MISSING, null, null, false);
 					} else {
 						this.acceptDraftData(phenotype);
 					}
@@ -1132,6 +1131,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
+		// TODO IBP-2781 getWithIsDerivedTrait to avoid go to the db again
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotype, draftMode);
 	}
