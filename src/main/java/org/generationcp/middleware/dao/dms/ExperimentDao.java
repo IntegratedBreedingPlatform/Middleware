@@ -649,6 +649,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			final List<Map<String, Object>> results = this.getObservationUnitsQueryResult(
 				datasetId,
 				measurementVariableDtos, observationUnitIds);
+
 			return this.mapResultsToMap(results, measurementVariableDtos);
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation";
@@ -657,6 +658,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	// TODO unnecessary indirection, inline code into getObservationUnitsAsMap
 	private List<Map<String, Object>> getObservationUnitsQueryResult(
 		final int datasetId, final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> observationUnitIds) {
 
@@ -677,19 +679,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	// TODO unnecessary indirection, inline code into getObservationUnitsAsMap
 	private SQLQuery createQueryAndAddScalar(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits, final String observationUnitTableQuery) {
 		final SQLQuery query = this.getSession().createSQLQuery(observationUnitTableQuery);
 		query.addScalar(ExperimentDao.OBS_UNIT_ID, new StringType());
+		query.addScalar(ExperimentDao.ND_EXPERIMENT_ID);
 		this.addScalarForTraits(selectionMethodsAndTraits, query, true);
 		return query;
 	}
 
+	// TODO unnecessary indirection, inline code into getObservationUnitsAsMap
 	private String getObservationUnitsQuery(
 		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		{
 
-			final StringBuilder sql = new StringBuilder("SELECT nde.obs_unit_id as OBS_UNIT_ID,  ");
+			final StringBuilder sql = new StringBuilder("SELECT nde.obs_unit_id as OBS_UNIT_ID,"
+				+ "  nde.nd_experiment_id as " + ND_EXPERIMENT_ID + ", ");
 
 			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
 				+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
@@ -757,6 +763,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 				final String obsUnitId = (String) row.get(OBS_UNIT_ID);
 				observationUnitRow.setObsUnitId(obsUnitId);
+				observationUnitRow.setObservationUnitId((Integer) row.get(ND_EXPERIMENT_ID));
 				observationUnitRow.setVariables(variables);
 				observationUnitRows.put(obsUnitId, observationUnitRow);
 			}

@@ -923,8 +923,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
-		final List<MeasurementVariable>
-			measurementVariableList =
+		final List<MeasurementVariable> measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (!measurementVariableList.isEmpty()) {
@@ -940,9 +939,6 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final Object observationUnitId : table.rowKeySet()) {
 				final Set<Phenotype> phenotypes = new HashSet<>();
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
-
-				// TODO Review performance IBP-2230
-				final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
 
 				for (final String variableName : table.columnKeySet()) {
 					final String importedVariableValue = table.get(observationUnitId, variableName);
@@ -983,23 +979,22 @@ public class DatasetServiceImpl implements DatasetService {
 							final ObservationDto observationDto =
 								new ObservationDto(measurementVariable.getTermId(), importedVariableValue, categoricalValue, status,
 									Util.getCurrentDateAsStringValue(), Util.getCurrentDateAsStringValue(),
-									experimentModel.getNdExperimentId(), categoricalValue, importedVariableValue);
+									currentRow.getObservationUnitId(), categoricalValue, importedVariableValue);
 
 							phenotype = this.createPhenotype(observationDto, draftMode);
 
-						} else if (observationUnitData != null && observationUnitData.getObservationId() != null
+						} else if (observationUnitData.getObservationId() != null
 							&& importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())
 							&& Boolean.TRUE.equals(draftMode)) {
 							/*Phenotype exists and imported value is equal to value => Erase draft data*/
 							phenotype =
 								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
 									observationUnitData.getValue(), null, null, draftMode);
-						} else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
+						} else if (observationUnitData.getObservationId() != null &&
 							!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
 							/*imported value is different to stored value*/
 							phenotype =
-								this.updatePhenotype(
-									observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
+								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
 									observationUnitData.getValue(), categoricalValue, importedVariableValue, draftMode);
 						}
 
@@ -1010,6 +1005,12 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (!draftMode) {
+					/* TODO improve performance
+					 *  Low priority as this flow is not reachable now from BMS
+					 *  Import goes to draft data always
+					 */
+					final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
+
 					final ArrayList<Phenotype> datasetPhenotypes = new ArrayList<>(experimentModel.getPhenotypes());
 					datasetPhenotypes.addAll(phenotypes);
 					this.setMeasurementDataAsOutOfSync(
