@@ -947,23 +947,25 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		// Add user roles to the particular user
 		final List<UserRole> userRoles = new ArrayList<>();
-		for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
-			final UserRole userRole = new UserRole();
-			final Role role = new Role();
-			role.setId(userRoleDto.getRole().getId());
-			userRole.setRole(role);
-			userRole.setUser(user);
-			if (userRoleDto.getCrop() != null) {
-				userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
+		if (userDto.getUserRoles() != null) {
+			for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
+				final UserRole userRole = new UserRole();
+				final Role role = new Role();
+				role.setId(userRoleDto.getRole().getId());
+				userRole.setRole(role);
+				userRole.setUser(user);
+				if (userRoleDto.getCrop() != null) {
+					userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
+				}
+				if (userRoleDto.getProgram() != null) {
+					final Project project =
+						this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
+					userRole.setWorkbenchProject(project);
+				}
+				userRole.setCreatedDate(new Date());
+				userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
+				userRoles.add(userRole);
 			}
-			if (userRoleDto.getProgram() != null) {
-				final Project project =
-					this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
-				userRole.setWorkbenchProject(project);
-			}
-			userRole.setCreatedDate(new Date());
-			userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
-			userRoles.add(userRole);
 		}
 		user.setRoles(userRoles);
 
@@ -1011,40 +1013,42 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			user.setStatus(userDto.getStatus());
 
 			final List<UserRole> userRoles = new ArrayList<>();
-			for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
-				boolean found = false;
-				for (final UserRole userRole : user.getRoles()) {
-					if (userRole.getRole().getId().equals(userRoleDto.getRole().getId()) &&
-						(userRole.getCropType() == null && userRoleDto.getCrop() == null || userRole.getCropType().getCropName()
-							.equals(userRoleDto.getCrop().getCropName())) &&
-						(userRole.getWorkbenchProject() == null && userRoleDto.getProgram() == null || userRole.getWorkbenchProject()
-							.getUniqueID().equals(userRoleDto.getProgram().getUuid()))) {
+			if (userDto.getUserRoles() != null) {
+				for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
+					boolean found = false;
+					for (final UserRole userRole : user.getRoles()) {
+						if (userRole.getRole().getId().equals(userRoleDto.getRole().getId()) &&
+							(userRole.getCropType() == null && userRoleDto.getCrop() == null || userRole.getCropType().getCropName()
+								.equals(userRoleDto.getCrop().getCropName())) &&
+							(userRole.getWorkbenchProject() == null && userRoleDto.getProgram() == null || userRole.getWorkbenchProject()
+								.getUniqueID().equals(userRoleDto.getProgram().getUuid()))) {
+							userRoles.add(userRole);
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						final UserRole userRole = new UserRole();
+						final Role role = new Role();
+						role.setId(userRoleDto.getRole().getId());
+						userRole.setRole(role);
+						userRole.setUser(user);
+						if (userRoleDto.getCrop() != null) {
+							userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
+						}
+						if (userRoleDto.getProgram() != null) {
+							final Project project =
+								this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
+							userRole.setWorkbenchProject(project);
+						}
+						userRole.setCreatedDate(new Date());
+						userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
 						userRoles.add(userRole);
-						found = true;
-						break;
 					}
 				}
-				if (!found) {
-					final UserRole userRole = new UserRole();
-					final Role role = new Role();
-					role.setId(userRoleDto.getRole().getId());
-					userRole.setRole(role);
-					userRole.setUser(user);
-					if (userRoleDto.getCrop() != null) {
-						userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
-					}
-					if (userRoleDto.getProgram() != null) {
-						final Project project =
-							this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
-						userRole.setWorkbenchProject(project);
-					}
-					userRole.setCreatedDate(new Date());
-					userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
-					userRoles.add(userRole);
-				}
+				user.getRoles().clear();
+				user.getRoles().addAll(userRoles);
 			}
-			user.getRoles().clear();
-			user.getRoles().addAll(userRoles);
 
 			// update user roles to the particular user
 			//			final UserRole role = (!user.getRoles().isEmpty()) ? user.getRoles().get(0) : new UserRole();
