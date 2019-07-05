@@ -47,7 +47,7 @@ public class UserRoleDto {
 		this.role = new RoleDto(userRole);
 		this.crop = cropDto;
 		this.program = programDto;
-		this.createdBy = userRole.getCreatedBy().getUserid();
+		this.createdBy = (userRole.getCreatedBy() != null) ? userRole.getCreatedBy().getUserid() : null;
 	}
 
 	public Integer getId() {

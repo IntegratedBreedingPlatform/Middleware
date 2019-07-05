@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.RoleTypeDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
+import org.generationcp.middleware.dao.UserRoleDao;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
@@ -117,6 +118,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final ProjectDAO projectDao = new ProjectDAO();
 		projectDao.setSession(this.getCurrentSession());
 		return projectDao;
+	}
+
+	private UserRoleDao getUserRoleDao() {
+
+		final UserRoleDao userRoleDao = new UserRoleDao();
+		userRoleDao.setSession(this.getCurrentSession());
+		return userRoleDao;
 	}
 
 	@Override
@@ -278,6 +286,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId);
 			for (final ProjectUserInfo projectUserInfo : projectUserInfos) {
 				this.deleteProjectUserInfo(projectUserInfo);
+			}
+
+			final List<UserRole> userRolesPerProgram = this.getUserRoleDao().getByProgramId(projectId);
+			for (final UserRole userRole : userRolesPerProgram) {
+				userRole.getUser().getRoles().remove(userRole);
+				this.getUserRoleDao().delete(userRole);
 			}
 
 		} catch (final Exception e) {
