@@ -79,7 +79,34 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public List<WorkbenchUser> getUsersByCropFilteringByAdmin(final String cropName) {
+
+		final List<WorkbenchUser> users = new ArrayList<>();
+		try {
+			if (cropName != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_CROP_FILTERING_BY_ADMIN);
+				query.setParameter("cropName", cropName);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] user = (Object[]) o;
+					final Integer userId = (Integer) user[0];
+					final Integer personId = (Integer) user[1];
+
+					final WorkbenchUser p = new WorkbenchUser();
+					p.setPersonid(personId);
+					p.setUserid(userId);
+					users.add(p);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByCropFilteringByAdmin query: "
+				+ e.getMessage(), e);
+		}
+		return users;
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getByNameUsingEqual(final String name, final int start, final int numOfRows) {
 		try {
@@ -314,6 +341,22 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		try {
 			if (projectId != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				query.setParameter("cropName", cropName);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+				+ e.getMessage(), e);
+		}
+		return userIDs;
+	}
+
+	public List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(final Long projectId, final String cropName) {
+		final List<Integer> userIDs = new ArrayList<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID_FILTERING_SUPERADMIN);
 				query.setParameter("projectId", projectId);
 				query.setParameter("cropName", cropName);
 				return query.list();

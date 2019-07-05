@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.RoleTypeDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
+import org.generationcp.middleware.dao.UserRoleDao;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
@@ -178,6 +179,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
 		standardPresetDAO.setSession(this.getCurrentSession());
 		return standardPresetDAO;
+	}
+
+	private UserRoleDao getUserRoleDao() {
+		final UserRoleDao userRoleDao = new UserRoleDao();
+		userRoleDao.setSession(this.getCurrentSession());
+		return userRoleDao;
 	}
 
 	@Override
@@ -440,6 +447,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
 		return this.getWorkbenchUserDao().getUsersByCrop(cropName);
+	}
+
+	@Override
+	public List<WorkbenchUser> getUsersByCropFilteringByAdmin(final String cropName) {
+		return this.getWorkbenchUserDao().getUsersByCropFilteringByAdmin(cropName);
 	}
 
 	@Override
@@ -1033,6 +1045,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
 		return this.getWorkbenchUserDao().getActiveUserIDsByProjectId(projectId, cropName );
+	}
+
+	@Override
+	public List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(final Long projectId, final String cropName) {
+		return this.getWorkbenchUserDao().getActiveUserIDsByProjectIdFilteringSuperAdmin(projectId, cropName );
 	}
 
 	@Override

@@ -314,6 +314,8 @@ public interface WorkbenchDataManager {
 
 	List<WorkbenchUser> getUsersByCrop(final String cropName);
 
+	List<WorkbenchUser> getUsersByCropFilteringByAdmin(String cropName);
+
 	/**
 	 * Returns number of all Users.
 	 *
@@ -661,6 +663,8 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<RoleType> getRoleTypes();
+
+	List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(Long projectId, String cropName);
 
 	/**
 	 * Return users with SUPERADMIN role
