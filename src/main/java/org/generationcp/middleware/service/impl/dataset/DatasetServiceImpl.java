@@ -479,19 +479,17 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	void resolveObservationStatus(final Integer variableId, final Phenotype phenotype) {
-
-		final boolean isDerivedTrait = this.isDerivedTrait(variableId);
-
+		final boolean isDerivedTrait;
+		if (phenotype.isDerivedTrait() != null) {
+			// Performance optimization when processing many phenotypes
+			isDerivedTrait = phenotype.isDerivedTrait();
+		} else {
+			final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variableId);
+			isDerivedTrait = formula != null;
+		}
 		if (isDerivedTrait) {
 			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
 		}
-	}
-
-	private boolean isDerivedTrait(final Integer variableId) {
-		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
-		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
-
-		return formula != null;
 	}
 
 	/*
@@ -830,6 +828,7 @@ public class DatasetServiceImpl implements DatasetService {
 					variableId);
 				Phenotype phenotype = null;
 				if (observationUnitData != null) {
+					// TODO IBP-2781 getWithIsDerivedTrait to avoid go to the db again
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
@@ -868,6 +867,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
 
 				if (observationUnitData != null) {
+					// TODO IBP-2781 getWithIsDerivedTrait to avoid go to the db again
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
@@ -1153,7 +1153,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (!draftMode) {
 			final Integer observableId = phenotype.getObservableId();
-			// TODO Review performance IBP-2230
 			this.resolveObservationStatus(observableId, phenotype);
 			phenotype.setChanged(true); // to set out-of-sync
 		}
@@ -1180,6 +1179,7 @@ public class DatasetServiceImpl implements DatasetService {
 		} else {
 			phenotype.setValue(observation.getValue());
 			phenotype.setcValue(observation.getCategoricalValueId());
+			// FIXME get phenotype With IsDerivedTrait to avoid go to the db again
 			this.resolveObservationStatus(variableId, phenotype);
 			phenotype.setChanged(true); // to set out-of-sync
 		}

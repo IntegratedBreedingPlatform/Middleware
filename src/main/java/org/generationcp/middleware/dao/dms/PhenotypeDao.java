@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
@@ -42,6 +43,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -1201,14 +1203,32 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
-		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.createAlias("experiment", "experiment");
-		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
-		final Criterion draftValue = Restrictions.isNotNull("draftValue");
-		final Criterion draftCValueId = Restrictions.isNotNull("draftCValueId");
-		criteria.add(Restrictions.or(draftValue, draftCValueId));
-		criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-		return criteria.list();
+		final List<Map<String, Object>> results = this.getSession().createSQLQuery("select {ph.*}, {e.*}, "
+			+ " (select exists( "
+			+ "     select 1 from formula where target_variable_id = ph.observable_id "
+			+ " )) as isDerivedTrait "
+			+ " from phenotype ph"
+			+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
+			+ " inner join project p on e.project_id = p.project_id "
+			+ " where p.project_id = :datasetId "
+			+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null)")
+			.addEntity("ph", Phenotype.class)
+			.addEntity("e", ExperimentModel.class)
+			.addScalar("isDerivedTrait", new BooleanType())
+			.setParameter("datasetId", datasetId)
+			.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+			.list();
+
+		final List<Phenotype> phenotypes = new ArrayList<>();
+
+		for (final Map<String, Object> result : results) {
+			final Phenotype phenotype = (Phenotype) result.get("ph");
+			final ExperimentModel experimentModel = (ExperimentModel) result.get("e");
+			phenotype.setExperiment(experimentModel);
+			phenotype.setDerivedTrait((Boolean) result.get("isDerivedTrait"));
+			phenotypes.add(phenotype);
+		}
+		return phenotypes;
 	}
 
 	public List<Phenotype> getPhenotypes(final Integer datasetId) {
