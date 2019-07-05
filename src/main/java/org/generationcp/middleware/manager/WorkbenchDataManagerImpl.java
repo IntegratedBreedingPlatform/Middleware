@@ -120,13 +120,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return projectDao;
 	}
 
-	private UserRoleDao getUserRoleDao() {
-
-		final UserRoleDao userRoleDao = new UserRoleDao();
-		userRoleDao.setSession(this.getCurrentSession());
-		return userRoleDao;
-	}
-
 	@Override
 	public ProjectUserInfoDAO getProjectUserInfoDao() {
 
