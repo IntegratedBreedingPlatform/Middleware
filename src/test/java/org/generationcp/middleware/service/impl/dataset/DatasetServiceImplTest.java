@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -72,6 +73,7 @@ import java.util.TreeSet;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -166,6 +168,29 @@ public class DatasetServiceImplTest {
 		final long count = 5;
 		when(this.phenotypeDao.countPhenotypesForDataset(Matchers.anyInt(), Matchers.anyListOf(Integer.class))).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countObservationsByVariables(123, Arrays.asList(11, 22)));
+	}
+
+	@Test
+	public void testUpdateDependentPhenotypesStatus() {
+		final Set<Integer> targetVariableIds = new HashSet<>();
+		targetVariableIds.add(1001);
+		final Set<Integer> observationUnitIds = new HashSet<>();
+		observationUnitIds.add(201);
+		this.datasetService.updateDependentPhenotypesStatus(targetVariableIds, observationUnitIds);
+		verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds);
+	}
+
+	@Test
+	public void testUpdateDependentPhenotypesStatusByGeolocation() {
+		final Integer inputId = 1000;
+		final Formula formula = new Formula();
+		final CVTerm targetCVTerm =  new CVTerm();
+		targetCVTerm.setCvTermId(1001);
+		formula.setTargetCVTerm(targetCVTerm);
+		when(this.formulaDao.getByInputIds(Arrays.asList(inputId))).thenReturn(Arrays.asList(formula));
+		this.datasetService.updateDependentPhenotypesStatusByGeolocation(1, Arrays.asList(inputId));
+		verify(this.formulaDao).getByInputIds(Arrays.asList(inputId));
+		verify(this.phenotypeDao).updateOutOfSyncPhenotypesByGeolocation(1, Sets.newHashSet(targetCVTerm.getCvTermId()));
 	}
 
 	@Test
