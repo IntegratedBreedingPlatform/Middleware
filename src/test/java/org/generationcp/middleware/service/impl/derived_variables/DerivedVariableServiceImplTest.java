@@ -2,7 +2,12 @@ package org.generationcp.middleware.service.impl.derived_variables;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -11,6 +16,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.junit.Before;
@@ -20,12 +26,15 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -33,6 +42,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,6 +53,8 @@ public class DerivedVariableServiceImplTest {
 	public static final int VARIABLE2_TERMID = 456;
 	public static final int VARIABLE3_TERMID = 789;
 	public static final int VARIABLE4_TERMID = 999;
+	public static final int STUDY_ID = 1000;
+	public static final int TERM_ID = 19001;
 
 	@Mock
 	private FormulaService formulaService;
@@ -57,18 +69,28 @@ public class DerivedVariableServiceImplTest {
 	private DmsProjectDao dmsProjectDao;
 
 	@Mock
+	private ExperimentDao experimentDao;
+
+	@Mock
+	private ProjectPropertyDao projectPropertyDao;
+
+	@Mock
 	private DaoFactory factory;
 
 	@InjectMocks
 	private final DerivedVariableServiceImpl derivedVariableService = new DerivedVariableServiceImpl();
 
 	private final Random random = new Random();
+	public static final Integer PLOT_DATASET_ID = 1001;
+	public static final Integer SUBOBS_DATASET_ID = 1002;
 
 	@Before
 	public void setup() {
 		this.derivedVariableService.setDaoFactory(this.factory);
 		when(this.factory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		when(this.factory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
+		when(this.factory.getExperimentDao()).thenReturn(this.experimentDao);
+		when(this.factory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 	}
 
 	@Test
@@ -145,13 +167,94 @@ public class DerivedVariableServiceImplTest {
 	}
 
 	@Test
-	public void testCountCalculatedVariablesInDatasets() {
+	public void testGetValuesFromObservations() {
+		this.derivedVariableService.getValuesFromObservations(STUDY_ID, Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()), new HashMap<Integer, Integer>());
+		verify(this.experimentDao).getValuesFromObservations(STUDY_ID, Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()), new HashMap<Integer, Integer>());
+	}
 
+	@Test
+	public void testCreateInputVariableDatasetReferenceMapForPlotDataset() {
+		final Set<FormulaVariable> formulaVariables = new HashSet<>();
+		final FormulaVariable formulaVariable = new FormulaVariable();
+		formulaVariable.setId(VARIABLE1_TERMID);
+		formulaVariables.add(formulaVariable);
+		when(this.formulaService.getAllFormulaVariables(new HashSet<>(Arrays.asList(TERM_ID)))).thenReturn(formulaVariables);
+
+		final DatasetDTO plotDataset = new DatasetDTO();
+		plotDataset.setDatasetId(PLOT_DATASET_ID);
+		when(this.datasetService.getDatasets(STUDY_ID, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId())))).thenReturn(Arrays.asList(plotDataset));
+
+		final ProjectProperty projectProperty = new ProjectProperty();
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(PLOT_DATASET_ID);
+		dmsProject.setName("PLOT DATA");
+		projectProperty.setProject(dmsProject);
+		projectProperty.setVariableId(VARIABLE1_TERMID);
+		projectProperty.setAlias("VARIABLE INPUT");
+		when(this.projectPropertyDao.getByStudyAndStandardVariableIds(STUDY_ID, Arrays.asList(VARIABLE1_TERMID))).thenReturn(Arrays.asList(projectProperty));
+
+		final  Map<Integer, Map<String, Object>> map = this.derivedVariableService.createInputVariableDatasetReferenceMap(STUDY_ID, PLOT_DATASET_ID, TERM_ID);
+		assertNotNull(map.get(projectProperty.getVariableId()));
+		final Map<String, Object> inputVariableDatasetReferenceMap = map.get(projectProperty.getVariableId());
+		assertEquals(projectProperty.getAlias(), inputVariableDatasetReferenceMap.get("variableName"));
+		final List<DatasetReference> datasetReferences = (List<DatasetReference>) inputVariableDatasetReferenceMap.get("datasets");
+		assertEquals(PLOT_DATASET_ID, datasetReferences.get(0).getId());
+		assertEquals(dmsProject.getName(), datasetReferences.get(0).getName());
+	}
+
+	@Test
+	public void testCreateInputVariableDatasetReferenceMapForSubobservation() {
+		final Set<FormulaVariable> formulaVariables = new HashSet<>();
+		final FormulaVariable formulaVariable = new FormulaVariable();
+		formulaVariable.setId(VARIABLE1_TERMID);
+		formulaVariables.add(formulaVariable);
+		when(this.formulaService.getAllFormulaVariables(new HashSet<>(Arrays.asList(TERM_ID)))).thenReturn(formulaVariables);
+
+		final DatasetDTO plotDataset = new DatasetDTO();
+		plotDataset.setDatasetId(PLOT_DATASET_ID);
+		when(this.datasetService.getDatasets(STUDY_ID, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId())))).thenReturn(Arrays.asList(plotDataset));
+
+		final ProjectProperty projectProperty = new ProjectProperty();
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(SUBOBS_DATASET_ID);
+		dmsProject.setName("PLANT SUBOBS");
+		projectProperty.setProject(dmsProject);
+		projectProperty.setVariableId(VARIABLE1_TERMID);
+		projectProperty.setAlias("VARIABLE INPUT");
+		when(this.projectPropertyDao.getByProjectIdAndVariableIds(SUBOBS_DATASET_ID, Arrays.asList(VARIABLE1_TERMID))).thenReturn(Arrays.asList(projectProperty));
+
+		final  Map<Integer, Map<String, Object>> map = this.derivedVariableService.createInputVariableDatasetReferenceMap(STUDY_ID, SUBOBS_DATASET_ID, TERM_ID);
+		assertNotNull(map.get(projectProperty.getVariableId()));
+		final Map<String, Object> inputVariableDatasetReferenceMap = map.get(projectProperty.getVariableId());
+		assertEquals(projectProperty.getAlias(), inputVariableDatasetReferenceMap.get("variableName"));
+		final List<DatasetReference> datasetReferences = (List<DatasetReference>) inputVariableDatasetReferenceMap.get("datasets");
+		assertEquals(SUBOBS_DATASET_ID, datasetReferences.get(0).getId());
+		assertEquals(dmsProject.getName(), datasetReferences.get(0).getName());
+	}
+
+	@Test
+	public void testCreateVariableIdMeasurementVariableMap() {
+		final List<DmsProject> dmsProjects = this.createDmsProjects();
+		final List<Integer> projectIds = new ArrayList<>();
+		for(DmsProject dmsProject: dmsProjects) {
+			projectIds.add(dmsProject.getProjectId());
+		}
+		when(this.dmsProjectDao.getDatasetsByStudy(STUDY_ID)).thenReturn(dmsProjects);
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(TERM_ID);
+
+		when(this.dmsProjectDao.getObservationSetVariables(projectIds,
+			Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()))).thenReturn(Arrays.asList(measurementVariable));
+		final Map<Integer, MeasurementVariable> variableIdMeasurementVariableMap = this.derivedVariableService.createVariableIdMeasurementVariableMap(STUDY_ID);
+		assertEquals(measurementVariable, variableIdMeasurementVariableMap.get(measurementVariable.getTermId()));
+	}
+
+	@Test
+	public void testCountCalculatedVariablesInDatasets() {
 		final int expectedCount = this.random.nextInt();
 		final Set<Integer> datasetIds = new HashSet<Integer>(Arrays.asList(1));
 		when(this.dmsProjectDao.countCalculatedVariablesInDatasets(datasetIds)).thenReturn(expectedCount);
 		assertEquals(expectedCount, this.derivedVariableService.countCalculatedVariablesInDatasets(datasetIds));
-
 	}
 
 	@Test
@@ -180,6 +283,77 @@ public class DerivedVariableServiceImplTest {
 		assertTrue(existingPhenotype.isChanged());
 		assertNull(existingPhenotype.getValueStatus());
 
+	}
+
+	@Test
+	public void testGetFormulaVariablesInStudy() {
+		final DmsProject plotDataset = new DmsProject();
+		plotDataset.setProjectId(PLOT_DATASET_ID);
+		when(this.dmsProjectDao.getDatasetsByTypeForStudy(STUDY_ID, DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(Arrays.asList(plotDataset));
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(TERM_ID);
+		when(this.dmsProjectDao.getObservationSetVariables(Arrays.asList(PLOT_DATASET_ID, SUBOBS_DATASET_ID),
+			Arrays
+				.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()))).thenReturn(Arrays.asList(measurementVariable));
+
+		this.derivedVariableService.getFormulaVariablesInStudy(STUDY_ID, SUBOBS_DATASET_ID);
+		verify(this.dmsProjectDao).getDatasetsByTypeForStudy(STUDY_ID, DatasetTypeEnum.PLOT_DATA.getId());
+		verify(this.dmsProjectDao).getObservationSetVariables(Arrays.asList(PLOT_DATASET_ID, SUBOBS_DATASET_ID),
+			Arrays
+				.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+		verify(this.formulaService).getAllFormulaVariables(new HashSet<>(Arrays.asList(measurementVariable.getTermId())));
+	}
+
+	@Test
+	public void testExtractVariableIdsFromDatasetForSubObs() {
+		final List<DmsProject> dmsProjects = this.createDmsProjects();
+		final List<Integer> projectIds = new ArrayList<>();
+		for(DmsProject dmsProject: dmsProjects) {
+			projectIds.add(dmsProject.getProjectId());
+		}
+		when(this.dmsProjectDao.getDatasetsByStudy(STUDY_ID)).thenReturn(dmsProjects);
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(TERM_ID);
+		when(this.dmsProjectDao.getObservationSetVariables(Arrays.asList(SUBOBS_DATASET_ID),
+			Arrays.asList(VariableType.TRAIT.getId()))).thenReturn(Arrays.asList(measurementVariable));
+
+		final Set<Integer> variableIds = this.derivedVariableService.extractVariableIdsFromDataset(STUDY_ID, SUBOBS_DATASET_ID);
+		verify(this.dmsProjectDao).getDatasetsByStudy(STUDY_ID);
+		verify(this.dmsProjectDao).getObservationSetVariables(Arrays.asList(SUBOBS_DATASET_ID),
+			Arrays.asList(VariableType.TRAIT.getId()));
+		verify(this.dmsProjectDao, never()).getObservationSetVariables(projectIds,
+			Arrays
+				.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+		assertEquals(1, variableIds.size());
+		assertTrue(variableIds.contains(measurementVariable.getTermId()));
+	}
+
+	@Test
+	public void testExtractVariableIdsFromDatasetForPlotDataset() {
+		final List<DmsProject> dmsProjects = this.createDmsProjects();
+		final List<Integer> projectIds = new ArrayList<>();
+		for(DmsProject dmsProject: dmsProjects) {
+			projectIds.add(dmsProject.getProjectId());
+		}
+		final DatasetType datasetType = new DatasetType();
+		datasetType.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		dmsProjects.get(1).setDatasetType(datasetType);
+		when(this.dmsProjectDao.getDatasetsByStudy(STUDY_ID)).thenReturn(dmsProjects);
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(TERM_ID);
+		when(this.dmsProjectDao.getObservationSetVariables(projectIds,
+			Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()))).thenReturn(Arrays.asList(measurementVariable));
+
+		final Set<Integer> variableIds = this.derivedVariableService.extractVariableIdsFromDataset(STUDY_ID, PLOT_DATASET_ID);
+		verify(this.dmsProjectDao).getDatasetsByStudy(STUDY_ID);
+		verify(this.dmsProjectDao, never()).getObservationSetVariables(Arrays.asList(PLOT_DATASET_ID),
+			Arrays.asList(VariableType.TRAIT.getId()));
+		verify(this.dmsProjectDao).getObservationSetVariables(projectIds,
+			Arrays
+				.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+		assertEquals(1, variableIds.size());
+		assertTrue(variableIds.contains(measurementVariable.getTermId()));
 	}
 
 	@Test
@@ -232,6 +406,19 @@ public class DerivedVariableServiceImplTest {
 
 		return formulaVariables;
 
+	}
+
+	private List<DmsProject> createDmsProjects() {
+		final List<DmsProject> dmsProjects = new ArrayList<>();
+		for(int i=0; i<4; i++) {
+			final DmsProject dmsProject = new DmsProject();
+			dmsProject.setProjectId(STUDY_ID + i);
+			final DatasetType datasetType = new DatasetType();
+			datasetType.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+			dmsProject.setDatasetType(datasetType);
+			dmsProjects.add(dmsProject);
+		}
+		return dmsProjects;
 	}
 
 }

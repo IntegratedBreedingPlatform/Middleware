@@ -51,7 +51,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Set<Integer> variableIds = this.extractVariableIdsFromDataset(studyId, datasetId);
 		final Set<FormulaVariable> missingFormulaVariablesInStudy = new HashSet<>();
 		final Set<FormulaVariable> formulaVariablesOfCalculatedVariable =
-			this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(variableId)));
+			this.formulaService.getAllFormulaVariables(new HashSet<>(Arrays.asList(variableId)));
 		for (final FormulaVariable formulaVariable : formulaVariablesOfCalculatedVariable) {
 			if (!variableIds.contains(formulaVariable.getId())) {
 				missingFormulaVariablesInStudy.add(formulaVariable);
@@ -172,7 +172,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		final Map<Integer, Map<String, Object>> inputVariableDatasetMap = new HashMap<>();
 		final Set<FormulaVariable> formulaVariables =
-			this.formulaService.getAllFormulaVariables(new HashSet<Integer>(Arrays.asList(variableId)));
+			this.formulaService.getAllFormulaVariables(new HashSet<>(Arrays.asList(variableId)));
 		final List<Integer> variableIds = new ArrayList<>();
 		for (final FormulaVariable formulaVariable : formulaVariables) {
 			variableIds.add(formulaVariable.getId());
