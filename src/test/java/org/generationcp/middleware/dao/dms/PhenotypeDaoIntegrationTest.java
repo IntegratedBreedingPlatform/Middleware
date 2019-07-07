@@ -12,7 +12,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import com.beust.jcommander.internal.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -331,6 +330,25 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer phenotypeId = this.phenotypes.get(0).getPhenotypeId();
 		Assert.assertNotNull(this.phenotypeDao.getPhenotype(experimentId,  phenotypeId));
 		Assert.assertNull(this.phenotypeDao.getPhenotype(experimentId + 1,  phenotypeId));
+	}
+
+	@Test
+	public void testCountOutOfSyncDataOfDatasetsInStudy() {
+		final String uniqueID = this.commonTestProject.getUniqueID();
+		final DmsProject plot =
+			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
+				study, study);
+
+		final List<Integer> traitIds = Arrays.asList(trait.getCvTermId());
+		this.createProjectProperties(plot, traitIds);
+		this.createEnvironmentData(plot, 1, traitIds);
+		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
+		final Integer variableId = this.trait.getCvTermId();
+		this.phenotypeDao
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
+		final Map<Integer, Long> outOfSyncMap = this.phenotypeDao.countOutOfSyncDataOfDatasetsInStudy(study.getProjectId());
+		Assert.assertNotNull(outOfSyncMap.get(plot.getProjectId()));
+		Assert.assertEquals(new Long(1), outOfSyncMap.get(plot.getProjectId()));
 	}
 
 	@Test
