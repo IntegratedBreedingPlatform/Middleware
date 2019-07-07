@@ -64,12 +64,9 @@ public class FormulaDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetByInputIds() {
-		final List<Formula> formulas = this.formulaDAO.getByInputIds(Arrays.asList(input1.getCvTermId()));
 		final Formula savedFormula = saveTestFormula();
 		final List<Formula> retrievedFormulas = this.formulaDAO.getByInputIds(Arrays.asList(input1.getCvTermId()));
-		Assert.assertEquals(formulas.size() + 1, retrievedFormulas.size());
 		Assert.assertTrue(retrievedFormulas.contains(savedFormula));
-		Assert.assertFalse(formulas.contains(savedFormula));
 	}
 
 	@Test
