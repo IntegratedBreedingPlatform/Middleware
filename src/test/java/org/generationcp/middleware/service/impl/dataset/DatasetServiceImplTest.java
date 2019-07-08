@@ -415,7 +415,7 @@ public class DatasetServiceImplTest {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
 		DatasetDTO datasetDTO;
 
-		final boolean filterDataset = datasetTypeId != null || datasetTypeId != 0;
+		final boolean filterDataset = datasetTypeId != null && datasetTypeId != 0;
 
 		datasetDTO = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", DatasetTypeEnum.SUMMARY_DATA.getId());
 		datasetDTOs1.add(datasetDTO);
