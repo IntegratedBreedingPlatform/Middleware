@@ -208,7 +208,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return inputVariableDatasetMap;
 	}
 
-	protected void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
+	private void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		phenotype.setValue(value);
@@ -218,7 +218,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		phenotypeDao.update(phenotype);
 	}
 
-	protected void createPhenotype(final ObservationDto observation) {
+	private void createPhenotype(final ObservationDto observation) {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());

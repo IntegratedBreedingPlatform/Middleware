@@ -63,7 +63,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -73,7 +72,6 @@ import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -421,7 +419,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetFieldMapInfoOfStudy() {
-		final List<Integer> trialIdList = new ArrayList<Integer>();
+		final List<Integer> trialIdList = new ArrayList<>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
 			this.manager.getFieldMapInfoOfStudy(trialIdList, StudyDataManagerImplTest.crossExpansionProperties);
@@ -918,7 +916,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<InstanceMetadata> instanceMetadataList = this.manager.getInstanceMetadata(studyId);
 		final Integer instanceId = instanceMetadataList.get(0).getInstanceDbId();
 
-		Assert.assertTrue(this.manager.areAllInstancesExistInDataset(datasetId, new HashSet<Integer>(Arrays.asList(instanceId))));
+		Assert.assertTrue(this.manager.areAllInstancesExistInDataset(datasetId, new HashSet<>(Arrays.asList(instanceId))));
 
 	}
 
@@ -981,8 +979,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("1000", savedPhenotype.getValue());
 	}
 
-	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)
-		throws Exception {
+	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank) {
 		final StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
 		final DMSVariableType vtype = new DMSVariableType();
 		vtype.setLocalName(name);
@@ -1056,12 +1053,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Add new study with new location ID
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
-		final StudyReference studyReference = this.manager.getStudyReference(studyId);
 		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());
-		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, location1, season);
+		this.studyTDI.addEnvironmentDataset(this.crop, studyId, location1, season);
 
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.manager.getActiveSession().flush();
@@ -1081,7 +1077,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Add new study with 2 environments assigned new location IDs
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
-		final StudyReference studyReference = this.manager.getStudyReference(studyId);
 		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());

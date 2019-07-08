@@ -38,7 +38,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -51,11 +50,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.text.SimpleDateFormat;
@@ -81,10 +79,10 @@ public class DatasetServiceImplTest {
 
 	private static final int STUDY_ID = 1234;
 	private static final String FACT1 = "FACT1";
-	public static final ArrayList<String> DESING_FACTORS =
+	private static final ArrayList<String> DESING_FACTORS =
 		Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), DatasetServiceImplTest.FACT1);
 	private static final String STOCK_ID = "STOCK_ID";
-	public static final ArrayList<String> GERMPLASM_DESCRIPTORS = Lists.newArrayList(
+	private static final ArrayList<String> GERMPLASM_DESCRIPTORS = Lists.newArrayList(
 		TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
 		TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), DatasetServiceImplTest.STOCK_ID);
 	private static final int DATASET_ID = 567;
@@ -98,14 +96,14 @@ public class DatasetServiceImplTest {
 	public static final String GID = "GID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
-	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
+	private static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	private static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
 	public static final String COL = "COL";
 	public static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String REP_NO = "REP_NO";
-	public static final String EXPECTED = "5";
+	private static final String EXPECTED = "5";
 
 	@Mock
 	private DaoFactory daoFactory;
@@ -166,7 +164,7 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testCountPhenotypes() {
 		final long count = 5;
-		when(this.phenotypeDao.countPhenotypesForDataset(Matchers.anyInt(), Matchers.anyListOf(Integer.class))).thenReturn(count);
+		when(this.phenotypeDao.countPhenotypesForDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyListOf(Integer.class))).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countObservationsByVariables(123, Arrays.asList(11, 22)));
 	}
 
@@ -329,22 +327,13 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testResolveObservationStatusVaribleHasNoFormula() {
-		final Random ran = new Random();
-		final int variableId = ran.nextInt();
-
-		final Phenotype phenotype = new Phenotype();
-		Assert.assertNull(phenotype.getValueStatus());
-	}
-
-	@Test
 	public void testUpdateDependentPhenotypesWhenNotInputVariable() {
 		final Random ran = new Random();
 		final int variableId = ran.nextInt();
 		final int observationUnitId = ran.nextInt();
 		Mockito.doReturn(new ArrayList<Formula>()).when(this.formulaDao).getByInputId(variableId);
 		this.datasetService.updateDependentPhenotypesStatus(variableId, observationUnitId);
-		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(Matchers.<Integer>anySet(), Matchers.<Integer>anySet());
+		Mockito.verify(this.phenotypeDao, Mockito.never()).updateOutOfSyncPhenotypes(ArgumentMatchers.<Integer>anySet(), ArgumentMatchers.<Integer>anySet());
 	}
 
 	@Test
@@ -379,7 +368,7 @@ public class DatasetServiceImplTest {
 	@Test
 	public void testCountPhenotypesByInstance() {
 		final long count = 6;
-		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(Matchers.anyInt(), Matchers.anyInt())).thenReturn(count);
+		Mockito.when(this.phenotypeDao.countPhenotypesForDatasetAndInstance(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt())).thenReturn(count);
 		Assert.assertEquals(count, this.datasetService.countObservationsByInstance(1, 2));
 	}
 
@@ -426,38 +415,38 @@ public class DatasetServiceImplTest {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
 		DatasetDTO datasetDTO;
 
-		final boolean filterDataset = datasetTypeId == null || datasetTypeId == 0 ? false : true;
+		final boolean filterDataset = datasetTypeId != null || datasetTypeId != 0;
 
 		datasetDTO = createDataset(25020, 25019, "IBP-2015-ENVIRONMENT", DatasetTypeEnum.SUMMARY_DATA.getId());
 		datasetDTOs1.add(datasetDTO);
-		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
+		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
 
 		}
 		datasetDTO = createDataset(25021, 25019, "IBP-2015-PLOTDATA", DatasetTypeEnum.PLOT_DATA.getId());
 		datasetDTOs1.add(datasetDTO);
-		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
+		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
 
 		}
 
 		datasetDTO = createDataset(25022, 25021, "IBP-2015-PLOTDATA-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs2.add(datasetDTO);
-		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
+		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
 
 		}
 
 		datasetDTO = createDataset(25023, 25022, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs3.add(datasetDTO);
-		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
+		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
 
 		}
 
 		datasetDTO = createDataset(25024, 25023, "IBP-2015-PLOTDATA-SUBOBS-SUBOBS-SUBOBS", DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTOs4.add(datasetDTO);
-		if ((filterDataset && datasetTypeId.equals(datasetDTO.getDatasetTypeId()) || !filterDataset)) {
+		if (!filterDataset || datasetTypeId.equals(datasetDTO.getDatasetTypeId())) {
 			datasetDTOList.add(datasetDTO);
 
 		}
@@ -479,7 +468,7 @@ public class DatasetServiceImplTest {
 
 	@Ignore // TODO move to integration tests
 	@Test
-	public void testGetObservations() throws Exception {
+	public void testGetObservations() {
 		this.datasetService = new DatasetServiceImpl(this.mockSessionProvider);
 		this.datasetService.setMeasurementVariableService(this.measurementVariableService);
 		this.datasetService.setStudyService(this.studyService);
@@ -494,12 +483,10 @@ public class DatasetServiceImplTest {
 		this.datasetService.setMeasurementVariableService(mockTraits);
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
 		final List<MeasurementVariableDto> projectTraits =
-			Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
+			Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
 		Mockito.when(mockTraits.getVariables(
 			DatasetServiceImplTest.STUDY_ID, VariableType.TRAIT.getId(),
 			VariableType.SELECTION_METHOD.getId())).thenReturn(projectTraits);
-		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
-		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "traitValue", Phenotype.ValueStatus.OUT_OF_SYNC));
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setAction("1");
@@ -522,7 +509,7 @@ public class DatasetServiceImplTest {
 		variables.put(FACT1, new ObservationUnitData());
 		observationUnitRow.setVariables(variables);
 
-		final List<ObservationUnitRow> testMeasurements = Collections.<ObservationUnitRow>singletonList(observationUnitRow);
+		final List<ObservationUnitRow> testMeasurements = Collections.singletonList(observationUnitRow);
 		Mockito.when(this.obsUnitsSearchDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		final ObservationUnitsSearchDTO
 			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
@@ -578,7 +565,7 @@ public class DatasetServiceImplTest {
 
 		this.datasetService.deletePhenotype(phenotypeId);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
-		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(new HashSet<Integer>(Arrays.asList(observationUnitId)), new HashSet<Integer>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
+		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
 	}
 
     @Test
@@ -617,9 +604,9 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testAcceptDraftData() throws Exception {
-		final Integer studyId = 2;
-		final Integer datasetId = 3;
+	public void testAcceptDraftData() {
+		final int studyId = 2;
+		final int datasetId = 3;
 
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
@@ -655,7 +642,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testDiscardDraftData() throws Exception {
+	public void testDiscardDraftData() {
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -693,7 +680,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testAcceptDraftDataDeletingRow() throws Exception {
+	public void testAcceptDraftDataDeletingRow() {
 		final Integer studyId = 2;
 		final Integer datasetId = 3;
 
@@ -730,7 +717,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testDiscardDraftDataDeletingRow() throws Exception {
+	public void testDiscardDraftDataDeletingRow() {
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -765,7 +752,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testDiscardDraftDataDeletingRowWithEmpty() throws Exception {
+	public void testDiscardDraftDataDeletingRowWithEmpty() {
 		final Integer datasetId = 3;
 
 		final DmsProject project = new DmsProject();
@@ -800,7 +787,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testAcceptDraftDataDeletingRowWithEmpty() throws Exception {
+	public void testAcceptDraftDataDeletingRowWithEmpty() {
 		final Integer studyId = 2;
 		final Integer datasetId = 3;
 
@@ -837,7 +824,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testSetAsMissingDraftDataValidValue() throws Exception {
+	public void testSetAsMissingDraftDataValidValue() {
 		final Integer studyId = 2;
 		final Integer datasetId = 3;
 
@@ -870,7 +857,7 @@ public class DatasetServiceImplTest {
 		valueReference.setName(EXPECTED);
 		valueReference.setId(5);
 		valueReference.setId(5);
-		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
+		variable.setPossibleValues(Lists.newArrayList(valueReference));
 		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
 
 
@@ -887,7 +874,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testSetAsMissingDraftDataInvalidValue() throws Exception {
+	public void testSetAsMissingDraftDataInvalidValue() {
 		final Integer studyId = 2;
 		final Integer datasetId = 3;
 
@@ -920,7 +907,7 @@ public class DatasetServiceImplTest {
 		valueReference.setName("50");
 		valueReference.setId(50);
 		valueReference.setId(50);
-		variable.setPossibleValues(Lists.<ValueReference>newArrayList(valueReference));
+		variable.setPossibleValues(Lists.newArrayList(valueReference));
 		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
 
 

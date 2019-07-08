@@ -38,9 +38,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	protected static final String LOCATION_ID = "LOCATION_ID";
 	protected static final String EXPT_DESIGN = "EXPT_DESIGN";
-	protected static final String FIELD_MAP_COLUMN = "FIELDMAP COLUMN";
+	static final String FIELD_MAP_COLUMN = "FIELDMAP COLUMN";
 	protected static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	protected static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
+	static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
 	protected static final String COL = "COL";
 	protected static final String ROW = "ROW";
 	protected static final String BLOCK_NO = "BLOCK_NO";
@@ -52,9 +52,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String GID = "GID";
 	protected static final String ENTRY_TYPE = "ENTRY_TYPE";
 	protected static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	protected static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
-	public static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
-	protected static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
+	static final String FIELD_MAP_RANGE = "FIELDMAP RANGE";
+	private static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
+	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 
 	static {
@@ -723,7 +723,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
 				+ "_Id AND ").append(stockMatchClause).append(" )");
-			;
 		}
 	}
 

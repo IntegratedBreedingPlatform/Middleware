@@ -558,14 +558,4 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		return geolocation.getLocationId();
 	}
 
-	private ProjectProperty saveProjectVariable(final DmsProject project, final CVTerm variable, final int rank, final VariableType variableType) {
-		final ProjectProperty property1 = new ProjectProperty();
-		property1.setAlias(org.apache.commons.lang.RandomStringUtils.randomAlphabetic(20));
-		property1.setRank(rank);
-		property1.setTypeId(variableType.getId());
-		property1.setProject(project);
-		property1.setVariableId(variable.getCvTermId());
-		return this.projectPropDao.save(property1);
-	}
-
 }

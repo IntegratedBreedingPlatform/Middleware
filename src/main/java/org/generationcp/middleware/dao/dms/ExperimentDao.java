@@ -61,7 +61,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	public static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
+	static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
 		" experiment.nd_experiment_id, " +
 		" sample.sample_id," +
 		" sample.sample_no " +
@@ -456,7 +456,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (returnVal == null) {
 				return 0;
 			} else {
-				return returnVal.intValue();
+				return returnVal;
 			}
 
 		} catch (final HibernateException e) {

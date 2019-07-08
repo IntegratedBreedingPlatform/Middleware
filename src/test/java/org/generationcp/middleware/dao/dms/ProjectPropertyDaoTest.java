@@ -227,7 +227,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final List<String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
 		Assert.assertNotNull(germplasmDescriptors);
-		Assert.assertTrue(germplasmDescriptors.size() == 2);
+		Assert.assertEquals(2, germplasmDescriptors.size());
 		Assert.assertTrue(germplasmDescriptors.contains(variable1.getName()));
 		Assert.assertTrue(germplasmDescriptors.contains(variable3.getName()));
 	}
@@ -274,7 +274,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
 		final List<String> designFactors = this.projectPropDao.getDesignFactors(this.study.getProjectId());
 		Assert.assertNotNull(designFactors);
-		Assert.assertTrue(designFactors.size() == 2);
+		Assert.assertEquals(2, designFactors.size());
 		Assert.assertTrue(designFactors.contains(variable4.getName()));
 		Assert.assertTrue(designFactors.contains(variable5.getName()));
 	}
@@ -354,9 +354,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX,
 				parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
-
-		return nurseryId;
+		return this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 	}
 
 }

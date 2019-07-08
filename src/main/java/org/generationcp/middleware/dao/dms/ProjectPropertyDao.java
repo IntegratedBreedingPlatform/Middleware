@@ -93,7 +93,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return new HashMap<>();
 	}
 
-	protected Map<String, Map<Integer, VariableType>> convertToVariablestandardVariableIdsWithTypeMap(final List<Object[]> queryResult) {
+	Map<String, Map<Integer, VariableType>> convertToVariablestandardVariableIdsWithTypeMap(final List<Object[]> queryResult) {
 
 		final Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<>();
 
@@ -304,7 +304,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
 			+ " WHERE pp.type_id IN (:variableTypeIds)"
 			+ " AND ds.study_id = :studyId";
-		;
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(variablesQuery);
 		sqlQuery.addScalar("name");
 		sqlQuery.setParameter("studyId", studyIdentifier);

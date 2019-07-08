@@ -446,7 +446,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createProjectProperties(final DmsProject project, final List<Integer> traitIds) {
-		Integer rank = 1;
+		int rank = 1;
 		for (final Integer traitId : traitIds) {
 			final ProjectProperty projectProp = new ProjectProperty();
 			projectProp.setAlias(traitId.toString());
