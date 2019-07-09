@@ -21,9 +21,9 @@
 	</changeSet>
 
 	<changeSet author="aldrin" id="v12.3.0-2">
-        <preConditions onFail="MARK_RAN">
-            <viewExists viewName="h2h_details"/>
-        </preConditions>
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="h2h_details"/>
+		</preConditions>
 		<comment>
 			Removing project_relationship table from the h2h_details view.
 		</comment>
@@ -46,22 +46,21 @@
 				`s`.`stock_id` AS `stock_id`,
 				`s`.`name` AS `entry_designation`
     		FROM
-				(((((`stock` `s`
-				JOIN `nd_experiment` `e` ON ((`e`.`stock_id` = `s`.`stock_id`)))
-				JOIN `phenotype` `p` ON ((`p`.`nd_experiment_id` = `e`.`nd_experiment_id`)))
-				JOIN `standard_variable_details` `svd` ON ((`svd`.`cvterm_id` = `p`.`observable_id`)))
-				JOIN `trait_details` `td` ON ((`td`.`trait_id` = `svd`.`property_id`)))
-				JOIN `project` `proj` ON ((`proj`.`project_id` = `e`.`project_id`)))
+				`stock` `s`
+				JOIN `nd_experiment` `e` ON `e`.`stock_id` = `s`.`stock_id`
+				JOIN `phenotype` `p` ON `p`.`nd_experiment_id` = `e`.`nd_experiment_id`
+				JOIN `standard_variable_details` `svd` ON `svd`.`cvterm_id` = `p`.`observable_id`
+				JOIN `trait_details` `td` ON `td`.`trait_id` = `svd`.`property_id`
+				JOIN `project` `proj` ON `proj`.`project_id` = `e`.`project_id`
 			WHERE
-				(`e`.`type_id` = 1170)
-					OR (`e`.`type_id` = 1155)
+				`e`.`type_id` IN (1170, 1155)
 			ORDER BY `e`.`project_id` , `e`.`nd_geolocation_id` , `e`.`type_id` , `td`.`trait_name` , `s`.`name`
 		</sql>
 	</changeSet>
 	<changeSet author="aldrin" id="v12.3.0-3">
-        <preConditions onFail="MARK_RAN">
-            <viewExists viewName="trial_study_locations"/>
-        </preConditions>
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="trial_study_locations"/>
+		</preConditions>
 		<comment>
 			Removing project_relationship table from the trial_study_locations view.
 		</comment>
@@ -81,26 +80,26 @@
 				`gp`.`value` AS `locationId`,
 				`p`.`description` AS `description`
 			FROM
-				((((((`nd_geolocationprop` `gp`
-				JOIN `nd_experiment` `e` ON (((`e`.`nd_geolocation_id` = `gp`.`nd_geolocation_id`)
-					AND (`e`.`nd_experiment_id` = (SELECT
+				`nd_geolocationprop` `gp`
+				JOIN `nd_experiment` `e` ON `e`.`nd_geolocation_id` = `gp`.`nd_geolocation_id`
+					AND `e`.`nd_experiment_id` = (SELECT
 						MIN(`min`.`nd_experiment_id`)
 					FROM
 						`nd_experiment` `min`
 					WHERE
-						(`min`.`nd_geolocation_id` = `gp`.`nd_geolocation_id`)))))))
-				JOIN `project` `p` ON `p`.`project_id` = `e`.`project_id` AND `p`.`study_id` IS NOT NULL)
-				LEFT JOIN `location` `l` ON ((`l`.`locid` = `gp`.`value`)))
-				LEFT JOIN `location` `prov` ON ((`prov`.`locid` = `l`.`snl1id`)))
-				LEFT JOIN `cntry` `c` ON ((`c`.`cntryid` = `l`.`cntryid`)))
+						`min`.`nd_geolocation_id` = `gp`.`nd_geolocation_id`)
+				JOIN `project` `p` ON `p`.`project_id` = `e`.`project_id` AND `p`.`study_id` IS NOT NULL
+				LEFT JOIN `location` `l` ON `l`.`locid` = `gp`.`value`
+				LEFT JOIN `location` `prov` ON `prov`.`locid` = `l`.`snl1id`
+				LEFT JOIN `cntry` `c` ON `c`.`cntryid` = `l`.`cntryid`
 			WHERE
-				(`gp`.`type_id` = 8190)
+				`gp`.`type_id` = 8190
 		</sql>
 	</changeSet>
 	<changeSet author="aldrin" id="v12.3.0-4">
-        <preConditions onFail="MARK_RAN">
-            <viewExists viewName="germplasm_trial_details"/>
-        </preConditions>
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="germplasm_trial_details"/>
+		</preConditions>
 		<comment>
 			Removing project_relationship table from the germplasm_trial_details view.
 		</comment>
@@ -126,16 +125,15 @@
 				`s`.`name` AS `entry_designation`,
 				`g`.`gid` AS `gid`
 			FROM
-				((((((`stock` `s`
-				JOIN `nd_experiment` `e` ON ((`e`.`stock_id` = `s`.`stock_id`)))
-				JOIN `phenotype` `p` ON ((`p`.`nd_experiment_id` = `e`.`nd_experiment_id`)))
-				JOIN `standard_variable_details` `svd` ON ((`svd`.`cvterm_id` = `p`.`observable_id`)))
-				JOIN `trait_details` `td` ON ((`td`.`trait_id` = `svd`.`property_id`)))
-				JOIN `project` `project` ON ((`project`.`project_id` = `e`.`project_id`)))
-				JOIN `germplsm` `g` ON ((`s`.`dbxref_id` = `g`.`gid`)))
+				`stock` `s`
+				JOIN `nd_experiment` `e` ON `e`.`stock_id` = `s`.`stock_id`
+				JOIN `phenotype` `p` ON `p`.`nd_experiment_id` = `e`.`nd_experiment_id`
+				JOIN `standard_variable_details` `svd` ON `svd`.`cvterm_id` = `p`.`observable_id`
+				JOIN `trait_details` `td` ON `td`.`trait_id` = `svd`.`property_id`
+				JOIN `project` `project` ON `project`.`project_id` = `e`.`project_id`
+				JOIN `germplsm` `g` ON `s`.`dbxref_id` = `g`.`gid`
 			WHERE
-				`e`.`type_id` = 1170
-					OR `e`.`type_id` = 1155
+				`e`.`type_id` IN (1170, 1155)
 			ORDER BY `e`.`project_id` , `e`.`nd_geolocation_id` , `e`.`type_id` , `td`.`trait_name` , `s`.`name`
 		</sql>
 	</changeSet>
