@@ -828,7 +828,11 @@ public class DatasetServiceImpl implements DatasetService {
 					variableId);
 				Phenotype phenotype = null;
 				if (observationUnitData != null) {
-					// TODO IBP-2781 getWithIsDerivedTrait to avoid go to the db again
+					/* TODO IBP-2822
+					 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
+					 *  because the performance gain of not having to call formulaDao is lost
+					 *  with this query that is not as good as getById
+					 */
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
@@ -867,7 +871,11 @@ public class DatasetServiceImpl implements DatasetService {
 				final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
 
 				if (observationUnitData != null) {
-					// TODO IBP-2781 getWithIsDerivedTrait to avoid go to the db again
+					/* TODO IBP-2822
+					 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
+					 *  because the performance gain of not having to call formulaDao is lost
+					 *  with this query that is not as good as getById
+ 					 */
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
@@ -1131,7 +1139,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
-		// TODO IBP-2781 getWithIsDerivedTrait to avoid go to the db again
+		/* TODO IBP-2822
+		 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
+		 *  because the performance gain of not having to call formulaDao is lost
+		 *  with this query that is not as good as getById
+		 */
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotype, draftMode);
 	}
@@ -1179,7 +1191,7 @@ public class DatasetServiceImpl implements DatasetService {
 		} else {
 			phenotype.setValue(observation.getValue());
 			phenotype.setcValue(observation.getCategoricalValueId());
-			// FIXME get phenotype With IsDerivedTrait to avoid go to the db again
+			// FIXME IBP-2822 get ObservationUnitData with IsDerivedTrait to avoid go to the db again
 			this.resolveObservationStatus(variableId, phenotype);
 			phenotype.setChanged(true); // to set out-of-sync
 		}
