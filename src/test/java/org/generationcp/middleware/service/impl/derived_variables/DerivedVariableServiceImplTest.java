@@ -288,7 +288,7 @@ public class DerivedVariableServiceImplTest {
 		this.derivedVariableService.saveCalculatedResult(value, categoricalId, observationUnitId, observationId, measurementVariable);
 
 		verify(this.phenotypeDao).update(existingPhenotype);
-		verify(this.datasetService).updateDependentPhenotypesStatus(variableTermId, observationUnitId);
+		verify(this.datasetService).updatePhenotypesStatus(variableTermId, observationUnitId);
 		assertEquals(value, existingPhenotype.getValue());
 		assertEquals(categoricalId, existingPhenotype.getcValueId());
 		assertTrue(existingPhenotype.isChanged());
@@ -386,7 +386,7 @@ public class DerivedVariableServiceImplTest {
 
 		final ArgumentCaptor<Phenotype> captor = ArgumentCaptor.forClass(Phenotype.class);
 		verify(this.phenotypeDao).save(captor.capture());
-		verify(this.datasetService).updateDependentPhenotypesStatus(variableTermId, observationUnitId);
+		verify(this.datasetService).updatePhenotypesStatus(variableTermId, observationUnitId);
 
 		final Phenotype phenotypeToBeSaved = captor.getValue();
 		assertNotNull(phenotypeToBeSaved.getCreatedDate());

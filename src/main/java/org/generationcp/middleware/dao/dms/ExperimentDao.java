@@ -884,16 +884,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "FROM nd_experiment e \n"
 			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
 			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id \n"
-			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) AND (");
+			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) ");
 
-		final Iterator<Map.Entry<Integer, Integer>> iterator = inputVariableDatasetMap.entrySet().iterator();
-		while (iterator.hasNext()) {
-			final Map.Entry<Integer, Integer> entry = iterator.next();
-			queryString.append(String.format("(p.observable_id = %s AND e.project_id = %s %n)", entry.getKey(), entry.getValue()));
-			if (iterator.hasNext()) {
-				queryString.append(" OR ");
-			} else {
-				queryString.append(") \n");
+		if (!inputVariableDatasetMap.isEmpty()) {
+			queryString.append("AND (");
+			final Iterator<Map.Entry<Integer, Integer>> iterator = inputVariableDatasetMap.entrySet().iterator();
+			while (iterator.hasNext()) {
+				final Map.Entry<Integer, Integer> entry = iterator.next();
+				queryString.append(String.format("(p.observable_id = %s AND e.project_id = %s %n)", entry.getKey(), entry.getValue()));
+				if (iterator.hasNext()) {
+					queryString.append(" OR ");
+				} else {
+					queryString.append(") \n");
+				}
 			}
 		}
 

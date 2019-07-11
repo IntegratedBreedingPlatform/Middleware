@@ -33,7 +33,7 @@ import java.util.Set;
 
 public class DerivedVariableServiceImpl implements DerivedVariableService {
 
-	public static final List<Integer> CALCULATED_VARIABLE_VARIABLE_TYPES = Arrays
+	protected static final List<Integer> CALCULATED_VARIABLE_VARIABLE_TYPES = Arrays
 		.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId());
 
 	@Autowired
@@ -107,7 +107,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
 		// In case the derived trait is also input of another formula (no recursion, just mark the target of that formula).
-		this.datasetService.updateDependentPhenotypesStatus(measurementVariable.getTermId(), observationUnitId);
+		this.datasetService.updatePhenotypesStatus(measurementVariable.getTermId(), observationUnitId);
 
 	}
 
