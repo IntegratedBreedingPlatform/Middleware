@@ -107,9 +107,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 				+ "           INNER JOIN "
 				+ "       users ON uc.user_id = users.userid "
 				+ "           INNER JOIN role r ON ur.role_id = r.id  "
-				+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
-				+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
-				+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
+				+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id)es   "
 				+ "    AND p.project_id = :projectId "
 				+ "  AND users.ustatus = 0 ";
 
