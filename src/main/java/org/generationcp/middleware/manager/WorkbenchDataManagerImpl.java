@@ -317,7 +317,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		this.getIbdbUserMapDao().removeUsersFromProgram(workbenchUserIds, projectId);
+		this.getUserRoleDao().removeUsersFromProgram(workbenchUserIds, projectId);
 	}
 
 	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
