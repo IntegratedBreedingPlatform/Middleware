@@ -221,6 +221,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public List<Project> getProjectsByCropName(final String cropName) {
+		return this.getProjectDao().getProjectsByCropName(cropName);
+	}
+
+	@Override
 	public Project saveOrUpdateProject(final Project project) {
 
 		try {

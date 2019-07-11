@@ -245,4 +245,9 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return new ArrayList<>();
 	}
 
+	public List<Project> getProjectsByCropName(final String cropName) {
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType.cropName", cropName));
+		return criteria.list();
+	}
+
 }
