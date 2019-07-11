@@ -2,10 +2,10 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
 import org.hibernate.Criteria;
@@ -38,18 +38,17 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM \n"
 			+ "            						sample AS sp \n" + "        WHERE\n"
 			+ "            						nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
-			+ "		FROM project p INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
-			+ "		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
-			+ "								INNER JOIN project p ON p.project_id = pr.subject_project_id\n"
-			+ "        						WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n"
-			+ "GROUP BY nde.nd_experiment_id";
+			+ "		FROM project p "
+			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
+			+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+			+ " GROUP BY nde.nd_experiment_id";
 
-	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample FROM project p INNER JOIN\n"
-		+ "    nd_experiment nde ON nde.project_id = p.project_id INNER JOIN\n"
-		+ "    sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id WHERE p.project_id = (SELECT \n"
-		+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
-		+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
-		+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n" + "GROUP BY sp.nd_experiment_id";
+	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample "
+		+ "		FROM project p "
+		+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+		+ "		INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
+		+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+		+ " GROUP BY sp.nd_experiment_id";
 
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
 		+ " SUBSTRING_INDEX(SAMPLE_NAME, ':', -1),               SIGNED) = 0,           0,"
@@ -64,8 +63,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			+ " inner join sample sp on sp.nd_experiment_id = nde.nd_experiment_id"
 			+ " where nde.nd_experiment_id in (:experimentIds)  group by nde.nd_experiment_id";
 
-
-
 	private static final String SAMPLE = "sample";
 	private static final String SAMPLE_EXPERIMENT = "sample.experiment";
 	private static final String EXPERIMENT = "experiment";
@@ -74,7 +71,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	public List<SampleDTO> filter(final Integer ndExperimentId, final Integer listId, final Pageable pageable) {
 
-		final Criteria criteria = createSampleDetailsCriteria();
+		final Criteria criteria = this.createSampleDetailsCriteria();
 		final int pageSize = pageable.getPageSize();
 		final int start = pageSize * pageable.getPageNumber();
 
@@ -136,7 +133,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	public long countByDatasetId(final Integer datasetId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("experiment", "experiment");
-		criteria.add(Restrictions.eq("experiment.project.projectId", datasetId));
+		criteria.createAlias("experiment.project", "project");
+		criteria.add(Restrictions
+			.or(Restrictions.eq("experiment.project.projectId", datasetId), Restrictions.eq("project.parent.projectId", datasetId)));
 		criteria.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
 	}
@@ -219,14 +218,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.project", "project")
 			.createAlias(
-				"project.properties", "projectProperty", Criteria.INNER_JOIN, Restrictions.eq("variableId", TermId.DATASET_TYPE.getId()))
+				"project.datasetType", "datasetType")
 			.createAlias(
 				"experiment.properties", "experimentProperty", Criteria.LEFT_JOIN, Restrictions.eq("typeId", TermId.PLOT_NO.getId()))
-			.createAlias("project.relatedTos", "relatedTos")
-			.createAlias("relatedTos.objectProject", "objectProject")
-			.createAlias("objectProject.relatedTos", "parentProjectRelatedTos")
-			.createAlias("parentProjectRelatedTos.objectProject", "parentProject")
-			.createAlias("objectProject.studyType", "studyType", Criteria.LEFT_JOIN)
+			.createAlias("project.study", "study")
+			.createAlias("study.studyType", "studyType", Criteria.LEFT_JOIN)
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
 			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
@@ -245,11 +241,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.alias(Projections.property("sample.samplingDate"), "samplingDate"))
 				.add(Projections.alias(Projections.property("sample.plateId"), "plateId"))
 				.add(Projections.alias(Projections.property("sample.well"), "well"))
-				.add(Projections.alias(Projections.property("projectProperty.value"), "datasetType"))
-				.add(Projections.alias(Projections.property("objectProject.projectId"), "projectId"))
-				.add(Projections.alias(Projections.property("objectProject.name"), "projectName"))
-				.add(Projections.alias(Projections.property("parentProject.projectId"), "parentProjectId"))
-				.add(Projections.alias(Projections.property("parentProject.name"), "parentProjectName"))
+				.add(Projections.alias(Projections.property("datasetType.name"), "datasetTypeName"))
+				.add(Projections.alias(Projections.property("datasetType.isSubObservationType"), "subObservationDatasetType"))
+				.add(Projections.alias(Projections.property("study.projectId"), "studyId"))
+				.add(Projections.alias(Projections.property("study.name"), "studyName"))
 				.add(Projections.alias(Projections.property("experiment.observationUnitNo"), "observationUnitNo"))
 				.add(Projections.alias(Projections.property("experimentProperty.value"), "plotNo"))
 				.add(Projections.alias(Projections.property("experiment.obsUnitId"), "observationUnitId"))
@@ -273,18 +268,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				}
 			} else {
 
-				final DataSetType dataSetType = DataSetType.findById(Integer.valueOf(sampleDetail.getDatasetType()));
 				final SampleDTO sampleDTO = new SampleDTO();
 
-				if (DataSetType.isSubObservationDatasetType(dataSetType)) {
-					// If the sample was created from subobservation, we should get the study name and id
-					// from Observation/Plot dataset's parent project (which is the study)
-					sampleDTO.setStudyName(sampleDetail.getParentProjectName());
-					sampleDTO.setStudyId(sampleDetail.getParentProjectId());
-				} else {
-					sampleDTO.setStudyName(sampleDetail.getProjectName());
-					sampleDTO.setStudyId(sampleDetail.getProjectId());
-				}
+
+				sampleDTO.setStudyName(sampleDetail.getStudyName());
+				sampleDTO.setStudyId(sampleDetail.getStudyId());
 
 				sampleDTO.setSampleId(sampleDetail.getSampleId());
 				sampleDTO.setEntryNo(sampleDetail.getEntryNumber());
@@ -300,7 +288,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				sampleDTO.setSamplingDate(sampleDetail.getSamplingDate());
 				sampleDTO.setPlateId(sampleDetail.getPlateId());
 				sampleDTO.setWell(sampleDetail.getWell());
-				sampleDTO.setDatasetType(dataSetType.getReadableName());
+				sampleDTO.setDatasetType(sampleDetail.getDatasetTypeName());
 
 				// Enumerator (a.k.a Observation Unit Number) is null if the sample was created from observation dataset, in that case,
 				// we should use PlotNo
@@ -443,8 +431,5 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return map;
 	}
-	
-	
-
 
 }

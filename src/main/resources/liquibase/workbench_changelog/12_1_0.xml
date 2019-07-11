@@ -1,0 +1,97 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="nahuel" id="v12.1.0-1" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="users_crops" />
+			</not>
+		</preConditions>
+		<comment>Add users_crops table to enhance permission management im BMS</comment>
+		<createTable tableName="users_crops">
+			<column name="user_id" type="INT">
+				<constraints nullable="false"
+							 foreignKeyName="fk_users_crops_user_id"
+							 referencedTableName="users"
+							 referencedColumnNames="userid"
+							 primaryKey="true" />
+			</column>
+			<column name="crop_name" type="VARCHAR(32)">
+				<constraints nullable="false"
+							 foreignKeyName="fk_users_crops_crop_name"
+							 referencedTableName="workbench_crop"
+							 referencedColumnNames="crop_name"
+							 primaryKey="true" />
+			</column>
+		</createTable>
+		<modifySql dbms="mysql">
+			<append value="ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci" />
+		</modifySql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v12.1.0-2" runAlways="true">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					# for every combination of superadmins and crops
+					# filter those that don't have a users_crops association
+					select count(1)
+					from workbench_crop wc
+					   cross join users u
+					   left join users_crops uc on wc.crop_name = uc.crop_name and u.userid = uc.user_id
+					   inner join users_roles ur on u.userid = ur.userid
+					   inner join role r on ur.role_id = r.id
+					where uc.user_id is null and r.description = 'SUPERADMIN'
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Associate all superadmins to every crop</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# for every combination of superadmins and crops
+			# filter those that don't have a users_crops association
+			# and insert them into users_crops
+			insert into users_crops (user_id, crop_name)
+			select u.userid, wc.crop_name
+			from workbench_crop wc
+			       cross join users u
+			       left join users_crops uc on wc.crop_name = uc.crop_name and u.userid = uc.user_id
+			       inner join users_roles ur on u.userid = ur.userid
+			       inner join role r on ur.role_id = r.id
+			where uc.user_id is null and r.description = 'SUPERADMIN';
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v12.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(distinct u.userid, wp.crop_type)
+					from workbench_project_user_info wpui
+					       inner join users u on wpui.user_id = u.userid
+					       inner join workbench_project wp on wpui.project_id = wp.project_id
+					where not exists(
+					  select 1
+					  from users_crops uc
+					  where uc.user_id = u.userid and uc.crop_name = wp.crop_type)
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Associate all program users to the corresponding crop</comment>
+		<sql dbms="mysql" splitStatements="true">
+			insert into users_crops (user_id, crop_name)
+			select distinct u.userid, wp.crop_type
+			from workbench_project_user_info wpui
+			       inner join users u on wpui.user_id = u.userid
+			       inner join workbench_project wp on wpui.project_id = wp.project_id
+			where not exists(
+			  select 1
+			  from users_crops uc
+			  where uc.user_id = u.userid and uc.crop_name = wp.crop_type);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

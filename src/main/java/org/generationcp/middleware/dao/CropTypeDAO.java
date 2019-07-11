@@ -43,9 +43,9 @@ public class CropTypeDAO extends GenericDAO<CropType, Long> {
 
 	public List<CropType> getAvailableCropsForUser(final int workbenchUserId) {
 		try {
-			final Query query = this.getSession().createQuery("select distinct project.cropType from ProjectUserInfo as projectUserInfo "
-				+ "inner join projectUserInfo.project as project "
-				+ "where projectUserInfo.userId = :workbenchUserId ");
+			final Query query = this.getSession().createQuery("select distinct cropType from WorkbenchUser as workbenchUser "
+				+ " inner join workbenchUser.crops as cropType "
+				+ " where workbenchUser.userid = :workbenchUserId ");
 			query.setParameter("workbenchUserId", workbenchUserId);
 			return query.list();
 		} catch (final HibernateException e) {

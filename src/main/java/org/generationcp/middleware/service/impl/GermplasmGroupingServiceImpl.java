@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -393,8 +392,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 			if (hybridMethods.contains(cross.getMethodId())) {
 				GermplasmGroupingServiceImpl.LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethodId());
-				final boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
-				final boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
+				final boolean parent1HasMGID = parent1 != null && parent1.getMgid() != null && parent1.getMgid() != 0;
+				final boolean parent2HasMGID = parent2 != null && parent2.getMgid() != null && parent2.getMgid() != 0;
 				final boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
 
 				if (bothParentsHaveMGID) {

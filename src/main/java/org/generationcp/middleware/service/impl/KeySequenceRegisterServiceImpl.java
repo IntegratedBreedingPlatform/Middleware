@@ -31,11 +31,11 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	public int incrementAndGetNextSequence(final String keyPrefix, final String suffix) {
 		return this.keySequenceRegisterDAO.incrementAndGetNextSequence(keyPrefix, suffix);
 	}
-	
+
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public int getNextSequence(String keyPrefix, String suffix) {
-		return this.keySequenceRegisterDAO.getNextSequence(keyPrefix, suffix);
+	public int getNextSequence(String keyPrefix) {
+		return this.keySequenceRegisterDAO.getNextSequence(keyPrefix);
 	}
 
 	@Override

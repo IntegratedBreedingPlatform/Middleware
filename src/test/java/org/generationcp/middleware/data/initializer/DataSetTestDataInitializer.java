@@ -1,10 +1,11 @@
 package org.generationcp.middleware.data.initializer;
 
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.pojos.dms.DatasetType;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 
 public class DataSetTestDataInitializer {
 
@@ -12,33 +13,27 @@ public class DataSetTestDataInitializer {
 	private static final int MEASUREMENT_DATASET_ID = 3;
 	private static final int MEANS_DATASET_ID = 4;
 
-	public static List<DataSet> createStudyDatasetsTestData(final String datasetName) {
-		final List<DataSet> trialDatasets = new ArrayList<>();
-		trialDatasets.add(DataSetTestDataInitializer.createStudyDatasetTestData(datasetName));
-		return trialDatasets;
-	}
-
 	public static DataSet createStudyDatasetTestData(final String datasetName) {
+
 		final DataSet dataSet = new DataSet();
 		dataSet.setName(datasetName);
 		dataSet.setDescription(datasetName);
-		dataSet.setDataSetType(DataSetType.SUMMARY_DATA);
+		dataSet.setDatasetType(new DatasetType(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		dataSet.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
 		dataSet.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
 		return dataSet;
 	}
 
-	public static List<DataSet> createPlotDatasetsTestData(final String datasetName) {
-		final List<DataSet> plotDatasets = new ArrayList<>();
-		plotDatasets.add(DataSetTestDataInitializer.createPlotDatasetTestData(datasetName, false));
-		return plotDatasets;
+	public static DataSet createPlotDatasetTestData(final String datasetName) {
+		return DataSetTestDataInitializer.createPlotDatasetTestData(datasetName, false);
 	}
 
 	public static DataSet createPlotDatasetTestData(final String datasetName, final boolean isStudy) {
+
 		final DataSet plotDataset = new DataSet();
 		plotDataset.setName(datasetName);
 		plotDataset.setDescription(datasetName);
-		plotDataset.setDataSetType(DataSetType.PLOT_DATA);
+		plotDataset.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
 		if (isStudy) {
 			plotDataset.setId(DataSetTestDataInitializer.STUDY_DATASET_ID);
 			plotDataset.setVariableTypes(VariableTypeListTestDataInitializer.createStudyVariableTypesTestData());
@@ -49,18 +44,13 @@ public class DataSetTestDataInitializer {
 		return plotDataset;
 	}
 
-	public static List<DataSet> createMeansDatasetsTestData(final String datasetName) {
-		final List<DataSet> meansDataset = new ArrayList<>();
-		meansDataset.add(DataSetTestDataInitializer.createMeansDatasetTestData(datasetName));
-		return meansDataset;
-	}
-
 	public static DataSet createMeansDatasetTestData(final String datasetName) {
+
 		final DataSet meansDataset = new DataSet();
 		meansDataset.setId(DataSetTestDataInitializer.MEANS_DATASET_ID);
 		meansDataset.setName(datasetName);
 		meansDataset.setDescription(datasetName);
-		meansDataset.setDataSetType(DataSetType.MEANS_DATA);
+		meansDataset.setDatasetType(new DatasetType(DatasetTypeEnum.MEANS_DATA.getId()));
 		meansDataset.setVariableTypes(VariableTypeListTestDataInitializer.createMeansVariableTypesTestData());
 		return meansDataset;
 	}

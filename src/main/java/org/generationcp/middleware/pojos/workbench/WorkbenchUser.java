@@ -12,6 +12,7 @@
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -38,6 +40,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.BeanFormState;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -121,6 +127,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@JoinColumn(name="personid", insertable=false, updatable=false)
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
+
+	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+		name = "users_crops",
+		joinColumns = @JoinColumn(name = "user_id"),
+		inverseJoinColumns = @JoinColumn(name = "crop_name"))
+	private List<CropType> crops = new ArrayList<>();
 
 	@Transient
 	private Boolean active = false;
@@ -390,5 +404,13 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 		return false;
 	}
-	
+
+	public List<CropType> getCrops() {
+		return crops;
+	}
+
+	public void setCrops(final List<CropType> crops) {
+		this.crops = crops;
+	}
+
 }

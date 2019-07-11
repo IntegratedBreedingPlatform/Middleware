@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -28,6 +27,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
@@ -54,7 +54,6 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
-import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,24 +106,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
 
 	/**
-	 * Type of study is stored in projectprops table.
-	 * Which folder the study is in, is defined in the project_relationship table.
+	 * Type of study is stored in project.study_type_id
+	 * Which folder the study is in is defined in project.parent_project_id
 	 */
 	static final String GET_CHILDREN_OF_FOLDER =
 		"SELECT subject.project_id AS project_id, "
 			+ "subject.name AS name,  subject.description AS description, "
-			+ "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, "
+			+ "	(CASE WHEN subject.study_type_id IS NOT NULL THEN 1 ELSE 0 END) AS is_study, "
 			+ "    subject.program_uuid AS program_uuid, "
 			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
 			+ "st.visible as visible, st.cvterm_id as cvtermId, subject.locked as isLocked, "
 			+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
 			+ "  FROM project subject "
-			+ "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "
 			+ "  LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
 			+ "  LEFT JOIN users u ON u.userid = subject.created_by "
 			+ "  LEFT JOIN persons p ON p.personid = u.personid "
-			+ " WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
-			+ "   AND pr.object_project_id = :folderId "
+			+ " LEFT JOIN project parent ON subject.parent_project_id = parent.project_id "
+			+ " WHERE subject.parent_project_id = :folderId "
+			+ "   AND parent.study_type_id IS NULL "
 			+ "   AND subject.deleted != " + DELETED_STUDY
 			+ "   AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
 			+ "   AND (:studyTypeId is null or subject.study_type_id = :studyTypeId or subject.study_type_id is null)"
@@ -144,24 +143,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " WHERE pr.project_id = :studyId and pr.deleted != " + DELETED_STUDY;
 
 	private static final String GET_STUDIES_OF_FOLDER =
-		"SELECT  DISTINCT pr.subject_project_id " + "FROM    project_relationship pr, project p " + "WHERE   pr.type_id = "
-			+ TermId.IS_STUDY.getId() + " " + "        AND pr.subject_project_id = p.project_id "
-			+ "        AND pr.object_project_id = :folderId " + "		AND p.deleted != " + DELETED_STUDY + " "
+		"SELECT DISTINCT p.project_id "
+			+ "FROM project p "
+			+ "WHERE p.parent_project_id = :folderId AND p.study_type_id IS NOT NULL AND p.deleted != " + DELETED_STUDY + " "
 			+ "ORDER BY p.name ";
 
 	private static final String GET_ALL_FOLDERS =
-		"SELECT pr.object_project_id, pr.subject_project_id, p.name, p.description " + " FROM project_relationship pr "
-			+ " INNER JOIN project p ON p.project_id = pr.subject_project_id " + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER
-			.getId();
+		" SELECT p.parent_project_id, p.project_id, p.name, p.description FROM project p "
+			+ " WHERE study_type_id IS NULL "
+			+ " AND study_id IS NULL AND p.project_id != " + DmsProject.SYSTEM_FOLDER_ID
+			+ " AND p.deleted != " + DELETED_STUDY;
 
 	private static final String GET_ALL_PROGRAM_STUDIES_AND_FOLDERS =
-		"SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = " + TermId.IS_STUDY.getId()
-			+ " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid " + "AND p.deleted != "
-			+ DELETED_STUDY + "  " + "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p "
-			+ "WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id "
-			+ "AND p.program_uuid = :program_uuid ";
+		" SELECT p.project_id FROM project p "
+			+ " WHERE study_id IS NULL AND p.project_id != " + DmsProject.SYSTEM_FOLDER_ID
+			+ " AND p.deleted != " + DELETED_STUDY
+			+ " AND p.program_uuid = :program_uuid ";
 
-	static final String GET_STUDY_METADATA_BY_ID = " SELECT  "
+	static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, "
@@ -185,30 +184,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         INNER JOIN "
 		+ "     project proj ON proj.project_id = nde.project_id "
 		+ "         INNER JOIN "
-		+ "     project_relationship pr ON proj.project_id = pr.subject_project_id "
-		+ "         INNER JOIN "
-		+ "     project pmain ON pmain.project_id = pr.object_project_id "
-		+ "         AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
+		+ "     project pmain ON pmain.project_id = proj.study_id "
 		+ "         LEFT OUTER JOIN "
 		+ "     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id "
 		+ "         LEFT OUTER JOIN "
 		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
 		+ " WHERE "
 		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
-		+ "         AND geoloc.nd_geolocation_id = :studyId "
+		+ "         AND geoloc.nd_geolocation_id = :geolocationId "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
 	private static final String GET_PROJECTID_BY_STUDYDBID =
-		"SELECT DISTINCT pr.object_project_id"
-			+ " FROM project_relationship pr"
-			+ " INNER JOIN project p ON p.project_id = pr.subject_project_id"
-			+ " INNER JOIN nd_experiment nde ON nde.project_id = pr.subject_project_id"
-			+ " INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
-			+ " INNER JOIN projectprop pp ON pp.project_id = p.project_id"
-			+ " WHERE gl.nd_geolocation_id = :studyDbId"
-			+ " AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-			+ "	AND pp.value = " + DataSetType.SUMMARY_DATA.getId()
-			+ "	AND pp.variable_id = " + TermId.DATASET_TYPE.getId();
+		"SELECT DISTINCT p.study_id"
+			+ " FROM project p "
+			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+			+ " WHERE nde.nd_geolocation_id = :studyDbId"
+			+ " AND p.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId();
 
 	private static final String STUDY_DETAILS_SQL = " SELECT DISTINCT \n"
 		+ "   p.name                     AS name, \n"
@@ -224,7 +215,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   p.project_id               AS id, \n"
 		+ "   ppPIid.value               AS piId, \n"
 		+ "   gpSiteId.value             AS siteId, \n"
-		+ "   ppFolder.object_project_id AS folderId, \n"
+		+ "   p.parent_project_id 		 AS folderId, \n"
 		+ "   p.program_uuid             AS programUUID, \n"
 		+ "	  p.study_update 			 AS studyUpdate, \n"
 		+ "	  p.created_by               AS createdBy, \n"
@@ -232,7 +223,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " FROM \n"
 		+ "   project p \n"
 		+ "   INNER JOIN study_type stype on stype.study_type_id = p.study_type_id"
-		+ "   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id \n"
 		+ "   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.variable_id = " + TermId.PI_NAME.getId() + " \n"
 		+ "   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id AND ppPIid.variable_id = " + TermId.PI_ID.getId() + " \n"
 		+ "   LEFT JOIN nd_experiment e ON e.project_id = p.project_id \n"
@@ -282,22 +272,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return childrenNodes;
 	}
 
-	public List<DatasetReference> getDatasetNodesByStudyId(final Integer studyId) {
+	public List<DatasetReference> getDirectChildDatasetsOfStudy(final Integer studyId) {
 
 		final List<DatasetReference> datasetReferences = new ArrayList<>();
 
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
-			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
+			criteria.add(Restrictions.eq("study.projectId", studyId));
+			// Exclude sub-observation datasets of study
+			criteria.add(Restrictions.eq("parent.projectId", studyId));
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property(DmsProjectDao.PROJECT_ID));
 			projectionList.add(Projections.property("name"));
 			projectionList.add(Projections.property("description"));
-			projectionList.add(Projections.property("pr.objectProject.projectId"));
 			criteria.setProjection(projectionList);
 
 			criteria.addOrder(Order.asc("name"));
@@ -313,26 +302,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error with getDatasetNodesByStudyId query from Project: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDirectChildDatasetsOfStudy query from Project: " + e.getMessage(), e);
 		}
 
 		return datasetReferences;
 
 	}
 
-	public List<DmsProject> getDatasetsByParent(final Integer studyId) {
+	public List<DmsProject> getDatasetsByParent(final Integer parentId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
-			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
-			criteria.setProjection(Projections.property("pr.subjectProject"));
+			criteria.add(Restrictions.eq("parent.projectId", parentId));
 			return criteria.list();
 
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-				"Error in getDatasetsByParent= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
+				"Error in getDatasetsByParent= " + parentId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 	}
 
@@ -398,42 +384,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getDataSetsByStudyAndProjectProperty(final int studyId, final int variable, final String value) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
-			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
-			criteria.createAlias("properties", "prop");
-			criteria.add(Restrictions.eq("prop.variableId", variable));
-			criteria.add(Restrictions.eq("prop.value", value));
-			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-			criteria.addOrder(Order.asc("prop.rank"));
-
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				"Error in getDataSetsByProjectProperty(" + variable + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
-		}
-	}
-
-	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID, final TermId relationship) {
-		try {
-			final String sql = "SELECT s.project_id FROM project s " + " WHERE name = :name AND program_uuid = :program_uuid"
-				+ " AND EXISTS (SELECT 1 FROM project_relationship pr WHERE pr.subject_project_id = s.project_id "
-				+ "   AND pr.type_id = " + relationship.getId() + ") " + "	AND s.deleted !=  " + DELETED_STUDY + " LIMIT 1";
-
-			final Query query =
-				this.getSession().createSQLQuery(sql).setParameter("name", name).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-			return (Integer) query.uniqueResult();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getStudyIdByName=" + name + " query in DmsProjectDao: " + e.getMessage(), e);
-		}
-	}
-
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
 		return this.getAllStudyDetails(studyType, programUUID, -1, -1);
 	}
@@ -457,8 +407,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
 			.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-			.append("       LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id and pr.type_id = ")
-			.append(TermId.BELONGS_TO_STUDY.getId()).append(" WHERE p.deleted != " + DELETED_STUDY + " ")
+			.append(" WHERE p.deleted != " + DELETED_STUDY + " ")
 			.append(" AND p.study_type_id = '" + studyType.getId() + "'")
 			.append(" AND (p.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ").append("OR p.program_uuid IS NULL) ")
 			.append(" ORDER BY p.name ");
@@ -587,10 +536,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException("Error in countAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 
-	}
-
-	public List<StudyDetails> getAllStudyDetails(final String programUUID) {
-		return this.getAllStudyDetails(programUUID, 0, -1);
 	}
 
 	public List<StudyDetails> getAllStudyDetails(final String programUUID, final int start, final int numOfRows) {
@@ -769,7 +714,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public Integer getProjectIdByNameAndProgramUUID(final String name, final String programUUID) {
 		try {
-			final String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid and study_type_id is not null";
+			final String sql =
+				"SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid and study_type_id is not null";
 			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameter("name", name);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
@@ -840,23 +786,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			locationCriteria.add(Restrictions.eq("typeId", TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()));
 			locationCriteria.createAlias("geoLocation", "g");
 			locationCriteria.createAlias("g.properties", "gp");
-			locationCriteria.add(Restrictions.and(Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
+			locationCriteria.createAlias("project", "p");
+			locationCriteria.createAlias("p.study", "st");
+			locationCriteria.add(Restrictions.and(
+				Restrictions.eq("gp.typeId", DmsProjectDao.LOCATION_ID),
 				Restrictions.eq("gp.value", parameters.get(StudyFilters.LOCATION_ID))));
-			locationCriteria.setProjection(Projections.property("project.projectId"));
-
-			criteria.createAlias("relatedBys", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
-			criteria.add(Property.forName("pr.subjectProject.projectId").in(locationCriteria));
+			locationCriteria.setProjection(Projections.property("st.projectId"));
+			criteria.add(Property.forName("projectId").in(locationCriteria));
 		}
 
 		criteria.addOrder(orderBy);
 		return criteria;
 	}
 
-	public StudyMetadata getStudyMetadata(final Integer studyId) {
-		Preconditions.checkNotNull(studyId);
+	public StudyMetadata getStudyMetadataForGeolocationId(final Integer geolocationId) {
+		Preconditions.checkNotNull(geolocationId);
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID);
+			final SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_GEOLOCATION_ID);
 			query.addScalar("studyDbId");
 			query.addScalar("trialOrNurseryId");
 			query.addScalar("studyName");
@@ -868,20 +814,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("endDate");
 			query.addScalar("deleted");
 			query.addScalar("locationID");
-			query.setParameter("studyId", studyId);
+			query.setParameter("geolocationId", geolocationId);
 			final Object result = query.uniqueResult();
 			if (result != null) {
 				final Object[] row = (Object[]) result;
 				final StudyMetadata studyMetadata = new StudyMetadata();
-				studyMetadata.setStudyDbId(studyId);
+				studyMetadata.setStudyDbId(geolocationId);
 				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
-				studyMetadata.setStudyType((row[3] instanceof String) ? (String) row[3] : null);
+				studyMetadata.setStudyType((row[3] instanceof Integer) ? ((Integer) row[3]).toString() : null);
 				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
 					studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[4])).toString());
 				}
 				studyMetadata.setTrialDbId(
-					(row[5] instanceof String && StringUtils.isNumeric((String) row[5])) ? Integer.parseInt((String) row[5]) : null);
+					(row[5] instanceof Integer) ? (Integer) row[5] : null);
 				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
 				studyMetadata.setStartDate((row[7] instanceof String) ? (String) row[7] : null);
 				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
@@ -892,7 +838,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				return null;
 			}
 		} catch (final HibernateException e) {
-			final String message = "Error with getStudyMetadata() query from study: " + studyId;
+			final String message = "Error with getStudyMetadataForGeolocationId() query from study with geoloCationId: " + geolocationId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -1050,7 +996,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   category.cvterm_id AS " + OBS_SET_CATEGORY_ID + ", "  //
 				+ "   category.name AS " + OBS_SET_CATEGORY_NAME + ", "  //
 				+ "   category.definition AS " + OBS_SET_CATEGORY_DESCRIPTION + ", "  //
-				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id and active = 1 LIMIT 1) AS " + OBS_SET_FORMULA_ID + ", "
+				+ "   (SELECT formula_id FROM formula WHERE target_variable_id = pp.variable_id and active = 1 LIMIT 1) AS "
+				+ OBS_SET_FORMULA_ID + ", "
 				+ "   scaleMinRange.value AS " + OBS_SET_SCALE_MIN_RANGE + ", "  //
 				+ "   scaleMaxRange.value AS " + OBS_SET_SCALE_MAX_RANGE + ", "  //
 				+ "   vo.expected_min AS " + OBS_SET_EXPECTED_MIN + ", "  //
@@ -1219,17 +1166,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("project.projectId"), "datasetId");
-			projectionList
-				.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {new IntegerType()}),
-					"datasetTypeId");
+			projectionList.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
-			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+			projectionList.add(Projections.property("parent.projectId"), "parentDatasetId");
+
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
-			criteria.createAlias("project.relatedTos", "pr");
-			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN,
-				Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
-			criteria.add(Restrictions.eq("pr.objectProject.projectId", parentId));
-			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.createAlias("project.datasetType", "dt");
+			criteria.createAlias("project.study", "study");
+			criteria.add(Restrictions.eq("study.projectId", parentId));
 			criteria.setProjection(projectionList);
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
 			datasetDTOS = criteria.list();
@@ -1291,14 +1235,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			// statement
 			this.getSession().flush();
 
-			// Delete from project relationship
-			SQLQuery statement =
-				this.getSession().createSQLQuery(
-					"delete pr " + "from project_relationship pr " + "where pr.subject_project_id = " + datasetId);
-			statement.executeUpdate();
-
 			// Delete experiments
-			statement =
+			SQLQuery statement =
 				this.getSession().createSQLQuery(
 					"delete e, pheno, eprop " + "from nd_experiment e, "
 						+ "phenotype pheno, nd_experimentprop eprop "
@@ -1341,17 +1279,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("project.projectId"), "datasetId");
-			projectionList
-				.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {new IntegerType()}),
-					"datasetTypeId");
+			projectionList.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
-			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+			projectionList.add(Projections.property("parent.projectId"), "parentDatasetId");
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
-			criteria.createAlias("project.relatedTos", "pr");
-			criteria.createAlias("project.properties", "pp", CriteriaSpecification.INNER_JOIN,
-				Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()));
+			criteria.createAlias("project.parent", "parent");
+			criteria.createAlias("project.datasetType", "dt");
 			criteria.add(Restrictions.eq("project.projectId", datasetId));
-			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.setProjection(projectionList);
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
 			datasetDTO = (DatasetDTO) criteria.uniqueResult();
@@ -1372,20 +1306,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("project.projectId"), "datasetId");
-			projectionList
-				.add(Projections.sqlProjection("value as datasetTypeId", new String[] {"datasetTypeId"}, new Type[] {new IntegerType()}),
-					"datasetTypeId");
+			projectionList.add(Projections.property("dt.datasetTypeId"), "datasetTypeId");
 			projectionList.add(Projections.property("project.name"), "name");
-			projectionList.add(Projections.property("pr.objectProject.projectId"), "parentDatasetId");
+			projectionList.add(Projections.property("parent.projectId"), "parentDatasetId");
 
 			final Criteria criteria = this.getSession().createCriteria(SampleList.class);
 			criteria.createAlias("samples", "sample")
 				.createAlias("samples.experiment", "experiment")
 				.createAlias("experiment.project", "project")
-				.createAlias("project.relatedTos", "pr")
-				.createAlias(
-					"project.properties", "pp", CriteriaSpecification.INNER_JOIN,
-					Restrictions.eq("pp.variableId", TermId.DATASET_TYPE.getId()))
+				.createAlias("project.parent", "parent")
+				.createAlias("project.datasetType", "dt")
 				.add(Restrictions.eq("id", sampleListId));
 			criteria.setProjection(Projections.distinct(projectionList));
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
@@ -1401,4 +1331,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public List<DmsProject> getDatasetsByTypeForStudy(final int studyId, final int datasetTypeId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
+			criteria.createAlias("project.study", "study");
+			criteria.createAlias("project.datasetType", "dt");
+			criteria.add(Restrictions.eq("study.projectId", studyId));
+			criteria.add(Restrictions.eq("dt.datasetTypeId", datasetTypeId));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error getting getDatasetsByTypeForStudy for datasetTypeId =" + datasetTypeId + ":" + e.getMessage();
+			DmsProjectDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
 }

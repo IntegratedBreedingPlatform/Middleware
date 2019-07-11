@@ -24,7 +24,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-
 import java.util.List;
 import java.util.Set;
 
@@ -625,6 +624,40 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Matchers.any(Germplasm.class));
 	}
 
+	/**
+	 * Edge scenario method is hybrid but male parent is unknown
+	 */
+	@Test
+	public void testProcessGroupInheritanceForCrossesWhereOneParentIsUnknown() {
+
+		final Integer crossGid1 = 1;
+		final Integer crossGid1Parent1 = 11;
+		final Integer crossGid1Parent2 = 12;
+		final Integer hybridMethodId = 416;
+
+		final Germplasm crossGermplasm1 = new Germplasm(crossGid1);
+		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setGpid1(crossGid1Parent1);
+		crossGermplasm1.setGpid2(0);
+		crossGermplasm1.setMgid(0);
+
+		final Germplasm crossGermplasm1Parent1 = new Germplasm(crossGid1Parent1);
+		crossGermplasm1Parent1.setMgid(null);
+
+		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1), 2))
+			.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1));
+
+		this.germplasmGroupingService
+			.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), false, GermplasmGroupingServiceImplTest.HYBRID_METHODS);
+
+		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
+		// Previous crosses should never be queried.
+		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
+		// No selection history should be copied.
+		// No Germplasm record should be saved.
+		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Matchers.any(Germplasm.class));
+	}
+
 	@Test
 	public void testGetSelectionHistory() {
 		final Germplasm germplasm = new Germplasm();
@@ -809,5 +842,5 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.when(this.germplasmDAO.getManagementGroupMembers(gid)).thenReturn(groupMembers);
 		Assert.assertSame(groupMembers, germplasmGroupingService.getGroupMembers(gid));
 	}
-  
+
 }

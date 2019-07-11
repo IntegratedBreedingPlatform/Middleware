@@ -11,10 +11,11 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.util.Debug;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import org.generationcp.middleware.util.Debug;
 
 /**
  * Contains the details of a dataset.
@@ -29,19 +30,19 @@ public class DataSet {
 
 	private int studyId;
 
-	private DataSetType dataSetType;
+	private DatasetType datasetType;
 
 	private VariableTypeList variableTypes;
 
 	private Set<Integer> locationIds = new HashSet<>();
-	
+
 	private String programUUID;
 
 	public int getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -49,7 +50,7 @@ public class DataSet {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -57,7 +58,7 @@ public class DataSet {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -65,23 +66,23 @@ public class DataSet {
 		return this.studyId;
 	}
 
-	public void setStudyId(int studyId) {
+	public void setStudyId(final int studyId) {
 		this.studyId = studyId;
 	}
 
-	public DataSetType getDataSetType() {
-		return this.dataSetType;
+	public DatasetType getDatasetType() {
+		return this.datasetType;
 	}
 
-	public void setDataSetType(DataSetType dataSetType) {
-		this.dataSetType = dataSetType;
+	public void setDatasetType(final DatasetType datasetType) {
+		this.datasetType = datasetType;
 	}
 
 	public VariableTypeList getVariableTypes() {
 		return this.variableTypes.sort();
 	}
 
-	public void setVariableTypes(VariableTypeList variableTypes) {
+	public void setVariableTypes(final VariableTypeList variableTypes) {
 		this.variableTypes = variableTypes;
 	}
 
@@ -89,15 +90,15 @@ public class DataSet {
 		return this.locationIds;
 	}
 
-	public void setLocationIds(Set<Integer> locationIds) {
+	public void setLocationIds(final Set<Integer> locationIds) {
 		this.locationIds = locationIds;
 		if (this.locationIds == null) {
 			this.locationIds = new HashSet<Integer>();
 		}
 	}
 
-	public boolean containsLocationId(int locationId) {
-		for (Integer locId : this.locationIds) {
+	public boolean containsLocationId(final int locationId) {
+		for (final Integer locId : this.locationIds) {
 			if (locId == locationId) {
 				return true;
 			}
@@ -105,12 +106,12 @@ public class DataSet {
 		return false;
 	}
 
-	public VariableTypeList getFactorsByProperty(int propertyId) {
-		VariableTypeList filteredFactors = new VariableTypeList();
+	public VariableTypeList getFactorsByProperty(final int propertyId) {
+		final VariableTypeList filteredFactors = new VariableTypeList();
 
-		VariableTypeList factors = this.getVariableTypes() != null ? this.getVariableTypes().getFactors() : null;
+		final VariableTypeList factors = this.getVariableTypes() != null ? this.getVariableTypes().getFactors() : null;
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (DMSVariableType factor : factors.getVariableTypes()) {
+			for (final DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getProperty().getId() == propertyId) {
 					filteredFactors.add(factor);
 				}
@@ -120,12 +121,12 @@ public class DataSet {
 		return filteredFactors.sort();
 	}
 
-	public VariableTypeList getFactorsByPhenotypicType(PhenotypicType factorType) {
-		VariableTypeList filteredFactors = new VariableTypeList();
+	public VariableTypeList getFactorsByPhenotypicType(final PhenotypicType factorType) {
+		final VariableTypeList filteredFactors = new VariableTypeList();
 
-		VariableTypeList factors = this.getVariableTypes() != null ? this.getVariableTypes().getFactors() : null;
+		final VariableTypeList factors = this.getVariableTypes() != null ? this.getVariableTypes().getFactors() : null;
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (DMSVariableType factor : factors.getVariableTypes()) {
+			for (final DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getPhenotypicType() == factorType) {
 					filteredFactors.add(factor);
 				}
@@ -134,7 +135,7 @@ public class DataSet {
 		return filteredFactors.sort();
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "DataSet: ");
 		Debug.println(indent + 3, "Id: " + this.getId());
 		Debug.println(indent + 3, "Name: " + this.getName());
@@ -148,7 +149,7 @@ public class DataSet {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.dataSetType == null ? 0 : this.dataSetType.hashCode());
+		result = prime * result + (this.datasetType == null ? 0 : this.datasetType.hashCode());
 		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
 		result = prime * result + this.id;
 		result = prime * result + (this.locationIds == null ? 0 : this.locationIds.hashCode());
@@ -159,20 +160,20 @@ public class DataSet {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (!(obj instanceof DataSet)) {
 			return false;
 		}
-		DataSet other = (DataSet) obj;
+		final DataSet other = (DataSet) obj;
 		return this.getId() == other.getId();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("DataSet [id=");
 		builder.append(this.id);
 		builder.append(", name=");
@@ -187,8 +188,8 @@ public class DataSet {
 		return builder.toString();
 	}
 
-	public DMSVariableType findVariableTypeByLocalName(String localName) {
-		for (DMSVariableType variableType : this.variableTypes.getVariableTypes()) {
+	public DMSVariableType findVariableTypeByLocalName(final String localName) {
+		for (final DMSVariableType variableType : this.variableTypes.getVariableTypes()) {
 			if (variableType.getLocalName().equals(localName)) {
 				return variableType;
 			}
@@ -196,13 +197,11 @@ public class DataSet {
 		return null;
 	}
 
-	
 	public String getProgramUUID() {
-		return programUUID;
+		return this.programUUID;
 	}
 
-	
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 }

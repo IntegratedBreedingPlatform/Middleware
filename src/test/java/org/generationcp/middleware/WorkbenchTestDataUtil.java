@@ -1,8 +1,10 @@
 
 package org.generationcp.middleware;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -64,6 +66,9 @@ public class WorkbenchTestDataUtil {
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
 		user.setRoles(Arrays.asList(new UserRole(user, new Role(1, "Admin"))));
+		final List<CropType> crops = new ArrayList<>();
+		crops.add(this.cropType);
+		user.setCrops(crops);
 		return user;
 	}
 
@@ -90,6 +95,12 @@ public class WorkbenchTestDataUtil {
 	}
 
 	public void setUpWorkbench() {
+		this.commonTestProject = this.createTestProjectData();
+		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
+		this.commonTestProject.setCropType(this.cropType);
+		final List<CropType> crops = new ArrayList<>();
+		crops.add(this.cropType);
+
 		this.testPerson1 = this.createTestPersonData();
 		this.workbenchDataManager.addPerson(this.testPerson1);
 		this.testPerson2 = this.createTestPersonData();
@@ -97,12 +108,13 @@ public class WorkbenchTestDataUtil {
 
 		this.testUser1 = this.createTestUserData();
 		this.testUser1.setPersonid(this.testPerson1.getId());
+		this.testUser1.setCrops(crops);
 		this.workbenchDataManager.addUser(this.testUser1);
 		this.testUser2 = this.createTestUserData();
 		this.testUser2.setPersonid(this.testPerson2.getId());
+		this.testUser2.setCrops(crops);
 		this.workbenchDataManager.addUser(this.testUser2);
 
-		this.commonTestProject = this.createTestProjectData();
 		this.commonTestProject.setUserId(this.testUser1.getUserid());
 		this.workbenchDataManager.addProject(this.commonTestProject);
 
@@ -130,9 +142,6 @@ public class WorkbenchTestDataUtil {
 		pui.setUserId(this.testUser2.getUserid());
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
-
-		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
-		this.commonTestProject.setCropType(this.cropType);
 	}
 
 	public Project getCommonTestProject() {

@@ -11,16 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
@@ -51,6 +41,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 @Transactional
 public class OntologyDataManagerImpl extends DataManager implements OntologyDataManager {
 
@@ -63,112 +63,113 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public OntologyDataManagerImpl() {
 	}
 
-	public OntologyDataManagerImpl(HibernateSessionProvider sessionProvider) {
+	public OntologyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		daoFactory = new DaoFactory(sessionProvider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
-	public Term getTermById(int termId) {
+	public Term getTermById(final int termId) {
 		return this.getTermBuilder().get(termId);
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(int stdVariableId, String programUUID) {
+	public StandardVariable getStandardVariable(final int stdVariableId, final String programUUID) {
 		return this.getStandardVariableBuilder().create(stdVariableId, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds, String programUUID) {
+	public List<StandardVariable> getStandardVariables(final List<Integer> standardVariableIds, final String programUUID) {
 		return this.getStandardVariableBuilder().create(standardVariableIds, programUUID);
 	}
 
 	@Override
-	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) {
+	public List<StandardVariableSummary> getStandardVariableSummaries(final List<Integer> standardVariableIds) {
 		return this.getStandardVariableBuilder().getStandardVariableSummaries(standardVariableIds);
 	}
 
 	@Override
-	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) {
+	public StandardVariableSummary getStandardVariableSummary(final Integer standardVariableId) {
 		return this.getStandardVariableBuilder().getStandardVariableSummary(standardVariableId);
 	}
 
 	@Override
-	public void addStandardVariable(StandardVariable stdVariable, String programUUID) {
+	public void addStandardVariable(final StandardVariable stdVariable, final String programUUID) {
 
-		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+		final Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
-			throw new MiddlewareQueryException(String.format("Error in addStandardVariable, Variable with name \"%s\" already exists",
-					stdVariable.getName()));
+			throw new MiddlewareQueryException(String.format(
+				"Error in addStandardVariable, Variable with name \"%s\" already exists",
+				stdVariable.getName()));
 		}
 
 		try {
 
 			// check if scale, property and method exists first
-			Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
+			final Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
 			if (scale == null) {
 				stdVariable.setScale(this.getTermSaver().save(stdVariable.getScale().getName(), stdVariable.getScale().getDefinition(),
-						CvId.SCALES));
+					CvId.SCALES));
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new scale with id = " + stdVariable.getScale().getId());
 				}
 			}
 
-			Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
+			final Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
 			if (property == null) {
 				stdVariable.setProperty(this.getTermSaver().save(stdVariable.getProperty().getName(),
-						stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
+					stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new property with id = " + stdVariable.getProperty().getId());
 				}
 			}
 
-			Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
+			final Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
 			if (method == null) {
 				stdVariable.setMethod(this.getTermSaver().save(stdVariable.getMethod().getName(), stdVariable.getMethod().getDefinition(),
-						CvId.METHODS));
+					CvId.METHODS));
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new method with id = " + stdVariable.getMethod().getId());
 				}
 			}
 
 			if (this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
-					stdVariable.getMethod().getName(), programUUID) == null) {
+				stdVariable.getMethod().getName(), programUUID) == null) {
 				this.getStandardVariableSaver().save(stdVariable);
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void addStandardVariable(List<StandardVariable> stdVariableList) {
+	public void addStandardVariable(final List<StandardVariable> stdVariableList) {
 
 		try {
-			for (StandardVariable stdVariable : stdVariableList) {
+			for (final StandardVariable stdVariable : stdVariableList) {
 				this.getStandardVariableSaver().save(stdVariable);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
 		}
 
 	}
 
 	@Override
-	public void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) {
-		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+	public void addStandardVariableForMigrator(final StandardVariable stdVariable, final String programUUID) {
+		final Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
 			throw new MiddlewareQueryException(String.format(
-					"Error in addStandardVariableForMigrator, Variable with name \"%s\" already exists", stdVariable.getName()));
+				"Error in addStandardVariableForMigrator, Variable with name \"%s\" already exists", stdVariable.getName()));
 		}
 
 		try {
 			// check if scale, property and method exists first
-			Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
+			final Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
 			if (scale == null) {
 				stdVariable.setScale(this.getTermSaver().save(stdVariable.getScale().getName(), stdVariable.getScale().getDefinition(),
-						CvId.SCALES));
+					CvId.SCALES));
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new scale with id = " + stdVariable.getScale().getId());
 				}
@@ -176,10 +177,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				stdVariable.setScale(scale);
 			}
 
-			Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
+			final Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
 			if (property == null) {
 				stdVariable.setProperty(this.getTermSaver().save(stdVariable.getProperty().getName(),
-						stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
+					stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new property with id = " + stdVariable.getProperty().getId());
 				}
@@ -187,10 +188,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				stdVariable.setProperty(property);
 			}
 
-			Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
+			final Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
 			if (method == null) {
 				stdVariable.setMethod(this.getTermSaver().save(stdVariable.getMethod().getName(), stdVariable.getMethod().getDefinition(),
-						CvId.METHODS));
+					CvId.METHODS));
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new method with id = " + stdVariable.getMethod().getId());
 				}
@@ -199,16 +200,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			}
 
 			// FIXME: Need to pass through programUUID
-			StandardVariable existingStandardVariable =
-					this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
-							stdVariable.getMethod().getName(), programUUID);
+			final StandardVariable existingStandardVariable =
+				this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
+					stdVariable.getMethod().getName(), programUUID);
 			if (existingStandardVariable == null) {
 				this.getStandardVariableSaver().save(stdVariable);
 			} else {
 				stdVariable.setId(existingStandardVariable.getId());
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in addStandardVariableForMigrator " + e.getMessage(), e);
 		}
@@ -220,39 +221,41 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	 */
 	@Deprecated
 	@Override
-	public Term addMethod(String name, String definition) {
+	public Term addMethod(final String name, final String definition) {
 		return this.addTerm(name, definition, CvId.METHODS);
 	}
 
 	@Override
-	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) {
-		Set<StandardVariable> standardVariables = new HashSet<>();
+	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(final String nameOrSynonym, final String programUUID) {
+		final Set<StandardVariable> standardVariables = new HashSet<>();
 		standardVariables.addAll(this.getStandardVariablesByNameOrSynonym(nameOrSynonym, programUUID));
 		return standardVariables;
 	}
 
-	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) {
-		Set<StandardVariable> standardVariables = new HashSet<>();
-		List<Integer> stdVarIds = daoFactory.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
-		for (Integer stdVarId : stdVarIds) {
+	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(final String nameOrSynonym, final String programUUID) {
+		final Set<StandardVariable> standardVariables = new HashSet<>();
+		final List<Integer> stdVarIds = this.daoFactory.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
+		for (final Integer stdVarId : stdVarIds) {
 			standardVariables.add(this.getStandardVariable(stdVarId, programUUID));
 		}
 		return standardVariables;
 	}
 
 	@Override
-	public Term findMethodById(int id) {
+	public Term findMethodById(final int id) {
 		return this.getMethodBuilder().findMethodById(id);
 	}
 
 	@Override
-	public Term findMethodByName(String name) {
+	public Term findMethodByName(final String name) {
 		return this.getMethodBuilder().findMethodByName(name);
 	}
 
 	@Override
-	public StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method, String programUUID) {
-		Term termProperty, termScale, termMethod;
+	public StandardVariable findStandardVariableByTraitScaleMethodNames(final String property, final String scale, final String method, final String programUUID) {
+		final Term termProperty;
+		Term termScale;
+		final Term termMethod;
 		Integer propertyId = null, scaleId = null, methodId = null;
 
 		termProperty = this.findTermByName(property, CvId.PROPERTIES);
@@ -275,50 +278,50 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public List<Term> getAllTermsByCvId(CvId cvId) {
+	public List<Term> getAllTermsByCvId(final CvId cvId) {
 		return this.getTermBuilder().getTermsByCvId(cvId);
 	}
 
 	@Override
-	public long countTermsByCvId(CvId cvId) {
-		return daoFactory.getCvTermDao().countTermsByCvId(cvId);
+	public long countTermsByCvId(final CvId cvId) {
+		return this.daoFactory.getCvTermDao().countTermsByCvId(cvId);
 	}
 
 	@Override
-	public List<Term> getMethodsForTrait(Integer traitId) {
-		List<Term> methodTerms = new ArrayList<>();
-		Set<Integer> methodIds = new HashSet<>();
-		List<Integer> localMethodIds = daoFactory.getCvTermDao().findMethodTermIdsByTrait(traitId);
+	public List<Term> getMethodsForTrait(final Integer traitId) {
+		final List<Term> methodTerms = new ArrayList<>();
+		final Set<Integer> methodIds = new HashSet<>();
+		final List<Integer> localMethodIds = this.daoFactory.getCvTermDao().findMethodTermIdsByTrait(traitId);
 		if (localMethodIds != null) {
 			methodIds.addAll(localMethodIds);
 		}
-		for (Integer termId : methodIds) {
+		for (final Integer termId : methodIds) {
 			methodTerms.add(this.getTermBuilder().get(termId));
 		}
 		return methodTerms;
 	}
 
 	@Override
-	public List<Term> getScalesForTrait(Integer traitId) {
-		List<Term> scaleTerms = new ArrayList<>();
-		Set<Integer> scaleIds = new HashSet<>();
-		List<Integer> localMethodIds = daoFactory.getCvTermDao().findScaleTermIdsByTrait(traitId);
+	public List<Term> getScalesForTrait(final Integer traitId) {
+		final List<Term> scaleTerms = new ArrayList<>();
+		final Set<Integer> scaleIds = new HashSet<>();
+		final List<Integer> localMethodIds = this.daoFactory.getCvTermDao().findScaleTermIdsByTrait(traitId);
 		if (localMethodIds != null) {
 			scaleIds.addAll(localMethodIds);
 		}
-		for (Integer termId : scaleIds) {
+		for (final Integer termId : scaleIds) {
 			scaleTerms.add(this.getTermBuilder().get(termId));
 		}
 		return scaleTerms;
 	}
 
 	@Override
-	public Term findTermByName(String name, CvId cvId) {
+	public Term findTermByName(final String name, final CvId cvId) {
 		return this.getTermBuilder().findTermByName(name, cvId);
 	}
 
 	@Override
-	public Term addTerm(String name, String definition, CvId cvId) {
+	public Term addTerm(final String name, final String definition, final CvId cvId) {
 		Term term = this.findTermByName(name, cvId);
 
 		if (term != null) {
@@ -334,14 +337,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				throw new MiddlewareQueryException("Variables cannot be used in this method.");
 			}
 			return term;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in addTerm: " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void updateTerm(Term term) {
+	public void updateTerm(final Term term) {
 
 		if (term == null) {
 			return;
@@ -351,85 +354,84 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 			this.getTermSaver().update(term);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void updateTerms(List<Term> terms) {
+	public void updateTerms(final List<Term> terms) {
 
-		for (Term term : terms) {
+		for (final Term term : terms) {
 			this.getTermSaver().update(term);
 		}
 
 	}
 
-
 	@Override
 	public List<Term> getDataTypes() {
-		List<Integer> dataTypeIds =
-				Arrays.asList(TermId.CLASS.getId(), TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId(),
-						TermId.NUMERIC_DBID_VARIABLE.getId(), TermId.CHARACTER_DBID_VARIABLE.getId(), TermId.CHARACTER_VARIABLE.getId(),
-						TermId.TIMESTAMP_VARIABLE.getId(), TermId.CATEGORICAL_VARIABLE.getId());
+		final List<Integer> dataTypeIds =
+			Arrays.asList(TermId.CLASS.getId(), TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId(),
+				TermId.NUMERIC_DBID_VARIABLE.getId(), TermId.CHARACTER_DBID_VARIABLE.getId(), TermId.CHARACTER_VARIABLE.getId(),
+				TermId.TIMESTAMP_VARIABLE.getId(), TermId.CATEGORICAL_VARIABLE.getId());
 		return this.getTermBuilder().getTermsByIds(dataTypeIds);
 	}
 
 	@Override
-	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, String programUUID, int start,
-			int numOfRows) {
+	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(
+		final PhenotypicType type, final String programUUID, final int start,
+		final int numOfRows) {
 
-		TreeMap<String, StandardVariable> standardVariables = new TreeMap<>();
+		final TreeMap<String, StandardVariable> standardVariables = new TreeMap<>();
 		List<Integer> localStdVariableIds = new ArrayList<>();
 
-		localStdVariableIds = daoFactory.getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
+		localStdVariableIds = this.daoFactory.getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
 
-		for (Integer stdVarId : localStdVariableIds) {
-			StandardVariable sd = this.getStandardVariableBuilder().create(stdVarId, programUUID);
+		for (final Integer stdVarId : localStdVariableIds) {
+			final StandardVariable sd = this.getStandardVariableBuilder().create(stdVarId, programUUID);
 			standardVariables.put(sd.getName(), sd);
 		}
 
-		Set<String> standardVariablesSet = standardVariables.keySet();
-		Object[] list = standardVariablesSet.toArray();
+		final Set<String> standardVariablesSet = standardVariables.keySet();
+		final Object[] list = standardVariablesSet.toArray();
 
-		String startSD = list[start].toString();
+		final String startSD = list[start].toString();
 
-		int end = start + numOfRows > list.length - 1 ? list.length - 1 : start + numOfRows;
-		String endSD = list[end].toString();
+		final int end = start + numOfRows > list.length - 1 ? list.length - 1 : start + numOfRows;
+		final String endSD = list[end].toString();
 
 		return standardVariables.subMap(startSD, true, endSD, true);
 	}
 
 	@Override
-	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID) {
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headers, final String programUUID) {
 		return this.getStandardVariableBuilder().getStandardVariablesInProjects(headers, programUUID);
 	}
-	
+
 	@Override
-	public List<ProjectProperty> getProjectPropertiesByProjectId(int projectId) {
+	public List<ProjectProperty> getProjectPropertiesByProjectId(final int projectId) {
 		return this.getProjectPropertyDao().getByProjectId(projectId);
 	}
 
-	
 	@Override
-	public List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) {
-		List<Term> terms = new ArrayList<>();
-		List<CVTerm> cvTerms = new ArrayList<>();
+	public List<Term> findTermsByNameOrSynonym(final String nameOrSynonym, final CvId cvId) {
+		final List<Term> terms = new ArrayList<>();
+		final List<CVTerm> cvTerms = new ArrayList<>();
 		List<Integer> termIds = new ArrayList<>();
 
-		termIds = daoFactory.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
-		for (Integer id : termIds) {
-			cvTerms.add(daoFactory.getCvTermDao().getById(id));
+		termIds = this.daoFactory.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
+		for (final Integer id : termIds) {
+			cvTerms.add(this.daoFactory.getCvTermDao().getById(id));
 		}
-		for (CVTerm cvTerm : cvTerms) {
+		for (final CVTerm cvTerm : cvTerms) {
 			terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
 		}
 		return terms;
 	}
 
 	@Override
-	public Term addProperty(String name, String definition, int isA) {
+	public Term addProperty(final String name, final String definition, final int isA) {
 
 		Term term = this.findTermByName(name, CvId.PROPERTIES);
 
@@ -440,7 +442,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		try {
 
 			term = this.getTermSaver().save(name, definition, CvId.PROPERTIES);
-			Term isATerm = this.getTermById(isA);
+			final Term isATerm = this.getTermById(isA);
 
 			if (isATerm != null) {
 				this.getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), isATerm.getId());
@@ -448,7 +450,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				throw new MiddlewareQueryException("The isA passed is not a valid Class term: " + isA);
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
 		}
@@ -457,14 +459,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Term addOrUpdateTerm(String name, String definition, CvId cvId) {
+	public Term addOrUpdateTerm(final String name, final String definition, final CvId cvId) {
 
 		try {
 
-			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
+			final Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
 
 			return term;
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
@@ -472,32 +474,32 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void addOrUpdateCropOntologyID(Property property, String cropOntologyID) {
+	public void addOrUpdateCropOntologyID(final Property property, final String cropOntologyID) {
 		assert !StringUtils.isEmpty(cropOntologyID);
 
 		try {
 
 			this.getStandardVariableSaver().saveOrUpdateCropOntologyId(property.getTerm().getId(), cropOntologyID);
 
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 	}
 
 	@Override
-	public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId) {
+	public Term addOrUpdateTermAndRelationship(final String name, final String definition, final CvId cvId, final int typeId, final int objectId) {
 		try {
-			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
+			final Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
 			this.saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
 			return term;
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 	}
 
 	@Override
-	public Term updateTermAndRelationship(Term term, int typeId, int objectId) {
+	public Term updateTermAndRelationship(final Term term, final int typeId, final int objectId) {
 
 		Term updatedTerm = null;
 
@@ -510,7 +512,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 			this.saveOrUpdateCvTermRelationship(updatedTerm.getId(), objectId, typeId);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
 		}
@@ -518,7 +520,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return updatedTerm;
 	}
 
-	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) {
+	private Term saveOrUpdateCvTerm(final String name, final String definition, final CvId cvId) {
 		Term term = this.findTermByName(name, cvId);
 
 		// If term is not existing, add
@@ -532,15 +534,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return term;
 	}
 
-    @Override
-    public void addCvTermRelationship(int subjectId, int objectId, int typeId) {
-        this.getTermRelationshipSaver().save(subjectId, typeId, objectId);
-    }
+	@Override
+	public void addCvTermRelationship(final int subjectId, final int objectId, final int typeId) {
+		this.getTermRelationshipSaver().save(subjectId, typeId, objectId);
+	}
 
-    private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) {
-		Term typeTerm = this.getTermById(typeId);
+	private void saveOrUpdateCvTermRelationship(final int subjectId, final int objectId, final int typeId) {
+		final Term typeTerm = this.getTermById(typeId);
 		if (typeTerm != null) {
-			CVTermRelationship cvRelationship = daoFactory.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
+			final CVTermRelationship cvRelationship =
+				this.daoFactory.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
 			// add the relationship
 			if (cvRelationship == null) {
 				this.getTermRelationshipSaver().save(subjectId, typeId, objectId);
@@ -555,8 +558,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Property getProperty(int termId) {
-		Property property = new Property();
+	public Property getProperty(final int termId) {
+		final Property property = new Property();
 
 		property.setTerm(this.getTermBuilder().getTermOfProperty(termId, CvId.PROPERTIES.getId()));
 		if (property.getTerm() != null) {
@@ -567,13 +570,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Property getProperty(String name) {
-		Property property = new Property();
+	public Property getProperty(final String name) {
+		final Property property = new Property();
 
 		property.setTerm(this.findTermByName(name, CvId.PROPERTIES));
 		if (property.getTerm() != null) {
 			property.setIsA(this.getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(), CvId.PROPERTIES.getId(),
-					TermId.IS_A.getId()));
+				TermId.IS_A.getId()));
 		}
 
 		return property;
@@ -582,22 +585,22 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public long countIsAOfProperties() {
 		long count = 0;
-		count += daoFactory.getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
+		count += this.daoFactory.getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
 		return count;
 	}
 
 	@Override
-	public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) {
+	public List<TraitClassReference> getAllTraitGroupsHierarchy(final boolean includePropertiesAndVariables) {
 		return this.getTraitGroupBuilder().getAllTraitGroupsHierarchy(includePropertiesAndVariables);
 	}
 
 	@Override
-	public List<Term> getTermsByIds(List<Integer> ids) {
+	public List<Term> getTermsByIds(final List<Integer> ids) {
 		return this.getTermBuilder().getTermsByIds(ids);
 	}
 
 	@Override
-	public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) {
+	public TraitClass addTraitClass(final String name, final String definition, final int parentTraitClassId) {
 		Term term = this.findTermByName(name, CvId.IBDB_TERMS);
 
 		if (term != null) {
@@ -612,7 +615,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				this.getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), parentTraitClassId);
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in addTraitClass " + e.getMessage(), e);
 		}
@@ -621,19 +624,20 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Set<StandardVariable> getAllStandardVariables(String programUUID) {
-		Set<StandardVariable> standardVariables = new HashSet<>();
-		List<Term> terms = this.getAllTermsByCvId(CvId.VARIABLES);
-		for (Term term : terms) {
+	public Set<StandardVariable> getAllStandardVariables(final String programUUID) {
+		final Set<StandardVariable> standardVariables = new HashSet<>();
+		final List<Term> terms = this.getAllTermsByCvId(CvId.VARIABLES);
+		for (final Term term : terms) {
 			standardVariables.add(this.getStandardVariable(term.getId(), programUUID));
 		}
 		return standardVariables;
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId,
-			String programUUID) {
-		List<StandardVariable> standardVariables = new ArrayList<>();
+	public List<StandardVariable> getStandardVariables(
+		final Integer traitClassId, final Integer propertyId, final Integer methodId, final Integer scaleId,
+		final String programUUID) {
+		final List<StandardVariable> standardVariables = new ArrayList<>();
 
 		if (traitClassId != null) {
 			standardVariables.addAll(this.getStandardVariablesOfTraitClass(traitClassId, programUUID));
@@ -641,29 +645,31 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		// For property, scale, method
-		List<Integer> standardVariableIds = daoFactory.getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
-		for (Integer id : standardVariableIds) {
+		final List<Integer> standardVariableIds =
+			this.daoFactory.getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
+		for (final Integer id : standardVariableIds) {
 			standardVariables.add(this.getStandardVariable(id, programUUID));
 		}
 
 		return standardVariables;
 	}
 
-	private List<StandardVariable> getStandardVariablesOfTraitClass(Integer traitClassId, String programUUID) {
-		List<StandardVariable> standardVariables = new ArrayList<>();
-		List<PropertyReference> properties = daoFactory.getCvTermDao().getPropertiesOfTraitClass(traitClassId);
+	private List<StandardVariable> getStandardVariablesOfTraitClass(final Integer traitClassId, final String programUUID) {
+		final List<StandardVariable> standardVariables = new ArrayList<>();
+		final List<PropertyReference> properties = this.daoFactory.getCvTermDao().getPropertiesOfTraitClass(traitClassId);
 
-		List<Integer> propertyIds = new ArrayList<>();
-		for (PropertyReference property : properties) {
+		final List<Integer> propertyIds = new ArrayList<>();
+		for (final PropertyReference property : properties) {
 			propertyIds.add(property.getId());
 		}
 
-		Map<Integer, List<StandardVariableReference>> propertyVars = daoFactory.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
+		final Map<Integer, List<StandardVariableReference>> propertyVars =
+			this.daoFactory.getCvTermDao().getStandardVariablesOfProperties(propertyIds);
 
-		for (Integer propId : propertyIds) {
-			List<StandardVariableReference> stdVarRefs = propertyVars.get(propId);
+		for (final Integer propId : propertyIds) {
+			final List<StandardVariableReference> stdVarRefs = propertyVars.get(propId);
 			if (stdVarRefs != null) {
-				for (StandardVariableReference stdVarRef : stdVarRefs) {
+				for (final StandardVariableReference stdVarRef : stdVarRefs) {
 					standardVariables.add(this.getStandardVariable(stdVarRef.getId(), programUUID));
 				}
 			}
@@ -674,18 +680,18 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) {
+	public Integer getStandardVariableIdByTermId(final int cvTermId, final TermId termId) {
 		return this.getStandardVariableBuilder().getIdByTermId(cvTermId, termId);
 	}
 
 	@Override
-	public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) {
+	public void saveOrUpdateStandardVariable(final StandardVariable standardVariable, final Operation operation) {
 
 		standardVariable.setProperty(this.getTermBuilder().findOrSaveTermByName(standardVariable.getProperty().getName(), CvId.PROPERTIES));
 		standardVariable.setScale(this.getTermBuilder().findOrSaveTermByName(standardVariable.getScale().getName(), CvId.SCALES));
 		standardVariable.setMethod(this.getTermBuilder().findOrSaveTermByName(standardVariable.getMethod().getName(), CvId.METHODS));
 
-		String errorCodes = this.getStandardVariableSaver().validate(standardVariable, operation);
+		final String errorCodes = this.getStandardVariableSaver().validate(standardVariable, operation);
 
 		if (errorCodes != null && !errorCodes.isEmpty()) {
 			throw new MiddlewareQueryException(errorCodes, "The variable you entered is invalid");
@@ -699,55 +705,55 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				this.getStandardVariableSaver().update(standardVariable);
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in saveOrUpdateStandardVariable " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) {
+	public void addOrUpdateStandardVariableConstraints(final int standardVariableId, final VariableConstraints constraints) {
 
 		try {
 
 			this.getStandardVariableSaver().saveConstraints(standardVariableId, constraints);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in addOrUpdateStandardVariableConstraints: " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void deleteStandardVariableLocalConstraints(int standardVariableId) {
+	public void deleteStandardVariableLocalConstraints(final int standardVariableId) {
 
 		try {
 
-			StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
+			final StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
 
 			this.getStandardVariableSaver().deleteConstraints(stdVar);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in deleteStandardVariableLocalConstraints " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) {
+	public Enumeration addStandardVariableEnumeration(final StandardVariable variable, final Enumeration enumeration) {
 
 		if (variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
 			throw new MiddlewareException(
-					"Error in addStandardVariableEnumeration(). Enumeration with the same name and description exists.");
+				"Error in addStandardVariableEnumeration(). Enumeration with the same name and description exists.");
 		}
 
-		Integer cvId = this.getEnumerationCvId(variable);
+		final Integer cvId = this.getEnumerationCvId(variable);
 
 		try {
 
 			this.getStandardVariableSaver().saveEnumeration(variable, enumeration, cvId);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in addStandardVariableEnumeration: " + e.getMessage(), e);
 		}
@@ -756,14 +762,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) {
+	public void saveOrUpdateStandardVariableEnumeration(final StandardVariable variable, final Enumeration enumeration) {
 
 		if (enumeration.getId() == null && variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
 			throw new MiddlewareException("Error in saveOrUpdateStandardVariableEnumeration(). "
-					+ "Enumeration id is null and an Enumeration with the same name and description exists." + "Add fails. ");
+				+ "Enumeration id is null and an Enumeration with the same name and description exists." + "Add fails. ");
 		}
 
-		Integer cvId = this.getEnumerationCvId(variable);
+		final Integer cvId = this.getEnumerationCvId(variable);
 
 		VariableCache.removeFromCache(variable.getId());
 		try {
@@ -777,14 +783,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				this.getTermSaver().update(new Term(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in saveOrUpdateStandardVariableEnumeration: " + e.getMessage(), e);
 		}
 
 	}
 
-	private Integer getEnumerationCvId(StandardVariable variable) {
+	private Integer getEnumerationCvId(final StandardVariable variable) {
 
 		// Check if cv entry of enumeration already exists
 		// Add cv entry of the standard variable if none found
@@ -798,92 +804,98 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) {
+	public void deleteStandardVariableEnumeration(final int standardVariableId, final int enumerationId) {
 
 		try {
 
-			StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
+			final StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
 			this.getStandardVariableSaver().deleteEnumeration(standardVariableId, stdVar.getEnumeration(enumerationId));
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException("Error in deleteStandardVariableEnumeration " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public void deleteTerm(int cvTermId, CvId cvId) {
+	public void deleteTerm(final int cvTermId, final CvId cvId) {
 
 		try {
 
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
 
-				this.getTermSaver().delete(daoFactory.getCvTermDao().getById(cvTermId), cvId);
+				this.getTermSaver().delete(this.daoFactory.getCvTermDao().getById(cvTermId), cvId);
 
 			} else {
 				throw new MiddlewareQueryException("variables cannot be used in this method");
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 	}
 
-	public Integer retrieveDerivedAnalysisVariable(Integer originalVariableTermID, Integer analysisMethodID) {
-        if (originalVariableTermID == null || analysisMethodID == null) {
-            return null;
-        }
+	public Integer retrieveDerivedAnalysisVariable(final Integer originalVariableTermID, final Integer analysisMethodID) {
+		if (originalVariableTermID == null || analysisMethodID == null) {
+			return null;
+		}
 
-        return daoFactory.getCvTermRelationshipDao().retrieveAnalysisDerivedVariableID(originalVariableTermID, analysisMethodID);
+		return this.daoFactory.getCvTermRelationshipDao().retrieveAnalysisDerivedVariableID(originalVariableTermID, analysisMethodID);
 	}
 
 	@Override
-	public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) {
+	public void deleteTermAndRelationship(final int cvTermId, final CvId cvId, final int typeId, final int objectId) {
 
 		try {
-			if (daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
+			if (this.daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
 				this.validateTermRelationshipsForDeletion(cvTermId);
 			}
 
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
 
 				this.deleteCvTermRelationship(cvTermId, typeId);
-				this.getTermSaver().delete(daoFactory.getCvTermDao().getById(cvTermId), cvId);
+				this.getTermSaver().delete(this.daoFactory.getCvTermDao().getById(cvTermId), cvId);
 
 			} else {
 				throw new MiddlewareQueryException("variables cannot be used in this method");
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 
 			throw new MiddlewareQueryException(e.getCode(), e);
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
 
-	private void validateTermRelationshipsForDeletion(int cvTermId) {
+	private void validateTermRelationshipsForDeletion(final int cvTermId) {
 
-		if (daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
-			if (daoFactory.getCvTermDao().getById(daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv()
-					.equals(CvId.PROPERTIES.getId())) {
-				throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(),
-						OntologyDataManagerImpl.DELETE_TERM_ERROR_MESSAGE);
+		if (this.daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
+			if (this.daoFactory.getCvTermDao().getById(
+				this.daoFactory.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId())
+				.getCv()
+				.equals(CvId.PROPERTIES.getId())) {
+				throw new MiddlewareQueryException(
+					ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(),
+					OntologyDataManagerImpl.DELETE_TERM_ERROR_MESSAGE);
 			} else {
-				throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(),
-						OntologyDataManagerImpl.DELETE_TERM_ERROR_MESSAGE);
+				throw new MiddlewareQueryException(
+					ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(),
+					OntologyDataManagerImpl.DELETE_TERM_ERROR_MESSAGE);
 			}
 		} else {
-			throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(),
-					OntologyDataManagerImpl.DELETE_TERM_ERROR_MESSAGE);
+			throw new MiddlewareQueryException(
+				ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(),
+				OntologyDataManagerImpl.DELETE_TERM_ERROR_MESSAGE);
 		}
 
 	}
 
-	private void deleteCvTermRelationship(int subjectId, int typeId) {
-		Term typeTerm = this.getTermById(typeId);
+	private void deleteCvTermRelationship(final int subjectId, final int typeId) {
+		final Term typeTerm = this.getTermById(typeId);
 		if (typeTerm != null) {
-			CVTermRelationship cvRelationship = daoFactory.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
+			final CVTermRelationship cvRelationship =
+				this.daoFactory.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
 			if (cvRelationship != null) {
 				this.getTermRelationshipSaver().deleteRelationship(cvRelationship);
 			}
@@ -892,11 +904,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public List<Property> getAllPropertiesWithTraitClass() {
-		List<Property> properties = daoFactory.getCvTermDao().getAllPropertiesWithTraitClass();
+		final List<Property> properties = this.daoFactory.getCvTermDao().getAllPropertiesWithTraitClass();
 		Collections.sort(properties, new Comparator<Property>() {
 
 			@Override
-			public int compare(Property o1, Property o2) {
+			public int compare(final Property o1, final Property o2) {
 				return o1.getName().toUpperCase().compareTo(o2.getName().toUpperCase());
 			}
 		});
@@ -904,36 +916,36 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void deleteStandardVariable(int stdVariableId) {
+	public void deleteStandardVariable(final int stdVariableId) {
 		VariableCache.removeFromCache(stdVariableId);
 
 		try {
-			StandardVariable stdVar = this.getStandardVariable(stdVariableId, null);
+			final StandardVariable stdVar = this.getStandardVariable(stdVariableId, null);
 			this.getStandardVariableSaver().delete(stdVar);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error in deleteStandardVariable " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method) {
+	public Integer getStandardVariableIdByPropertyScaleMethod(final String property, final String scale, final String method) {
 
-		Integer propertyId = this.findTermIdByName(property, CvId.PROPERTIES);
-		Integer scaleId = this.findTermIdByName(scale, CvId.SCALES);
-		Integer methodId = this.findTermIdByName(method, CvId.METHODS);
+		final Integer propertyId = this.findTermIdByName(property, CvId.PROPERTIES);
+		final Integer scaleId = this.findTermIdByName(scale, CvId.SCALES);
+		final Integer methodId = this.findTermIdByName(method, CvId.METHODS);
 
 		return this.getStandardVariableIdByPropertyIdScaleIdMethodId(propertyId, scaleId, methodId);
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId) {
+	public Integer getStandardVariableIdByPropertyIdScaleIdMethodId(final Integer propertyId, final Integer scaleId, final Integer methodId) {
 
 		return this.getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 
 	}
 
-	private Integer findTermIdByName(String name, CvId cvType) {
-		Term term = this.findTermByName(name, cvType);
+	private Integer findTermIdByName(final String name, final CvId cvType) {
+		final Term term = this.findTermByName(name, cvType);
 		if (term != null) {
 			return term.getId();
 		}
@@ -941,28 +953,28 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) {
+	public boolean validateDeleteStandardVariableEnumeration(final int standardVariableId, final int enumerationId) {
 		return this.getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
 	}
 
 	@Override
-	public List<NameSynonym> getSynonymsOfTerm(Integer termId) {
-		List<CVTermSynonym> synonyms = this.getNameSynonymBuilder().findSynonyms(termId);
+	public List<NameSynonym> getSynonymsOfTerm(final Integer termId) {
+		final List<CVTermSynonym> synonyms = this.getNameSynonymBuilder().findSynonyms(termId);
 		return this.getNameSynonymBuilder().create(synonyms);
 	}
 
 	@Override
-	public boolean isSeedAmountVariable(String variateProperty) {
+	public boolean isSeedAmountVariable(final String variateProperty) {
 		boolean isSeedAmountVar = false;
 
 		if ("INVENTORY AMOUNT".equalsIgnoreCase(variateProperty)) {
 			isSeedAmountVar = true;
 
 		} else {
-			List<Term> termsByNameOrSynonym = this.findTermsByNameOrSynonym("INVENTORY AMOUNT", CvId.PROPERTIES);
+			final List<Term> termsByNameOrSynonym = this.findTermsByNameOrSynonym("INVENTORY AMOUNT", CvId.PROPERTIES);
 			if (termsByNameOrSynonym != null && !termsByNameOrSynonym.isEmpty()) {
-				List<NameSynonym> synonymsOfTerm = this.getSynonymsOfTerm(termsByNameOrSynonym.get(0).getId());
-				for (NameSynonym synonym : synonymsOfTerm) {
+				final List<NameSynonym> synonymsOfTerm = this.getSynonymsOfTerm(termsByNameOrSynonym.get(0).getId());
+				for (final NameSynonym synonym : synonymsOfTerm) {
 					if (synonym.getName().equalsIgnoreCase(variateProperty)) {
 						isSeedAmountVar = true;
 						break;
@@ -976,16 +988,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getCVIdByName(String name) {
+	public Integer getCVIdByName(final String name) {
 		return this.getCvDao().getIdByName(name);
 	}
 
 	@Override
-	public Term findTermByName(String name, int cvId) {
+	public Term findTermByName(final String name, final int cvId) {
 		return this.getTermBuilder().findTermByName(name, cvId);
 	}
 
-	public void setDaoFactory(DaoFactory daoFactory) {
+	public void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 }

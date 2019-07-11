@@ -17,7 +17,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
-import org.generationcp.middleware.operation.builder.FolderBuilder;
 import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.NameBuilder;
@@ -47,7 +46,6 @@ import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
 import org.generationcp.middleware.operation.saver.LocdesSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
-import org.generationcp.middleware.operation.saver.ProjectRelationshipSaver;
 import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
@@ -394,46 +392,6 @@ public abstract class DataManager extends DatabaseBroker {
 		return count;
 	}
 
-	/**
-	 * A generic implementation of the countByXXXX(Integer id, ...) method that calls a specific count method from a DAO. <br/>
-	 * Calls the corresponding count method as specified in the parameter methodName. <br/>
-	 * <br/>
-	 * Sample usage: <br/>
-	 *
-	 * <pre>
-	 * <code>
-	 *      public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
-	 *            {
-	 *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition",
-	 *                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
-	 *    }
-	 * </code>
-	 * </pre>
-	 *
-	 * @param dao            The DAO to call the method from
-	 * @param id             The entity id
-	 * @param methodName     The method to call
-	 * @param parameters     The parameters to be passed to the method
-	 * @param parameterTypes The types of the parameters to be passed to the method
-	 * @return The count
-	 * @
-	 */
-	@SuppressWarnings("rawtypes")
-	public long countFromInstanceByIdAndMethod(
-		final GenericDAO dao, final Integer id, final String methodName, final Object[] parameters, final Class[] parameterTypes) {
-		long count = 0;
-		try {
-			final java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
-			dao.setSession(this.getActiveSession());
-			count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-		} catch (final Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-			// NoSuchMethodException
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error in counting: " + e.getMessage(), e);
-		}
-		return count;
-	}
-
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object save(final GenericDAO dao, final Object entity) {
 
@@ -585,10 +543,6 @@ public abstract class DataManager extends DatabaseBroker {
 		return new ProjectSaver(this.sessionProvider);
 	}
 
-	protected final ProjectRelationshipSaver getProjectRelationshipSaver() {
-		return new ProjectRelationshipSaver(this.sessionProvider);
-	}
-
 	protected final ProjectPropertySaver getProjectPropertySaver() {
 		return new ProjectPropertySaver(this.sessionProvider);
 	}
@@ -619,10 +573,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final ListDataPropertySaver getListDataPropertySaver() {
 		return new ListDataPropertySaver(this.sessionProvider);
-	}
-
-	protected final FolderBuilder getFolderBuilder() {
-		return new FolderBuilder(this.sessionProvider);
 	}
 
 	protected final LocdesSaver getLocdesSaver() {

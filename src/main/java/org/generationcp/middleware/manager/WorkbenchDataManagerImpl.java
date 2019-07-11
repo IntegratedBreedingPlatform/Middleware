@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -426,6 +427,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<WorkbenchUser> getAllActiveUsersSorted() {
 		return this.getWorkbenchUserDao().getAllActiveUsersSorted();
+	}
+
+	@Override
+	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
+		return this.getWorkbenchUserDao().getUsersByCrop(cropName);
 	}
 
 	@Override
@@ -917,6 +923,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		// Add user roles to the particular user
 		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
 
+		final List<CropType> crops = new ArrayList<>();
+		for (final CropDto crop : userDto.getCrops()) {
+			final CropType cropType = new CropType();
+			cropType.setCropName(crop.getCropName());
+			crops.add(cropType);
+		}
+		user.setCrops(crops);
+
 		try {
 
 			final WorkbenchUser recordSaved = this.getWorkbenchUserDao().saveOrUpdate(user);
@@ -957,6 +971,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			if (!role.getRole().equals(userDto.getRole())) {
 				role.setRole(userDto.getRole());
 			}
+
+			final List<CropType> crops = new ArrayList<>();
+			for (final CropDto crop : userDto.getCrops()) {
+				final CropType cropType = new CropType();
+				cropType.setCropName(crop.getCropName());
+				crops.add(cropType);
+			}
+			user.setCrops(crops);
 
 			this.getWorkbenchUserDao().saveOrUpdate(user);
 			idUserSaved = user.getUserid();

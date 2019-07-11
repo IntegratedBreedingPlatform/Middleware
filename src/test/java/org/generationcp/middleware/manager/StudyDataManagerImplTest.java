@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -20,7 +22,6 @@ import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializ
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -49,6 +50,7 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -216,12 +218,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchStudiesByGid() {
+	public void testSearchStudiesByGid() throws Exception {
+		final Integer gid = this.studyTDI.getGid();
+		final Integer geolocationId = this.studyTDI.getGeolocationId();
+		final Integer stockId = this.studyTDI.getStockId();
+
+		// Create test dataset
+		final DatasetReference dataset = this.studyTDI.addTestDataset(this.studyReference.getId());
+		final ExperimentValues values = new ExperimentValues();
+		values.setLocationId(geolocationId);
+		values.setGermplasmId(stockId);
+		this.manager.addExperiment(this.crop, dataset.getId(), ExperimentType.PLOT, values);
+
 		// Flushing to force Hibernate to synchronize with the underlying database before the search
 		// Without this the inserted experiment is not retrieved properly
 		this.manager.getActiveSession().flush();
 
-		final Integer gid = this.studyTDI.getGid();
 		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
 		final StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
 		// We are sure that the result set will contain the test study we added in the set up
@@ -236,6 +248,18 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testMoveDmsProject() {
+		final String uniqueId = this.commonTestProject.getUniqueID();
+		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
+		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId());
+		this.sessionProvder.getSession().flush();
+
+		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), uniqueId);
+		Assert.assertNotNull(childrenNodes);
+		Assert.assertEquals("Study should have been moved to new folder.", 1, childrenNodes.size());
+	}
+
+	@Test
 	public void testGetChildrenOfFolder() {
 
 		final String uniqueId = this.commonTestProject.getUniqueID();
@@ -244,11 +268,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String subFolderDescription = "Sub Folder Description";
 		final int subFolderID =
 			this.manager.addSubFolder(mainFolder.getProjectId(), subFolderName, subFolderDescription, uniqueId, "objective");
-		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId(), true);
+		this.manager.moveDmsProject(this.studyReference.getId(), mainFolder.getProjectId());
 
+		this.sessionProvder.getSession().flush();
 		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), uniqueId);
 		Assert.assertNotNull(childrenNodes);
-		Assert.assertEquals("The size should be one.", 2, childrenNodes.size());
+		Assert.assertEquals(2, childrenNodes.size());
 		for (final Reference reference : childrenNodes) {
 			if (reference.isFolder()) {
 				Assert.assertEquals(subFolderID, reference.getId().intValue());
@@ -274,12 +299,44 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllFolders() {
 		final int originalSize = this.manager.getAllFolders().size();
-		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
-		this.studyTDI.createFolderTestData(null);
+		final String uniqueID = this.commonTestProject.getUniqueID();
+		final DmsProject folder1 = this.studyTDI.createFolderTestData(uniqueID);
+		final DmsProject folder2 = this.studyTDI.createFolderTestData(null);
+		final DmsProject folder3 = this.studyTDI.createFolderTestData(uniqueID, folder1.getProjectId());
+		this.sessionProvder.getSession().flush();
 
-		final int newSize = this.manager.getAllFolders().size();
-		// We only assert that there are two folders added.
-		Assert.assertEquals("The new size should be equal to the original size + 2", originalSize + 2, newSize);
+		final List<FolderReference> allFolders = this.manager.getAllFolders();
+		final int newSize = allFolders.size();
+		final List<Integer> idList = Lists.transform(allFolders, new Function<FolderReference, Integer>() {
+
+			@Override
+			public Integer apply(final FolderReference dataset) {
+				return dataset.getId();
+			}
+		});
+		Assert.assertEquals("The new size should be equal to the original size + 3", originalSize + 3, newSize);
+		Assert.assertTrue(idList.contains(folder1.getProjectId()));
+		Assert.assertTrue(idList.contains(folder2.getProjectId()));
+		Assert.assertTrue(idList.contains(folder3.getProjectId()));
+		for (final FolderReference folder : allFolders) {
+			final Integer id = folder.getId();
+			if (id.equals(folder1.getProjectId())) {
+				Assert.assertEquals(folder1.getProjectId(), id);
+				Assert.assertEquals(folder1.getName(), folder.getName());
+				Assert.assertEquals(folder1.getDescription(), folder.getDescription());
+				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
+			} else if (id.equals(folder2.getProjectId())) {
+				Assert.assertEquals(folder2.getProjectId(), id);
+				Assert.assertEquals(folder2.getName(), folder.getName());
+				Assert.assertEquals(folder2.getDescription(), folder.getDescription());
+				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
+			} else if (id.equals(folder3.getProjectId())) {
+				Assert.assertEquals(folder3.getProjectId(), id);
+				Assert.assertEquals(folder3.getName(), folder.getName());
+				Assert.assertEquals(folder3.getDescription(), folder.getDescription());
+				Assert.assertEquals(folder1.getProjectId(), folder.getParentFolderId());
+			}
+		}
 	}
 
 	@Test
@@ -298,7 +355,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final DataSet dataset = this.manager.getDataSet(datasetReference.getId());
 		Assert.assertEquals("The dataset name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
 			dataset.getName());
-		Assert.assertEquals(DataSetType.MEANS_DATA, dataset.getDataSetType());
+		Assert.assertEquals(DatasetTypeEnum.MEANS_DATA.getId(), dataset.getDatasetType().getDatasetTypeId().intValue());
 	}
 
 	@Test
@@ -323,8 +380,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetDataSetsByType() throws Exception {
 		this.studyTDI.addTestDataset(this.studyReference.getId());
-		final DataSetType dataSetType = DataSetType.MEANS_DATA;
-		final List<DataSet> datasets = this.manager.getDataSetsByType(this.studyReference.getId(), dataSetType);
+		final List<DataSet> datasets = this.manager.getDataSetsByType(this.studyReference.getId(), DatasetTypeEnum.MEANS_DATA.getId());
 		Assert.assertTrue("Datasets' size should be greter than 0", datasets.size() > 0);
 		Assert.assertTrue(
 			"The size should be greater than 0 since we are sure that it will return at least one data set",
@@ -334,8 +390,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testFindOneDataSetByType() throws Exception {
 		this.studyTDI.addTestDataset(this.studyReference.getId());
-		final DataSetType dataSetType = DataSetType.MEANS_DATA;
-		final DataSet dataset = this.manager.findOneDataSetByType(this.studyReference.getId(), dataSetType);
+		final DataSet dataset = this.manager.findOneDataSetByType(this.studyReference.getId(), DatasetTypeEnum.MEANS_DATA.getId());
 		Assert.assertEquals("Dataset's name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME,
 			dataset.getName());
 	}
@@ -381,17 +436,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final int id = this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder", uniqueId, "objective");
 		final DmsProject proj = this.manager.getParentFolder(id);
 		Assert.assertEquals("The folder names should be equal", project.getName(), proj.getName());
-	}
-
-	@Test
-	public void testGetFolderTree() {
-		List<FolderReference> tree = this.manager.getFolderTree();
-		final int sizeBefore = tree.size();
-		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
-		tree = this.manager.getFolderTree();
-		final int newSize = tree.size();
-		// Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
-		Assert.assertEquals("The new size should be equal the  size before + the newly added folder", newSize, (sizeBefore + 1));
 	}
 
 	@Test
@@ -780,7 +824,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testIsLocationIdVariable() throws Exception {
-		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		Assert.assertTrue(this.manager.isLocationIdVariable(this.studyReference.getId(), "LOCATION_NAME"));
 		Assert.assertFalse(this.manager.isLocationIdVariable(this.studyReference.getId(), "EXPERIMENT_DESIGN_FACTOR"));
@@ -794,7 +838,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final String albaniaLocationId = "2";
 		final String algeriaLocationId = "3";
 
-		this.studyTDI.addTestDataset(this.studyReference.getId(), DataSetType.SUMMARY_DATA);
+		this.studyTDI.addTestDataset(this.studyReference.getId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), afghanistanLocationId, "1");
 		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), albaniaLocationId, "1");
@@ -865,7 +909,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
@@ -883,7 +927,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		// Flushing to force Hibernate to synchronize with the underlying database
@@ -901,7 +945,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final Random random = new Random();
 		final Integer studyId = this.studyReference.getId();
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Integer datasetId = this.studyTDI.addEnvironmentDataset(this.crop, studyId, String.valueOf(random.nextInt()), "1");
 
 		Assert.assertFalse(this.manager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(999)));
@@ -983,13 +1027,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		return vtype;
 	}
 
-	private DatasetReference addTestDataset(final int studyId, final String name, final DataSetType dataSetType) throws Exception {
+	private DatasetReference addTestDataset(final int studyId, final String name, final int datasetTypeId) throws Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 
 		final DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setName(name);
 		datasetValues.setDescription("My Dataset Description");
-		datasetValues.setType(dataSetType);
 
 		DMSVariableType variableType =
 			this.createVariableType(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha", 4);
@@ -1005,8 +1048,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		variableType.setLocalName("Plot No");
 		typeList.add(variableType);
 
-		return this.manager.addDataSet(studyId, typeList, datasetValues, null);
+		return this.manager.addDataSet(studyId, typeList, datasetValues, null, datasetTypeId);
 	}
+
 	@Test
 	public void testRenameStudy() throws Exception {
 		// Create project record
@@ -1019,11 +1063,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		project = this.manager.getDmsProjectDao().save(project);
 
 		final DatasetReference plotdata =
-			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DataSetType.PLOT_DATA);
-
+			this.addTestDataset(project.getProjectId(), project.getName() + PLOTDATA, DatasetTypeEnum.PLOT_DATA.getId());
 
 		final DatasetReference environment =
-			this.addTestDataset(project.getProjectId(), project.getName() + ENVIRONMENT, DataSetType.SUMMARY_DATA);
+			this.addTestDataset(project.getProjectId(), project.getName() + ENVIRONMENT, DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		final String newStudyName = "newStudyName";
 		this.manager.renameStudy(newStudyName, project.getProjectId(), programUUID);
@@ -1047,7 +1090,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
 		final StudyReference studyReference = this.manager.getStudyReference(studyId);
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());
@@ -1072,7 +1115,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final StudyReference newStudy = this.studyTDI.addTestStudy();
 		final Integer studyId = newStudy.getId();
 		final StudyReference studyReference = this.manager.getStudyReference(studyId);
-		this.studyTDI.addTestDataset(studyId, DataSetType.PLOT_DATA);
+		this.studyTDI.addTestDataset(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 		final Random random = new Random();
 		final String location1 = String.valueOf(random.nextInt());
 		final String season = String.valueOf(random.nextInt());
@@ -1103,6 +1146,14 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, study1.getInstanceMetaData().size());
 		Assert.assertEquals(location1, study1.getInstanceMetaData().get(0).getLocationDbId().toString());
+	}
+
+	@Test
+	public void testIsStudy() {
+		Assert.assertTrue(this.manager.isStudy(this.studyReference.getId()));
+		final String uniqueId = this.commonTestProject.getUniqueID();
+		final DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
+		Assert.assertFalse(this.manager.isStudy(mainFolder.getProjectId()));
 	}
 
 }

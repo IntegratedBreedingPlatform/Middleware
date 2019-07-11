@@ -308,6 +308,8 @@ public interface WorkbenchDataManager {
 	 */
 	List<WorkbenchUser> getAllActiveUsersSorted();
 
+	List<WorkbenchUser> getUsersByCrop(final String cropName);
+
 	/**
 	 * Returns number of all Users.
 	 *

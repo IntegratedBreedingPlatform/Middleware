@@ -15,14 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
-import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -324,7 +323,7 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList);
 
-	
+
 	/**
 	 * Returns all the list of name types available for the given list of gids.
 	 *
@@ -332,7 +331,7 @@ public interface GermplasmDataManager {
 	 * @return List of UserDefinedField POJOs that contains the name types for the given GIDs.
 	 */
 	List<UserDefinedField> getNameTypesByGIDList(List<Integer> gidList);
-	
+
 	/**
 	 * Returns a Map of GIDs to the name values given name type and a list of GIDs.
 	 *
@@ -341,8 +340,8 @@ public interface GermplasmDataManager {
 	 * @return Map<Integer, String> - map of gids to their corresponding name values for the specified name type
 	 */
 	Map<Integer, String> getNamesByTypeAndGIDList(Integer nameType, List<Integer> gidList);
-	
-	
+
+
 	/**
 	 * Returns the Method record identified by the id.
 	 *
@@ -655,7 +654,7 @@ public interface GermplasmDataManager {
 	 * @return The attribute record corresponding to the given id.
 	 */
 	Attribute getAttributeById(Integer id);
-	
+
 	/**
 	 * Given a valid Germplasm object, update the corresponding record in the database.
 	 *
@@ -752,13 +751,12 @@ public interface GermplasmDataManager {
 	List<Location> getAllBreedingLocations();
 
 	/**
-	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix and suffix
+	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix
 	 *
 	 * @param prefix - String used as prefix for Germplasm Names querying
-	 * @param suffix - String used as prefix for Germplasm Names querying
-	 * @return next available sequence number for a germplasm with given prefix and suffix
+	 * @return next available sequence number for a germplasm with given prefix
 	 */
-	String getNextSequenceNumberForCrossName(String prefix, String suffix);
+	String getNextSequenceNumberForCrossName(String prefix);
 
 	/**
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.
@@ -1190,12 +1188,12 @@ public interface GermplasmDataManager {
 
 	GermplasmDTO getGermplasmDTOByGID (Integer gid);
 
-	List<GermplasmDTO> searchGermplasmDTO (GermplasmSearchRequestDTO germplasmSearchRequestDTO);
+	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Integer page, Integer pageSize);
 
-	long countGermplasmDTOs(GermplasmSearchRequestDTO germplasmSearchRequestDTO);
-	
+	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
+
 	Germplasm getUnknownGermplasmWithPreferredName();
-	
+
 	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
 
 }

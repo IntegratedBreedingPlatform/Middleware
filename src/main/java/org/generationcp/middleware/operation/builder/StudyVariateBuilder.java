@@ -29,7 +29,7 @@ public class StudyVariateBuilder extends Builder {
 		VariableTypeList variates = new VariableTypeList();
 		this.addVariates(studyId, variates);
 
-		List<DatasetReference> dataSetReferences = this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		List<DatasetReference> dataSetReferences = this.getDmsProjectDao().getDirectChildDatasetsOfStudy(studyId);
 		for (DatasetReference dataSetReference : dataSetReferences) {
 			this.addVariates(dataSetReference.getId(), variates);
 		}

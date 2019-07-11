@@ -89,7 +89,6 @@
         <mapping class="org.generationcp.middleware.pojos.dms.StockProperty"/>
         <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
         <mapping class="org.generationcp.middleware.pojos.dms.PhenotypeOutlier"/>
-        <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProgramFavorite"/>
 
         <mapping class="org.generationcp.middleware.pojos.mbdt.MBDTProjectData"/>
@@ -106,9 +105,11 @@
         <mapping class="org.generationcp.middleware.pojos.Sample"/>
         <mapping class="org.generationcp.middleware.pojos.SampleList"/>
         <mapping class="org.generationcp.middleware.pojos.dms.StudyType"/>
+        <mapping class="org.generationcp.middleware.pojos.dms.DatasetType"/>
 
         <!-- Derived variables -->
         <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>
 
+        <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
     </session-factory>
 </hibernate-configuration>
