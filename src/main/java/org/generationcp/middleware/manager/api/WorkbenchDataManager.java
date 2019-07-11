@@ -324,8 +324,6 @@ public interface WorkbenchDataManager {
 
 	List<WorkbenchUser> getUsersByCrop(final String cropName);
 
-	List<WorkbenchUser> getUsersByCropFilteringByAdmin(String cropName);
-
 	/**
 	 * Returns number of all Users.
 	 *

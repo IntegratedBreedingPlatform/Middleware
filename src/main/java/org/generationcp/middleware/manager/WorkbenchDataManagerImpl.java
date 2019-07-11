@@ -464,11 +464,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchUser> getUsersByCropFilteringByAdmin(final String cropName) {
-		return this.getWorkbenchUserDao().getUsersByCropFilteringByAdmin(cropName);
-	}
-
-	@Override
 	public long countAllUsers() {
 		return this.getWorkbenchUserDao().countAll();
 	}
