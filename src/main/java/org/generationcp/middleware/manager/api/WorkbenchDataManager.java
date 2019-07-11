@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -411,6 +412,8 @@ public interface WorkbenchDataManager {
 	 */
 	List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName);
 
+	List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(final Long projectId, final String cropName);
+
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
 	 *
@@ -664,8 +667,6 @@ public interface WorkbenchDataManager {
 	 */
 	List<RoleType> getRoleTypes();
 
-	List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(Long projectId, String cropName);
-
 	/**
 	 * Return users with SUPERADMIN role
 	 *
@@ -710,4 +711,6 @@ public interface WorkbenchDataManager {
 	WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(Integer workbenchSidebarCategoryLink);
 
 	List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds);
+
+	void saveOrUpdateUserRole(UserRole userRole);
 }

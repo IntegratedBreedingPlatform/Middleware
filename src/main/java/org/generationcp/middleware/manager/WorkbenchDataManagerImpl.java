@@ -1148,4 +1148,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds){
 		return this.getWorkbenchSidebarCategoryDao().getCategoriesByLinkIds(linkIds);
 	}
+
+	@Override
+	public void saveOrUpdateUserRole(final UserRole userRole) {
+		this.getUserRoleDao().saveOrUpdate(userRole);
+	}
 }
