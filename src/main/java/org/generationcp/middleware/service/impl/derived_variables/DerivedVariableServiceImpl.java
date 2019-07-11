@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,8 +34,8 @@ import java.util.Set;
 
 public class DerivedVariableServiceImpl implements DerivedVariableService {
 
-	protected static final List<Integer> CALCULATED_VARIABLE_VARIABLE_TYPES = Arrays
-		.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId());
+	public static final List<Integer> CALCULATED_VARIABLE_VARIABLE_TYPES = Collections.unmodifiableList(
+		Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 
 	@Autowired
 	private FormulaService formulaService;

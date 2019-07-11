@@ -517,10 +517,9 @@ public class DatasetServiceImpl implements DatasetService {
 					return formula.getTargetCVTerm().getCvTermId();
 				}
 			});
-			if (!targetVariableIds.isEmpty()) {
-				this.daoFactory.getPhenotypeDAO()
-					.updateOutOfSyncPhenotypes(Sets.newHashSet(observationUnitId), Sets.newHashSet(targetVariableIds));
-			}
+			this.daoFactory.getPhenotypeDAO()
+				.updateOutOfSyncPhenotypes(Sets.newHashSet(observationUnitId), Sets.newHashSet(targetVariableIds));
+
 		}
 
 	}
@@ -545,10 +544,8 @@ public class DatasetServiceImpl implements DatasetService {
 					return formula.getTargetCVTerm().getCvTermId();
 				}
 			});
-			if (!targetVariableIds.isEmpty()) {
-				this.daoFactory.getPhenotypeDAO()
-					.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
-			}
+			this.daoFactory.getPhenotypeDAO()
+				.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
 		}
 	}
 
@@ -736,12 +733,12 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 
 			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
-			this.reorganizePhenotypesStatus(studyId, datasetId, draftPhenotypes, allPhenotypes);
+			this.reorganizePhenotypesStatus(studyId, draftPhenotypes, allPhenotypes);
 		}
 	}
 
 	private void reorganizePhenotypesStatus(
-		final Integer studyId, final Integer datasetId, final List<Phenotype> inputPhenotypes, final List<Phenotype> allPhenotypes) {
+		final Integer studyId, final List<Phenotype> inputPhenotypes, final List<Phenotype> allPhenotypes) {
 		final List<MeasurementVariable> measurementVariableList =
 			new ArrayList<MeasurementVariable>(this.derivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId).values());
 
@@ -843,7 +840,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (!selectedPhenotypes.isEmpty()) {
-					this.reorganizePhenotypesStatus(studyId, datasetId, draftPhenotypes, allPhenotypes);
+					this.reorganizePhenotypesStatus(studyId, draftPhenotypes, allPhenotypes);
 				}
 			}
 		}
@@ -884,7 +881,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
-		this.reorganizePhenotypesStatus(studyId, datasetId, phenotypes, allPhenotypes);
+		this.reorganizePhenotypesStatus(studyId, phenotypes, allPhenotypes);
 	}
 
 	@Override
@@ -932,7 +929,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (!draftMode) {
 			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
-			this.reorganizePhenotypesStatus(studyId, datasetId, phenotypes, allPhenotypes);
+			this.reorganizePhenotypesStatus(studyId, phenotypes, allPhenotypes);
 		}
 	}
 
