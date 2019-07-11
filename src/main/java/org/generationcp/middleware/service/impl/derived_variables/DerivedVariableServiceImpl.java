@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
@@ -23,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +32,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class DerivedVariableServiceImpl implements DerivedVariableService {
+
+	public static final List<Integer> CALCULATED_VARIABLE_VARIABLE_TYPES = Arrays
+		.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId());
 
 	@Autowired
 	private FormulaService formulaService;
@@ -73,8 +76,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
 		final List<MeasurementVariable> measurementVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(Arrays.asList(plotDatasetId, datasetId),
-				Arrays
-					.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+				CALCULATED_VARIABLE_VARIABLE_TYPES);
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			variableIds.add(measurementVariable.getTermId());
 		}
@@ -120,7 +122,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 		final List<MeasurementVariable> measurementVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetIds,
-				Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+				CALCULATED_VARIABLE_VARIABLE_TYPES);
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
 		}
@@ -147,8 +149,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			// If dataset is plot dataset, we should get all variables (ENVIRONMENT DETAIL, STUDY_CONDITION and TRAIT) across all datasets in study.
 			measurementVariables =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
-					Arrays
-						.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
+					CALCULATED_VARIABLE_VARIABLE_TYPES);
 		} else {
 			// Else, we assume that the dataset is sub-observation, in that case, we should only get the TRAIT variables within the sub-ob dataset.
 			measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(Arrays.asList(datasetId),
@@ -170,10 +171,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(final Integer studyId, final Integer datasetId,
+	public Map<Integer, VariableDatasetsDTO> createVariableDatasetsMap(final Integer studyId, final Integer datasetId,
 		final Integer variableId) {
 
-		final Map<Integer, Map<String, Object>> inputVariableDatasetMap = new HashMap<>();
+		final Map<Integer, VariableDatasetsDTO> inputVariableDatasetMap = new HashMap<>();
 		final Optional<FormulaDto> formulaDtoOptional = this.formulaService.getByTargetId(variableId);
 		final List<Integer> variableIds = new ArrayList<>();
 
@@ -193,25 +194,20 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		} else {
 			// But if the calculated variable is executed in a sub observation dataset, the system should only read the input variables
 			// contained in the same dataset.
-			//TODO Call the proper method that gets the input variables for calculated variables in subobservations
 			projectProperties = this.daoFactory.getProjectPropertyDAO().getByProjectIdAndVariableIds(datasetId, variableIds);
 		}
-
-		final String variableNameProperty = "variableName";
-		final String datasetsProperty = "datasets";
 
 		for (final ProjectProperty projectProperty : projectProperties) {
 			final Integer projectPropertyVariableId = projectProperty.getVariableId();
 			final DmsProject project = projectProperty.getProject();
 
+			// Create new variableDatasetsDto instance if it's not yet in the map.
 			if (!inputVariableDatasetMap.containsKey(projectPropertyVariableId)) {
-				final Map<String, Object> variableDatasetInfo = new HashMap<>();
-				variableDatasetInfo.put(variableNameProperty, projectProperty.getAlias());
-				variableDatasetInfo.put(datasetsProperty, new ArrayList<DatasetReference>());
-				inputVariableDatasetMap.put(projectPropertyVariableId, variableDatasetInfo);
+				final VariableDatasetsDTO variableDatasetsDTO = new VariableDatasetsDTO();
+				variableDatasetsDTO.setVariableName(projectProperty.getAlias());
+				inputVariableDatasetMap.put(projectPropertyVariableId, variableDatasetsDTO);
 			}
-			final List<DatasetReference> datasets = (List<DatasetReference>) inputVariableDatasetMap.get(projectPropertyVariableId).get(
-				datasetsProperty);
+			final List<DatasetReference> datasets = inputVariableDatasetMap.get(projectPropertyVariableId).getDatasets();
 			datasets.add(new DatasetReference(project.getProjectId(), project.getName()));
 		}
 

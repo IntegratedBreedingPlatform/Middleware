@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.derived_variables;
 
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 
@@ -53,5 +54,5 @@ public interface DerivedVariableService {
 	Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMapInStudy(final int studyId);
 
 
-	Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(Integer studyId, Integer datasetId, Integer variableId);
+	Map<Integer, VariableDatasetsDTO> createVariableDatasetsMap(Integer studyId, Integer datasetId, Integer variableId);
 }
