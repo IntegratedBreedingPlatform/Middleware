@@ -218,18 +218,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetDatasetsByStudy() {
-		final String studyName = "Study1";
-		final String programUUID = UUID.randomUUID().toString();
-
-		final DmsProject study = this.createProject(studyName, programUUID);
-		final DmsProject plot = this.createDataset(studyName + " - Plot Dataset", programUUID, DatasetTypeEnum.PLOT_DATA.getId(), study, study);
-		final List<DmsProject> datasets = this.dmsProjectDao.getDatasetsByStudy(study.getProjectId());
-		Assert.assertEquals(1, datasets.size());
-		Assert.assertEquals(plot, datasets.get(0));
-	}
-
-	@Test
 	public void testGetProjectIdByStudyDbId() {
 
 		final String studyName = "Study1";

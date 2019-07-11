@@ -50,9 +50,8 @@ public interface DerivedVariableService {
 	 * @param studyId
 	 * @return
 	 */
-	Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int studyId);
+	Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMapInStudy(final int studyId);
 
-	Set<Integer> extractVariableIdsFromDataset(final Integer studyId, final Integer datasetId);
 
 	Map<Integer, Map<String, Object>> createInputVariableDatasetReferenceMap(Integer studyId, Integer datasetId, Integer variableId);
 }

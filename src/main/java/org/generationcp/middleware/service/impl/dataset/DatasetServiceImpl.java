@@ -743,7 +743,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private void reorganizePhenotypesStatus(
 		final Integer studyId, final Integer datasetId, final List<Phenotype> inputPhenotypes, final List<Phenotype> allPhenotypes) {
 		final List<MeasurementVariable> measurementVariableList =
-			new ArrayList<MeasurementVariable>(this.derivedVariableService.createVariableIdMeasurementVariableMap(studyId).values());
+			new ArrayList<MeasurementVariable>(this.derivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId).values());
 
 		if (!measurementVariableList.isEmpty()) {
 			final Map<Integer, List<Integer>> formulasMap = this.getTargetsByInput(measurementVariableList);

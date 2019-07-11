@@ -1,9 +1,12 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
+import com.google.common.base.Optional;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,16 +110,16 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int studyId) {
+	public Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMapInStudy(final int studyId) {
 		final Map<Integer, MeasurementVariable> variableIdMeasurementVariableMap = new HashMap<>();
 
-		final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getDatasetsByStudy(studyId);
-		final List<Integer> projectIds = new ArrayList<>();
-		for (final DmsProject dmsProject : projects) {
-			projectIds.add(dmsProject.getProjectId());
+		final List<DatasetDTO> projects = this.daoFactory.getDmsProjectDAO().getDatasets(studyId);
+		final List<Integer> datasetIds = new ArrayList<>();
+		for (final DatasetDTO datasetDTO : projects) {
+			datasetIds.add(datasetDTO.getDatasetId());
 		}
 		final List<MeasurementVariable> measurementVariables =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(projectIds,
+			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetIds,
 				Arrays.asList(VariableType.TRAIT.getId(), VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.STUDY_CONDITION.getId()));
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
@@ -123,18 +127,17 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return variableIdMeasurementVariableMap;
 	}
 
-	@Override
-	public Set<Integer> extractVariableIdsFromDataset(final Integer studyId, final Integer datasetId) {
+	protected Set<Integer> extractVariableIdsFromDataset(final Integer studyId, final Integer datasetId) {
 
 		final Set<Integer> variableIds = new HashSet<>();
 
 		boolean isPlotDataset = false;
-		final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getDatasetsByStudy(studyId);
+		final List<DatasetDTO> projects = this.daoFactory.getDmsProjectDAO().getDatasets(studyId);
 		final List<Integer> projectIds = new ArrayList<>();
-		for (final DmsProject dmsProject : projects) {
-			projectIds.add(dmsProject.getProjectId());
-			if (dmsProject.getProjectId().equals(datasetId)
-				&& dmsProject.getDatasetType().getDatasetTypeId().intValue() == DatasetTypeEnum.PLOT_DATA.getId()) {
+		for (final DatasetDTO datasetDTO : projects) {
+			projectIds.add(datasetDTO.getDatasetId());
+			if (datasetDTO.getDatasetId().equals(datasetId)
+				&& datasetDTO.getDatasetTypeId().intValue() == DatasetTypeEnum.PLOT_DATA.getId()) {
 				isPlotDataset = true;
 			}
 		}
@@ -171,18 +174,25 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Integer variableId) {
 
 		final Map<Integer, Map<String, Object>> inputVariableDatasetMap = new HashMap<>();
-		final Set<FormulaVariable> formulaVariables =
-			this.formulaService.getAllFormulaVariables(new HashSet<>(Arrays.asList(variableId)));
+		final Optional<FormulaDto> formulaDtoOptional = this.formulaService.getByTargetId(variableId);
 		final List<Integer> variableIds = new ArrayList<>();
-		for (final FormulaVariable formulaVariable : formulaVariables) {
-			variableIds.add(formulaVariable.getId());
+
+		if (formulaDtoOptional.isPresent()) {
+			for (final FormulaVariable formulaVariable : formulaDtoOptional.get().getInputs()) {
+				variableIds.add(formulaVariable.getId());
+			}
 		}
-		Integer plotDatasetId =
+
+		final Integer plotDatasetId =
 			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 		final List<ProjectProperty> projectProperties;
+
+		// if the calculated variable is executed from a plot dataset, the system should be able to read all input variables added in a study
 		if (plotDatasetId.equals(datasetId)) {
 			projectProperties = this.daoFactory.getProjectPropertyDAO().getByStudyAndStandardVariableIds(studyId, variableIds);
 		} else {
+			// But if the calculated variable is executed in a sub observation dataset, the system should only read the input variables
+			// contained in the same dataset.
 			//TODO Call the proper method that gets the input variables for calculated variables in subobservations
 			projectProperties = this.daoFactory.getProjectPropertyDAO().getByProjectIdAndVariableIds(datasetId, variableIds);
 		}

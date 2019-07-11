@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -74,13 +75,7 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 		List<Formula> formulas = new ArrayList<>();
 
 		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("inputs", "input");
-			criteria.add(Restrictions.eq("input.cvTermId", inputId));
-			criteria.setFetchMode("inputs", FetchMode.JOIN);
-
-			formulas = criteria.list();
-
+			formulas = this.getByInputIds(Collections.singletonList(inputId));
 		} catch (final HibernateException e) {
 			final String message = "Error in getByInputId(" + inputId + ")";
 			FormulaDAO.LOG.error(message, e);
@@ -91,7 +86,7 @@ public class FormulaDAO extends GenericDAO<Formula, Integer> {
 	}
 
 	/**
-	 * Get active and inactive. This is useful to identify where an input is used, and it's necessary to know it even for inactive formulas
+	 * Get active and inactive. This is useful to identify where an input are used, and it's necessary to know it even for inactive formulas
 	 */
 	public List<Formula> getByInputIds(final List<Integer> inputIds) {
 

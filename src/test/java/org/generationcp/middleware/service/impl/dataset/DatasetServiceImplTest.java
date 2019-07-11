@@ -630,7 +630,7 @@ public class DatasetServiceImplTest {
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
-		Mockito.when(this.derivedVariableService.createVariableIdMeasurementVariableMap(studyId)).thenReturn(new HashMap<Integer, MeasurementVariable>());
+		Mockito.when(this.derivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId)).thenReturn(new HashMap<Integer, MeasurementVariable>());
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		this.datasetService.acceptAllDatasetDraftData(studyId, datasetId);
 

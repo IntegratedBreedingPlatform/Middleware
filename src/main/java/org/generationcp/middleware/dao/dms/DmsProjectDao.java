@@ -323,19 +323,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<DmsProject> getDatasetsByStudy(final Integer studyId) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("study.projectId", studyId));
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				"Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
-		}
-	}
-
 	public List<DmsProject> getByIds(final Collection<Integer> projectIds) {
 		final List<DmsProject> studyNodes = new ArrayList<>();
 		try {
@@ -1178,7 +1165,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<DatasetDTO> getDatasets(final Integer parentId) {
+	public List<DatasetDTO> getDatasets(final Integer studyId) {
 		final List<DatasetDTO> datasetDTOS;
 		try {
 
@@ -1191,13 +1178,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.datasetType", "dt");
 			criteria.createAlias("project.study", "study");
-			criteria.add(Restrictions.eq("study.projectId", parentId));
+			criteria.add(Restrictions.eq("study.projectId", studyId));
 			criteria.setProjection(projectionList);
 			criteria.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class));
 			datasetDTOS = criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getDatasets for studyId=" + parentId + ":" + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error getting getDatasets for studyId=" + studyId + ":" + e.getMessage(), e);
 		}
 		return datasetDTOS;
 

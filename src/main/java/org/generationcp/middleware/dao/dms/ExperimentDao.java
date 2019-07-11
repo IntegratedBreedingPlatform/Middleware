@@ -881,7 +881,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "CASE WHEN e.parent_id IS NULL THEN e.nd_experiment_id ELSE e.parent_id END as `experimentId`,\n"
 			+ "p.observable_id as `variableId`, \n"
 			+ "p.value \n"
-			+ "FROM ibdbv2_maize_merged.nd_experiment e \n"
+			+ "FROM nd_experiment e \n"
 			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
 			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id \n"
 			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) AND (");
