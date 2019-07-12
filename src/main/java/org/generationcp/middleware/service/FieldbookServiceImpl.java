@@ -72,7 +72,6 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.FlushMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -243,19 +242,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
-		}
-	}
-
-	//TODO find a better way to mark variable as OUT_OF_SYNC when inputs are deleted
-	@Override
-	public void updatePhenotypeStatus(final List<MeasurementRow> observations) {
-		final List<MeasurementData> measurementDataList = this.getChangedFormulaObservations(observations);
-		for (final MeasurementData measurementData: measurementDataList) {
-			final Phenotype phenotype = this.getPhenotypeDao().getById(measurementData.getPhenotypeId());
-			if (phenotype != null) {
-				phenotype.setValueStatus(measurementData.getValueStatus());
-				this.getPhenotypeDao().saveOrUpdate(phenotype);
-			}
 		}
 	}
 
