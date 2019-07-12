@@ -20,6 +20,7 @@ public class DatasetDTO implements Serializable {
 	private List<StudyInstance> instances;
 	private List<MeasurementVariable> variables;
 	private Boolean hasPendingData;
+	private Boolean hasOutOfSyncData;
 
 	public DatasetDTO(){
 
@@ -84,6 +85,14 @@ public class DatasetDTO implements Serializable {
 
 	public void setHasPendingData(final Boolean hasPendingData) {
 		this.hasPendingData = hasPendingData;
+	}
+
+	public Boolean getHasOutOfSyncData() {
+		return this.hasOutOfSyncData;
+	}
+
+	public void setHasOutOfSyncData(final Boolean hasOutOfSyncData) {
+		this.hasOutOfSyncData = hasOutOfSyncData;
 	}
 
 	@Override

@@ -45,6 +45,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -130,6 +131,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private DerivedVariableService derivedVariableService;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -373,11 +377,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds) {
+
+		final Map<Integer, Long> countOutOfSyncPerDatasetMap =
+			this.daoFactory.getPhenotypeDAO().countOutOfSyncDataOfDatasetsInStudy(parentId);
 		final List<DatasetDTO> datasetDTOs = this.daoFactory.getDmsProjectDAO().getDatasets(parentId);
 
 		for (final DatasetDTO datasetDTO : datasetDTOs) {
 			if (datasetTypeIds.isEmpty() || datasetTypeIds.contains(datasetDTO.getDatasetTypeId())) {
-				datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetDTO.getDatasetId()) > 0);
+				final Integer datasetId = datasetDTO.getDatasetId();
+				datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetId) > 0);
+				datasetDTO.setHasOutOfSyncData(
+					countOutOfSyncPerDatasetMap.containsKey(datasetId) ? countOutOfSyncPerDatasetMap.get(datasetDTO.getDatasetId()) > 0 :
+						Boolean.FALSE);
 				filtered.add(datasetDTO);
 			}
 		}
@@ -432,7 +443,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
 
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
-		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+		this.updateDependentPhenotypesAsOutOfSync(observableId, observationUnitId);
 
 		observation.setObservationId(savedRecord.getPhenotypeId());
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -464,7 +475,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (!observationDto.isDraftMode()) {
 			// Also update the status of phenotypes of the same observation unit for variables using it as input variable
-			this.updateDependentPhenotypesStatus(observableId, observationDto.getObservationUnitId());
+			this.updateDependentPhenotypesAsOutOfSync(observableId, observationDto.getObservationUnitId());
 		}
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -492,11 +503,8 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	/*
-	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
-	 */
 	@Override
-	public void updateDependentPhenotypesStatus(final Integer variableId, final Integer observationUnitId) {
+	public void updateDependentPhenotypesAsOutOfSync(final Integer variableId, final Integer observationUnitId) {
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
 		if (!formulaList.isEmpty()) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
@@ -506,9 +514,36 @@ public class DatasetServiceImpl implements DatasetService {
 					return formula.getTargetCVTerm().getCvTermId();
 				}
 			});
-			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitId, targetVariableIds);
+			this.daoFactory.getPhenotypeDAO()
+				.updateOutOfSyncPhenotypes(Sets.newHashSet(observationUnitId), Sets.newHashSet(targetVariableIds));
+
 		}
 
+	}
+
+	@Override
+	public void updateOutOfSyncPhenotypes(final Set<Integer> targetVariableIds, final Set<Integer> observationUnitIds) {
+		if (!targetVariableIds.isEmpty()) {
+			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds);
+		}
+
+	}
+
+	@Override
+	public void updateDependentPhenotypesStatusByGeolocation(final Integer geolocation, final List<Integer> variableIds) {
+
+		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputIds(variableIds);
+		if (!formulaList.isEmpty()) {
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
+
+				@Override
+				public Integer apply(final Formula formula) {
+					return formula.getTargetCVTerm().getCvTermId();
+				}
+			});
+			this.daoFactory.getPhenotypeDAO()
+				.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
+		}
 	}
 
 	@Override
@@ -519,6 +554,7 @@ public class DatasetServiceImpl implements DatasetService {
 			datasetDTO.setVariables(
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.DATASET_VARIABLE_TYPES));
 			datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetId) > 0);
+			datasetDTO.setHasOutOfSyncData(this.daoFactory.getPhenotypeDAO().hasOutOfSync(datasetId));
 		}
 
 		return datasetDTO;
@@ -588,24 +624,24 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.studyService.getAdditionalDesignFactors(studyId);
 	}
 
-	List<String> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
+	List<MeasurementVariableDto> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
 			.getObservationSetVariables(trialDatasetId, Lists.<Integer>newArrayList(VariableType.STUDY_CONDITION.getId()));
-		final List<String> factors = new ArrayList<>();
+		final List<MeasurementVariableDto> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentConditions) {
-			factors.add(variable.getName());
+			factors.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
 		}
 		return factors;
 	}
 
-	List<String> findAdditionalEnvironmentFactors(final Integer trialDatasetId) {
+	List<MeasurementVariableDto> findAdditionalEnvironmentFactors(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentDetailsVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(trialDatasetId, Lists.newArrayList(
 				VariableType.ENVIRONMENT_DETAIL.getId()));
-		final List<String> factors = new ArrayList<>();
+		final List<MeasurementVariableDto> factors = new ArrayList<>();
 		for (final MeasurementVariable variable : environmentDetailsVariables) {
 			if (!STANDARD_ENVIRONMENT_FACTORS.contains(variable.getTermId())) {
-				factors.add(variable.getName());
+				factors.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
 			}
 		}
 		return factors;
@@ -639,7 +675,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
 
 		// Also update the status of phenotypes of the same observation unit for variables using the trait as input variable
-		this.updateDependentPhenotypesStatus(observableId, observationUnitId);
+		this.updateDependentPhenotypesAsOutOfSync(observableId, observationUnitId);
 	}
 
 	@Override
@@ -678,16 +714,15 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void reorganizePhenotypesStatus(
-		final Integer datasetId, final List<Phenotype> inputPhenotypes, final List<Phenotype> allPhenotypes) {
+		final Integer studyId, final List<Phenotype> inputPhenotypes) {
 		final List<MeasurementVariable> measurementVariableList =
-			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
+			new ArrayList<MeasurementVariable>(this.derivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId).values());
 
 		if (!measurementVariableList.isEmpty()) {
 			final Map<Integer, List<Integer>> formulasMap = this.getTargetsByInput(measurementVariableList);
 			this.setMeasurementDataAsOutOfSync(
 				formulasMap,
-				Sets.newHashSet(inputPhenotypes),
-				Sets.newHashSet(allPhenotypes));
+				Sets.newHashSet(inputPhenotypes));
 		}
 	}
 
@@ -740,9 +775,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptAllDatasetDraftData(final Integer datasetId) {
-		final PhenotypeDao phenotypeDAO = this.daoFactory.getPhenotypeDAO();
-		final List<Phenotype> draftPhenotypes = phenotypeDAO.getDatasetDraftData(datasetId);
+	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
+
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
 		if (!draftPhenotypes.isEmpty()) {
 
@@ -755,17 +790,15 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 
-			final List<Phenotype> allPhenotypes = phenotypeDAO.getPhenotypes(datasetId);
-			this.reorganizePhenotypesStatus(datasetId, draftPhenotypes, allPhenotypes);
+			this.reorganizePhenotypesStatus(studyId, draftPhenotypes);
 		}
 	}
 
 	@Override
-	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer datasetId) {
+	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
 		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
 		if (!draftPhenotypes.isEmpty()) {
-			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
 			final List<MeasurementVariable>
 				measurementVariableList =
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
@@ -802,7 +835,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (!selectedPhenotypes.isEmpty()) {
-					this.reorganizePhenotypesStatus(datasetId, draftPhenotypes, allPhenotypes);
+					this.reorganizePhenotypesStatus(studyId, draftPhenotypes);
 				}
 			}
 		}
@@ -847,8 +880,7 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 
-		final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
-		this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
+		this.reorganizePhenotypesStatus(studyId, phenotypes);
 	}
 
 	@Override
@@ -900,8 +932,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		if (!draftMode) {
-			final List<Phenotype> allPhenotypes = this.daoFactory.getPhenotypeDAO().getPhenotypes(datasetId);
-			this.reorganizePhenotypesStatus(datasetId, phenotypes, allPhenotypes);
+			this.reorganizePhenotypesStatus(studyId, phenotypes);
 		}
 	}
 
@@ -1022,8 +1053,7 @@ public class DatasetServiceImpl implements DatasetService {
 					datasetPhenotypes.addAll(phenotypes);
 					this.setMeasurementDataAsOutOfSync(
 						formulasMap, //
-						Sets.newHashSet(phenotypes), //
-						Sets.newHashSet(datasetPhenotypes));
+						Sets.newHashSet(phenotypes));
 				}
 			}
 		}
@@ -1077,8 +1107,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void setMeasurementDataAsOutOfSync(
 		final Map<Integer, List<Integer>> targetsByInput,
-		final Set<Phenotype> inputPhenotypes,
-		final Set<Phenotype> datasetPhenotypes) {
+		final Set<Phenotype> inputPhenotypes) {
 
 		if (!targetsByInput.isEmpty()) {
 			final Set<Integer> observationUnitIdOutOfSync = new HashSet<>();
@@ -1094,15 +1123,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 
-			for (final Phenotype datasetPhenotype : datasetPhenotypes) {
-				if (targetVariableIdOutOfSync.contains(datasetPhenotype.getObservableId())
-					&& observationUnitIdOutOfSync.contains(datasetPhenotype.getExperiment().getNdExperimentId())) {
-
-					datasetPhenotype.setValueStatus(Phenotype.ValueStatus.OUT_OF_SYNC);
-					this.daoFactory.getPhenotypeDAO().saveOrUpdate(datasetPhenotype);
-				}
-
-			}
+			this.updateOutOfSyncPhenotypes(targetVariableIdOutOfSync, observationUnitIdOutOfSync);
 		}
 	}
 

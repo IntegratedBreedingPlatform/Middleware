@@ -1362,7 +1362,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "  FROM germplsm g " //
 				+ "  	LEFT JOIN reflinks reference ON reference.brefid = g.gref " //
 				+ "  	LEFT join methods m ON g.methn = m.mid " //
-				+ "		LEFT JOIN listdata l on l.gid = g.gid " //
 				+ "	 WHERE g.deleted = 0" //
 				+ "      AND g.grplce = 0"; //
 

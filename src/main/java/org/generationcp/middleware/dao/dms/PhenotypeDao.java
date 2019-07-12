@@ -41,6 +41,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.BooleanType;
@@ -1144,16 +1145,31 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final BigInteger result = (BigInteger) query.uniqueResult();
 		return result.intValue() > 0;
 	}
-	
-	public void updateOutOfSyncPhenotypes(final Integer experimentId, final List<Integer> targetVariableIds) {
-		final String sql = "UPDATE phenotype pheno "
-				+ "SET pheno.status = :status "
-				+ " WHERE pheno.nd_experiment_id = :experimentId " 
-				+ " AND pheno.observable_id in (:variableIds) ";
+
+	public void updateOutOfSyncPhenotypes(final Set<Integer> experimentIds, final Set<Integer> targetVariableIds) {
+		final String sql = "UPDATE nd_experiment experiment\n"
+			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
+			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
+			+ "SET pheno.status = :status \n"
+			+ "WHERE experiment.nd_experiment_id in (:experimentIds)  AND pheno.observable_id in (:variableIds) ;";
 
 		final SQLQuery statement = this.getSession().createSQLQuery(sql);
 		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
-		statement.setParameter("experimentId", experimentId);
+		statement.setParameterList("experimentIds", experimentIds);
+		statement.setParameterList("variableIds", targetVariableIds);
+		statement.executeUpdate();
+	}
+
+	public void updateOutOfSyncPhenotypesByGeolocation(final int geoLocationId, final Set<Integer> targetVariableIds) {
+		final String sql = "UPDATE nd_experiment experiment\n"
+			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
+			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
+			+ "SET pheno.status = :status \n"
+			+ "WHERE experiment.nd_geolocation_id = :geoLocationId  AND pheno.observable_id in (:variableIds) ;";
+
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
+		statement.setParameter("geoLocationId", geoLocationId);
 		statement.setParameterList("variableIds", targetVariableIds);
 		statement.executeUpdate();
 	}
@@ -1200,6 +1216,25 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		criteria.setProjection(Projections.rowCount());
 		final Long count = (Long) criteria.uniqueResult();
 		return count;
+	}
+
+	public Map<Integer, Long> countOutOfSyncDataOfDatasetsInStudy(final Integer studyId) {
+		final Map<Integer, Long> countOutOfSyncPerProjectMap = new HashMap<>();
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("experiment", "experiment");
+		criteria.createAlias("experiment.project", "project");
+		criteria.createAlias("project.study", "study");
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.add(Restrictions.eq("valueStatus", ValueStatus.OUT_OF_SYNC));
+		final ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(Projections.groupProperty("project.projectId"))
+			.add(Projections.rowCount());
+		criteria.setProjection(projectionList);
+		final List<Object[]> results = criteria.list();
+		for (final Object[] row : results) {
+			countOutOfSyncPerProjectMap.put((Integer) row[0], (Long) row[1]);
+		}
+		return countOutOfSyncPerProjectMap;
 	}
 
 	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {

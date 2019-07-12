@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	public static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
+	static final String SQL_GET_SAMPLED_OBSERVATION_BY_STUDY = " SELECT " +
 		" experiment.nd_experiment_id, " +
 		" sample.sample_id," +
 		" sample.sample_no " +
@@ -454,7 +456,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			if (returnVal == null) {
 				return 0;
 			} else {
-				return returnVal.intValue();
+				return returnVal;
 			}
 
 		} catch (final HibernateException e) {
@@ -877,6 +879,62 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int studyId, final List<Integer> datasetTypeIds,
+		final Map<Integer, Integer> inputVariableDatasetMap) {
+
+		final StringBuilder queryString = new StringBuilder("SELECT \n"
+			+ "CASE WHEN e.parent_id IS NULL THEN e.nd_experiment_id ELSE e.parent_id END as `experimentId`,\n"
+			+ "p.observable_id as `variableId`, \n"
+			+ "p.value \n"
+			+ "FROM nd_experiment e \n"
+			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
+			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id \n"
+			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) ");
+
+		if (!inputVariableDatasetMap.isEmpty()) {
+			queryString.append("AND (");
+			final Iterator<Map.Entry<Integer, Integer>> iterator = inputVariableDatasetMap.entrySet().iterator();
+			while (iterator.hasNext()) {
+				final Map.Entry<Integer, Integer> entry = iterator.next();
+				queryString.append(String.format("(p.observable_id = %s AND e.project_id = %s %n)", entry.getKey(), entry.getValue()));
+				if (iterator.hasNext()) {
+					queryString.append(" OR ");
+				} else {
+					queryString.append(") \n");
+				}
+			}
+		}
+
+		queryString.append("ORDER BY `experimentId`, `variableId` ;");
+
+		final SQLQuery q = this.getSession().createSQLQuery(queryString.toString());
+		q.addScalar("experimentId", new IntegerType());
+		q.addScalar("variableId", new StringType());
+		q.addScalar("value", new StringType());
+		q.setParameter("studyId", studyId);
+		q.setParameterList("datasetTypeIds", datasetTypeIds);
+		q.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = q.list();
+
+		final Map<Integer, Map<String, List<Object>>> map = new HashMap<>();
+
+		for (final Map<String, Object> row : results) {
+			final Integer experimentId = (Integer) row.get("experimentId");
+			final String variableId = (String) row.get("variableId");
+			final Object value = row.get("value");
+			if (!map.containsKey(experimentId)) {
+				map.put(experimentId, new HashMap<String, List<Object>>());
+			}
+			if (!map.get(experimentId).containsKey(variableId)) {
+				map.get(experimentId).put(variableId, new ArrayList<Object>());
+			}
+			// Group values per variable and experimentId.
+			map.get(experimentId).get(variableId).add(value);
+		}
+
+		return map;
 	}
 
 }

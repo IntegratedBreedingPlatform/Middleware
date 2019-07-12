@@ -10,6 +10,7 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
@@ -17,8 +18,10 @@ import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
@@ -31,10 +34,13 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +51,7 @@ import java.util.UUID;
 public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 	private static final int NO_OF_GERMPLASM = 5;
-	public static final int STUDY_TYPE_ID = 6;
+	private static final int STUDY_TYPE_ID = 6;
 
 	private ExperimentPropertyDao experimentPropertyDao;
 
@@ -69,7 +75,15 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 	private SampleDao sampleDao;
 
+	private ProjectPropertyDao projectPropDao;
+
+	private CVTermDao cvTermDao;
+
 	private DmsProject study;
+
+	private DmsProject plot;
+
+	private IntegrationTestDataInitializer testDataInitializer;
 
 	@Before
 	public void setUp() {
@@ -126,8 +140,27 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.sampleListDao.setSession(this.sessionProvder.getSession());
 		}
 
+		if (this.projectPropDao == null) {
+			this.projectPropDao = new ProjectPropertyDao();
+			this.projectPropDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.cvTermDao == null) {
+			this.cvTermDao = new CVTermDao();
+			this.cvTermDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if(this.testDataInitializer == null ) {
+			this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder);
+		}
+
 		if (this.study == null) {
 			this.study = this.createProject("Study " + UUID.randomUUID().toString(), UUID.randomUUID().toString());
+		}
+
+		if(this.plot == null) {
+			this.plot = this.testDataInitializer
+				.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
 		}
 	}
 
@@ -352,6 +385,19 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(idList.contains(dataset1.getProjectId()));
 		Assert.assertTrue(idList.contains(dataset2.getProjectId()));
 		Assert.assertFalse(idList.contains(subobsDataset.getProjectId()));
+	}
+
+	@Test
+	public void testGetObservationSetVariables() {
+		final int variableId = 8206;
+		final DmsProject plantSubObsDataset =
+			this.testDataInitializer.createDmsProject("Plant SubObs Dataset", "Plot Dataset-Description", this.study, this.plot,
+				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
+		this.testDataInitializer.addProjectProp(plantSubObsDataset, variableId, "PLANT_NO", VariableType.OBSERVATION_UNIT, "", 1);
+		this.sessionProvder.getSession().flush();
+		final List<MeasurementVariable> measurementVariables = this.dmsProjectDao.getObservationSetVariables(plantSubObsDataset.getProjectId(), Lists.newArrayList(VariableType.OBSERVATION_UNIT.getId()));
+		Assert.assertEquals(1, measurementVariables.size());
+		Assert.assertEquals(variableId, measurementVariables.get(0).getTermId());
 	}
 
 	@Test

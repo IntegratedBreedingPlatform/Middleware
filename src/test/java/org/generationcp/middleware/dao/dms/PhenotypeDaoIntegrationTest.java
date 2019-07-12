@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -295,21 +296,35 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.phenotypeDao.deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
 		Assert.assertEquals(0, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 	}
-	
+
 	@Test
-	public void testUpdateOutOfSyncPhenotypes(){
-		this.createEnvironmentData(1, true);	
+	public void testUpdateOutOfSyncPhenotypes() {
+		this.createEnvironmentData(1, true);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		final Integer datasetId = this.study.getProjectId();
 		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
-		
-		this.phenotypeDao.updateOutOfSyncPhenotypes(experimentId, Arrays.asList(variableId));
+
+		this.phenotypeDao
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
 		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
 		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());
 	}
-	
+
+	@Test
+	public void testUpdateOutOfSyncPhenotypesByGeolocation() {
+		final Integer geolocationId = this.createEnvironmentData(1, true);
+		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
+		final Integer variableId = this.trait.getCvTermId();
+		final Integer datasetId = this.study.getProjectId();
+		Assert.assertFalse(this.phenotypeDao.hasOutOfSync(datasetId));
+		this.phenotypeDao.updateOutOfSyncPhenotypesByGeolocation(geolocationId, new HashSet<>(Arrays.asList(variableId)));
+		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
+		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
+		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());
+	}
+
 	@Test
 	public void testIsValidPhenotype() {
 		this.createEnvironmentData(1, true);
@@ -317,6 +332,25 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer phenotypeId = this.phenotypes.get(0).getPhenotypeId();
 		Assert.assertNotNull(this.phenotypeDao.getPhenotype(experimentId,  phenotypeId));
 		Assert.assertNull(this.phenotypeDao.getPhenotype(experimentId + 1,  phenotypeId));
+	}
+
+	@Test
+	public void testCountOutOfSyncDataOfDatasetsInStudy() {
+		final String uniqueID = this.commonTestProject.getUniqueID();
+		final DmsProject plot =
+			this.createDataset(this.study.getName() + " - Plot Dataset", uniqueID, DatasetTypeEnum.PLOT_DATA.getId(),
+				study, study);
+
+		final List<Integer> traitIds = Arrays.asList(trait.getCvTermId());
+		this.createProjectProperties(plot, traitIds);
+		this.createEnvironmentData(plot, 1, traitIds);
+		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
+		final Integer variableId = this.trait.getCvTermId();
+		this.phenotypeDao
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
+		final Map<Integer, Long> outOfSyncMap = this.phenotypeDao.countOutOfSyncDataOfDatasetsInStudy(study.getProjectId());
+		Assert.assertNotNull(outOfSyncMap.get(plot.getProjectId()));
+		Assert.assertEquals(new Long(1), outOfSyncMap.get(plot.getProjectId()));
 	}
 
 	@Test
@@ -414,7 +448,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createProjectProperties(final DmsProject project, final List<Integer> traitIds) {
-		Integer rank = 1;
+		int rank = 1;
 		for (final Integer traitId : traitIds) {
 			final ProjectProperty projectProp = new ProjectProperty();
 			projectProp.setAlias(traitId.toString());
