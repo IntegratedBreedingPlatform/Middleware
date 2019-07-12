@@ -95,21 +95,22 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "    GROUP BY users.userid";
 
 	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID =
-			"SELECT DISTINCT users.userid "
-				+ "    FROM "
-				+ "       workbench_project p "
-				+ "           INNER JOIN "
-				+ "       workbench_crop wc ON p.crop_type = wc.crop_name "
-				+ "           INNER JOIN "
-				+ "       users_crops uc ON uc.crop_name = wc.crop_name "
-				+ "           INNER JOIN "
-				+ "       users_roles ur ON ur.userid = uc.user_id "
-				+ "           INNER JOIN "
-				+ "       users ON uc.user_id = users.userid "
-				+ "           INNER JOIN role r ON ur.role_id = r.id  "
-				+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id)es   "
-				+ "    AND p.project_id = :projectId "
-				+ "  AND users.ustatus = 0 ";
+		"SELECT DISTINCT users.userid "
+			+ "    FROM "
+			+ "       workbench_project p "
+			+ "           INNER JOIN "
+			+ "       workbench_crop wc ON p.crop_type = wc.crop_name "
+			+ "           INNER JOIN "
+			+ "       users_crops uc ON uc.crop_name = wc.crop_name "
+			+ "           INNER JOIN "
+			+ "       users_roles ur ON ur.userid = uc.user_id "
+			+ "           INNER JOIN "
+			+ "       users ON uc.user_id = users.userid "
+			+ "           INNER JOIN role r ON ur.role_id = r.id  "
+			+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId()
+			+ " 			AND ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id) "
+			+ "    	AND p.project_id = :projectId "
+			+ "  	AND users.ustatus = 0 ";
 
 	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID_FILTERING_SUPERADMIN =
 		"SELECT DISTINCT users.userid "
