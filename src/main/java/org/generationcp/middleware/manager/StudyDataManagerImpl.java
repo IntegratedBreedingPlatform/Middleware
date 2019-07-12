@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.base.Function;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -62,7 +61,6 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -1053,29 +1051,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Phenotype getPhenotypeById(final int phenotypeId) {
 		return this.getPhenotypeDao().getById(phenotypeId);
-	}
-
-	@Override
-	public void saveOrUpdatePhenotypeValue(
-		final int experimentId, final int variableId, final String value,
-		final Phenotype existingPhenotype, final int dataTypeId, final Phenotype.ValueStatus valueStatus) {
-		this.getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId, valueStatus);
-		this.updateDependentPhenotypesStatus(variableId, experimentId);
-	}
-
-	void updateDependentPhenotypesStatus(final Integer variableId, final Integer experimentId) {
-		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
-		if (!formulaList.isEmpty()) {
-			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
-
-				@Override
-				public Integer apply(final Formula formula) {
-					return formula.getTargetCVTerm().getCvTermId();
-				}
-			});
-			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(experimentId, targetVariableIds);
-		}
-
 	}
 
 	@Override

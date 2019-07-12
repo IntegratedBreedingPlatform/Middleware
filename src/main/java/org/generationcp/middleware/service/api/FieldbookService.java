@@ -977,8 +977,6 @@ public interface FieldbookService {
 	
 	Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(String studyName, String programUUID);
 
-	void updatePhenotypeStatus(final List<MeasurementRow> observations);
-
 	Boolean hasOutOfSyncObservations(Integer id);
 
 

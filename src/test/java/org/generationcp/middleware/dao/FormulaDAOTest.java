@@ -54,14 +54,22 @@ public class FormulaDAOTest extends IntegrationTestBase {
 
 		Assert.assertThat("Should have removed input", savedFormula2.getInputs().size(), Matchers.is(1));
 	}
-	
+
 	@Test
 	public void testGetByTargetVariableId() {
 		final Formula formula = saveTestFormula();
 		final Formula retrievedFormula = this.formulaDAO.getByTargetVariableId(this.targetCVTerm.getCvTermId());
 		Assert.assertThat("Should retrieve created formula by target variable ID", retrievedFormula, Matchers.equalTo(formula));
 	}
-	
+
+	@Test
+	public void testGetByInputIds() {
+		final Formula savedFormula = saveTestFormula();
+		this.sessionProvder.getSession().flush();
+		final List<Formula> retrievedFormulas = this.formulaDAO.getByInputIds(Arrays.asList(input1.getCvTermId()));
+		Assert.assertTrue(retrievedFormulas.contains(savedFormula));
+	}
+
 	@Test
 	public void testGetByTargetVariableIds() {
 		final Formula formula1 = saveTestFormula();
@@ -97,7 +105,7 @@ public class FormulaDAOTest extends IntegrationTestBase {
 		Assert.assertThat(fromFormula2.get(0).getFormulaId(), is(formula2.getFormulaId()));
 	}
 
-	protected Formula saveTestFormula() {
+	private Formula saveTestFormula() {
 		final Formula formula = new Formula();
 		formula.setActive(true);
 		formula.setDefinition(RandomStringUtils.randomAlphanumeric(50));

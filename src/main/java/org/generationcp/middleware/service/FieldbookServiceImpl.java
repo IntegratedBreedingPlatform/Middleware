@@ -62,7 +62,6 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -72,7 +71,6 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.FlushMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -246,19 +244,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 	}
 
-	//TODO find a better way to mark variable as OUT_OF_SYNC when inputs are deleted
-	@Override
-	public void updatePhenotypeStatus(final List<MeasurementRow> observations) {
-		final List<MeasurementData> measurementDataList = this.getChangedFormulaObservations(observations);
-		for (final MeasurementData measurementData: measurementDataList) {
-			final Phenotype phenotype = this.getPhenotypeDao().getById(measurementData.getPhenotypeId());
-			if (phenotype != null) {
-				phenotype.setValueStatus(measurementData.getValueStatus());
-				this.getPhenotypeDao().saveOrUpdate(phenotype);
-			}
-		}
-	}
-
 	@Override
 	public Boolean hasOutOfSyncObservations(final Integer projectId) {
 		return this.getPhenotypeDao().hasOutOfSync(projectId);
@@ -297,23 +282,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		} finally {
 			timerWatch.stop();
 		}
-	}
-
-	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
-		final List<MeasurementData> result = new ArrayList<>();
-		for (final MeasurementRow measurementRow : observations) {
-			final List<MeasurementData> dataList = measurementRow.getDataList();
-			if (dataList == null || dataList.isEmpty()) {
-				continue;
-			}
-			for (final MeasurementData measurementData : dataList) {
-				if (Phenotype.ValueStatus.OUT_OF_SYNC.equals(measurementData.getValueStatus()) && measurementData.isChanged()) {
-					result.add(measurementData);
-					break;
-				}
-			}
-		}
-		return result;
 	}
 
 	protected void saveOrUpdateTrialDesignData(final ExperimentPropertySaver experimentPropertySaver, final ExperimentModel experimentModel,

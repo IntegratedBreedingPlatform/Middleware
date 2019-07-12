@@ -121,10 +121,31 @@ public interface DatasetService {
 	 */
 	List<DatasetDTO> getDatasets(Integer studyId, Set<Integer> datasetTypeIds);
 
-	/*
-	 * If variable is input variable to formula, update the phenotypes status as "OUT OF SYNC" for given observation unit
+	/**
+	 * If the variable is input variable for a formula, update the phenotypes status as "OUT OF SYNC" for given observation unit.
+	 * This will also update the phenotype status of calculated variables in plot observation if the observation unit is a sub-observation.
+	 *
+	 * @param variableId
+	 * @param observationUnitId
 	 */
-	void updateDependentPhenotypesStatus(Integer variableId, Integer observationUnitId);
+	void updateDependentPhenotypesAsOutOfSync(Integer variableId, Integer observationUnitId);
+
+	/**
+	 * Update the phenotype status as "OUT OF SYNC" for given calculated variables and observation unit.
+	 * This will also update the phenotype status of calculated variables in plot observation if the observation unit is a sub-observation.
+	 *
+	 * @param targetVariableIds
+	 * @param observationUnitIds
+	 */
+	void updateOutOfSyncPhenotypes(Set<Integer> targetVariableIds, Set<Integer> observationUnitIds);
+
+	/**
+	 * Update the phenotype status as "OUT OF SYNC" for calculated variables using given variables as inputs.
+	 * This will update the phenotype status of calculated variables in all observation for the specified geolocation (trial instance)
+	 * @param geolocation
+	 * @param variableIds
+	 */
+	void updateDependentPhenotypesStatusByGeolocation(Integer geolocation, List<Integer> variableIds);
 
 	/**
 	 * Return a dataset given the id
@@ -211,9 +232,10 @@ public interface DatasetService {
 
 	/**
 	 * It will accept all the draft data even when there are out of bounds values for numerical types.
-	 * @param datasetId Id of the dataset
+	 * @param studyId
+	 * @param datasetId
 	 */
-	void acceptAllDatasetDraftData(Integer datasetId);
+	void acceptAllDatasetDraftData(Integer studyId, Integer datasetId);
 
 	/**
 	 * Return a map with all needed information to show in dataset observation table
@@ -288,9 +310,10 @@ public interface DatasetService {
 
 	/**
 	 * Accepts the in bounds values for the draft data and set as missing the out of bounds values
-	 * @param datasetId Id of the dataset
+	 * @param studyId
+	 * @param datasetId
 	 */
-	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer datasetId);
+	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer studyId, Integer datasetId);
 
 	/**
 	 * Count how many instances and observations are filtered given a filter with a not null variable

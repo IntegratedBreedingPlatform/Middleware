@@ -14,8 +14,8 @@ import java.util.Map;
 @AutoProperty
 public class ObservationUnitsSearchDTO {
 	
-	private List<String> environmentDetails;
-	private List<String> environmentConditions;
+	private List<MeasurementVariableDto> environmentDetails;
+	private List<MeasurementVariableDto> environmentConditions;
 	private List<String> genericGermplasmDescriptors;
 	private List<String> additionalDesignFactors;
 	private List<MeasurementVariableDto> selectionMethodsAndTraits;
@@ -135,19 +135,19 @@ public class ObservationUnitsSearchDTO {
 		this.instanceId = instanceId;
 	}
 
-	public List<String> getEnvironmentDetails() {
+	public List<MeasurementVariableDto> getEnvironmentDetails() {
 		return this.environmentDetails;
 	}
 	
-	public void setEnvironmentDetails(final List<String> environmentFactors) {
+	public void setEnvironmentDetails(final List<MeasurementVariableDto> environmentFactors) {
 		this.environmentDetails = environmentFactors;
 	}
 	
-	public List<String> getEnvironmentConditions() {
+	public List<MeasurementVariableDto> getEnvironmentConditions() {
 		return this.environmentConditions;
 	}
 	
-	public void setEnvironmentConditions(final List<String> environmentConditions) {
+	public void setEnvironmentConditions(final List<MeasurementVariableDto> environmentConditions) {
 		this.environmentConditions = environmentConditions;
 	}
 	
