@@ -62,7 +62,6 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -283,23 +282,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		} finally {
 			timerWatch.stop();
 		}
-	}
-
-	private List<MeasurementData> getChangedFormulaObservations(final List<MeasurementRow> observations) {
-		final List<MeasurementData> result = new ArrayList<>();
-		for (final MeasurementRow measurementRow : observations) {
-			final List<MeasurementData> dataList = measurementRow.getDataList();
-			if (dataList == null || dataList.isEmpty()) {
-				continue;
-			}
-			for (final MeasurementData measurementData : dataList) {
-				if (Phenotype.ValueStatus.OUT_OF_SYNC.equals(measurementData.getValueStatus()) && measurementData.isChanged()) {
-					result.add(measurementData);
-					break;
-				}
-			}
-		}
-		return result;
 	}
 
 	protected void saveOrUpdateTrialDesignData(final ExperimentPropertySaver experimentPropertySaver, final ExperimentModel experimentModel,

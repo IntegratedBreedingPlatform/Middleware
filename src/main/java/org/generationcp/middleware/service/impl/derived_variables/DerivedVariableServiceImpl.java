@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.derived_variables;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -59,7 +60,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Set<Integer> variableIds = this.extractVariableIdsFromDataset(studyId, datasetId);
 		final Set<FormulaVariable> missingFormulaVariablesInStudy = new HashSet<>();
 		final Set<FormulaVariable> formulaVariablesOfCalculatedVariable =
-			this.formulaService.getAllFormulaVariables(new HashSet<>(Arrays.asList(variableId)));
+			this.formulaService.getAllFormulaVariables(Sets.newHashSet(variableId));
 		for (final FormulaVariable formulaVariable : formulaVariablesOfCalculatedVariable) {
 			if (!variableIds.contains(formulaVariable.getId())) {
 				missingFormulaVariablesInStudy.add(formulaVariable);
@@ -130,7 +131,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return variableIdMeasurementVariableMap;
 	}
 
-	protected Set<Integer> extractVariableIdsFromDataset(final Integer studyId, final Integer datasetId) {
+	Set<Integer> extractVariableIdsFromDataset(final Integer studyId, final Integer datasetId) {
 
 		final Set<Integer> variableIds = new HashSet<>();
 
@@ -153,9 +154,8 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					CALCULATED_VARIABLE_VARIABLE_TYPES);
 		} else {
 			// Else, we assume that the dataset is sub-observation, in that case, we should only get the TRAIT variables within the sub-ob dataset.
-			measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(Arrays.asList(datasetId),
-				Arrays
-					.asList(VariableType.TRAIT.getId()));
+			measurementVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(Collections.singletonList(datasetId),
+				Collections.singletonList(VariableType.TRAIT.getId()));
 		}
 
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
@@ -186,7 +186,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 
 		final Integer plotDatasetId =
-			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			this.datasetService.getDatasets(studyId, Sets.newHashSet(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
 		final List<ProjectProperty> projectProperties;
 
 		// if the calculated variable is executed from a plot dataset, the system should be able to read all input variables added in a study
