@@ -4,6 +4,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,5 +47,17 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 		}
 	}
 
-
+	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
+		// of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+		final String sql = "DELETE ur FROM users_roles ur "
+			+ " WHERE ur.workbench_project_id = :projectId AND ur.userid in (:workbenchUserIds)";
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("projectId", projectId);
+		statement.setParameterList("workbenchUserIds", workbenchUserIds);
+		statement.executeUpdate();
+	}
 }

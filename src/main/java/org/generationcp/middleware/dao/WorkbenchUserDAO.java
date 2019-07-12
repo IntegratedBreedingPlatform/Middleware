@@ -81,33 +81,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getUsersByCropFilteringByAdmin(final String cropName) {
-
-		final List<WorkbenchUser> users = new ArrayList<>();
-		try {
-			if (cropName != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_CROP_FILTERING_BY_ADMIN);
-				query.setParameter("cropName", cropName);
-				final List<Object> results = query.list();
-				for (final Object o : results) {
-					final Object[] user = (Object[]) o;
-					final Integer userId = (Integer) user[0];
-					final Integer personId = (Integer) user[1];
-
-					final WorkbenchUser p = new WorkbenchUser();
-					p.setPersonid(personId);
-					p.setUserid(userId);
-					users.add(p);
-				}
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getUsersByCropFilteringByAdmin query: "
-				+ e.getMessage(), e);
-		}
-		return users;
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getByNameUsingEqual(final String name, final int start, final int numOfRows) {
 		try {
 			if (name != null) {

@@ -221,6 +221,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public List<Project> getProjectsByCropName(final String cropName) {
+		return this.getProjectDao().getProjectsByCropName(cropName);
+	}
+
+	@Override
 	public Project saveOrUpdateProject(final Project project) {
 
 		try {
@@ -312,7 +317,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		this.getIbdbUserMapDao().removeUsersFromProgram(workbenchUserIds, projectId);
+		this.getUserRoleDao().removeUsersFromProgram(workbenchUserIds, projectId);
 	}
 
 	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
@@ -456,11 +461,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
 		return this.getWorkbenchUserDao().getUsersByCrop(cropName);
-	}
-
-	@Override
-	public List<WorkbenchUser> getUsersByCropFilteringByAdmin(final String cropName) {
-		return this.getWorkbenchUserDao().getUsersByCropFilteringByAdmin(cropName);
 	}
 
 	@Override
@@ -1147,5 +1147,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds){
 		return this.getWorkbenchSidebarCategoryDao().getCategoriesByLinkIds(linkIds);
+	}
+
+	@Override
+	public void saveOrUpdateUserRole(final UserRole userRole) {
+		this.getUserRoleDao().saveOrUpdate(userRole);
 	}
 }
