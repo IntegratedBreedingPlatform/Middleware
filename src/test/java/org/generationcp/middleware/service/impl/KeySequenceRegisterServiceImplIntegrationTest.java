@@ -42,7 +42,6 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 
 	private static final Logger LOG = LoggerFactory.getLogger(KeySequenceRegisterServiceImplIntegrationTest.class);
 	private static final String PREFIX = "QWERTY" + new Random().nextInt();
-	private static final String SUFFIX = "XYZ" + new Random().nextInt();
 	private static final Integer LAST_SEQUENCE_USED = 9;
 
 	@Autowired
@@ -64,16 +63,16 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	@Test
 	public void testIncrementAndGetNextSequence() throws Exception {
 
-		int threads = 10;
-		List<Future<Integer>> results = new ArrayList<>();
+		final int threads = 10;
+		final List<Future<Integer>> results = new ArrayList<>();
 
-		ExecutorService threadPool = Executors.newFixedThreadPool(threads);
+		final ExecutorService threadPool = Executors.newFixedThreadPool(threads);
 
 		// Simulating how vaadin client components use the middleware service.
 		// Also simulating multiple parallel users/threads invoking same operation.
 
 		for (int i = 1; i <= threads; i++) {
-			Future<Integer> result = threadPool.submit(new Callable<Integer>() {
+			final Future<Integer> result = threadPool.submit(new Callable<Integer>() {
 				@Override
 				public Integer call() {
 					return new AssignCodeVaadinComponent().assignCodes();
@@ -86,9 +85,9 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 		while (!threadPool.isTerminated()) {
 		}
 
-		Set<Integer> uniqueSequences = new HashSet<>();
-		for (Future<Integer> future : results) {
-			Integer generatedSequence = future.get();
+		final Set<Integer> uniqueSequences = new HashSet<>();
+		for (final Future<Integer> future : results) {
+			final Integer generatedSequence = future.get();
 			uniqueSequences.add(generatedSequence);
 			LOG.info("Sequence returned: {}.", generatedSequence);
 		}
@@ -99,7 +98,6 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	public void testGetNextSequence() {
 		final KeySequenceRegister keyRegister = new KeySequenceRegister();
 		keyRegister.setKeyPrefix(KeySequenceRegisterServiceImplIntegrationTest.PREFIX);
-		keyRegister.setSuffix(KeySequenceRegisterServiceImplIntegrationTest.SUFFIX);
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
 
@@ -112,13 +110,12 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	public void testSaveLastSequenceUsed() {
 		final KeySequenceRegister keyRegister = new KeySequenceRegister();
 		keyRegister.setKeyPrefix(KeySequenceRegisterServiceImplIntegrationTest.PREFIX);
-		keyRegister.setSuffix(KeySequenceRegisterServiceImplIntegrationTest.SUFFIX);
 		keyRegister.setLastUsedSequence(KeySequenceRegisterServiceImplIntegrationTest.LAST_SEQUENCE_USED);
 		this.keySequenceRegisterDao.save(keyRegister);
 
 		final KeySequenceRegisterService keySequenceRegisterService = new KeySequenceRegisterServiceImpl(this.sessionProvder.getSession());
 		final Integer newLastSequenceUsed = 51;
-		keySequenceRegisterService.saveLastSequenceUsed(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, KeySequenceRegisterServiceImplIntegrationTest.SUFFIX, newLastSequenceUsed);
+		keySequenceRegisterService.saveLastSequenceUsed(KeySequenceRegisterServiceImplIntegrationTest.PREFIX, newLastSequenceUsed);
 		Assert.assertEquals(newLastSequenceUsed + 1, keySequenceRegisterService.getNextSequence(KeySequenceRegisterServiceImplIntegrationTest.PREFIX));
 	}
 
@@ -127,18 +124,20 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	 */
 	class AssignCodeVaadinComponent {
 
-		public int assignCodes() {
+		int assignCodes() {
 
 			synchronized (AssignCodeVaadinComponent.class) {
 
-				TransactionTemplate tx = new TransactionTemplate(platformTransactionManager);
+				final TransactionTemplate tx = new TransactionTemplate(
+					KeySequenceRegisterServiceImplIntegrationTest.this.platformTransactionManager);
 				return tx.execute(new TransactionCallback<Integer>() {
 
 					@Override
-					public Integer doInTransaction(TransactionStatus status) {
-						KeySequenceRegisterService keySequenceRegisterService =
-								new KeySequenceRegisterServiceImpl(SessionFactoryUtils.getSession(sessionFactory, false));
-						return keySequenceRegisterService.incrementAndGetNextSequence("CML", null);
+					public Integer doInTransaction(final TransactionStatus status) {
+						final KeySequenceRegisterService keySequenceRegisterService =
+								new KeySequenceRegisterServiceImpl(SessionFactoryUtils.getSession(
+									KeySequenceRegisterServiceImplIntegrationTest.this.sessionFactory, false));
+						return keySequenceRegisterService.incrementAndGetNextSequence("CML");
 					}
 				});
 			}

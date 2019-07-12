@@ -1,12 +1,12 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.List;
-
 import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
 
 public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, String> {
 
@@ -38,22 +38,22 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		return 1;
 	}
 
-	public int incrementAndGetNextSequence(final String keyPrefix, final String suffix) {
+	public int incrementAndGetNextSequence(final String keyPrefix) {
 
 		final KeySequenceRegister keySequenceRegister = this.getByPrefix(keyPrefix);
 
 		if (keySequenceRegister != null) {
-			int newLastUsedSequence = keySequenceRegister.getLastUsedSequence() + 1;
+			final int newLastUsedSequence = keySequenceRegister.getLastUsedSequence() + 1;
 			keySequenceRegister.setLastUsedSequence(newLastUsedSequence);
 			this.getSession().update(keySequenceRegister);
 			return newLastUsedSequence;
 		} else {
-			this.getSession().save(new KeySequenceRegister(keyPrefix, suffix, 1));
+			this.getSession().save(new KeySequenceRegister(keyPrefix, 1));
 			return 1;
 		}
 	}
 
-	public void saveLastSequenceUsed(final String keyPrefix, final String suffix, final Integer lastSequence) {
+	public void saveLastSequenceUsed(final String keyPrefix, final Integer lastSequence) {
 
 		final KeySequenceRegister keySequenceRegister = this.getByPrefix(keyPrefix);
 
@@ -64,7 +64,7 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 				this.getSession().update(keySequenceRegister);
 			}
 		} else {
-			this.getSession().save(new KeySequenceRegister(keyPrefix, suffix, lastSequence));
+			this.getSession().save(new KeySequenceRegister(keyPrefix, lastSequence));
 		}
 	}
 }
