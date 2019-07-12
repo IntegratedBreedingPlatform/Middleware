@@ -35,9 +35,9 @@ public interface DatasetService {
 	/**
 	 * Adds a variable to the dataset. Variable type MUST be Trait or Selection
 	 * @param datasetId Id of the dataset
-	 * @param variableId If of the variable                    
+	 * @param variableId If of the variable
 	 * @param type Variable type
-	 * @param alias Assigned to the variable in the dataset               
+	 * @param alias Assigned to the variable in the dataset
 	 */
 	void addDatasetVariable(Integer datasetId, Integer variableId, VariableType type, String alias);
 
@@ -104,7 +104,7 @@ public interface DatasetService {
 	 * @param datasetTypeId Type of the new dataset
 	 * @param instanceIds List of instances to which new experiments will be created
 	 * @param observationUnitVariableId Variable to define the sequence number
-	 * @param numberOfSubObservationUnits Number of sub-obs to be created per experiment                                    
+	 * @param numberOfSubObservationUnits Number of sub-obs to be created per experiment
 	 * @param parentId Id of the parent dataset
 	 * @return The new created dataset
 	 */
@@ -231,13 +231,6 @@ public interface DatasetService {
 	List<MeasurementVariableDto> getDatasetVariablesByType(Integer datasetId, VariableType variableType);
 
 	/**
-	 * It will accept all the draft data even when there are out of bounds values for numerical types.
-	 * @param studyId
-	 * @param datasetId
-	 */
-	void acceptAllDatasetDraftData(Integer studyId, Integer datasetId);
-
-	/**
 	 * Return a map with all needed information to show in dataset observation table
 	 * @param datasetId
 	 * @param selectionMethodsAndTraits
@@ -309,20 +302,18 @@ public interface DatasetService {
 	Boolean hasDatasetDraftDataOutOfBounds(Integer datasetId);
 
 	/**
+	 * It will accept all the draft data even when there are out of bounds values for numerical types.
+	 * @param studyId
+	 * @param datasetId
+	 */
+	void acceptAllDatasetDraftData(Integer studyId, Integer datasetId);
+
+	/**
 	 * Accepts the in bounds values for the draft data and set as missing the out of bounds values
 	 * @param studyId
 	 * @param datasetId
 	 */
 	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer studyId, Integer datasetId);
-
-	/**
-	 * Count how many instances and observations are filtered given a filter with a not null variable
-	 * @param datasetId Id of the dataset
-	 * @param filter Filter
-	 * @return FilteredPhenotypesInstancesCountDTO
-	 */
-	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
-		Integer datasetId, ObservationUnitsSearchDTO filter);
 
 	/**
 	 * Accept the draft values that are retrieved after filtering by searchDTO.
@@ -332,6 +323,15 @@ public interface DatasetService {
 	 * @param searchDTO searchDTO
 	 */
 	void acceptDraftDataFilteredByVariable(Integer datasetId, ObservationUnitsSearchDTO searchDTO, int studyId);
+
+	/**
+	 * Count how many instances and observations are filtered given a filter with a not null variable
+	 * @param datasetId Id of the dataset
+	 * @param filter Filter
+	 * @return FilteredPhenotypesInstancesCountDTO
+	 */
+	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+		Integer datasetId, ObservationUnitsSearchDTO filter);
 
 	/**
 	 * Set an specific variable to an specific variable

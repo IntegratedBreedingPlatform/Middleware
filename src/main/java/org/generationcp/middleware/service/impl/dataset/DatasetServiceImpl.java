@@ -455,8 +455,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationDto updatePhenotype(
-		final Integer observationId, final ObservationDto observationDto) {
+	public ObservationDto updatePhenotype(final Integer observationId, final ObservationDto observationDto) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
@@ -491,19 +490,17 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	void resolveObservationStatus(final Integer variableId, final Phenotype phenotype) {
-
-		final boolean isDerivedTrait = this.isDerivedTrait(variableId);
-
+		final boolean isDerivedTrait;
+		if (phenotype.isDerivedTrait() != null) {
+			// Performance optimization when processing many phenotypes
+			isDerivedTrait = phenotype.isDerivedTrait();
+		} else {
+			final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variableId);
+			isDerivedTrait = formula != null;
+		}
 		if (isDerivedTrait) {
 			phenotype.setValueStatus(Phenotype.ValueStatus.MANUALLY_EDITED);
 		}
-	}
-
-	private boolean isDerivedTrait(final Integer variableId) {
-		final FormulaDAO formulaDAO = this.daoFactory.getFormulaDAO();
-		final Formula formula = formulaDAO.getByTargetVariableId(variableId);
-
-		return formula != null;
 	}
 
 	@Override
@@ -711,28 +708,8 @@ public class DatasetServiceImpl implements DatasetService {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
 				this.deletePhenotype(phenotype.getPhenotypeId());
 			} else {
-				this.updatePhenotype(phenotype.getPhenotypeId(), phenotype.getcValueId(), phenotype.getValue(), null, null, true);
+				this.updatePhenotype(phenotype, phenotype.getcValueId(), phenotype.getValue(), null, null, true);
 			}
-		}
-	}
-
-	@Override
-	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
-
-		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
-
-		if (!draftPhenotypes.isEmpty()) {
-
-			for (final Phenotype phenotype : draftPhenotypes) {
-				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
-					this.deletePhenotype(phenotype.getPhenotypeId());
-				} else {
-					this.updatePhenotype(
-						phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null, false);
-				}
-			}
-
-			this.reorganizePhenotypesStatus(studyId, draftPhenotypes);
 		}
 	}
 
@@ -798,6 +775,26 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
+
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+
+		if (!draftPhenotypes.isEmpty()) {
+
+			for (final Phenotype phenotype : draftPhenotypes) {
+				if (StringUtils.isEmpty(phenotype.getDraftValue())) {
+					this.deletePhenotype(phenotype.getPhenotypeId());
+				} else {
+					this.updatePhenotype(
+						phenotype, phenotype.getDraftCValueId(), phenotype.getDraftValue(), null, null, false);
+				}
+			}
+
+			this.reorganizePhenotypesStatus(studyId, draftPhenotypes);
+		}
+	}
+
+	@Override
 	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
 		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
 
@@ -831,7 +828,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 				for (final Phenotype phenotype : selectedPhenotypes) {
 					if (!ExportImportUtils.isValidValue(measurementVariable, phenotype.getDraftValue(), possibleValues)) {
-						this.updatePhenotype(phenotype.getPhenotypeId(), null, Phenotype.MISSING, null, null, false);
+						this.updatePhenotype(phenotype, null, Phenotype.MISSING, null, null, false);
 					} else {
 						this.acceptDraftData(phenotype);
 					}
@@ -864,6 +861,11 @@ public class DatasetServiceImpl implements DatasetService {
 					variableId);
 				Phenotype phenotype = null;
 				if (observationUnitData != null) {
+					/* TODO IBP-2822
+					 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
+					 *  because the performance gain of not having to call formulaDao is lost
+					 *  with this query that is not as good as getById
+					 */
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
@@ -901,6 +903,11 @@ public class DatasetServiceImpl implements DatasetService {
 				final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
 
 				if (observationUnitData != null) {
+					/* TODO IBP-2822
+					 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
+					 *  because the performance gain of not having to call formulaDao is lost
+					 *  with this query that is not as good as getById
+ 					 */
 					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
 				}
 
@@ -954,8 +961,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void importDataset(final Integer datasetId, final Table<String, String, String> table, final Boolean draftMode) {
-		final List<MeasurementVariable>
-			measurementVariableList =
+		final List<MeasurementVariable> measurementVariableList =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (!measurementVariableList.isEmpty()) {
@@ -971,9 +977,6 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final Object observationUnitId : table.rowKeySet()) {
 				final Set<Phenotype> phenotypes = new HashSet<>();
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
-
-				// TODO Review performance IBP-2230
-				final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
 
 				for (final String variableName : table.columnKeySet()) {
 					final String importedVariableValue = table.get(observationUnitId, variableName);
@@ -1014,23 +1017,22 @@ public class DatasetServiceImpl implements DatasetService {
 							final ObservationDto observationDto =
 								new ObservationDto(measurementVariable.getTermId(), importedVariableValue, categoricalValue, status,
 									Util.getCurrentDateAsStringValue(), Util.getCurrentDateAsStringValue(),
-									experimentModel.getNdExperimentId(), categoricalValue, importedVariableValue);
+									currentRow.getObservationUnitId(), categoricalValue, importedVariableValue);
 
 							phenotype = this.createPhenotype(observationDto, draftMode);
 
-						} else if (observationUnitData != null && observationUnitData.getObservationId() != null
+						} else if (observationUnitData.getObservationId() != null
 							&& importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())
 							&& Boolean.TRUE.equals(draftMode)) {
 							/*Phenotype exists and imported value is equal to value => Erase draft data*/
 							phenotype =
 								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
 									observationUnitData.getValue(), null, null, draftMode);
-						} else if (observationUnitData != null && observationUnitData.getObservationId() != null &&
+						} else if (observationUnitData.getObservationId() != null &&
 							!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
 							/*imported value is different to stored value*/
 							phenotype =
-								this.updatePhenotype(
-									observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
+								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
 									observationUnitData.getValue(), categoricalValue, importedVariableValue, draftMode);
 						}
 
@@ -1041,6 +1043,12 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (!draftMode) {
+					/* TODO improve performance
+					 *  Low priority as this flow is not reachable now from BMS
+					 *  Import goes to draft data always
+					 */
+					final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
+
 					final ArrayList<Phenotype> datasetPhenotypes = new ArrayList<>(experimentModel.getPhenotypes());
 					datasetPhenotypes.addAll(phenotypes);
 					this.setMeasurementDataAsOutOfSync(
@@ -1152,6 +1160,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 
+		/* TODO IBP-2822
+		 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
+		 *  because the performance gain of not having to call formulaDao is lost
+		 *  with this query that is not as good as getById
+		 */
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
 		return this.updatePhenotypeValues(categoricalValueId, value, draftCategoricalValueId, draftvalue, phenotype, draftMode);
 	}
@@ -1173,7 +1186,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		if (!draftMode) {
 			final Integer observableId = phenotype.getObservableId();
-			// TODO Review performance IBP-2230
 			this.resolveObservationStatus(observableId, phenotype);
 			phenotype.setChanged(true); // to set out-of-sync
 		}
@@ -1200,6 +1212,7 @@ public class DatasetServiceImpl implements DatasetService {
 		} else {
 			phenotype.setValue(observation.getValue());
 			phenotype.setcValue(observation.getCategoricalValueId());
+			// FIXME IBP-2822 get ObservationUnitData with IsDerivedTrait to avoid go to the db again
 			this.resolveObservationStatus(variableId, phenotype);
 			phenotype.setChanged(true); // to set out-of-sync
 		}
