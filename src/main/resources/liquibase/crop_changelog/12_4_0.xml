@@ -1,0 +1,58 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="mderamos" id="v12.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="key_sequence_register" columnName="suffix"/>
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM key_sequence_register key_sequence_register_duplicate, key_sequence_register key_sequence_register
+						WHERE key_sequence_register.key_prefix = key_sequence_register_duplicate.key_prefix
+						AND key_sequence_register.last_used_sequence > key_sequence_register_duplicate.last_used_sequence;
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Remove duplicate entries from key_sequence_register
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE key_sequence_register_duplicate FROM key_sequence_register key_sequence_register_duplicate, key_sequence_register key_sequence_register
+				WHERE key_sequence_register.key_prefix = key_sequence_register_duplicate.key_prefix
+                AND key_sequence_register.last_used_sequence > key_sequence_register_duplicate.last_used_sequence;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v12.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="key_sequence_register" columnName="suffix"/>
+		</preConditions>
+		<comment>
+			Remove suffix column and update the key_sequence_register_uk1 unique constraint from key_sequence_register
+		</comment>
+		<dropIndex tableName="key_sequence_register" indexName="key_sequence_register_uk1"/>
+		<dropColumn tableName="key_sequence_register" columnName="suffix"/>
+		<addUniqueConstraint tableName="key_sequence_register" columnNames="key_prefix" constraintName="key_sequence_register_uk1"/>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v12.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="key_sequence_register" columnName="suffix"/>
+			</not>
+		</preConditions>
+		<comment>
+			Update last_sequence_used of existing entries in key_sequence_register by looking up in NAMES table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE key_sequence_register SET last_used_sequence =
+				(SELECT CONVERT(REPLACE(UPPER(nval), key_prefix, ''), SIGNED) as next_number
+				FROM names WHERE names.nval LIKE concat(key_prefix, '%')
+				AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)
+				ORDER BY next_number desc LIMIT 1);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
