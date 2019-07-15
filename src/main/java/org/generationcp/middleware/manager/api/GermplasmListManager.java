@@ -149,16 +149,6 @@ public interface GermplasmListManager {
 	GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId);
 
 	/**
-	 * Returns the Top Level Germplasm List Folders present in the specified database.
-	 *
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance  - can either be Database.CENTRAL or Database.LOCAL
-	 * @return - List of GermplasmList POJOs
-	 */
-	List<GermplasmList> getAllTopLevelLists(int start, int numOfRows);
-
-	/**
 	 * Returns the Top Level Germplasm List Folders present in the program of the specified database. Retrieval from the database is done by
 	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
 	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
