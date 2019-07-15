@@ -23,9 +23,6 @@ public class KeySequenceRegister {
 	
 	@Column(name = "key_prefix", nullable = false)
 	private String keyPrefix;
-	
-	@Column(name = "suffix", nullable = true)
-	private String suffix;
 
 	@Column(name = "last_used_sequence", nullable = false)
 	private int lastUsedSequence;
@@ -41,16 +38,14 @@ public class KeySequenceRegister {
 		this.id = id;
 	}
 	
-	public KeySequenceRegister(final String keyPrefix, final String suffix, final int lastUsedSequence) {
+	public KeySequenceRegister(final String keyPrefix, final int lastUsedSequence) {
 		this.keyPrefix = keyPrefix;
-		this.suffix = suffix;
 		this.lastUsedSequence = lastUsedSequence;
 	}
 	
-	public KeySequenceRegister(final Integer id, final String keyPrefix, final String suffix, final int lastUsedSequence, final int optimisticLockNumber) {
+	public KeySequenceRegister(final Integer id, final String keyPrefix, final int lastUsedSequence, final int optimisticLockNumber) {
 		this.id = id;
 		this.keyPrefix = keyPrefix;
-		this.suffix = suffix;
 		this.lastUsedSequence = lastUsedSequence;
 		this.optimisticLockNumber = optimisticLockNumber;
 	}
@@ -81,7 +76,7 @@ public class KeySequenceRegister {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append(this.id).append(this.keyPrefix).append(this.suffix).append(this.lastUsedSequence)
+		return new ToStringBuilder(this).append(this.id).append(this.keyPrefix).append(this.lastUsedSequence)
 				.toString();
 	}
 
@@ -107,16 +102,6 @@ public class KeySequenceRegister {
 	
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	
-	public String getSuffix() {
-		return suffix;
-	}
-
-	
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
 	}
 
 }

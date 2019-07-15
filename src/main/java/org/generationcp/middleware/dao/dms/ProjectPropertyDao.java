@@ -39,7 +39,7 @@ import java.util.Map;
 
 /**
  * DAO class for {@link ProjectProperty}.
- * 
+ *
  */
 public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
@@ -69,14 +69,14 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 						.add(Projections.property("alias"))
 						.add(Projections.property("variableId"))
 						.add(Projections.property(TYPE_ID))));
-				
-				/* Exclude variables used as condition such that variable type in projectprop "Study Detail" as "Study Detail" 
+
+				/* Exclude variables used as condition such that variable type in projectprop "Study Detail" as "Study Detail"
 				 * is not one of the standard categorizations in Ontology Mapping so it will lead to variable being unmapped
 				 */
 				final List<Integer> variableTypes = VariableType.ids();
 				variableTypes.remove(VariableType.STUDY_DETAIL.getId());
 				criteria.add(Restrictions.in(TYPE_ID, variableTypes));
-				
+
 				criteria.add(Restrictions.in("alias", variableNames));
 				criteria.createAlias("property.variable", "variable").add(Restrictions.eq("variable.isObsolete", 0));
 				criteria.createAlias("property.project", "project").add(Restrictions.eq("project.programUUID", programUUID));
@@ -93,7 +93,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return new HashMap<>();
 	}
 
-	protected Map<String, Map<Integer, VariableType>> convertToVariablestandardVariableIdsWithTypeMap(final List<Object[]> queryResult) {
+	Map<String, Map<Integer, VariableType>> convertToVariablestandardVariableIdsWithTypeMap(final List<Object[]> queryResult) {
 
 		final Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<>();
 
@@ -269,7 +269,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-	
+
 	public void deleteProjectVariables(final Integer projectId, final List<Integer> variableIds) {
 		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and variable_id IN (:variableIds)";
 		final Query query =
@@ -304,12 +304,46 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
 			+ " WHERE pp.type_id IN (:variableTypeIds)"
 			+ " AND ds.study_id = :studyId";
-		;
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(variablesQuery);
 		sqlQuery.addScalar("name");
 		sqlQuery.setParameter("studyId", studyIdentifier);
 		sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
 		return sqlQuery.list();
+	}
+
+
+	public List<ProjectProperty> getByStudyAndStandardVariableIds(final int studyId, final List<Integer> standardVariableIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("project.study", "study");
+			criteria.add(Restrictions.eq("study.projectId", studyId));
+			criteria.add(Restrictions.in("variableId", standardVariableIds));
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error in getByStudyAndStandardVariableIds(" + standardVariableIds + ")";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<ProjectProperty> getByProjectIdAndVariableIds(final Integer projectId, final List<Integer> standardVariableIds) {
+		final List<ProjectProperty> list;
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(projectId);
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("project", dmsProject));
+			criteria.add(Restrictions.in("variableId", standardVariableIds));
+
+			list = criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error in getByProjectIdAndVariableIds(" + dmsProject.getProjectId() + ", " + standardVariableIds + ") in ProjectPropertyDao";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return list;
 	}
 
 

@@ -25,7 +25,6 @@ public interface PedigreeService {
 	 * Gets the cross expansion i.e build the pedigree string.
 	 *
 	 * @param gid the gid
-	 * @param level the level
 	 * @return The cross expansion based on the given gid and level
 	 */
 	String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties);
@@ -33,7 +32,7 @@ public interface PedigreeService {
 	/**
 	 * Gets the cross expansion i.e build the pedigree string.
 	 *
-	 * @param gid Set of gids to build a pedigree string for. The max set size that can be passed in is 5000.
+	 * @param gids Set of gids to build a pedigree string for. The max set size that can be passed in is 5000.
 	 * @param level the number of generation traversed to generate the pedigree
 	 * @param level the level
 	 * @return The cross expansion based on the given gid and level

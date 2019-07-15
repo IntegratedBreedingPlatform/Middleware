@@ -14,4 +14,8 @@ public interface DatasetTypeService {
 	List<Integer> getObservationDatasetTypeIds();
 
 	List<Integer> getSubObservationDatasetTypeIds();
+
+	List<String> getObservationLevels(Integer pageSize, Integer pageNumber);
+
+	Long countObservationLevels();
 }
