@@ -6,22 +6,24 @@
 
 	<changeSet author="mderamos" id="v12.4.0-1">
 		<preConditions onFail="MARK_RAN">
-			<columnExists tableName="key_sequence_register" columnName="suffix"/>
-			<not>
-				<sqlCheck expectedResult="0">
-					SELECT COUNT(*) FROM key_sequence_register key_sequence_register_duplicate, key_sequence_register key_sequence_register
-						WHERE key_sequence_register.key_prefix = key_sequence_register_duplicate.key_prefix
-						AND key_sequence_register.last_used_sequence > key_sequence_register_duplicate.last_used_sequence;
-				</sqlCheck>
-			</not>
+			<and>
+				<columnExists tableName="key_sequence_register" columnName="suffix"/>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(*) FROM key_sequence_register duplicate, key_sequence_register ksr
+							WHERE ksr.key_prefix = duplicate.key_prefix
+							AND ksr.last_used_sequence > duplicate.last_used_sequence;
+					</sqlCheck>
+				</not>
+			</and>
 		</preConditions>
 		<comment>
 			Remove duplicate entries from key_sequence_register
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			DELETE key_sequence_register_duplicate FROM key_sequence_register key_sequence_register_duplicate, key_sequence_register key_sequence_register
-				WHERE key_sequence_register.key_prefix = key_sequence_register_duplicate.key_prefix
-                AND key_sequence_register.last_used_sequence > key_sequence_register_duplicate.last_used_sequence;
+			DELETE duplicate FROM key_sequence_register duplicate, key_sequence_register ksr
+				WHERE ksr.key_prefix = duplicate.key_prefix
+                AND ksr.last_used_sequence > duplicate.last_used_sequence;
 		</sql>
 	</changeSet>
 
