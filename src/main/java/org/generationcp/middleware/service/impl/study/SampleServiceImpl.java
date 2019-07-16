@@ -11,13 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -41,6 +39,9 @@ public class SampleServiceImpl implements SampleService {
 
 	private final HibernateSessionProvider sessionProvider;
 
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
 	private final DaoFactory daoFactory;
 
 	public SampleServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -50,8 +51,8 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public Sample buildSample(final String cropName, final String cropPrefix, final Integer entryNumber,
-		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
-		final Date createdDate, final User takenBy, final Integer sampleNumber) {
+		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final Integer createdBy,
+		final Date createdDate, final Integer takenBy, final Integer sampleNumber) {
 
 		final Sample sample = new Sample();
 		sample.setTakenBy(takenBy);
@@ -124,7 +125,8 @@ public class SampleServiceImpl implements SampleService {
 		final ExperimentModel experiment = sample.getExperiment();
 		final DmsProject study = experiment.getProject().getStudy();
 		final Integer studyId = study.getProjectId();
-		final String takenBy = (sample.getTakenBy() != null) ? sample.getTakenBy().getPerson().getDisplayName() : null;
+		final String takenBy =
+			(sample.getTakenBy() != null) ? this.workbenchDataManager.getUserById(sample.getTakenBy()).getPerson().getDisplayName() : null;
 		final String obsUnitId = experiment.getObsUnitId();
 		final String studyName = study.getName();
 		final StockModel stock = experiment.getStock();

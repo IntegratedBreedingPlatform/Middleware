@@ -12,7 +12,6 @@ import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -58,12 +57,6 @@ public class DaoFactory {
 		final SampleDao sampleDao = new SampleDao();
 		sampleDao.setSession(this.sessionProvider.getSession());
 		return sampleDao;
-	}
-
-	public UserDAO getUserDao() {
-		final UserDAO userDAO = new UserDAO();
-		userDAO.setSession(this.sessionProvider.getSession());
-		return userDAO;
 	}
 
 	public CVTermDao getCvTermDao() {

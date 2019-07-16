@@ -62,10 +62,9 @@ public class SampleList implements Serializable {
 	@Column(name = "notes")
 	private String notes;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "created_by")
-	@NotFound(action = NotFoundAction.IGNORE)
-	private User createdBy;
+	@Basic(optional = false)
+	@Column(name = "created_by")
+	private Integer createdBy;
 
 	@OneToMany(mappedBy = "sampleList", cascade = CascadeType.ALL)
 	private List<Sample> samples;
@@ -144,11 +143,11 @@ public class SampleList implements Serializable {
 		this.notes = notes;
 	}
 
-	public User getCreatedBy() {
+	public Integer getCreatedBy() {
 		return this.createdBy;
 	}
 
-	public void setCreatedBy(final User createdBy) {
+	public void setCreatedBy(final Integer createdBy) {
 		this.createdBy = createdBy;
 	}
 

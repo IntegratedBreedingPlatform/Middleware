@@ -43,6 +43,7 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.Attribute;
@@ -59,12 +60,12 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -99,6 +100,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
+
+	@Resource
+	private WorkbenchDataManager workbenchDataManager;
 
 	private DaoFactory daoFactory;
 
@@ -576,16 +580,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Person> getAllPersons() {
-		return this.getUserDataManager().getAllPersons();
-	}
-
-	@Override
-	public List<Person> getAllPersonsOrderedByLocalCentral() {
-		return this.getUserDataManager().getAllPersonsOrderedByLocalCentral();
-	}
-
-	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int datasetId, final List<Integer> variateIds) {
 
 		return this.getStudyDataManager().countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
@@ -826,11 +820,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Person getPersonById(final int id) {
-		return this.getUserDataManager().getPersonById(id);
-	}
-
-	@Override
 	public int getMeasurementDatasetId(final int studyId) {
 		return this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
 	}
@@ -857,17 +846,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public String getOwnerListName(final Integer userId) {
-
-		final User user = this.getUserDataManager().getUserById(userId);
-		if (user != null) {
-			final int personId = user.getPersonid();
-			final Person p = this.getUserDataManager().getPersonById(personId);
-
-			if (p != null) {
-				return p.getFirstName() + " " + p.getMiddleName() + " " + p.getLastName();
-			} else {
-				return user.getName();
-			}
+		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(userId);
+		if (workbenchUser != null) {
+				return workbenchUser.getPerson().getDisplayName();
 		} else {
 			return "";
 		}

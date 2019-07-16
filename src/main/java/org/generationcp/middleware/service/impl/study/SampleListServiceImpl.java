@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -17,7 +16,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -32,7 +31,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,11 +60,10 @@ public class SampleListServiceImpl implements SampleListService {
 
 		try {
 			final SampleList sampleList = new SampleList();
-			User takenBy = null;
 			sampleList.setCreatedDate(sampleListDTO.getCreatedDate());
-			final User user = this.daoFactory.getUserDao().getUserByUserName(sampleListDTO.getCreatedBy());
+			final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(sampleListDTO.getCreatedBy());
 			sampleList.setProgramUUID(sampleListDTO.getProgramUUID());
-			sampleList.setCreatedBy(user);
+			sampleList.setCreatedBy(workbenchUser.getUserid());
 			sampleList.setDescription(sampleListDTO.getDescription());
 			sampleList.setListName(sampleListDTO.getListName());
 			sampleList.setNotes(sampleListDTO.getNotes());
@@ -94,8 +91,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
 
+			Integer takenBy = null;
 			if (!sampleListDTO.getTakenBy().isEmpty()) {
-				takenBy = this.daoFactory.getUserDao().getUserByUserName(sampleListDTO.getTakenBy());
+				takenBy = this.workbenchDataManager.getUserByUsername(sampleListDTO.getTakenBy()).getUserid();
 			}
 
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
@@ -137,7 +135,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 					final Sample sample = this.sampleService
 							.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
-									sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user,
+									sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, workbenchUser.getUserid(),
 									sampleListDTO.getCreatedDate(), takenBy, sampleNumber);
 					samples.add(sample);
 				}
@@ -221,10 +219,12 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(uniqueSampleListName == null, "Folder name should be unique within the same directory");
 
 		try {
-			final User cropUser = this.daoFactory.getUserDao().getUserByUserName(username);
+
+
+			final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(username);
 			final SampleList sampleFolder = new SampleList();
 			sampleFolder.setCreatedDate(new Date());
-			sampleFolder.setCreatedBy(cropUser);
+			sampleFolder.setCreatedBy(workbenchUser.getUserid());
 			sampleFolder.setDescription(null);
 			sampleFolder.setListName(folderName);
 			sampleFolder.setNotes(null);

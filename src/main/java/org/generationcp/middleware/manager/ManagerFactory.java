@@ -23,7 +23,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
@@ -193,10 +192,6 @@ public class ManagerFactory implements Serializable {
 
 	public GenotypicDataManager getGenotypicDataManager() {
 		return new GenotypicDataManagerImpl(this.sessionProvider);
-	}
-
-	public UserDataManager getUserDataManager() {
-		return new UserDataManagerImpl(this.sessionProvider);
 	}
 
 	public FieldbookService getFieldbookMiddlewareService() {

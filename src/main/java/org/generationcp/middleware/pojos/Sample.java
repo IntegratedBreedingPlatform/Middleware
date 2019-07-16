@@ -51,10 +51,9 @@ public class Sample implements Serializable {
 	@Column(name = "sample_name")
 	private String sampleName;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "taken_by")
-	@NotFound(action = NotFoundAction.IGNORE)
-	private User takenBy;
+	@Basic(optional = false)
+	@Column(name = "taken_by")
+	private Integer takenBy;
 
 	@Column(name = "sampling_date")
 	private Date samplingDate;
@@ -77,10 +76,9 @@ public class Sample implements Serializable {
 	@JoinColumn(name = "sample_list")
 	private SampleList sampleList;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "created_by")
-	@NotFound(action = NotFoundAction.IGNORE)
-	private User createdBy;
+	@Basic(optional = false)
+	@Column(name = "created_by")
+	private Integer createdBy;
 
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sample_id")
@@ -103,11 +101,11 @@ public class Sample implements Serializable {
 
 	}
 
-	public User getCreatedBy() {
+	public Integer getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(final User createdBy) {
+	public void setCreatedBy(final Integer createdBy) {
 		this.createdBy = createdBy;
 	}
 
@@ -143,11 +141,11 @@ public class Sample implements Serializable {
 		this.sampleName = sampleName;
 	}
 
-	public User getTakenBy() {
+	public Integer getTakenBy() {
 		return this.takenBy;
 	}
 
-	public void setTakenBy(final User takenBy) {
+	public void setTakenBy(final Integer takenBy) {
 		this.takenBy = takenBy;
 	}
 

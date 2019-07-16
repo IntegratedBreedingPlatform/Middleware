@@ -18,7 +18,6 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -36,7 +35,7 @@ public class TransactionBuilder extends Builder {
 		this.daoFactory = new DaoFactory(sessionProviderForLocal);
 	}
 
-	public List<Transaction> buildForSave(List<Lot> lots, Double amount, Integer userId, String comment, Integer sourceId,
+	public List<Transaction> buildForSave(List<Lot> lots, Double amount, Integer userId, Integer personId, String comment, Integer sourceId,
 			String inventoryID) throws MiddlewareQueryException {
 
 		List<Transaction> transactions = new ArrayList<Transaction>();
@@ -44,17 +43,17 @@ public class TransactionBuilder extends Builder {
 			transactions.add(new Transaction(/* id */null, userId, lot, this.getCurrentDate(), TransactionStatus.ANTICIPATED.getIntValue(),
 			/* quantity */this.formatAmount(amount), comment, TransactionBuilder.COMMITMENT_DATE_INDEFINITE,
 			/* sourceType: LIST for now */EntityType.LIST.name(), sourceId, /* sourceRecordId */lot.getEntityId(), /* prevAmount */0d,
-					this.getPersonId(userId), inventoryID));
+					personId, inventoryID));
 		}
 		return transactions;
 	}
 
-	public Transaction buildForAdd(Lot lot, Integer lRecordID, Double amount, Integer userId, String comment, Integer sourceId,
+	public Transaction buildForAdd(Lot lot, Integer lRecordID, Double amount, Integer userId, Integer personId, String comment, Integer sourceId,
 			String inventoryID, String bulkWith, String bulkComp) throws MiddlewareQueryException {
 		Transaction transaction =
 				new Transaction(null, userId, lot, this.getCurrentDate(), TransactionStatus.ANTICIPATED.getIntValue(),
 						this.formatAmount(amount), comment, TransactionBuilder.COMMITMENT_DATE_INDEFINITE, EntityType.LIST.name(),
-						sourceId, lRecordID, 0d, this.getPersonId(userId), inventoryID);
+						sourceId, lRecordID, 0d, personId, inventoryID);
 
 		transaction.setBulkCompl(bulkComp);
 		transaction.setBulkWith(bulkWith);
@@ -93,10 +92,5 @@ public class TransactionBuilder extends Builder {
 	private Double formatAmount(Double amount) {
 		// Truncate amount to 3 decimal places
 		return Double.valueOf(new DecimalFormat("#.000").format(amount));
-	}
-
-	private Integer getPersonId(Integer userId) throws MiddlewareQueryException {
-		User user = this.daoFactory.getUserDao().getById(userId);
-		return user.getPersonid();
 	}
 }

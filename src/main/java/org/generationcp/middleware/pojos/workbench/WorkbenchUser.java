@@ -39,7 +39,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.BeanFormState;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NotFound;
@@ -171,28 +170,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	 */
 	public WorkbenchUser copy() {
 		WorkbenchUser user = new WorkbenchUser();
-		user.setInstalid(this.instalid);
-		user.setStatus(this.status);
-		user.setAccess(this.access);
-		user.setType(this.type);
-		user.setName(this.name);
-		user.setPassword(this.password);
-		user.setPersonid(this.personid);
-		user.setAssignDate(this.adate);
-		user.setCloseDate(this.cdate);
-		user.setIsNew(this.isnew);
-		user.setActive(this.active);
-		user.setEnabled(this.enabled);
-		return user;
-	}
-	
-	/**
-	 * Get a copy of this {@link WorkbenchUser} object. Note that this method will not copy the {@link WorkbenchUser#userid} field.
-	 * 
-	 * @return the copy of the User object
-	 */
-	public User copyToUser() {
-		User user = new User();
 		user.setInstalid(this.instalid);
 		user.setStatus(this.status);
 		user.setAccess(this.access);
