@@ -52,16 +52,6 @@ public interface LocationDataManager {
 	List<Location> getAllLocations();
 
 	/**
-	 * Returns all Local Locations.
-	 *
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results
-	 *                  to be returned
-	 * @return All Locations based on the given start and numOfRows
-	 */
-	List<Location> getAllLocalLocations(int start, int numOfRows);
-
-	/**
 	 * Returns number of all Locations.
 	 *
 	 * @return the number of all Locations
@@ -80,8 +70,7 @@ public interface LocationDataManager {
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
 	 *
-	 * @param name - search string for the name of the locations
-	 * @param op   - can be EQUAL like LIKE
+	 * @param programUUID
 	 * @return Number of Locations
 	 */
 	long countLocationsByUniqueID(String programUUID);
@@ -343,14 +332,6 @@ public interface LocationDataManager {
 	int addLocationAndLocdes(Location location, Locdes locdes);
 
 	/**
-	 * Deletes a single {@code Location} object into the database.
-	 *
-	 * @param location - The {@code Location} object to be deleted from the database.
-	 *                 Must be a valid {@code Location} object.
-	 */
-	void deleteLocation(Location location);
-
-	/**
 	 * Get all breeding locations.
 	 * <p/>
 	 * Return a List of Locations which represent the breeding locations stored
@@ -444,16 +425,9 @@ public interface LocationDataManager {
 	 */
 	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList);
 
-	/**
-	 * get all seeding location records filtered by programUUID
-	 *
-	 * @param programUUID
-	 */
-	public List<Location> getAllSeedingLocations(String programUUID);
+	List<Location> getAllBreedingLocations(List<Integer> locationIds);
 
-	public List<Location> getAllBreedingLocations(List<Integer> locationIds);
-
-	public List<Location> getAllSeedingLocations(List<Integer> locationIds);
+	List<Location> getAllSeedingLocations(List<Integer> locationIds);
 
 	/**
 	 * Get all breeding locations filtered by programUUID plus it also returns
@@ -496,13 +470,6 @@ public interface LocationDataManager {
 	 * @return the user defined field id of code
 	 */
 	Integer getUserDefinedFieldIdOfName(UDTableType tableType, String name);
-
-	/**
-	 * Returns map with key locid with a Map whit additional info.
-	 *
-	 * @return Returns map with key locid with a Map whit additional info.
-
-	 */
 
 	/**
 	 * Returns location ID of unspecified location

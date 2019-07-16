@@ -82,7 +82,6 @@ public interface GermplasmListManager {
 	 * Returns the number of Germplasm List records that have the given status.
 	 *
 	 * @param status
-	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return The count of Germplasm lists based on the given status.
 	 */
 	long countGermplasmListByStatus(Integer status);
@@ -149,16 +148,6 @@ public interface GermplasmListManager {
 	GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId);
 
 	/**
-	 * Returns the Top Level Germplasm List Folders present in the specified database.
-	 *
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance  - can either be Database.CENTRAL or Database.LOCAL
-	 * @return - List of GermplasmList POJOs
-	 */
-	List<GermplasmList> getAllTopLevelLists(int start, int numOfRows);
-
-	/**
 	 * Returns the Top Level Germplasm List Folders present in the program of the specified database. Retrieval from the database is done by
 	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
 	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
@@ -209,7 +198,7 @@ public interface GermplasmListManager {
 	 * @param programUUID : string - the unique program key that denotes a program
 	 * @return int : returns number of rows deleted from the DB
 	 */
-	public int deleteGermplasmListsByProgram(String programUUID);
+	int deleteGermplasmListsByProgram(String programUUID);
 
 	/**
 	 * Removes the specified {@code GermplasmList} object from the database.
@@ -266,15 +255,6 @@ public interface GermplasmListManager {
 	List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas);
 
 	/**
-	 * Updates the database with the {@code GermplasmListData} object specified.
-	 *
-	 * @param germplasmListData - The {@code GermplasmListData} object to be updated in the database. Must be a valid
-	 *                          {@code GermplasmListData} object.
-	 * @return Returns the id of the updated {@code GermplasmListData} record
-	 */
-	Integer updateGermplasmListData(GermplasmListData germplasmListData);
-
-	/**
 	 * Updates the database with the {@code GermplasmListData} objects specified.
 	 *
 	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be updated in the database. Must be valid
@@ -282,15 +262,6 @@ public interface GermplasmListManager {
 	 * @return Returns the ids of the updated {@code GermplasmListData} records
 	 */
 	List<Integer> updateGermplasmListData(List<GermplasmListData> germplasmListDatas);
-
-	/**
-	 * Removes the corresponding {@code GermplasmListData} record from the database given its List ID and Entry ID.
-	 *
-	 * @param listId  - {@code GermplasmList} ID of the Germplasm List Data to be deleted.
-	 * @param entryId - {@code GermplasmListData} Entry ID of the Germplasm List Data to be deleted.
-	 * @return Returns the number of {@code GermplasmListData} records deleted from the database.
-	 */
-	int deleteGermplasmListDataByListIdEntryId(Integer listId, Integer entryId);
 
 	/**
 	 * Removes the corresponding {@code GermplasmListData} record from the database given its List ID and Entry ID.
@@ -403,14 +374,6 @@ public interface GermplasmListManager {
 	long countListDataProjectGermplasmListDataByListId(Integer id);
 
 	/**
-	 * Save list data properties
-	 *
-	 * @param listDataProps
-	 * @return
-	 */
-	List<ListDataProperty> saveListDataProperties(List<ListDataProperty> listDataProps);
-
-	/**
 	 * @param listID
 	 * @return
 	 */
@@ -430,13 +393,6 @@ public interface GermplasmListManager {
 
 	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID);
 
-	/***
-	 *
-	 * @param listRef
-	 * @return
-	 */
-	List<GermplasmList> getGermplasmListByListRef(Integer listRef);
-
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for lists ids provide.
 	 * This helps avoiding the need to query metadata in a loop for each list
@@ -449,7 +405,7 @@ public interface GermplasmListManager {
 	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
 	 * This helps avoiding the need to query metadata in a loop for each folder
 	 *
-	 * @param germplasmListParent ids for which we should retrieve metadata
+	 * @param germplasmLists lists for which we should retrieve metadata
 	 */
 	Map<Integer, ListMetadata> getGermplasmFolderMetadata(List<GermplasmList> germplasmLists);
 
