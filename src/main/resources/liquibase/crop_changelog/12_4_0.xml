@@ -59,6 +59,8 @@
 		<addUniqueConstraint tableName="key_sequence_register" columnNames="key_prefix" constraintName="key_prefix_unique"/>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v12.4.0-5">
+		<preConditions onFail="CONTINUE">
 			<not>
 				<columnExists tableName="key_sequence_register" columnName="suffix"/>
 			</not>
@@ -68,10 +70,10 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE key_sequence_register SET last_used_sequence =
-				(SELECT CONVERT(REPLACE(UPPER(nval), key_prefix, ''), SIGNED) as next_number
+				COALESCE((SELECT CONVERT(REPLACE(UPPER(nval), key_prefix, ''), SIGNED) as last_used_number
 				FROM names WHERE names.nval LIKE concat(key_prefix, '%')
 				AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)
-				ORDER BY next_number desc LIMIT 1);
+				ORDER BY last_used_number desc LIMIT 1), 0);
 		</sql>
 	</changeSet>
 
