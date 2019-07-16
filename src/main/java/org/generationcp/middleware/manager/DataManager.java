@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -53,10 +52,6 @@ import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * The Class DataManager. Superclass of DataManager implementations. Contains generic implementation of retrieval methods. Contains getters
@@ -162,12 +157,11 @@ public abstract class DataManager extends DatabaseBroker {
 	 * </pre>
 	 *
 	 * @param dao      The DAO to call the method from
-	 * @param instance The database instance to query from
 	 * @return The number of entities
 	 * @
 	 */
 	@SuppressWarnings("rawtypes")
-	public long countFromInstance(final GenericDAO dao) {
+	long countFromInstance(final GenericDAO dao) {
 		long count = 0;
 		dao.setSession(this.getActiveSession());
 		count = count + dao.countAll();
@@ -178,8 +172,7 @@ public abstract class DataManager extends DatabaseBroker {
 	public Object save(final GenericDAO dao, final Object entity) {
 
 		try {
-			final Object recordSaved = dao.save(entity);
-			return recordSaved;
+			return dao.save(entity);
 		} catch (final Exception e) {
 			DataManager.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n"
@@ -190,8 +183,7 @@ public abstract class DataManager extends DatabaseBroker {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object saveOrUpdate(final GenericDAO dao, final Object entity) {
 		try {
-			final Object recordSaved = dao.saveOrUpdate(entity);
-			return recordSaved;
+			return dao.saveOrUpdate(entity);
 		} catch (final Exception e) {
 			DataManager.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n"
@@ -210,31 +202,6 @@ public abstract class DataManager extends DatabaseBroker {
 	protected void logAndThrowException(final String message, final Throwable e) {
 		DataManager.LOG.error(e.getMessage(), e);
 		throw new MiddlewareQueryException(message, e);
-	}
-
-	/**
-	 * Retrieves the positive ids from the given list of ids
-	 *
-	 * @param ids The positive list of ids
-	 * @return the positive ids from the given list
-	 */
-	protected List<Integer> getPositiveIds(final List<Integer> ids) {
-		final List<Integer> positiveIds = new ArrayList<>();
-		for (final Integer id : ids) {
-			if (id >= 0) {
-				positiveIds.add(id);
-			}
-		}
-		return positiveIds;
-	}
-
-	void doInTransaction(final Work work) {
-
-		try {
-			work.doWork();
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error encountered with " + work.getName() + e.getMessage(), e);
-		}
 	}
 
 	protected final TermBuilder getTermBuilder() {

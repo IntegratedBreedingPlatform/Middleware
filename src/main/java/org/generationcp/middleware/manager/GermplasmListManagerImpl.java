@@ -11,16 +11,13 @@
 
 package org.generationcp.middleware.manager;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -39,7 +36,6 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
@@ -47,13 +43,15 @@ import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -306,14 +304,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public Integer updateGermplasmListData(final GermplasmListData germplasmListData) {
-		final List<GermplasmListData> list = new ArrayList<>();
-		list.add(germplasmListData);
-		final List<Integer> ids = this.updateGermplasmListData(list);
-		return !ids.isEmpty() ? ids.get(0) : null;
-	}
-
-	@Override
 	public List<Integer> updateGermplasmListData(final List<GermplasmListData> germplasmListDatas) {
 		return this.addOrUpdateGermplasmListData(germplasmListDatas, Operation.UPDATE);
 	}
@@ -372,12 +362,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		}
 
 		return germplasmListDataDeleted;
-	}
-
-	@Override
-	public int deleteGermplasmListDataByListIdEntryId(final Integer listId, final Integer entryId) {
-		final GermplasmListData germplasmListData = this.getGermplasmListDataByListIdAndEntryId(listId, entryId);
-		return this.deleteGermplasmListData(germplasmListData);
 	}
 
 	@Override
@@ -573,11 +557,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<ListDataProperty> saveListDataProperties(final List<ListDataProperty> listDataProps) {
-		return this.getListDataPropertySaver().saveListDataProperties(listDataProps);
-	}
-
-	@Override
 	public List<ListDataProject> retrieveSnapshotListData(final Integer listID) {
 		return this.getListDataProjectDAO().getByListId(listID);
 	}
@@ -636,11 +615,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmList> getGermplasmListByListRef(final Integer listRef) {
-		return this.daoFactory.getGermplasmListDAO().getByListRef(listRef);
-	}
-
-	@Override
 	public List<GermplasmList> getGermplasmListByGIDandProgramUUID(
 		final Integer gid, final int start, final int numOfRows,
 		final String programUUID) {
@@ -652,21 +626,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.daoFactory.getGermplasmListDAO().getListsByProgramUUID(programUUID);
 	}
 
-	/**
-	 * (non-Javadoc)
-	 *
-	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getAllGermplasmListsByIds(java.util.List)
-	 */
 	@Override
 	public List<GermplasmList> getAllGermplasmListsByIds(final List<Integer> listIds) {
 		return this.daoFactory.getGermplasmListDAO().getAllGermplasmListsById(listIds);
 	}
 
-	/**
-	 * (non-Javadoc)
-	 *
-	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getGermplasmFolderMetadata(java.util.List)
-	 */
 	@Override
 	public Map<Integer, ListMetadata> getGermplasmFolderMetadata(final List<GermplasmList> germplasmLists) {
 		final List<Integer> folderIdsToRetrieveFolderCount = this.getFolderIdsFromGermplasmList(germplasmLists);

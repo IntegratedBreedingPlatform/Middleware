@@ -29,7 +29,6 @@ import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,11 +61,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final List<Location> locations = this.daoFactory.getLocationDAO().getAll();
 		Collections.sort(locations);
 		return locations;
-	}
-
-	@Override
-	public List<Location> getAllLocalLocations(final int start, final int numOfRows) {
-		return this.daoFactory.getLocationDAO().getAll(start, numOfRows);
 	}
 
 	@Override
@@ -278,21 +272,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public void deleteLocation(final Location location) {
-
-		try {
-
-			this.daoFactory.getLocationDAO().makeTransient(location);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location + "): " + e
-					.getMessage(), e);
-		}
-	}
-
-	@Override
 	public List<Country> getAllCountry() {
 		return this.getCountryDao().getAllCountry();
 	}
@@ -471,12 +450,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getAllSeedingLocations(final String programUUID) {
-		final Integer seedLType = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
-		return this.daoFactory.getLocationDAO().getByType(seedLType, programUUID);
-	}
-
-	@Override
 	public List<Location> getAllBreedingLocations(final List<Integer> locationIds) {
 		return this.daoFactory.getLocationDAO().getBreedingLocations(locationIds);
 	}
@@ -509,9 +482,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<LocationDetailsDto> getLocationsByFilter(
 		final int pageNumber, final int pageSize,
 		final Map<LocationFilters, Object> filters) {
-		final List<LocationDetailsDto> locationsDetailsDto =
+		return
 			this.daoFactory.getLocationDAO().getLocationsByFilter(pageNumber, pageSize, filters);
-		return locationsDetailsDto;
 	}
 
 	@Override
