@@ -32,15 +32,33 @@
 			<columnExists tableName="key_sequence_register" columnName="suffix"/>
 		</preConditions>
 		<comment>
-			Remove suffix column and update the key_sequence_register_uk1 unique constraint from key_sequence_register
+			Remove suffix column from key_sequence_register table
 		</comment>
-		<dropIndex tableName="key_sequence_register" indexName="key_sequence_register_uk1"/>
 		<dropColumn tableName="key_sequence_register" columnName="suffix"/>
-		<addUniqueConstraint tableName="key_sequence_register" columnNames="key_prefix" constraintName="key_sequence_register_uk1"/>
 	</changeSet>
 
 	<changeSet author="mderamos" id="v12.4.0-3">
 		<preConditions onFail="MARK_RAN">
+			<indexExists tableName="key_sequence_register" indexName="key_sequence_register_uk1"/>
+		</preConditions>
+		<comment>
+			Remove key_sequence_register_uk1 unique constraint from key_sequence_register
+		</comment>
+		<dropIndex tableName="key_sequence_register" indexName="key_sequence_register_uk1"/>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v12.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="key_sequence_register" indexName="key_prefix_unique"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add key_prefix_unique unique constraint to key_sequence_register
+		</comment>
+		<addUniqueConstraint tableName="key_sequence_register" columnNames="key_prefix" constraintName="key_prefix_unique"/>
+	</changeSet>
+
 			<not>
 				<columnExists tableName="key_sequence_register" columnName="suffix"/>
 			</not>
