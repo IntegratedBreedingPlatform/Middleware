@@ -109,7 +109,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		
 		if (this.testPerson == null) {
 			this.testPerson = this.personDao.save(PersonTestDataInitializer.createPerson());
-			User user = UserTestDataInitializer.createActiveUser();
+			final User user = UserTestDataInitializer.createActiveUser();
 			user.setPersonid(this.testPerson.getId());
 			this.testUser = this.userDao.save(user);
 		}
@@ -204,19 +204,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		final long count = this.stockDao.countStocks(project.getProjectId(), environment.getLocationId(), variateTerm.getCvTermId());
 		Assert.assertEquals(TEST_COUNT, count);
 	}
-	
-	@Test
-	public void testCountObservations() {
-		final CVTerm variateTerm = createVariate();
-		for (final ExperimentModel experiment : experiments) {
-			this.createTestObservations(experiment, variateTerm);
-		}
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
-		final long count = this.stockDao.countObservations(project.getProjectId(), environment.getLocationId(), variateTerm.getCvTermId());
-		Assert.assertEquals(TEST_COUNT, count);
-	}
-	
+
 	@Test
 	public void testCountStudiesByGid() {
 		final Germplasm germplasm = this.testStocks.get(0).getGermplasm();
@@ -260,7 +248,6 @@ public class StockDaoTest extends IntegrationTestBase {
 			Assert.assertEquals(study.getProgramUUID(), studyReference.getProgramUUID());
 			Assert.assertEquals(study.getStudyType().getName(), studyReference.getStudyType().getName());
 			Assert.assertEquals(this.testUser.getUserid(), studyReference.getOwnerId());
-			Assert.assertEquals(this.testPerson.getFirstName() + " " + this.testPerson.getLastName(), studyReference.getOwnerName());
 			Assert.assertTrue(studyReference.getIsLocked());
 		}
 	}

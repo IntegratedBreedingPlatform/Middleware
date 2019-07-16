@@ -117,11 +117,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "    subject.program_uuid AS program_uuid, "
 			+ "    st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
 			+ "st.visible as visible, st.cvterm_id as cvtermId, subject.locked as isLocked, "
-			+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
+			+ "subject.created_by "
 			+ "  FROM project subject "
 			+ "  LEFT JOIN study_type st ON subject.study_type_id = st.study_type_id "
-			+ "  LEFT JOIN users u ON u.userid = subject.created_by "
-			+ "  LEFT JOIN persons p ON p.personid = u.personid "
 			+ " LEFT JOIN project parent ON subject.parent_project_id = parent.project_id "
 			+ " WHERE subject.parent_project_id = :folderId "
 			+ "   AND parent.study_type_id IS NULL "
@@ -136,11 +134,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "pr.name AS name,  pr.description AS description, pr.program_uuid AS program_uuid, "
 			+ "st.study_type_id AS studyType, st.label as label, st.name as studyTypeName, "
 			+ "st.visible as visible, st.cvterm_id as cvtermId, pr.locked as isLocked, "
-			+ "u.userId as ownerId, CONCAT(fname, ' ', lname) as ownerName "
+			+ "pr.created_by "
 			+ "  FROM project pr "
 			+ "  LEFT JOIN study_type st ON pr.study_type_id = st.study_type_id "
-			+ "  LEFT JOIN users u ON u.userid = pr.created_by "
-			+ "  LEFT JOIN persons p ON p.personid = u.personid "
 			+ " WHERE pr.project_id = :studyId and pr.deleted != " + DELETED_STUDY;
 
 	private static final String GET_STUDIES_OF_FOLDER =
@@ -262,9 +258,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Integer cvtermId = (Integer) row[9];
 				final Boolean isLocked = (Boolean) row[10];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-				final Integer ownerId = (Integer) row[11];
-				final String ownerName = (String) row[12];
-				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId, ownerName));
+				final String ownerId = (String) row[11];
+				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, Integer.valueOf(ownerId)));
 			} else {
 				childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 			}
@@ -922,8 +917,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name")
 					.addScalar("description").addScalar("is_study", new IntegerType()).addScalar("program_uuid").addScalar("studyType")
 					.addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("ownerId")
-					.addScalar("ownerName");
+					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("created_by");
 			query.setParameter("folderId", folderId);
 			query.setParameter("studyTypeId", studyType);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
@@ -947,8 +941,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 				this.getSession().createSQLQuery(DmsProjectDao.STUDY_REFERENCE_SQL).addScalar("project_id").addScalar("name")
 					.addScalar("description").addScalar("program_uuid").addScalar("studyType").addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("ownerId")
-					.addScalar("ownerName");
+					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("created_by");
 			query.setParameter("studyId", studyId);
 
 			final List<Object[]> list = query.list();
@@ -965,9 +958,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final Integer cvtermId = (Integer) row[8];
 					final Boolean isLocked = (Boolean) row[9];
 					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-					final Integer ownerId = (Integer) row[10];
-					final String ownerName = (String) row[11];
-					studyReference = new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId, ownerName);
+					final String ownerId = (String) row[10];
+					studyReference = new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, Integer.valueOf(ownerId));
 				}
 			}
 
