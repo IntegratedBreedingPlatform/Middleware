@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TimeZone;
 
 public class SampleDTO {
 
@@ -20,6 +18,7 @@ public class SampleDTO {
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
+	private Integer takenByUserId;
 	private String sampleList;
 	private String plateId;
 	private String well;
@@ -250,6 +249,14 @@ public class SampleDTO {
 
 	public void setSampleNumber(final Integer sampleNumber) {
 		this.sampleNumber = sampleNumber;
+	}
+
+	public Integer getTakenByUserId() {
+		return this.takenByUserId;
+	}
+
+	public void setTakenByUserId(final Integer takenByUserId) {
+		this.takenByUserId = takenByUserId;
 	}
 
 	@Override

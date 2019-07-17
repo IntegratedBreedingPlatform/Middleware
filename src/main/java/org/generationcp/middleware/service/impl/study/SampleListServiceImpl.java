@@ -413,6 +413,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
+
+		// FIXME: IBP-2784 Find an efficient way to populate the user's first and last name (SampleDetailsDTO#takenBy) from Workbench database.
 		return this.daoFactory.getSampleListDao().getSampleDetailsDTO(sampleListId);
 	}
 

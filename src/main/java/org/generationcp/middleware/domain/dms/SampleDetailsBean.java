@@ -15,8 +15,7 @@ public class SampleDetailsBean {
 	private Integer sampleNumber;
 	private String sampleName;
 	private String sampleBusinessKey;
-	private String takenByFirstName;
-	private String takenByLastName;
+	private Integer takenBy;
 	private String sampleList;
 	private Date samplingDate;
 	private String plateId;
@@ -30,6 +29,14 @@ public class SampleDetailsBean {
 	private String observationUnitId;
 	private Integer gdmsDatasetId;
 	private String gdmsDatasetName;
+
+	public Integer getTakenBy() {
+		return this.takenBy;
+	}
+
+	public void setTakenBy(final Integer takenBy) {
+		this.takenBy = takenBy;
+	}
 
 	public Integer getSampleId() {
 		return this.sampleId;
@@ -69,22 +76,6 @@ public class SampleDetailsBean {
 
 	public void setSampleBusinessKey(final String sampleBusinessKey) {
 		this.sampleBusinessKey = sampleBusinessKey;
-	}
-
-	public String getTakenByFirstName() {
-		return this.takenByFirstName;
-	}
-
-	public void setTakenByFirstName(final String takenByFirstName) {
-		this.takenByFirstName = takenByFirstName;
-	}
-
-	public String getTakenByLastName() {
-		return this.takenByLastName;
-	}
-
-	public void setTakenByLastName(final String takenByLastName) {
-		this.takenByLastName = takenByLastName;
 	}
 
 	public String getSampleList() {

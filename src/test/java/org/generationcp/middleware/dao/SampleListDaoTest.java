@@ -275,7 +275,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(SampleListDaoTest.ADMIN);
 		final Person person = workbenchUser.getPerson();
 		Assert.assertEquals("BUSINESS-KEY-TEST-LIST-1", sampleDetailsDTO.getSampleBusinessKey());
-		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), sampleDetailsDTO.getTakenBy());
+		Assert.assertEquals(workbenchUser.getUserid(), sampleDetailsDTO.getTakenByUserId());
 		Assert.assertEquals("SAMPLE-TEST-LIST-1", sampleDetailsDTO.getSampleName());
 		Assert.assertEquals("Germplasm 1", sampleDetailsDTO.getDesignation());
 		Assert.assertEquals(sampleDetailsDTO.getDateFormat().format(new Date()), sampleDetailsDTO.getDisplayDate());

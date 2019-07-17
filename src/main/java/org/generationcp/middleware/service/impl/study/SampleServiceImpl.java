@@ -85,6 +85,7 @@ public class SampleServiceImpl implements SampleService {
 		if (experiment != null) {
 			ndExperimentId = experiment.getNdExperimentId();
 		}
+		// FIXME: IBP-2784 Find an efficient way to populate the user's first and last name (SampelDTO#takenBy) from Workbench database
 		return this.daoFactory.getSampleDao().filter(ndExperimentId, listId, pageable);
 	}
 

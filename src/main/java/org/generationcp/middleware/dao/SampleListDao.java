@@ -146,7 +146,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("sample.sampleNumber"), "sampleNumber");
 		projectionList.add(Projections.property("sample.sampleName"), "sampleName");
 		projectionList.add(Projections.property("sample.entryNumber"), "entryNumber");
-		projectionList.add(CustomProjections.concatProperties(" ","person.firstName", "person.lastName"), "takenBy");
+		projectionList.add(Projections.property("sample.takenBy"), "takenByUserId");
 		projectionList.add(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey");
 		projectionList.add(Projections.property("experiment.obsUnitId"), "obsUnitId");
 		// TODO move PLOT_NO to nd_exp observation_unit_no and change type to OBSERVATION_UNIT
@@ -157,8 +157,6 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("sample.well"), "well");
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample")
-			.createAlias("samples.takenBy", "user", CriteriaSpecification.LEFT_JOIN)
-			.createAlias("user.person", "person", CriteriaSpecification.LEFT_JOIN)
 			.createAlias("samples.experiment", "experiment")
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
