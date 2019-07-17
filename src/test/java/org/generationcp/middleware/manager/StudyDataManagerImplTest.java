@@ -45,10 +45,8 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
-import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -56,7 +54,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -66,6 +63,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
@@ -110,6 +108,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationManager;
 
+	@Autowired
+	private UserService userService;
+
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	private static CrossExpansionProperties crossExpansionProperties;
@@ -120,6 +121,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
+		this.manager.setUserService(this.userService);
 		if (this.workbenchTestDataUtil == null) {
 			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
 			this.workbenchTestDataUtil.setUpWorkbench();
@@ -173,13 +175,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudiesByFolder() {
-		final StudyResultSet resultSet = this.manager.searchStudies(new ParentFolderStudyQueryFilter(1), 5);
-		// We are sure that the result set will return at least one study, the study that we added in the setup
-		Assert.assertTrue("The size should be greater than 0.", resultSet.size() > 0);
-	}
-
-	@Test
 	public void testSearchStudiesForName() throws Exception {
 		// Study search query expect datasets for studies to be returned
 		this.studyTDI.addTestDataset(this.studyReference.getId());
@@ -189,13 +184,18 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		filter.setProgramUUID(this.studyReference.getProgramUUID());
 
 		filter.setName(RandomStringUtils.randomAlphanumeric(100));
-		StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		Assert.assertEquals("The size should be zero since the study is not existing", 0, resultSet.size());
+		List<StudyReference> studyReferences = this.manager.searchStudies(filter);
+		Assert.assertEquals("The size should be zero since the study is not existing", 0, studyReferences.size());
 
 		filter.setName(this.studyReference.getName());
-		resultSet = this.manager.searchStudies(filter, 10);
+		studyReferences = this.manager.searchStudies(filter);
 
-		Assert.assertTrue("The study search by name results should contain test study", resultSet.size() > 0);
+		Assert.assertTrue("The study search by name results should contain test study", studyReferences.size() > 0);
+		// The owner ID is not retrieved in query hence, owner name is null too
+		for (final StudyReference study : studyReferences) {
+			Assert.assertNull(study.getOwnerId());
+			Assert.assertNull(study.getOwnerName());
+		}
 	}
 
 	@Test
@@ -207,8 +207,13 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		filter.setStartDate(new Integer(StudyTestDataInitializer.START_DATE));
 		filter.setProgramUUID(this.studyReference.getProgramUUID());
 
-		final StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
-		Assert.assertTrue("The study search by start date results should contain test study", resultSet.size() > 0);
+		final List<StudyReference> studyReferences = this.manager.searchStudies(filter);
+		Assert.assertTrue("The study search by start date results should contain test study", studyReferences.size() > 0);
+		// The owner ID is not retrieved in query hence, owner name is null too
+		for (final StudyReference study : studyReferences) {
+			Assert.assertNull(study.getOwnerId());
+			Assert.assertNull(study.getOwnerName());
+		}
 	}
 
 	@Test
@@ -229,9 +234,13 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		this.manager.getActiveSession().flush();
 
 		final GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
-		final StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
+		final List<StudyReference> studyReferences = this.manager.searchStudies(filter);
 		// We are sure that the result set will contain the test study we added in the set up
-		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
+		Assert.assertTrue("The size should be greater than 0", studyReferences.size() > 0);
+		for (final StudyReference study : studyReferences) {
+			Assert.assertNotNull(study.getOwnerId());
+			Assert.assertNotNull(study.getOwnerName());
+		}
 	}
 
 	@Test

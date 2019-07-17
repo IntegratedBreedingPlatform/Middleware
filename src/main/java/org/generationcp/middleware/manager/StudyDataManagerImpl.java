@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.base.Function;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -45,13 +46,9 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.search.StudyResultSet;
-import org.generationcp.middleware.domain.search.StudyResultSetByGid;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
-import org.generationcp.middleware.domain.search.StudyResultSetByParentFolder;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
-import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -72,6 +69,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
@@ -79,6 +77,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -93,6 +93,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
+
+	@Resource
+	private UserService userService;
 
 	public StudyDataManagerImpl() {
 	}
@@ -172,15 +175,38 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyResultSet searchStudies(final StudyQueryFilter filter, final int numOfRows) {
-		if (filter instanceof ParentFolderStudyQueryFilter) {
-			return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProvider);
-		} else if (filter instanceof GidStudyQueryFilter) {
-			return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProvider);
+	public List<StudyReference> searchStudies(final StudyQueryFilter filter) {
+		final List<StudyReference> studyReferences = new ArrayList<>();
+		if (filter instanceof GidStudyQueryFilter) {
+			final int gid = ((GidStudyQueryFilter) filter).getGid();
+			studyReferences.addAll(this.daoFactory.getStockDao().getStudiesByGid(gid));
+
 		} else if (filter instanceof BrowseStudyQueryFilter) {
-			return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, this.sessionProvider);
+			final StudyResultSetByNameStartDateSeasonCountry studyResultSet =
+				new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, this.sessionProvider);
+			studyReferences.addAll(studyResultSet.getMatchingStudies());
 		}
-		return null;
+
+		// Retrieve study owner names from workbench DB
+		if (!studyReferences.isEmpty()) {
+			final List<Integer> userIds = Lists.transform(studyReferences, new Function<StudyReference, Integer>() {
+
+				@Nullable
+				@Override
+				public Integer apply(@Nullable final StudyReference input) {
+					return input.getOwnerId();
+				}
+			});
+			if (!userIds.isEmpty()){
+				final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+				for (final StudyReference study : studyReferences) {
+					if (study.getOwnerId() != null){
+						study.setOwnerName(userIDFullNameMap.get(study.getOwnerId()));
+					}
+				}
+			}
+		}
+		return studyReferences;
 	}
 
 	@Override
@@ -931,6 +957,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	public void setLocationDataManager(final LocationDataManager locationDataManager) {
 		this.locationDataManager = locationDataManager;
+	}
+
+	public void setUserService(final UserService userService) {
+		this.userService = userService;
 	}
 
 	@Override

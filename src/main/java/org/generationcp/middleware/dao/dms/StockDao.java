@@ -76,7 +76,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows) {
+	public List<StudyReference> getStudiesByGid(final int gid) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
@@ -92,8 +92,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("project_id").addScalar("name").addScalar("description").addScalar("study_type_id").addScalar("label")
 					.addScalar("studyTypeName").addScalar("visible").addScalar("cvterm_id").addScalar("program_uuid").addScalar("locked")
 					.addScalar("created_by");
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
 
 			final List<Object[]> results = query.list();
 			for (final Object[] row : results) {

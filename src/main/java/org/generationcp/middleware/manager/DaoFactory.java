@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -18,10 +19,12 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.dms.StudySearchDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -212,5 +215,23 @@ public class DaoFactory {
 		final ObservationUnitsSearchDao obsUnitsSearchDao = new ObservationUnitsSearchDao();
 		obsUnitsSearchDao.setSession(this.sessionProvider.getSession());
 		return obsUnitsSearchDao;
+	}
+
+	public StudySearchDao getStudySearchDao() {
+		final StudySearchDao studySearchDao = new StudySearchDao();
+		studySearchDao.setSession(this.sessionProvider.getSession());
+		return studySearchDao;
+	}
+
+	public LocationSearchDao getLocationSearchDao() {
+		final LocationSearchDao locationSearchDao = new LocationSearchDao();
+		locationSearchDao.setSession(this.sessionProvider.getSession());
+		return locationSearchDao;
+	}
+
+	public CountryDAO getCountryDao() {
+		final CountryDAO countryDAO	 = new CountryDAO();
+		countryDAO.setSession(this.sessionProvider.getSession());
+		return countryDAO;
 	}
 }

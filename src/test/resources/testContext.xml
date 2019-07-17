@@ -39,6 +39,11 @@
 		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
 
+	<bean id="userService"
+		  class="org.generationcp.middleware.service.impl.user.UserServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
 	<bean id="workbenchSessionProvider"
 		class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
 		<property name="sessionFactory" ref="WORKBENCH_SessionFactory" />

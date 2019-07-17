@@ -34,7 +34,6 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -166,10 +165,9 @@ public interface StudyDataManager {
 	 *
 	 * @param filter    The filter for the search - could be an instance of BrowseStudyQueryFilter, GidStudyQueryFilter,
 	 *                  ParentFolderStudyQueryFilter.
-	 * @param numOfRows The number of rows to retrieve
-	 * @return The result set containing the matching studies
+	 * @return list of matching studies
 	 */
-	StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows);
+	List<StudyReference> searchStudies(StudyQueryFilter filter);
 
 	/**
 	 * Returns the list of factors for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves from local.
