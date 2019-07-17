@@ -239,7 +239,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue("The size should be greater than 0", studyReferences.size() > 0);
 		for (final StudyReference study : studyReferences) {
 			Assert.assertNotNull(study.getOwnerId());
-			Assert.assertNotNull(study.getOwnerName());
+			final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(study.getOwnerId());
+			Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
+
 		}
 	}
 

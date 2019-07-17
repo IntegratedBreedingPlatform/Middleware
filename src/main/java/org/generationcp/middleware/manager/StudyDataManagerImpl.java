@@ -151,7 +151,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID) {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, null);
+		final List<Reference> childrenOfFolder = this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, null);
+		this.populateStudyOwnerName(childrenOfFolder);
+		return childrenOfFolder;
 	}
 
 	@Override
@@ -188,6 +190,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 
 		// Retrieve study owner names from workbench DB
+		this.populateStudyOwnerName(studyReferences);
+		return studyReferences;
+	}
+
+	private void populateStudyOwnerName(final List<? extends Reference> references) {
+		final List<StudyReference> studyReferences = new ArrayList<>();
+		for (final Reference reference : references) {
+			if (reference instanceof StudyReference) {
+				studyReferences.add((StudyReference)reference);
+			}
+		}
 		if (!studyReferences.isEmpty()) {
 			final List<Integer> userIds = Lists.transform(studyReferences, new Function<StudyReference, Integer>() {
 
@@ -206,7 +219,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				}
 			}
 		}
-		return studyReferences;
 	}
 
 	@Override
@@ -1213,7 +1225,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	 */
 	@Override
 	public List<Reference> getChildrenOfFolderByStudyType(final int folderId, final String programUUID, final Integer studyTypeId) {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
+		final List<Reference> children = this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypeId);
+		this.populateStudyOwnerName(children);
+		return children;
 	}
 
 	@Override
@@ -1240,7 +1254,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference getStudyReference(final Integer studyId) {
-		return this.getDmsProjectDao().getStudyReference(studyId);
+		final StudyReference studyReference = this.getDmsProjectDao().getStudyReference(studyId);
+		this.populateStudyOwnerName(Collections.singletonList(studyReference));
+		return studyReference;
 	}
 
 	public Boolean existInstances(final Set<Integer> instanceIds) {
