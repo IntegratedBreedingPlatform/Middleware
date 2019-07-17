@@ -640,19 +640,15 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 
 		final StringBuilder sql = new StringBuilder(
-				"SELECT ln.listid as listId, COUNT(ld.listid) as count, lu.uname as userName, lp.fname as firstName, lp.lname lastName")
+				"SELECT ln.listid as listId, COUNT(ld.listid) as count, ln.listuid as ownerId ")
 						.append(" FROM listnms ln ").append("	INNER JOIN listdata ld ON ln.listid = ld.listid ")
-						.append("   LEFT OUTER JOIN users lu ON ln.listuid = lu.userid ")
-						.append("   LEFT OUTER JOIN persons lp ON lp.personid = lu.personid ")
 						.append(" WHERE ln.listid in (:listids) AND").append(" ln.listtype != 'FOLDER' ")
 						.append(" GROUP BY ln.listid;");
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		query.addScalar("listId", new IntegerType());
 		query.addScalar("count", new IntegerType());
-		query.addScalar("userName");
-		query.addScalar("firstName");
-		query.addScalar("lastName");
+		query.addScalar("ownerId", new IntegerType());
 		query.setParameterList("listids", listIdsFromGermplasmList);
 
 		@SuppressWarnings("unchecked")
