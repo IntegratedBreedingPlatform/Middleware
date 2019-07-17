@@ -91,7 +91,9 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 					final Integer personId = (Integer) user[7];
 					final Integer aDate = (Integer) user[8];
 					final Integer cDate = (Integer) user[9];
-					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
+					final Person person = new Person();
+					person.setId(personId);
+					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, person, aDate, cDate);
 					users.add(u);
 				}
 			}

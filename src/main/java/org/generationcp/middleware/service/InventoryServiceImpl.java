@@ -295,7 +295,7 @@ public class InventoryServiceImpl implements InventoryService {
 		this.daoFactory.getLotDao().saveOrUpdate(lot);
 
 		final Transaction transaction =
-				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), workbenchUser.getUserid(), workbenchUser.getPersonid(),
+				this.transactionBuilder.buildForAdd(lot, listData == null ? 0 : listData.getId(), details.getAmount(), workbenchUser.getUserid(), workbenchUser.getPerson().getId(),
 						details.getComment(), details.getSourceId(), details.getInventoryID(), details.getBulkWith(),
 						details.getBulkCompl());
 		this.daoFactory.getTransactionDAO().saveOrUpdate(transaction);

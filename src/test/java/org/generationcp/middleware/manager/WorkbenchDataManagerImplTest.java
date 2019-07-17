@@ -123,7 +123,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final WorkbenchUser adminUser = new WorkbenchUser();
 		adminUser.setName("admin");
 		adminUser.setPassword("b");
-		adminUser.setPersonid(adminPersonId);
+		final Person person = new Person();
+		person.setId(adminPersonId);
+		adminUser.setPerson(person);
 		adminUser.setInstalid(0);
 		adminUser.setStatus(0);
 		adminUser.setAccess(0);
@@ -154,12 +156,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		breederPerson.setLanguage(0);
 		breederPerson.setPhone("-");
 		final Integer breederPersonId = this.workbenchDataManager.addPerson(breederPerson);
+		breederPerson.setId(breederPersonId);
 		Assert.assertNotNull("Expected id of a newly saved record in persons.", breederPersonId);
 
 		final WorkbenchUser breederUser = new WorkbenchUser();
 		breederUser.setName("breeder");
 		breederUser.setPassword("b");
-		breederUser.setPersonid(breederPersonId);
+		breederUser.setPerson(breederPerson);
 		breederUser.setInstalid(0);
 		breederUser.setStatus(0);
 		breederUser.setAccess(0);
@@ -190,12 +193,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		technicianPerson.setLanguage(0);
 		technicianPerson.setPhone("-");
 		final Integer technicianPersonId = this.workbenchDataManager.addPerson(technicianPerson);
+		technicianPerson.setId(technicianPersonId);
 		Assert.assertNotNull("Expected id of a newly saved record in persons.", technicianPersonId);
 
 		final WorkbenchUser technicianUser = new WorkbenchUser();
 		technicianUser.setName("technician");
 		technicianUser.setPassword("b");
-		technicianUser.setPersonid(technicianPersonId);
+		technicianUser.setPerson(technicianPerson);
 		technicianUser.setInstalid(0);
 		technicianUser.setStatus(0);
 		technicianUser.setAccess(0);

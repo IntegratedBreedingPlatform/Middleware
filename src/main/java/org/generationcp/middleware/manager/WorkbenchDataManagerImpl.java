@@ -909,7 +909,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final Person person = this.setPerson(userDto, new Person());
 
 		final WorkbenchUser user = new WorkbenchUser();
-		user.setPersonid(person.getId());
 		user.setPerson(person);
 		user.setName(userDto.getUsername());
 		user.setPassword(userDto.getPassword());

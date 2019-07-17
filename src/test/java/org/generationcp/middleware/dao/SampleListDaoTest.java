@@ -339,7 +339,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 			workbenchUser = UserTestDataInitializer.createWorkbenchUser();
 			workbenchUser.setName(ADMIN);
 			workbenchUser.setUserid(null);
-			workbenchUser.setPersonid(person.getId());
 			workbenchUser.setPerson(person);
 			this.workbenchDataManager.addUser(workbenchUser);
 		}

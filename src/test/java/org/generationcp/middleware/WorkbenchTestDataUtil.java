@@ -62,7 +62,9 @@ public class WorkbenchTestDataUtil {
 		user.setType(1);
 		user.setName("user_test" + new Random().nextInt());
 		user.setPassword("user_password");
-		user.setPersonid(1);
+		final Person person = new Person();
+		person.setId(1);
+		user.setPerson(person);
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
 		user.setRoles(Arrays.asList(new UserRole(user, new Role(1, "Admin"))));
@@ -107,11 +109,11 @@ public class WorkbenchTestDataUtil {
 		this.workbenchDataManager.addPerson(this.testPerson2);
 
 		this.testUser1 = this.createTestUserData();
-		this.testUser1.setPersonid(this.testPerson1.getId());
+		this.testUser1.setPerson(this.testPerson1);
 		this.testUser1.setCrops(crops);
 		this.workbenchDataManager.addUser(this.testUser1);
 		this.testUser2 = this.createTestUserData();
-		this.testUser2.setPersonid(this.testPerson2.getId());
+		this.testUser2.setPerson(this.testPerson2);
 		this.testUser2.setCrops(crops);
 		this.workbenchDataManager.addUser(this.testUser2);
 
