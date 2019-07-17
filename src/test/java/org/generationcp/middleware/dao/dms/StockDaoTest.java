@@ -17,23 +17,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.data.initializer.WorkbenchUserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -45,7 +39,6 @@ import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -225,7 +218,7 @@ public class StockDaoTest extends IntegrationTestBase {
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		final List<StudyReference> studies = this.stockDao.getStudiesByGid(germplasm.getGid(), 0, 10);
+		final List<StudyReference> studies = this.stockDao.getStudiesByGid(germplasm.getGid());
 		final ImmutableMap<Integer, StudyReference> resultsMap = Maps.uniqueIndex(studies, new Function<StudyReference, Integer>() {
 			@Override
 			public Integer apply(final StudyReference input) {
