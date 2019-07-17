@@ -201,7 +201,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), 0, details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
@@ -240,7 +240,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), 0, details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);

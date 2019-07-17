@@ -17,31 +17,34 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.StudyTypeDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
+import org.generationcp.middleware.data.initializer.WorkbenchUserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,16 +64,16 @@ public class StockDaoTest extends IntegrationTestBase {
 	private CVTermDao cvtermDao;
 	private PhenotypeDao phenotypeDao;
 	private StudyTypeDAO studyTypeDAO;
-	private UserDAO userDao;
 	private PersonDAO personDao;
-	
 	private DmsProject project;
 	private List<StockModel> testStocks;
 	private List<ExperimentModel> experiments;
 	private Geolocation environment;
-	private User testUser;
 	private Person testPerson;
-	
+	private WorkbenchUser workbenchUser;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	@Before
 	public void setUp() throws Exception {
@@ -100,25 +103,17 @@ public class StockDaoTest extends IntegrationTestBase {
 
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(this.sessionProvder.getSession());
-		
-		this.userDao = new UserDAO();
-		this.userDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.personDao = new PersonDAO();
 		this.personDao.setSession(this.sessionProvder.getSession());
-		
-		if (this.testPerson == null) {
-			this.testPerson = this.personDao.save(PersonTestDataInitializer.createPerson());
-			final User user = UserTestDataInitializer.createActiveUser();
-			user.setPersonid(this.testPerson.getId());
-			this.testUser = this.userDao.save(user);
-		}
 
 		this.project = this.createProject(null);
 		this.testStocks = new ArrayList<>();
 		this.experiments = new ArrayList<>();
 		
 		this.createSampleStocks(TEST_COUNT, project);
+
+
 	}
 
 	private DmsProject createProject(final DmsProject parent) {
@@ -127,7 +122,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		project.setDescription("Test Project " + RandomStringUtils.randomAlphanumeric(5));
 		project.setStudyType(this.studyTypeDAO.getStudyTypeByName(StudyTypeDto.TRIAL_NAME));
 		project.setProgramUUID(RandomStringUtils.randomAlphanumeric(20));
-		project.setCreatedBy(this.testUser.getUserid().toString());
+		project.setCreatedBy(this.workbenchUser.getUserid().toString());
 		project.setLocked(true);
 		if (parent != null) {
 			project.setParent(parent);
@@ -247,7 +242,8 @@ public class StockDaoTest extends IntegrationTestBase {
 			Assert.assertEquals(study.getDescription(), studyReference.getDescription());
 			Assert.assertEquals(study.getProgramUUID(), studyReference.getProgramUUID());
 			Assert.assertEquals(study.getStudyType().getName(), studyReference.getStudyType().getName());
-			Assert.assertEquals(this.testUser.getUserid(), studyReference.getOwnerId());
+			Assert.assertEquals(this.workbenchUser.getUserid(), studyReference.getOwnerId());
+			Assert.assertEquals(this.testPerson.getFirstName() + " " + this.testPerson.getLastName(), studyReference.getOwnerName());
 			Assert.assertTrue(studyReference.getIsLocked());
 		}
 	}

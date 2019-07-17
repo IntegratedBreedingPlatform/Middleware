@@ -12,13 +12,11 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -55,9 +53,6 @@ public class DataSetupTest extends IntegrationTestBase {
 
     @Autowired
     private WorkbenchDataManager workbenchDataManager;
-
-    @Autowired
-    private UserDataManager userDataManager;
 
     @Autowired
     private DataImportService dataImportService;
@@ -182,18 +177,6 @@ public class DataSetupTest extends IntegrationTestBase {
 
         // FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 //		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
-
-        final User cropDBUser = workbenchUser.copyToUser();
-        final Person cropDBPerson = person.copy();
-        this.userDataManager.addPerson(cropDBPerson);
-        cropDBUser.setPersonid(cropDBPerson.getId());
-        this.userDataManager.addUser(cropDBUser);
-
-        final IbdbUserMap ibdbUserMap = new IbdbUserMap();
-        ibdbUserMap.setWorkbenchUserId(workbenchUser.getUserid());
-        ibdbUserMap.setProjectId(program.getProjectId());
-        ibdbUserMap.setIbdbUserId(cropDBUser.getUserid());
-        this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
 
         final ProjectUserInfo pUserInfo = new ProjectUserInfo(program,
                 workbenchUser.getUserid());

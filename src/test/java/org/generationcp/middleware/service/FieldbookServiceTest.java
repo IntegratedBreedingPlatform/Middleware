@@ -15,17 +15,15 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +45,6 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 	private FieldbookServiceImpl fieldbookMiddlewareService;
 
-	private UserDataManager userDataManager;
 
 	private StudyReference studyReference;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -68,7 +65,6 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	public void setUp() throws Exception {
 		this.fieldbookMiddlewareService = new FieldbookServiceImpl(this.sessionProvder, "TESTCROP");
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
-		this.userDataManager = new UserDataManagerImpl(this.sessionProvder);
 
 		if (this.workbenchTestDataUtil == null) {
 			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
@@ -84,7 +80,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
-			this.locationManager, this.userDataManager);
+			this.locationManager);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 		this.studyTDI.addEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));
@@ -148,9 +144,8 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
 		Assert.assertFalse(study.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
-		final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
-		final Person person = this.userDataManager.getPersonById(user.getPersonid());
-		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), study.getOwnerName());
+		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(this.studyReference.getOwnerId());
+		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
 	}
 
 	@Test

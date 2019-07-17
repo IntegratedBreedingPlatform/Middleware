@@ -55,10 +55,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -66,6 +64,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
@@ -111,9 +110,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationManager;
 
-	@Autowired
-	private UserDataManager userDataManager;
-
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	private static CrossExpansionProperties crossExpansionProperties;
@@ -138,7 +134,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
-			this.locationManager, this.userDataManager);
+			this.locationManager);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 
@@ -287,9 +283,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
 				Assert.assertFalse(study.getIsLocked());
 				Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
-				final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
-				final Person person = this.userDataManager.getPersonById(user.getPersonid());
-				Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), study.getOwnerName());
+				final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(this.studyReference.getOwnerId());
+				Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
 			}
 		}
 	}
@@ -883,9 +878,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getStudyType(), studyFromDB.getStudyType());
 		Assert.assertFalse(studyFromDB.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), studyFromDB.getOwnerId());
-		final User user = this.userDataManager.getUserById(this.studyReference.getOwnerId());
-		final Person person = this.userDataManager.getPersonById(user.getPersonid());
-		Assert.assertEquals(person.getFirstName() + " " + person.getLastName(), studyFromDB.getOwnerName());
+		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(this.studyReference.getOwnerId());
+		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), studyFromDB.getOwnerName());
 	}
 
 	@Test

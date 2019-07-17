@@ -18,14 +18,14 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,10 +59,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	@Autowired
 	private InventoryDataManager inventoryDataManager;
 
-	@Autowired
-	private UserDataManager userDataManager;
-
 	private InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
+	private IntegrationTestDataInitializer testDataInitializer;
 
 	private Integer germplasmListId;
 	private final Map<Integer, Transaction> listDataIdTransactionMap = new HashMap<Integer, Transaction>();
@@ -79,6 +77,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		germplasmListData = Lists.newArrayList();
 
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		initializeGermplasms(1);
 		this.initializeGermplasmsListAndListData(this.germplasmMap);
 		this.initLotsAndTransactions(this.germplasmListId);
@@ -216,9 +215,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		final User user = UserTestDataInitializer.createUser();
-		user.setUserid(null);
-		this.userDataManager.addUser(user);
+		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 
 		Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
 		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));

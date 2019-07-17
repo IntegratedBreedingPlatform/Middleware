@@ -30,7 +30,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
@@ -39,7 +38,6 @@ import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -86,9 +84,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private LocationDataManager locationManager;
-
-	@Autowired
-	private UserDataManager userDataManager;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -160,21 +155,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			this.progenitorDAO.setSession(this.sessionProvder.getSession());
 		}
 
-		// Make sure a seed User(1) is present in the crop db otherwise add one
-		User user = this.userDataManager.getUserById(1);
-		if (user == null) {
-			user = new User();
-			user.setAccess(1);
-			user.setAssignDate(1);
-			user.setCloseDate(1);
-			user.setInstalid(1);
-			user.setName("uname");
-			user.setPassword("upwd");
-			user.setPersonid(1);
-			user.setStatus(1);
-			user.setType(1);
-			this.userDataManager.addUser(user);
-		}
 	}
 
 	@Test

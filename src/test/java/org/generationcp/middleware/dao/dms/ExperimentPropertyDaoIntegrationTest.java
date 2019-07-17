@@ -48,7 +48,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
 
-		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder);
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
