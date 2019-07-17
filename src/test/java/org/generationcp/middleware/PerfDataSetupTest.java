@@ -91,7 +91,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		workbenchUser.setName("joe");
 		// Bcrypt string for password "b" generated at https://www.bcrypt-generator.com/
 		workbenchUser.setPassword("$2a$08$sfZD1PpIrk3KHcqvUarui.eWRir4OXWYEaVSNcvyVK6EtkB5RzYl.");
-		workbenchUser.setPersonid(person.getId());
+		workbenchUser.setPerson(person);
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
 		// Role ID 1 = ADMIN

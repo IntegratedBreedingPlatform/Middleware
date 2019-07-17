@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -78,7 +79,9 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 	int createWorkbenchUser(final String userName, final List<CropType> crops) {
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setName(userName);
-		workbenchUser.setPersonid(1);
+		final Person person = new Person();
+		person.setId(1);
+		workbenchUser.setPerson(person);
 		workbenchUser.setAccess(0);
 		workbenchUser.setActive(true);
 		workbenchUser.setInstalid(0);

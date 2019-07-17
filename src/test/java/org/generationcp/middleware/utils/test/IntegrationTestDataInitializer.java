@@ -310,7 +310,9 @@ public class IntegrationTestDataInitializer {
 		workbenchUser.setType(1);
 		workbenchUser.setName("user_test" + new Random().nextInt());
 		workbenchUser.setPassword("user_password");
-		workbenchUser.setPersonid(1);
+		final Person aPerson = new Person();
+		aPerson.setId(1);
+		workbenchUser.setPerson(aPerson);
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, new Role(1, "Admin"))));

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -19,8 +20,10 @@ public class UserTestDataInitializer {
 		user.setAccess(-1);
 		user.setType(-1);
 		user.setName("user_test");
+		final Person person = new Person();
+		person.setId(-1);
+		user.setPerson(person);
 		user.setPassword("user_password");
-		user.setPersonid(-1);
 		user.setAssignDate(20120101);
 		user.setCloseDate(20120101);
 		return user;
@@ -44,7 +47,9 @@ public class UserTestDataInitializer {
 			final String firstName, final String middleName) {
 		final WorkbenchUser user = new WorkbenchUser(userId);
 		user.setName(username);
-		user.setPersonid(personId);
+		final Person person = new Person();
+		person.setId(personId);
+		user.setPerson(person);
 		user.setPerson(PersonTestDataInitializer.createPerson(username, userId, firstName, middleName));
 		user.setStatus(0);
 		
