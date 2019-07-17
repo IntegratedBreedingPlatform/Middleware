@@ -21,12 +21,14 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
@@ -34,6 +36,7 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +48,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.exceptions.verification.TooLittleActualInvocations;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryServiceImplTest {
@@ -64,6 +69,7 @@ public class InventoryServiceImplTest {
 	private static final String TEST_SCALE_NAME = "SCALE";
 
 	private static final String TEST_FULLNAME = "Test User";
+	public static final int USER_ID = 1;
 
 	@Mock
 	private HibernateSessionProvider sessionProvider;
@@ -101,20 +107,27 @@ public class InventoryServiceImplTest {
 	@Mock
 	private TransactionBuilder transactionBuilder;
 
+	@Mock
+	private WorkbenchDataManager workbenchDataManager;
+
 	@InjectMocks
 	private InventoryServiceImpl inventoryServiceImpl = new InventoryServiceImpl();
 
 	@Before
 	public void setup() {
 
-		Mockito.when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
-		Mockito.when(this.daoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
-		Mockito.when(this.daoFactory.getPersonDAO()).thenReturn(this.personDAO);
-		Mockito.when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
-		Mockito.when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
-		Mockito.when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
-		Mockito.when(this.daoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
-		Mockito.when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
+		when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
+		when(this.daoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
+		when(this.daoFactory.getPersonDAO()).thenReturn(this.personDAO);
+		when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
+		when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
+		when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
+		when(this.daoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
+		when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
+
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		workbenchUser.setUserid(USER_ID);
+		when(this.workbenchDataManager.getUserById(USER_ID)).thenReturn(workbenchUser);
 	}
 
 	@Test
@@ -201,7 +214,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), 0, details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
@@ -240,7 +253,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), 0, details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
@@ -299,7 +312,7 @@ public class InventoryServiceImplTest {
 		inventoryDetails.setLocationId(locationId);
 		inventoryDetails.setScaleId(scaleId);
 		inventoryDetails.setComment("TEST");
-		inventoryDetails.setUserId(1);
+		inventoryDetails.setUserId(USER_ID);
 		inventoryDetails.setAmount(20d);
 		inventoryDetails.setSourceId(listId);
 		inventoryDetails.setSourceRecordId(listDataId);

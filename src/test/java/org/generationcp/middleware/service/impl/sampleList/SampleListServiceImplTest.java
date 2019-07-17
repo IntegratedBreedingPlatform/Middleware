@@ -53,6 +53,7 @@ public class SampleListServiceImplTest {
 	public static final String PLOT_CODE_PREFIX = "AZDS";
 	public static final boolean IS_CROP_LIST = false;
 	public static final String PROGRAM_UUID = "3973084-9234894-sasdk-93921";
+	public static final int USERID = 1;
 
 	@Mock
 	private HibernateSessionProvider session;
@@ -92,18 +93,22 @@ public class SampleListServiceImplTest {
 		this.sampleListService.setDaoFactory(daoFactory);
 		when(daoFactory.getSampleDao()).thenReturn(this.sampleDao);
 		when(daoFactory.getSampleListDao()).thenReturn(this.sampleListDao);
+
+		final WorkbenchUser createdBy = new WorkbenchUser();
+		createdBy.setName(ADMIN);
+		createdBy.setUserid(USERID);
+		when(this.workbenchDataManager.getUserByUsername(ADMIN)).thenReturn(createdBy);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderFolderNull() throws Exception {
-		final WorkbenchUser createdBy = new WorkbenchUser();
-		this.sampleListService.createSampleListFolder(null, 1, createdBy.getName(), PROGRAM_UUID);
+		this.sampleListService.createSampleListFolder(null, 1, ADMIN, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateSampleListFolderParentIdNull() throws Exception {
 		final WorkbenchUser createdBy = new WorkbenchUser();
-		this.sampleListService.createSampleListFolder("name", null, createdBy.getName(), PROGRAM_UUID);
+		this.sampleListService.createSampleListFolder("name", null, ADMIN, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -168,21 +173,18 @@ public class SampleListServiceImplTest {
 		sampleFolder.setId(1);
 		sampleFolder.setType(SampleListType.FOLDER);
 		when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleFolder);
-		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, createdBy.getName(), PROGRAM_UUID);
+		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, ADMIN, PROGRAM_UUID);
 		MatcherAssert.assertThat(sampleFolder.getId(), Matchers.equalTo(savedObject));
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
 	public void testCreateSampleListFolderDBException() throws Exception {
-		final WorkbenchUser createdBy = new WorkbenchUser();
-		createdBy.setUserid(org.mockito.Matchers.anyInt());
-		createdBy.setName("superadmin");
 		final SampleList parentFolder = new SampleList();
 		parentFolder.setType(SampleListType.FOLDER);
 		when(this.sampleListDao.getById(1)).thenReturn(parentFolder);
 		when(this.sampleListDao.getSampleListByParentAndName("4", 1, null)).thenReturn(null);
 		when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenThrow(MiddlewareQueryException.class);
-		this.sampleListService.createSampleListFolder("4", 1, createdBy.getName(), PROGRAM_UUID);
+		this.sampleListService.createSampleListFolder("4", 1, ADMIN, PROGRAM_UUID);
 	}
 
 	@Test(expected = NullPointerException.class)
