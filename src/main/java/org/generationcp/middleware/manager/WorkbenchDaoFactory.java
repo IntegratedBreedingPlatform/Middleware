@@ -1,9 +1,16 @@
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.ProjectActivityDAO;
+import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.RoleDAO;
+import org.generationcp.middleware.dao.StandardPresetDAO;
+import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
+import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
+import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
@@ -47,6 +54,48 @@ public class WorkbenchDaoFactory {
 		final RoleDAO roleDAO = new RoleDAO();
 		roleDAO.setSession(this.sessionProvider.getSession());
 		return roleDAO;
+	}
+
+	public CropTypeDAO getCropTypeDAO() {
+		final CropTypeDAO cropTypeDAO = new CropTypeDAO();
+		cropTypeDAO.setSession(this.sessionProvider.getSession());
+		return cropTypeDAO;
+	}
+
+	public ProjectActivityDAO getProjectActivityDAO() {
+		final ProjectActivityDAO projectActivityDAO = new ProjectActivityDAO();
+		projectActivityDAO.setSession(this.sessionProvider.getSession());
+		return projectActivityDAO;
+	}
+
+	public ProjectDAO getProjectDAO() {
+		final ProjectDAO projectDAO = new ProjectDAO();
+		projectDAO.setSession(this.sessionProvider.getSession());
+		return projectDAO;
+	}
+
+	public ToolDAO getToolDAO() {
+		final ToolDAO toolDAO = new ToolDAO();
+		toolDAO.setSession(this.sessionProvider.getSession());
+		return toolDAO;
+	}
+
+	public StandardPresetDAO getStandardPresetDAO() {
+		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
+		standardPresetDAO.setSession(this.sessionProvider.getSession());
+		return standardPresetDAO;
+	}
+
+	public WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDAO() {
+		final WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
+		workbenchSidebarCategoryDAO.setSession(this.sessionProvider.getSession());
+		return workbenchSidebarCategoryDAO;
+	}
+
+	public WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDAO() {
+		final WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
+		workbenchSidebarCategoryLinkDAO.setSession(this.sessionProvider.getSession());
+		return workbenchSidebarCategoryLinkDAO;
 	}
 
 }

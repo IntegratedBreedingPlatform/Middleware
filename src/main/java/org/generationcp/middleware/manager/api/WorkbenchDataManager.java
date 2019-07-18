@@ -10,25 +10,18 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.dao.StandardPresetDAO;
-import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
-import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.util.List;
 import java.util.Map;
@@ -135,13 +128,6 @@ public interface WorkbenchDataManager {
 	void deleteProjectDependencies(Project project);
 
 	/**
-	 * Gets the tool DAO directly.
-	 *
-	 * @return the tool with the given name
-	 */
-	ToolDAO getToolDao();
-
-	/**
 	 * Get all tools.
 	 *
 	 * @return The list of all tools.
@@ -163,8 +149,6 @@ public interface WorkbenchDataManager {
 	 * @return the list of matching tools
 	 */
 	List<Tool> getToolsWithType(ToolType toolType);
-
-
 
 	/**
 	 * Gets a project by id.
@@ -291,13 +275,6 @@ public interface WorkbenchDataManager {
 	long countProjectActivitiesByProjectId(Long projectId);
 
 	/**
-	 * Gets the ProjectUserInfoDAO.
-	 *
-	 * @return ProjectUserInfoDAO
-	 */
-	ProjectUserInfoDAO getProjectUserInfoDao();
-
-	/**
 	 * Saves or updates the ProjectUserInfo.
 	 *
 	 * @param projectUserInfo the project user info
@@ -350,13 +327,6 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
-
-	/**
-	 * Returns the DAO object for standard preset
-	 *
-	 * @return StandardPresetDAO
-	 */
-	StandardPresetDAO getStandardPresetDAO();
 
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId, String toolSection);
 
