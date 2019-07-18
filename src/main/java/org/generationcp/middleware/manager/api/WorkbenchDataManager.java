@@ -471,36 +471,6 @@ public interface WorkbenchDataManager {
 	long countProjectActivitiesByProjectId(Long projectId);
 
 	/**
-	 * Add a mapping between Workbench user record and the crop databse user record, if it does not already exist.
-	 *
-	 * @param userMap the user map
-	 * @return Returns the id of the {@code IbdbUserMap} record added or that of the existing one if it is already there.
-	 */
-	Integer addIbdbUserMap(IbdbUserMap userMap);
-
-	Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId);
-
-	/**
-	 * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
-	 *
-	 * @param workbenchUserId - the specified Workbench User ID
-	 * @param projectId       - the specified Project ID
-	 * @return Returns the IbdbUserMap object associated with the specified Workbench User ID and Project ID. Returns null when there is no
-	 * IbdbUserMap matching the specified Workbench User ID and Project ID.
-	 */
-	IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId);
-
-	/**
-	 * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
-	 *
-	 * @param workbenchUserId - the specified Workbench User ID
-	 * @param projectId       - the specified Project ID
-	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
-	 * User ID matching the specified Workbench User ID and Project ID.
-	 */
-	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId);
-
-	/**
 	 * Gets the ProjectUserInfoDAO.
 	 *
 	 * @return ProjectUserInfoDAO
@@ -593,16 +563,6 @@ public interface WorkbenchDataManager {
 	void close();
 
 	/**
-	 * Returns the correspoding workbench user id.
-	 *
-	 * @param ibdbUserId the ibdb user id
-	 * @param projectId  - the specified Project ID
-	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
-	 * User ID matching the specified Workbench User ID and Project ID.
-	 */
-	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId);
-
-	/**
 	 * Gets the all Users Sorted
 	 *
 	 * @return
@@ -680,7 +640,7 @@ public interface WorkbenchDataManager {
 	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
 
 	/**
-	 * Deletes the Project_User_Info and IBDB_User_Map entries of the removed program members
+	 * Deletes the Project_User_Info entries of the removed program members
 	 *
 	 * @param workbenchUserIds - the user ids of the removed program members
 	 * @param projectId        - the project id

@@ -187,4 +187,19 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return persons;
 	}
+
+	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
+		// of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+		final String sql = "DELETE project_user_info FROM workbench_project_user_info project_user_info"
+			+ " WHERE project_user_info.project_id = :projectId AND project_user_info.user_id in (:workbenchUserIds)";
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("projectId", projectId);
+		statement.setParameterList("workbenchUserIds", workbenchUserIds);
+		statement.executeUpdate();
+	}
+
 }

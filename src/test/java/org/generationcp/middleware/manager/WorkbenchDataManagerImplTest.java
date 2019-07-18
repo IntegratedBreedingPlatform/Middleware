@@ -11,17 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
@@ -32,7 +22,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -53,7 +42,16 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
@@ -239,36 +237,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		final long count = this.workbenchDataManager.countProjectActivitiesByProjectId(this.commonTestProject.getProjectId());
 		Assert.assertEquals(3, count);
-	}
-
-	@Test
-	public void testIbdbUserMap() {
-		final IbdbUserMap userMap = new IbdbUserMap();
-		userMap.setProjectId(this.commonTestProject.getProjectId());
-		userMap.setIbdbUserId(this.testUser1.getUserid() * -1);
-		userMap.setWorkbenchUserId(this.testUser1.getUserid());
-
-		final Integer result = this.workbenchDataManager.addIbdbUserMap(userMap);
-		Assert.assertNotNull("Expected id of a newly saved record in workbench_ibdb_user_map", result);
-
-		final Integer cropDBUserId =
-				this.workbenchDataManager.getLocalIbdbUserId(this.testUser1.getUserid(), this.commonTestProject.getProjectId());
-		Assert.assertNotNull(cropDBUserId);
-
-		// Try to add a duplicate IbdbUserMap (same workbench project and user id).
-		final IbdbUserMap duplicateUserMap = new IbdbUserMap();
-		duplicateUserMap.setProjectId(userMap.getProjectId());
-		duplicateUserMap.setIbdbUserId(userMap.getIbdbUserId());
-		duplicateUserMap.setWorkbenchUserId(userMap.getWorkbenchUserId());
-		final Integer result2 = this.workbenchDataManager.addIbdbUserMap(duplicateUserMap);
-		Assert.assertEquals("Expected existing record's id being returned when trying to add duplicate entry in workbench_ibdb_user_map",
-				result, result2);
-		final Integer cropDBUserId2 =
-				this.workbenchDataManager.getLocalIbdbUserId(this.testUser1.getUserid(), this.commonTestProject.getProjectId());
-		Assert.assertEquals(
-				"Expected workbench user to map to same crop db record after attempting to add duplicate entry in workbench_ibdb_user_map",
-				cropDBUserId, cropDBUserId2);
-
 	}
 
 	@Test
@@ -878,24 +846,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(userId, result.getUserId());
 		Assert.assertEquals(this.commonTestProject.getProjectId(), result.getProject().getProjectId());
 
-		//Add IBDB User Map entry and assert the it has been added to the DB
-		final IbdbUserMap ibdbUserMap = new IbdbUserMap();
-		ibdbUserMap.setWorkbenchUserId(userId);
-		ibdbUserMap.setProjectId(this.commonTestProject.getProjectId());
-		ibdbUserMap.setIbdbUserId(1);
-		this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
-		IbdbUserMap addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
-		Assert.assertNotNull(addedIbdbUserMap);
-
-
 		this.workbenchDataManager.removeUsersFromProgram(Arrays.asList(userId), this.commonTestProject.getProjectId());
 
 		//Assert that the project user info entry has been deleted
 		result = this.workbenchDataManager.getProjectUserInfoByProjectIdAndUserId(this.commonTestProject.getProjectId(), userId);
 		Assert.assertNull(result);
-
-		//Assert that the IBDB User Map entry has been deleted
-		addedIbdbUserMap = this.workbenchDataManager.getIbdbUserMap(userId, this.commonTestProject.getProjectId());
-		Assert.assertNull(addedIbdbUserMap);
 	}
 }

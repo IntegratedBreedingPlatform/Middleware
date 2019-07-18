@@ -11,7 +11,6 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.CropTypeDAO;
-import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
@@ -30,7 +29,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -87,12 +85,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final CropTypeDAO cropTypeDao = new CropTypeDAO();
 		cropTypeDao.setSession(this.getCurrentSession());
 		return cropTypeDao;
-	}
-
-	private IbdbUserMapDAO getIbdbUserMapDao() {
-		final IbdbUserMapDAO ibdbUserMapDao = new IbdbUserMapDAO();
-		ibdbUserMapDao.setSession(this.getCurrentSession());
-		return ibdbUserMapDao;
 	}
 
 	private PersonDAO getPersonDao() {
@@ -288,11 +280,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		this.getIbdbUserMapDao().removeUsersFromProgram(workbenchUserIds, projectId);
-	}
-
-	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
-		return this.getIbdbUserMapDao().getIbdbUserMapByID(projectId);
+		this.getProjectUserInfoDao().removeUsersFromProgram(workbenchUserIds, projectId);
 	}
 
 	public void deleteProjectUserInfo(final ProjectUserInfo projectUserInfo) {
@@ -620,76 +608,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public long countProjectActivitiesByProjectId(final Long projectId) {
 		return this.getProjectActivityDao().countByProjectId(projectId);
-	}
-
-	@Override
-	public Integer addIbdbUserMap(final IbdbUserMap userMap) {
-
-		try {
-			final IbdbUserMap existingMapping = this.getIbdbUserMap(userMap.getWorkbenchUserId(), userMap.getProjectId());
-			if (existingMapping == null) {
-				this.getIbdbUserMapDao().saveOrUpdate(userMap);
-				return userMap.getIbdbUserMapId().intValue();
-			} else {
-				return existingMapping.getIbdbUserMapId().intValue();
-			}
-		} catch (final Exception e) {
-			final String message =
-				"Error encountered while adding IbdbUserMap (linking workbench user id to crop database user): WorkbenchDataManager.addIbdbUserMap(userMap="
-					+ userMap + "): " + e.getMessage();
-			WorkbenchDataManagerImpl.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@Override
-	public Integer getCurrentIbdbUserId(final Long projectId, final Integer workbenchUserId) {
-		Integer ibdbUserId = null;
-		final IbdbUserMap userMapEntry = this.getIbdbUserMap(workbenchUserId, projectId);
-		if (userMapEntry != null) {
-			ibdbUserId = userMapEntry.getIbdbUserId();
-		}
-		return ibdbUserId;
-	}
-
-	@Override
-	public IbdbUserMap getIbdbUserMap(final Integer workbenchUserId, final Long projectId) {
-
-		IbdbUserMap ibdbUserMap = null;
-		try {
-
-			ibdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while retrieving Local IbdbUserMap: WorkbenchDataManager.getIbdbUserMap(workbenchUserId="
-					+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
-		}
-
-		return ibdbUserMap;
-	}
-
-	@Override
-	public Integer getLocalIbdbUserId(final Integer workbenchUserId, final Long projectId) {
-
-		Integer ibdbUserId = null;
-		try {
-
-			ibdbUserId = this.getIbdbUserMapDao().getLocalIbdbUserId(workbenchUserId, projectId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
-					+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
-		}
-
-		return ibdbUserId;
-	}
-
-	@Override
-	public Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(final Integer ibdbUserId, final Long projectId) {
-		return this.getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
 	}
 
 	@Override
