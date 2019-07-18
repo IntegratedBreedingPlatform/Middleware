@@ -300,5 +300,20 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return idNamesMap;
 	}
 
+	public List<WorkbenchUser> getUsersByPersonIds(final List<Integer> personIds) {
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			criteria.add(Restrictions.in("person.id", personIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getUsersByPersonIds(personIds= " + personIds + ") query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
 	
 }

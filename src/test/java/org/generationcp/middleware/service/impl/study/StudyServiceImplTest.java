@@ -270,6 +270,7 @@ public class StudyServiceImplTest {
 		properties.put("p1", "v1");
 
 		Mockito.when(this.studyDataManager.getStudyMetadataForGeolocationId(metadata.getStudyDbId())).thenReturn(metadata);
+		Mockito.when(this.studyDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users);
 		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties);
 
 		final StudyDetailsDto studyDetailsDto = this.studyServiceImpl.getStudyDetailsForGeolocation(metadata.getStudyDbId());
@@ -316,6 +317,8 @@ public class StudyServiceImplTest {
 		final Map<String, String> properties2 = new HashMap<>();
 		properties2.put("p2", "v2");
 
+		Mockito.when(this.studyDataManager.getUsersAssociatedToStudy(metadata.getStudyDbId())).thenReturn(users1);
+		Mockito.when(this.studyDataManager.getUsersForEnvironment(metadata.getStudyDbId())).thenReturn(users2);
 		Mockito.when(this.studyDataManager.getStudyMetadataForGeolocationId(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(this.studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties1);
 		Mockito.when(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(metadata.getNurseryOrTrialId())).thenReturn(properties2);

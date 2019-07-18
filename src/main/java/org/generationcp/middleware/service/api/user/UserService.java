@@ -7,4 +7,6 @@ public interface UserService {
 
 	Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds);
 
+	List<UserDto> getUsersByPersonIds(final List<Integer> personIds);
+
 }

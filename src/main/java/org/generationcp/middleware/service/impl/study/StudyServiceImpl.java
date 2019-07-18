@@ -533,10 +533,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setMetadata(studyMetadata);
 				final List<UserDto> users = new ArrayList<>();
 				final Map<String, String> properties = new HashMap<>();
-
-				// FIXME: IBP-2784
-				//users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-				//users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+				users.addAll(this.studyDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+				users.addAll(this.studyDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(geolocationId));
 				properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);

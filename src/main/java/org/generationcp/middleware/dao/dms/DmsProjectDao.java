@@ -1291,4 +1291,52 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
+
+
+	public List<Integer> getPersonIdsAssociatedToStudy(final Integer studyId) {
+		Preconditions.checkNotNull(studyId);
+		try {
+			final Query query =
+				this.getSession().createSQLQuery("SELECT DISTINCT pp.value AS personId \n"
+					+ "FROM   cvterm scale \n"
+					+ "       INNER JOIN cvterm_relationship r \n"
+					+ "               ON ( r.object_id = scale.cvterm_id ) \n"
+					+ "       INNER JOIN cvterm variable \n"
+					+ "               ON ( r.subject_id = variable.cvterm_id ) \n"
+					+ "       INNER JOIN projectprop pp \n"
+					+ "               ON ( pp.variable_id = variable.cvterm_id ) \n"
+					+ "WHERE  pp.project_id = :studyId \n"
+					+ "       AND r.object_id = 1901; ").addScalar("personId", new IntegerType());
+			query.setParameter("studyId", studyId);
+			return query.list();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getPersonsAssociatedToStudy() query from studyId: " + studyId;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Integer> getPersonIdsAssociatedToEnvironent(final Integer instanceId) {
+		Preconditions.checkNotNull(instanceId);
+		try {
+			final Query query =
+				this.getSession().createSQLQuery("SELECT DISTINCT pp.value AS personId \n"
+					+ "FROM   cvterm scale \n"
+					+ "       INNER JOIN cvterm_relationship r \n"
+					+ "               ON ( r.object_id = scale.cvterm_id ) \n"
+					+ "       INNER JOIN cvterm variable \n"
+					+ "               ON ( r.subject_id = variable.cvterm_id ) \n"
+					+ "       INNER JOIN nd_geolocationprop pp \n"
+					+ "               ON ( pp.type_id = variable.cvterm_id ) \n"
+					+ "WHERE  pp.nd_geolocation_id = :instanceId \n"
+					+ "       AND r.object_id = 1901; ").addScalar("personId", new IntegerType());
+			query.setParameter("instanceId", instanceId);
+			return query.list();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with getPersonIdsAssociatedToEnvironent() query from instanceId: " + instanceId;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }

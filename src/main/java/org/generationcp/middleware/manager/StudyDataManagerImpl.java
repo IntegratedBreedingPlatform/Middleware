@@ -69,6 +69,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -1297,5 +1298,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
 		}
 		return phenotypeMap;
+	}
+
+	@Override
+	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
+		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToStudy(studyId);
+		return this.userService.getUsersByPersonIds(personIds);
+	}
+
+	@Override
+	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
+		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironent(instanceId);
+		return this.userService.getUsersByPersonIds(personIds);
 	}
 }

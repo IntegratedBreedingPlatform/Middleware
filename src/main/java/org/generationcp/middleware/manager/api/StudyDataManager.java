@@ -36,6 +36,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -43,6 +44,7 @@ import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -757,4 +759,18 @@ public interface StudyDataManager {
 	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
 
 	boolean renameStudy(final String newStudyName, final int studyId, final String programUUID);
+
+	/**
+	 *
+	 * @param studyId
+	 * @return
+	 */
+	List<UserDto> getUsersAssociatedToStudy (final Integer studyId);
+
+	/**
+	 *
+	 * @param instanceId
+	 * @return
+	 */
+	List<UserDto> getUsersForEnvironment(final Integer instanceId);
 }
