@@ -176,6 +176,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="sampleService" class="org.generationcp.middleware.service.impl.study.SampleServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>

@@ -205,4 +205,8 @@ public class SampleServiceImpl implements SampleService {
 		return this.daoFactory.getSampleDao().hasSamples(studyId);
 	}
 
+	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
+
 }

@@ -287,10 +287,10 @@ public class IntegrationTestDataInitializer {
 
 		final Person person = new Person();
 		person.setInstituteId(1);
-		person.setFirstName("Test");
+		person.setFirstName("John");
 		person.setMiddleName("M");
 		final int randomNumber = new Random().nextInt();
-		person.setLastName("Person " + randomNumber);
+		person.setLastName("Doe");
 		person.setPositionName("King of Icewind Dale");
 		person.setTitle("His Highness");
 		person.setExtension("Ext");
@@ -310,9 +310,7 @@ public class IntegrationTestDataInitializer {
 		workbenchUser.setType(1);
 		workbenchUser.setName("user_test" + new Random().nextInt());
 		workbenchUser.setPassword("user_password");
-		final Person aPerson = new Person();
-		aPerson.setId(1);
-		workbenchUser.setPerson(aPerson);
+		workbenchUser.setPerson(person);
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, new Role(1, "Admin"))));
