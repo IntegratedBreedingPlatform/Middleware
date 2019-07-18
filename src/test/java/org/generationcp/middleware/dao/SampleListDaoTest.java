@@ -30,6 +30,8 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +66,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private GermplasmDAO germplasmDao;
 	private ProjectPropertyDao projectPropertyDao;
 	private WorkbenchDataManager workbenchDataManager;
+	private UserService userService;
 
 	private DaoFactory daoFactory;
 
@@ -101,7 +104,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.projectPropertyDao.setSession(this.sessionProvder.getSession());
 
 		this.workbenchDataManager = new WorkbenchDataManagerImpl(this.workbenchSessionProvider);
-
+		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 		// Create three sample lists test data for search
 		this.createSampleListForSearch("TEST-LIST-1");
 		this.createSampleListForSearch("TEST-LIST-2");
@@ -110,7 +113,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testCreateSampleList() {
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(SampleListDaoTest.ADMIN);
+		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(workbenchUser.getUserid());
 
 		final Sample sample = SampleTestDataInitializer.createSample(sampleList, workbenchUser.getUserid());
@@ -131,7 +134,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetSampleListByParentAndNameOk() throws Exception {
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(SampleListDaoTest.ADMIN);
+		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
 		final SampleList sampleList =
 			SampleListTestDataInitializer.createSampleList(workbenchUser.getUserid());
 		final SampleList parent = this.sampleListDao.getRootSampleList();
@@ -160,7 +163,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllTopLevelLists() {
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(SampleListDaoTest.ADMIN);
+		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(workbenchUser.getUserid());
 		final SampleList parent = this.sampleListDao.getRootSampleList();
 		sampleList.setHierarchy(parent);
@@ -176,7 +179,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllTopLevelListsProgramUUIDIsNull() {
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(SampleListDaoTest.ADMIN);
+		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(workbenchUser.getUserid());
 		sampleList.setProgramUUID(null);
 		final SampleList parent = this.sampleListDao.getRootSampleList();
@@ -272,7 +275,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertFalse(result.isEmpty());
 		final SampleDetailsDTO sampleDetailsDTO = result.get(0);
 
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(SampleListDaoTest.ADMIN);
+		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
 		final Person person = workbenchUser.getPerson();
 		Assert.assertEquals("BUSINESS-KEY-TEST-LIST-1", sampleDetailsDTO.getSampleBusinessKey());
 		Assert.assertEquals(workbenchUser.getUserid(), sampleDetailsDTO.getTakenByUserId());
@@ -328,7 +331,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	}
 
 	private WorkbenchUser createTestUser() {
-		WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(SampleListDaoTest.ADMIN);
+		WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
 		if (workbenchUser == null) {
 			// FIXME fresh db doesn't have admin user in crop. BMS-886
 			final Person person = PersonTestDataInitializer.createPerson();
@@ -340,7 +343,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 			workbenchUser.setName(ADMIN);
 			workbenchUser.setUserid(null);
 			workbenchUser.setPerson(person);
-			this.workbenchDataManager.addUser(workbenchUser);
+			this.userService.addUser(workbenchUser);
 		}
 
 		return workbenchUser;

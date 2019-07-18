@@ -67,6 +67,9 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationManager;
 
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private StudyDataManagerImpl studyDataManager;
 
 	private ProjectPropertySaver projectPropertySaver;
@@ -83,7 +86,7 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 
 	private Project commonTestProject;
 	private StudyReference studyReference;
-	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private StudyTestDataInitializer studyTDI;
 
 	@Before
@@ -98,19 +101,12 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 		this.cvTermDao = new CVTermDao();
 		this.cvTermDao.setSession(this.sessionProvder.getSession());
 
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
-
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
 
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
+		this.workbenchTestDataUtil.setUpWorkbench();
+
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
 		this.studyTDI =

@@ -44,6 +44,7 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.InventoryService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -65,7 +66,7 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Resource
-	private WorkbenchDataManager workbenchDataManager;
+	private UserService userService;
 
 	public InventoryServiceImpl(final HibernateSessionProvider sessionProvider) {
 
@@ -286,7 +287,7 @@ public class InventoryServiceImpl implements InventoryService {
 			throw new MiddlewareQueryException("A lot with the same entity id, location id, and scale id already exists");
 		}
 
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(details.getUserId());
+		final WorkbenchUser workbenchUser = this.userService.getUserById(details.getUserId());
 
 		final Lot lot =
 				this.lotBuilder.createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(),

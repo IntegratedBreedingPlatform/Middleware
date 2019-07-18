@@ -103,7 +103,7 @@ public class SampleListServiceImplTest {
 		final WorkbenchUser createdBy = new WorkbenchUser();
 		createdBy.setName(ADMIN);
 		createdBy.setUserid(USERID);
-		when(this.workbenchDataManager.getUserByUsername(ADMIN)).thenReturn(createdBy);
+		when(this.userService.getUserByUsername(ADMIN)).thenReturn(createdBy);
 	}
 
 	@Test(expected = NullPointerException.class)

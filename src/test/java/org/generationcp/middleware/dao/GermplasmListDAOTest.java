@@ -49,6 +49,9 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationManager;
 
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private GermplasmListDAO dao;
 	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
 	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
@@ -66,7 +69,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private GermplasmList list;
 	private Germplasm germplasm;
 	private Project commonTestProject;
-	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
 
@@ -94,10 +97,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData);
 
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
+		this.workbenchTestDataUtil.setUpWorkbench();
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();

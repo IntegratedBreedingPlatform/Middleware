@@ -111,8 +111,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private UserService userService;
 
-	private Project commonTestProject;
+	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	private Project commonTestProject;
+
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
@@ -122,10 +125,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
 		this.manager.setUserService(this.userService);
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
+
+		this.workbenchTestDataUtil.setUpWorkbench();
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -239,7 +240,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue("The size should be greater than 0", studyReferences.size() > 0);
 		for (final StudyReference study : studyReferences) {
 			Assert.assertNotNull(study.getOwnerId());
-			final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(study.getOwnerId());
+			final WorkbenchUser workbenchUser = this.userService.getUserById(study.getOwnerId());
 			Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
 
 		}
@@ -294,7 +295,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
 				Assert.assertFalse(study.getIsLocked());
 				Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
-				final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(this.studyReference.getOwnerId());
+				final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
 				Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
 			}
 		}
@@ -889,7 +890,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getStudyType(), studyFromDB.getStudyType());
 		Assert.assertFalse(studyFromDB.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), studyFromDB.getOwnerId());
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(this.studyReference.getOwnerId());
+		final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
 		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), studyFromDB.getOwnerName());
 	}
 

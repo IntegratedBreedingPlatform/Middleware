@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,6 +36,9 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private GermplasmDataManager germplasmManager;
@@ -80,7 +84,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		person.setContact("No Contact");
 		person.setLanguage(1);
 		person.setPhone("02121212121");
-		this.workbenchDataManager.addPerson(person);
+		this.userService.addPerson(person);
 
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setInstalid(1);
@@ -96,7 +100,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		// Role ID 1 = ADMIN
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, 1)));
 
-		this.workbenchDataManager.addUser(workbenchUser);
+		this.userService.addUser(workbenchUser);
 
 		CropType cropType = this.workbenchDataManager.getCropTypeByName("maize");
 		if (cropType == null) {

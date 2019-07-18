@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +39,9 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private UserService userService;
 
 	@Before
 	public void setUp() throws Exception {
@@ -91,7 +95,7 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		workbenchUser.setCloseDate(20190101);
 		workbenchUser.setPassword("password");
 		workbenchUser.setCrops(crops);
-		return this.workbenchDataManager.addUser(workbenchUser);
+		return this.userService.addUser(workbenchUser);
 	}
 
 	CropType createCropType(final String cropName) {

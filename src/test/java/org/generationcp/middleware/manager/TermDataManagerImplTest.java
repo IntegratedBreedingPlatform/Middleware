@@ -52,6 +52,8 @@ public class TermDataManagerImplTest extends IntegrationTestBase {
 	private OntologyScaleDataManager scaleManager;
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private Project testProject;
 	private Method testMethod;
@@ -61,8 +63,8 @@ public class TermDataManagerImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
-		this.testProject = instance.createTestProjectData();
+
+		this.testProject = this.workbenchTestDataUtil.createTestProjectData();
 
 		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
 		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());

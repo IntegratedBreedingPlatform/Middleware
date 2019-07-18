@@ -88,6 +88,9 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private NameDAO nameDAO;
 
 	private GermplasmDAO germplasmDAO;
@@ -99,8 +102,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private ProgenitorDAO progenitorDAO;
 
 	private Project commonTestProject;
-
-	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
@@ -124,11 +125,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager);
-		}
-
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
 		}
 
 		if (this.commonTestProject == null) {

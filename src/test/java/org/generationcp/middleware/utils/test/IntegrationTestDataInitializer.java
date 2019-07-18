@@ -48,6 +48,8 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,6 +73,7 @@ public class IntegrationTestDataInitializer {
 	private ProjectPropertyDao projectPropertyDao;
 
 	private DaoFactory daoFactory;
+	private UserService userService;
 	private WorkbenchDataManager workbenchDataManager;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
@@ -91,6 +94,7 @@ public class IntegrationTestDataInitializer {
 		this.personDAO = this.daoFactory.getPersonDAO();
 		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 		this.workbenchDataManager = new WorkbenchDataManagerImpl(workbenchSessionProvider);
+		this.userService = new UserServiceImpl(workbenchSessionProvider);
 	}
 
 	public DmsProject createDmsProject(final String name, final String description, final DmsProject study, final DmsProject parent,
@@ -301,7 +305,7 @@ public class IntegrationTestDataInitializer {
 		person.setLanguage(1);
 		person.setPhone("Phone");
 
-		this.workbenchDataManager.addPerson(person);
+		this.userService.addPerson(person);
 
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setInstalid(1);
@@ -317,7 +321,7 @@ public class IntegrationTestDataInitializer {
 		final List<CropType> crops = new ArrayList<>();
 		crops.add(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
 		workbenchUser.setCrops(crops);
-		this.workbenchDataManager.addUser(workbenchUser);
+		this.userService.addUser(workbenchUser);
 
 		return workbenchUser;
 

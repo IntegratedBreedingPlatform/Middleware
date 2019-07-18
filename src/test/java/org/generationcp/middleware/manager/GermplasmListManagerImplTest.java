@@ -35,6 +35,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -93,6 +94,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private UserService userService;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
@@ -609,7 +613,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.listId, germplasmListMetadata.getListId());
 		Assert.assertEquals(Integer.valueOf(1), germplasmListMetadata.getNumberOfEntries());
 		Assert.assertEquals(GermplasmListManagerImplTest.OWNER_ID, germplasmListMetadata.getOwnerId());
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(germplasmListMetadata.getOwnerId());
+		final WorkbenchUser workbenchUser = this.userService.getUserById(germplasmListMetadata.getOwnerId());
 		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), germplasmListMetadata.getOwnerName());
 
 	}

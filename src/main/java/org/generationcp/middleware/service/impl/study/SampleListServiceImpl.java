@@ -65,7 +65,7 @@ public class SampleListServiceImpl implements SampleListService {
 		try {
 			final SampleList sampleList = new SampleList();
 			sampleList.setCreatedDate(sampleListDTO.getCreatedDate());
-			final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(sampleListDTO.getCreatedBy());
+			final WorkbenchUser workbenchUser = this.userService.getUserByUsername(sampleListDTO.getCreatedBy());
 			sampleList.setProgramUUID(sampleListDTO.getProgramUUID());
 			sampleList.setCreatedBy(workbenchUser.getUserid());
 			sampleList.setDescription(sampleListDTO.getDescription());
@@ -97,7 +97,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 			Integer takenBy = null;
 			if (!sampleListDTO.getTakenBy().isEmpty()) {
-				takenBy = this.workbenchDataManager.getUserByUsername(sampleListDTO.getTakenBy()).getUserid();
+				takenBy = this.userService.getUserByUsername(sampleListDTO.getTakenBy()).getUserid();
 			}
 
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
@@ -225,7 +225,7 @@ public class SampleListServiceImpl implements SampleListService {
 		try {
 
 
-			final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(username);
+			final WorkbenchUser workbenchUser = this.userService.getUserByUsername(username);
 			final SampleList sampleFolder = new SampleList();
 			sampleFolder.setCreatedDate(new Date());
 			sampleFolder.setCreatedBy(workbenchUser.getUserid());

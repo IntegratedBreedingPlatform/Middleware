@@ -68,6 +68,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.TimerWatch;
@@ -103,6 +104,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Resource
+	private UserService userService;
 
 	private DaoFactory daoFactory;
 
@@ -846,7 +850,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public String getOwnerListName(final Integer userId) {
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(userId);
+		final WorkbenchUser workbenchUser = this.userService.getUserById(userId);
 		if (workbenchUser != null) {
 				return workbenchUser.getPerson().getDisplayName();
 		} else {

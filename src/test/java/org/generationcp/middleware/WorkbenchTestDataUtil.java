@@ -19,28 +19,34 @@ import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 public class WorkbenchTestDataUtil {
 
 	@Autowired
-	private final WorkbenchDataManager workbenchDataManager;
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private UserService userService;
+
 	private Project commonTestProject;
 	private WorkbenchUser testUser1, testUser2;
 	private Person testPerson1, testPerson2;
 	private ProjectActivity testProjectActivity1, testProjectActivity2;
 	private CropType cropType;
 
-	public WorkbenchTestDataUtil(WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public WorkbenchTestDataUtil() {
+		// Do nothing
 	}
 
 	public Person createTestPersonData() {
-		Person person = new Person();
+		final Person person = new Person();
 		person.setInstituteId(1);
 		person.setFirstName("Test");
 		person.setMiddleName("M");
-		int randomNumber = new Random().nextInt();
+		final int randomNumber = new Random().nextInt();
 		person.setLastName("Person " + randomNumber);
 		person.setPositionName("King of Icewind Dale");
 		person.setTitle("His Highness");
@@ -55,7 +61,7 @@ public class WorkbenchTestDataUtil {
 	}
 
 	public WorkbenchUser createTestUserData() {
-		WorkbenchUser user = new WorkbenchUser();
+		final WorkbenchUser user = new WorkbenchUser();
 		user.setInstalid(1);
 		user.setStatus(1);
 		user.setAccess(1);
@@ -75,9 +81,9 @@ public class WorkbenchTestDataUtil {
 	}
 
 	public Project createTestProjectData() {
-		Project project = new Project();
+		final Project project = new Project();
 		project.setUserId(1);
-		int uniqueId = new Random().nextInt(10000);
+		final int uniqueId = new Random().nextInt(10000);
 		project.setProjectName("Test Project " + uniqueId);
 		project.setStartDate(new Date(System.currentTimeMillis()));
 		project.setCropType(this.cropType);
@@ -86,8 +92,8 @@ public class WorkbenchTestDataUtil {
 		return project;
 	}
 
-	public ProjectActivity createTestProjectActivityData(Project project, WorkbenchUser user) {
-		ProjectActivity projectActivity = new ProjectActivity();
+	public ProjectActivity createTestProjectActivityData(final Project project, final WorkbenchUser user) {
+		final ProjectActivity projectActivity = new ProjectActivity();
 		projectActivity.setProject(project);
 		projectActivity.setName("Project Activity" + new Random().nextInt());
 		projectActivity.setDescription("Some project activity");
@@ -104,18 +110,18 @@ public class WorkbenchTestDataUtil {
 		crops.add(this.cropType);
 
 		this.testPerson1 = this.createTestPersonData();
-		this.workbenchDataManager.addPerson(this.testPerson1);
+		this.userService.addPerson(this.testPerson1);
 		this.testPerson2 = this.createTestPersonData();
-		this.workbenchDataManager.addPerson(this.testPerson2);
+		this.userService.addPerson(this.testPerson2);
 
 		this.testUser1 = this.createTestUserData();
 		this.testUser1.setPerson(this.testPerson1);
 		this.testUser1.setCrops(crops);
-		this.workbenchDataManager.addUser(this.testUser1);
+		this.userService.addUser(this.testUser1);
 		this.testUser2 = this.createTestUserData();
 		this.testUser2.setPerson(this.testPerson2);
 		this.testUser2.setCrops(crops);
-		this.workbenchDataManager.addUser(this.testUser2);
+		this.userService.addUser(this.testUser2);
 
 		this.commonTestProject.setUserId(this.testUser1.getUserid());
 		this.workbenchDataManager.addProject(this.commonTestProject);
@@ -126,11 +132,11 @@ public class WorkbenchTestDataUtil {
 		this.testProjectActivity2 = this.createTestProjectActivityData(this.commonTestProject, this.testUser2);
 		this.workbenchDataManager.addProjectActivity(this.testProjectActivity2);
 
-		UserInfo userInfo = new UserInfo();
+		final UserInfo userInfo = new UserInfo();
 		//TODO check if this is needed since we are hardcoding to user id 3
 		userInfo.setUserId(3);
 		userInfo.setLoginCount(5);
-		this.workbenchDataManager.insertOrUpdateUserInfo(userInfo);
+		this.userService.insertOrUpdateUserInfo(userInfo);
 
 		// Save test users 1 and 2 as members of test program
 		ProjectUserInfo pui = new ProjectUserInfo();
@@ -138,7 +144,7 @@ public class WorkbenchTestDataUtil {
 		pui.setUserId(this.commonTestProject.getUserId());
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
-		
+
 		pui = new ProjectUserInfo();
 		pui.setProject(this.commonTestProject);
 		pui.setUserId(this.testUser2.getUserid());
@@ -163,21 +169,21 @@ public class WorkbenchTestDataUtil {
 		}
 		return this.testUser1;
 	}
-	
+
 	public WorkbenchUser getTestUser2() {
 		if (this.testUser2 == null) {
 			this.testUser2 = this.createTestUserData();
 		}
 		return this.testUser2;
 	}
-	
-	public UserDto createTestUserDTO(Integer userId){
-		UserDto userdto = new UserDto();
-		
-		if(userId!=null && !userId.equals(0)){
+
+	public UserDto createTestUserDTO(final Integer userId) {
+		final UserDto userdto = new UserDto();
+
+		if (userId != null && !userId.equals(0)) {
 			userdto.setUserId(userId);
 		}
-		
+
 		final String username = RandomStringUtils.randomAlphanumeric(30);
 		userdto.setUsername(username);
 		final String firstName = RandomStringUtils.randomAlphanumeric(20);
@@ -192,7 +198,7 @@ public class WorkbenchTestDataUtil {
 		return userdto;
 	}
 
-	public void setCropType(CropType cropType) {
+	public void setCropType(final CropType cropType) {
 		this.cropType = cropType;
 	}
 }

@@ -146,7 +146,7 @@ public class SampleServiceImpl implements SampleService {
 		final DmsProject study = experiment.getProject().getStudy();
 		final Integer studyId = study.getProjectId();
 		final String takenBy =
-			(sample.getTakenBy() != null) ? this.workbenchDataManager.getUserById(sample.getTakenBy()).getPerson().getDisplayName() : null;
+			(sample.getTakenBy() != null) ? this.userService.getUserById(sample.getTakenBy()).getPerson().getDisplayName() : null;
 		final String obsUnitId = experiment.getObsUnitId();
 		final String studyName = study.getName();
 		final StockModel stock = experiment.getStock();

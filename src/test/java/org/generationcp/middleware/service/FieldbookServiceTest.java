@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,11 +44,17 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	@Autowired
 	private LocationDataManager locationManager;
 
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private FieldbookServiceImpl fieldbookMiddlewareService;
 
 
 	private StudyReference studyReference;
-	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private StudyTestDataInitializer studyTDI;
 	private StudyDataManagerImpl manager;
 	private Project commonTestProject;
@@ -66,10 +73,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		this.fieldbookMiddlewareService = new FieldbookServiceImpl(this.sessionProvder, "TESTCROP");
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
 
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
+		this.workbenchTestDataUtil.setUpWorkbench();
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -144,7 +148,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getStudyType(), study.getStudyType());
 		Assert.assertFalse(study.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
-		final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(this.studyReference.getOwnerId());
+		final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
 		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
 	}
 

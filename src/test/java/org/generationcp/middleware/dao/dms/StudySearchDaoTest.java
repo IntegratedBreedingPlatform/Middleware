@@ -63,6 +63,9 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	@Autowired
 	private FieldbookService fieldbookService;
+
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	
 	@Mock
 	private Session mockSession;
@@ -499,7 +502,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	private void createTestStudies() throws Exception {
 
-		final WorkbenchTestDataUtil workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+
 		final Project project = workbenchTestDataUtil.createTestProjectData();
 		project.setUniqueID(StudySearchDaoTest.PROGRAM_UUID);
 

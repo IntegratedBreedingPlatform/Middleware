@@ -37,6 +37,7 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -110,6 +111,9 @@ public class InventoryServiceImplTest {
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Mock
+	private UserService userService;
+
 	@InjectMocks
 	private InventoryServiceImpl inventoryServiceImpl = new InventoryServiceImpl();
 
@@ -127,7 +131,7 @@ public class InventoryServiceImplTest {
 
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setUserid(USER_ID);
-		when(this.workbenchDataManager.getUserById(USER_ID)).thenReturn(workbenchUser);
+		when(this.userService.getUserById(USER_ID)).thenReturn(workbenchUser);
 	}
 
 	@Test
