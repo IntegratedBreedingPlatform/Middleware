@@ -59,8 +59,8 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,12 +139,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "  LEFT JOIN study_type st ON pr.study_type_id = st.study_type_id "
 			+ " WHERE pr.project_id = :studyId and pr.deleted != " + DELETED_STUDY;
 
-	private static final String GET_STUDIES_OF_FOLDER =
-		"SELECT DISTINCT p.project_id "
-			+ "FROM project p "
-			+ "WHERE p.parent_project_id = :folderId AND p.study_type_id IS NOT NULL AND p.deleted != " + DELETED_STUDY + " "
-			+ "ORDER BY p.name ";
-
 	private static final String GET_ALL_FOLDERS =
 		" SELECT p.parent_project_id, p.project_id, p.name, p.description FROM project p "
 			+ " WHERE study_type_id IS NULL "
@@ -157,7 +151,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ " AND p.deleted != " + DELETED_STUDY
 			+ " AND p.program_uuid = :program_uuid ";
 
-	static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
+	private static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
 		+ "		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, "
@@ -333,51 +327,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException("Error in getByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyNodes;
-	}
-
-	public List<DmsProject> getProjectsByFolder(final Integer folderId, final int start, final int numOfRows) {
-		List<DmsProject> projects = new ArrayList<>();
-		if (folderId == null) {
-			return projects;
-		}
-
-		try {
-			// Get projects by folder
-			final Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
-			query.setParameter("folderId", folderId);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			final List<Integer> projectIds = query.list();
-			projects = this.getByIds(projectIds);
-
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error with getProjectsByFolder query from Project: " + e.getMessage(), e);
-		}
-
-		return projects;
-	}
-
-	public long countProjectsByFolder(final Integer folderId) {
-		long count = 0;
-		if (folderId == null) {
-			return count;
-		}
-
-		try {
-			final Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
-			query.setParameter("folderId", folderId);
-			final List<Object[]> list = query.list();
-			count = list.size();
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				"Error in countProjectsByFolder(" + folderId + ") query in DmsProjectDao: " + e.getMessage(),
-				e);
-		}
-
-		return count;
-
 	}
 
 	public List<StudyDetails> getAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
@@ -973,7 +922,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<MeasurementVariable> getObservationSetVariables(final Integer observationSetId, final List<Integer> variableTypes) {
-		return this.getObservationSetVariables(Arrays.asList(observationSetId), variableTypes);
+		return this.getObservationSetVariables(Collections.singletonList(observationSetId), variableTypes);
 	}
 
 	public List<MeasurementVariable> getObservationSetVariables(final List<Integer> observationSetIds, final List<Integer> variableTypes) {

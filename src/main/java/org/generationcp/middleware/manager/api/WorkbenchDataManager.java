@@ -246,7 +246,7 @@ public interface WorkbenchDataManager {
 	void incrementUserLogInCount(int userId);
 
 	/**
-	 * Insert or update the specified {@link WorkbenchUserInfo} record.
+	 * Insert or update the specified {@link UserInfo} record.
 	 *
 	 * @param userDetails the user details
 	 */
@@ -612,7 +612,7 @@ public interface WorkbenchDataManager {
 	/**
 	 * create the user.
 	 *
-	 * @param user the user
+	 * @param userDto the user
 	 * @return Returns the id of the {@code UserDto} record added
 	 */
 	public Integer createUser(UserDto userDto);
@@ -620,7 +620,7 @@ public interface WorkbenchDataManager {
 	/**
 	 * Updates the user.
 	 *
-	 * @param user the user to update
+	 * @param userDto the user to update
 	 * @return Returns the id of the {@code UserDto} record added
 	 */
 	public Integer updateUser(UserDto userDto);

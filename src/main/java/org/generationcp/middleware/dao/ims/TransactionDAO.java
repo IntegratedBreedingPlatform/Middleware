@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -32,6 +26,14 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Transaction}.
@@ -39,260 +41,276 @@ import org.hibernate.criterion.Restrictions;
  */
 public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
+	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
+
 	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllReserve(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Transaction> getAllReserve(final int start, final int numOfRows) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-			criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.eq("status", 0));
+			criteria.add(Restrictions.lt("quantity", 0));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAllReserve() query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllReserve() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Transaction>();
 	}
 
-	public List<String> getInventoryIDsWithBreederIdentifier(String identifier) throws MiddlewareQueryException {
+	public List<String> getInventoryIDsWithBreederIdentifier(final String identifier) {
 		try {
-			String queryString = Transaction.GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY.replace(":identifier", identifier);
-			Query query = this.getSession().createSQLQuery(queryString);
+			final String queryString = Transaction.GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY.replace(":identifier", identifier);
+			final Query query = this.getSession().createSQLQuery(queryString);
 			return query.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with get query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getInventoryIDsWithBreederIdentifier query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public long countAllReserve() {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.setProjection(Projections.rowCount());
+			criteria.add(Restrictions.eq("status", 0));
+			criteria.add(Restrictions.lt("quantity", 0));
+			return ((Long) criteria.uniqueResult());
+		} catch (final HibernateException e) {
+			final String message = "Error with countAllReserve query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Transaction> getAllDeposit(final int start, final int numOfRows) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.eq("status", 0));
+			criteria.add(Restrictions.gt("quantity", 0));
+			criteria.setFirstResult(start);
+			criteria.setMaxResults(numOfRows);
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllDeposit query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public long countAllDeposit() {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.setProjection(Projections.rowCount());
+			criteria.add(Restrictions.eq("status", 0));
+			criteria.add(Restrictions.gt("quantity", 0));
+			return ((Long) criteria.uniqueResult());
+		} catch (final HibernateException e) {
+			final String message = "Error with countAllDeposit() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Transaction> getAllReserveByRequestor(final Integer personId, final int start, final int numOfRows) {
+		try {
+			if (personId != null) {
+				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+				criteria.add(Restrictions.eq("status", 0));
+				criteria.add(Restrictions.lt("quantity", 0));
+				criteria.add(Restrictions.eq("personId", personId));
+				criteria.setFirstResult(start);
+				criteria.setMaxResults(numOfRows);
+				return criteria.list();
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllReserveByRequestor(personId=" + personId + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return new ArrayList<>();
 	}
 
-	public long countAllReserve() throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-			criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
-			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countAllReserve() query from Transaction: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllDeposit(int start, int numOfRows) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-			criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAllDeposit() query from Transaction: " + e.getMessage(), e);
-		}
-		return new ArrayList<Transaction>();
-	}
-
-	public long countAllDeposit() throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-			criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
-			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countAllDeposit() query from Transaction: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllReserveByRequestor(Integer personId, int start, int numOfRows) throws MiddlewareQueryException {
+	public long countAllReserveByRequestor(final Integer personId) {
 		try {
 			if (personId != null) {
-				Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-				criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
+				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+				criteria.setProjection(Projections.rowCount());
+				criteria.add(Restrictions.eq("status", 0));
+				criteria.add(Restrictions.lt("quantity", 0));
+				criteria.add(Restrictions.eq("personId", personId));
+				return ((Long) criteria.uniqueResult());
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with countAllReserveByRequestor(personId=" + personId + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Transaction> getAllDepositByDonor(final Integer personId, final int start, final int numOfRows) {
+		try {
+			if (personId != null) {
+				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+				criteria.add(Restrictions.eq("status", 0));
+				criteria.add(Restrictions.gt("quantity", 0));
 				criteria.add(Restrictions.eq("personId", personId));
 				criteria.setFirstResult(start);
 				criteria.setMaxResults(numOfRows);
 				return criteria.list();
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getAllReserveByRequestor(personId=" + personId + ") query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllDepositByDonor(personId=" + personId + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Transaction>();
+		return new ArrayList<>();
 	}
 
-	public long countAllReserveByRequestor(Integer personId) throws MiddlewareQueryException {
+	public long countAllDepositByDonor(final Integer personId) {
 		try {
 			if (personId != null) {
-				Criteria criteria = this.getSession().createCriteria(Transaction.class);
+				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 				criteria.setProjection(Projections.rowCount());
-				criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-				criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
+				criteria.add(Restrictions.eq("status", 0));
+				criteria.add(Restrictions.gt("quantity", 0));
 				criteria.add(Restrictions.eq("personId", personId));
-				return ((Long) criteria.uniqueResult()).longValue();
+				return ((Long) criteria.uniqueResult());
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with countAllReserveByRequestor(personId=" + personId + ") query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with countAllDepositByDonor(personId=" + personId + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllDepositByDonor(Integer personId, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Transaction> getAllUncommitted(final int start, final int numOfRows) {
 		try {
-			if (personId != null) {
-				Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-				criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
-				criteria.add(Restrictions.eq("personId", personId));
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
-				return criteria.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getAllDepositByDonor(personId=" + personId + ") query from Transaction: " + e.getMessage(), e);
-		}
-		return new ArrayList<Transaction>();
-	}
-
-	public long countAllDepositByDonor(Integer personId) throws MiddlewareQueryException {
-		try {
-			if (personId != null) {
-				Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.setProjection(Projections.rowCount());
-				criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-				criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
-				criteria.add(Restrictions.eq("personId", personId));
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with countAllDepositByDonor(personId=" + personId + ") query from Transaction: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllUncommitted(int start, int numOfRows) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.eq("status", 0));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAllUncommitted() query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllUncomitted() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Transaction>();
 	}
 
-	public long countAllUncommitted() throws MiddlewareQueryException {
+	public long countAllUncommitted() {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
+			criteria.add(Restrictions.eq("status", 0));
 			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countAllUncommitted() query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with countAllUncommitted() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllWithdrawals(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Transaction> getAllWithdrawals(final int start, final int numOfRows) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			criteria.add(Restrictions.lt("quantity", 0));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAllWithdrawals() query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllWithdrawals() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Transaction>();
 	}
 
-	public long countAllWithdrawals() throws MiddlewareQueryException {
+	public long countAllWithdrawals() {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
-			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countAllWithdrawals() query from Transaction: " + e.getMessage(), e);
+			criteria.add(Restrictions.lt("quantity", 0));
+			return ((Long) criteria.uniqueResult());
+		} catch (final HibernateException e) {
+			final String message = "Error with countAllWithdrawals() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Transaction> getEmptyLot(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Transaction> getEmptyLot(final int start, final int numOfRows) {
 		try {
-			Query query = this.getSession().getNamedQuery(Transaction.GET_EMPTY_LOT);
+			final Query query = this.getSession().getNamedQuery(Transaction.GET_EMPTY_LOT);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 			return query.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getEmptyLot() query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getEmptyLot() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Transaction>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Transaction> getLotWithMinimumAmount(double minAmount, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<Transaction> getLotWithMinimumAmount(final double minAmount, final int start, final int numOfRows) {
 		try {
-			Query query = this.getSession().getNamedQuery(Transaction.GET_LOT_WITH_MINIMUM_AMOUNT);
+			final Query query = this.getSession().getNamedQuery(Transaction.GET_LOT_WITH_MINIMUM_AMOUNT);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 			query.setParameter("minAmount", minAmount);
 			return query.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getLotWithMinimumAmount(minAmount=" + minAmount + ") query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getLotWithMinimumAmount(minAmount=\" + minAmount + \") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Transaction>();
 	}
 
-	public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(List<Integer> recordIds) throws MiddlewareQueryException {
-		List<InventoryDetails> detailsList = new ArrayList<InventoryDetails>();
+	public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(final List<Integer> recordIds) {
+		final List<InventoryDetails> detailsList = new ArrayList<InventoryDetails>();
 
 		if (recordIds == null || recordIds.isEmpty()) {
 			return detailsList;
 		}
 
 		try {
-			Session session = this.getSession();
+			final Session session = this.getSession();
 
-			StringBuilder sql =
+			final StringBuilder sql =
 					new StringBuilder().append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
 							.append("tran.sourceid, tran.trnqty, tran.inventory_id, lot.comments, tran.recordid ")
 							.append("FROM ims_transaction tran ").append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
 							.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
 							.append("		 AND tran.recordid IN (:recordIds) ");
-			SQLQuery query = session.createSQLQuery(sql.toString());
+			final SQLQuery query = session.createSQLQuery(sql.toString());
 			query.setParameterList("recordIds", recordIds);
 
-			List<Object[]> results = query.list();
+			final List<Object[]> results = query.list();
 
 			if (!results.isEmpty()) {
-				for (Object[] row : results) {
-					Integer lotId = (Integer) row[0];
-					Integer userId = (Integer) row[1];
-					Integer gid = (Integer) row[2];
-					Integer locationId = (Integer) row[3];
-					Integer scaleId = (Integer) row[4];
-					Integer sourceId = (Integer) row[5];
-					Double amount = (Double) row[6];
-					String inventoryID = (String) row[7];
-					String comment = (String) row[8];
-					Integer sourceRecordId = (Integer) row[9];
+				for (final Object[] row : results) {
+					final Integer lotId = (Integer) row[0];
+					final Integer userId = (Integer) row[1];
+					final Integer gid = (Integer) row[2];
+					final Integer locationId = (Integer) row[3];
+					final Integer scaleId = (Integer) row[4];
+					final Integer sourceId = (Integer) row[5];
+					final Double amount = (Double) row[6];
+					final String inventoryID = (String) row[7];
+					final String comment = (String) row[8];
+					final Integer sourceRecordId = (Integer) row[9];
 
-					InventoryDetails details =
+					final InventoryDetails details =
 							new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId, null, comment);
 					details.setInventoryID(inventoryID);
 					details.setSourceRecordId(sourceRecordId);
@@ -300,137 +318,90 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				}
 			}
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getInventoryDetailsByTransactionRecordId() query from TransactionDAO: " + e.getMessage(),
-					e);
+		} catch (final HibernateException e) {
+			final String message = "Error with getInventoryDetailsByTransactionRecordId() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return detailsList;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException {
-		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-
-		if (gids == null || gids.isEmpty()) {
-			return inventoryDetails;
-		}
+	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(final List<Integer> listEntryIds) {
+		final Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
 
 		try {
-			Session session = this.getSession();
-
-			StringBuilder sql =
-					new StringBuilder().append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-							.append("tran.sourceid, tran.trnqty, lot.comments ").append("FROM ims_lot lot ")
-							.append("LEFT JOIN ims_transaction tran ON lot.lotid = tran.lotid ").append("WHERE lot.status = ")
-							.append(LotStatus.ACTIVE.getIntValue()).append("		 AND lot.eid IN (:gids) ");
-			SQLQuery query = session.createSQLQuery(sql.toString());
-			query.setParameterList("gids", gids);
-
-			List<Object[]> results = query.list();
-
-			if (!results.isEmpty()) {
-				for (Object[] row : results) {
-					Integer lotId = (Integer) row[0];
-					Integer userId = (Integer) row[1];
-					Integer gid = (Integer) row[2];
-					Integer locationId = (Integer) row[3];
-					Integer scaleId = (Integer) row[4];
-					Integer sourceId = (Integer) row[5];
-					Double amount = (Double) row[6];
-					String comment = (String) row[7];
-
-					inventoryDetails.add(new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, sourceId, null, scaleId,
-							null, comment));
-				}
-			}
-
-			for (Integer gid : gids) {
-				if (!this.isGidInInventoryList(inventoryDetails, gid)) {
-					inventoryDetails.add(new InventoryDetails(gid, null, null, null, null, null, null, null, null, null, null, null));
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getGidsByListId() query from GermplasmList: " + e.getMessage(), e);
-		}
-
-		return inventoryDetails;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(List<Integer> listEntryIds) throws MiddlewareQueryException {
-		Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
-
-		try {
-			String sql =
+			final String sql =
 					"SELECT recordid, count(DISTINCT t.lotid) " + "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
 							+ "WHERE trnstat = 0 AND trnqty < 0 AND recordid IN (:entryIds) "
 							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
-				Integer entryId = (Integer) row[0];
-				BigInteger count = (BigInteger) row[1];
+			final Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
+				final Integer entryId = (Integer) row[0];
+				final BigInteger count = (BigInteger) row[1];
 
 				lotCounts.put(entryId, count);
 			}
 
-		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error at countLotsWithReservationForListEntries=" + listEntryIds + " at TransactionDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			final String message = "Error with countLotsWithReservationForListEntries=" + listEntryIds + " query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return lotCounts;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctScale(List<Integer> listEntryIds) throws MiddlewareQueryException {
-		Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<Integer, Object[]>();
+	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctScale(final List<Integer> listEntryIds) {
+		final Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<Integer, Object[]>();
 
 		try {
-			String sql =
+			final String sql =
 					"SELECT recordid, sum(trnqty)*-1 as withdrawal, count(distinct l.scaleid),l.scaleid "
 							+ "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
 							+ "WHERE trnqty < 0 AND trnstat <> 9 AND recordid IN (:entryIds) "
 							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
-				Integer entryId = (Integer) row[0];
-				Double withdrawalBalance = (Double) row[1];
+			final Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
+				final Integer entryId = (Integer) row[0];
+				final Double withdrawalBalance = (Double) row[1];
 
-				BigInteger distinctWithdrawalScale = (BigInteger) row[2];
-				Integer withdrawalScale = (Integer) row[3];
+				final BigInteger distinctWithdrawalScale = (BigInteger) row[2];
+				final Integer withdrawalScale = (Integer) row[3];
 
 				mapWithdrawalStatusEntryWise.put(entryId, new Object[]{ withdrawalBalance, 	distinctWithdrawalScale, withdrawalScale});
 			}
 
-		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error at retrieveWithdrawalBalanceWithDistinctScale=" + listEntryIds + " at TransactionDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			final String message = "Error with retrieveWithdrawalBalanceWithDistinctScale=" + listEntryIds + " query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return mapWithdrawalStatusEntryWise;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Object[]> retrieveWithdrawalStatus(Integer sourceId, List<Integer> listGids) throws MiddlewareQueryException {
-		List<Object[]> listOfTransactionStatusForGermplsm = new ArrayList<Object[]>();
+	public List<Object[]> retrieveWithdrawalStatus(final Integer sourceId, final List<Integer> listGids) {
+		final List<Object[]> listOfTransactionStatusForGermplsm = new ArrayList<Object[]>();
 
 		try {
-			String sql =
+			final String sql =
 					"select lot.*,recordid,trnstat  from  (SELECT i.lotid, i.eid FROM ims_lot i "
 							+ " LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
 							+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gIds) GROUP BY i.lotid ) lot "
 							+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid   AND trnstat in (0,1) AND trnqty < 0 "
 							+ " AND sourceid = :sourceid AND sourcetype = 'LIST'  ORDER by lot.eid; ";
-			Query query = this.getSession().createSQLQuery(sql);
+			final Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gIds", listGids);
 			query.setParameter("sourceid", sourceId);
 
-			List<Object[]> result = query.list();
-			for (Object[] row : result) {
+			final List<Object[]> result = query.list();
+			for (final Object[] row : result) {
 
 				Integer lotId = null;
 				Integer germplsmId = null;
@@ -454,65 +425,57 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				listOfTransactionStatusForGermplsm.add(new Object[]{ lotId, germplsmId, recordId, tranStatus });
 			}
 
-		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error at retrieveWithdrawalStatus=" + listGids + " at TransactionDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			final String message = "Error withretrieveWithdrawalStatus=" + listGids + " query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return listOfTransactionStatusForGermplsm;
 	}
 
-
-
-	private boolean isGidInInventoryList(List<InventoryDetails> inventoryDetails, Integer gid) {
-		for (InventoryDetails detail : inventoryDetails) {
-			if (detail.getGid().equals(gid)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	@SuppressWarnings("unchecked")
-	public List<Transaction> getByLotIds(List<Integer> lotIds) throws MiddlewareQueryException {
-		List<Transaction> transactions = new ArrayList<Transaction>();
+	public List<Transaction> getByLotIds(final List<Integer> lotIds) {
+		final List<Transaction> transactions = new ArrayList<Transaction>();
 
 		if (lotIds == null || lotIds.isEmpty()) {
 			return transactions;
 		}
 
 		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
+			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.add(Restrictions.in("lot.id", lotIds));
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByLotIds() query from Transaction: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			final String message = "Error getByLotIds() query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
-		return transactions;
 	}
 
-	public void cancelUnconfirmedTransactionsForListEntries(List<Integer> listEntryIds) throws MiddlewareQueryException {
+	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
 			
-			String sql =
+			final String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
 							+ "WHERE trnstat = 0 AND recordid IN (:entryIds) " + "AND sourceType = 'LIST'";
-			Query query =
+			final Query query =
 					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
 							.setParameterList("entryIds", listEntryIds);
 			query.executeUpdate();
-		} catch (Exception e) {
-			this.logAndThrowException("Error at cancelReservationForListEntries=" + listEntryIds + " at TransactionDAO: " + e.getMessage(),
-					e);
+		} catch (final Exception e) {
+			final String message = "Error cancelUnconfirmedTransactionsForListEntries=" + listEntryIds + " query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public void cancelReservationsForLotEntryAndLrecId(Integer lotId, Integer lrecId) throws MiddlewareQueryException {
+	public void cancelReservationsForLotEntryAndLrecId(final Integer lotId, final Integer lrecId) {
 		try {
 			
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
@@ -520,86 +483,54 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			// statement
 			this.getSession().flush();
 			
-			String sql =
+			final String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate " + "WHERE trnstat = 0 AND lotId = :lotId "
 							+ "AND recordId = :lrecId " + "AND trnqty < 0 " + "AND sourceType = 'LIST'";
-			Query query =
+			final Query query =
 					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
 							.setParameter("lotId", lotId).setParameter("lrecId", lrecId);
 			query.executeUpdate();
-		} catch (Exception e) {
-			this.logAndThrowException("Error at cancelReservationsForListEntries(lotId:" + lotId + ", lrecId:" + lrecId
-					+ ") at TransactionDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			final String message = "Error cancelReservationsForLotEntryAndLrecId(lotId:" + lotId + ", lrecId:" + lrecId
+				+ ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public void cancelUnconfirmedTransactionsForGermplasms(List<Integer> gids) throws MiddlewareQueryException {
+	public void cancelUnconfirmedTransactionsForGermplasms(final List<Integer> gids) {
 		try {
-			String sql =
+			final String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
 							+ "WHERE trnstat = 0 AND sourceType = 'LIST' " + "AND lotid in ( select lotid from ims_lot "
 							+ "WHERE status = 0 AND etype = 'GERMPLSM' " + "AND eid in (:gids))";
-			Query query =
+			final Query query =
 					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
 							.setParameterList("gids", gids);
 			query.executeUpdate();
-		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error at cancelUnconfirmedTransactionsForGermplasms=" + gids + " at TransactionDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			final String message = "Error cancelUnconfirmedTransactionsForGermplasms=" + gids + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public void cancelUnconfirmedTransactionsForLists(List<Integer> listIds) throws MiddlewareQueryException {
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-			
-			String sql =
-					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
-							+ "WHERE trnstat = 0 AND sourceId in (:listIds) " + "AND sourceType = 'LIST'";
-			Query query =
-					this.getSession().createSQLQuery(sql).setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
-							.setParameterList("listIds", listIds);
-			query.executeUpdate();
-		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error at cancelUnconfirmedTransactionsForLists=" + listIds + " at TransactionDAO: " + e.getMessage(), e);
-		}
-	}
+	public Map<Integer, String> retrieveStockIds(final List<Integer> gIds) {
 
-	public boolean transactionsExistForListData(Integer dataListId) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.eq("sourceId", dataListId));
-			criteria.add(Restrictions.eq("sourceType", EntityType.LIST.name()));
-			criteria.setProjection(Projections.rowCount());
+		final Map<Integer, String> gIdStockIdMap = new HashMap<>();
 
-			Number number = (Number) criteria.uniqueResult();
-			return number.intValue() > 0;
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error at transactionsExistForListData=" + dataListId + " at TransactionDAO: " + e.getMessage(), e);
-			return false;
-		}
-	}
-
-	public Map<Integer, String> retrieveStockIds(List<Integer> gIds) {
-
-		Map<Integer, String> gIdStockIdMap = new HashMap<>();
-
-		String sql =
+		final String sql =
 				"SELECT a.gid,group_concat(inventory_id SEPARATOR ', ')  " + "FROM listdata a  "
 						+ "inner join ims_lot b ON a.gid = b.eid  "
 						+ "INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid "
 						+ "WHERE a.gid in (:gIds) GROUP BY a.gid";
 
-		Query query = this.getSession().createSQLQuery(sql).setParameterList("gIds", gIds);
+		final Query query = this.getSession().createSQLQuery(sql).setParameterList("gIds", gIds);
 
-		List<Object[]> result = query.list();
-		for (Object[] row : result) {
-			Integer gid = (Integer) row[0];
-			String stockIds = (String) row[1];
+		final List<Object[]> result = query.list();
+		for (final Object[] row : result) {
+			final Integer gid = (Integer) row[0];
+			final String stockIds = (String) row[1];
 
 			gIdStockIdMap.put(gid, stockIds);
 		}
@@ -625,57 +556,60 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<String> getStockIdsByListDataProjectListId(Integer listId) throws MiddlewareQueryException {
+	public List<String> getStockIdsByListDataProjectListId(final Integer listId) {
 		try {
-			String sql =
+			final String sql =
 					"SELECT tran.inventory_id" + " FROM ims_transaction tran, listnms l" + " WHERE l.listId = :listId "
 							+ " AND sourceId = l.listref AND sourceType = 'LIST'" + " AND inventory_id IS NOT NULL";
-			Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
+			final Query query = this.getSession().createSQLQuery(sql).setParameter("listId", listId);
 			return query.list();
-		} catch (Exception e) {
-			this.logAndThrowException("Error at getStockIdsByListId(" + listId + ") at TransactionDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			final String message = "Error with getStockIdsByListDataProjectListId(" + listId + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<String>();
 	}
 
-	public List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) {
+	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
 
-		List<TransactionReportRow> transactions = new ArrayList<>();
+		final List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
-			String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
+			final String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
 					+ "(CASE WHEN i.comments in ('Lot closed', 'Discard') THEN i.comments WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit' "
 					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
 					+ "WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.lotid";
 
-			Query query = this.getSession().createSQLQuery(sql);
+			final Query query = this.getSession().createSQLQuery(sql);
 
 			query.setParameter("lotId", lotId);
 
 			this.createTransactionRow(transactions, query);
 
-		} catch (Exception e) {
-			this.logAndThrowException("Error at getTransactionDetailsForLot(" + lotId + ") at TransactionDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			final String message = "Error with ggetTransactionDetailsForLot(" + lotId + ") query from Transaction: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return transactions;
 	}
 
-	private void createTransactionRow(List<TransactionReportRow> transactionReportRows, Query query) {
+	private void createTransactionRow(final List<TransactionReportRow> transactionReportRows, final Query query) {
 
-		List<Object[]> result = query.list();
+		final List<Object[]> result = query.list();
 		TransactionReportRow transaction = null;
-		for (Object[] row : result) {
+		for (final Object[] row : result) {
 
-			Integer userId = (Integer) row[0];
-			Integer lotId = (Integer) row[1];
-			Integer trnDate = (Integer) row[2];
-			Integer trnState = (Integer) row[3];
-			Double trnQty = (Double) row[4];
-			Integer listId = (Integer) row[5];
-			String listName = (String) row[6];
-			String comments = (String) row[7];
-			String lotStatus = (String) row[8];
+			final Integer userId = (Integer) row[0];
+			final Integer lotId = (Integer) row[1];
+			final Integer trnDate = (Integer) row[2];
+			final Integer trnState = (Integer) row[3];
+			final Double trnQty = (Double) row[4];
+			final Integer listId = (Integer) row[5];
+			final String listName = (String) row[6];
+			final String comments = (String) row[7];
+			final String lotStatus = (String) row[8];
 
 			transaction = new TransactionReportRow();
 			transaction.setUserId(userId);
