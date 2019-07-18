@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.generationcp.middleware.service.impl.study.StudyMeasurements;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static org.mockito.Mockito.when;
 
@@ -79,6 +81,9 @@ public class SampleListServiceImplTest {
 	@Mock
 	private SampleService sampleService;
 
+	@Mock
+	private UserService userService;
+
 	private SampleListServiceImpl sampleListService;
 
 	@Before
@@ -88,6 +93,7 @@ public class SampleListServiceImplTest {
 		this.sampleListService.setStudyMeasurements(this.studyMeasurements);
 		this.sampleListService.setWorkbenchDataManager(this.workbenchDataManager);
 		this.sampleListService.setSampleService(this.sampleService);
+		this.sampleListService.setUserService(this.userService);
 
 		final DaoFactory daoFactory = Mockito.mock(DaoFactory.class);
 		this.sampleListService.setDaoFactory(daoFactory);
@@ -645,32 +651,48 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testGetSampleDetailsDTOs() {
+
+		final Integer userId1 = 1;
+		final Integer userId2 = 2;
+		final String userFullName1 = "John Doe";
+		final String userFullName2 = "Jane Doe";
+
+		final Map<Integer, String> userIDFullNameMap = new HashMap<>();
+		userIDFullNameMap.put(userId1, userFullName1);
+		userIDFullNameMap.put(userId2, userFullName2);
+
 		final Integer sampleListId = 1;
-		final List<SampleDetailsDTO> list = new ArrayList<>();
-		final SampleDetailsDTO dto0 = new SampleDetailsDTO();
-		dto0.setGid(1);
-		dto0.setEntryNo(1);
+		final List<SampleDetailsDTO> sampleDetailsDTOS = new ArrayList<>();
+		final SampleDetailsDTO sampleDetailsDTO1 = new SampleDetailsDTO();
+		sampleDetailsDTO1.setGid(1);
+		sampleDetailsDTO1.setEntryNo(1);
+		sampleDetailsDTO1.setTakenByUserId(userId1);
 
-		final SampleDetailsDTO dto1 = new SampleDetailsDTO();
-		dto1.setGid(2);
-		dto1.setEntryNo(2);
+		final SampleDetailsDTO sampleDetailsDTO2 = new SampleDetailsDTO();
+		sampleDetailsDTO2.setGid(2);
+		sampleDetailsDTO2.setEntryNo(2);
+		sampleDetailsDTO2.setTakenByUserId(userId2);
 
-		list.add(dto0);
-		list.add(dto1);
-		when(this.sampleListService.getSampleDetailsDTOs(sampleListId)).thenReturn(list);
+		sampleDetailsDTOS.add(sampleDetailsDTO1);
+		sampleDetailsDTOS.add(sampleDetailsDTO2);
+
+		when(this.userService.getUserIDFullNameMap(Arrays.asList(userId1, userId2))).thenReturn(userIDFullNameMap);
+		when(this.sampleListDao.getSampleDetailsDTO(sampleListId)).thenReturn(sampleDetailsDTOS);
 
 		final List<SampleDetailsDTO> result = this.sampleListService.getSampleDetailsDTOs(sampleListId);
 
-		final SampleDetailsDTO result0 = result.get(0);
-		final SampleDetailsDTO result1 = result.get(1);
+		final SampleDetailsDTO result1 = result.get(0);
+		final SampleDetailsDTO result2 = result.get(1);
 
 		Assert.assertEquals(2, result.size());
-		Assert.assertNotNull(result0);
 		Assert.assertNotNull(result1);
-		Assert.assertEquals(result0.getEntryNo(), dto0.getEntryNo());
-		Assert.assertEquals(result0.getGid(), dto0.getGid());
-		Assert.assertEquals(result1.getEntryNo(), dto1.getEntryNo());
-		Assert.assertEquals(result1.getGid(), dto1.getGid());
+		Assert.assertNotNull(result1);
+		Assert.assertEquals(result1.getEntryNo(), sampleDetailsDTO1.getEntryNo());
+		Assert.assertEquals(result1.getGid(), sampleDetailsDTO1.getGid());
+		Assert.assertEquals(userFullName1, result1.getTakenBy());
+		Assert.assertEquals(result2.getEntryNo(), sampleDetailsDTO2.getEntryNo());
+		Assert.assertEquals(result2.getGid(), sampleDetailsDTO2.getGid());
+		Assert.assertEquals("Jane Doe", result2.getTakenBy());
 	}
 
 	@Test
@@ -714,7 +736,7 @@ public class SampleListServiceImplTest {
 			Assert.assertEquals(null, sample.getPlateId());
 			Assert.assertEquals(null, sample.getWell());
 		}
-		
+
 		when(sampleListDao.getById(sampleListId)).thenReturn(sampleList);
 
 		this.sampleListService.updateSamplePlateInfo(sampleListId, samplePlateInfoMap);
@@ -730,7 +752,7 @@ public class SampleListServiceImplTest {
 		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
 
 	}
-	
+
 	@Test
 	public void testUpdateASamplePlateInfoFromSampleList() {
 
@@ -762,7 +784,7 @@ public class SampleListServiceImplTest {
 		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
 
 	}
-	
+
 
 	private SampleList createSampleList() {
 

@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private SampleService sampleService;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -413,9 +417,22 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
+		final  List<SampleDetailsDTO> sampleDetailsDTOS = this.daoFactory.getSampleListDao().getSampleDetailsDTO(sampleListId);
 
-		// FIXME: IBP-2784 Find an efficient way to populate the user's first and last name (SampleDetailsDTO#takenBy) from Workbench database.
-		return this.daoFactory.getSampleListDao().getSampleDetailsDTO(sampleListId);
+		// Populate takenBy with full name of user from workbench database.
+		final List<Integer> userIds = Lists.transform(sampleDetailsDTOS, new Function<SampleDetailsDTO, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final SampleDetailsDTO input) {
+				return input.getTakenByUserId();
+			}
+		});
+		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+		for (final SampleDetailsDTO sampleDetailsDTO : sampleDetailsDTOS) {
+			sampleDetailsDTO.setTakenBy(userIDFullNameMap.get(sampleDetailsDTO.getTakenByUserId()));
+		}
+		return sampleDetailsDTOS;
 	}
 
 	@Override
@@ -466,5 +483,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 	public void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
+	}
+
+	public void setUserService(final UserService userService) {
+		this.userService = userService;
 	}
 }
