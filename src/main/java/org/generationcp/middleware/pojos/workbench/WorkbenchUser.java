@@ -54,7 +54,7 @@ import org.hibernate.annotations.NotFoundAction;
 		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
 		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
 		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
-		@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.personid = p.id AND "
+		@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.person.id = p.id AND "
 			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 
 })
