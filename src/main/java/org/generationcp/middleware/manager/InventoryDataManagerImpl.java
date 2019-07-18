@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -38,11 +40,15 @@ import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nullable;
+import javax.annotation.Resource;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -53,6 +59,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager {
+
+	@Resource
+	private UserService userService;
 
 	private DaoFactory daoFactory;
 
@@ -574,10 +583,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		return this.getListInventoryBuilder().retrieveLotCountsForList(listEntries);
 	}
 
-	/**
-	 * (non-Javadoc)
-	 * @see org.generationcp.middleware.manager.api.InventoryDataManager#populateLotCountsIntoExistingList(org.generationcp.middleware.pojos.GermplasmList)
-	 */
 	@Override
 	public void populateLotCountsIntoExistingList(final GermplasmList germplasmList) throws MiddlewareQueryException {
 		this.getListInventoryBuilder().retrieveLotCountsForList(germplasmList.getListData());
@@ -659,7 +664,24 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException {
-		return daoFactory.getTransactionDAO().getTransactionDetailsForLot(lotId);
+		final List<TransactionReportRow> transactionDetailsForLot = daoFactory.getTransactionDAO().getTransactionDetailsForLot(lotId);
+		final List<Integer> userIds = Lists.transform(transactionDetailsForLot, new Function<TransactionReportRow, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final TransactionReportRow input) {
+				return input.getUserId();
+			}
+		});
+		if (!userIds.isEmpty()) {
+			final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+			for (final TransactionReportRow row : transactionDetailsForLot) {
+				if (row.getUserId() != null) {
+					row.setUser(userIDFullNameMap.get(row.getUserId()));
+				}
+			}
+		}
+		return transactionDetailsForLot;
 	}
 
 	@Override

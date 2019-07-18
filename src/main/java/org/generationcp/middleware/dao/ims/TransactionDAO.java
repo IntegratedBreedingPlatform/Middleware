@@ -638,15 +638,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return new ArrayList<String>();
 	}
 
-	public List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException {
+	public List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) {
 
 		List<TransactionReportRow> transactions = new ArrayList<>();
 		try {
-			String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname,u.uname,i.comments,"
+			String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname, i.comments,"
 					+ "(CASE WHEN i.comments in ('Lot closed', 'Discard') THEN i.comments WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit' "
 					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype "
 					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
-					+ "LEFT JOIN users u ON u.userid = i.userid WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.lotid";
+					+ "WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.lotid";
 
 			Query query = this.getSession().createSQLQuery(sql);
 
@@ -674,9 +674,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			Double trnQty = (Double) row[4];
 			Integer listId = (Integer) row[5];
 			String listName = (String) row[6];
-			String userName = (String) row[7];
-			String comments = (String) row[8];
-			String lotStatus = (String) row[9];
+			String comments = (String) row[7];
+			String lotStatus = (String) row[8];
 
 			transaction = new TransactionReportRow();
 			transaction.setUserId(userId);
@@ -686,7 +685,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			transaction.setQuantity(trnQty);
 			transaction.setListId(listId);
 			transaction.setListName(listName);
-			transaction.setUser(userName);
 			transaction.setCommentOfLot(comments);
 			transaction.setLotStatus(lotStatus);
 

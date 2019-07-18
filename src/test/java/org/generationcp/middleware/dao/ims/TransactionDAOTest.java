@@ -242,20 +242,17 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 				Assert.assertEquals(depositTransaction.getQuantity(), reportRow.getQuantity());
 				Assert.assertEquals(LOT_DEPOSIT, reportRow.getLotStatus());
-				Assert.assertEquals("user_test", reportRow.getUser());
 				Assert.assertEquals(depositTransaction.getTransactionDate(), reportRow.getDate());
 				Assert.assertEquals(depositTransaction.getComments(), reportRow.getCommentOfLot());
 
 			}
 			if (LOT_DISCARD.equals(reportRow.getLotStatus())) {
-
-				Assert.assertEquals("user_test", reportRow.getUser());
 				Assert.assertEquals(closedTransaction.getTransactionDate(), reportRow.getDate());
 				Assert.assertEquals(closedTransaction.getComments(), reportRow.getCommentOfLot());
 				Assert.assertEquals(closedTransaction.getQuantity(), reportRow.getQuantity());
 				Assert.assertEquals(LOT_DISCARD, reportRow.getLotStatus());
-
 			}
+			Assert.assertEquals(user.getUserid(), reportRow.getUserId());
 		}
 
 	}
