@@ -50,4 +50,9 @@ public class UserServiceImpl implements UserService {
 		}
 		return userDtos;
 	}
+
+	@Override
+	public WorkbenchUser getUserByFullname(final String fullname) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByFullName(fullname);
+	}
 }
