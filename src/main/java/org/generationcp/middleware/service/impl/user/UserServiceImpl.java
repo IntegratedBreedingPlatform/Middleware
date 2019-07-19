@@ -301,6 +301,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public String getPersonName(final int userId) {
+		final WorkbenchUser workbenchUser = this.workbenchDaoFactory.getWorkbenchUserDAO().getById(userId);
+		if (workbenchUser != null) {
+			workbenchUser.getPerson().getDisplayName();
+		}
+		return "";
+	}
+
+	@Override
 	public List<Person> getAllPersons() {
 		return this.workbenchDaoFactory.getPersonDAO().getAll();
 	}

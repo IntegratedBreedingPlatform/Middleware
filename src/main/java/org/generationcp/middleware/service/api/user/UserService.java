@@ -179,6 +179,8 @@ public interface UserService {
 
 	Person getPersonByEmailAndName(String email, String firstName, String lastName);
 
+	String getPersonName(int userId);
+
 	/**
 	 * Returns all Persons.
 	 *
