@@ -16,10 +16,8 @@ import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -199,7 +197,7 @@ public class IntegrationTestDataInitializer {
 		final SampleList sampleList = SampleListTestDataInitializer.createSampleList(userId);
 		sampleList.setListName(listName);
 		sampleList.setDescription("DESCRIPTION-" + listName);
-		sampleList.setCreatedBy(userId);
+		sampleList.setCreatedByUserId(userId);
 		this.sampleListDao.saveOrUpdate(sampleList);
 		return sampleList;
 

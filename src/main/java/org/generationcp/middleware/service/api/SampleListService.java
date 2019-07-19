@@ -70,16 +70,6 @@ public interface SampleListService {
 	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 
 	/**
-	 * Returns the Top Level sample List Folders present in the program of the specified database. Retrieval from the database is done by
-	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
-	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
-	 *
-	 * @param programUUID - the program UUID
-	 * @return - List of SampleList POJOs
-	 */
-	List<SampleList> getAllTopLevelLists(final String programUUID);
-
-	/**
 	 * Returns a list of {@code SampleList} child records given a parent id. Retrieval from the database is done by batch (as specified
 	 * in batchSize) to reduce the load in instances where there is a large volume of child folders to be retrieved. Though retrieval is by
 	 * batch, this method still returns all of the child folders as a single list.

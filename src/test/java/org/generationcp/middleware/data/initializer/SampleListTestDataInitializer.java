@@ -10,7 +10,7 @@ public class SampleListTestDataInitializer {
 	public static SampleList createSampleList(final Integer userId) {
 		final SampleList sampleList = new SampleList();
 		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(userId);
+		sampleList.setCreatedByUserId(userId);
 		sampleList.setDescription("description");
 		sampleList.setListName("Sample list");
 		sampleList.setNotes("Notes");
@@ -22,7 +22,7 @@ public class SampleListTestDataInitializer {
 	public static SampleList createSampleListFolder(final Integer userId) {
 		final SampleList sampleList = new SampleList();
 		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(userId);
+		sampleList.setCreatedByUserId(userId);
 		sampleList.setDescription("description");
 		sampleList.setListName("Sample Folder");
 		sampleList.setNotes("Notes");

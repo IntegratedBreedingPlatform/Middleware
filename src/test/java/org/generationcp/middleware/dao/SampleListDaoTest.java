@@ -121,7 +121,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.sampleListDao.saveOrUpdate(sampleList);
 		Assert.assertNotNull(sampleList.getId());
 		// FIXME fresh db doesn't have admin workbenchUser in crop. Use workbench.users. BMS-886
-		// Assert.assertEquals(workbenchUser.getName(), sampleList.getCreatedBy().getName());
+		// Assert.assertEquals(workbenchUser.getName(), sampleList.getCreatedByUserId().getName());
 		Assert.assertEquals(sampleList.getDescription(), SampleListDaoTest.DESCRIPTION);
 		Assert.assertEquals(SampleListDaoTest.SAMPLE_LIST_NAME, sampleList.getListName());
 		Assert.assertEquals(sampleList.getNotes(), SampleListDaoTest.NOTES);
