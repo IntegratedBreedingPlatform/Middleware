@@ -425,8 +425,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  "
 			+ "    nde.obs_unit_id as OBS_UNIT_ID,  " //
 			+ "    parent.obs_unit_id as PARENT_OBS_UNIT_ID,  " //
-			+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp "
-			+ "		INNER JOIN nd_experiment sp_nde ON sp.nd_experiment_id = sp_nde.nd_experiment_id WHERE sp_nde.nd_experiment_id = nde.nd_experiment_id OR sp_nde.parent_id = nde.nd_experiment_id) 'SUM_OF_SAMPLES',");
+			+ "    coalesce(nullif((SELECT count(sp.sample_id) " //
+			+ "        FROM sample sp " //
+			+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) " //
+			+ "         + coalesce(child_sample_count.count, 0), 0), '-') 'SUM_OF_SAMPLES', ");
 
 		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'," //
 			+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s'," //
@@ -509,6 +511,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ " LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id " //
+			// Count samples for child dataset (sub-obs)
+			+ " LEFT JOIN (SELECT parent.nd_experiment_id, " //
+			+ "       nullif(count(child_sample.sample_id), 0) AS count " //
+			+ "     FROM nd_experiment child " // start the join with child to avoid parent_id full index scan
+			+ "            LEFT JOIN sample child_sample ON child.nd_experiment_id = child_sample.nd_experiment_id " //
+			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id " //
+			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id " //
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " //
 			+ " WHERE p.project_id = :datasetId "); //
