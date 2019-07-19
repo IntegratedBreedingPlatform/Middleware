@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -328,4 +327,5 @@ public interface WorkbenchDataManager {
 	 */
 	void close();
 
+	StandardPreset getStandardPresetById(Integer presetId);
 }

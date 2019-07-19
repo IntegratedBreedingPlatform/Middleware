@@ -466,6 +466,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public StandardPreset getStandardPresetById(final Integer presetId) {
+		return this.workbenchDaoFactory.getStandardPresetDAO().getById(presetId);
+	}
+
+	@Override
 	public Project getProjectByUuid(final String projectUuid) {
 		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid);
 	}
