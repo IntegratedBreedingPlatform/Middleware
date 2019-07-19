@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.user;
 
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
@@ -19,7 +20,6 @@ public interface UserService {
 	 * @return the user matching the given id
 	 */
 	WorkbenchUser getUserById(final Integer userId);
-
 
 	/**
 	 * Gets the user by name.
@@ -53,6 +53,29 @@ public interface UserService {
 	 */
 	List<UserDto> getUsersByProjectUuid(final String projectUuid);
 
+	/**
+	 * Retrieves the user ids of the program members using the project id
+	 *
+	 * @param projectId
+	 * @return
+	 */
+	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
+
+	/**
+	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
+	 *
+	 * @param projectId - the project id
+	 * @return the List of {@link WorkbenchUser} records
+	 */
+	List<WorkbenchUser> getUsersByProjectId(Long projectId);
+
+	/**
+	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
+	 *
+	 * @param projectId - the project id
+	 * @return the Maps of {@link Person} records identified by {@link WorkbenchUser} ids
+	 */
+	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
 
 	/**
 	 * Gets the all Users Sorted
@@ -82,7 +105,6 @@ public interface UserService {
 	 * @return the number of all Users
 	 */
 	long countAllUsers();
-
 
 	/**
 	 * create the user.
@@ -295,6 +317,5 @@ public interface UserService {
 	 * @return
 	 */
 	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
-
 
 }

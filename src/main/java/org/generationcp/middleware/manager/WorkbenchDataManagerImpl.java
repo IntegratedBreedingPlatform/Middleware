@@ -15,7 +15,6 @@ import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -232,16 +231,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getLastOpenedProject(final Integer userId) {
 		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProject(userId);
-	}
-
-	@Override
-	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getUsersByProjectId(projectId);
-	}
-
-	@Override
-	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getPersonsByProjectId(projectId);
 	}
 
 	@Override
@@ -479,11 +468,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getProjectByUuid(final String projectUuid) {
 		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid);
-	}
-
-	@Override
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getActiveUserIDsByProjectId(projectId);
 	}
 
 }

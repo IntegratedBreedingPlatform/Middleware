@@ -83,6 +83,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 	}
 
+	// TODO: IBP-2748 Move all UserService unit tests to a a new test class.
 	@Test
 	public void testAddUser() {
 		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
@@ -521,7 +522,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetActiveUserIDsByProjectId() {
 		final List<Integer> prevListOfUserIDs =
-			this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
+			this.userService.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 
 		//Set up data
 		UserDto userDto =
@@ -533,7 +534,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 
-		List<Integer> userIDs = this.workbenchDataManager.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
+		List<Integer> userIDs = this.userService.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 		Assert.assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
 	}
 
@@ -675,7 +676,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUsersByProjectId() {
-		final List<WorkbenchUser> results = this.workbenchDataManager.getUsersByProjectId(this.commonTestProject.getProjectId());
+		final List<WorkbenchUser> results = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
 
 		Assert.assertNotNull(results);
 		Assert.assertEquals(2, results.size());
@@ -687,7 +688,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPersonsByProjectId() {
-		final Map<Integer, Person> personsMap = this.workbenchDataManager.getPersonsByProjectId(this.commonTestProject.getProjectId());
+		final Map<Integer, Person> personsMap = this.userService.getPersonsByProjectId(this.commonTestProject.getProjectId());
 
 		Assert.assertNotNull(personsMap);
 		Assert.assertEquals(2, personsMap.keySet().size());
@@ -716,7 +717,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
 		Assert.assertNotNull(projectActiviesBefore);
 		Assert.assertFalse(projectActiviesBefore.isEmpty());
-		final List<WorkbenchUser> usersBefore = this.workbenchDataManager.getUsersByProjectId(id);
+		final List<WorkbenchUser> usersBefore = this.userService.getUsersByProjectId(id);
 		Assert.assertNotNull(usersBefore);
 		Assert.assertFalse(usersBefore.isEmpty());
 
@@ -727,7 +728,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
 		Assert.assertNotNull(projectActiviesAfter);
 		Assert.assertTrue(projectActiviesAfter.isEmpty());
-		final List<WorkbenchUser> usersAfter = this.workbenchDataManager.getUsersByProjectId(id);
+		final List<WorkbenchUser> usersAfter = this.userService.getUsersByProjectId(id);
 		Assert.assertNotNull(usersAfter);
 		Assert.assertTrue(usersAfter.isEmpty());
 	}

@@ -201,30 +201,6 @@ public interface WorkbenchDataManager {
 	List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList);
 
 	/**
-	 * Retrieves the user ids of the program members using the project id
-	 *
-	 * @param projectId
-	 * @return
-	 */
-	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
-
-	/**
-	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the List of {@link WorkbenchUser} records
-	 */
-	List<WorkbenchUser> getUsersByProjectId(Long projectId);
-
-	/**
-	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the Maps of {@link Person} records identified by {@link WorkbenchUser} ids
-	 */
-	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
-
-	/**
 	 * Get the list of all installed central crop databases.
 	 *
 	 * @return the installed central crops
