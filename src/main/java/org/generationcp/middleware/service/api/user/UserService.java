@@ -163,7 +163,7 @@ public interface UserService {
 	 */
 	void removeUsersFromProgram(List<Integer> workbenchUserIds, Long projectId);
 
-	List<UserDto> getUsersByPersonIds(final List<Integer> personIds);
+	List<UserDto> getUsersByIds(final List<Integer> personIds);
 
 	/**
 	 * Gets the person by id.

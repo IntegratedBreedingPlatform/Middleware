@@ -1293,7 +1293,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 
-	public List<Integer> getPersonIdsAssociatedToStudy(final Integer studyId) {
+	public List<Integer> getUserIdsAssociatedToStudy(final Integer studyId) {
 		Preconditions.checkNotNull(studyId);
 		try {
 			final Query query =
@@ -1316,7 +1316,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<Integer> getPersonIdsAssociatedToEnvironent(final Integer instanceId) {
+	public List<Integer> getUserIdsAssociatedToEnvironent(final Integer instanceId) {
 		Preconditions.checkNotNull(instanceId);
 		try {
 			final Query query =
@@ -1333,7 +1333,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.setParameter("instanceId", instanceId);
 			return query.list();
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getPersonIdsAssociatedToEnvironent() query from instanceId: " + instanceId;
+			final String message = "Error with getUserIdsAssociatedToEnvironent() query from instanceId: " + instanceId;
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
