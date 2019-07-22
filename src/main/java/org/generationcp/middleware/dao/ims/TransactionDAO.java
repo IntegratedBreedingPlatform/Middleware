@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao.ims;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
@@ -113,82 +112,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllReserveByRequestor(final Integer personId, final int start, final int numOfRows) {
-		try {
-			if (personId != null) {
-				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.add(Restrictions.eq("status", 0));
-				criteria.add(Restrictions.lt("quantity", 0));
-				criteria.add(Restrictions.eq("personId", personId));
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllReserveByRequestor(personId=" + personId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return new ArrayList<>();
-	}
-
-	public long countAllReserveByRequestor(final Integer personId) {
-		try {
-			if (personId != null) {
-				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.setProjection(Projections.rowCount());
-				criteria.add(Restrictions.eq("status", 0));
-				criteria.add(Restrictions.lt("quantity", 0));
-				criteria.add(Restrictions.eq("personId", personId));
-				return ((Long) criteria.uniqueResult());
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllReserveByRequestor(personId=" + personId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Transaction> getAllDepositByDonor(final Integer personId, final int start, final int numOfRows) {
-		try {
-			if (personId != null) {
-				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.add(Restrictions.eq("status", 0));
-				criteria.add(Restrictions.gt("quantity", 0));
-				criteria.add(Restrictions.eq("personId", personId));
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllDepositByDonor(personId=" + personId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return new ArrayList<>();
-	}
-
-	public long countAllDepositByDonor(final Integer personId) {
-		try {
-			if (personId != null) {
-				final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-				criteria.setProjection(Projections.rowCount());
-				criteria.add(Restrictions.eq("status", 0));
-				criteria.add(Restrictions.gt("quantity", 0));
-				criteria.add(Restrictions.eq("personId", personId));
-				return ((Long) criteria.uniqueResult());
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with countAllDepositByDonor(personId=" + personId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")

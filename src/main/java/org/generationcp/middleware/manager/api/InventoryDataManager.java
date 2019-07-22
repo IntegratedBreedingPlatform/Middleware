@@ -282,46 +282,6 @@ public interface InventoryDataManager {
 	long countAllDepositTransactions();
 
 	/**
-	 * Returns the Transaction records which are classified as reserve transactions (the records have status = 0 and negative quantities)
-	 * and made by the person identified by the given id.
-	 *
-	 * @param personId the person id
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of Transaction POJOs
-	 */
-	List<Transaction> getAllReserveTransactionsByRequestor(Integer personId, int start, int numOfRows);
-
-	/**
-	 * Returns the number of Transaction records which are classified as reserve transactions (the records have status = 0 and negative
-	 * quantities) and made by the person identified by the given id.
-	 *
-	 * @param personId the person id
-	 * @return the count
-	 */
-	long countAllReserveTransactionsByRequestor(Integer personId);
-
-	/**
-	 * Returns the Transaction records which are classified as deposit transactions (the records have status = 0 and positive quantities)
-	 * and made by the person identified by the given id.
-	 *
-	 * @param personId the person id
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of Transaction POJOs
-	 */
-	List<Transaction> getAllDepositTransactionsByDonor(Integer personId, int start, int numOfRows);
-
-	/**
-	 * Returns the number of Transaction records which are classified as deposit transactions (the records have status = 0 and positive
-	 * quantities) and made by the person identified by the given id.
-	 *
-	 * @param personId the person id
-	 * @return the count
-	 */
-	long countAllDepositTransactionsByDonor(Integer personId);
-
-	/**
 	 * Returns a report on all uncommitted Transaction records. Included information are: commitment date, quantity of transaction, scale of
 	 * the lot of the transaction, location of the lot, comment on the lot.
 	 *

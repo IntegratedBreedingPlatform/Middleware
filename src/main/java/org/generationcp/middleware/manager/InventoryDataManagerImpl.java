@@ -285,28 +285,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public List<org.generationcp.middleware.pojos.ims.Transaction> getAllReserveTransactionsByRequestor(final Integer personId, final int start,
-			final int numOfRows) {
-		return this.daoFactory.getTransactionDAO().getAllReserveByRequestor(personId, start, numOfRows);
-	}
-
-	@Override
-	public long countAllReserveTransactionsByRequestor(final Integer personId) {
-		return this.daoFactory.getTransactionDAO().countAllReserveByRequestor(personId);
-	}
-
-	@Override
-	public List<org.generationcp.middleware.pojos.ims.Transaction> getAllDepositTransactionsByDonor(final Integer personId, final int start,
-			final int numOfRows) {
-		return this.daoFactory.getTransactionDAO().getAllDepositByDonor(personId, start, numOfRows);
-	}
-
-	@Override
-	public long countAllDepositTransactionsByDonor(final Integer personId) {
-		return this.daoFactory.getTransactionDAO().countAllDepositByDonor(personId);
-	}
-
-	@Override
 	public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(final int start, final int numOfRows) {
 		final List<TransactionReportRow> report = new ArrayList<>();
 
