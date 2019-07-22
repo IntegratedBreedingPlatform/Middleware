@@ -11,6 +11,7 @@ public class ProgramMapper {
 			programDto.setId(project.getProjectId());
 			programDto.setName(project.getProjectName());
 			programDto.setCrop(new CropDto(project.getCropType()));
+			programDto.setUuid(project.getUniqueID());
 			return programDto;
 		} else {
 			return null;
