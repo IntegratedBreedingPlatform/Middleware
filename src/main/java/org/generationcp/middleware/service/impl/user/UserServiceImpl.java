@@ -63,6 +63,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public Map<Integer, String> getAllUserIDFullNameMap() {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getAllUserIDFullNameMap();
+	}
+
+	@Override
 	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByCrop(cropName);
 	}

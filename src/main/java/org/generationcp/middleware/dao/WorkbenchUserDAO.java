@@ -300,6 +300,29 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return idNamesMap;
 	}
 
+	public Map<Integer, String> getAllUserIDFullNameMap() {
+		final Map<Integer, String> idNamesMap = new HashMap<>();
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("userid"));
+			projectionList.add(Projections.property("person.firstName"));
+			projectionList.add(Projections.property("person.lastName"));
+			criteria.setProjection(projectionList);
+
+			final List<Object[]> results = criteria.list();
+			for (final Object[] row : results) {
+				idNamesMap.put((Integer) row[0], (String) row[1] + " " + (String) row[2]);
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllUserIDFullNameMap() query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return idNamesMap;
+	}
+
 	public List<WorkbenchUser> getUsersByPersonIds(final List<Integer> personIds) {
 
 		try {

@@ -36,6 +36,8 @@ public interface UserService {
 
 	Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds);
 
+	Map<Integer, String> getAllUserIDFullNameMap();
+
 	List<WorkbenchUser> getUsersByCrop(final String cropName);
 
 	/**
