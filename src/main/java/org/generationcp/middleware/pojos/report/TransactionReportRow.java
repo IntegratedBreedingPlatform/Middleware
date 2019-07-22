@@ -36,7 +36,6 @@ public class TransactionReportRow implements Serializable {
 	private Location locationOfLot;
 	private String commentOfLot;
 	private Integer entityIdOfLot;
-	private Person person;
 	private Integer lotId;
 	private String listName;
 	private String user;
@@ -95,14 +94,6 @@ public class TransactionReportRow implements Serializable {
 
 	public void setEntityIdOfLot(Integer entityIdOfLot) {
 		this.entityIdOfLot = entityIdOfLot;
-	}
-
-	public Person getPerson() {
-		return this.person;
-	}
-
-	public void setPerson(Person person) {
-		this.person = person;
 	}
 
 	public Integer getLotId() {
@@ -172,8 +163,6 @@ public class TransactionReportRow implements Serializable {
 		builder.append(this.commentOfLot);
 		builder.append(", entityIdOfLot=");
 		builder.append(this.entityIdOfLot);
-		builder.append(", person=");
-		builder.append(this.person);
 		builder.append("]");
 		return builder.toString();
 	}

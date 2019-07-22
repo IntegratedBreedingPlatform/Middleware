@@ -93,9 +93,6 @@ public class Transaction implements Serializable {
 	@Column(name = "prevamount")
 	private Double previousAmount;
 
-	@Column(name = "personid")
-	private Integer personId;
-
 	@Column(name = "inventory_id")
 	private String inventoryID;
 
@@ -114,8 +111,7 @@ public class Transaction implements Serializable {
 	}
 
 	public Transaction(Integer id, Integer userId, Lot lot, Integer transactionDate, Integer status, Double quantity, String comments,
-			Integer commitmentDate, String sourceType, Integer sourceId, Integer sourceRecordId, Double previousAmount, Integer personId,
-			String inventoryID) {
+			Integer commitmentDate, String sourceType, Integer sourceId, Integer sourceRecordId, Double previousAmount, String inventoryID) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -129,7 +125,6 @@ public class Transaction implements Serializable {
 		this.sourceId = sourceId;
 		this.sourceRecordId = sourceRecordId;
 		this.previousAmount = previousAmount;
-		this.personId = personId;
 		this.inventoryID = inventoryID;
 	}
 
@@ -229,14 +224,6 @@ public class Transaction implements Serializable {
 		this.previousAmount = previousAmount;
 	}
 
-	public Integer getPersonId() {
-		return this.personId;
-	}
-
-	public void setPersonId(Integer personId) {
-		this.personId = personId;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -262,8 +249,6 @@ public class Transaction implements Serializable {
 		builder.append(this.sourceRecordId);
 		builder.append(", previousAmount=");
 		builder.append(this.previousAmount);
-		builder.append(", personId=");
-		builder.append(this.personId);
 		builder.append("]");
 		return builder.toString();
 	}

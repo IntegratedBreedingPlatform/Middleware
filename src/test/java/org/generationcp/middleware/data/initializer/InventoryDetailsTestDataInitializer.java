@@ -20,7 +20,6 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
 public class InventoryDetailsTestDataInitializer {
 
-	private static final int PERSON_ID = 1;
 	private static final String LIST_SOURCE_TYPE = "LIST";
 	private static final String GERMPLASM_ENTITY_TYPE = "GERMPLSM";
 	private static final int USER_ID = 1;
@@ -104,7 +103,6 @@ public class InventoryDetailsTestDataInitializer {
 		for (final Lot lot : lots) {
 			final Transaction transaction = new Transaction();
 			transaction.setUserId(USER_ID);
-			transaction.setPersonId(PERSON_ID);
 			transaction.setLot(lot);
 			transaction.setTransactionDate(20160101);
 			transaction.setStatus(0);
@@ -136,7 +134,6 @@ public class InventoryDetailsTestDataInitializer {
 		for (final Lot lot : lots) {
 			final Transaction transaction = new Transaction();
 			transaction.setUserId(USER_ID);
-			transaction.setPersonId(PERSON_ID);
 			transaction.setLot(lot);
 			transaction.setTransactionDate(20160101);
 			transaction.setStatus(0);
@@ -237,7 +234,6 @@ public class InventoryDetailsTestDataInitializer {
 		transaction.setStatus(status);
 		transaction.setComments(comments);
 		transaction.setLot(lot);
-		transaction.setPersonId(personId);
 		transaction.setSourceId(sourceId);
 		transaction.setSourceRecordId(sourceRecordId);
 		transaction.setSourceType(sourceType);
@@ -252,7 +248,6 @@ public class InventoryDetailsTestDataInitializer {
 		transaction.setStatus(status);
 		transaction.setComments(comments);
 		transaction.setLot(lot);
-		transaction.setPersonId(personId);
 		transaction.setSourceId(sourceId);
 		transaction.setSourceRecordId(sourceRecordId);
 		transaction.setSourceType(sourceType);

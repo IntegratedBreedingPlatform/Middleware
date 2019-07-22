@@ -52,9 +52,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The user id. */
 	Integer userId;
 
-	/** The person id. */
-	Integer personId;
-
 	/** The user name. */
 	String userName;
 
@@ -467,14 +464,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setLocationAbbr(String locationAbbr) {
 		this.locationAbbr = locationAbbr;
-	}
-
-	public Integer getPersonId() {
-		return this.personId;
-	}
-
-	public void setPersonId(final Integer personId) {
-		this.personId = personId;
 	}
 
 	@Override

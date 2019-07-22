@@ -97,17 +97,17 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), Integer
-				.valueOf(20140413), 1, -1d, "sample added transaction 1", 0, null, null, null, 100d, 1, null));
+				.valueOf(20140413), 1, -1d, "sample added transaction 1", 0, null, null, null, 100d, null));
 		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), Integer
-				.valueOf(20140518), 1, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+				.valueOf(20140518), 1, -2d, "sample added transaction 2", 0, null, null, null, 150d, null));
 		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), Integer
-				.valueOf(20140518), 0, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+				.valueOf(20140518), 0, -2d, "sample added transaction 2", 0, null, null, null, 150d, null));
 		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), Integer
-				.valueOf(20140518), 0, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+				.valueOf(20140518), 0, 2d, "sample added transaction 2", 0, null, null, null, 150d, null));
 		transactions.add(new Transaction(null, 1, this.lot, Integer.valueOf(20140413), 1, -1d, "sample added transaction 1", 0, null, null,
-				null, 100d, 1, null));
+				null, 100d, null));
 		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), Integer
-				.valueOf(20120518), 1, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+				.valueOf(20120518), 1, 2d, "sample added transaction 2", 0, null, null, null, 150d, null));
 		final Set<Transaction> transactionSet = new HashSet<>();
 		transactionSet.add(transactions.get(4));
 		this.lot.setTransactions(transactionSet);
@@ -278,7 +278,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	public void testAddTransaction() {
 		final Transaction transaction =
 				new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-						Integer.valueOf(20140413), 1, 200d, "sample added transaction", 0, null, null, null, 100d, 1, null);
+						Integer.valueOf(20140413), 1, 200d, "sample added transaction", 0, null, null, null, 100d, null);
 		this.manager.addTransaction(transaction);
 		Assert.assertNotNull(transaction.getId());
 		Debug.println(IntegrationTestBase.INDENT, "testAddTransaction() Added: " + transaction);
@@ -289,9 +289,9 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		// this test assumes there are existing lot records with entity type = GERMPLSM
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), Integer
-				.valueOf(20140413), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null));
+				.valueOf(20140413), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, null));
 		transactions.add(new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), Integer
-				.valueOf(20140518), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+				.valueOf(20140518), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, null));
 		this.manager.addTransactions(transactions);
 		Assert.assertNotNull(transactions.get(0).getId());
 		Debug.printObjects(IntegrationTestBase.INDENT, transactions);
@@ -679,11 +679,11 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	public void testGetTransactionsByIdList() throws Exception{
 		final List<Transaction> transactions = new ArrayList<Transaction>();
 		final Transaction transaction1 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-				Integer.valueOf(20140413), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null);
+				Integer.valueOf(20140413), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, null);
 		transactions.add(transaction1);
 
 		final Transaction transaction2 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
-				Integer.valueOf(20140518), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null);
+				Integer.valueOf(20140518), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, null);
 		transactions.add(transaction2);
 
 		this.manager.addTransactions(transactions);
