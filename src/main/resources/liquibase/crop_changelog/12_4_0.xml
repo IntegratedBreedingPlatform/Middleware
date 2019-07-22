@@ -1,0 +1,623 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="darla" id="v12.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					  FROM persons p
+					 WHERE NOT EXISTS (
+					 	   SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail)
+					   AND EXISTS (
+						   SELECT 1 from users u where u.personid = p.personid);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Insert into workbench database any persons (matching by email) that only exist in crop database
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench.persons(fname, lname, pemail)
+			SELECT fname, lname, pemail
+			  FROM persons p
+			 WHERE NOT EXISTS (
+				   SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail)
+			   AND EXISTS (
+			       SELECT 1 from users u where u.personid = p.personid);
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM users u
+ 					 WHERE NOT EXISTS (
+						   SELECT 1 FROM workbench.workbench_ibdb_user_map map
+						    INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+						    INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+						    WHERE map.ibdb_user_id = u.userid);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Insert into workbench database any users that only exist in crop database (i.e. don't exist in workbench_ibdb_user_map table)
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench.users(`ustatus`, `uaccess`, `utype`, `uname`, `upswd`, `personid`, `adate`, `cdate`)
+			SELECT 1, uaccess, utype, uname, upswd, wp.personid, adate, cdate
+			  FROM users u
+			 INNER JOIN persons p on p.personid = u.personid
+			 INNER JOIN workbench.persons wp on wp.pemail = p.pemail
+ 			 WHERE NOT EXISTS (
+				   SELECT 1 FROM workbench.workbench_ibdb_user_map map
+				    INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+				    INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			        WHERE map.ibdb_user_id = u.userid);
+
+			INSERT INTO workbench.workbench_ibdb_user_map(`workbench_user_id`, `project_id`, `ibdb_user_id`)
+			SELECT u.wb_userid, program.project_id, u.crop_userid
+    		  FROM (
+				   SELECT wu.userid as wb_userid, u.userid as crop_userid
+				     FROM users u
+				    INNER JOIN persons p on p.personid = u.personid
+				    INNER JOIN workbench.persons wp on wp.pemail = p.pemail
+					<!-- Some crop users share the same person so we also match by username to remove duplicate records for insertion  -->
+					INNER JOIN workbench.users wu on wu.personid = wp.personid AND wu.uname = u.uname
+					WHERE NOT EXISTS (
+						  SELECT 1 FROM workbench.workbench_ibdb_user_map map
+						  INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+						  INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			 			  WHERE map.ibdb_user_id = u.userid or map.workbench_user_id = wu.userid)
+					ORDER BY crop_userid asc
+			      ) u,
+				  <!-- We will get any one program from the crop database to use as project_id in workbench_ibdb_user_map -->
+				( SELECT p.project_id
+			        FROM workbench.workbench_project p
+			       INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			       LIMIT 1
+				) program;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="names" columnName="nuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Backup names.nuid field to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="names">
+			<column name="nuid_bkp" type="INT" afterColumn="nuid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE names
+			   SET nuid_bkp = nuid;
+
+			UPDATE names
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = nuid
+			   SET nuid = workbench_user_id
+			 WHERE nuid != 0;
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="darla" id="v12.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="udflds" columnName="fuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy fuid field of UDFLDS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="udflds">
+			<column name="fuid_bkp" type="INT" afterColumn="fuid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE udflds
+			   SET fuid_bkp = fuid;
+
+			UPDATE udflds
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = fuid
+			   SET fuid = workbench_user_id
+			 WHERE fuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="germplsm" columnName="germuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy germuid field of GERMPLSM table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="germplsm">
+			<column name="germuid_bkp" type="INT" afterColumn="germuid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE germplsm
+			   SET germuid_bkp = germuid;
+
+			UPDATE germplsm
+			INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = germuid
+			   SET germuid = workbench_user_id
+			 WHERE germuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="created_by_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy created_by field of PROJECT table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="project">
+			<column name="created_by_bkp" type="INT" afterColumn="created_by">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE project
+			   SET created_by_bkp = created_by;
+
+			UPDATE project
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = created_by
+			   SET created_by = workbench_user_id
+			 WHERE created_by != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="methods" columnName="muid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy muid field of METHODS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="methods">
+			<column name="muid_bkp" type="INT" afterColumn="muid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE methods
+			   SET muid_bkp = muid;
+
+			UPDATE methods
+			INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = muid
+			   SET muid = workbench_user_id
+			 WHERE muid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="atributs" columnName="auid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy auid field of ATRIBUTS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="atributs">
+			<column name="auid_bkp" type="INT" afterColumn="auid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE atributs
+			   SET auid_bkp = auid;
+
+			UPDATE atributs
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = auid
+			   SET auid = workbench_user_id
+			 WHERE auid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-9">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listnms" columnName="listuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy listuid field of LISTNMS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="listnms">
+			<column name="listuid_bkp" type="INT" afterColumn="listuid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE listnms
+			   SET listuid_bkp = listuid;
+
+			UPDATE listnms
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = listuid
+			   SET listuid = workbench_user_id
+			 WHERE listuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="user_program_tree_state" columnName="userid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy userid field of USER_PROGRAM_TREE_STATE table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<dropIndex indexName="unique" tableName="user_program_tree_state"/>
+		<addColumn tableName="user_program_tree_state">
+			<column name="userid_bkp" type="INT" afterColumn="userid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE user_program_tree_state
+			   SET userid_bkp = userid;
+
+			UPDATE user_program_tree_state
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = userid
+			   SET userid = workbench_user_id
+			 WHERE userid != 0;
+		</sql>
+		<createIndex indexName="user_program_tree_state_unique" tableName="user_program_tree_state" unique="true">
+			<column name="userid" type="int" />
+			<column name="program_uuid" type="varchar(255)" />
+			<column name="tree_type" type="varchar(45)" />
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-11">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="gdms_dataset_users" columnName="user_id_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy user_id field of GDMS_DATASET_USERS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="gdms_dataset_users">
+			<column name="user_id_bkp" type="INT" afterColumn="user_id">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE gdms_dataset_users
+			   SET user_id_bkp = user_id;
+
+			UPDATE gdms_dataset_users
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = user_id
+			   SET user_id = workbench_user_id
+			 WHERE user_id != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-12">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="gdms_track_data" columnName="user_id_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy user_id field of GDMS_TRACK_DATA table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="gdms_track_data">
+			<column name="user_id_bkp" type="INT" afterColumn="user_id">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE gdms_track_data
+			   SET user_id_bkp = user_id;
+
+			UPDATE gdms_track_data
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = user_id
+			   SET user_id = workbench_user_id
+			 WHERE user_id != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-13">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="sample_list" columnName="created_by_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy created_by field of SAMPLE_LIST table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<dropForeignKeyConstraint baseTableName="sample_list" constraintName="fk_sample_list_user"/>
+		<addColumn tableName="sample_list">
+			<column name="created_by_bkp" type="INT" afterColumn="created_by">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE sample_list
+			   SET created_by_bkp = created_by;
+
+			UPDATE sample_list
+			INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = created_by
+			   SET created_by = workbench_user_id
+			 WHERE created_by != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-14">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<columnExists tableName="sample" columnName="created_by_bkp"/>
+				</not>
+				<not>
+					<columnExists tableName="sample" columnName="taken_by_bkp"/>
+				</not>
+			</and>
+
+		</preConditions>
+		<comment>
+			Copy created_by and taken_by fields of SAMPLE table to backup columns and transform their values to refer to users table in workbench database
+		</comment>
+		<dropForeignKeyConstraint baseTableName="sample" constraintName="fk_sample_created_by"/>
+		<dropForeignKeyConstraint baseTableName="sample" constraintName="fk_sample_user"/>
+		<addColumn tableName="sample">
+			<column name="created_by_bkp" type="INT" afterColumn="created_by">
+				<constraints nullable="false"/>
+			</column>
+			<column name="taken_by_bkp" type="INT" afterColumn="taken_by">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE sample
+			   SET created_by_bkp = created_by,
+			       taken_by_bkp = taken_by;
+
+			UPDATE sample
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map1 ON map1.ibdb_user_id = created_by
+			  LEFT JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map2 ON map2.ibdb_user_id = taken_by
+			   SET created_by = map1.workbench_user_id, taken_by = map2.workbench_user_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-15">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_lot" columnName="userid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy userid field of IMS_LOT table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="ims_lot">
+			<column name="userid_bkp" type="INT" afterColumn="userid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_lot
+			   SET userid_bkp = userid;
+
+			UPDATE ims_lot
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = userid
+			   SET userid = workbench_user_id
+			 WHERE userid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-16">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="ims_transaction" columnName="userid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy userid field of IMS_TRANSACTION table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="ims_transaction">
+			<column name="userid_bkp" type="INT" afterColumn="userid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE ims_transaction
+			   SET userid_bkp = userid;
+
+			UPDATE ims_transaction
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = userid
+			   SET userid = workbench_user_id
+			 WHERE userid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-17">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="locdes" columnName="duid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy duid field of LOCDES table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="locdes">
+			<column name="duid_bkp" type="INT" afterColumn="duid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE locdes
+			   SET duid_bkp = duid;
+
+			UPDATE locdes
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = duid
+			   SET duid = workbench_user_id
+			 WHERE duid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-18">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="changes" columnName="cuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy cuid field of CHANGES table, albeit unused in BMS code, to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="changes">
+			<column name="cuid_bkp" type="INT" afterColumn="cuid">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE changes
+			   SET cuid_bkp = cuid;
+
+			UPDATE changes
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = cuid
+			   SET cuid = workbench_user_id
+			 WHERE cuid != 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-19">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="reflinks" columnName="refuid_bkp"/>
+			</not>
+		</preConditions>
+		<comment>
+			Copy refuid field of REFLINKS table to backup column and transform its values to refer to users table in workbench database
+		</comment>
+		<addColumn tableName="reflinks">
+			<column name="refuid_bkp" type="INT" afterColumn="refuid">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE reflinks
+			   SET refuid_bkp = refuid;
+
+			UPDATE reflinks
+			 INNER JOIN (
+			       SELECT DISTINCT workbench_user_id, ibdb_user_id
+	                 FROM workbench.workbench_ibdb_user_map map
+	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
+	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+                 ) map ON map.ibdb_user_id = refuid
+			   SET refuid = workbench_user_id
+			 WHERE refuid != 0;
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>
