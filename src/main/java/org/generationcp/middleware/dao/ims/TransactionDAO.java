@@ -134,7 +134,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.setProjection(Projections.rowCount());
 			criteria.add(Restrictions.eq("status", 0));
-			return ((Long) criteria.uniqueResult()).longValue(); // count
+			return ((Long) criteria.uniqueResult());
 		} catch (final HibernateException e) {
 			final String message = "Error with countAllUncommitted() query from Transaction: " + e.getMessage();
 			LOG.error(message, e);
@@ -200,7 +200,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 	public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(final List<Integer> recordIds) {
-		final List<InventoryDetails> detailsList = new ArrayList<InventoryDetails>();
+		final List<InventoryDetails> detailsList = new ArrayList<>();
 
 		if (recordIds == null || recordIds.isEmpty()) {
 			return detailsList;
@@ -252,7 +252,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(final List<Integer> listEntryIds) {
-		final Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
+		final Map<Integer, BigInteger> lotCounts = new HashMap<>();
 
 		try {
 			final String sql =
@@ -279,7 +279,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctScale(final List<Integer> listEntryIds) {
-		final Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<Integer, Object[]>();
+		final Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<>();
 
 		try {
 			final String sql =
@@ -310,7 +310,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Object[]> retrieveWithdrawalStatus(final Integer sourceId, final List<Integer> listGids) {
-		final List<Object[]> listOfTransactionStatusForGermplsm = new ArrayList<Object[]>();
+		final List<Object[]> listOfTransactionStatusForGermplsm = new ArrayList<>();
 
 		try {
 			final String sql =
@@ -359,7 +359,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Transaction> getByLotIds(final List<Integer> lotIds) {
-		final List<Transaction> transactions = new ArrayList<Transaction>();
+		final List<Transaction> transactions = new ArrayList<>();
 
 		if (lotIds == null || lotIds.isEmpty()) {
 			return transactions;

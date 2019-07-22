@@ -11,11 +11,10 @@
 
 package org.generationcp.middleware.pojos.report;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Person;
+
+import java.io.Serializable;
 
 /**
  * This POJO represents a row in reports about Transaction records. Note that different reports require different information and so some
@@ -52,7 +51,7 @@ public class TransactionReportRow implements Serializable {
 		return this.date;
 	}
 
-	public void setDate(Integer date) {
+	public void setDate(final Integer date) {
 		this.date = date;
 	}
 
@@ -60,7 +59,7 @@ public class TransactionReportRow implements Serializable {
 		return this.quantity;
 	}
 
-	public void setQuantity(Double quantity) {
+	public void setQuantity(final Double quantity) {
 		this.quantity = quantity;
 	}
 
@@ -68,7 +67,7 @@ public class TransactionReportRow implements Serializable {
 		return this.scaleOfLot;
 	}
 
-	public void setScaleOfLot(Term scaleOfLot) {
+	public void setScaleOfLot(final Term scaleOfLot) {
 		this.scaleOfLot = scaleOfLot;
 	}
 
@@ -76,7 +75,7 @@ public class TransactionReportRow implements Serializable {
 		return this.locationOfLot;
 	}
 
-	public void setLocationOfLot(Location locationOfLot) {
+	public void setLocationOfLot(final Location locationOfLot) {
 		this.locationOfLot = locationOfLot;
 	}
 
@@ -84,7 +83,7 @@ public class TransactionReportRow implements Serializable {
 		return this.commentOfLot;
 	}
 
-	public void setCommentOfLot(String commentOfLot) {
+	public void setCommentOfLot(final String commentOfLot) {
 		this.commentOfLot = commentOfLot;
 	}
 
@@ -92,65 +91,65 @@ public class TransactionReportRow implements Serializable {
 		return this.entityIdOfLot;
 	}
 
-	public void setEntityIdOfLot(Integer entityIdOfLot) {
+	public void setEntityIdOfLot(final Integer entityIdOfLot) {
 		this.entityIdOfLot = entityIdOfLot;
 	}
 
 	public Integer getLotId() {
-		return lotId;
+		return this.lotId;
 	}
 
-	public void setLotId(Integer lotId) {
+	public void setLotId(final Integer lotId) {
 		this.lotId = lotId;
 	}
 
 	public String getListName() {
-		return listName;
+		return this.listName;
 	}
 
-	public void setListName(String listName) {
+	public void setListName(final String listName) {
 		this.listName = listName;
 	}
 
 	public String getUser() {
-		return user;
+		return this.user;
 	}
 
-	public void setUser(String user) {
+	public void setUser(final String user) {
 		this.user = user;
 	}
 
 	public Integer getUserId() {
-		return userId;
+		return this.userId;
 	}
 
-	public void setUserId(Integer userId) {
+	public void setUserId(final Integer userId) {
 		this.userId = userId;
 	}
 
 	public Integer getListId() {
-		return listId;
+		return this.listId;
 	}
 
-	public void setListId(Integer listId) {
+	public void setListId(final Integer listId) {
 		this.listId = listId;
 	}
 
-	public void setTrnStatus(Integer trnStatus) {
+	public void setTrnStatus(final Integer trnStatus) {
 		this.trnStatus = trnStatus;
 	}
 
 	public String getLotStatus() {
-		return lotStatus;
+		return this.lotStatus;
 	}
 
-	public void setLotStatus(String lotStatus) {
+	public void setLotStatus(final String lotStatus) {
 		this.lotStatus = lotStatus;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("TransactionReportRow [date=");
 		builder.append(this.date);
 		builder.append(", quantity=");

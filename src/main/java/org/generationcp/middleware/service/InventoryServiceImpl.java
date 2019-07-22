@@ -74,13 +74,12 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId) throws MiddlewareQueryException {
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId) {
 		return this.getInventoryDetailsByGermplasmList(listId, GermplasmListType.ADVANCED.name());
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId, final String germplasmListType)
-			throws MiddlewareQueryException {
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(final Integer listId, final String germplasmListType) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
 		final List<GermplasmListData> listData = this.getGermplasmListData(germplasmList, germplasmListType);
 		return this.getInventoryDetailsList(germplasmList, listData);
@@ -188,7 +187,7 @@ public class InventoryServiceImpl implements InventoryService {
 		final Map<Integer, List<InventoryDetails>> listDataIdToInventoryDetailsMap = new HashMap<>();
 
 		for (final InventoryDetails inventoryDetails : detailList) {
-		    Integer recordId = inventoryDetails.getSourceRecordId();
+		    final Integer recordId = inventoryDetails.getSourceRecordId();
 		  if (!listDataIdToInventoryDetailsMap.containsKey(recordId)) {
 			listDataIdToInventoryDetailsMap.put(recordId, Lists.<InventoryDetails>newArrayList());
 		  }
@@ -198,7 +197,7 @@ public class InventoryServiceImpl implements InventoryService {
 		for (final GermplasmListData germplasmListData : dataList) {
 			final List<InventoryDetails> inventoryDetails = listDataIdToInventoryDetailsMap.get(germplasmListData.getId());
 			if (inventoryDetails != null) {
-			  for(InventoryDetails inventoryDetailsList: inventoryDetails) {
+			  for(final InventoryDetails inventoryDetailsList: inventoryDetails) {
 				inventoryDetailsList.copyFromGermplasmListData(germplasmListData);
 				inventoryDetailsList.setSourceId(germplasmList.getId());
 				inventoryDetailsList.setSourceName(germplasmList.getName());
@@ -233,7 +232,7 @@ public class InventoryServiceImpl implements InventoryService {
 	 * existing stock IDs with matching breeder identifier, 0 is returned.
 	 */
 	@Override
-	public Integer getCurrentNotationNumberForBreederIdentifier(final String breederIdentifier) throws MiddlewareQueryException {
+	public Integer getCurrentNotationNumberForBreederIdentifier(final String breederIdentifier) {
 		final List<String> inventoryIDs =
 				this.daoFactory.getTransactionDAO().getInventoryIDsWithBreederIdentifier(breederIdentifier);
 
@@ -274,8 +273,7 @@ public class InventoryServiceImpl implements InventoryService {
 	 *
 	 */
 	@Override
-	public void addLotAndTransaction(final InventoryDetails details, final GermplasmListData listData, final ListDataProject listDataProject)
-			throws MiddlewareQueryException {
+	public void addLotAndTransaction(final InventoryDetails details, final GermplasmListData listData, final ListDataProject listDataProject) {
 		final Lot existingLot =
 				this.getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(EntityType.GERMPLSM.name(), details.getGid(),
 						details.getLocationId(), details.getScaleId());
@@ -316,20 +314,19 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId)
-			throws MiddlewareQueryException {
+	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId) {
 		return this.daoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId);
 	}
 
 	@Override
 	public List<InventoryDetails> getSummedInventoryListByListDataProjectListId(final Integer listDataProjectListId,
-			final GermplasmListType type) throws MiddlewareQueryException {
+			final GermplasmListType type) {
 		return this.daoFactory.getStockTransactionDAO().retrieveSummedInventoryDetailsForListDataProjectListId(
 				listDataProjectListId, type);
 	}
 
 	@Override
-	public boolean stockHasCompletedBulking(final Integer listId) throws MiddlewareQueryException {
+	public boolean stockHasCompletedBulking(final Integer listId) {
 		return this.daoFactory.getStockTransactionDAO().stockHasCompletedBulking(listId);
 	}
 
