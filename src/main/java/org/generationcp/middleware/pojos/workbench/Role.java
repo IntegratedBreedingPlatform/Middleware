@@ -20,8 +20,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -69,14 +69,14 @@ public class Role implements Serializable {
 	private WorkbenchUser createdBy;
 
 	@Column(name = "updated_date")
-	private Timestamp updatedDate;
+	private Date updatedDate;
 
 	@ManyToOne
 	@JoinColumn(name = "updated_by", nullable = true)
 	private WorkbenchUser updatedBy;
 
 	@Column(name = "created_date")
-	private Timestamp createdDate;
+	private Date createdDate;
 
 	@Fetch(FetchMode.SUBSELECT)
 	@OneToMany(fetch = FetchType.EAGER)
@@ -155,11 +155,11 @@ public class Role implements Serializable {
 		this.createdBy = createdBy;
 	}
 
-	public Timestamp getUpdatedDate() {
+	public Date getUpdatedDate() {
 		return this.updatedDate;
 	}
 
-	public void setUpdatedDate(final Timestamp updatedDate) {
+	public void setUpdatedDate(final Date updatedDate) {
 		this.updatedDate = updatedDate;
 	}
 
@@ -171,11 +171,11 @@ public class Role implements Serializable {
 		this.updatedBy = updatedBy;
 	}
 
-	public Timestamp getCreatedDate() {
+	public Date getCreatedDate() {
 		return this.createdDate;
 	}
 
-	public void setCreatedDate(final Timestamp createdDate) {
+	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
@@ -200,7 +200,7 @@ public class Role implements Serializable {
 	}
 
 	public List<Permission> getPermissions() {
-		return permissions;
+		return this.permissions;
 	}
 
 	public void setPermissions(final List<Permission> permissions) {

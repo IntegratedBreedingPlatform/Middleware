@@ -1,5 +1,6 @@
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
@@ -17,7 +18,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(RoleDAO.class);
 
 	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
-		List<Role> toReturn;
+		final List<Role> toReturn;
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Role.class);
@@ -31,6 +32,12 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 				if (roleSearchDto.getRoleTypeId() != null) {
 					criteria.createAlias("roleType", "roleType");
 					criteria.add(Restrictions.eq("roleType.id", roleSearchDto.getRoleTypeId()));
+				}
+				if(roleSearchDto.getName() != null && StringUtils.isNotBlank(roleSearchDto.getName())) {
+					criteria.add(Restrictions.eq("name", roleSearchDto.getName()));
+				}
+				if(roleSearchDto.getDescription() != null && StringUtils.isNotBlank(roleSearchDto.getDescription())) {
+					criteria.add(Restrictions.eq("description", roleSearchDto.getDescription()));
 				}
 			}
 			criteria.addOrder(Order.asc("id"));

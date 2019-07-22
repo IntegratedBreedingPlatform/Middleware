@@ -1,15 +1,22 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "permission")
@@ -34,8 +41,21 @@ public class Permission {
 	@JoinColumn(name = "workbench_sidebar_category_link_id", nullable = true)
 	private WorkbenchSidebarCategoryLink sidebarCategoryLink;
 
+
+	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+		name = "role_type_permission",
+		joinColumns = @JoinColumn(name = "permission_id"),
+		inverseJoinColumns = @JoinColumn(name = "role_type_id"))
+	private final List<RoleTypePermission> roleTypePermissions = new ArrayList<>();
+
+	public List<RoleTypePermission> getRoleTypePermissions() {
+		return this.roleTypePermissions;
+	}
+
 	public Integer getPermissionId() {
-		return permissionId;
+		return this.permissionId;
 	}
 
 	public void setPermissionId(final Integer permissionId) {

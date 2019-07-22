@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
+import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -715,9 +716,21 @@ public interface WorkbenchDataManager {
 	 */
 	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
 
+	RoleType getRoleType(Integer id);
+
 	WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(Integer workbenchSidebarCategoryLink);
 
 	List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds);
 
 	void saveOrUpdateUserRole(UserRole userRole);
+
+	Permission getPermission(Integer id);
+
+	List<Permission> getPermissions();
+
+	Role saveOrUpdateRole(Role role);
+
+	Role getRoleByName(String name);
+
+	Role getRoleByDescription(String description);
 }

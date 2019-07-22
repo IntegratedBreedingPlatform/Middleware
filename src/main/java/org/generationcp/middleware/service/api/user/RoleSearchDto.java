@@ -14,6 +14,10 @@ public class RoleSearchDto {
 
 	private Integer roleTypeId;
 
+	private String name;
+
+	private String description;
+
 	public RoleSearchDto() {
 	}
 
@@ -24,7 +28,7 @@ public class RoleSearchDto {
 	}
 
 	public Boolean getAssignable() {
-		return assignable;
+		return this.assignable;
 	}
 
 	public void setAssignable(final Boolean assignable) {
@@ -32,7 +36,7 @@ public class RoleSearchDto {
 	}
 
 	public Integer getRoleTypeId() {
-		return roleTypeId;
+		return this.roleTypeId;
 	}
 
 	public void setRoleTypeId(final Integer roleTypeId) {
@@ -40,11 +44,27 @@ public class RoleSearchDto {
 	}
 
 	public Set<Integer> getRoleIds() {
-		return roleIds;
+		return this.roleIds;
 	}
 
 	public void setRoleIds(final Set<Integer> roleIds) {
 		this.roleIds = roleIds;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	@Override

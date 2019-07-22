@@ -12,6 +12,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
+import org.generationcp.middleware.dao.PermissionDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
+import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -160,6 +162,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final RoleTypeDAO roleTypeDAO = new RoleTypeDAO();
 		roleTypeDAO.setSession(this.getCurrentSession());
 		return roleTypeDAO;
+	}
+
+	private PermissionDAO getPermissionDao() {
+		final PermissionDAO permissionDAO = new PermissionDAO();
+		permissionDAO.setSession(this.getCurrentSession());
+		return permissionDAO;
 	}
 
 	private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
@@ -1140,6 +1148,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public RoleType getRoleType(final Integer id) {
+		return this.getRoleTypeDao().getById(id);
+	}
+
+	@Override
 	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(final Integer workbenchSidebarCategoryLink) {
 		return this.getWorkbenchSidebarCategoryLinkDao().getById(workbenchSidebarCategoryLink);
 	}
@@ -1152,5 +1165,44 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public void saveOrUpdateUserRole(final UserRole userRole) {
 		this.getUserRoleDao().saveOrUpdate(userRole);
+	}
+
+	@Override
+	public Permission getPermission(final Integer permissionId) {
+		return this.getPermissionDao().getById(permissionId);
+	}
+
+	@Override
+	public List<Permission> getPermissions() {
+		return this.getPermissionDao().getAll();
+	}
+
+	@Override
+	public Role saveOrUpdateRole(final Role role) {
+
+		try {
+			this.getRoleDao().merge(role);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Cannot save Role: WorkbenchDataManager.saveOrUpdateRole(role=" + role + "): " + e.getMessage(), e);
+		}
+
+		return role;
+	}
+
+	@Override
+	public Role getRoleByName(final String name) {
+		final RoleSearchDto roleSearchDto = new RoleSearchDto();
+		roleSearchDto.setName( name);
+		final List<Role> roles = this.getRoleDao().getRoles( roleSearchDto );
+		return roles.isEmpty() ? null : roles.get( 0 );
+	}
+
+	@Override
+	public Role getRoleByDescription(final String description) {
+		final RoleSearchDto roleSearchDto = new RoleSearchDto();
+		roleSearchDto.setDescription( description );
+		final List<Role> roles = this.getRoleDao().getRoles( roleSearchDto );
+		return roles.isEmpty() ? null : roles.get( 0 );
 	}
 }
