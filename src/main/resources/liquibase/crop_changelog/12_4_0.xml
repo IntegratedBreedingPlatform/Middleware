@@ -646,4 +646,78 @@
 	</changeSet>
 
 
+	<changeSet author="darla" id="v12.4.0-22">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="persons_bkp" />
+			</not>
+		</preConditions>
+		<comment>
+			Store into backup table the PERSONS table, then drop the PERSONS table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			  CREATE TABLE persons_bkp (
+				`personid` int(11) NOT NULL AUTO_INCREMENT,
+				`fname` varchar(20) NOT NULL DEFAULT '-',
+				`lname` varchar(50) NOT NULL DEFAULT '-',
+				`ioname` varchar(15) NOT NULL DEFAULT '-',
+				`institid` int(11) NOT NULL DEFAULT '0',
+				`ptitle` varchar(25) NOT NULL DEFAULT '-',
+				`poname` varchar(50) NOT NULL DEFAULT '-',
+				`plangu` int(11) NOT NULL DEFAULT '0',
+				`pphone` varchar(20) NOT NULL DEFAULT '-',
+				`pextent` varchar(20) NOT NULL DEFAULT '-',
+				`pfax` varchar(20) NOT NULL DEFAULT '-',
+				`pemail` varchar(40) NOT NULL DEFAULT '-',
+				`prole` int(11) NOT NULL DEFAULT '0',
+				`sperson` int(11) NOT NULL DEFAULT '0',
+				`eperson` int(11) NOT NULL DEFAULT '0',
+				`pstatus` int(11) NOT NULL DEFAULT '0',
+				`pnotes` varchar(255) NOT NULL DEFAULT '-',
+				`contact` varchar(255) NOT NULL DEFAULT '-',
+				 PRIMARY KEY (`personid`),
+				 UNIQUE KEY `persons_bkp_uk` (`pemail`)
+			);
+
+			INSERT INTO persons_bkp
+			SELECT * FROM persons;
+
+			DROP TABLE persons;
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="darla" id="v12.4.0-23">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="users_bkp" />
+			</not>
+		</preConditions>
+		<comment>
+			Store into backup table the USERS table, then drop the USERS table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE users_bkp (
+  				`userid` int(11) NOT NULL AUTO_INCREMENT,
+  				`instalid` int(11) NOT NULL DEFAULT '0',
+  				`ustatus` int(11) NOT NULL DEFAULT '0',
+  				`uaccess` int(11) NOT NULL DEFAULT '0',
+  				`utype` int(11) NOT NULL DEFAULT '0',
+  				`uname` varchar(30) NOT NULL DEFAULT '-',
+  				`upswd` varchar(60) NOT NULL DEFAULT '-',
+  				`personid` int(11) NOT NULL DEFAULT '0',
+  				`adate` int(11) NOT NULL DEFAULT '0',
+  				`cdate` int(11) NOT NULL DEFAULT '0',
+  				PRIMARY KEY (`userid`)
+			);
+
+			INSERT INTO users_bkp
+			SELECT * FROM users;
+
+			DROP TABLE users;
+		</sql>
+	</changeSet>
+
+
+
 </databaseChangeLog>
