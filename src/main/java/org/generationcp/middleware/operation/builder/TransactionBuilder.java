@@ -28,12 +28,12 @@ public class TransactionBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Transaction buildForAdd(final Lot lot, final Integer lRecordID, final Double amount, final Integer userId, final String comment, final Integer sourceId,
+	public Transaction buildForAdd(final Lot lot, final Integer lRecordID, final Double amount, final Integer userId, final Integer personId, final String comment, final Integer sourceId,
 			final String inventoryID, final String bulkWith, final String bulkComp) {
 		final Transaction transaction =
 				new Transaction(null, userId, lot, this.getCurrentDate(), TransactionStatus.ANTICIPATED.getIntValue(),
 						this.formatAmount(amount), comment, TransactionBuilder.COMMITMENT_DATE_INDEFINITE, EntityType.LIST.name(),
-						sourceId, lRecordID, 0d, inventoryID);
+						sourceId, lRecordID, 0d, personId, inventoryID);
 
 		transaction.setBulkCompl(bulkComp);
 		transaction.setBulkWith(bulkWith);

@@ -11,7 +11,8 @@
 
 package org.generationcp.middleware.pojos.ims;
 
-import java.io.Serializable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -24,9 +25,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.io.Serializable;
 
 /**
  * POJO for ims_transaction table.
@@ -93,6 +92,9 @@ public class Transaction implements Serializable {
 	@Column(name = "prevamount")
 	private Double previousAmount;
 
+	@Column(name = "personid")
+	private Integer personId;
+
 	@Column(name = "inventory_id")
 	private String inventoryID;
 
@@ -111,7 +113,8 @@ public class Transaction implements Serializable {
 	}
 
 	public Transaction(final Integer id, final Integer userId, final Lot lot, final Integer transactionDate, final Integer status, final Double quantity, final String comments,
-			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final String inventoryID) {
+			final Integer commitmentDate, final String sourceType, final Integer sourceId, final Integer sourceRecordId, final Double previousAmount, final Integer personId,
+			final String inventoryID) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -125,6 +128,7 @@ public class Transaction implements Serializable {
 		this.sourceId = sourceId;
 		this.sourceRecordId = sourceRecordId;
 		this.previousAmount = previousAmount;
+		this.personId = personId;
 		this.inventoryID = inventoryID;
 	}
 
@@ -224,6 +228,14 @@ public class Transaction implements Serializable {
 		this.previousAmount = previousAmount;
 	}
 
+	public Integer getPersonId() {
+		return this.personId;
+	}
+
+	public void setPersonId(final Integer personId) {
+		this.personId = personId;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
@@ -249,6 +261,8 @@ public class Transaction implements Serializable {
 		builder.append(this.sourceRecordId);
 		builder.append(", previousAmount=");
 		builder.append(this.previousAmount);
+		builder.append(", personId=");
+		builder.append(this.personId);
 		builder.append("]");
 		return builder.toString();
 	}

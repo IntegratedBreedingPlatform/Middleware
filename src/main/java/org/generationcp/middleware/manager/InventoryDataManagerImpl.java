@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
@@ -369,9 +370,16 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			final Location location = locationManager.getLocationByID(t.getLot().getLocationId());
 			row.setLocationOfLot(location);
 
+			final Person person = this.getPersonById(t.getPersonId());
+			row.setPerson(person);
+
 			report.add(row);
 		}
 		return report;
+	}
+
+	private Person getPersonById(final Integer id) {
+		return this.daoFactory.getPersonDAO().getById(id, false);
 	}
 
 	@Override

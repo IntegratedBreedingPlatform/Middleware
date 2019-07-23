@@ -218,7 +218,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
@@ -257,7 +257,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
@@ -285,7 +285,7 @@ public class InventoryServiceImplTest {
 				new Transaction(null, details.getUserId(), lot, Util.getCurrentDateAsIntegerValue(),
 						TransactionStatus.ANTICIPATED.getIntValue(),
 						Double.valueOf(new DecimalFormat("#.000").format(details.getAmount())), details.getComment(), 0,
-						EntityType.LIST.name(), details.getSourceId(), listData == null ? 0 : listData.getId(), 0d,
+						EntityType.LIST.name(), details.getSourceId(), listData == null ? 0 : listData.getId(), 0d, 1,
 						details.getInventoryID());
 
 		transaction.setBulkCompl(details.getBulkCompl());
