@@ -412,26 +412,38 @@
 
 	<changeSet author="darla" id="v12.4.0-16">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="ims_transaction" columnName="userid_bkp"/>
-			</not>
+			<and>
+				<not>
+					<columnExists tableName="ims_transaction" columnName="userid_bkp"/>
+				</not>
+				<not>
+				 	<columnExists tableName="ims_transaction" columnName="personid_bkp"/>
+				</not>
+			</and>
 		</preConditions>
 		<comment>
-			Copy userid field of IMS_TRANSACTION table to backup column and transform its values to refer to users table in workbench database
+			Copy userid and personid fields of IMS_TRANSACTION table to backup column and transform their values to refer to users and persons tables, respectively, in workbench database
 		</comment>
 		<addColumn tableName="ims_transaction">
 			<column name="userid_bkp" type="INT" afterColumn="userid">
 				<constraints nullable="true"/>
 			</column>
+			<column name="personid_bkp" type="INT" afterColumn="personid">
+				<constraints nullable="true"/>
+			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE ims_transaction
-			   SET userid_bkp = userid;
+			   SET userid_bkp = userid,
+			       personid_bkp = personid;
 
 			UPDATE ims_transaction tr
-		  	 INNER JOIN users u ON u.userid = tr.userid
+			 INNER JOIN users u ON u.userid = tr.userid
 			 INNER JOIN workbench.users wu ON wu.uname = u.uname
-			   SET tr.userid = wu.userid
+			  LEFT JOIN persons p ON p.personid = tr.personid
+			  LEFT JOIN workbench.persons wp ON wp.pemail = p.pemail
+			   SET tr.userid = wu.userid,
+				   tr.personid = wp.personid
 			 WHERE tr.userid != 0;
 		</sql>
 	</changeSet>
