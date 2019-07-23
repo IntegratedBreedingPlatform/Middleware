@@ -57,7 +57,7 @@
 			</not>
 		</preConditions>
 		<comment>
-			Backup names.nuid field to backup column and transform its values to refer to users table in workbench database
+			Backup nuid field of NAMES table to backup column and transform its values to refer to users table in workbench database
 		</comment>
 		<addColumn tableName="names">
 			<column name="nuid_bkp" type="INT" afterColumn="nuid">
@@ -69,13 +69,9 @@
 			   SET nuid_bkp = nuid;
 
 			UPDATE names
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = nuid
-			   SET nuid = workbench_user_id
+			 INNER JOIN users u ON u.userid = nuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET nuid = wu.userid
 			 WHERE nuid != 0;
 		</sql>
 	</changeSet>
@@ -100,13 +96,9 @@
 			   SET fuid_bkp = fuid;
 
 			UPDATE udflds
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = fuid
-			   SET fuid = workbench_user_id
+			 INNER JOIN users u ON u.userid = fuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET fuid = wu.userid
 			 WHERE fuid != 0;
 		</sql>
 	</changeSet>
@@ -130,13 +122,9 @@
 			   SET germuid_bkp = germuid;
 
 			UPDATE germplsm
-			INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = germuid
-			   SET germuid = workbench_user_id
+			 INNER JOIN users u ON u.userid = germuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET germuid = wu.userid
 			 WHERE germuid != 0;
 		</sql>
 	</changeSet>
@@ -160,13 +148,9 @@
 			   SET created_by_bkp = created_by;
 
 			UPDATE project
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = created_by
-			   SET created_by = workbench_user_id
+			 INNER JOIN users u ON u.userid = created_by
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET created_by = wu.userid
 			 WHERE created_by != 0;
 		</sql>
 	</changeSet>
@@ -190,13 +174,9 @@
 			   SET muid_bkp = muid;
 
 			UPDATE methods
-			INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = muid
-			   SET muid = workbench_user_id
+			 INNER JOIN users u ON u.userid = muid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET muid = wu.userid
 			 WHERE muid != 0;
 		</sql>
 	</changeSet>
@@ -220,13 +200,9 @@
 			   SET auid_bkp = auid;
 
 			UPDATE atributs
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = auid
-			   SET auid = workbench_user_id
+			 INNER JOIN users u ON u.userid = auid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET auid = wu.userid
 			 WHERE auid != 0;
 		</sql>
 	</changeSet>
@@ -250,13 +226,9 @@
 			   SET listuid_bkp = listuid;
 
 			UPDATE listnms
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = listuid
-			   SET listuid = workbench_user_id
+			 INNER JOIN users u ON u.userid = listuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET listuid = wu.userid
 			 WHERE listuid != 0;
 		</sql>
 	</changeSet>
@@ -280,15 +252,11 @@
 			UPDATE user_program_tree_state
 			   SET userid_bkp = userid;
 
-			UPDATE user_program_tree_state
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = userid
-			   SET userid = workbench_user_id
-			 WHERE userid != 0;
+			UPDATE user_program_tree_state tree
+			 INNER JOIN users u ON u.userid = tree.userid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET tree.userid = wu.userid
+			 WHERE tree.userid != 0;
 		</sql>
 		<createIndex indexName="user_program_tree_state_unique" tableName="user_program_tree_state" unique="true">
 			<column name="userid" type="int" />
@@ -316,13 +284,9 @@
 			   SET user_id_bkp = user_id;
 
 			UPDATE gdms_dataset_users
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = user_id
-			   SET user_id = workbench_user_id
+			 INNER JOIN users u ON u.userid = user_id
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET user_id = wu.userid
 			 WHERE user_id != 0;
 		</sql>
 	</changeSet>
@@ -346,13 +310,9 @@
 			   SET user_id_bkp = user_id;
 
 			UPDATE gdms_track_data
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = user_id
-			   SET user_id = workbench_user_id
+			 INNER JOIN users u ON u.userid = user_id
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET user_id = wu.userid
 			 WHERE user_id != 0;
 		</sql>
 	</changeSet>
@@ -377,13 +337,9 @@
 			   SET created_by_bkp = created_by;
 
 			UPDATE sample_list
-			INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = created_by
-			   SET created_by = workbench_user_id
+			 INNER JOIN users u ON u.userid = created_by
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET created_by = wu.userid
 			 WHERE created_by != 0;
 		</sql>
 	</changeSet>
@@ -419,19 +375,12 @@
 			       taken_by_bkp = taken_by;
 
 			UPDATE sample
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map1 ON map1.ibdb_user_id = created_by
-			  LEFT JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map2 ON map2.ibdb_user_id = taken_by
-			   SET created_by = map1.workbench_user_id, taken_by = map2.workbench_user_id;
+			 INNER JOIN users u ON u.userid = created_by
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			  LEFT JOIN users tu ON tu.userid = taken_by
+			  LEFT JOIN workbench.users twu on twu.uname = tu.uname
+			   SET created_by = wu.userid,
+			       taken_by = twu.userid;
 		</sql>
 	</changeSet>
 
@@ -453,15 +402,11 @@
 			UPDATE ims_lot
 			   SET userid_bkp = userid;
 
-			UPDATE ims_lot
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = userid
-			   SET userid = workbench_user_id
-			 WHERE userid != 0;
+			UPDATE ims_lot lot
+			  INNER JOIN users u ON u.userid = lot.userid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET lot.userid = wu.userid
+			 WHERE lot.userid != 0;
 		</sql>
 	</changeSet>
 
@@ -483,15 +428,11 @@
 			UPDATE ims_transaction
 			   SET userid_bkp = userid;
 
-			UPDATE ims_transaction
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = userid
-			   SET userid = workbench_user_id
-			 WHERE userid != 0;
+			UPDATE ims_transaction tr
+		  	 INNER JOIN users u ON u.userid = tr.userid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET tr.userid = wu.userid
+			 WHERE tr.userid != 0;
 		</sql>
 	</changeSet>
 
@@ -514,13 +455,9 @@
 			   SET duid_bkp = duid;
 
 			UPDATE locdes
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = duid
-			   SET duid = workbench_user_id
+			 INNER JOIN users u ON u.userid = duid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET duid = wu.userid
 			 WHERE duid != 0;
 		</sql>
 	</changeSet>
@@ -544,13 +481,9 @@
 			   SET cuid_bkp = cuid;
 
 			UPDATE changes
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = cuid
-			   SET cuid = workbench_user_id
+			 INNER JOIN users u ON u.userid = cuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET cuid = wu.userid
 			 WHERE cuid != 0;
 		</sql>
 	</changeSet>
@@ -574,13 +507,9 @@
 			   SET refuid_bkp = refuid;
 
 			UPDATE reflinks
-			 INNER JOIN (
-			       SELECT DISTINCT workbench_user_id, ibdb_user_id
-	                 FROM workbench.workbench_ibdb_user_map map
-	                INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-	                INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-                 ) map ON map.ibdb_user_id = refuid
-			   SET refuid = workbench_user_id
+			 INNER JOIN users u ON u.userid = refuid
+			 INNER JOIN workbench.users wu ON wu.uname = u.uname
+			   SET refuid = wu.userid
 			 WHERE refuid != 0;
 		</sql>
 	</changeSet>
