@@ -11,9 +11,7 @@
 					SELECT COUNT(1)
 					  FROM persons p
 					 WHERE NOT EXISTS (
-					 	   SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail)
-					   AND EXISTS (
-						   SELECT 1 from users u where u.personid = p.personid);
+						   SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail);
 				</sqlCheck>
 			</not>
 		</preConditions>
@@ -25,9 +23,7 @@
 			SELECT fname, lname, pemail
 			  FROM persons p
 			 WHERE NOT EXISTS (
-				   SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail)
-			   AND EXISTS (
-			       SELECT 1 from users u where u.personid = p.personid);
+					SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail);
 		</sql>
 	</changeSet>
 
