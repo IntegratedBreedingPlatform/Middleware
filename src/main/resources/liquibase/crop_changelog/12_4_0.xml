@@ -527,4 +527,65 @@
 	</changeSet>
 
 
+	<changeSet author="darla" id="v12.4.0-20">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(1) FROM projectprop pp
+						 WHERE pp.value IS NOT null AND pp.value != '' AND pp.variable_id IN (
+								SELECT var.cvterm_id
+								  FROM cvterm var
+								 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+								 WHERE scale.object_id = 1901
+							);
+					</sqlCheck>
+				</not>
+				<not>
+					<tableExists tableName="projectprop_users_bkp" />
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Transform study settings variables that refer to crop persons to now point to persons table in workbench database
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE projectprop_users_bkp (
+			  `projectprop_id` int(11) NOT NULL AUTO_INCREMENT,
+			  `project_id` int(11) NOT NULL,
+			  `type_id` int(11) NOT NULL,
+			  `value` varchar(255) DEFAULT NULL,
+			  `rank` int(11) NOT NULL DEFAULT '0',
+			  `variable_id` int(11) NOT NULL,
+			  `alias` varchar(255) DEFAULT NULL,
+			  PRIMARY KEY (`projectprop_id`),
+			  UNIQUE KEY `projectprop_users_bkp_idx1` (`project_id`,`type_id`,`rank`,`variable_id`)
+			);
+
+			<!-- Insert into backup table records of variables with "Person ID" scale (1901) -->
+			INSERT INTO projectprop_users_bkp
+			SELECT * FROM projectprop pp
+			 WHERE pp.value IS NOT null AND pp.value != '' AND pp.variable_id IN (
+					SELECT var.cvterm_id
+					  FROM cvterm var
+					 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+					 WHERE scale.object_id = 1901
+				);
+
+			<!-- Update person ID values to refer to persons in workbench DB for variables with "Person ID" scale -->
+			UPDATE projectprop pp
+			 INNER JOIN persons p on p.personid = pp.value
+			 INNER JOIN workbench.persons wp ON wp.pemail = p.pemail
+			   SET pp.value = wp.personid
+			 WHERE pp.value IS NOT null AND pp.value != '' AND pp.variable_id IN (
+					SELECT var.cvterm_id
+					  FROM cvterm var
+					 INNER JOIN cvterm_relationship scale ON var.cvterm_id = scale.subject_id AND scale.type_id = 1220
+					 WHERE scale.object_id = 1901
+				);
+			
+		</sql>
+	</changeSet>
+
+
 </databaseChangeLog>
