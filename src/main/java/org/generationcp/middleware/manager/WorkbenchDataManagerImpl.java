@@ -1178,13 +1178,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Role saveOrUpdateRole(final Role role) {
+	public Role saveRole(final Role role) {
 
 		try {
-			this.getRoleDao().merge(role);
+			this.getRoleDao().save(role);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-				"Cannot save Role: WorkbenchDataManager.saveOrUpdateRole(role=" + role + "): " + e.getMessage(), e);
+				"Cannot save Role: WorkbenchDataManager.saveRole(role=" + role + "): " + e.getMessage(), e);
 		}
 
 		return role;

@@ -33,7 +33,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 					criteria.createAlias("roleType", "roleType");
 					criteria.add(Restrictions.eq("roleType.id", roleSearchDto.getRoleTypeId()));
 				}
-				if(roleSearchDto.getName() != null && StringUtils.isNotBlank(roleSearchDto.getName())) {
+				if (StringUtils.isNotBlank(roleSearchDto.getName())) {
 					criteria.add(Restrictions.eq("name", roleSearchDto.getName()));
 				}
 			}
