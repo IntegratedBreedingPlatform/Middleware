@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="darla" id="v12.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="workbench_ibdb_user_map_bkp" />
+			</not>
+		</preConditions>
+		<comment>
+			Store into backup table the WORKBENCH_IBDB_USER_MAP table, then drop the WORKBENCH_IBDB_USER_MAP table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `workbench_ibdb_user_map_bkp` (
+			  `ibdb_user_map_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			  `workbench_user_id` int(11) NOT NULL,
+			  `project_id` int(10) unsigned NOT NULL,
+			  `ibdb_user_id` int(11) NOT NULL,
+			  PRIMARY KEY (`ibdb_user_map_id`),
+			  UNIQUE KEY `user_map_bkp_uk` (`project_id`,`workbench_user_id`)
+			);
+
+			INSERT INTO workbench_ibdb_user_map_bkp
+			SELECT * FROM workbench_ibdb_user_map;
+
+			DROP TABLE workbench_ibdb_user_map;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
