@@ -31,17 +31,14 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					SELECT COUNT(1) FROM users u
- 					 WHERE NOT EXISTS (
-						   SELECT 1 FROM workbench.workbench_ibdb_user_map map
-						    INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-						    INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-						    WHERE map.ibdb_user_id = u.userid);
+					    SELECT COUNT(1) FROM users u
+     					 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
+
 				</sqlCheck>
 			</not>
 		</preConditions>
 		<comment>
-			Insert into workbench database any users that only exist in crop database (i.e. don't exist in workbench_ibdb_user_map table)
+			Insert into workbench database any users (matching by username) that only exist in crop database
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench.users(`ustatus`, `uaccess`, `utype`, `uname`, `upswd`, `personid`, `adate`, `cdate`)
@@ -49,34 +46,7 @@
 			  FROM users u
 			 INNER JOIN persons p on p.personid = u.personid
 			 INNER JOIN workbench.persons wp on wp.pemail = p.pemail
- 			 WHERE NOT EXISTS (
-				   SELECT 1 FROM workbench.workbench_ibdb_user_map map
-				    INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-				    INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-			        WHERE map.ibdb_user_id = u.userid);
-
-			INSERT INTO workbench.workbench_ibdb_user_map(`workbench_user_id`, `project_id`, `ibdb_user_id`)
-			SELECT u.wb_userid, program.project_id, u.crop_userid
-    		  FROM (
-				   SELECT wu.userid as wb_userid, u.userid as crop_userid
-				     FROM users u
-				    INNER JOIN persons p on p.personid = u.personid
-				    INNER JOIN workbench.persons wp on wp.pemail = p.pemail
-					<!-- Some crop users share the same person so we also match by username to remove duplicate records for insertion  -->
-					INNER JOIN workbench.users wu on wu.personid = wp.personid AND wu.uname = u.uname
-					WHERE NOT EXISTS (
-						  SELECT 1 FROM workbench.workbench_ibdb_user_map map
-						  INNER JOIN workbench.workbench_project p on p.project_id = map.project_id
-						  INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-			 			  WHERE map.ibdb_user_id = u.userid or map.workbench_user_id = wu.userid)
-					ORDER BY crop_userid asc
-			      ) u,
-				  <!-- We will get any one program from the crop database to use as project_id in workbench_ibdb_user_map -->
-				( SELECT p.project_id
-			        FROM workbench.workbench_project p
-			       INNER JOIN workbench.workbench_crop crop ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
-			       LIMIT 1
-				) program;
+			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
 		</sql>
 	</changeSet>
 
