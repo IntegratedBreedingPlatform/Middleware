@@ -271,8 +271,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDto> getUsersByIds(final List<Integer> userIds) {
-		final List<WorkbenchUser> workbenchUsers = this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByIds(userIds);
+	public List<UserDto> getUsersByPersonIds(final List<Integer> personIds) {
+		final List<WorkbenchUser> workbenchUsers = this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByPersonIds(personIds);
 		final List<UserDto> userDtos = new ArrayList<>();
 		for (final WorkbenchUser workbenchUser : workbenchUsers) {
 			final UserDto userDto = new UserDto();

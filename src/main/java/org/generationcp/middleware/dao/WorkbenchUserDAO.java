@@ -323,6 +323,21 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return idNamesMap;
 	}
 
+	public List<WorkbenchUser> getUsersByPersonIds(final List<Integer> personIds) {
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			criteria.add(Restrictions.in("person.id", personIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getUsersByPersonIds(personIds= " + personIds + ") query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
 	public WorkbenchUser getUserByFullName(final String fullname) {
 		try {
 			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_BY_FULLNAME);
@@ -330,20 +345,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			return (WorkbenchUser) query.uniqueResult();
 		} catch (final HibernateException e) {
 			final String message = "Error with getUserByFullName query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-	}
-
-	public List<WorkbenchUser> getUsersByIds(final List<Integer> userIds) {
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
-			criteria.add(Restrictions.in("user.userid", userIds));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getUsersByIds(userIds= " + userIds + ") query from WorkbenchUserDAO: " + e.getMessage();
 			WorkbenchUserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
