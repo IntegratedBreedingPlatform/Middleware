@@ -322,4 +322,11 @@ public interface UserService {
 	 */
 	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
 
+	/**
+	 * Saves or updates the ProjectUserInfo.
+	 *
+	 * @param projectUserInfo the project user info
+	 * @return ProjectUserInfo
+	 */
+	void saveProjectUserInfo(ProjectUserInfo projectUserInfo);
 }

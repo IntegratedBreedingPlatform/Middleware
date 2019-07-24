@@ -110,20 +110,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public ProjectUserInfo saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo) {
-
-		try {
-			this.workbenchDaoFactory.getProjectUserInfoDAO().merge(projectUserInfo);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot save ProjectUserInfo: WorkbenchDataManager.saveOrUpdateProjectUserInfo(project=" + projectUserInfo + "): " + e
-					.getMessage(), e);
-		}
-
-		return projectUserInfo;
-	}
-
-	@Override
 	public Project addProject(final Project project) {
 
 		try {

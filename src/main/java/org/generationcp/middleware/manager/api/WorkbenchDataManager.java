@@ -250,14 +250,6 @@ public interface WorkbenchDataManager {
 	long countProjectActivitiesByProjectId(Long projectId);
 
 	/**
-	 * Saves or updates the ProjectUserInfo.
-	 *
-	 * @param projectUserInfo the project user info
-	 * @return ProjectUserInfo
-	 */
-	ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
-
-	/**
 	 * Gets the all workbench sidebar category.
 	 *
 	 * @return the all workbench sidebar category
