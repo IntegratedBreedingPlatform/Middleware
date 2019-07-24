@@ -120,7 +120,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	private Boolean isnew = false;
 
 	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="personid", insertable=false, updatable=false)
+	@JoinColumn(name="personid")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
 
