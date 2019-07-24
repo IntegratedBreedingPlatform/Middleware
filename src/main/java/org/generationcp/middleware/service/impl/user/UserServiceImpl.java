@@ -7,6 +7,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -85,6 +86,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
 		return this.workbenchDaoFactory.getProjectUserInfoDAO().getActiveUserIDsByProjectId(projectId);
+	}
+
+	@Override
+	public List<WorkbenchUser> getActiveUsersByCrop(final CropType cropType) {
+		return this.workbenchDaoFactory.getProjectUserInfoDAO().getActiveUsersByCrop(cropType);
 	}
 
 	@Override
@@ -450,6 +456,17 @@ public class UserServiceImpl implements UserService {
 			this.workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(projectUserInfo);
 		}
 	}
+
+	@Override
+	public void saveCropPerson(final CropPerson cropPerson) {
+		this.workbenchDaoFactory.getCropPersonDAO().saveOrUpdate(cropPerson);
+	}
+
+	@Override
+	public void removeCropPerson(final CropPerson cropPerson) {
+		this.workbenchDaoFactory.getCropPersonDAO().makeTransient(cropPerson);
+	}
+
 	@Override
 	public List<Role> getAssignableRoles() {
 		return this.workbenchDaoFactory.getRoleDAO().getAssignableRoles();

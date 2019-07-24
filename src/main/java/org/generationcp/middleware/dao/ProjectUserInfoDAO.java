@@ -198,4 +198,18 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		statement.executeUpdate();
 	}
 
+	public List<WorkbenchUser> getActiveUsersByCrop(final CropType cropType) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
+			criteria.createAlias("project", "project");
+			criteria.createAlias("project.cropType", "cropType");
+			criteria.add(Restrictions.eq("cropType.cropName", cropType.getCropName()));
+			criteria.setProjection(Projections.distinct(Projections.property("user")));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getActiveUsersByCrop()";
+			ProjectUserInfoDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

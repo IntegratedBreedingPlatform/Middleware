@@ -2,6 +2,8 @@ package org.generationcp.middleware.service.api.user;
 
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -62,6 +64,13 @@ public interface UserService {
 	 * @return
 	 */
 	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
+
+	/**
+	 * Retrieves the users that are members of any program in a crop.
+	 * @param cropType
+	 * @return
+	 */
+	List<WorkbenchUser> getActiveUsersByCrop(final CropType cropType);
 
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
@@ -329,4 +338,9 @@ public interface UserService {
 	 * @return ProjectUserInfo
 	 */
 	void saveProjectUserInfo(ProjectUserInfo projectUserInfo);
+
+	void saveCropPerson(CropPerson cropPerson);
+
+	void removeCropPerson(CropPerson cropPerson);
+
 }
