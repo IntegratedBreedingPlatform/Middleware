@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.dao.CropPersonDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
@@ -36,6 +37,12 @@ public class WorkbenchDaoFactory {
 		final PersonDAO personDAO = new PersonDAO();
 		personDAO.setSession(this.sessionProvider.getSession());
 		return personDAO;
+	}
+
+	public CropPersonDAO getCropPersonDAO() {
+		final CropPersonDAO cropPersonDAO = new CropPersonDAO();
+		cropPersonDAO.setSession(this.sessionProvider.getSession());
+		return cropPersonDAO;
 	}
 
 	public UserInfoDAO getUserInfoDAO() {

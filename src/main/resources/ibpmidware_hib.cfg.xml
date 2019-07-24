@@ -67,6 +67,7 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLinkRole"/>
         <mapping class="org.generationcp.middleware.pojos.naming.NamingConfiguration"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.CropPerson"/>
 
         <!-- Mapping classes for new OMS schema -->
         <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
