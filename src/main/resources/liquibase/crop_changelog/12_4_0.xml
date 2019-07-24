@@ -645,8 +645,36 @@
 		</sql>
 	</changeSet>
 
-
 	<changeSet author="darla" id="v12.4.0-22">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					  FROM persons p
+					 INNER JOIN workbench.persons wp ON wp.pemail = p.pemail
+					 INNER JOIN workbench.workbench_crop crop ON crop.db_name = DATABASE()
+					 WHERE NOT EXISTS (
+							SELECT 1 FROM workbench.crop_persons cp
+							 WHERE cp.personid = wp.personid AND cp.crop_name = crop.crop_name);
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Associate persons to crop by inserting to CROP_PERSONS table in workbench database
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench.crop_persons
+			SELECT crop_name, wp.personid
+			  FROM persons p
+			 INNER JOIN workbench.persons wp ON wp.pemail = p.pemail
+			 INNER JOIN workbench.workbench_crop crop ON crop.db_name = DATABASE()
+			 WHERE NOT EXISTS (
+					SELECT 1 FROM workbench.crop_persons cp
+					 WHERE cp.personid = wp.personid AND cp.crop_name = crop.crop_name);
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-23">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="persons_bkp" />
@@ -687,7 +715,7 @@
 	</changeSet>
 
 
-	<changeSet author="darla" id="v12.4.0-23">
+	<changeSet author="darla" id="v12.4.0-24">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="users_bkp" />
