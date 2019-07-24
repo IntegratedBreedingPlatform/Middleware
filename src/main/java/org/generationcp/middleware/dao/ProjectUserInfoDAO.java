@@ -17,12 +17,20 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link ProjectUserInfo}.
@@ -30,28 +38,30 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
-	
-	public static final String GET_USERS_BY_PROJECT_ID = 
+
+	private static final Logger LOG = LoggerFactory.getLogger(ProjectUserInfoDAO.class);
+
+	public static final String GET_USERS_BY_PROJECT_ID =
 			"SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, "
 			+ "users.uname, users.upswd, users.personid, users.adate, users.cdate "
 			+ "FROM users "
-			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id " 
+			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
 			+ "WHERE pu.project_id = :projectId "
 			+ "GROUP BY users.userid";
-	
-	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID = 
+
+	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID =
 			"SELECT DISTINCT pu.user_id "
 			+ "FROM workbench_project_user_info pu "
 			+ "INNER JOIN users u ON u.userid = pu.user_id "
-			+ "WHERE u.ustatus = 0 AND pu.project_id = :projectId"; 
-	
+			+ "WHERE u.ustatus = 0 AND pu.project_id = :projectId";
+
 	public static final String GET_PERSONS_BY_PROJECT_ID = "SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
 			+ "persons.lname "
 			+ "FROM persons "
 			+ "JOIN users ON users.personid = persons.personid "
 			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
 			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjectsByUser(WorkbenchUser user) {
 		try {
@@ -66,7 +76,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return new ArrayList<>();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		final List<WorkbenchUser> users = new ArrayList<>();
@@ -99,7 +109,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return users;
 	}
-	
+
 	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
 		final List<Integer> userIDs = new ArrayList<>();
 		try {
@@ -144,7 +154,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<ProjectUserInfo> getByProjectIdAndUserIds(Long projectId, List<Integer> userIds) {
 		try {
@@ -157,7 +167,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 					+ ex.getMessage(), ex);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
 		final Map<Integer, Person> persons = new HashMap<>();
