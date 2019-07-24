@@ -108,22 +108,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Integer addUser(final WorkbenchUser user) {
-
-		Integer idUserSaved = null;
+	public WorkbenchUser addUser(final WorkbenchUser user) {
 		try {
-
-			final WorkbenchUser recordSaved = this.workbenchDaoFactory.getWorkbenchUserDAO().saveOrUpdate(user);
-			idUserSaved = recordSaved.getUserid();
-
+			return this.workbenchDaoFactory.getWorkbenchUserDAO().saveOrUpdate(user);
 		} catch (final Exception e) {
-
 			throw new MiddlewareQueryException(
-				"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+				"Error encountered while saving User: userService.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
-
-		return idUserSaved;
-
 	}
 
 	@Override
@@ -141,7 +132,7 @@ public class UserServiceImpl implements UserService {
 		// user.type = 0 - Default user type (not used)
 
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		final Person person = this.setPerson(userDto, new Person());
+		final Person person = this.createPersonFromDto(userDto, new Person());
 
 		final WorkbenchUser user = new WorkbenchUser();
 		user.setPerson(person);
@@ -173,7 +164,7 @@ public class UserServiceImpl implements UserService {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+				"Error encountered while saving User: userService.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
 
 		final UserInfo userInfo = new UserInfo();
@@ -193,7 +184,7 @@ public class UserServiceImpl implements UserService {
 
 		try {
 			user = this.getUserById(userDto.getUserId());
-			this.setPerson(userDto, user.getPerson());
+			this.createPersonFromDto(userDto, user.getPerson());
 
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
@@ -241,7 +232,7 @@ public class UserServiceImpl implements UserService {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while deleting User: WorkbenchDataManager.deleteUser(user=" + user + "):  " + e.getMessage(), e);
+				"Error encountered while deleting User: userService.deleteUser(user=" + user + "):  " + e.getMessage(), e);
 		}
 	}
 
@@ -325,20 +316,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Integer addPerson(final Person person) {
-
-		Integer idPersonSaved = null;
+	public Person addPerson(final Person person) {
 		try {
-
-			final Person recordSaved = this.workbenchDaoFactory.getPersonDAO().saveOrUpdate(person);
-			idPersonSaved = recordSaved.getId();
-
+			return this.workbenchDaoFactory.getPersonDAO().saveOrUpdate(person);
 		} catch (final Exception e) {
-
 			throw new MiddlewareQueryException(
-				"Error encountered while saving Person: WorkbenchDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
+				"Error encountered while saving Person: userService.addPerson(person=" + person + "): " + e.getMessage(), e);
 		}
-		return idPersonSaved;
 	}
 
 	@Override
@@ -351,7 +335,7 @@ public class UserServiceImpl implements UserService {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while deleting Person: WorkbenchDataManager.deletePerson(person=" + person + "): " + e.getMessage(),
+				"Error encountered while deleting Person: userService.deletePerson(person=" + person + "): " + e.getMessage(),
 				e);
 		}
 	}
@@ -429,7 +413,7 @@ public class UserServiceImpl implements UserService {
 		this.workbenchDaoFactory.getUserInfoDAO().insertOrUpdateUserInfo(userDetails);
 	}
 
-	private Person setPerson(final UserDto userDto, final Person person) {
+	private Person createPersonFromDto(final UserDto userDto, final Person person) {
 
 		person.setFirstName(userDto.getFirstName());
 		person.setMiddleName("");
@@ -444,9 +428,7 @@ public class UserServiceImpl implements UserService {
 		person.setNotes("-");
 		person.setPositionName("-");
 		person.setPhone("-");
-		this.addPerson(person);
-
-		return person;
+		return this.addPerson(person);
 	}
 
 	@Override

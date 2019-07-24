@@ -97,9 +97,9 @@ public interface UserService {
 	 * Adds a user.
 	 *
 	 * @param user - the user to add
-	 * @return Returns the id of the {@code User} record added
+	 * @return Returns the the {@code WorkbenchUser} record added
 	 */
-	Integer addUser(WorkbenchUser user);
+	WorkbenchUser addUser(WorkbenchUser user);
 
 	/**
 	 * Returns number of all Users.
@@ -201,9 +201,9 @@ public interface UserService {
 	 * Adds the person.
 	 *
 	 * @param person - the Person to add
-	 * @return Returns the id of the {@code Person} record added
+	 * @return Returns the {@code Person} record added
 	 */
-	Integer addPerson(Person person);
+	Person addPerson(Person person);
 
 	/**
 	 * Deletes a person.

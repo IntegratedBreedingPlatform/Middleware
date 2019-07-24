@@ -140,16 +140,18 @@ public class WorkbenchTestDataUtil {
 
 		// Save test users 1 and 2 as members of test program
 		ProjectUserInfo pui = new ProjectUserInfo();
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		workbenchUser.setUserid(this.commonTestProject.getUserId());
 		pui.setProject(this.commonTestProject);
-		pui.setUserId(this.commonTestProject.getUserId());
+		pui.setUser(workbenchUser);
 		pui.setLastOpenDate(new Date());
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
+		this.userService.saveProjectUserInfo(pui);
 
 		pui = new ProjectUserInfo();
 		pui.setProject(this.commonTestProject);
-		pui.setUserId(this.testUser2.getUserid());
+		pui.setUser(this.testUser2);
 		pui.setLastOpenDate(new Date());
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
+		this.userService.saveProjectUserInfo(pui);
 	}
 
 	public Project getCommonTestProject() {

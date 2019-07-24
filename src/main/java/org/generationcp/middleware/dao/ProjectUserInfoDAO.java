@@ -11,13 +11,9 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -61,7 +57,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		try {
 			if (user != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
-				criteria.add(Restrictions.eq("userId", user.getUserid()));
+				criteria.add(Restrictions.eq("user.userid", user.getUserid()));
 				criteria.setProjection(Projections.distinct(Projections.property("project")));
 				return criteria.list();
 			}
@@ -124,7 +120,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			if (projectId != null && userId != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 				criteria.add(Restrictions.eq("project.projectId", projectId));
-				criteria.add(Restrictions.eq("userId", userId));
+				criteria.add(Restrictions.eq("user.userid", userId));
 				return (ProjectUserInfo) criteria.uniqueResult();
 			}
 		} catch (HibernateException ex) {
@@ -154,7 +150,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 			criteria.add(Restrictions.eq("project.projectId", projectId));
-			criteria.add(Restrictions.in("userId", userIds));
+			criteria.add(Restrictions.in("user.userid", userIds));
 			return criteria.list();
 		} catch (HibernateException ex) {
 			throw new MiddlewareQueryException("Error in getByProjectIdAndUserIds(projectId = " + projectId + ", userIds = " + userIds + "):"

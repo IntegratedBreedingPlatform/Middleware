@@ -182,8 +182,8 @@ public class DataSetupTest extends IntegrationTestBase {
 //		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
         final ProjectUserInfo pUserInfo = new ProjectUserInfo(program,
-                workbenchUser.getUserid());
-        this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+                workbenchUser);
+        this.userService.saveProjectUserInfo(pUserInfo);
 
         return program.getUniqueID();
     }

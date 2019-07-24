@@ -87,20 +87,20 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddUser() {
 		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
-		final Integer result = this.userService.addUser(user);
+		final WorkbenchUser result = this.userService.addUser(user);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_user.", result);
 
-		final WorkbenchUser readUser = this.userService.getUserById(result);
+		final WorkbenchUser readUser = this.userService.getUserById(result.getUserid());
 		Assert.assertEquals(user.getName(), readUser.getName());
 	}
 
 	@Test
 	public void testAddPerson() {
 		final Person person = this.workbenchTestDataUtil.createTestPersonData();
-		final Integer result = this.userService.addPerson(person);
+		final Person result = this.userService.addPerson(person);
 		Assert.assertNotNull("Expected id of a newly saved record in persons.", result);
 
-		final Person readPerson = this.userService.getPersonById(result);
+		final Person readPerson = this.userService.getPersonById(result.getId());
 		Assert.assertEquals(person.getLastName(), readPerson.getLastName());
 	}
 
@@ -121,15 +121,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		adminPerson.setContact("-");
 		adminPerson.setLanguage(0);
 		adminPerson.setPhone("-");
-		final Integer adminPersonId = this.userService.addPerson(adminPerson);
-		Assert.assertNotNull("Expected id of a newly saved record in persons.", adminPersonId);
+		final Person savedAdminPerson = this.userService.addPerson(adminPerson);
+		Assert.assertNotNull("Expected id of a newly saved record in persons.", savedAdminPerson);
 
 		final WorkbenchUser adminUser = new WorkbenchUser();
 		adminUser.setName("admin");
 		adminUser.setPassword("b");
-		final Person person = new Person();
-		person.setId(adminPersonId);
-		adminUser.setPerson(person);
+		adminUser.setPerson(savedAdminPerson);
 		adminUser.setInstalid(0);
 		adminUser.setStatus(0);
 		adminUser.setAccess(0);
@@ -159,14 +157,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		breederPerson.setContact("-");
 		breederPerson.setLanguage(0);
 		breederPerson.setPhone("-");
-		final Integer breederPersonId = this.userService.addPerson(breederPerson);
-		breederPerson.setId(breederPersonId);
-		Assert.assertNotNull("Expected id of a newly saved record in persons.", breederPersonId);
+		final Person savedBreederPerson = this.userService.addPerson(breederPerson);
+		Assert.assertNotNull("Expected newly saved record in persons is not null", savedBreederPerson);
 
 		final WorkbenchUser breederUser = new WorkbenchUser();
 		breederUser.setName("breeder");
 		breederUser.setPassword("b");
-		breederUser.setPerson(breederPerson);
+		breederUser.setPerson(savedBreederPerson);
 		breederUser.setInstalid(0);
 		breederUser.setStatus(0);
 		breederUser.setAccess(0);
@@ -196,14 +193,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		technicianPerson.setContact("-");
 		technicianPerson.setLanguage(0);
 		technicianPerson.setPhone("-");
-		final Integer technicianPersonId = this.userService.addPerson(technicianPerson);
-		technicianPerson.setId(technicianPersonId);
-		Assert.assertNotNull("Expected id of a newly saved record in persons.", technicianPersonId);
+		final Person savedTechnicalPerson = this.userService.addPerson(technicianPerson);
+		Assert.assertNotNull("Expected id of a newly saved record in persons.", savedTechnicalPerson);
 
 		final WorkbenchUser technicianUser = new WorkbenchUser();
 		technicianUser.setName("technician");
 		technicianUser.setPassword("b");
-		technicianUser.setPerson(technicianPerson);
+		technicianUser.setPerson(savedTechnicalPerson);
 		technicianUser.setInstalid(0);
 		technicianUser.setStatus(0);
 		technicianUser.setAccess(0);
@@ -528,11 +524,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		UserDto userDto =
 			UserDtoTestDataInitializer.createUserDto("USer", "User", "User@leafnode.io", "userPassword", "Breeder", "username");
 		final int id = this.userService.createUser(userDto);
-		ProjectUserInfo pui = new ProjectUserInfo();
+		final ProjectUserInfo pui = new ProjectUserInfo();
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		workbenchUser.setUserid(id);
 		pui.setProject(this.commonTestProject);
-		pui.setUserId(id);
+		pui.setUser(workbenchUser);
 		pui.setLastOpenDate(new Date());
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
+		this.userService.saveProjectUserInfo(pui);
 
 		List<Integer> userIDs = this.userService.getActiveUserIDsByProjectId(this.commonTestProject.getProjectId());
 		Assert.assertTrue("The newly added member should be added in the retrieved list.", prevListOfUserIDs.size() + 1 == userIDs.size());
@@ -668,10 +666,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(2, results.size());
 		final ProjectUserInfo userInfo1 = results.get(0);
 		Assert.assertEquals(userInfo1.getProject(), this.commonTestProject);
-		Assert.assertEquals(userInfo1.getUserId(), this.testUser1.getUserid());
+		Assert.assertEquals(userInfo1.getUser().getUserid(), this.testUser1.getUserid());
 		final ProjectUserInfo userInfo2 = results.get(1);
 		Assert.assertEquals(userInfo2.getProject(), this.commonTestProject);
-		Assert.assertEquals(userInfo2.getUserId(), this.workbenchTestDataUtil.getTestUser2().getUserid());
+		Assert.assertEquals(userInfo2.getUser().getUserid(), this.workbenchTestDataUtil.getTestUser2().getUserid());
 	}
 
 	@Test
@@ -785,39 +783,36 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
 		user.setRoles(Arrays.asList(new UserRole(user, new Role(5, "SUPERADMIN"))));
 
-		final Integer newUserId = this.userService.addUser(user);
+		final WorkbenchUser workbenchUser = this.userService.addUser(user);
 		final List<WorkbenchUser> latestSuperAdminUsers = this.userService.getSuperAdminUsers();
 		Assert.assertNotNull(latestSuperAdminUsers);
 		Assert.assertEquals(latestSuperAdminUsers.size(), superAdminCountBefore + 1);
-		Assert.assertTrue(latestSuperAdminUsers.contains(new WorkbenchUser(newUserId)));
+		Assert.assertTrue(latestSuperAdminUsers.contains(workbenchUser));
 	}
 
 	@Test
 	public void testIsSuperAdminUser() {
-		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
-		final Integer userId1 = this.userService.addUser(user1);
-
+		final WorkbenchUser savedUser1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 		final WorkbenchUser user2 = this.workbenchTestDataUtil.createTestUserData();
 		user2.setRoles(Arrays.asList(new UserRole(user2, new Role(5, "SUPERADMIN"))));
-		final Integer userId2 = this.userService.addUser(user2);
+		final WorkbenchUser savedUser2 = this.userService.addUser(user2);
 
-		Assert.assertFalse(this.userService.isSuperAdminUser(userId1));
-		Assert.assertTrue(this.userService.isSuperAdminUser(userId2));
+		Assert.assertFalse(this.userService.isSuperAdminUser(savedUser1.getUserid()));
+		Assert.assertTrue(this.userService.isSuperAdminUser(savedUser2.getUserid()));
 	}
 
 	@Test
 	public void testGetProjectUserInfoByProjectIdAndUserIds() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
 		this.workbenchDataManager.addProject(project);
-		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
-		final Integer userId1 = this.userService.addUser(user1);
+		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, userId1);
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
+		this.userService.saveProjectUserInfo(pUserInfo);
 		final List<ProjectUserInfo> result =
-			this.userService.getProjectUserInfoByProjectIdAndUserIds(project.getProjectId(), Arrays.asList(userId1));
+			this.userService.getProjectUserInfoByProjectIdAndUserIds(project.getProjectId(), Arrays.asList(user1.getUserid()));
 		Assert.assertEquals(1, result.size());
-		Assert.assertEquals(userId1, result.get(0).getUserId());
+		Assert.assertEquals(user1.getUserid(), result.get(0).getUser().getUserid());
 		Assert.assertEquals(project.getProjectId(), result.get(0).getProject().getProjectId());
 	}
 
@@ -825,32 +820,30 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetProjectUserInfoByProjectIdAndUserId() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
 		this.workbenchDataManager.addProject(project);
-		final WorkbenchUser user1 = this.workbenchTestDataUtil.createTestUserData();
-		final Integer userId1 = this.userService.addUser(user1);
+		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, userId1);
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
-		final ProjectUserInfo result = this.userService.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), userId1);
-		Assert.assertEquals(userId1, result.getUserId());
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
+		this.userService.saveProjectUserInfo(pUserInfo);
+		final ProjectUserInfo result = this.userService.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), user1.getUserid());
+		Assert.assertEquals(user1.getUserid(), result.getUser().getUserid());
 		Assert.assertEquals(project.getProjectId(), result.getProject().getProjectId());
 	}
 
 	@Test
 	public void testRemoveUsersFromProgram() {
-		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
-		final Integer userId = this.userService.addUser(user);
+		final WorkbenchUser workbenchUser = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 
 		//Add project user info entry and assert that it has been added to the db
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(this.commonTestProject, userId);
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
-		ProjectUserInfo result = this.userService.getProjectUserInfoByProjectIdAndUserId(this.commonTestProject.getProjectId(), userId);
-		Assert.assertEquals(userId, result.getUserId());
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(this.commonTestProject, workbenchUser);
+		this.userService.saveProjectUserInfo(pUserInfo);
+		ProjectUserInfo result = this.userService.getProjectUserInfoByProjectIdAndUserId(this.commonTestProject.getProjectId(), workbenchUser.getUserid());
+		Assert.assertEquals(workbenchUser.getUserid(), result.getUser().getUserid());
 		Assert.assertEquals(this.commonTestProject.getProjectId(), result.getProject().getProjectId());
 
-		this.userService.removeUsersFromProgram(Arrays.asList(userId), this.commonTestProject.getProjectId());
+		this.userService.removeUsersFromProgram(Arrays.asList(workbenchUser.getUserid()), this.commonTestProject.getProjectId());
 
 		//Assert that the project user info entry has been deleted
-		result = this.userService.getProjectUserInfoByProjectIdAndUserId(this.commonTestProject.getProjectId(), userId);
+		result = this.userService.getProjectUserInfoByProjectIdAndUserId(this.commonTestProject.getProjectId(), workbenchUser.getUserid());
 		Assert.assertNull(result);
 	}
 }

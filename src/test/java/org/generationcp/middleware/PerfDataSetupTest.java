@@ -121,8 +121,8 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 		// this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program, workbenchUser.getUserid());
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program, workbenchUser);
+		this.userService.saveProjectUserInfo(pUserInfo);
 
 		LOG.info("Workbench program and users created.");
 		return program.getUniqueID();
