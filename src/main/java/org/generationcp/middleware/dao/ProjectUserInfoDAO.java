@@ -21,8 +21,11 @@ import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -208,16 +211,15 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		statement.executeUpdate();
 	}
 
-	public List<WorkbenchUser> getActiveUsersByCrop(final CropType cropType) {
+	public List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType) {
 		try {
-			final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
-			criteria.createAlias("project", "project");
-			criteria.createAlias("project.cropType", "cropType");
-			criteria.add(Restrictions.eq("cropType.cropName", cropType.getCropName()));
-			criteria.setProjection(Projections.distinct(Projections.property("user")));
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "workbenchUser");
+			final DetachedCriteria subCriteria = DetachedCriteria.forClass(ProjectUserInfo.class,"userInfo");
+			subCriteria.add(Property.forName("userInfo.user.userid").eqProperty("workbenchUser.userid"));
+			criteria.add(Subqueries.notExists(subCriteria.setProjection(Projections.property("userInfo.userInfoId"))));
 			return criteria.list();
 		} catch (final HibernateException e) {
-			final String message = "Error with getActiveUsersByCrop()";
+			final String message = "Error with getUsersWithoutAssociatedPrograms(cropType=" + cropType.getCropName() + ")";
 			ProjectUserInfoDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

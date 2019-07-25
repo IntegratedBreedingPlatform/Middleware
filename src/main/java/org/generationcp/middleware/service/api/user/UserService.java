@@ -70,7 +70,7 @@ public interface UserService {
 	 * @param cropType
 	 * @return
 	 */
-	List<WorkbenchUser> getActiveUsersByCrop(final CropType cropType);
+	List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType);
 
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.

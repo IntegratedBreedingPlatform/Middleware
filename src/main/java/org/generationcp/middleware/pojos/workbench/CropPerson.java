@@ -8,10 +8,15 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity @IdClass(CropPersonId.class)
 @Table(name = "crop_persons")
-public class CropPerson {
+public class CropPerson implements Serializable {
+
+	public CropPerson() {
+
+	}
 
 	public CropPerson(final CropType cropType, final Person person) {
 		this.cropType = cropType;

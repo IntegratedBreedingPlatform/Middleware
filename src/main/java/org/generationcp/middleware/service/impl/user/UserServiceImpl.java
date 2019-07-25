@@ -89,8 +89,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<WorkbenchUser> getActiveUsersByCrop(final CropType cropType) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getActiveUsersByCrop(cropType);
+	public List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType) {
+		return this.workbenchDaoFactory.getProjectUserInfoDAO().getUsersWithoutAssociatedPrograms(cropType);
 	}
 
 	@Override
