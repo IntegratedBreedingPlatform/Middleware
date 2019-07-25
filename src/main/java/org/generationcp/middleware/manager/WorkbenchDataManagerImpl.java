@@ -34,7 +34,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
-import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -71,7 +70,6 @@ import java.util.UUID;
  */
 @Transactional
 public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
-
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
@@ -1119,12 +1117,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
-		return this.getWorkbenchUserDao().getActiveUserIDsByProjectId(projectId, cropName );
+		return this.getWorkbenchUserDao().getActiveUserIDsByProjectId(projectId, cropName);
 	}
 
 	@Override
 	public List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(final Long projectId, final String cropName) {
-		return this.getWorkbenchUserDao().getActiveUserIDsByProjectIdFilteringSuperAdmin(projectId, cropName );
+		return this.getWorkbenchUserDao().getActiveUserIDsByProjectIdFilteringSuperAdmin(projectId, cropName);
 	}
 
 	@Override
@@ -1158,23 +1156,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds){
+	public List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds) {
 		return this.getWorkbenchSidebarCategoryDao().getCategoriesByLinkIds(linkIds);
 	}
 
 	@Override
 	public void saveOrUpdateUserRole(final UserRole userRole) {
 		this.getUserRoleDao().saveOrUpdate(userRole);
-	}
-
-	@Override
-	public Permission getPermission(final Integer permissionId) {
-		return this.getPermissionDao().getById(permissionId);
-	}
-
-	@Override
-	public List<Permission> getPermissions() {
-		return this.getPermissionDao().getAll();
 	}
 
 	@Override
@@ -1193,16 +1181,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Role getRoleByName(final String name) {
 		final RoleSearchDto roleSearchDto = new RoleSearchDto();
-		roleSearchDto.setName( name);
-		final List<Role> roles = this.getRoleDao().getRoles( roleSearchDto );
-		return roles.isEmpty() ? null : roles.get( 0 );
-	}
-
-	@Override
-	public Role getRoleByDescription(final String description) {
-		final RoleSearchDto roleSearchDto = new RoleSearchDto();
-		roleSearchDto.setDescription( description );
-		final List<Role> roles = this.getRoleDao().getRoles( roleSearchDto );
-		return roles.isEmpty() ? null : roles.get( 0 );
+		roleSearchDto.setName(name);
+		final List<Role> roles = this.getRoleDao().getRoles(roleSearchDto);
+		return roles.isEmpty() ? null : roles.get(0);
 	}
 }

@@ -4,21 +4,29 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "role_type_permission")
 public class RoleTypePermission {
 
-	@Id
-	@Column(name = "permission_id", nullable = false)
-	private Integer permissionId;
+	@EmbeddedId
+	private RoleTypePermissionId id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
+	@MapsId("permissionId")
+	@JoinColumn(name = "permission_id")
+	private Permission permission;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@MapsId("roleTypeId")
 	@JoinColumn(name = "role_type_id")
 	private RoleType roleType;
 
@@ -43,11 +51,36 @@ public class RoleTypePermission {
 		this.selectable = selectable;
 	}
 
-	public Integer getPermissionId() {
-		return this.permissionId;
+	public Permission getPermission() {
+		return permission;
 	}
 
-	public void setPermissionId(final Integer permissionId) {
-		this.permissionId = permissionId;
+	public void setPermission(final Permission permission) {
+		this.permission = permission;
+	}
+
+	public RoleTypePermissionId getId() {
+		return id;
+	}
+
+	public void setId(final RoleTypePermissionId id) {
+		this.id = id;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		RoleTypePermission that = (RoleTypePermission) o;
+		return Objects.equals(permission, that.permission) &&
+				Objects.equals(roleType, that.roleType);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(permission, roleType);
 	}
 }

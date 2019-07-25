@@ -4,11 +4,14 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.workbench.Permission;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Transactional
 public class PermissionServiceImpl implements PermissionService {
 
 	private HibernateSessionProvider sessionProvider;
@@ -51,6 +54,21 @@ public class PermissionServiceImpl implements PermissionService {
 		else {
 			permissionDtoList.add(permissionDto);
 		}
+	}
+
+	@Override
+	public Permission getPermissionById(final Integer permissionId) {
+		return this.daoFactory.getPermissionDAO().getById(permissionId);
+	}
+
+	@Override
+	public List<Permission> getAllPermissions() {
+		return this.daoFactory.getPermissionDAO().getAll();
+	}
+
+	@Override
+	public List<Permission> getPermissionsByIds(final Set<Integer> permissionIds) {
+		return this.daoFactory.getPermissionDAO().getPermissions(permissionIds);
 	}
 
 	@Override

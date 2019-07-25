@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -41,13 +40,8 @@ public class Permission {
 	@JoinColumn(name = "workbench_sidebar_category_link_id", nullable = true)
 	private WorkbenchSidebarCategoryLink sidebarCategoryLink;
 
-
 	@Fetch(FetchMode.SUBSELECT)
-	@OneToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-		name = "role_type_permission",
-		joinColumns = @JoinColumn(name = "permission_id"),
-		inverseJoinColumns = @JoinColumn(name = "role_type_id"))
+	@OneToMany(mappedBy = "permission", fetch = FetchType.EAGER)
 	private final List<RoleTypePermission> roleTypePermissions = new ArrayList<>();
 
 	public List<RoleTypePermission> getRoleTypePermissions() {

@@ -724,13 +724,8 @@ public interface WorkbenchDataManager {
 
 	void saveOrUpdateUserRole(UserRole userRole);
 
-	Permission getPermission(Integer id);
-
-	List<Permission> getPermissions();
-
 	Role saveRole(Role role);
 
 	Role getRoleByName(String name);
 
-	Role getRoleByDescription(String description);
 }

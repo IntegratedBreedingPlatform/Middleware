@@ -1,5 +1,8 @@
 package org.generationcp.middleware.pojos.workbench;
 
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "role_type")
+@AutoProperty
 public class RoleType {
 
 	@Id
@@ -34,4 +38,20 @@ public class RoleType {
 	public void setName(final String name) {
 		this.name = name;
 	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 }

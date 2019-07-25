@@ -4,14 +4,18 @@ import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Permission;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PermissionDAO extends GenericDAO<Permission, Integer> {
 
@@ -77,5 +81,21 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		query.setResultTransformer(Transformers.aliasToBean(PermissionDto.class));
 		final List<PermissionDto> results = query.list();
 		return results;
+	}
+
+	public List<Permission> getPermissions(final Set<Integer> permissionIds) {
+		final List<Permission> toReturn;
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Permission.class);
+			criteria.add(Restrictions.in("permissionId", permissionIds));
+			criteria.addOrder(Order.asc("id"));
+			toReturn = criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error with getPermissions query from PermissionDAO: " + e.getMessage();
+			PermissionDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return toReturn;
 	}
 }
