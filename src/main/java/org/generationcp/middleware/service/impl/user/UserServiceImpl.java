@@ -310,7 +310,7 @@ public class UserServiceImpl implements UserService {
 	public String getPersonName(final int userId) {
 		final WorkbenchUser workbenchUser = this.workbenchDaoFactory.getWorkbenchUserDAO().getById(userId);
 		if (workbenchUser != null) {
-			workbenchUser.getPerson().getDisplayName();
+			return workbenchUser.getPerson().getDisplayName();
 		}
 		return "";
 	}
