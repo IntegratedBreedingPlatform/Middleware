@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUserIDFullNameMap(userIds);
+		if (!userIds.isEmpty()) {
+			return this.workbenchDaoFactory.getWorkbenchUserDAO().getUserIDFullNameMap(userIds);
+		}
+		return new HashMap<>();
 	}
 
 	@Override
