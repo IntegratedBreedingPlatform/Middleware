@@ -1308,7 +1308,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
-		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironent(instanceId);
+		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
 		return this.userService.getUsersByPersonIds(personIds);
 	}
 }
