@@ -61,7 +61,7 @@
 		</comment>
 		<addColumn tableName="names">
 			<column name="nuid_bkp" type="INT" afterColumn="nuid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -88,7 +88,7 @@
 		</comment>
 		<addColumn tableName="udflds">
 			<column name="fuid_bkp" type="INT" afterColumn="fuid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -114,7 +114,7 @@
 		</comment>
 		<addColumn tableName="germplsm">
 			<column name="germuid_bkp" type="INT" afterColumn="germuid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -166,7 +166,7 @@
 		</comment>
 		<addColumn tableName="methods">
 			<column name="muid_bkp" type="INT" afterColumn="muid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -192,7 +192,7 @@
 		</comment>
 		<addColumn tableName="atributs">
 			<column name="auid_bkp" type="INT" afterColumn="auid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -218,7 +218,7 @@
 		</comment>
 		<addColumn tableName="listnms">
 			<column name="listuid_bkp" type="INT" afterColumn="listuid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -276,7 +276,7 @@
 		</comment>
 		<addColumn tableName="gdms_dataset_users">
 			<column name="user_id_bkp" type="INT" afterColumn="user_id">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -302,7 +302,7 @@
 		</comment>
 		<addColumn tableName="gdms_track_data">
 			<column name="user_id_bkp" type="INT" afterColumn="user_id">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -363,7 +363,7 @@
 		<dropForeignKeyConstraint baseTableName="sample" constraintName="fk_sample_user"/>
 		<addColumn tableName="sample">
 			<column name="created_by_bkp" type="INT" afterColumn="created_by">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 			<column name="taken_by_bkp" type="INT" afterColumn="taken_by">
 				<constraints nullable="true"/>
@@ -459,7 +459,7 @@
 		</comment>
 		<addColumn tableName="locdes">
 			<column name="duid_bkp" type="INT" afterColumn="duid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
@@ -485,7 +485,7 @@
 		</comment>
 		<addColumn tableName="changes">
 			<column name="cuid_bkp" type="INT" afterColumn="cuid">
-				<constraints nullable="false"/>
+				<constraints nullable="true"/>
 			</column>
 		</addColumn>
 		<sql dbms="mysql" splitStatements="true">
