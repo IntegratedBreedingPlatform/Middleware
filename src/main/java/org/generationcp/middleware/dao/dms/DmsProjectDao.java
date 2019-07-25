@@ -252,8 +252,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Integer cvtermId = (Integer) row[9];
 				final Boolean isLocked = (Boolean) row[10];
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
-				final String ownerId = (String) row[11];
-				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, Integer.valueOf(ownerId)));
+				final Integer ownerId = (Integer) row[11];
+				childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyTypeDto, isLocked, ownerId));
 			} else {
 				childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 			}
@@ -866,7 +866,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER).addScalar("project_id").addScalar("name")
 					.addScalar("description").addScalar("is_study", new IntegerType()).addScalar("program_uuid").addScalar("studyType")
 					.addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("created_by");
+					.addScalar("studyTypeName").addScalar("visible").addScalar("cvtermId").addScalar("isLocked").addScalar("created_by", new IntegerType());
 			query.setParameter("folderId", folderId);
 			query.setParameter("studyTypeId", studyType);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
