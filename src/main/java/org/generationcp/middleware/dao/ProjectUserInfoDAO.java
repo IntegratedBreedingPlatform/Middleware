@@ -46,9 +46,11 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 
 	public static final String GET_USERS_BY_PROJECT_ID =
 			"SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, "
-			+ "users.uname, users.upswd, users.personid, users.adate, users.cdate "
+			+ "users.uname, users.upswd, users.personid, users.adate, users.cdate, "
+			+ "person.fname, person.ioname, person.lname "
 			+ "FROM users "
 			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
+			+ "INNER JOIN persons person ON person.personid = users.personid "
 			+ "WHERE pu.project_id = :projectId "
 			+ "GROUP BY users.userid";
 
@@ -102,6 +104,9 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 					final Integer cDate = (Integer) user[9];
 					final Person person = new Person();
 					person.setId(personId);
+					person.setFirstName((String) user[10]);
+					person.setMiddleName((String) user[11]);
+					person.setLastName((String) user[12]);
 					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, person, aDate, cDate);
 					users.add(u);
 				}
