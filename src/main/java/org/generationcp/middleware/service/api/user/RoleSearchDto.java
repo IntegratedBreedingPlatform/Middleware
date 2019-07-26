@@ -16,8 +16,6 @@ public class RoleSearchDto {
 
 	private String name;
 
-	private String description;
-
 	public RoleSearchDto() {
 	}
 
@@ -57,14 +55,6 @@ public class RoleSearchDto {
 
 	public void setName(final String name) {
 		this.name = name;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
 	}
 
 	@Override

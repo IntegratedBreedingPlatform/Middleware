@@ -72,6 +72,12 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	@Override
+	public PermissionDto getPermissionTree(final Integer roleTypeId) {
+		return null;
+	}
+
+
+	@Override
 	public void close() {
 		if (this.sessionProvider != null) {
 			this.sessionProvider.close();

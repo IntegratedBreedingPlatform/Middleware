@@ -18,6 +18,8 @@ public interface PermissionService {
 
 	List<Permission> getPermissionsByIds(Set<Integer> permissionIds);
 
+	PermissionDto getPermissionTree(Integer roleTypeId);
+
 	/**
 	 * Close the sessionProvider
 	 */
