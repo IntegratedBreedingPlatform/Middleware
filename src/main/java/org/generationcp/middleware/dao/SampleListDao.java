@@ -262,7 +262,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		try {
 			if (userID != null) {
 				final Criteria criteria = this.getSession().createCriteria(SampleList.class);
-				criteria.add(Restrictions.eq("createdBy.userid", userID));
+				criteria.add(Restrictions.eq("createdByUserId", userID));
 
 				this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
 
