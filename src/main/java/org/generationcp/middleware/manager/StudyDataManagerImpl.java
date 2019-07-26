@@ -833,7 +833,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				}
 			}
 			if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
-				final Person person = this.daoFactory.getPersonDAO().getById(detail.getPiId());
+				final Person person = this.userService.getPersonById(detail.getPiId());
 				if (person != null) {
 					detail.setPiName(person.getDisplayName());
 				}
@@ -874,7 +874,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			siteMap.putAll(this.daoFactory.getLocationDAO().getLocationNamesByLocationIDs(siteIds));
 		}
 		if (!personIds.isEmpty()) {
-			personMap.putAll(this.daoFactory.getPersonDAO().getPersonNamesByPersonIds(personIds));
+			personMap.putAll(this.userService.getPersonNamesByPersonIds(personIds));
 		}
 	}
 

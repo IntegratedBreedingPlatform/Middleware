@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -344,5 +345,7 @@ public interface UserService {
 	void saveCropPerson(CropPerson cropPerson);
 
 	void removeCropPerson(CropPerson cropPerson);
+
+	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
 }

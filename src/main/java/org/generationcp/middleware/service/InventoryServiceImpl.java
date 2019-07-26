@@ -119,7 +119,7 @@ public class InventoryServiceImpl implements InventoryService {
 
 		final Map<Integer, String> usersMap = new HashMap<Integer, String>();
 		if (!userIds.isEmpty()) {
-			usersMap.putAll(this.daoFactory.getPersonDAO().getPersonNamesByUserIds(new ArrayList<>(userIds)));
+			usersMap.putAll(this.userService.getUserIDFullNameMap(new ArrayList<>(userIds)));
 		}
 
 		// set scale details of the inventory

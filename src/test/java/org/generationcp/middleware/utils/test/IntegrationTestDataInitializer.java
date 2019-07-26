@@ -67,7 +67,6 @@ public class IntegrationTestDataInitializer {
 	private CVTermDao cvTermDao;
 	private SampleDao sampleDao;
 	private SampleListDao sampleListDao;
-	private PersonDAO personDAO;
 	private ProjectPropertyDao projectPropertyDao;
 
 	private DaoFactory daoFactory;
@@ -89,7 +88,6 @@ public class IntegrationTestDataInitializer {
 		this.cvTermDao = this.daoFactory.getCvTermDao();
 		this.sampleDao = this.daoFactory.getSampleDao();
 		this.sampleListDao = this.daoFactory.getSampleListDao();
-		this.personDAO = this.daoFactory.getPersonDAO();
 		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 		this.workbenchDataManager = new WorkbenchDataManagerImpl(workbenchSessionProvider);
 		this.userService = new UserServiceImpl(workbenchSessionProvider);

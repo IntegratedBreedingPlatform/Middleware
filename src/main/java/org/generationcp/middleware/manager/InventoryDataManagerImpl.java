@@ -370,16 +370,12 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			final Location location = locationManager.getLocationByID(t.getLot().getLocationId());
 			row.setLocationOfLot(location);
 
-			final Person person = this.getPersonById(t.getPersonId());
+			final Person person = this.userService.getPersonById(t.getPersonId());
 			row.setPerson(person);
 
 			report.add(row);
 		}
 		return report;
-	}
-
-	private Person getPersonById(final Integer id) {
-		return this.daoFactory.getPersonDAO().getById(id, false);
 	}
 
 	@Override

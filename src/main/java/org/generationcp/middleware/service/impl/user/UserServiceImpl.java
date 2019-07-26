@@ -477,6 +477,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public Map<Integer, String> getPersonNamesByPersonIds(final List<Integer> personIds) {
+		return this.workbenchDaoFactory.getPersonDAO().getPersonNamesByPersonIds(personIds);
+	}
+
+	@Override
 	public List<Role> getAssignableRoles() {
 		return this.workbenchDaoFactory.getRoleDAO().getAssignableRoles();
 	}

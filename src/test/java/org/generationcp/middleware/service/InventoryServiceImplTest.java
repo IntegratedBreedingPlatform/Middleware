@@ -1,16 +1,9 @@
 
 package org.generationcp.middleware.service;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -50,6 +43,12 @@ import org.mockito.Mockito;
 import org.mockito.exceptions.verification.TooLittleActualInvocations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -71,6 +70,7 @@ public class InventoryServiceImplTest {
 
 	private static final String TEST_FULLNAME = "Test User";
 	public static final int USER_ID = 1;
+	public static final int PERSON_ID = 2;
 
 	@Mock
 	private HibernateSessionProvider sessionProvider;
@@ -100,9 +100,6 @@ public class InventoryServiceImplTest {
 	private CVTermDao cvTermDAO;
 
 	@Mock
-	private PersonDAO personDAO;
-
-	@Mock
 	private LotBuilder lotBuilder;
 
 	@Mock
@@ -122,7 +119,6 @@ public class InventoryServiceImplTest {
 
 		when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
 		when(this.daoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
-		when(this.daoFactory.getPersonDAO()).thenReturn(this.personDAO);
 		when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
 		when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
 		when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
@@ -130,8 +126,12 @@ public class InventoryServiceImplTest {
 		when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
 
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		final Person person = new Person();
+		person.setId(PERSON_ID);
 		workbenchUser.setUserid(USER_ID);
+		workbenchUser.setPerson(person);
 		when(this.userService.getUserById(USER_ID)).thenReturn(workbenchUser);
+
 	}
 
 	@Test
@@ -379,7 +379,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
 		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyListOf(Integer.class));
 		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyListOf(Integer.class));
-		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(usernameList).when(this.userService).getUserIDFullNameMap(Mockito.anyListOf(Integer.class));
 
 		List<InventoryDetails> result = this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(advanceListId);
 
@@ -417,7 +417,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
 		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyListOf(Integer.class));
 		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyListOf(Integer.class));
-		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(usernameList).when(this.userService).getUserIDFullNameMap(Mockito.anyListOf(Integer.class));
 
 		List<InventoryDetails> result =
 				this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(crossesId, GermplasmListType.CROSSES.name());
