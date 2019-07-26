@@ -147,7 +147,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Reference> getRootFolders(final String programUUID) {
-		return this.getDmsProjectDao().getRootFolders(programUUID, null);
+		final List<Reference> references = this.getDmsProjectDao().getRootFolders(programUUID, null);
+		this.populateStudyOwnerName(references);
+		return references;
 	}
 
 	@Override
