@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.workbench;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -22,6 +23,9 @@ public class PermissionDto {
 	private Integer workbenchCategoryLinkId;
 
 	private List<PermissionDto> children;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Boolean selectable;
 
 	public PermissionDto() {
 	}
@@ -78,6 +82,14 @@ public class PermissionDto {
 
 	public void setChildren(final List<PermissionDto> children) {
 		this.children = children;
+	}
+
+	public Boolean getSelectable() {
+		return selectable;
+	}
+
+	public void setSelectable(final Boolean selectable) {
+		this.selectable = selectable;
 	}
 
 	@Override

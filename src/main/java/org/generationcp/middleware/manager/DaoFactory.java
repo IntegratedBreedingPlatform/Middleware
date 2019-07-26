@@ -11,6 +11,7 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
+import org.generationcp.middleware.dao.RoleTypePermissionDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
@@ -233,5 +234,11 @@ public class DaoFactory {
 		final ProjectDAO projectDAO = new ProjectDAO();
 		projectDAO.setSession(this.sessionProvider.getSession());
 		return projectDAO;
+	}
+
+	public RoleTypePermissionDAO getRoleTypePermissionDAO() {
+		final RoleTypePermissionDAO roleTypePermissionDAO = new RoleTypePermissionDAO();
+		roleTypePermissionDAO.setSession(this.sessionProvider.getSession());
+		return roleTypePermissionDAO;
 	}
 }
