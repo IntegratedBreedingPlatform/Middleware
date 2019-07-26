@@ -316,6 +316,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<Person> getPersonsByCrop(final CropType cropType) {
+		return this.workbenchDaoFactory.getPersonDAO().getPersonsByCrop(cropType);
+	}
+
+	@Override
 	public List<Person> getAllPersons() {
 		return this.workbenchDaoFactory.getPersonDAO().getAll();
 	}

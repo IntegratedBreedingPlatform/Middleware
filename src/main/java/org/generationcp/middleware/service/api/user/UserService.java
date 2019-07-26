@@ -192,6 +192,8 @@ public interface UserService {
 
 	String getPersonName(int userId);
 
+	List<Person> getPersonsByCrop(CropType cropType);
+
 	/**
 	 * Returns all Persons.
 	 *
