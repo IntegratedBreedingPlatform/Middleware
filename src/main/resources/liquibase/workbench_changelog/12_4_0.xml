@@ -51,4 +51,15 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="darla" id="v12.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_project_user_role" />
+		</preConditions>
+		<comment>
+			Delete unused table "workbench_project_user_role"
+		</comment>
+		<dropTable cascadeConstraints="true"  tableName="workbench_project_user_role"/>
+	</changeSet>
+
+
 </databaseChangeLog>
