@@ -9,8 +9,10 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
@@ -22,6 +24,7 @@ import org.generationcp.middleware.reports.ReporterFactory;
 import org.generationcp.middleware.service.api.ReportService;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -38,12 +41,22 @@ public class ReportServiceImpl extends Service implements ReportService {
 	public static final String DEFAULT_INTEGER_STRING_VALUE = "0";
 	private final ReporterFactory factory = ReporterFactory.instance();
 
+	@Resource
+	private StudyDataManager studyDataManager;
+
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	@Resource
+	private WorkbookBuilder workbookBuilder;
+
 	public ReportServiceImpl() {
 		super();
 	}
 
 	public ReportServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+
 	}
 
 	public ReportServiceImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
@@ -97,9 +110,9 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 */
 	private Map<String, Object> extractFieldbookData(final Integer studyId, final boolean parentsInfoRequireed) {
 
-		final Workbook wb = this.getWorkbookBuilder().create(studyId);
+		final Workbook wb = this.workbookBuilder.create(studyId);
 		// getWorkbookBuilder().create no longer loads observations collection by default. Load only when needed. Like here.
-		this.getWorkbookBuilder().loadAllObservations(wb);
+		this.workbookBuilder.loadAllObservations(wb);
 		final List<MeasurementRow> observations = wb.getObservations();
 		final List<MeasurementVariable> studyConditions = this.appendCountryInformationFromCondition(wb.getConditions());
 		final List<MeasurementRow> trialObservations = wb.getTrialObservations();

@@ -63,7 +63,7 @@ public class DataSetBuilderTest {
 		MockitoAnnotations.initMocks(this);
 
 		// Inject the mock services into the test class
-		this.dataSetBuilder = new DataSetBuilder(this.hibernateSessionProvider, this.dmsProjectDao, this.studyDataManager);
+		this.dataSetBuilder = new DataSetBuilder(this.hibernateSessionProvider);
 
 	}
 

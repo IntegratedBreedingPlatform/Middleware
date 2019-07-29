@@ -56,6 +56,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -97,6 +100,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Resource
 	private UserService userService;
+
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	@Resource
+	private StockBuilder stockBuilder;
+
+	@Resource
+	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
 	public StudyDataManagerImpl() {
 	}
@@ -166,7 +178,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public DataSet getDataSet(final int dataSetId) {
-		return this.getDataSetBuilder().build(dataSetId);
+		return this.dataSetBuilder.build(dataSetId);
 	}
 
 	@Override
@@ -201,7 +213,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		for (final Reference reference : references) {
 			if (reference instanceof StudyReference) {
-				studyReferences.add((StudyReference)reference);
+				studyReferences.add((StudyReference) reference);
 			}
 		}
 		if (!studyReferences.isEmpty()) {
@@ -213,10 +225,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					return input.getOwnerId();
 				}
 			});
-			if (!userIds.isEmpty()){
+			if (!userIds.isEmpty()) {
 				final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 				for (final StudyReference study : studyReferences) {
-					if (study.getOwnerId() != null){
+					if (study.getOwnerId() != null) {
 						study.setOwnerName(userIDFullNameMap.get(study.getOwnerId()));
 					}
 				}
@@ -266,27 +278,27 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(final int dataSetId, final int start, final int numRows) {
-		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
 	}
 
 	@Override
 	public List<Experiment> getExperimentsOfFirstInstance(final int dataSetId, final int start, final int numOfRows) {
-		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, variableTypes, true);
 	}
 
 	@Override
 	public VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId) {
-		return this.getDataSetBuilder().getTreatmentFactorVariableTypes(dataSetId);
+		return this.dataSetBuilder.getTreatmentFactorVariableTypes(dataSetId);
 	}
 
 	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(
 		final int trialDataSetId, final int dataSetId, final int start,
 		final int numRows) {
-		final VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
-		final VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		final VariableTypeList trialVariableTypes = this.dataSetBuilder.getVariableTypes(trialDataSetId);
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
 
 		variableTypes.addAll(trialVariableTypes);
 
@@ -371,7 +383,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final List<DataSet> datasets = new ArrayList<>();
 
 		for (final DmsProject datasetProject : datasetProjects) {
-			datasets.add(this.getDataSetBuilder().build(datasetProject.getProjectId()));
+			datasets.add(this.dataSetBuilder.build(datasetProject.getProjectId()));
 		}
 
 		return datasets;
@@ -393,12 +405,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public TrialEnvironments getTrialEnvironmentsInDataset(final int datasetId) {
 		final DmsProject study = this.getDmsProjectDao().getById(datasetId).getStudy();
-		return this.getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
+		return this.trialEnvironmentBuilder.getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
 	}
 
 	@Override
 	public Stocks getStocksInDataset(final int datasetId) {
-		return this.getStockBuilder().getStocksInDataset(datasetId);
+		return this.stockBuilder.getStocksInDataset(datasetId);
 	}
 
 	@Override
