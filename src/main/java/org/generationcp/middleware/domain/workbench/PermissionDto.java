@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.workbench.Permission;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AutoProperty
@@ -22,7 +23,7 @@ public class PermissionDto {
 	@JsonIgnore
 	private Integer workbenchCategoryLinkId;
 
-	private List<PermissionDto> children;
+	private List<PermissionDto> children = new ArrayList<>();
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Boolean selectable;
@@ -31,6 +32,9 @@ public class PermissionDto {
 	}
 
 	public PermissionDto(final Permission permission) {
+		if (permission.getParent() != null) {
+			this.setParentId(permission.getParent().getPermissionId());
+		}
 		this.id = permission.getPermissionId();
 		this.description = permission.getDescription();
 		this.name = permission.getName();
@@ -90,6 +94,10 @@ public class PermissionDto {
 
 	public void setSelectable(final Boolean selectable) {
 		this.selectable = selectable;
+	}
+
+	public void addChild(final PermissionDto permissionDto) {
+		this.children.add(permissionDto);
 	}
 
 	@Override

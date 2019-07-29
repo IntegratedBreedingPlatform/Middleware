@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.workbench.Permission;
+import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
@@ -73,9 +74,30 @@ public class PermissionServiceImpl implements PermissionService {
 
 	@Override
 	public PermissionDto getPermissionTree(final Integer roleTypeId) {
-		return null;
+		final List<RoleTypePermission> children =
+			this.daoFactory.getRoleTypePermissionDAO().getPermissionsByRoleTypeAndParent(roleTypeId, null);
+		PermissionDto permissionDto = new PermissionDto(children.get(0).getPermission());
+		permissionDto.setSelectable(children.get(0).getSelectable());
+
+		this.getPermissionTree(permissionDto, roleTypeId);
+		return permissionDto;
 	}
 
+	private void getPermissionTree(PermissionDto permissionDto, Integer roleTypeId) {
+		final List<RoleTypePermission> children =
+			this.daoFactory.getRoleTypePermissionDAO().getPermissionsByRoleTypeAndParent(roleTypeId, permissionDto.getId());
+		if (children.isEmpty()) {
+			return;
+		} else {
+			for (final RoleTypePermission roleTypePermission : children) {
+				PermissionDto child = new PermissionDto(roleTypePermission.getPermission());
+				child.setSelectable(roleTypePermission.getSelectable());
+				permissionDto.addChild(child);
+				this.getPermissionTree(child, roleTypeId);
+			}
+
+		}
+	}
 
 	@Override
 	public void close() {
