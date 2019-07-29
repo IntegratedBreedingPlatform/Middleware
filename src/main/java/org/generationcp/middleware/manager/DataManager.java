@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
@@ -224,10 +223,6 @@ public abstract class DataManager extends DatabaseBroker {
 		return new StudyTypeBuilder();
 	}
 
-	protected final DataSetBuilder getDataSetBuilder() {
-		return new DataSetBuilder(this.sessionProvider);
-	}
-
 	protected final ExperimentBuilder getExperimentBuilder() {
 		return new ExperimentBuilder(this.sessionProvider);
 	}
@@ -244,16 +239,8 @@ public abstract class DataManager extends DatabaseBroker {
 		return new StudyReferenceBuilder(this.sessionProvider);
 	}
 
-	protected final StockBuilder getStockBuilder() {
-		return new StockBuilder(this.sessionProvider);
-	}
-
 	protected final TraitBuilder getTraitBuilder() {
 		return new TraitBuilder(this.sessionProvider);
-	}
-
-	protected final TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
-		return new TrialEnvironmentBuilder(this.sessionProvider);
 	}
 
 	protected final VariableInfoBuilder getVariableInfoBuilder() {

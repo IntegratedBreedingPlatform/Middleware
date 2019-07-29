@@ -22,8 +22,11 @@ import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +37,13 @@ import java.util.Set;
 @Transactional
 public class CrossStudyDataManagerImpl extends DataManager implements CrossStudyDataManager {
 
+
+	@Resource
+	private StudyDataManager studyDataManager;
+
+	@Resource
+	private TrialEnvironmentBuilder trialEnvironmentBuilder;
+	
 	public CrossStudyDataManagerImpl() {
 	}
 
@@ -43,17 +53,17 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 
 	@Override
 	public TrialEnvironments getAllTrialEnvironments() {
-		return this.getTrialEnvironmentBuilder().getAllTrialEnvironments();
+		return this.trialEnvironmentBuilder.getAllTrialEnvironments();
 	}
 
 	@Override
 	public long countAllTrialEnvironments() {
-		return this.getTrialEnvironmentBuilder().countAllTrialEnvironments();
+		return this.trialEnvironmentBuilder.countAllTrialEnvironments();
 	}
 
 	@Override
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> trialEnvtIds) {
-		return this.getTrialEnvironmentBuilder().getPropertiesForTrialEnvironments(trialEnvtIds);
+		return this.trialEnvironmentBuilder.getPropertiesForTrialEnvironments(trialEnvtIds);
 	}
 
 	@Override
@@ -75,7 +85,7 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(
 		final List<GermplasmPair> germplasmPairs,
 		final List<Integer> experimentTypes, final String programUUID) {
-		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes, programUUID);
+		return this.trialEnvironmentBuilder.getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes, programUUID);
 	}
 
 	@Override
@@ -97,7 +107,7 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 
 	@Override
 	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds, final String programUUID) {
-		return this.getTrialEnvironmentBuilder().getEnvironmentsForTraits(traitIds, programUUID);
+		return this.trialEnvironmentBuilder.getEnvironmentsForTraits(traitIds, programUUID);
 	}
 
 	@Override

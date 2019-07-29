@@ -36,6 +36,9 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -48,8 +51,10 @@ import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +84,17 @@ public class WorkbookSaver extends Saver {
 	public static final String ENVIRONMENT = "-ENVIRONMENT";
 	public static final String PLOTDATA = "-PLOTDATA";
 
-	private final DaoFactory daoFactory;
+	private DaoFactory daoFactory;
+
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	@Resource
+	private WorkbookBuilder workbookBuilder;
+
+	public WorkbookSaver() {
+
+	}
 
 	public WorkbookSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -202,10 +217,10 @@ public class WorkbookSaver extends Saver {
 		int savedEnvironmentsCount = 0;
 		boolean isDeleteTrialObservations = false;
 		if (environmentDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId());
+			environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
 		}
 		if (plotDatasetId == null && workbook.getStudyDetails().getId() != null) {
-			plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId());
+			plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		}
 
 		if (environmentDatasetId != null) {
@@ -341,8 +356,8 @@ public class WorkbookSaver extends Saver {
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 
-		final Integer environmentDatasetId = this.getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId());
-		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId());
+		final Integer environmentDatasetId = this.workbookBuilder.getTrialDataSetId(workbook.getStudyDetails().getId());
+		final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		final int studyId = workbook.getStudyDetails().getId();
 
 		int savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
@@ -1207,8 +1222,8 @@ public class WorkbookSaver extends Saver {
 		Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
 			final Integer studyId = study.getProjectId();
-			measurementDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
-			trialDatasetId = this.getWorkbookBuilder().getTrialDataSetId(studyId);
+			measurementDatasetId = this.workbookBuilder.getMeasurementDataSetId(studyId);
+			trialDatasetId = this.workbookBuilder.getTrialDataSetId(studyId);
 		}
 		final DmsProject trialDataset = this.getDmsProjectDao().getById(trialDatasetId);
 		final DmsProject measurementDataset = this.getDmsProjectDao().getById(measurementDatasetId);

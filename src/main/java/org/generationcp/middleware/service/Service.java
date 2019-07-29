@@ -36,16 +36,13 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
-import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
-import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
@@ -90,10 +87,6 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final PhenotypeOutlierSaver getPhenotypeOutlierSaver() {
 		return new PhenotypeOutlierSaver(this.sessionProvider);
-	}
-
-	protected final WorkbookSaver getWorkbookSaver() {
-		return new WorkbookSaver(this.sessionProvider);
 	}
 
 	protected final ExperimentPropertySaver getExperimentPropertySaver() {
@@ -141,10 +134,6 @@ public abstract class Service extends DatabaseBroker {
 		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
-	protected WorkbookBuilder getWorkbookBuilder() {
-		return new WorkbookBuilder(this.sessionProvider);
-	}
-
 	protected final ValueReferenceBuilder getValueReferenceBuilder() {
 		return new ValueReferenceBuilder(this.sessionProvider);
 	}
@@ -165,10 +154,6 @@ public abstract class Service extends DatabaseBroker {
 		return new ExperimentBuilder(this.sessionProvider);
 	}
 
-	protected final StockBuilder getStockBuilder() {
-		return new StockBuilder(this.sessionProvider);
-	}
-
 	protected final ExperimentDestroyer getExperimentDestroyer() {
 		return new ExperimentDestroyer(this.sessionProvider);
 	}
@@ -179,10 +164,6 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
 		return new MeasurementVariableTransformer(this.sessionProvider);
-	}
-
-	protected DataSetBuilder getDataSetBuilder() {
-		return new DataSetBuilder(this.sessionProvider);
 	}
 
 	protected final TermBuilder getTermBuilder() {

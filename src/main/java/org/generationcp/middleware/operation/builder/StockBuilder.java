@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.Set;
-
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -28,15 +26,26 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.Resource;
+import java.util.Set;
 
 public class StockBuilder extends Builder {
+
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	public StockBuilder() {
+
+	}
 
 	public StockBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
 	public Stocks getStocksInDataset(int datasetId) throws MiddlewareException {
-		DataSet dataSet = this.getDataSetBuilder().build(datasetId);
+		DataSet dataSet = this.dataSetBuilder.build(datasetId);
 		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
 		VariableTypeList stockVariableTypes = this.getStockVariableTypes(study, dataSet);

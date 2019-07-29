@@ -43,9 +43,14 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -57,7 +62,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -107,6 +111,21 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private UserService userService;
+
+	@Resource
+	private StudyDataManager studyDataManager;
+
+	@Resource
+	private WorkbookBuilder workbookBuilder;
+
+	@Resource
+	private DataSetBuilder dataSetBuilder;
+
+	@Resource
+	private WorkbookSaver workbookSaver;
+
+	@Resource
+	private StockBuilder stockBuilder;
 
 	private DaoFactory daoFactory;
 
@@ -217,7 +236,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Workbook getStudyDataSet(final int id) {
-		final Workbook workbook = this.getWorkbookBuilder().create(id);
+		final Workbook workbook = this.workbookBuilder.create(id);
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
@@ -232,7 +251,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public boolean loadAllObservations(final Workbook workbook) {
 		if (workbook.getObservations() == null || workbook.getObservations().isEmpty() && workbook.getStudyDetails() != null
 				&& workbook.getStudyDetails().getId() != null) {
-			this.getWorkbookBuilder().loadAllObservations(workbook);
+			this.workbookBuilder.loadAllObservations(workbook);
 			return true;
 		}
 		return false;
@@ -241,11 +260,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public void saveWorkbookVariablesAndObservations(final Workbook workbook, final String programUUID) {
 		try {
 
-			this.getWorkbookSaver().saveWorkbookVariables(workbook);
-			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+			this.workbookSaver.saveWorkbookVariables(workbook);
+			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
 
 			// save trial observations
-			this.getWorkbookSaver().saveTrialObservations(workbook, programUUID);
+			this.workbookSaver.saveTrialObservations(workbook, programUUID);
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
@@ -262,10 +281,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final Workbook workbook, final String programUUID, final CropType crop) {
 		final TimerWatch timerWatch = new TimerWatch("saveExperimentalDesign (grand total)");
 		try {
-			this.getWorkbookSaver().saveProjectProperties(workbook);
-			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
-			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
-			this.getWorkbookSaver().savePlotDataset(workbook, variableMap, programUUID, crop);
+			this.workbookSaver.saveProjectProperties(workbook);
+			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
+			final Map<String, ?> variableMap = this.workbookSaver.saveVariables(workbook, programUUID);
+			this.workbookSaver.savePlotDataset(workbook, variableMap, programUUID, crop);
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
@@ -280,11 +299,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		final TimerWatch timerWatch = new TimerWatch("deleteExperimentalDesign (grand total)");
 		try {
 
-			this.getWorkbookSaver().saveProjectProperties(workbook);
-			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
-			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
+			this.workbookSaver.saveProjectProperties(workbook);
+			this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
+			final Map<String, ?> variableMap = this.workbookSaver.saveVariables(workbook, programUUID);
 
-			this.getWorkbookSaver().deleteExperimentalDesign(workbook, variableMap, programUUID, crop);
+			this.workbookSaver.deleteExperimentalDesign(workbook, variableMap, programUUID, crop);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		} finally {
@@ -686,7 +705,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Workbook getStudyVariableSettings(final int id) {
-		return this.getWorkbookBuilder().createStudyVariableSettings(id);
+		return this.workbookBuilder.createStudyVariableSettings(id);
 	}
 
 	@Override
@@ -825,7 +844,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public int getMeasurementDatasetId(final int studyId) {
-		return this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
+		return this.workbookBuilder.getMeasurementDataSetId(studyId);
 	}
 
 	@Override
@@ -835,7 +854,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public long countStocks(final int datasetId) {
-		return this.getStockBuilder().countStocks(datasetId);
+		return this.stockBuilder.countStocks(datasetId);
 	}
 
 	@Override
@@ -901,7 +920,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<MeasurementRow> buildTrialObservations(final int trialDatasetId, final List<MeasurementVariable> factorList,
 			final List<MeasurementVariable> variateList) {
-		return this.getWorkbookBuilder().buildTrialObservations(trialDatasetId, factorList, variateList);
+		return this.workbookBuilder.buildTrialObservations(trialDatasetId, factorList, variateList);
 	}
 
 	@Override
@@ -959,12 +978,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void setTreatmentFactorValues(final List<TreatmentVariable> treatmentFactors, final int measurementDatasetID) {
-		this.getWorkbookBuilder().setTreatmentFactorValues(treatmentFactors, measurementDatasetID);
+		this.workbookBuilder.setTreatmentFactorValues(treatmentFactors, measurementDatasetID);
 	}
 
 	@Override
 	public Workbook getCompleteDataset(final int datasetId) {
-		final Workbook workbook = this.getDataSetBuilder().buildCompleteDataset(datasetId);
+		final Workbook workbook = this.dataSetBuilder.buildCompleteDataset(datasetId);
 		this.setOrderVariableByRank(workbook, datasetId);
 		return workbook;
 	}
@@ -1116,7 +1135,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void saveStudyColumnOrdering(final Integer studyId, final List<Integer> orderedTermIds) {
-		final int plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
+		final int plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(studyId);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 
@@ -1125,7 +1144,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		if (workbook != null) {
 			final Integer studyId = workbook.getStudyDetails().getId();
 			if (studyId != null) {
-				final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId);
+				final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(studyId);
 				this.setOrderVariableByRank(workbook, plotDatasetId);
 			}
 			return true;

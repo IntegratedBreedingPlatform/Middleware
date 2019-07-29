@@ -34,7 +34,12 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
@@ -319,5 +324,25 @@ public class ManagerFactory implements Serializable {
 
 	public DerivedVariableService getDerivedVariableService() {
 		return new DerivedVariableServiceImpl(this.sessionProvider);
+	}
+
+	public TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
+		return new TrialEnvironmentBuilder(this.sessionProvider);
+	}
+
+	public DataSetBuilder getDataSetBuilder() {
+		return new DataSetBuilder(this.sessionProvider);
+	}
+
+	public StockBuilder getStockBuilder() {
+		return new StockBuilder(this.sessionProvider);
+	}
+
+	public WorkbookBuilder getWorkbookBuilder() {
+		return new WorkbookBuilder(this.sessionProvider);
+	}
+
+	public WorkbookSaver getWorkbookSaver() {
+		return new WorkbookSaver(this.sessionProvider);
 	}
 }
