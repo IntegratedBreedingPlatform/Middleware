@@ -26,6 +26,11 @@
 		<property name="transactionTimeout" value="${test.atomikos.transaction.timeout}" />
 	</bean>
 
+
+	<bean id="managerFactory" name="managerFactory" class="org.generationcp.middleware.manager.ManagerFactory">
+		<property name="sessionProvider" ref="cropSessionProvider"></property>
+	</bean>
+
 	<bean id="transactionManager"
 		class="org.springframework.transaction.jta.JtaTransactionManager"
 		depends-on="atomikosTransactionManager,atomikosUserTransaction">
@@ -183,5 +188,32 @@
 
 	<bean id="workbenchTestDataUtil" class="org.generationcp.middleware.WorkbenchTestDataUtil">
     </bean>
+
+	<bean id="trialEnvironmentBuilder" factory-bean="managerFactory"
+	  factory-method="getTrialEnvironmentBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="dataSetBuilder" factory-bean="managerFactory"
+		  factory-method="getDataSetBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="stockBuilder" factory-bean="managerFactory"
+		  factory-method="getStockBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="workbookBuilder" factory-bean="managerFactory"
+		  factory-method="getWorkbookBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="workbookSaver" factory-bean="managerFactory"
+		  factory-method="getWorkbookSaver">
+		<aop:scoped-proxy />
+	</bean>
+
+
 
 </beans>
