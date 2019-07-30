@@ -16,9 +16,39 @@
 			</not>
 		</preConditions>
 		<comment>
-			Insert into workbench database any persons (matching by email) that only exist in crop database
+			Insert into backup table in crop database any persons (matching by email) that don't exist in workbench database.
+			Insert into workbench database these crop-only persons records.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
+			  CREATE TABLE persons_migrated (
+				`personid` int(11) NOT NULL AUTO_INCREMENT,
+				`fname` varchar(20) NOT NULL DEFAULT '-',
+				`lname` varchar(50) NOT NULL DEFAULT '-',
+				`ioname` varchar(15) NOT NULL DEFAULT '-',
+				`institid` int(11) NOT NULL DEFAULT '0',
+				`ptitle` varchar(25) NOT NULL DEFAULT '-',
+				`poname` varchar(50) NOT NULL DEFAULT '-',
+				`plangu` int(11) NOT NULL DEFAULT '0',
+				`pphone` varchar(20) NOT NULL DEFAULT '-',
+				`pextent` varchar(20) NOT NULL DEFAULT '-',
+				`pfax` varchar(20) NOT NULL DEFAULT '-',
+				`pemail` varchar(40) NOT NULL DEFAULT '-',
+				`prole` int(11) NOT NULL DEFAULT '0',
+				`sperson` int(11) NOT NULL DEFAULT '0',
+				`eperson` int(11) NOT NULL DEFAULT '0',
+				`pstatus` int(11) NOT NULL DEFAULT '0',
+				`pnotes` varchar(255) NOT NULL DEFAULT '-',
+				`contact` varchar(255) NOT NULL DEFAULT '-',
+				 PRIMARY KEY (`personid`),
+				 UNIQUE KEY `persons_bkp_uk` (`pemail`)
+			);
+
+			INSERT INTO persons_migrated
+			SELECT *
+			  FROM persons p
+			 WHERE NOT EXISTS (
+					SELECT 1 FROM workbench.persons wp WHERE wp.pemail = p.pemail);
+
 			INSERT INTO workbench.persons(fname, lname, pemail)
 			SELECT fname, lname, pemail
 			  FROM persons p
@@ -38,9 +68,29 @@
 			</not>
 		</preConditions>
 		<comment>
-			Insert into workbench database any users (matching by username) that only exist in crop database
+			Insert into backup table in crop database any users (matching by username) that don't exist in workbench database.
+			Insert into workbench database these crop-only usets records.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE users_migrated (
+  				`userid` int(11) NOT NULL AUTO_INCREMENT,
+  				`instalid` int(11) NOT NULL DEFAULT '0',
+  				`ustatus` int(11) NOT NULL DEFAULT '0',
+  				`uaccess` int(11) NOT NULL DEFAULT '0',
+  				`utype` int(11) NOT NULL DEFAULT '0',
+  				`uname` varchar(30) NOT NULL DEFAULT '-',
+  				`upswd` varchar(60) NOT NULL DEFAULT '-',
+  				`personid` int(11) NOT NULL DEFAULT '0',
+  				`adate` int(11) NOT NULL DEFAULT '0',
+  				`cdate` int(11) NOT NULL DEFAULT '0',
+  				PRIMARY KEY (`userid`)
+			);
+
+			INSERT INTO users_migrated
+			SELECT * FROM users u
+			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
+
+
 			INSERT INTO workbench.users(`ustatus`, `uaccess`, `utype`, `uname`, `upswd`, `personid`, `adate`, `cdate`)
 			SELECT 1, uaccess, utype, uname, upswd, wp.personid, adate, cdate
 			  FROM users u
