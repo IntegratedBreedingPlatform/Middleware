@@ -179,14 +179,6 @@ public class Role implements Serializable {
 		this.createdDate = createdDate;
 	}
 
-	public static String getADMIN() {
-		return ADMIN;
-	}
-
-	public static String getSUPERADMIN() {
-		return SUPERADMIN;
-	}
-
 	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}

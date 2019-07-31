@@ -130,7 +130,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 			+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
 			+ "    AND p.project_id = :projectId "
 			+ "  AND users.ustatus = 0 "
-			+ " AND (UPPER(r.name) != '" +  Role.getSUPERADMIN() + "' OR r.name is null)";
+			+ " AND (UPPER(r.name) != '" + Role.SUPERADMIN + "' OR r.name is null)";
 
 	public static final String GET_PERSONS_BY_PROJECT_ID =
 		"SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
@@ -185,7 +185,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "        WHERE "
 		+ "            ct.crop_Name = :cropName "
 		+ "                AND wu.userid = u.userid) "
-		+ "        AND (UPPER(r.name) != '" + Role.getSUPERADMIN() + "' OR r.name is null)"
+		+ "        AND (UPPER(r.name) != '" + Role.SUPERADMIN + "' OR r.name is null)"
 		+ "ORDER BY persons.fname , persons.lName;";
 	
 	public static final String GET_USERS_BY_PROJECT_UUID = "SELECT  "
