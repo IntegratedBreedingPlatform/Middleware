@@ -1325,4 +1325,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
 		return this.userService.getUsersByPersonIds(personIds);
 	}
+
+	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
+		this.dataSetBuilder = dataSetBuilder;
+	}
+
+	void setTrialEnvironmentBuilder(final TrialEnvironmentBuilder trialEnvironmentBuilder) {
+		this.trialEnvironmentBuilder = trialEnvironmentBuilder;
+	}
 }

@@ -323,6 +323,7 @@ public class InventoryServiceImplTest {
 		inventoryDetails.setInventoryID("SID1-1");
 		inventoryDetails.setBulkCompl("Y");
 		inventoryDetails.setBulkCompl("SID1-2");
+		inventoryDetails.setPersonId(PERSON_ID);
 		return inventoryDetails;
 	}
 

@@ -54,6 +54,8 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -114,6 +116,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	@Autowired
+	private DataSetBuilder datasetBuilder;
+
+	@Autowired
+	private TrialEnvironmentBuilder trialEnvironmentBuilder;
+
 	private Project commonTestProject;
 
 	private static CrossExpansionProperties crossExpansionProperties;
@@ -147,6 +155,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		studyType.setName(StudyTypeDto.TRIAL_NAME);
 		studyType.setCvTermId(10010);
 		studyType.setVisible(true);
+
+		this.manager.setDataSetBuilder(this.datasetBuilder);
+		this.manager.setTrialEnvironmentBuilder(this.trialEnvironmentBuilder);
 	}
 
 	@Test

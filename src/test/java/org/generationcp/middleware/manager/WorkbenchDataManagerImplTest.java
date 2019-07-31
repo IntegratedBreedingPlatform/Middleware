@@ -492,20 +492,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		}
 		return fulllist;
 	}
-
-	@Test
-	public void testGetAllUserDtosSorted() {
-		final UserDto user = this.workbenchTestDataUtil.createTestUserDTO(25);
-		final List<UserDto> users = Lists.newArrayList(user);
-		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
-
-		Mockito.when(userService.getAllUsersSortedByLastName()).thenReturn(users);
-		assertThat("Expected list users not null.", users != null);
-		assertThat("Expected list users not empty.", !users.isEmpty());
-		assertThat("Expected list users size 1.", users.size() == 1);
-
-	}
-
 	@Test
 	public void testCreateUser() {
 		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
