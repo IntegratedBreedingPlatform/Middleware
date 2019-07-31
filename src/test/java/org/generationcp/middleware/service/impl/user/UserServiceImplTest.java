@@ -509,7 +509,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetPesonName() {
 		final WorkbenchUser workbenchUser = this.integrationTestDataInitializer.createUserForTesting();
-		assertEquals(workbenchUser.getPerson().getDisplayName(), this.userService.getPersonName(workbenchUser.getUserid()));
+		assertEquals(workbenchUser.getPerson().getDisplayName(), this.userService.getPersonNameForUserId(workbenchUser.getUserid()));
 	}
 
 	@Test

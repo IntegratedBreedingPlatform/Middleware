@@ -307,10 +307,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String getPersonName(final int userId) {
+	public String getPersonNameForUserId(final int userId) {
 		final WorkbenchUser workbenchUser = this.workbenchDaoFactory.getWorkbenchUserDAO().getById(userId);
 		if (workbenchUser != null) {
 			return workbenchUser.getPerson().getDisplayName();
+		}
+		return "";
+	}
+
+	@Override
+	public String getPersonNameForPersonId(final int personId) {
+		final Person person= this.workbenchDaoFactory.getPersonDAO().getById(personId);
+		if (person != null) {
+			return person.getDisplayName();
 		}
 		return "";
 	}

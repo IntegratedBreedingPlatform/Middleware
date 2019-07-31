@@ -191,7 +191,19 @@ public interface UserService {
 
 	Person getPersonByEmailAndName(String email, String firstName, String lastName);
 
-	String getPersonName(int userId);
+	/**
+	 * Returns the user's person name given the user id
+	 * @param userId
+	 * @return
+	 */
+	String getPersonNameForUserId(int userId);
+
+	/**
+	 * Returns the person name given the person id
+	 * @param personId
+	 * @return
+	 */
+	String getPersonNameForPersonId(int personId);
 
 	List<Person> getPersonsByCrop(CropType cropType);
 
