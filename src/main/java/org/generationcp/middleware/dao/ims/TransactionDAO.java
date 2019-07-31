@@ -47,7 +47,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.lt("quantity", 0));
+			criteria.add(Restrictions.lt("quantity", 0d));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
@@ -75,7 +75,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.setProjection(Projections.rowCount());
 			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.lt("quantity", 0));
+			criteria.add(Restrictions.lt("quantity", 0d));
 			return ((Long) criteria.uniqueResult());
 		} catch (final HibernateException e) {
 			final String message = "Error with countAllReserve query from Transaction: " + e.getMessage();
@@ -89,7 +89,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.gt("quantity", 0));
+			criteria.add(Restrictions.gt("quantity", 0d));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
@@ -105,7 +105,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.setProjection(Projections.rowCount());
 			criteria.add(Restrictions.eq("status", 0));
-			criteria.add(Restrictions.gt("quantity", 0));
+			criteria.add(Restrictions.gt("quantity", 0d));
 			return ((Long) criteria.uniqueResult());
 		} catch (final HibernateException e) {
 			final String message = "Error with countAllDeposit() query from Transaction: " + e.getMessage();
@@ -146,7 +146,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	public List<Transaction> getAllWithdrawals(final int start, final int numOfRows) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
-			criteria.add(Restrictions.lt("quantity", 0));
+			criteria.add(Restrictions.lt("quantity", 0d));
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
@@ -161,7 +161,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Transaction.class);
 			criteria.setProjection(Projections.rowCount());
-			criteria.add(Restrictions.lt("quantity", 0));
+			criteria.add(Restrictions.lt("quantity", 0d));
 			return ((Long) criteria.uniqueResult());
 		} catch (final HibernateException e) {
 			final String message = "Error with countAllWithdrawals() query from Transaction: " + e.getMessage();
