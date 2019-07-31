@@ -240,7 +240,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
-	
+
 	@Override
 	public Workbook getStudyByNameAndProgramUUID(final String studyName, final String programUUID) {
 		final int id = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(studyName, programUUID);
@@ -1257,9 +1257,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(final String name, final String programUUID) {
 		final Integer studyId = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(name, programUUID);
 		if (studyId != null) {
-			return Optional.of(this.getStudyDataManager().getStudyReference(studyId));
+			return Optional.of(this.studyDataManager.getStudyReference(studyId));
 		}
 		return Optional.absent();
 	}
 
+	void setUserService(final UserService userService) {
+		this.userService = userService;
+	}
+
+	void setWorkbookBuilder(final WorkbookBuilder workbookBuilder) {
+		this.workbookBuilder = workbookBuilder;
+	}
+
+	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
+		this.dataSetBuilder = dataSetBuilder;
+	}
+
+	void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+	}
 }
