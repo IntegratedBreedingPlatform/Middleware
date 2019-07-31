@@ -530,18 +530,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	}
 
-	public boolean hasRole(final String role) {
-		if (!Objects.equals(this.roles,null)) {
-			for (final UserRole userRole : this.roles) {
-				if (userRole.getRole().getCapitalizedRole().equalsIgnoreCase(role)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
 	public List<CropType> getCrops() {
 		return this.crops;
 	}
@@ -556,5 +544,16 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	public void setPermissions(final List<PermissionDto> permissions) {
 		this.permissions = permissions;
+	}
+
+	public boolean isSuperAdmin() {
+		boolean found = false;
+		for (final UserRole userRole : this.roles) {
+			if (userRole.getRole().getName().toUpperCase().equals(Role.SUPERADMIN)) {
+				found = true;
+				break;
+			}
+		}
+		return found;
 	}
 }
