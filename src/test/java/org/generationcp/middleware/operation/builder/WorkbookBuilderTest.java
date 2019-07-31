@@ -71,6 +71,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
+	@Autowired
 	private WorkbookBuilder workbookBuilder;
 
 	private MeasurementVariableTransformer measurementVariableTransformer;
@@ -95,9 +96,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		if (this.workbookBuilder == null) {
-			this.workbookBuilder = new WorkbookBuilder(this.sessionProvder);
-		}
 
 		if (this.measurementVariableTransformer == null) {
 			this.measurementVariableTransformer = new MeasurementVariableTransformer(this.sessionProvder);
