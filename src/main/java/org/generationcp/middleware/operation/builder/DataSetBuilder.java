@@ -44,7 +44,6 @@ import java.util.Set;
 
 public class DataSetBuilder extends Builder {
 
-	// ready for Sring autowiring :-)
 	private DaoFactory daoFactory;
 
 	@Resource
