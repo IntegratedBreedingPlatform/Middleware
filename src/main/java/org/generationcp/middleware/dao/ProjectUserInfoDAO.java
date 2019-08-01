@@ -221,7 +221,9 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "workbenchUser");
 			final DetachedCriteria subCriteria = DetachedCriteria.forClass(ProjectUserInfo.class,"userInfo");
 			subCriteria.createAlias("userInfo.project", "project");
-			subCriteria.add(Property.forName("userInfo.user.userid").eqProperty("workbenchUser.userid"));
+			subCriteria.createAlias("userInfo.user", "user");
+			subCriteria.add(Property.forName("user.userid").eqProperty("workbenchUser.userid"));
+			subCriteria.add(Property.forName("user.status").eq(0));
 			subCriteria.add(Property.forName("project.cropType.cropName").eq(cropType.getCropName()));
 			criteria.add(Subqueries.notExists(subCriteria.setProjection(Projections.property("userInfo.userInfoId"))));
 			return criteria.list();
