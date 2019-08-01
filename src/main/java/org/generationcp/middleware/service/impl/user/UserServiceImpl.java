@@ -486,6 +486,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public CropPerson getCropPerson(final String cropName, final Integer personId) {
+		return this.workbenchDaoFactory.getCropPersonDAO().getByCropNameAndPersonId(cropName, personId);
+	}
+
+	@Override
 	public Map<Integer, String> getPersonNamesByPersonIds(final List<Integer> personIds) {
 		return this.workbenchDaoFactory.getPersonDAO().getPersonNamesByPersonIds(personIds);
 	}

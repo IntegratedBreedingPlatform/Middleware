@@ -358,6 +358,8 @@ public interface UserService {
 
 	void removeCropPerson(CropPerson cropPerson);
 
+	CropPerson getCropPerson(String cropName, Integer personId);
+
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
 }
