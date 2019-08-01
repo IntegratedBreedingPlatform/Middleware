@@ -522,17 +522,11 @@ public class UserServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUsersWithoutAssociatedPrograms() {
-		final WorkbenchUser workbenchUserWithoutProgram = this.integrationTestDataInitializer.createUserForTesting();
-		final WorkbenchUser workbenchUserWithProgram = this.integrationTestDataInitializer.createUserForTesting();
+		final List<WorkbenchUser> currentUsersWithNoPrograms = this.userService.getUsersWithoutAssociatedPrograms(this.commonTestProject.getCropType());
 
-		final ProjectUserInfo projectUserInfo = new ProjectUserInfo();
-		projectUserInfo.setUser(workbenchUserWithProgram);
-		projectUserInfo.setProject(this.commonTestProject);
-		this.workbenchDaoFactory.getProjectUserInfoDAO().save(projectUserInfo);
-
-		final List<WorkbenchUser> result = this.userService.getUsersWithoutAssociatedPrograms(this.commonTestProject.getCropType());
-		assertEquals(1, result.size());
-		assertEquals(workbenchUserWithoutProgram.getUserid(), result.get(0).getUserid());
+		this.integrationTestDataInitializer.createUserForTesting();
+		final List<WorkbenchUser> usersWithNoPrograms = this.userService.getUsersWithoutAssociatedPrograms(this.commonTestProject.getCropType());
+		assertEquals(1, usersWithNoPrograms.size() - currentUsersWithNoPrograms.size());
 	}
 
 	@Test
