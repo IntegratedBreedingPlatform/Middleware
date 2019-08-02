@@ -7,7 +7,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.List;
 
 public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 
@@ -41,4 +43,59 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.MEANS_OVER_TRIAL_INSTANCES.getId()));
 	}
 
+	@Test
+	public void testGetObservationDatasetTypeIds() {
+		final List<Integer> observationDatasetTypeIds = this.datasetTypeService.getObservationDatasetTypeIds();
+		Assert.assertEquals(observationDatasetTypeIds.size(), 6);
+		Assert.assertTrue(observationDatasetTypeIds.contains(DatasetTypeEnum.MEANS_DATA.getId()));
+		Assert.assertTrue(observationDatasetTypeIds.contains(DatasetTypeEnum.PLOT_DATA.getId()));
+		Assert.assertTrue(observationDatasetTypeIds.contains(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(observationDatasetTypeIds.contains(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(observationDatasetTypeIds.contains(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(observationDatasetTypeIds.contains(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId()));
+	}
+
+	@Test
+	public void testGetSubObservationDatasetTypeIds() {
+		final List<Integer> subObservationDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
+		Assert.assertEquals(subObservationDatasetTypeIds.size(), 4);
+		Assert.assertTrue(subObservationDatasetTypeIds.contains(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(subObservationDatasetTypeIds.contains(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(subObservationDatasetTypeIds.contains(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId()));
+		Assert.assertTrue(subObservationDatasetTypeIds.contains(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId()));
+
+	}
+
+	@Test
+	public void testGetObservationLevels() {
+		final List<String> observationLevels = this.datasetTypeService.getObservationLevels(1000, 0);
+		final List<String> obsLevels = this.getObservationLevels(false);
+		Assert.assertEquals(obsLevels.size(), observationLevels.size());
+		Assert.assertTrue(obsLevels.contains(observationLevels.get(0)));
+		Assert.assertTrue(obsLevels.contains(observationLevels.get(1)));
+		Assert.assertTrue(obsLevels.contains(observationLevels.get(2)));
+		Assert.assertTrue(obsLevels.contains(observationLevels.get(3)));
+		Assert.assertTrue(obsLevels.contains(observationLevels.get(4)));
+		Assert.assertTrue(obsLevels.contains(observationLevels.get(5)));
+	}
+
+	@Test
+	public void testCountObservationLevels() {	
+		final Long count = this.datasetTypeService.countObservationLevels();
+		Assert.assertEquals(Math.round(count),  6);
+	}
+
+	public List<String> getObservationLevels(final boolean isSubObs) {
+		List<String> levels = new ArrayList<>();
+		levels.add("PLANT");
+		levels.add("QUADRAT");
+		levels.add("TIMESERIES");
+		levels.add("CUSTOM");
+
+		if(!isSubObs) {
+			levels.add("MEANS");
+			levels.add("PLOT");
+		}
+		return levels;
+	}
 }
