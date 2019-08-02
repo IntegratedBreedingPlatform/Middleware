@@ -131,10 +131,6 @@ public class Saver extends DatabaseBroker {
 		return new GeolocationPropertySaver(this.sessionProvider);
 	}
 
-	protected StudyDataManager getStudyDataManager() {
-		return new StudyDataManagerImpl(this.sessionProvider);
-	}
-
 	protected final ExperimentDestroyer getExperimentDestroyer() {
 		return new ExperimentDestroyer(this.sessionProvider);
 	}

@@ -92,6 +92,9 @@ public class WorkbookSaver extends Saver {
 	@Resource
 	private WorkbookBuilder workbookBuilder;
 
+	@Resource
+	private StudyDataManager studyDataManager;
+
 	public WorkbookSaver() {
 
 	}
@@ -224,7 +227,7 @@ public class WorkbookSaver extends Saver {
 		}
 
 		if (environmentDatasetId != null) {
-			savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
+			savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
 		}
 
 		if ((savedEnvironmentsCount != workbook.getTrialObservations().size() && savedEnvironmentsCount > 0 || isDeleteObservations)
@@ -309,7 +312,7 @@ public class WorkbookSaver extends Saver {
 		final Integer environmentDatasetId = workbook.getTrialDatasetId();
 		final Integer plotDatasetId = workbook.getMeasurementDatesetId();
 
-		final int savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
+		final int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
 
 		// delete measurement data
 		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
@@ -360,7 +363,7 @@ public class WorkbookSaver extends Saver {
 		final Integer plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(workbook.getStudyDetails().getId());
 		final int studyId = workbook.getStudyDetails().getId();
 
-		int savedEnvironmentsCount = (int) this.getStudyDataManager().countExperiments(environmentDatasetId);
+		int savedEnvironmentsCount = (int) this.studyDataManager.countExperiments(environmentDatasetId);
 		this.getExperimentDestroyer().deleteExperimentsByStudy(plotDatasetId);
 
 		this.resetTrialObservations(workbook.getTrialObservations());
@@ -764,7 +767,7 @@ public class WorkbookSaver extends Saver {
 			//Recover the studyTypeDto if the id is null. Is necessary to save it in the project table.
 			if (null == workbook.getStudyDetails().getStudyType().getId()) {
 				final StudyTypeDto studyTypeDto =
-					this.getStudyDataManager().getStudyTypeByName(workbook.getStudyDetails().getStudyType().getName());
+					this.studyDataManager.getStudyTypeByName(workbook.getStudyDetails().getStudyType().getName());
 				workbook.getStudyDetails().setStudyType(studyTypeDto);
 			}
 
@@ -790,7 +793,7 @@ public class WorkbookSaver extends Saver {
 		Integer datasetId = null;
 		if (trialName == null || "".equals(trialName)) {
 
-			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
+			final List<DataSet> dataSetsByType = this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 			if (dataSetsByType != null && !CollectionUtils.isEmpty(dataSetsByType)) {
 				datasetId = dataSetsByType.get(0).getId();
 			}
@@ -837,7 +840,7 @@ public class WorkbookSaver extends Saver {
 		Integer datasetId = null;
 
 		if (datasetName == null || "".equals(datasetName)) {
-			final List<DataSet> dataSetsByType = this.getStudyDataManager().getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+			final List<DataSet> dataSetsByType = this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
 			if (dataSetsByType != null && !CollectionUtils.isEmpty(dataSetsByType)) {
 				datasetId = dataSetsByType.get(0).getId();
 			}

@@ -68,6 +68,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Resource
 	private UserService userService;
 
+	@Resource
+	private ListDataProjectSaver ListDataProjectSaver;
+
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
 	 * cache is per database url.
@@ -669,12 +672,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
 		final List<GermplasmList> germplasmLists = this.daoFactory.getGermplasmListDAO().getByListRef(listId);
 		for (final GermplasmList germplasmList : germplasmLists) {
-			this.getListDataProjectSaver().performListDataProjectEntriesDeletion(germplasms, germplasmList.getId());
+			this.ListDataProjectSaver.performListDataProjectEntriesDeletion(germplasms, germplasmList.getId());
 		}
-	}
-
-	private final ListDataProjectSaver getListDataProjectSaver() {
-		return new ListDataProjectSaver(this.sessionProvider);
 	}
 
 	@Override

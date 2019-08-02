@@ -93,10 +93,6 @@ public abstract class Service extends DatabaseBroker {
 		return new ExperimentPropertySaver(this.sessionProvider);
 	}
 
-	protected StudyDataManager getStudyDataManager() {
-		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
-	}
-
 	protected final OntologyDataManager getOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.sessionProvider);
 	}

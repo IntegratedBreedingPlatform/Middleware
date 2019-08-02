@@ -143,13 +143,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfTrial(final List<Integer> trialIdList,
 			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, crossExpansionProperties);
+		return this.studyDataManager.getFieldMapInfoOfStudy(trialIdList, crossExpansionProperties);
 	}
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfNursery(final List<Integer> nurseryIdList,
 			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, crossExpansionProperties);
+		return this.studyDataManager.getFieldMapInfoOfStudy(nurseryIdList, crossExpansionProperties);
 	}
 
 	@Override
@@ -178,13 +178,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void saveOrUpdateFieldmapProperties(final List<FieldMapInfo> info, final int userId, final boolean isNew) {
-		this.getStudyDataManager().saveOrUpdateFieldmapProperties(info, userId, isNew);
+		this.studyDataManager.saveOrUpdateFieldmapProperties(info, userId, isNew);
 	}
 
 	@Override
 	public Study getStudy(final int studyId) {
 		// not using the variable type
-		return this.getStudyDataManager().getStudy(studyId, false);
+		return this.studyDataManager.getStudy(studyId, false);
 	}
 
 	@Override
@@ -209,12 +209,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, crossExpansionProperties);
+		return this.studyDataManager.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, crossExpansionProperties);
 	}
 
 	@Override
 	public List<DatasetReference> getDatasetReferences(final int studyId) {
-		return this.getStudyDataManager().getDatasetReferences(studyId);
+		return this.studyDataManager.getDatasetReferences(studyId);
 	}
 
 	@Override
@@ -243,7 +243,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Workbook getStudyByNameAndProgramUUID(final String studyName, final String programUUID) {
-		final int id = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(studyName, programUUID);
+		final int id = this.studyDataManager.getStudyIdByNameAndProgramUUID(studyName, programUUID);
 		return this.getStudyDataSet(id);
 	}
 
@@ -605,7 +605,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int datasetId, final List<Integer> variateIds) {
 
-		return this.getStudyDataManager().countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
+		return this.studyDataManager.countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
 	}
 
 	@Override
@@ -759,7 +759,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) {
-		return this.getStudyDataManager().getAllFieldMapsInBlockByBlockId(blockId);
+		return this.studyDataManager.getAllFieldMapsInBlockByBlockId(blockId);
 	}
 
 	@Override
@@ -879,7 +879,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public StudyDetails getStudyDetails(final int studyId) {
-		return this.getStudyDataManager().getStudyDetails(studyId);
+		return this.studyDataManager.getStudyDetails(studyId);
 	}
 
 	@Override
@@ -889,7 +889,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public String getFolderNameById(final Integer folderId) {
-		return this.getStudyDataManager().getFolderNameById(folderId);
+		return this.studyDataManager.getFolderNameById(folderId);
 	}
 
 	@Override
@@ -899,12 +899,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public boolean checkIfStudyHasMeasurementData(final int datasetId, final List<Integer> variateIds) {
-		return this.getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+		return this.studyDataManager.checkIfStudyHasMeasurementData(datasetId, variateIds);
 	}
 
 	@Override
 	public int countVariatesWithData(final int datasetId, final List<Integer> variateIds) {
-		return this.getStudyDataManager().countVariatesWithData(datasetId, variateIds);
+		return this.studyDataManager.countVariatesWithData(datasetId, variateIds);
 	}
 
 	@Override
@@ -1136,7 +1136,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public void saveStudyColumnOrdering(final Integer studyId, final List<Integer> orderedTermIds) {
 		final int plotDatasetId = this.workbookBuilder.getMeasurementDataSetId(studyId);
-		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
+		this.studyDataManager.updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 
 	@Override
@@ -1255,7 +1255,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Optional<StudyReference> getStudyReferenceByNameAndProgramUUID(final String name, final String programUUID) {
-		final Integer studyId = this.getStudyDataManager().getStudyIdByNameAndProgramUUID(name, programUUID);
+		final Integer studyId = this.studyDataManager.getStudyIdByNameAndProgramUUID(name, programUUID);
 		if (studyId != null) {
 			return Optional.of(this.studyDataManager.getStudyReference(studyId));
 		}

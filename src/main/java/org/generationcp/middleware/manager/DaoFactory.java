@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -31,6 +32,8 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.operation.saver.PhenotypeSaver;
+import org.generationcp.middleware.pojos.ListDataProject;
 
 public class DaoFactory {
 
@@ -185,7 +188,6 @@ public class DaoFactory {
 		return progenitorDao;
 	}
 
-
 	public DatasetTypeDAO getDatasetTypeDao() {
 		final DatasetTypeDAO datasetTypeDao = new DatasetTypeDAO();
 		datasetTypeDao.setSession(this.sessionProvider.getSession());
@@ -217,8 +219,14 @@ public class DaoFactory {
 	}
 
 	public CountryDAO getCountryDao() {
-		final CountryDAO countryDAO	 = new CountryDAO();
+		final CountryDAO countryDAO = new CountryDAO();
 		countryDAO.setSession(this.sessionProvider.getSession());
 		return countryDAO;
+	}
+
+	public ListDataProjectDAO getListDataProjectDAO() {
+		final ListDataProjectDAO listDataProjectDAO = new ListDataProjectDAO();
+		listDataProjectDAO.setSession(this.sessionProvider.getSession());
+		return listDataProjectDAO;
 	}
 }

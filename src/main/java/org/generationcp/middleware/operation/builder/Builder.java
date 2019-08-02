@@ -102,10 +102,6 @@ public abstract class Builder extends DatabaseBroker {
 		return new CvTermRelationshipSaver(this.sessionProvider);
 	}
 
-	public StudyDataManager getStudyDataManager() {
-		return new StudyDataManagerImpl(this.sessionProvider);
-	}
-
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
 		return new MeasurementVariableTransformer(this.sessionProvider);
 	}
