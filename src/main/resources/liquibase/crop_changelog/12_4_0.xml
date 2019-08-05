@@ -70,7 +70,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE key_sequence_register SET last_used_sequence =
-				COALESCE((SELECT CONVERT(REPLACE(UPPER(nval), key_prefix, ''), SIGNED) as last_used_number
+				COALESCE((SELECT REPLACE(UPPER(nval), key_prefix, '')+0 as last_used_number
 				FROM names WHERE names.nval LIKE concat(key_prefix, '%')
 				AND NOT EXISTS (select 1 from germplsm g where g.gid = names.gid and g.deleted = 1)
 				ORDER BY last_used_number desc LIMIT 1), 0);
