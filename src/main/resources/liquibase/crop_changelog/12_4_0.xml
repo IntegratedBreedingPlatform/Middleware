@@ -88,7 +88,7 @@
 			);
 
 			INSERT INTO users_migrated
-			SELECT * FROM users u
+			SELECT u.* FROM users u
 			 INNER JOIN persons p on p.personid = u.personid
 			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
 
