@@ -62,6 +62,7 @@
 			<not>
 				<sqlCheck expectedResult="0">
 					    SELECT COUNT(1) FROM users u
+						 INNER JOIN persons p on p.personid = u.personid
      					 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
 
 				</sqlCheck>
@@ -88,14 +89,15 @@
 
 			INSERT INTO users_migrated
 			SELECT * FROM users u
+			 INNER JOIN persons p on p.personid = u.personid
 			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
 
 
 			INSERT INTO workbench.users(`ustatus`, `uaccess`, `utype`, `uname`, `upswd`, `personid`, `adate`, `cdate`)
 			SELECT 1, uaccess, utype, uname, upswd, IFNULL(0, wp.personid), adate, cdate
 			  FROM users u
-			 LEFT JOIN persons p on p.personid = u.personid
-			 LEFT JOIN workbench.persons wp on wp.pemail = p.pemail
+			 INNER JOIN persons p on p.personid = u.personid
+			 INNER JOIN workbench.persons wp on wp.pemail = p.pemail
 			 WHERE NOT EXISTS (SELECT 1 from workbench.users wu where wu.uname = u.uname);
 		</sql>
 	</changeSet>
