@@ -21,7 +21,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			  CREATE TABLE persons_migrated (
-				`personid` int(11) NOT NULL AUTO_INCREMENT,
+				`personid` int(11) NOT NULL,
 				`fname` varchar(20) NOT NULL DEFAULT '-',
 				`lname` varchar(50) NOT NULL DEFAULT '-',
 				`ioname` varchar(15) NOT NULL DEFAULT '-',
@@ -74,7 +74,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE users_migrated (
-  				`userid` int(11) NOT NULL AUTO_INCREMENT,
+  				`userid` int(11) NOT NULL,
   				`instalid` int(11) NOT NULL DEFAULT '0',
   				`ustatus` int(11) NOT NULL DEFAULT '0',
   				`uaccess` int(11) NOT NULL DEFAULT '0',
