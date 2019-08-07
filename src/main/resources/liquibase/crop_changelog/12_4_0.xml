@@ -94,7 +94,7 @@
 
 
 			INSERT INTO workbench.users(`ustatus`, `uaccess`, `utype`, `uname`, `upswd`, `personid`, `adate`, `cdate`)
-			SELECT 1, uaccess, utype, uname, upswd, IFNULL(0, wp.personid), adate, cdate
+			SELECT 1, uaccess, utype, uname, upswd, wp.personid, adate, cdate
 			  FROM users u
 			 INNER JOIN persons p on p.personid = u.personid
 			 INNER JOIN workbench.persons wp on wp.pemail = p.pemail
