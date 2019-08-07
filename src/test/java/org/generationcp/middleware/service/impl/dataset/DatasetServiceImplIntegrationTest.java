@@ -104,10 +104,10 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         // Check for study and environment values
         Assert.assertNotNull(observationUnitRow.getVariables().get("STUDY_INSTITUTE"));
         Assert.assertNotNull(observationUnitRow.getVariables().get("STUDY_BM_CODE"));
-        Assert.assertNotNull(observationUnitRow.getVariables().get("SITE_ALT"));
-        Assert.assertNotNull(observationUnitRow.getVariables().get("SITE_LAT"));
-        Assert.assertNotNull(observationUnitRow.getVariables().get("SITE_LONG"));
-        Assert.assertNotNull(observationUnitRow.getVariables().get("SITE_DATUM"));
+        Assert.assertNotNull(observationUnitRow.getEnvironmentVariables().get("SITE_ALT"));
+        Assert.assertNotNull(observationUnitRow.getEnvironmentVariables().get("SITE_LAT"));
+        Assert.assertNotNull(observationUnitRow.getEnvironmentVariables().get("SITE_LONG"));
+        Assert.assertNotNull(observationUnitRow.getEnvironmentVariables().get("SITE_DATUM"));
     }
 
     @Test
