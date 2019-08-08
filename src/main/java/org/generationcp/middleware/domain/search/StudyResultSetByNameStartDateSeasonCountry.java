@@ -11,58 +11,37 @@
 
 package org.generationcp.middleware.domain.search;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.searcher.Searcher;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
 
-public class StudyResultSetByNameStartDateSeasonCountry extends Searcher implements StudyResultSet {
+import java.util.ArrayList;
+import java.util.List;
 
-	private final List<Integer> locationIds;
-	private Integer size;
-	private List<StudyReference> studyReferences = new ArrayList<>();
-	private int index;
+public class StudyResultSetByNameStartDateSeasonCountry {
+
+	private DaoFactory daoFactory;
+	private BrowseStudyQueryFilter filter;
 
 	public StudyResultSetByNameStartDateSeasonCountry(final BrowseStudyQueryFilter filter, final HibernateSessionProvider sessionProvider) {
-
-		super(sessionProvider);
-
-		this.locationIds = this.getLocationIds(filter.getCountry());
-		this.index = 0;
-
-		this.searchStudiesMatchingFilter(filter);
+		this.filter  = filter;
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	private List<Integer> getLocationIds(final String countryName) {
 		List<Integer> locationIds = new ArrayList<>();
 		if (countryName != null) {
-			final List<Country> countries = this.getCountryDao().getByIsoFull(countryName);
-			locationIds = this.getLocationSearchDao().getLocationIds(countries);
+			final List<Country> countries = this.daoFactory.getCountryDao().getByIsoFull(countryName);
+			locationIds = this.daoFactory.getLocationSearchDao().getLocationIds(countries);
 		}
 		return locationIds;
 	}
 
-	private void searchStudiesMatchingFilter(final BrowseStudyQueryFilter filter) {
-		this.studyReferences = this.getStudySearchDao().searchStudies(filter, this.locationIds);
-		this.size = this.studyReferences.size();
+	public List<StudyReference> getMatchingStudies() {
+		final List<Integer> locationIds = this.getLocationIds(this.filter.getCountry());
+		return this.daoFactory.getStudySearchDao().searchStudies(this.filter, locationIds);
 	}
 
-	@Override
-	public boolean hasMore() {
-		return this.index < this.size;
-	}
-
-	@Override
-	public StudyReference next() {
-		return this.studyReferences.get(this.index++);
-	}
-
-	@Override
-	public long size() {
-		return this.size;
-	}
 }

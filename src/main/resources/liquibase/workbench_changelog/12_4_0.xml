@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="darla" id="v12.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="workbench_ibdb_user_map_bkp" />
+			</not>
+		</preConditions>
+		<comment>
+			Store into backup table the WORKBENCH_IBDB_USER_MAP table, then drop the WORKBENCH_IBDB_USER_MAP table.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `workbench_ibdb_user_map_bkp` (
+			  `ibdb_user_map_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			  `workbench_user_id` int(11) NOT NULL,
+			  `project_id` int(10) unsigned NOT NULL,
+			  `ibdb_user_id` int(11) NOT NULL,
+			  PRIMARY KEY (`ibdb_user_map_id`),
+			  UNIQUE KEY `user_map_bkp_uk` (`project_id`,`workbench_user_id`)
+			);
+
+			INSERT INTO workbench_ibdb_user_map_bkp
+			SELECT * FROM workbench_ibdb_user_map;
+
+			DROP TABLE workbench_ibdb_user_map;
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="darla" id="v12.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="crop_persons" />
+			</not>
+		</preConditions>
+		<comment>
+			Create CROP_PERSONS table for storing association between crop and persons
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE crop_persons (
+			  `crop_name` varchar(32) NOT NULL,
+			  `personid` int(11) NOT NULL,
+			  PRIMARY KEY (`crop_name`, `personid`),
+			  CONSTRAINT `crop_persons_fk_crop` FOREIGN KEY (`crop_name`) REFERENCES `workbench_crop` (`crop_name`) ON DELETE CASCADE,
+			  CONSTRAINT `crop_persons_fk_person` FOREIGN KEY (`personid`) REFERENCES `persons` (`personid`) ON DELETE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v12.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_project_user_role" />
+		</preConditions>
+		<comment>
+			Delete unused table "workbench_project_user_role"
+		</comment>
+		<dropTable cascadeConstraints="true"  tableName="workbench_project_user_role"/>
+	</changeSet>
+
+
+</databaseChangeLog>

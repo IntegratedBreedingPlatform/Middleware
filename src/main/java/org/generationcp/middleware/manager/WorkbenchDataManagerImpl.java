@@ -30,10 +30,8 @@ import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -41,8 +39,6 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -75,6 +71,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	private HibernateSessionProvider sessionProvider;
 
+	private WorkbenchDaoFactory workbenchDaoFactory;
+
 	private Project currentlastOpenedProject;
 
 	public WorkbenchDataManagerImpl() {
@@ -83,159 +81,48 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	public WorkbenchDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(sessionProvider);
 	}
 
 	public Session getCurrentSession() {
 		return this.sessionProvider.getSession();
 	}
 
-	private CropTypeDAO getCropTypeDao() {
-		final CropTypeDAO cropTypeDao = new CropTypeDAO();
-		cropTypeDao.setSession(this.getCurrentSession());
-		return cropTypeDao;
-	}
-
-	private IbdbUserMapDAO getIbdbUserMapDao() {
-		final IbdbUserMapDAO ibdbUserMapDao = new IbdbUserMapDAO();
-		ibdbUserMapDao.setSession(this.getCurrentSession());
-		return ibdbUserMapDao;
-	}
-
-	private PersonDAO getPersonDao() {
-		final PersonDAO personDao = new PersonDAO();
-		personDao.setSession(this.getCurrentSession());
-		return personDao;
-	}
-
-	private ProjectActivityDAO getProjectActivityDao() {
-		final ProjectActivityDAO projectActivityDao = new ProjectActivityDAO();
-		projectActivityDao.setSession(this.getCurrentSession());
-		return projectActivityDao;
-	}
-
-	private ProjectDAO getProjectDao() {
-
-		final ProjectDAO projectDao = new ProjectDAO();
-		projectDao.setSession(this.getCurrentSession());
-		return projectDao;
-	}
-
-	@Override
-	public ProjectUserInfoDAO getProjectUserInfoDao() {
-
-		final ProjectUserInfoDAO projectUserInfoDao = new ProjectUserInfoDAO();
-		projectUserInfoDao.setSession(this.getCurrentSession());
-		return projectUserInfoDao;
-	}
-
-	@Override
-	public ToolDAO getToolDao() {
-
-		final ToolDAO toolDao = new ToolDAO();
-		toolDao.setSession(this.getCurrentSession());
-		return toolDao;
-	}
-
-	private WorkbenchUserDAO getWorkbenchUserDao() {
-
-		final WorkbenchUserDAO userDao = new WorkbenchUserDAO();
-		userDao.setSession(this.getCurrentSession());
-		return userDao;
-	}
-
-	private UserInfoDAO getUserInfoDao() {
-
-		final UserInfoDAO userInfoDao = new UserInfoDAO();
-		userInfoDao.setSession(this.getCurrentSession());
-		return userInfoDao;
-	}
-
-	private RoleDAO getRoleDao() {
-		final RoleDAO roleDao = new RoleDAO();
-		roleDao.setSession(this.getCurrentSession());
-		return roleDao;
-	}
-
-	private RoleTypeDAO getRoleTypeDao() {
-		final RoleTypeDAO roleTypeDAO = new RoleTypeDAO();
-		roleTypeDAO.setSession(this.getCurrentSession());
-		return roleTypeDAO;
-	}
-
-	private PermissionDAO getPermissionDao() {
-		final PermissionDAO permissionDAO = new PermissionDAO();
-		permissionDAO.setSession(this.getCurrentSession());
-		return permissionDAO;
-	}
-
-	private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
-
-		final WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
-		workbenchSidebarCategoryDAO.setSession(this.getCurrentSession());
-		return workbenchSidebarCategoryDAO;
-	}
-
-	private WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
-
-		final WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
-
-		workbenchSidebarCategoryLinkDAO.setSession(this.getCurrentSession());
-		return workbenchSidebarCategoryLinkDAO;
-	}
-
-	@Override
-	public StandardPresetDAO getStandardPresetDAO() {
-		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
-		standardPresetDAO.setSession(this.getCurrentSession());
-		return standardPresetDAO;
-	}
-
-	private UserRoleDao getUserRoleDao() {
-		final UserRoleDao userRoleDao = new UserRoleDao();
-		userRoleDao.setSession(this.getCurrentSession());
-		return userRoleDao;
-	}
-
 	@Override
 	public List<Project> getProjects() {
-		return this.getProjectDao().getAll();
+		return this.workbenchDaoFactory.getProjectDAO().getAll();
 	}
 
 	@Override
 	public List<Project> getProjects(final int start, final int numOfRows) {
-		return this.getProjectDao().getAll(start, numOfRows);
+		return this.workbenchDaoFactory.getProjectDAO().getAll(start, numOfRows);
 	}
 
 	@Override
 	public List<Project> getProjects(final int start, final int numOfRows, final Map<ProgramFilters, Object> filters) {
-		return this.getProjectDao().getProjectsByFilter(start, numOfRows, filters);
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(start, numOfRows, filters);
 	}
 
 	@Override
 	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters) {
-		return this.getProjectDao().countProjectsByFilter(filters);
+		return this.workbenchDaoFactory.getProjectDAO().countProjectsByFilter(filters);
 	}
 
 	@Override
 	public List<Project> getProjectsByCrop(final CropType cropType) {
-		return this.getProjectDao().getProjectsByCrop(cropType);
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByCrop(cropType);
 	}
 
 	@Override
-	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
-		return this.getProjectDao().getProjectsByUser(user, cropName);
-	}
-
-	@Override
-	public List<Project> getProjectsByCropName(final String cropName) {
-		return this.getProjectDao().getProjectsByCropName(cropName);
+	public List<Project> getProjectsByUser(final WorkbenchUser user) {
+		return this.workbenchDaoFactory.getProjectUserInfoDAO().getProjectsByUser(user);
 	}
 
 	@Override
 	public Project saveOrUpdateProject(final Project project) {
 
 		try {
-			this.getProjectDao().merge(project);
+			this.workbenchDaoFactory.getProjectDAO().merge(project);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Cannot save Project: WorkbenchDataManager.saveOrUpdateProject(project=" + project + "): " + e.getMessage(), e);
@@ -245,25 +132,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public ProjectUserInfo saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo) {
-
-		try {
-			this.getProjectUserInfoDao().merge(projectUserInfo);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot save ProjectUserInfo: WorkbenchDataManager.saveOrUpdateProjectUserInfo(project=" + projectUserInfo + "): " + e
-					.getMessage(), e);
-		}
-
-		return projectUserInfo;
-	}
-
-	@Override
 	public Project addProject(final Project project) {
 
 		try {
 			project.setUniqueID(UUID.randomUUID().toString());
-			this.getProjectDao().save(project);
+			this.workbenchDaoFactory.getProjectDAO().save(project);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): " + e.getMessage(), e);
@@ -274,7 +147,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project mergeProject(final Project project) {
 		try {
-			this.getProjectDao().merge(project);
+			this.workbenchDaoFactory.getProjectDAO().merge(project);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Cannot save Project: WorkbenchDataManager.updateProject(project=" + project + "): " + e.getMessage(), e);
@@ -311,30 +184,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 	}
 
-	@Override
-	public List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(final Long projectId, final List<Integer> userIds) {
-		return this.getProjectUserInfoDao().getByProjectIdAndUserIds(projectId, userIds);
-	}
-
-	@Override
-	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(final Long projectId, final Integer userId) {
-		return this.getProjectUserInfoDao().getByProjectIdAndUserId(projectId, userId);
-	}
-
-	@Override
-	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		this.getUserRoleDao().removeUsersFromProgram(workbenchUserIds, projectId);
-	}
-
-	public List<IbdbUserMap> getIbdbUserMapsByProjectId(final Long projectId) {
-		return this.getIbdbUserMapDao().getIbdbUserMapByID(projectId);
-	}
-
 	public void deleteProjectUserInfo(final ProjectUserInfo projectUserInfo) {
 
 		try {
 
-			this.getProjectUserInfoDao().makeTransient(projectUserInfo);
+			this.workbenchDaoFactory.getProjectUserInfoDAO().makeTransient(projectUserInfo);
 
 		} catch (final Exception e) {
 
@@ -349,7 +203,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		try {
 
-			this.getProjectDao().deleteProject(project.getProjectName());
+			this.workbenchDaoFactory.getProjectDAO().deleteProject(project.getProjectName());
 
 		} catch (final Exception e) {
 
@@ -360,216 +214,59 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<Tool> getAllTools() {
-		return this.getToolDao().getAll();
+		return this.workbenchDaoFactory.getToolDAO().getAll();
 	}
 
 	@Override
 	public Tool getToolWithName(final String toolId) {
-		return this.getToolDao().getByToolName(toolId);
+		return this.workbenchDaoFactory.getToolDAO().getByToolName(toolId);
 	}
 
 	@Override
 	public List<Tool> getToolsWithType(final ToolType toolType) {
-		return this.getToolDao().getToolsByToolType(toolType);
-	}
-
-	@Override
-	public boolean isPersonExists(final String firstName, final String lastName) {
-		return this.getPersonDao().isPersonExists(firstName, lastName);
-	}
-
-	@Override
-	public boolean isPersonWithEmailExists(final String email) {
-		return this.getPersonDao().isPersonWithEmailExists(email);
-	}
-
-	@Override
-	public Person getPersonByEmail(final String email) {
-		return this.getPersonDao().getPersonByEmail(email);
-	}
-
-	@Override
-	public Person getPersonByEmailAndName(final String email, final String firstName, final String lastName) {
-		return this.getPersonDao().getPersonByEmailAndName(email, firstName, lastName);
-	}
-
-	@Override
-	public boolean isUsernameExists(final String userName) {
-		return this.getWorkbenchUserDao().isUsernameExists(userName);
-	}
-
-	@Override
-	public boolean isPersonWithUsernameAndEmailExists(final String username, final String email) {
-		return this.getPersonDao().isPersonWithUsernameAndEmailExists(username, email);
-	}
-
-	@Override
-	public Integer addPerson(final Person person) {
-
-		final Integer idPersonSaved;
-		try {
-
-			final Person recordSaved = this.getPersonDao().saveOrUpdate(person);
-			idPersonSaved = recordSaved.getId();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Person: WorkbenchDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
-		}
-		return idPersonSaved;
-	}
-
-	@Override
-	public Integer addUser(final WorkbenchUser user) {
-
-		final Integer idUserSaved;
-		try {
-
-			final WorkbenchUser recordSaved = this.getWorkbenchUserDao().saveOrUpdate(user);
-			idUserSaved = recordSaved.getUserid();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
-		}
-
-		return idUserSaved;
-
+		return this.workbenchDaoFactory.getToolDAO().getToolsByToolType(toolType);
 	}
 
 	@Override
 	public Project getProjectById(final Long projectId) {
-		return this.getProjectDao().getById(projectId);
+		return this.workbenchDaoFactory.getProjectDAO().getById(projectId);
 	}
 
 	@Override
 	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) {
-		return this.getProjectDao().getProjectByNameAndCrop(projectName, cropType);
+		return this.workbenchDaoFactory.getProjectDAO().getProjectByNameAndCrop(projectName, cropType);
 	}
 
 	@Override
 	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
-		return this.getProjectDao().getByUuid(projectUuid, cropType);
-	}
-
-	@Override
-	public List<WorkbenchUser> getAllUsers() {
-		return this.getWorkbenchUserDao().getAll();
-	}
-
-	@Override
-	public List<WorkbenchUser> getAllActiveUsersSorted() {
-		return this.getWorkbenchUserDao().getAllActiveUsersSorted();
-	}
-
-	@Override
-	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
-		return this.getWorkbenchUserDao().getUsersByCrop(cropName);
-	}
-
-	@Override
-	public long countAllUsers() {
-		return this.getWorkbenchUserDao().countAll();
-	}
-
-	@Override
-	public WorkbenchUser getUserById(final int id) {
-		return this.getWorkbenchUserDao().getById(id, false);
-	}
-
-	@Override
-	public List<WorkbenchUser> getUserByName(final String name, final int start, final int numOfRows, final Operation op) {
-		final WorkbenchUserDAO dao = this.getWorkbenchUserDao();
-		List<WorkbenchUser> users = new ArrayList<>();
-		if (op == Operation.EQUAL) {
-			users = dao.getByNameUsingEqual(name, start, numOfRows);
-		} else if (op == Operation.LIKE) {
-			users = dao.getByNameUsingLike(name, start, numOfRows);
-		}
-		return users;
-	}
-
-	@Override
-	public void deleteUser(final WorkbenchUser user) {
-
-		try {
-
-			this.getWorkbenchUserDao().makeTransient(user);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting User: WorkbenchDataManager.deleteUser(user=" + user + "):  " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public List<Person> getAllPersons() {
-		return this.getPersonDao().getAll();
-	}
-
-	@Override
-	public long countAllPersons() {
-		return this.getPersonDao().countAll();
-	}
-
-	@Override
-	public Person getPersonById(final int id) {
-		return this.getPersonDao().getById(id, false);
-	}
-
-	@Override
-	public void deletePerson(final Person person) {
-
-		try {
-
-			this.getPersonDao().makeTransient(person);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting Person: WorkbenchDataManager.deletePerson(person=" + person + "): " + e.getMessage(),
-				e);
-		}
+		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid, cropType);
 	}
 
 	@Override
 	public Project getLastOpenedProject(final Integer userId) {
-		return this.getProjectDao().getLastOpenedProject(userId);
-	}
-
-	@Override
-	public List<WorkbenchUser> getUsersByProjectId(final Long projectId, final String cropName) {
-		return this.getWorkbenchUserDao().getUsersByProjectId(projectId, cropName);
-	}
-
-	@Override
-	public Map<Integer, Person> getPersonsByProjectId(final Long projectId, final String cropName) {
-		return this.getWorkbenchUserDao().getPersonsByProjectId(projectId, cropName);
+		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProject(userId);
 	}
 
 	@Override
 	public List<CropType> getInstalledCropDatabses() {
-		return this.getCropTypeDao().getAll();
+		return this.workbenchDaoFactory.getCropTypeDAO().getAll();
 	}
 
 	@Override
 	public List<CropType> getAvailableCropsForUser(final int workbenchUserId) {
-		return this.getCropTypeDao().getAvailableCropsForUser(workbenchUserId);
+		return this.workbenchDaoFactory.getCropTypeDAO().getAvailableCropsForUser(workbenchUserId);
 	}
 
 	@Override
 	public CropType getCropTypeByName(final String cropName) {
-		return this.getCropTypeDao().getByName(cropName);
+		return this.workbenchDaoFactory.getCropTypeDAO().getByName(cropName);
 	}
 
 	@Override
 	public String addCropType(final CropType cropType) {
 
-		final CropTypeDAO dao = this.getCropTypeDao();
-		if (this.getCropTypeDao().getByName(cropType.getCropName()) != null) {
+		final CropTypeDAO dao = this.workbenchDaoFactory.getCropTypeDAO();
+		if (this.workbenchDaoFactory.getCropTypeDAO().getByName(cropType.getCropName()) != null) {
 			throw new MiddlewareQueryException("Crop type already exists.");
 		}
 
@@ -590,7 +287,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	public List<ProjectUserInfo> getByProjectId(final Long projectId) {
-		return this.getProjectUserInfoDao().getByProjectId(projectId);
+		return this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectId(projectId);
 
 	}
 
@@ -615,7 +312,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final List<Integer> idsSaved = new ArrayList<>();
 		try {
 
-			final ProjectActivityDAO dao = this.getProjectActivityDao();
+			final ProjectActivityDAO dao = this.workbenchDaoFactory.getProjectActivityDAO();
 
 			for (final ProjectActivity projectActivityListData : projectActivityList) {
 				final ProjectActivity recordSaved = dao.save(projectActivityListData);
@@ -634,7 +331,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<ProjectActivity> getProjectActivitiesByProjectId(final Long projectId, final int start, final int numOfRows) {
-		return this.getProjectActivityDao().getByProjectId(projectId, start, numOfRows);
+		return this.workbenchDaoFactory.getProjectActivityDAO().getByProjectId(projectId, start, numOfRows);
 	}
 
 	@Override
@@ -642,7 +339,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		try {
 
-			this.getProjectActivityDao().makeTransient(projectActivity);
+			this.workbenchDaoFactory.getProjectActivityDAO().makeTransient(projectActivity);
 
 		} catch (final Exception e) {
 
@@ -654,171 +351,34 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public long countProjectActivitiesByProjectId(final Long projectId) {
-		return this.getProjectActivityDao().countByProjectId(projectId);
-	}
-
-	@Override
-	public Integer addIbdbUserMap(final IbdbUserMap userMap) {
-
-		try {
-			final IbdbUserMap existingMapping = this.getIbdbUserMap(userMap.getWorkbenchUserId(), userMap.getProjectId());
-			if (existingMapping == null) {
-				this.getIbdbUserMapDao().saveOrUpdate(userMap);
-				return userMap.getIbdbUserMapId().intValue();
-			} else {
-				return existingMapping.getIbdbUserMapId().intValue();
-			}
-		} catch (final Exception e) {
-			final String message =
-				"Error encountered while adding IbdbUserMap (linking workbench user id to crop database user): WorkbenchDataManager.addIbdbUserMap(userMap="
-					+ userMap + "): " + e.getMessage();
-			WorkbenchDataManagerImpl.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@Override
-	public Integer getCurrentIbdbUserId(final Long projectId, final Integer workbenchUserId) {
-		Integer ibdbUserId = null;
-		final IbdbUserMap userMapEntry = this.getIbdbUserMap(workbenchUserId, projectId);
-		if (userMapEntry != null) {
-			ibdbUserId = userMapEntry.getIbdbUserId();
-		}
-		return ibdbUserId;
-	}
-
-	@Override
-	public IbdbUserMap getIbdbUserMap(final Integer workbenchUserId, final Long projectId) {
-
-		final IbdbUserMap ibdbUserMap;
-		try {
-
-			ibdbUserMap = this.getIbdbUserMapDao().getIbdbUserMapByUserAndProjectID(workbenchUserId, projectId);
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while retrieving Local IbdbUserMap: WorkbenchDataManager.getIbdbUserMap(workbenchUserId="
-					+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
-		}
-
-		return ibdbUserMap;
-	}
-
-	@Override
-	public Integer getLocalIbdbUserId(final Integer workbenchUserId, final Long projectId) {
-
-		final Integer ibdbUserId;
-		try {
-
-			ibdbUserId = this.getIbdbUserMapDao().getLocalIbdbUserId(workbenchUserId, projectId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
-					+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
-		}
-
-		return ibdbUserId;
-	}
-
-	@Override
-	public Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(final Integer ibdbUserId, final Long projectId) {
-		return this.getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
-	}
-
-	@Override
-	public UserInfo getUserInfo(final int userId) {
-		try {
-			return this.getUserInfoDao().getUserInfoByUserId(userId);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
-		}
-
-	}
-
-	@Override
-	public UserInfo getUserInfoByUsername(final String username) {
-		final WorkbenchUser user = this.getUserByName(username, 0, 1, Operation.EQUAL).get(0);
-
-		return this.getUserInfo(user.getUserid());
-	}
-
-	@Override
-	public WorkbenchUser getUserByUsername(final String userName) {
-		return this.getWorkbenchUserDao().getUserByUserName(userName);
-	}
-
-	@Override
-	public UserInfo getUserInfoByResetToken(final String token) {
-		return this.getUserInfoDao().getUserInfoByToken(token);
-	}
-
-	@Override
-	public UserInfo updateUserInfo(final UserInfo userInfo) {
-
-		try {
-
-			this.getUserInfoDao().update(userInfo);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("Cannot update userInfo =" + userInfo.getUserId() + "): " + e.getMessage(), e);
-
-		}
-		return userInfo;
-	}
-
-	@Override
-	public void incrementUserLogInCount(final int userId) {
-
-		try {
-
-			final UserInfo userdetails = this.getUserInfoDao().getUserInfoByUserId(userId);
-			if (userdetails != null) {
-				this.getUserInfoDao().updateLoginCounter(userdetails);
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void insertOrUpdateUserInfo(final UserInfo userDetails) {
-		this.getUserInfoDao().insertOrUpdateUserInfo(userDetails);
-	}
-
-	@Override
-	public boolean changeUserPassword(final String username, final String password) {
-		return this.getWorkbenchUserDao().changePassword(username, password);
+		return this.workbenchDaoFactory.getProjectActivityDAO().countByProjectId(projectId);
 	}
 
 	@Override
 	public List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory() {
-		return this.getWorkbenchSidebarCategoryDao().getAll();
+		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryDAO().getAll();
 	}
 
 	@Override
 	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks() {
-		return this.getWorkbenchSidebarCategoryLinkDao().getAll();
+		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDAO().getAll();
 	}
 
 	@Override
 	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(final WorkbenchSidebarCategory category) {
-		return this.getWorkbenchSidebarCategoryLinkDao().getAllWorkbenchSidebarLinksByCategoryId(category, 0, Integer.MAX_VALUE);
+		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDAO()
+			.getAllWorkbenchSidebarLinksByCategoryId(category, 0, Integer.MAX_VALUE);
 	}
 
 	@Override
 	public Project getLastOpenedProjectAnyUser() {
-		return this.getProjectDao().getLastOpenedProjectAnyUser();
+		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
 	}
 
 	@Override
 	public Boolean isLastOpenedProjectChanged() {
 
-		final Project project = this.getProjectDao().getLastOpenedProjectAnyUser();
+		final Project project = this.workbenchDaoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
 
 		if (this.currentlastOpenedProject == null) {
 			this.currentlastOpenedProject = project;
@@ -891,7 +451,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public StandardPreset saveOrUpdateStandardPreset(final StandardPreset standardPreset) {
 		try {
-			return this.getStandardPresetDAO().saveOrUpdate(standardPreset);
+			return this.workbenchDaoFactory.getStandardPresetDAO().saveOrUpdate(standardPreset);
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -903,7 +463,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public void deleteStandardPreset(final int standardPresetId) {
 		try {
-			final StandardPreset preset = this.getStandardPresetDAO().getById(standardPresetId);
+			final StandardPreset preset = this.workbenchDaoFactory.getStandardPresetDAO().getById(standardPresetId);
 			this.getCurrentSession().delete(preset);
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -920,269 +480,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<UserDto> getAllUsersSortedByLastName() {
-		return this.getWorkbenchUserDao().getAllUsersSortedByLastName();
-
-	}
-
-	@Override
-	public List<UserDto> getUsersByProjectUuid(final String projectUuid, final String cropName) {
-		return this.getWorkbenchUserDao().getUsersByProjectUUId(projectUuid, cropName);
-
-	}
-
-	@Override
-	public Integer createUser(final UserDto userDto) {
-
-		final Integer idUserSaved;
-		// user.access = 0 - Default User
-		// user.instalid = 0 - Access all areas (legacy from the ICIS system) (not used)
-		// user.status = 0 - Unassigned
-		// user.type = 0 - Default user type (not used)
-
-		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		final Person person = this.setPerson(userDto, new Person());
-
-		final WorkbenchUser user = new WorkbenchUser();
-		user.setPersonid(person.getId());
-		user.setPerson(person);
-		user.setName(userDto.getUsername());
-		user.setPassword(userDto.getPassword());
-		user.setAccess(0);
-		user.setAssignDate(currentDate);
-		user.setCloseDate(currentDate);
-		user.setInstalid(0);
-		user.setStatus(userDto.getStatus());
-		user.setType(0);
-
-		// Add user roles to the particular user
-		final List<UserRole> userRoles = new ArrayList<>();
-		if (userDto.getUserRoles() != null) {
-			for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
-				final UserRole userRole = new UserRole();
-				final Role role = new Role();
-				role.setId(userRoleDto.getRole().getId());
-				userRole.setRole(role);
-				userRole.setUser(user);
-				if (userRoleDto.getCrop() != null) {
-					userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
-				}
-				if (userRoleDto.getProgram() != null) {
-					final Project project =
-						this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
-					userRole.setWorkbenchProject(project);
-				}
-				userRole.setCreatedDate(new Date());
-				userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
-				userRoles.add(userRole);
-			}
-		}
-		user.setRoles(userRoles);
-
-		final List<CropType> crops = new ArrayList<>();
-		for (final CropDto crop : userDto.getCrops()) {
-			final CropType cropType = new CropType();
-			cropType.setCropName(crop.getCropName());
-			crops.add(cropType);
-		}
-		user.setCrops(crops);
-
-		try {
-
-			final WorkbenchUser recordSaved = this.getWorkbenchUserDao().saveOrUpdate(user);
-			idUserSaved = recordSaved.getUserid();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
-		}
-
-		final UserInfo userInfo = new UserInfo();
-		userInfo.setUserId(user.getUserid());
-		userInfo.setLoginCount(0);
-		this.getUserInfoDao().insertOrUpdateUserInfo(userInfo);
-
-		return idUserSaved;
-
-	}
-
-	@Override
-	public Integer updateUser(final UserDto userDto) {
-		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		WorkbenchUser user = null;
-		final Integer idUserSaved;
-
-		try {
-			user = this.getUserById(userDto.getUserId());
-			this.setPerson(userDto, user.getPerson());
-
-			user.setName(userDto.getUsername());
-			user.setAssignDate(currentDate);
-			user.setCloseDate(currentDate);
-			user.setStatus(userDto.getStatus());
-
-			final List<UserRole> userRoles = new ArrayList<>();
-			if (userDto.getUserRoles() != null) {
-				for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
-					boolean found = false;
-					for (final UserRole userRole : user.getRoles()) {
-						if (userRole.getRole().getId().equals(userRoleDto.getRole().getId()) &&
-							(userRole.getCropType() == null && userRoleDto.getCrop() == null || userRole.getCropType().getCropName()
-								.equals(userRoleDto.getCrop().getCropName())) &&
-							(userRole.getWorkbenchProject() == null && userRoleDto.getProgram() == null || userRole.getWorkbenchProject()
-								.getUniqueID().equals(userRoleDto.getProgram().getUuid()))) {
-							userRoles.add(userRole);
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						final UserRole userRole = new UserRole();
-						final Role role = new Role();
-						role.setId(userRoleDto.getRole().getId());
-						userRole.setRole(role);
-						userRole.setUser(user);
-						if (userRoleDto.getCrop() != null) {
-							userRole.setCropType(new CropType(userRoleDto.getCrop().getCropName()));
-						}
-						if (userRoleDto.getProgram() != null) {
-							final Project project =
-								this.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
-							userRole.setWorkbenchProject(project);
-						}
-						userRole.setCreatedDate(new Date());
-						userRole.setCreatedBy(this.getUserById(userRoleDto.getCreatedBy()));
-						userRoles.add(userRole);
-					}
-				}
-				user.getRoles().clear();
-				user.getRoles().addAll(userRoles);
-			}
-
-			// update user roles to the particular user
-			//			final UserRole role = (!user.getRoles().isEmpty()) ? user.getRoles().get(0) : new UserRole();
-			//			role.setRole(userDto.getRole());
-			//TODO Fix based on new structure
-
-			final List<CropType> crops = new ArrayList<>();
-			for (final CropDto crop : userDto.getCrops()) {
-				final CropType cropType = new CropType();
-				cropType.setCropName(crop.getCropName());
-				crops.add(cropType);
-			}
-			user.setCrops(crops);
-
-			this.getWorkbenchUserDao().saveOrUpdate(user);
-			idUserSaved = user.getUserid();
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving User: UserDataManager.updateUser(user=" + user + "): " + e.getMessage(), e);
-		}
-
-		return idUserSaved;
-	}
-
-	@Override
-	public void updateUser(final WorkbenchUser user) {
-		this.getWorkbenchUserDao().saveOrUpdate(user);
-		this.getPersonDao().saveOrUpdate(user.getPerson());
-	}
-
-	private Person setPerson(final UserDto userDto, final Person person) {
-
-		person.setFirstName(userDto.getFirstName());
-		person.setMiddleName("");
-		person.setLastName(userDto.getLastName());
-		person.setEmail(userDto.getEmail());
-		person.setTitle("-");
-		person.setContact("-");
-		person.setExtension("-");
-		person.setFax("-");
-		person.setInstituteId(0);
-		person.setLanguage(0);
-		person.setNotes("-");
-		person.setPositionName("-");
-		person.setPhone("-");
-		this.addPerson(person);
-
-		return person;
+	public StandardPreset getStandardPresetById(final Integer presetId) {
+		return this.workbenchDaoFactory.getStandardPresetDAO().getById(presetId);
 	}
 
 	@Override
 	public Project getProjectByUuid(final String projectUuid) {
-		return this.getProjectDao().getByUuid(projectUuid);
-	}
-
-	@Override
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
-		return this.getWorkbenchUserDao().getActiveUserIDsByProjectId(projectId, cropName);
-	}
-
-	@Override
-	public List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(final Long projectId, final String cropName) {
-		return this.getWorkbenchUserDao().getActiveUserIDsByProjectIdFilteringSuperAdmin(projectId, cropName);
-	}
-
-	@Override
-	public List<WorkbenchUser> getSuperAdminUsers() {
-		return this.getWorkbenchUserDao().getSuperAdminUsers();
-	}
-
-	@Override
-	public boolean isSuperAdminUser(final Integer userId) {
-		return this.getWorkbenchUserDao().isSuperAdminUser(userId);
-	}
-
-	@Override
-	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
-		return this.getRoleDao().getRoles(roleSearchDto);
-	}
-
-	@Override
-	public List<RoleType> getRoleTypes() {
-		return this.getRoleTypeDao().getRoleTypes();
-	}
-
-	@Override
-	public RoleType getRoleType(final Integer id) {
-		return this.getRoleTypeDao().getById(id);
-	}
-
-	@Override
-	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(final Integer workbenchSidebarCategoryLink) {
-		return this.getWorkbenchSidebarCategoryLinkDao().getById(workbenchSidebarCategoryLink);
-	}
-
-	@Override
-	public List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds) {
-		return this.getWorkbenchSidebarCategoryDao().getCategoriesByLinkIds(linkIds);
-	}
-
-	@Override
-	public void saveOrUpdateUserRole(final UserRole userRole) {
-		this.getUserRoleDao().saveOrUpdate(userRole);
-	}
-
-	@Override
-	public Role saveRole(final Role role) {
-
-		try {
-			this.getRoleDao().save(role);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot save Role: WorkbenchDataManager.saveRole(role=" + role + "): " + e.getMessage(), e);
-		}
-
-		return role;
-	}
-
-	@Override
-	public Role getRoleByName(final String name) {
-		final RoleSearchDto roleSearchDto = new RoleSearchDto();
-		roleSearchDto.setName(name);
-		final List<Role> roles = this.getRoleDao().getRoles(roleSearchDto);
-		return roles.isEmpty() ? null : roles.get(0);
+		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid);
 	}
 }

@@ -13,10 +13,12 @@ package org.generationcp.middleware.dao;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +40,9 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private UserService userService;
+
 	@Before
 	public void setUp() throws Exception {
 		this.cropTypeDAO = new CropTypeDAO();
@@ -55,16 +60,16 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		final CropType customCrop2 = this.createCropType(crop2);
 		final CropType customCrop3 = this.createCropType(crop3);
 
-		final int workbenchUserId1 = this.createWorkbenchUser("User999", Lists.newArrayList(customCrop1, customCrop2));
-		final int workbenchUserId2 = this.createWorkbenchUser("User1000", Lists.newArrayList(customCrop3));
+		final WorkbenchUser workbenchUser1 = this.createWorkbenchUser("User999", Lists.newArrayList(customCrop1, customCrop2));
+		final WorkbenchUser workbenchUser2 = this.createWorkbenchUser("User1000", Lists.newArrayList(customCrop3));
 
 		// Create dummy projects
-		this.createProject("Project1", customCrop1, workbenchUserId1);
-		this.createProject("Project2", customCrop2, workbenchUserId1);
-		this.createProject("Project3", customCrop3, workbenchUserId2);
+		this.createProject("Project1", customCrop1, workbenchUser1);
+		this.createProject("Project2", customCrop2, workbenchUser1);
+		this.createProject("Project3", customCrop3, workbenchUser2);
 
-		final List<CropType> cropsForWorkbenchUser1 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUserId1);
-		final List<CropType> cropsForWorkbenchUser2 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUserId2);
+		final List<CropType> cropsForWorkbenchUser1 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUser1.getUserid());
+		final List<CropType> cropsForWorkbenchUser2 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUser2.getUserid());
 
 		Assert.assertEquals(2, cropsForWorkbenchUser1.size());
 		Assert.assertEquals(crop1, cropsForWorkbenchUser1.get(0).getCropName());
@@ -75,10 +80,12 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 
 	}
 
-	int createWorkbenchUser(final String userName, final List<CropType> crops) {
+	WorkbenchUser createWorkbenchUser(final String userName, final List<CropType> crops) {
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setName(userName);
-		workbenchUser.setPersonid(1);
+		final Person person = new Person();
+		person.setId(1);
+		workbenchUser.setPerson(person);
 		workbenchUser.setAccess(0);
 		workbenchUser.setActive(true);
 		workbenchUser.setInstalid(0);
@@ -88,7 +95,7 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		workbenchUser.setCloseDate(20190101);
 		workbenchUser.setPassword("password");
 		workbenchUser.setCrops(crops);
-		return this.workbenchDataManager.addUser(workbenchUser);
+		return this.userService.addUser(workbenchUser);
 	}
 
 	CropType createCropType(final String cropName) {
@@ -98,22 +105,22 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		return cropType;
 	}
 
-	Project createProject(final String projectName, final CropType cropType, final int workbenchUserId) {
+	Project createProject(final String projectName, final CropType cropType, final WorkbenchUser workbenchUser) {
 		final Project project = new Project();
 		project.setProjectName(projectName);
 		project.setCropType(cropType);
-		project.setUserId(workbenchUserId);
+		project.setUserId(workbenchUser.getUserid());
 		project.setUniqueID(UUID.randomUUID().toString());
 		this.workbenchDataManager.addProject(project);
-		this.createProjectUserInfo(project, workbenchUserId);
+		this.createProjectUserInfo(project, workbenchUser);
 		return project;
 	}
 
-	ProjectUserInfo createProjectUserInfo(final Project project, final int workbenchUserId) {
+	ProjectUserInfo createProjectUserInfo(final Project project, final WorkbenchUser workbenchUser) {
 		final ProjectUserInfo projectUserInfo = new ProjectUserInfo();
 		projectUserInfo.setProject(project);
-		projectUserInfo.setUserId(workbenchUserId);
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(projectUserInfo);
+		projectUserInfo.setUser(workbenchUser);
+		this.userService.saveProjectUserInfo(projectUserInfo);
 		return projectUserInfo;
 	}
 

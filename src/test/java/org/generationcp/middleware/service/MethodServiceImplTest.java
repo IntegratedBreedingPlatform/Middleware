@@ -18,19 +18,19 @@ public class MethodServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-	private MethodDAO methodDAO;
+	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	private MethodDAO methodDAO;
+
 	private Project commonTestProject;
 
 	private MethodServiceImpl methodService;
 
-
 	@Before
 	public void setUp() {
-		if (this.workbenchTestDataUtil == null) {
-			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-			this.workbenchTestDataUtil.setUpWorkbench();
-		}
+
+		this.workbenchTestDataUtil.setUpWorkbench();
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();

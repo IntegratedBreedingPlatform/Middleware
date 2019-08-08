@@ -57,6 +57,7 @@ import java.util.UUID;
 // TODO This test has no assertions (= not a test!) needs data setup so that assertions can be added.
 public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
+
 	@Autowired
 	private CrossStudyDataManager crossStudyDataManager;
 

@@ -41,13 +41,22 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.BeanFormState;
+import org.generationcp.middleware.pojos.Person;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * POJO for users table in Workbench Database. 
+ * POJO for users table in Workbench Database.
  * It differs from users in crop dbs as there are no
  * users_roles and role table and therefore relation in crop DBs
  *
@@ -55,7 +64,10 @@ import java.util.Objects;
 @NamedQueries({@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM WorkbenchUser s WHERE s.name = :name"),
 		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
 		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
-		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name")
+		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
+		@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.person.id = p.id AND "
+			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
+
 })
 @NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
 		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
@@ -158,6 +170,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
+	public static final String GET_BY_FULLNAME = "getByFullName";
 
 	public static final String GET_USERS_BY_CROP_FILTERING_BY_ADMIN = "SELECT  "
 		+ "    u.userid, "
@@ -187,7 +200,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "                AND wu.userid = u.userid) "
 		+ "        AND (UPPER(r.name) != '" + Role.SUPERADMIN + "' OR r.name is null)"
 		+ "ORDER BY persons.fname , persons.lName;";
-	
+
 	public static final String GET_USERS_BY_PROJECT_UUID = "SELECT  "
 		+ "       users.userid, "
 		+ "       users.uname, "
@@ -239,9 +252,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Column(name = "upswd")
 	private String password;
 
-	@Column(name = "personid")
-	private Integer personid;
-
 	@Column(name = "adate")
 	private Integer adate;
 
@@ -257,7 +267,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	private Boolean isnew = false;
 
 	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="personid", insertable=false, updatable=false)
+	@JoinColumn(name="personid")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
 
@@ -286,9 +296,8 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		this.userid = userid;
 	}
 
-	public WorkbenchUser(
-		final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type, final String name, final String password,
-			final Integer personid, final Integer adate, final Integer cdate) {
+	public WorkbenchUser(final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type, final String name, final String password,
+			final Person person, final Integer adate, final Integer cdate) {
 		super();
 		this.userid = userid;
 		this.instalid = instalid;
@@ -297,7 +306,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		this.type = type;
 		this.name = name;
 		this.password = password;
-		this.personid = personid;
+		this.person = person;
 		this.adate = adate;
 		this.cdate = cdate;
 
@@ -305,7 +314,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	/**
 	 * Get a copy of this {@link WorkbenchUser} object. Note that this method will not copy the {@link WorkbenchUser#userid} field.
-	 * 
+	 *
 	 * @return the copy of the User object
 	 */
 	public WorkbenchUser copy() {
@@ -316,29 +325,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		user.setType(this.type);
 		user.setName(this.name);
 		user.setPassword(this.password);
-		user.setPersonid(this.personid);
-		user.setAssignDate(this.adate);
-		user.setCloseDate(this.cdate);
-		user.setIsNew(this.isnew);
-		user.setActive(this.active);
-		user.setEnabled(this.enabled);
-		return user;
-	}
-	
-	/**
-	 * Get a copy of this {@link WorkbenchUser} object. Note that this method will not copy the {@link WorkbenchUser#userid} field.
-	 * 
-	 * @return the copy of the User object
-	 */
-	public User copyToUser() {
-		final User user = new User();
-		user.setInstalid(this.instalid);
-		user.setStatus(this.status);
-		user.setAccess(this.access);
-		user.setType(this.type);
-		user.setName(this.name);
-		user.setPassword(this.password);
-		user.setPersonid(this.personid);
+		user.setPerson(this.person);
 		user.setAssignDate(this.adate);
 		user.setCloseDate(this.cdate);
 		user.setIsNew(this.isnew);
@@ -401,14 +388,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	public void setPassword(final String password) {
 		this.password = password;
-	}
-
-	public Integer getPersonid() {
-		return this.personid;
-	}
-
-	public void setPersonid(final Integer personid) {
-		this.personid = personid;
 	}
 
 	public Integer getAssignDate() {
@@ -490,8 +469,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		builder.append(this.name);
 		builder.append(", password=");
 		builder.append(this.password);
-		builder.append(", personid=");
-		builder.append(this.personid);
 		builder.append(", adate=");
 		builder.append(this.adate);
 		builder.append(", cdate=");

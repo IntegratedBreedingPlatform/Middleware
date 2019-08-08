@@ -1,6 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
@@ -16,6 +17,8 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -277,94 +280,78 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getUsersByProjectId(final Long projectId, final String cropName) {
-		final List<WorkbenchUser> users = new ArrayList<>();
+	public Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds) {
+		final Map<Integer, String> idNamesMap = new HashMap<>();
 		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_ID);
-				query.setParameter("projectId", projectId);
-				query.setParameter("cropName", cropName);
-				final List<Object> results = query.list();
-				for (final Object o : results) {
-					final Object[] user = (Object[]) o;
-					final Integer userId = (Integer) user[0];
-					final Integer instalId = (Integer) user[1];
-					final Integer uStatus = (Integer) user[2];
-					final Integer uAccess = (Integer) user[3];
-					final Integer uType = (Integer) user[4];
-					final String uName = (String) user[5];
-					final String upswd = (String) user[6];
-					final Integer personId = (Integer) user[7];
-					final Integer aDate = (Integer) user[8];
-					final Integer cDate = (Integer) user[9];
-					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
-					users.add(u);
-				}
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("userid"));
+			projectionList.add(Projections.property("person.firstName"));
+			projectionList.add(Projections.property("person.lastName"));
+			criteria.setProjection(projectionList);
+			criteria.add(Restrictions.in("userid", userIds));
+
+			final List<Object[]> results = criteria.list();
+			for (final Object[] row : results) {
+				idNamesMap.put((Integer) row[0], (String) row[1] + " " + (String) row[2]);
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUserInfoDao: "
-				+ e.getMessage(), e);
+			final String message = "Error with getUserIDFullNameMap(userIds= " + userIds + ") query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return users;
+		return idNamesMap;
 	}
 
-	public List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName) {
-		final List<Integer> userIDs = new ArrayList<>();
+	public Map<Integer, String> getAllUserIDFullNameMap() {
+		final Map<Integer, String> idNamesMap = new HashMap<>();
 		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID);
-				query.setParameter("projectId", projectId);
-				query.setParameter("cropName", cropName);
-				return query.list();
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("userid"));
+			projectionList.add(Projections.property("person.firstName"));
+			projectionList.add(Projections.property("person.lastName"));
+			criteria.setProjection(projectionList);
+
+			final List<Object[]> results = criteria.list();
+			for (final Object[] row : results) {
+				idNamesMap.put((Integer) row[0], (String) row[1] + " " + (String) row[2]);
 			}
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
-				+ e.getMessage(), e);
+			final String message = "Error with getAllUserIDFullNameMap() query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return userIDs;
+		return idNamesMap;
 	}
 
-	public List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(final Long projectId, final String cropName) {
-		final List<Integer> userIDs = new ArrayList<>();
+	public List<WorkbenchUser> getUsersByPersonIds(final List<Integer> personIds) {
+
 		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_BY_PROJECT_ID_FILTERING_SUPERADMIN);
-				query.setParameter("projectId", projectId);
-				query.setParameter("cropName", cropName);
-				return query.list();
-			}
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			criteria.add(Restrictions.in("person.id", personIds));
+			return criteria.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getActiveUserIDsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
-				+ e.getMessage(), e);
+			final String message = "Error with getUsersByPersonIds(personIds= " + personIds + ") query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return userIDs;
+
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<Integer, Person> getPersonsByProjectId(final Long projectId, final String cropName) {
-		final Map<Integer, Person> persons = new HashMap<>();
+	public WorkbenchUser getUserByFullName(final String fullname) {
 		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_PERSONS_BY_PROJECT_ID);
-				query.setParameter("projectId", projectId);
-				query.setParameter("cropName", cropName);
-				final List<Object> results = query.list();
-				for (final Object o : results) {
-					final Object[] person = (Object[]) o;
-					final Integer userId = (Integer) person[0];
-					final Integer personId = (Integer) person[1];
-					final String firstName = (String) person[2];
-					final String middleName = (String) person[3];
-					final String lastName = (String) person[4];
-					final Person p = new Person(personId, firstName, middleName, lastName);
-					persons.put(userId, p);
-				}
-			}
+			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_BY_FULLNAME);
+			query.setParameter("fullname", fullname);
+			return (WorkbenchUser) query.uniqueResult();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getPersonsByProjectId(projectId=" + projectId + ") query from ProjectUser: "
-				+ e.getMessage(), e);
+			final String message = "Error with getUserByFullName query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return persons;
+
 	}
 }

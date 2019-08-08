@@ -5,16 +5,17 @@ public class GermplasmListMetadata {
 
 	private Integer listId;
 	private Integer numberOfEntries;
+	private Integer ownerId;
 	private String ownerName;
 
 	public GermplasmListMetadata() {
 
 	}
 
-	public GermplasmListMetadata(final Integer listId, final Integer numberOfEntries, final String ownerName) {
+	public GermplasmListMetadata(final Integer listId, final Integer numberOfEntries, final Integer ownerid) {
 		this.listId = listId;
 		this.numberOfEntries = numberOfEntries;
-		this.ownerName = ownerName;
+		this.ownerId = ownerid;
 	}
 
 	public Integer getListId() {
@@ -41,8 +42,16 @@ public class GermplasmListMetadata {
 		this.ownerName = ownerName;
 	}
 
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(final Integer ownerId) {
+		this.ownerId = ownerId;
+	}
+
 	@Override
 	public String toString() {
-		return "GermplasmListMetadata [listId=" + listId + ", numberOfEntries=" + numberOfEntries + ", ownerName=" + ownerName + "]";
+		return "GermplasmListMetadata [listId=" + listId + ", numberOfEntries=" + numberOfEntries + ", ownerId=" + ownerId + ", ownerName=" + ownerName + "]";
 	}
 }

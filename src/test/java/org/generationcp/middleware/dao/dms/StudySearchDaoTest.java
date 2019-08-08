@@ -16,7 +16,6 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -64,9 +63,9 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	@Autowired
 	private FieldbookService fieldbookService;
-	
+
 	@Autowired
-	private UserDataManager userDataManager;
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	
 	@Mock
 	private Session mockSession;
@@ -503,7 +502,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	private void createTestStudies() throws Exception {
 
-		final WorkbenchTestDataUtil workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+
 		final Project project = workbenchTestDataUtil.createTestProjectData();
 		project.setUniqueID(StudySearchDaoTest.PROGRAM_UUID);
 
@@ -511,7 +510,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		studyDataManager.setSessionProvider(this.sessionProvder);
 
 		final StudyTestDataInitializer studyTestDataInitializer =
-				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager, this.userDataManager);
+				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager);
 
 		// First 3 studies have location and season variables at study level
 		// We need to add datasets to studies

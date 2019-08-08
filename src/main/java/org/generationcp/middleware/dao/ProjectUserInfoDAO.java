@@ -12,13 +12,30 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link ProjectUserInfo}.
@@ -33,7 +50,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			if (projectId != null && userId != null) {
 				final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 				criteria.add(Restrictions.eq("project.projectId", projectId));
-				criteria.add(Restrictions.eq("userId", userId));
+				criteria.add(Restrictions.eq("user.userid", userId));
 				return (ProjectUserInfo) criteria.uniqueResult();
 			}
 		} catch (final HibernateException ex) {
@@ -57,13 +74,13 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<ProjectUserInfo> getByProjectIdAndUserIds(final Long projectId, final List<Integer> userIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 			criteria.add(Restrictions.eq("project.projectId", projectId));
-			criteria.add(Restrictions.in("userId", userIds));
+			criteria.add(Restrictions.in("user.userid", userIds));
 			return criteria.list();
 		} catch (final HibernateException ex) {
 			throw new MiddlewareQueryException("Error in getByProjectIdAndUserIds(projectId = " + projectId + ", userIds = " + userIds + "):"

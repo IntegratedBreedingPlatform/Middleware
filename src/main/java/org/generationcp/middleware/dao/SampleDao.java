@@ -147,8 +147,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		final List<Object[]> result = criteria
 			.createAlias("sample.sampleList", "sampleList")
-			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
-			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
@@ -158,17 +156,16 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property(SAMPLE_ID)) //row[0]
 				.add(Projections.property("sampleName")) //row[1]
 				.add(Projections.property(SAMPLE_BUSINESS_KEY)) //row[2]
-				.add(Projections.property("person.firstName")) //row[3]
-				.add(Projections.property("person.lastName")) //row[4]
-				.add(Projections.property("sampleList.listName")) //row[5]
-				.add(Projections.property("dataset.datasetId")) //row[6]
-				.add(Projections.property("dataset.datasetName")) //row[7]
-				.add(Projections.property("germplasm.gid")) //row[8]
-				.add(Projections.property("stock.name")) //row[9] TODO preferred name
-				.add(Projections.property("samplingDate")) //row[10]
-				.add(Projections.property("entryNumber")) //row[11]
-				.add(Projections.property("sample.plateId")) //row[12]
-				.add(Projections.property("sample.well")) //row[13]
+				.add(Projections.property("sample.takenBy")) //row[3]
+				.add(Projections.property("sampleList.listName")) //row[4]
+				.add(Projections.property("dataset.datasetId")) //row[5]
+				.add(Projections.property("dataset.datasetName")) //row[6]
+				.add(Projections.property("germplasm.gid")) //row[7]
+				.add(Projections.property("stock.name")) //row[8] TODO preferred name
+				.add(Projections.property("samplingDate")) //row[9]
+				.add(Projections.property("entryNumber")) //row[10]
+				.add(Projections.property("sample.plateId")) //row[11]
+				.add(Projections.property("sample.well")) //row[12]
 			)).list();
 		return this.mapSampleDTOS(result);
 	}
@@ -181,26 +178,25 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			SampleDTO dto = sampleDTOMap.get(sampleId);
 			if (dto == null) {
 				dto = new SampleDTO();
-				dto.setEntryNo((Integer) row[11]);
+				dto.setEntryNo((Integer) row[10]);
 				dto.setSampleId(sampleId);
 				dto.setSampleName((String) row[1]);
 				dto.setSampleBusinessKey((String) row[2]);
-				if (row[3] != null && row[4] != null)
-					dto.setTakenBy(row[3] + " " + row[4]);
-				dto.setSampleList((String) row[5]);
-				dto.setGid((Integer) row[8]);
-				dto.setDesignation((String) row[9]);
-				if (row[10] != null) {
-					dto.setSamplingDate((Date) row[10]);
+				dto.setTakenByUserId((Integer) row[3]);
+				dto.setSampleList((String) row[4]);
+				dto.setGid((Integer) row[7]);
+				dto.setDesignation((String) row[8]);
+				if (row[9] != null) {
+					dto.setSamplingDate((Date) row[9]);
 				}
 				dto.setDatasets(new HashSet<SampleDTO.Dataset>());
-				dto.setPlateId((String) row[12]);
-				dto.setWell((String) row[13]);
+				dto.setPlateId((String) row[11]);
+				dto.setWell((String) row[12]);
 			}
 
-			if ((row[6] != null) && (row[7] != null)) {
+			if ((row[5] != null) && (row[6] != null)) {
 				final SampleDTO.Dataset dataset;
-				dataset = new SampleDTO().new Dataset((Integer) row[6], (String) row[7]);
+				dataset = new SampleDTO().new Dataset((Integer) row[5], (String) row[6]);
 				dto.getDatasets().add(dataset);
 			}
 
@@ -213,8 +209,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private Criteria createSampleDetailsCriteria() {
 		return this.getSession().createCriteria(Sample.class, SAMPLE)
 			.createAlias("sample.sampleList", "sampleList")
-			.createAlias("sample.takenBy", "takenBy", Criteria.LEFT_JOIN)
-			.createAlias("takenBy.person", "person", Criteria.LEFT_JOIN)
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.project", "project")
 			.createAlias(
@@ -231,12 +225,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.alias(Projections.property("sample.sampleId"), "sampleId"))
 				.add(Projections.alias(Projections.property("sample.entryNumber"), "entryNumber"))
 				.add(Projections.alias(Projections.property("germplasm.gid"), "gid"))
+				.add(Projections.alias(Projections.property("sample.takenBy"), "takenBy"))
 				.add(Projections.alias(Projections.property("stock.name"), "designation"))
 				.add(Projections.alias(Projections.property("sample.sampleNumber"), "sampleNumber"))
 				.add(Projections.alias(Projections.property("sample.sampleName"), "sampleName"))
 				.add(Projections.alias(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey"))
-				.add(Projections.alias(Projections.property("person.firstName"), "takenByFirstName"))
-				.add(Projections.alias(Projections.property("person.lastName"), "takenByLastName"))
 				.add(Projections.alias(Projections.property("sampleList.listName"), "sampleList"))
 				.add(Projections.alias(Projections.property("sample.samplingDate"), "samplingDate"))
 				.add(Projections.alias(Projections.property("sample.plateId"), "plateId"))
@@ -281,9 +274,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				sampleDTO.setSampleNumber(sampleDetail.getSampleNumber());
 				sampleDTO.setSampleName(sampleDetail.getSampleName());
 				sampleDTO.setSampleBusinessKey(sampleDetail.getSampleBusinessKey());
-				if (sampleDetail.getTakenByFirstName() != null && sampleDetail.getTakenByLastName() != null) {
-					sampleDTO.setTakenBy(sampleDetail.getTakenByFirstName() + " " + sampleDetail.getTakenByLastName());
-				}
+				sampleDTO.setTakenByUserId(sampleDetail.getTakenBy());
 				sampleDTO.setSampleList(sampleDetail.getSampleList());
 				sampleDTO.setSamplingDate(sampleDetail.getSamplingDate());
 				sampleDTO.setPlateId(sampleDetail.getPlateId());

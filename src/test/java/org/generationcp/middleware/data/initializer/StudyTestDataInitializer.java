@@ -16,15 +16,12 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -53,21 +50,18 @@ public class StudyTestDataInitializer {
 	private final Project commonTestProject;
 	private final GermplasmDataManager germplasmDataDM;
 	private final LocationDataManager locationDataManager;
-	private final UserDataManager userDataManager;
 	private Integer gid;
 	private Integer stockId;
 	private Integer geolocationId;
 
 	public StudyTestDataInitializer(
 		final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
-		final Project testProject, final GermplasmDataManager germplasmDataDM, final LocationDataManager locationDataManager,
-		final UserDataManager userDataManager) {
+		final Project testProject, final GermplasmDataManager germplasmDataDM, final LocationDataManager locationDataManager) {
 		this.studyDataManager = studyDataManagerImpl;
 		this.ontologyManager = ontologyDataManager;
 		this.commonTestProject = testProject;
 		this.germplasmDataDM = germplasmDataDM;
 		this.locationDataManager = locationDataManager;
-		this.userDataManager = userDataManager;
 	}
 
 	public StudyReference addTestStudy() throws Exception {
@@ -97,7 +91,7 @@ public class StudyTestDataInitializer {
 
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
-		final Integer userId = this.addTestUser();
+		final Integer userId = 1;
 
 		final CropType crop = new CropType();
 		final StudyReference addedStudy =
@@ -107,13 +101,6 @@ public class StudyTestDataInitializer {
 		return addedStudy;
 	}
 
-	private Integer addTestUser() {
-		final Integer personId = this.userDataManager.addPerson(PersonTestDataInitializer.createPerson());
-		final User user = UserTestDataInitializer.createActiveUser();
-		user.setPersonid(personId);
-		final Integer userId = this.userDataManager.addUser(user);
-		return userId;
-	}
 
 	public StudyReference addTestStudy(
 		final String studyName, final StudyTypeDto studyType, final String seasonId, final String locationId,
@@ -131,7 +118,7 @@ public class StudyTestDataInitializer {
 		variableList.add(variable);
 
 		final StudyValues studyValues = this.createStudyValues(variableList);
-		final Integer userId = this.addTestUser();
+		final Integer userId = 1;
 
 		final StudyReference addedStudy = this.studyDataManager
 			.addStudy(new CropType(), StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues,

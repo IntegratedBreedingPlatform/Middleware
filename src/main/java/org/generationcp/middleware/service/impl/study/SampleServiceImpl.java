@@ -1,23 +1,18 @@
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.generationcp.middleware.domain.sample.SampleGermplasmDetailDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -25,13 +20,18 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import javax.annotation.Nullable;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Repository
 @Transactional
@@ -40,6 +40,12 @@ public class SampleServiceImpl implements SampleService {
 	private static final String SAMPLE_KEY_PREFIX = "S";
 
 	private final HibernateSessionProvider sessionProvider;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private UserService userService;
 
 	private final DaoFactory daoFactory;
 
@@ -50,8 +56,8 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public Sample buildSample(final String cropName, final String cropPrefix, final Integer entryNumber,
-		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final User createdBy,
-		final Date createdDate, final User takenBy, final Integer sampleNumber) {
+		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, final Integer createdBy,
+		final Date createdDate, final Integer takenBy, final Integer sampleNumber) {
 
 		final Sample sample = new Sample();
 		sample.setTakenBy(takenBy);
@@ -84,7 +90,22 @@ public class SampleServiceImpl implements SampleService {
 		if (experiment != null) {
 			ndExperimentId = experiment.getNdExperimentId();
 		}
-		return this.daoFactory.getSampleDao().filter(ndExperimentId, listId, pageable);
+		final List<SampleDTO> sampleDTOS = this.daoFactory.getSampleDao().filter(ndExperimentId, listId, pageable);
+		// Populate takenBy with full name of user from workbench database.
+		final List<Integer> userIds = Lists.transform(sampleDTOS, new Function<SampleDTO, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable final SampleDTO input) {
+				return input.getTakenByUserId();
+			}
+		});
+		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+		for (final SampleDTO sampleDTO : sampleDTOS) {
+			sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId()));
+		}
+
+		return sampleDTOS;
 	}
 
 	@Override
@@ -124,7 +145,8 @@ public class SampleServiceImpl implements SampleService {
 		final ExperimentModel experiment = sample.getExperiment();
 		final DmsProject study = experiment.getProject().getStudy();
 		final Integer studyId = study.getProjectId();
-		final String takenBy = (sample.getTakenBy() != null) ? sample.getTakenBy().getPerson().getDisplayName() : null;
+		final String takenBy =
+			(sample.getTakenBy() != null) ? this.userService.getUserById(sample.getTakenBy()).getPerson().getDisplayName() : null;
 		final String obsUnitId = experiment.getObsUnitId();
 		final String studyName = study.getName();
 		final StockModel stock = experiment.getStock();
@@ -200,6 +222,10 @@ public class SampleServiceImpl implements SampleService {
 	@Override
 	public Boolean studyHasSamples(final Integer studyId) {
 		return this.daoFactory.getSampleDao().hasSamples(studyId);
+	}
+
+	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
 	}
 
 }

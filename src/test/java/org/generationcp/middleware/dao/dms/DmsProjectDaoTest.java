@@ -67,7 +67,7 @@ public class DmsProjectDaoTest {
 		final Object[] mockDBRow3 =
 			new Object[] {
 				3, "My Nursery", "My Nursery Desc", 1, PROG_UUID, 1, StudyTypeDto.NURSERY_LABEL, StudyTypeDto.NURSERY_NAME,
-				Byte.valueOf("1"), 200, true, ownerId1, ownerName1};
+				Byte.valueOf("1"), 200, true, ownerId1};
 		mockQueryResult.add(mockDBRow3);
 
 		final Integer ownerId2 = 110;
@@ -75,7 +75,7 @@ public class DmsProjectDaoTest {
 		final Object[] mockDBRow4 =
 			new Object[] {
 				4, "My Trial", "My Trial Desc", 1, PROG_UUID, 2, StudyTypeDto.TRIAL_LABEL, StudyTypeDto.TRIAL_NAME,
-				Byte.valueOf("1"), 201, false, ownerId2, ownerName2};
+				Byte.valueOf("1"), 201, false, ownerId2};
 		mockQueryResult.add(mockDBRow4);
 
 		Mockito.when(this.mockQuery.list()).thenReturn(mockQueryResult);
@@ -98,7 +98,6 @@ public class DmsProjectDaoTest {
 		Assert.assertEquals(StudyTypeDto.NURSERY_NAME, nurseryResult.getStudyType().getName());
 		Assert.assertTrue(nurseryResult.getIsLocked());
 		Assert.assertEquals(ownerId1, nurseryResult.getOwnerId());
-		Assert.assertEquals(ownerName1, nurseryResult.getOwnerName());
 		this.assertCommonDataMapping(mockDBRow3, myNursery);
 
 		final Reference myTrial = result.get(3);
@@ -107,7 +106,6 @@ public class DmsProjectDaoTest {
 		Assert.assertEquals(StudyTypeDto.TRIAL_NAME, trialResult.getStudyType().getName());
 		Assert.assertFalse(trialResult.getIsLocked());
 		Assert.assertEquals(ownerId2, trialResult.getOwnerId());
-		Assert.assertEquals(ownerName2, trialResult.getOwnerName());
 		this.assertCommonDataMapping(mockDBRow4, myTrial);
 	}
 
