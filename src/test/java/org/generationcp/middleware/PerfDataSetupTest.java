@@ -12,18 +12,16 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,7 +38,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
-	private UserDataManager userDataManager;
+	private UserService userService;
 
 	@Autowired
 	private GermplasmDataManager germplasmManager;
@@ -86,7 +84,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		person.setContact("No Contact");
 		person.setLanguage(1);
 		person.setPhone("02121212121");
-		this.workbenchDataManager.addPerson(person);
+		this.userService.addPerson(person);
 
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setInstalid(1);
@@ -96,13 +94,13 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		workbenchUser.setName("joe");
 		// Bcrypt string for password "b" generated at https://www.bcrypt-generator.com/
 		workbenchUser.setPassword("$2a$08$sfZD1PpIrk3KHcqvUarui.eWRir4OXWYEaVSNcvyVK6EtkB5RzYl.");
-		workbenchUser.setPersonid(person.getId());
+		workbenchUser.setPerson(person);
 		workbenchUser.setAssignDate(20150101);
 		workbenchUser.setCloseDate(20150101);
 		// Role ID 1 = ADMIN
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, 1)));
 
-		this.workbenchDataManager.addUser(workbenchUser);
+		this.userService.addUser(workbenchUser);
 
 		CropType cropType = this.workbenchDataManager.getCropTypeByName("maize");
 		if (cropType == null) {
@@ -123,20 +121,8 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 		// this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
-		final User cropDBUser = workbenchUser.copyToUser();
-		final Person cropDBPerson = person.copy();
-		this.userDataManager.addPerson(cropDBPerson);
-		cropDBUser.setPersonid(cropDBPerson.getId());
-		this.userDataManager.addUser(cropDBUser);
-
-		final IbdbUserMap ibdbUserMap = new IbdbUserMap();
-		ibdbUserMap.setWorkbenchUserId(workbenchUser.getUserid());
-		ibdbUserMap.setProjectId(program.getProjectId());
-		ibdbUserMap.setIbdbUserId(cropDBUser.getUserid());
-		this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
-
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program, workbenchUser.getUserid());
-		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program, workbenchUser);
+		this.userService.saveProjectUserInfo(pUserInfo);
 
 		LOG.info("Workbench program and users created.");
 		return program.getUniqueID();

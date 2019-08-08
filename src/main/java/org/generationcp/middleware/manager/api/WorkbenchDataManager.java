@@ -10,26 +10,17 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.dao.StandardPresetDAO;
-import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
-import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.util.List;
 import java.util.Map;
@@ -136,13 +127,6 @@ public interface WorkbenchDataManager {
 	void deleteProjectDependencies(Project project);
 
 	/**
-	 * Gets the tool DAO directly.
-	 *
-	 * @return the tool with the given name
-	 */
-	ToolDAO getToolDao();
-
-	/**
 	 * Get all tools.
 	 *
 	 * @return The list of all tools.
@@ -164,109 +148,6 @@ public interface WorkbenchDataManager {
 	 * @return the list of matching tools
 	 */
 	List<Tool> getToolsWithType(ToolType toolType);
-
-	/**
-	 * Changes the password of the user.
-	 *
-	 * @param username - the username
-	 * @param password - the new password
-	 * @return true, if is user login is completed
-	 */
-	boolean changeUserPassword(String username, String password);
-
-	/**
-	 * Checks if is person exists.
-	 *
-	 * @param firstName - the first name
-	 * @param lastName  - the last name
-	 * @return true, if is person exists
-	 */
-	boolean isPersonExists(String firstName, String lastName);
-
-	/**
-	 * Checks if person with specified email exists.
-	 *
-	 * @param email
-	 * @return
-	 */
-	boolean isPersonWithEmailExists(String email);
-
-	/**
-	 * @param email
-	 * @return
-	 */
-	Person getPersonByEmail(String email);
-
-	Person getPersonByEmailAndName(String email, String firstName, String lastName);
-
-	/**
-	 * Checks if person with specified username AND email exists.
-	 *
-	 * @param username
-	 * @param email
-	 * @return
-	 */
-	boolean isPersonWithUsernameAndEmailExists(String username, String email);
-
-	/**
-	 * Checks if a username exists.
-	 *
-	 * @param userName - the user name to check
-	 * @return true, if is username exists
-	 */
-	boolean isUsernameExists(String userName);
-
-	/**
-	 * Get the user info record for the specified user.
-	 *
-	 * @param userId the user id
-	 * @return the user info
-	 */
-	UserInfo getUserInfo(int userId);
-
-	/**
-	 * Get the user info record given the username, not that the username must exist else we'll have null exceptions
-	 *
-	 * @param username
-	 * @return
-	 */
-	UserInfo getUserInfoByUsername(String username);
-
-	WorkbenchUser getUserByUsername(String userName);
-
-	UserInfo getUserInfoByResetToken(String token);
-
-	UserInfo updateUserInfo(UserInfo userInfo);
-
-	/**
-	 * Increments the log in count.
-	 *
-	 * @param userId the user id
-	 */
-	void incrementUserLogInCount(int userId);
-
-	/**
-	 * Insert or update the specified {@link WorkbenchUserInfo} record.
-	 *
-	 * @param userDetails the user details
-	 */
-	void insertOrUpdateUserInfo(UserInfo userDetails);
-
-	/**
-	 * Adds the person.
-	 *
-	 * @param person - the Person to add
-	 * @return Returns the id of the {@code Person} record added
-	 */
-	Integer addPerson(Person person);
-
-	/**
-	 * Adds a user.
-	 *
-	 * @param user - the user to add
-	 * @return Returns the id of the {@code User} record added
-	 */
-	Integer addUser(WorkbenchUser user);
 
 	/**
 	 * Gets a project by id.
@@ -295,84 +176,6 @@ public interface WorkbenchDataManager {
 	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
 
 	/**
-	 * Returns all the Workbench users.
-	 *
-	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
-	 */
-	List<WorkbenchUser> getAllUsers();
-
-	/**
-	 * Returns all the Workbench users ordered by First Name then Last Name.
-	 *
-	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
-	 */
-	List<WorkbenchUser> getAllActiveUsersSorted();
-
-	List<WorkbenchUser> getUsersByCrop(final String cropName);
-
-	/**
-	 * Returns number of all Users.
-	 *
-	 * @return the number of all Users
-	 */
-	long countAllUsers();
-
-	/**
-	 * Gets the user by id.
-	 *
-	 * @param id - the user id to match
-	 * @return the user matching the given id
-	 */
-	WorkbenchUser getUserById(int id);
-
-	/**
-	 * Gets the user by name.
-	 *
-	 * @param name      - the name to match
-	 * @param start     - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @param op        the op
-	 * @return the user by name
-	 */
-	List<WorkbenchUser> getUserByName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Deletes a user.
-	 *
-	 * @param user - the Workbench User to delete
-	 */
-	void deleteUser(WorkbenchUser user);
-
-	/**
-	 * Returns all Persons.
-	 *
-	 * @return all Persons
-	 */
-	List<Person> getAllPersons();
-
-	/**
-	 * Returns number of all Persons.
-	 *
-	 * @return the number of all Persons
-	 */
-	long countAllPersons();
-
-	/**
-	 * Gets the person by id.
-	 *
-	 * @param id - the id to match
-	 * @return the person matching the given id
-	 */
-	Person getPersonById(int id);
-
-	/**
-	 * Deletes a person.
-	 *
-	 * @param person - the Person to delete
-	 */
-	void deletePerson(Person person);
-
-	/**
 	 * Returns the project last accessed by the user.
 	 *
 	 * @param userId - the user id to match
@@ -395,30 +198,6 @@ public interface WorkbenchDataManager {
 	 * @return Returns the ids of the {@code ProjectActivity} records added
 	 */
 	List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList);
-
-	/**
-	 * Retrieves the user ids of the program members using the project id
-	 *
-	 * @param projectId
-	 * @return
-	 */
-	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
-
-	/**
-	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the List of {@link WorkbenchUser} records
-	 */
-	List<WorkbenchUser> getUsersByProjectId(Long projectId);
-
-	/**
-	 * Return a Map of {@link Person} records identified by {@link WorkbenchUser} ids associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @return the Maps of {@link Person} records identified by {@link WorkbenchUser} ids
-	 */
-	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
 
 	/**
 	 * Get the list of all installed central crop databases.
@@ -471,51 +250,6 @@ public interface WorkbenchDataManager {
 	long countProjectActivitiesByProjectId(Long projectId);
 
 	/**
-	 * Add a mapping between Workbench user record and the crop databse user record, if it does not already exist.
-	 *
-	 * @param userMap the user map
-	 * @return Returns the id of the {@code IbdbUserMap} record added or that of the existing one if it is already there.
-	 */
-	Integer addIbdbUserMap(IbdbUserMap userMap);
-
-	Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId);
-
-	/**
-	 * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
-	 *
-	 * @param workbenchUserId - the specified Workbench User ID
-	 * @param projectId       - the specified Project ID
-	 * @return Returns the IbdbUserMap object associated with the specified Workbench User ID and Project ID. Returns null when there is no
-	 * IbdbUserMap matching the specified Workbench User ID and Project ID.
-	 */
-	IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId);
-
-	/**
-	 * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
-	 *
-	 * @param workbenchUserId - the specified Workbench User ID
-	 * @param projectId       - the specified Project ID
-	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
-	 * User ID matching the specified Workbench User ID and Project ID.
-	 */
-	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId);
-
-	/**
-	 * Gets the ProjectUserInfoDAO.
-	 *
-	 * @return ProjectUserInfoDAO
-	 */
-	ProjectUserInfoDAO getProjectUserInfoDao();
-
-	/**
-	 * Saves or updates the ProjectUserInfo.
-	 *
-	 * @param projectUserInfo the project user info
-	 * @return ProjectUserInfo
-	 */
-	ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
-
-	/**
 	 * Gets the all workbench sidebar category.
 	 *
 	 * @return the all workbench sidebar category
@@ -561,13 +295,6 @@ public interface WorkbenchDataManager {
 	 */
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
 
-	/**
-	 * Returns the DAO object for standard preset
-	 *
-	 * @return StandardPresetDAO
-	 */
-	StandardPresetDAO getStandardPresetDAO();
-
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId, String toolSection);
 
 	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId, String toolSection);
@@ -592,108 +319,5 @@ public interface WorkbenchDataManager {
 	 */
 	void close();
 
-	/**
-	 * Returns the correspoding workbench user id.
-	 *
-	 * @param ibdbUserId the ibdb user id
-	 * @param projectId  - the specified Project ID
-	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
-	 * User ID matching the specified Workbench User ID and Project ID.
-	 */
-	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId);
-
-	/**
-	 * Gets the all Users Sorted
-	 *
-	 * @return
-	 */
-	List<UserDto> getAllUsersSortedByLastName();
-
-	/**
-	 * create the user.
-	 *
-	 * @param user the user
-	 * @return Returns the id of the {@code UserDto} record added
-	 */
-	public Integer createUser(UserDto userDto);
-
-	/**
-	 * Updates the user.
-	 *
-	 * @param user the user to update
-	 * @return Returns the id of the {@code UserDto} record added
-	 */
-	public Integer updateUser(UserDto userDto);
-
-	/**
-	 * Updates the user.
-	 *
-	 * @param user the user to update
-	 * @return Returns the id of the {@code User} record updated
-	 */
-	public void updateUser(WorkbenchUser user);
-
-	/**
-	 * Gets the user by project_uuid.
-	 *
-	 * @param projectUuid
-	 * @return the user matching the given project_uuid
-	 */
-	List<UserDto> getUsersByProjectUuid(final String projectUuid);
-
-	/**
-	 * Returns list of roles that can be assigned to a new user
-	 *
-	 * @return
-	 */
-	List<Role> getAssignableRoles();
-
-	/**
-	 * Returns list of roles
-	 *
-	 * @return
-	 */
-	List<Role> getAllRoles();
-
-	/**
-	 * Return users with SUPERADMIN role
-	 *
-	 * @return
-	 */
-	List<WorkbenchUser> getSuperAdminUsers();
-
-	/**
-	 * Returns true if user has SUPERADMIN role assigned
-	 *
-	 * @param userId
-	 * @return
-	 */
-	boolean isSuperAdminUser(Integer userId);
-
-	/**
-	 * Returns ProjectUserInfo List with the given project id and user ids
-	 *
-	 * @param projectId
-	 * @param ids
-	 * @return
-	 */
-	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
-
-	/**
-	 * Deletes the Project_User_Info and IBDB_User_Map entries of the removed program members
-	 *
-	 * @param workbenchUserIds - the user ids of the removed program members
-	 * @param projectId        - the project id
-	 */
-	void removeUsersFromProgram(List<Integer> workbenchUserIds, Long projectId);
-
-	/**
-	 * Returns ProjectUserInfo with the given project id and user id
-	 *
-	 * @param projectId
-	 * @param userId
-	 * @return
-	 */
-	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
-
+	StandardPreset getStandardPresetById(Integer presetId);
 }

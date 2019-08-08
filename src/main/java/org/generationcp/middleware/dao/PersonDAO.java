@@ -19,16 +19,23 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Person}.
  *
  */
 public class PersonDAO extends GenericDAO<Person, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PersonDAO.class);
 
 	public boolean isPersonExists(final String firstName, final String lastName) throws MiddlewareQueryException {
 		try {
@@ -180,5 +187,19 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 					e);
 		}
 		return person;
+	}
+
+	public List<Person> getPersonsByCrop(final CropType cropType) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(CropPerson.class);
+			criteria.add(Restrictions.eq("cropType.cropName", cropType.getCropName()));
+			criteria.setProjection(Projections.property("person"));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getPersonsByCrop(cropType=" + cropType + "";
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message,
+				e);
+		}
 	}
 }

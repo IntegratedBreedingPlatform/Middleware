@@ -32,7 +32,9 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
@@ -82,6 +84,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Resource
 	private LocationDataManager locationDataManager;
+
+	@Resource
+	private StudyDataManager studyDataManager;
+
+	@Resource
+	private WorkbookSaver workbookSaver;
 
 	public DataImportServiceImpl() {
 
@@ -134,10 +142,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 			final boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
 			if (isUpdate) {
-				this.getWorkbookSaver().saveWorkbookVariables(workbook);
-				this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+				this.workbookSaver.saveWorkbookVariables(workbook);
+				this.workbookSaver.removeDeletedVariablesAndObservations(workbook);
 			}
-			variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
+			variableMap = this.workbookSaver.saveVariables(workbook, programUUID);
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
@@ -150,7 +158,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			return this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID, crop);
+			return this.workbookSaver.saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID, crop);
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
@@ -982,7 +990,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			studyId = this.getWorkbookSaver().saveProjectOntology(workbook, programUUID, crop);
+			studyId = this.workbookSaver.saveProjectOntology(workbook, programUUID, crop);
 
 		} catch (final Exception e) {
 
@@ -1002,7 +1010,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			this.getWorkbookSaver().saveProjectData(workbook, programUUID, crop);
+			this.workbookSaver.saveProjectData(workbook, programUUID, crop);
 
 		} catch (final Exception e) {
 

@@ -4,14 +4,13 @@ import java.util.Date;
 
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
 
 public class SampleListTestDataInitializer {
 
-	public static SampleList createSampleList(final User user) {
+	public static SampleList createSampleList(final Integer userId) {
 		final SampleList sampleList = new SampleList();
 		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(user);
+		sampleList.setCreatedByUserId(userId);
 		sampleList.setDescription("description");
 		sampleList.setListName("Sample list");
 		sampleList.setNotes("Notes");
@@ -20,10 +19,10 @@ public class SampleListTestDataInitializer {
 		return sampleList;
 	}
 	
-	public static SampleList createSampleListFolder(final User user) {
+	public static SampleList createSampleListFolder(final Integer userId) {
 		final SampleList sampleList = new SampleList();
 		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(user);
+		sampleList.setCreatedByUserId(userId);
 		sampleList.setDescription("description");
 		sampleList.setListName("Sample Folder");
 		sampleList.setNotes("Notes");

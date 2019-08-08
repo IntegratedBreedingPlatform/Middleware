@@ -1,6 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -14,12 +15,16 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	
@@ -270,5 +275,79 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 		return false;
 	}
-	
+
+	public Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds) {
+		final Map<Integer, String> idNamesMap = new HashMap<>();
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("userid"));
+			projectionList.add(Projections.property("person.firstName"));
+			projectionList.add(Projections.property("person.lastName"));
+			criteria.setProjection(projectionList);
+			criteria.add(Restrictions.in("userid", userIds));
+
+			final List<Object[]> results = criteria.list();
+			for (final Object[] row : results) {
+				idNamesMap.put((Integer) row[0], (String) row[1] + " " + (String) row[2]);
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with getUserIDFullNameMap(userIds= " + userIds + ") query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return idNamesMap;
+	}
+
+	public Map<Integer, String> getAllUserIDFullNameMap() {
+		final Map<Integer, String> idNamesMap = new HashMap<>();
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			final ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("userid"));
+			projectionList.add(Projections.property("person.firstName"));
+			projectionList.add(Projections.property("person.lastName"));
+			criteria.setProjection(projectionList);
+
+			final List<Object[]> results = criteria.list();
+			for (final Object[] row : results) {
+				idNamesMap.put((Integer) row[0], (String) row[1] + " " + (String) row[2]);
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with getAllUserIDFullNameMap() query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+		return idNamesMap;
+	}
+
+	public List<WorkbenchUser> getUsersByPersonIds(final List<Integer> personIds) {
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+			criteria.createAlias("person", "person");
+			criteria.add(Restrictions.in("person.id", personIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getUsersByPersonIds(personIds= " + personIds + ") query from WorkbenchUserDAO: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
+
+	public WorkbenchUser getUserByFullName(final String fullname) {
+		try {
+			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_BY_FULLNAME);
+			query.setParameter("fullname", fullname);
+			return (WorkbenchUser) query.uniqueResult();
+		} catch (final HibernateException e) {
+			final String message = "Error with getUserByFullName query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
 }

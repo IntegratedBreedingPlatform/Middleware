@@ -38,7 +38,7 @@ import java.util.Set;
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	private static final String IN_STOCK_DAO = " in StockDao: ";
-	protected static final String DBXREF_ID = "dbxrefId";
+	static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
@@ -76,26 +76,22 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows) {
+	public List<StudyReference> getStudiesByGid(final int gid) {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("select distinct p.project_id, p.name, p.description, "
 				+ "st.study_type_id, st.label, st.name as studyTypeName, st.visible, st.cvterm_id, p.program_uuid, p.locked, "
-				+ "u.userId, CONCAT(fname, ' ', lname) as ownerName "
+				+ "p.created_by "
 				+ "FROM stock s "
 				+ "LEFT JOIN nd_experiment e on e.stock_id = s.stock_id "
 				+ "LEFT JOIN project ds ON ds.project_id = e.project_id "
 				+ "LEFT JOIN project p ON ds.study_id = p.project_id "
 				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
-				+ "LEFT JOIN users u ON u.userid = p.created_by "
-				+ "LEFT JOIN persons per ON per.personid = u.personid "
 				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.addScalar("project_id").addScalar("name").addScalar("description").addScalar("study_type_id").addScalar("label")
 					.addScalar("studyTypeName").addScalar("visible").addScalar("cvterm_id").addScalar("program_uuid").addScalar("locked")
-					.addScalar("userId").addScalar("ownerName");
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
+					.addScalar("created_by");
 
 			final List<Object[]> results = query.list();
 			for (final Object[] row : results) {
@@ -109,12 +105,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final Integer cvtermId = (Integer) row[7];
 				final String programUUID = (String) row[8];
 				final Boolean isLocked = (Boolean) row[9];
-				final Integer ownerId = (Integer) row[10];
-				final String ownerName = (String) row[11];
-				
+				final String ownerId = (String) row[10];
+
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], programUUID, studyTypeDto,
-						isLocked, ownerId, ownerName));
+						isLocked, Integer.valueOf(ownerId)));
 			}
 
 		} catch (final HibernateException e) {
@@ -157,25 +152,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at countStocks=" + datasetId + StockDao.IN_STOCK_DAO + e.getMessage(), e);
-		}
-	}
-
-	public long countObservations(final int datasetId, final int trialEnvironmentId, final int variateStdVarId)
-			 {
-		try {
-
-			final String sql = "select count(e.nd_experiment_id) "
-					+ "from nd_experiment e, phenotype p "
-					+ "where e.nd_experiment_id = p.nd_experiment_id  "
-					+ "  and e.nd_geolocation_id = " + trialEnvironmentId
-					+ "  and p.observable_id = " + variateStdVarId + "  and e.project_id = " + datasetId
-					+ "  and (trim(p.value) <> '' and p.value is not null)";
-			final Query query = this.getSession().createSQLQuery(sql);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at countObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
 	}
 

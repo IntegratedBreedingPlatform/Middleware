@@ -21,6 +21,7 @@ public class SampleDetailsDTO implements Serializable {
 	private String obsUnitId;
 	private String sampleBusinessKey;
 	private String takenBy;
+	private Integer takenByUserId;
 	private Date sampleDate;
 	private String sampleType;
 	private String tissueType;
@@ -292,5 +293,13 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setSampleNumber(final Integer sampleNumber) {
 		this.sampleNumber = sampleNumber;
+	}
+
+	public Integer getTakenByUserId() {
+		return this.takenByUserId;
+	}
+
+	public void setTakenByUserId(final Integer takenByUserId) {
+		this.takenByUserId = takenByUserId;
 	}
 }

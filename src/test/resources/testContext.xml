@@ -26,6 +26,11 @@
 		<property name="transactionTimeout" value="${test.atomikos.transaction.timeout}" />
 	</bean>
 
+
+	<bean id="managerFactory" name="managerFactory" class="org.generationcp.middleware.manager.ManagerFactory">
+		<property name="sessionProvider" ref="cropSessionProvider"></property>
+	</bean>
+
 	<bean id="transactionManager"
 		class="org.springframework.transaction.jta.JtaTransactionManager"
 		depends-on="atomikosTransactionManager,atomikosUserTransaction">
@@ -39,6 +44,11 @@
 		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
 
+	<bean id="userService"
+		  class="org.generationcp.middleware.service.impl.user.UserServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
 	<bean id="workbenchSessionProvider"
 		class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
 		<property name="sessionFactory" ref="WORKBENCH_SessionFactory" />
@@ -46,10 +56,6 @@
 
     <bean id="ontologyDataManager" class="org.generationcp.middleware.manager.OntologyDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>
-
-    <bean id="userDataManager" class="org.generationcp.middleware.manager.UserDataManagerImpl">
-        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
     <bean id="germplasmDataManager" class="org.generationcp.middleware.manager.GermplasmDataManagerImpl">
@@ -171,8 +177,43 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="sampleService" class="org.generationcp.middleware.service.impl.study.SampleServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>
     </bean>
+
+	<bean id="workbenchTestDataUtil" class="org.generationcp.middleware.WorkbenchTestDataUtil">
+    </bean>
+
+	<bean id="trialEnvironmentBuilder" factory-bean="managerFactory"
+	  factory-method="getTrialEnvironmentBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="dataSetBuilder" factory-bean="managerFactory"
+		  factory-method="getDataSetBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="stockBuilder" factory-bean="managerFactory"
+		  factory-method="getStockBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="workbookBuilder" factory-bean="managerFactory"
+		  factory-method="getWorkbookBuilder">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="workbookSaver" factory-bean="managerFactory"
+		  factory-method="getWorkbookSaver">
+		<aop:scoped-proxy />
+	</bean>
+
+
+
 </beans>

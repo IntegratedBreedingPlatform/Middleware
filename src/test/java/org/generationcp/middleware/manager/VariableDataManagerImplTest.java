@@ -54,6 +54,9 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
 	private Project testProject;
 	private Method testMethod;
 	private Property testProperty;
@@ -102,8 +105,7 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
-		this.testProject = instance.createTestProjectData();
+		this.testProject = this.workbenchTestDataUtil.createTestProjectData();
 
 		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
 		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());

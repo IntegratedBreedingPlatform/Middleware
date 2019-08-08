@@ -188,20 +188,6 @@ public class GMSPojosSimpleTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUser() {
-		Query query = this.session.createQuery("FROM User");
-		query.setMaxResults(5);
-		List results = query.list();
-
-		for (Object obj : results) {
-			Assert.assertTrue(obj instanceof User);
-			Assert.assertTrue(obj != null);
-			User holder = (User) obj;
-			Debug.println(IntegrationTestBase.INDENT, holder);
-		}
-	}
-
-	@Test
 	public void testGermplasmList() {
 		Query query = this.session.createQuery("FROM GermplasmList");
 		query.setMaxResults(5);
