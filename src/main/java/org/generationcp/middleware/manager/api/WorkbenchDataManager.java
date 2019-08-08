@@ -728,4 +728,6 @@ public interface WorkbenchDataManager {
 
 	Role getRoleByName(String name);
 
+	Role getRoleById(Integer id);
+
 }

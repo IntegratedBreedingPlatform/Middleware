@@ -86,6 +86,14 @@ public class Role implements Serializable {
 		inverseJoinColumns = @JoinColumn(name = "permission_id"))
 	private List<Permission> permissions = new ArrayList<>();
 
+	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "users_roles",
+			joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
+			inverseJoinColumns = @JoinColumn(name = "id"))
+	private List<UserRole> userRoles = new ArrayList<>();
+
 	public Role() {
 	}
 
@@ -230,4 +238,11 @@ public class Role implements Serializable {
 		return SUPERADMIN.equalsIgnoreCase(this.name);
 	}
 
+	public List<UserRole> getUserRoles() {
+		return userRoles;
+	}
+
+	public void setUserRoles(final List<UserRole> userRoles) {
+		this.userRoles = userRoles;
+	}
 }
