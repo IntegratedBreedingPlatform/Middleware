@@ -12,23 +12,18 @@ package org.generationcp.middleware.manager.api;
 
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
-import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
-import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.util.List;
 import java.util.Map;
@@ -218,9 +213,6 @@ public interface WorkbenchDataManager {
 	 */
 	List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList);
 
-	// TODO Move to UserService
-	List<Integer> getActiveUserIDsByProjectIdFilteringSuperAdmin(final Long projectId, final String cropName);
-
 	/**
 	 * Get the list of all installed central crop databases.
 	 *
@@ -341,7 +333,23 @@ public interface WorkbenchDataManager {
 	 */
 	void close();
 
+	/**
+	 * Returns list of roles filtered according to roleSearchDto
+	 *
+	 * @return
+	 */
+	List<Role> getRoles(RoleSearchDto roleSearchDto);
+
+	/**
+	 * Returns list of roleTypes
+	 *
+	 * @return
+	 */
+	List<RoleType> getRoleTypes();
+
 	StandardPreset getStandardPresetById(Integer presetId);
+
+	// TODO Move role methods to RoleServiceImp
 
 	RoleType getRoleType(Integer id);
 

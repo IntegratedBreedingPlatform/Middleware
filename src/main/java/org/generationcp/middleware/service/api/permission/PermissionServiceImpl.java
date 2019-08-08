@@ -3,7 +3,7 @@ package org.generationcp.middleware.service.api.permission;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +16,11 @@ import java.util.Set;
 public class PermissionServiceImpl implements PermissionService {
 
 	private HibernateSessionProvider sessionProvider;
-	private DaoFactory daoFactory;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	public PermissionServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
-		this.daoFactory = new DaoFactory(this.sessionProvider);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.sessionProvider);
 	}
 
 	public PermissionServiceImpl() {
@@ -28,14 +28,14 @@ public class PermissionServiceImpl implements PermissionService {
 
 	@Override
 	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId) {
-		return this.daoFactory.getPermissionDAO().getPermissions(userId, cropName, programId);
+		return this.workbenchDaoFactory.getPermissionDAO().getPermissions(userId, cropName, programId);
 	}
 
 	@Override
 	public List<PermissionDto> getPermissionLinks(
 		final Integer userId, final String cropName, final Integer programId) {
 		final Set<PermissionDto> result = new HashSet<>();
-		final List<PermissionDto> permissions = this.daoFactory.getPermissionDAO().getPermissions(userId, cropName, programId);
+		final List<PermissionDto> permissions = this.workbenchDaoFactory.getPermissionDAO().getPermissions(userId, cropName, programId);
 		for (final PermissionDto permissionDto: permissions) {
 			this.getLinks(result, permissionDto);
 		}
@@ -43,7 +43,7 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	private void getLinks(final Set<PermissionDto> permissionDtoList, final PermissionDto permissionDto ) {
-		final List<PermissionDto> children = this.daoFactory.getPermissionDAO().getChildrenOfPermission(permissionDto);
+		final List<PermissionDto> children = this.workbenchDaoFactory.getPermissionDAO().getChildrenOfPermission(permissionDto);
 		if (children.size() != 0) {
 			for (final PermissionDto dto : children) {
 				if (dto.getWorkbenchCategoryLinkId() != null) {
@@ -59,23 +59,23 @@ public class PermissionServiceImpl implements PermissionService {
 
 	@Override
 	public Permission getPermissionById(final Integer permissionId) {
-		return this.daoFactory.getPermissionDAO().getById(permissionId);
+		return this.workbenchDaoFactory.getPermissionDAO().getById(permissionId);
 	}
 
 	@Override
 	public List<Permission> getAllPermissions() {
-		return this.daoFactory.getPermissionDAO().getAll();
+		return this.workbenchDaoFactory.getPermissionDAO().getAll();
 	}
 
 	@Override
 	public List<Permission> getPermissionsByIds(final Set<Integer> permissionIds) {
-		return this.daoFactory.getPermissionDAO().getPermissions(permissionIds);
+		return this.workbenchDaoFactory.getPermissionDAO().getPermissions(permissionIds);
 	}
 
 	@Override
 	public PermissionDto getPermissionTree(final Integer roleTypeId) {
 		final List<RoleTypePermission> children =
-			this.daoFactory.getRoleTypePermissionDAO().getPermissionsByRoleTypeAndParent(roleTypeId, null);
+			this.workbenchDaoFactory.getRoleTypePermissionDAO().getPermissionsByRoleTypeAndParent(roleTypeId, null);
 		PermissionDto permissionDto = new PermissionDto(children.get(0).getPermission());
 		permissionDto.setSelectable(children.get(0).getSelectable());
 
@@ -85,7 +85,7 @@ public class PermissionServiceImpl implements PermissionService {
 
 	private void getPermissionTree(PermissionDto permissionDto, Integer roleTypeId) {
 		final List<RoleTypePermission> children =
-			this.daoFactory.getRoleTypePermissionDAO().getPermissionsByRoleTypeAndParent(roleTypeId, permissionDto.getId());
+			this.workbenchDaoFactory.getRoleTypePermissionDAO().getPermissionsByRoleTypeAndParent(roleTypeId, permissionDto.getId());
 		if (children.isEmpty()) {
 			return;
 		} else {

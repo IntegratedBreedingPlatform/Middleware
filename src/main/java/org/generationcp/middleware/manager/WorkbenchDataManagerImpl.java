@@ -11,22 +11,7 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.CropTypeDAO;
-import org.generationcp.middleware.dao.IbdbUserMapDAO;
-import org.generationcp.middleware.dao.PermissionDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
-import org.generationcp.middleware.dao.ProjectDAO;
-import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.dao.RoleDAO;
-import org.generationcp.middleware.dao.RoleTypeDAO;
-import org.generationcp.middleware.dao.StandardPresetDAO;
-import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.dao.UserInfoDAO;
-import org.generationcp.middleware.dao.UserRoleDao;
-import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
-import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
-import org.generationcp.middleware.dao.WorkbenchUserDAO;
-import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -39,14 +24,12 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
-import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.service.api.user.UserRoleDto;
-import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -56,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -114,8 +96,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjectsByUser(final WorkbenchUser user) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getProjectsByUser(user);
+	public List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName) {
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByUser(user, cropName);
+	}
+
+	@Override
+	public List<Project> getProjectsByCropName(final String cropName) {
+		return this.workbenchDaoFactory.getProjectDAO().getProjectsByCropName(cropName);
 	}
 
 	@Override
@@ -171,10 +158,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				this.deleteProjectUserInfo(projectUserInfo);
 			}
 
-			final List<UserRole> userRolesPerProgram = this.getUserRoleDao().getByProgramId(projectId);
+			final List<UserRole> userRolesPerProgram = this.workbenchDaoFactory.getUserRoleDao().getByProgramId(projectId);
 			for (final UserRole userRole : userRolesPerProgram) {
 				userRole.getUser().getRoles().remove(userRole);
-				this.getUserRoleDao().delete(userRole);
+				this.workbenchDaoFactory.getUserRoleDao().delete(userRole);
 			}
 
 		} catch (final Exception e) {
@@ -487,5 +474,56 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getProjectByUuid(final String projectUuid) {
 		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid);
+	}
+
+	@Override
+	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
+		return this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
+	}
+
+	@Override
+	public List<RoleType> getRoleTypes() {
+		return this.workbenchDaoFactory.getRoleTypeDAO().getRoleTypes();
+	}
+
+	@Override
+	public RoleType getRoleType(final Integer id) {
+		return this.workbenchDaoFactory.getRoleTypeDAO().getById(id);
+	}
+
+	@Override
+	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksById(final Integer workbenchSidebarCategoryLink) {
+		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDao().getById(workbenchSidebarCategoryLink);
+	}
+
+	@Override
+	public List<WorkbenchSidebarCategory> getCategoriesByLinkIds(final List<Integer> linkIds) {
+		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryDao().getCategoriesByLinkIds(linkIds);
+	}
+
+	@Override
+	public void saveOrUpdateUserRole(final UserRole userRole) {
+		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(userRole);
+	}
+
+	@Override
+	public Role saveRole(final Role role) {
+
+		try {
+			this.workbenchDaoFactory.getRoleDao().save(role);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Cannot save Role: WorkbenchDataManager.saveRole(role=" + role + "): " + e.getMessage(), e);
+		}
+
+		return role;
+	}
+
+	@Override
+	public Role getRoleByName(final String name) {
+		final RoleSearchDto roleSearchDto = new RoleSearchDto();
+		roleSearchDto.setName(name);
+		final List<Role> roles = this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
+		return roles.isEmpty() ? null : roles.get(0);
 	}
 }

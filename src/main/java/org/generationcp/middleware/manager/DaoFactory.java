@@ -8,12 +8,8 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.PermissionDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
-import org.generationcp.middleware.dao.ProjectDAO;
-import org.generationcp.middleware.dao.RoleTypePermissionDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
@@ -35,8 +31,6 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.saver.PhenotypeSaver;
-import org.generationcp.middleware.pojos.ListDataProject;
 
 public class DaoFactory {
 

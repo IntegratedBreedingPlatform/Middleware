@@ -6,11 +6,9 @@ import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,15 +54,16 @@ public interface UserService {
 	 * @param projectUuid
 	 * @return the user matching the given project_uuid
 	 */
-	List<UserDto> getUsersByProjectUuid(final String projectUuid);
+	List<UserDto> getUsersByProjectUuid(final String projectUuid, final String cropName);
 
 	/**
 	 * Retrieves the user ids of the program members using the project id
 	 *
 	 * @param projectId
+	 * @param cropName
 	 * @return
 	 */
-	List<Integer> getActiveUserIDsByProjectId(final Long projectId);
+	List<Integer> getActiveUserIDsByProjectId(final Long projectId, final String cropName);
 
 	/**
 	 * Retrieves the users that are members of any program in a crop.
@@ -306,20 +305,6 @@ public interface UserService {
 	 * @param userDetails the user details
 	 */
 	void insertOrUpdateUserInfo(UserInfo userDetails);
-
-	/**
-	 * Returns list of roles that can be assigned to a new user
-	 *
-	 * @return
-	 */
-	List<Role> getAssignableRoles();
-
-	/**
-	 * Returns list of roles
-	 *
-	 * @return
-	 */
-	List<Role> getAllRoles();
 
 	/**
 	 * Return users with SUPERADMIN role

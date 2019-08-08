@@ -1,10 +1,8 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;

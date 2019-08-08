@@ -17,7 +17,6 @@ import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.pojos.BeanFormState;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NotFound;
@@ -41,19 +40,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.BeanFormState;
-import org.generationcp.middleware.pojos.Person;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * POJO for users table in Workbench Database.

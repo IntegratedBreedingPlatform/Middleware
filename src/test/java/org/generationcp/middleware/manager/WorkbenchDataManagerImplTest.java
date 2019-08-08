@@ -370,46 +370,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetProjectsByUserId() {
-		final List<Project> projects = this.workbenchDataManager.getProjectsByUser(this.testUser1, null);
-
-		Assert.assertNotNull(projects);
-		Assert.assertNotNull(projects.get(0));
-
-		Project savedCommonTestProject = this.workbenchDataManager.getProjectById(commonTestProject.getProjectId());
-
-		Assert.assertTrue(projects.contains(savedCommonTestProject));
-	}
-
-	@Test
-	public void testDeleteProjectDependencies() {
-		// Create new project - for deletion later
-		this.workbenchTestDataUtil.setUpWorkbench();
-		final Project testProject = this.workbenchTestDataUtil.getCommonTestProject();
-		final Long id = testProject.getProjectId();
-
-		// Check project dependencies exist before deleting
-		final List<ProjectActivity> projectActiviesBefore =
-			this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
-		Assert.assertNotNull(projectActiviesBefore);
-		Assert.assertFalse(projectActiviesBefore.isEmpty());
-		final List<WorkbenchUser> usersBefore = this.userService.getUsersByProjectId(id, CROP_NAME);
-		Assert.assertNotNull(usersBefore);
-		Assert.assertFalse(usersBefore.isEmpty());
-
-		// Method to test
-		this.workbenchDataManager.deleteProjectDependencies(testProject);
-
-		final List<ProjectActivity> projectActiviesAfter =
-			this.workbenchDataManager.getProjectActivitiesByProjectId(id, 0, Integer.MAX_VALUE);
-		Assert.assertNotNull(projectActiviesAfter);
-		Assert.assertTrue(projectActiviesAfter.isEmpty());
-		final List<WorkbenchUser> usersAfter = this.userService.getUsersByProjectId(id, CROP_NAME);
-		Assert.assertNotNull(usersAfter);
-		Assert.assertTrue(!usersAfter.isEmpty());
-	}
-
-	@Test
 	public void testGetAllWorkbenchSidebarLinksByCategoryId() {
 		final WorkbenchSidebarCategory category = new WorkbenchSidebarCategory();
 		// Retrieve links for "Program Administration" category
