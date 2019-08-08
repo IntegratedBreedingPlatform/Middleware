@@ -337,7 +337,7 @@ public interface UserService {
 	 * @param projectUserInfo the project user info
 	 * @return ProjectUserInfo
 	 */
-	void saveProjectUserInfo(ProjectUserInfo projectUserInfo);
+	void saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
 
 	void saveCropPerson(CropPerson cropPerson);
 

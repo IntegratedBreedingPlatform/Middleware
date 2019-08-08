@@ -146,13 +146,13 @@ public class WorkbenchTestDataUtil {
 		pui.setProject(this.commonTestProject);
 		pui.setUser(workbenchUser);
 		pui.setLastOpenDate(new Date());
-		this.userService.saveProjectUserInfo(pui);
+		this.userService.saveOrUpdateProjectUserInfo(pui);
 
 		pui = new ProjectUserInfo();
 		pui.setProject(this.commonTestProject);
 		pui.setUser(this.testUser2);
 		pui.setLastOpenDate(new Date());
-		this.userService.saveProjectUserInfo(pui);
+		this.userService.saveOrUpdateProjectUserInfo(pui);
 	}
 
 	public Project getCommonTestProject() {

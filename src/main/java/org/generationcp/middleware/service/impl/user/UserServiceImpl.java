@@ -518,13 +518,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void saveProjectUserInfo(final ProjectUserInfo projectUserInfo) {
-		final ProjectUserInfo existingProjectUserInfo = this.workbenchDaoFactory.getProjectUserInfoDAO()
-			.getByProjectIdAndUserId(projectUserInfo.getProject().getProjectId(), projectUserInfo.getUser().getUserid());
-		// Only save if the record with the same projectId and userId not yet exists.
-		if (existingProjectUserInfo == null) {
-			this.workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(projectUserInfo);
-		}
+	public void saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo) {
+		this.workbenchDaoFactory.getProjectUserInfoDAO().merge(projectUserInfo);
 	}
 
 	@Override

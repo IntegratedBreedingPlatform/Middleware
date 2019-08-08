@@ -120,7 +120,7 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		final ProjectUserInfo projectUserInfo = new ProjectUserInfo();
 		projectUserInfo.setProject(project);
 		projectUserInfo.setUser(workbenchUser);
-		this.userService.saveProjectUserInfo(projectUserInfo);
+		this.userService.saveOrUpdateProjectUserInfo(projectUserInfo);
 		return projectUserInfo;
 	}
 

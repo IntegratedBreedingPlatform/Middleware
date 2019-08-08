@@ -122,7 +122,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		// this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
 		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program, workbenchUser);
-		this.userService.saveProjectUserInfo(pUserInfo);
+		this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
 
 		LOG.info("Workbench program and users created.");
 		return program.getUniqueID();

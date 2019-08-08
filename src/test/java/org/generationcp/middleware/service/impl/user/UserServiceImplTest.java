@@ -379,7 +379,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 
 		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
-		this.userService.saveProjectUserInfo(pUserInfo);
+		this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
 		final List<ProjectUserInfo> result =
 			this.userService.getProjectUserInfoByProjectIdAndUserIds(project.getProjectId(), Arrays.asList(user1.getUserid()));
 		assertEquals(1, result.size());
@@ -394,7 +394,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 
 		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
-		this.userService.saveProjectUserInfo(pUserInfo);
+		this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
 		final ProjectUserInfo result = this.userService.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), user1.getUserid());
 		assertEquals(user1.getUserid(), result.getUser().getUserid());
 		assertEquals(project.getProjectId(), result.getProject().getProjectId());
