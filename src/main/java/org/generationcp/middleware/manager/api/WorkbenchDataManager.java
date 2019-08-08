@@ -362,4 +362,7 @@ public interface WorkbenchDataManager {
 	Role saveRole(Role role);
 
 	Role getRoleByName(String name);
+
+	Role getRoleById(Integer id);
+
 }

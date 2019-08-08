@@ -526,4 +526,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final List<Role> roles = this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
 		return roles.isEmpty() ? null : roles.get(0);
 	}
+
+	@Override
+	public Role getRoleById(final Integer id) {
+		return this.getRoleDao().getById(id);
+	}
 }
