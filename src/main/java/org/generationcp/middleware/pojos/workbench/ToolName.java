@@ -42,7 +42,8 @@ public enum ToolName {
 	STUDY_BROWSER_WITH_ID("study_browser_with_id"),
 	TRAIT_DONOR_QUERY("trait_donor_query"),
 	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web"),
-	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web");
+	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web"),
+	MANAGE_PROGRAMS("manage_program");
 
 	private final String name;
 
@@ -65,7 +66,7 @@ public enum ToolName {
 	}
 
 	public static boolean isURLAccessibleTool(final String name) {
-		final List<ToolName> workbenchTools = Arrays.asList(BV_SSA, BV_META_ANALYSIS, BV_GXE);
+		final List<ToolName> workbenchTools = Arrays.asList(BV_SSA, BV_META_ANALYSIS, BV_GXE, MANAGE_PROGRAMS);
 		final List<ToolName> toolsWithURL = new ArrayList<>(Arrays.asList(ToolName.values()));
 		toolsWithURL.removeAll(workbenchTools);
 		for (final ToolName tool : toolsWithURL) {
