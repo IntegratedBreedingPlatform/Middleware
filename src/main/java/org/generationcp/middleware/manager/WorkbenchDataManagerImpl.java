@@ -510,7 +510,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public Role saveRole(final Role role) {
 
 		try {
-			this.workbenchDaoFactory.getRoleDao().save(role);
+			this.workbenchDaoFactory.getRoleDao().saveOrUpdate(role);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Cannot save Role: WorkbenchDataManager.saveRole(role=" + role + "): " + e.getMessage(), e);
@@ -529,6 +529,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Role getRoleById(final Integer id) {
-		return this.getRoleDao().getById(id);
+		return this.workbenchDaoFactory.getRoleDao().getById(id);
 	}
 }

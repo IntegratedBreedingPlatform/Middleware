@@ -348,4 +348,6 @@ public interface UserService {
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
 	WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid);
+
+	List<WorkbenchUser> getUsersWithRole(int id);
 }

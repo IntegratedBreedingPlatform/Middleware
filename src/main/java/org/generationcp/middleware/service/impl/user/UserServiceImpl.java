@@ -557,4 +557,9 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
+	@Override
+	public List<WorkbenchUser> getUsersWithRole(final int roleId) {
+		return this.workbenchDaoFactory.getUserRoleDao().getUsersByRoleId(roleId);
+	}
+
 }
