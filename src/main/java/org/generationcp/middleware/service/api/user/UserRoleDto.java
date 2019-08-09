@@ -12,6 +12,8 @@ public class UserRoleDto {
 
 	private Integer id;
 
+	private Integer userId;
+
 	private RoleDto role;
 
 	private CropDto crop;
@@ -48,6 +50,7 @@ public class UserRoleDto {
 		this.crop = cropDto;
 		this.program = programDto;
 		this.createdBy = (userRole.getCreatedBy() != null) ? userRole.getCreatedBy().getUserid() : null;
+		this.userId = userRole.getUser().getUserid();
 	}
 
 	public Integer getId() {
@@ -56,6 +59,14 @@ public class UserRoleDto {
 
 	public void setId(final Integer id) {
 		this.id = id;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(final Integer userId) {
+		this.userId = userId;
 	}
 
 	public RoleDto getRole() {
