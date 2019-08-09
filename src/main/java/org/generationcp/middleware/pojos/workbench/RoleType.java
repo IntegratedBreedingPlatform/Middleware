@@ -23,6 +23,13 @@ public class RoleType {
 	@Column(name = "name", nullable = false)
 	private String name;
 
+	public RoleType() {
+	}
+
+	public RoleType(final String name) {
+		this.name = name;
+	}
+
 	public Integer getId() {
 		return this.id;
 	}
