@@ -53,11 +53,10 @@ public class StudyReference extends Reference {
 	}
 	
 	public StudyReference(final Integer id, final String name, final String description, final String programUUID,
-			final StudyTypeDto studyType, final Boolean isLocked, final Integer ownerId, final String ownerName) {
+			final StudyTypeDto studyType, final Boolean isLocked, final Integer ownerId) {
 		this(id, name, description, programUUID, studyType);
 		this.isLocked = isLocked;
 		this.ownerId = ownerId;
-		this.ownerName = ownerName;
 	}
 
 	public StudyReference(final Integer id, final String name, final String description, final Integer numberOfEnvironments) {

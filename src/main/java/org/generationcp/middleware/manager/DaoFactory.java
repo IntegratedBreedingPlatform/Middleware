@@ -1,9 +1,11 @@
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -12,16 +14,17 @@ import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.dms.StudySearchDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -29,6 +32,8 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.operation.saver.PhenotypeSaver;
+import org.generationcp.middleware.pojos.ListDataProject;
 
 public class DaoFactory {
 
@@ -58,12 +63,6 @@ public class DaoFactory {
 		final SampleDao sampleDao = new SampleDao();
 		sampleDao.setSession(this.sessionProvider.getSession());
 		return sampleDao;
-	}
-
-	public UserDAO getUserDao() {
-		final UserDAO userDAO = new UserDAO();
-		userDAO.setSession(this.sessionProvider.getSession());
-		return userDAO;
 	}
 
 	public CVTermDao getCvTermDao() {
@@ -132,12 +131,6 @@ public class DaoFactory {
 		return locationDao;
 	}
 
-	public PersonDAO getPersonDAO() {
-		final PersonDAO personDao = new PersonDAO();
-		personDao.setSession(this.sessionProvider.getSession());
-		return personDao;
-	}
-
 	public PhenotypeDao getPhenotypeDAO() {
 		final PhenotypeDao phenotypeDao = new PhenotypeDao();
 		phenotypeDao.setSession(this.sessionProvider.getSession());
@@ -195,7 +188,6 @@ public class DaoFactory {
 		return progenitorDao;
 	}
 
-
 	public DatasetTypeDAO getDatasetTypeDao() {
 		final DatasetTypeDAO datasetTypeDao = new DatasetTypeDAO();
 		datasetTypeDao.setSession(this.sessionProvider.getSession());
@@ -212,5 +204,29 @@ public class DaoFactory {
 		final ObservationUnitsSearchDao obsUnitsSearchDao = new ObservationUnitsSearchDao();
 		obsUnitsSearchDao.setSession(this.sessionProvider.getSession());
 		return obsUnitsSearchDao;
+	}
+
+	public StudySearchDao getStudySearchDao() {
+		final StudySearchDao studySearchDao = new StudySearchDao();
+		studySearchDao.setSession(this.sessionProvider.getSession());
+		return studySearchDao;
+	}
+
+	public LocationSearchDao getLocationSearchDao() {
+		final LocationSearchDao locationSearchDao = new LocationSearchDao();
+		locationSearchDao.setSession(this.sessionProvider.getSession());
+		return locationSearchDao;
+	}
+
+	public CountryDAO getCountryDao() {
+		final CountryDAO countryDAO = new CountryDAO();
+		countryDAO.setSession(this.sessionProvider.getSession());
+		return countryDAO;
+	}
+
+	public ListDataProjectDAO getListDataProjectDAO() {
+		final ListDataProjectDAO listDataProjectDAO = new ListDataProjectDAO();
+		listDataProjectDAO.setSession(this.sessionProvider.getSession());
+		return listDataProjectDAO;
 	}
 }

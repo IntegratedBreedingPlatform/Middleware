@@ -20,25 +20,22 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.StudyTypeDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
-import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +47,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class StockDaoTest extends IntegrationTestBase {
-	
+
 	private static final int TEST_COUNT = 3;
 	private DmsProjectDao dmsProjectDao;
 	private GermplasmDAO germplasmDao;
@@ -61,64 +58,56 @@ public class StockDaoTest extends IntegrationTestBase {
 	private CVTermDao cvtermDao;
 	private PhenotypeDao phenotypeDao;
 	private StudyTypeDAO studyTypeDAO;
-	private UserDAO userDao;
 	private PersonDAO personDao;
-	
 	private DmsProject project;
 	private List<StockModel> testStocks;
 	private List<ExperimentModel> experiments;
 	private Geolocation environment;
-	private User testUser;
-	private Person testPerson;
-	
+	private WorkbenchUser workbenchUser;
+	private IntegrationTestDataInitializer testDataInitializer;
 
 	@Before
 	public void setUp() throws Exception {
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.germplasmDao = new GermplasmDAO();
 		this.germplasmDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.geolocationDao = new GeolocationDao();
 		this.geolocationDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.stockDao = new StockDao();
 		this.stockDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.cvtermDao = new CVTermDao();
 		this.cvtermDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.phenotypeDao = new PhenotypeDao();
 		this.phenotypeDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.stockPropertyDao = new StockPropertyDao();
 		this.stockPropertyDao.setSession(this.sessionProvder.getSession());
 
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(this.sessionProvder.getSession());
-		
-		this.userDao = new UserDAO();
-		this.userDao.setSession(this.sessionProvder.getSession());
-		
+
 		this.personDao = new PersonDAO();
 		this.personDao.setSession(this.sessionProvder.getSession());
-		
-		if (this.testPerson == null) {
-			this.testPerson = this.personDao.save(PersonTestDataInitializer.createPerson());
-			User user = UserTestDataInitializer.createActiveUser();
-			user.setPersonid(this.testPerson.getId());
-			this.testUser = this.userDao.save(user);
-		}
+
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+		this.workbenchUser = this.testDataInitializer.createUserForTesting();
 
 		this.project = this.createProject(null);
 		this.testStocks = new ArrayList<>();
 		this.experiments = new ArrayList<>();
-		
+
 		this.createSampleStocks(TEST_COUNT, project);
+
+
 	}
 
 	private DmsProject createProject(final DmsProject parent) {
@@ -127,7 +116,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		project.setDescription("Test Project " + RandomStringUtils.randomAlphanumeric(5));
 		project.setStudyType(this.studyTypeDAO.getStudyTypeByName(StudyTypeDto.TRIAL_NAME));
 		project.setProgramUUID(RandomStringUtils.randomAlphanumeric(20));
-		project.setCreatedBy(this.testUser.getUserid().toString());
+		project.setCreatedBy(this.workbenchUser.getUserid().toString());
 		project.setLocked(true);
 		if (parent != null) {
 			project.setParent(parent);
@@ -136,7 +125,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		dmsProjectDao.save(project);
 		return project;
 	}
-	
+
 	@Test
 	public void testGetStockIdsByProperty_UsingDbxrefId() {
 		final StockModel testStock = this.testStocks.get(0);
@@ -145,7 +134,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(stockIds);
 		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
 	}
-	
+
 	@Test
 	public void testGetStockIdsByProperty_UsingUniqueName() {
 		final StockModel testStock = this.testStocks.get(0);
@@ -153,7 +142,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(stockIds);
 		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
 	}
-	
+
 	@Test
 	public void testGetStockIdsByProperty_UsingName() {
 		final StockModel testStock = this.testStocks.get(0);
@@ -161,7 +150,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(stockIds);
 		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
 	}
-	
+
 	@Test
 	public void testGetStockIdsByProperty_UsingValue() {
 		final StockModel testStock = this.testStocks.get(0);
@@ -169,17 +158,17 @@ public class StockDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(stockIds);
 		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
 	}
-	
+
 	@Test
 	public void testFindInDataset() {
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		
+
 		final Set<StockModel> stocks = this.stockDao.findInDataSet(this.project.getProjectId());
 		Assert.assertNotNull(stocks);
 		Assert.assertEquals(TEST_COUNT, stocks.size());
 	}
-	
+
 	@Test
 	public void testGetStocksByIds() {
 		final List<Integer> ids = new ArrayList<>();
@@ -192,7 +181,7 @@ public class StockDaoTest extends IntegrationTestBase {
 			Assert.assertEquals(stock, stocksMap.get(stock.getStockId()));
 		}
 	}
-	
+
 	@Test
 	public void testCountStocks() {
 		final CVTerm variateTerm = createVariate();
@@ -204,19 +193,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		final long count = this.stockDao.countStocks(project.getProjectId(), environment.getLocationId(), variateTerm.getCvTermId());
 		Assert.assertEquals(TEST_COUNT, count);
 	}
-	
-	@Test
-	public void testCountObservations() {
-		final CVTerm variateTerm = createVariate();
-		for (final ExperimentModel experiment : experiments) {
-			this.createTestObservations(experiment, variateTerm);
-		}
-		// Need to flush session to sync with underlying database before querying
-		this.sessionProvder.getSession().flush();
-		final long count = this.stockDao.countObservations(project.getProjectId(), environment.getLocationId(), variateTerm.getCvTermId());
-		Assert.assertEquals(TEST_COUNT, count);
-	}
-	
+
 	@Test
 	public void testCountStudiesByGid() {
 		final Germplasm germplasm = this.testStocks.get(0).getGermplasm();
@@ -224,13 +201,13 @@ public class StockDaoTest extends IntegrationTestBase {
 		final DmsProject parent1 = this.createProject(null);
 		final DmsProject parent2 = this.createProject(null);
 		this.setupParentProjects(parent1, parent2, stock);
-		
+
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 		final long count = this.stockDao.countStudiesByGid(germplasm.getGid());
 		Assert.assertEquals(2, count);
 	}
-	
+
 	@Test
 	public void testGetStudiesByGid() {
 		final Germplasm germplasm = this.testStocks.get(0).getGermplasm();
@@ -238,10 +215,10 @@ public class StockDaoTest extends IntegrationTestBase {
 		final DmsProject parent1 = this.createProject(null);
 		final DmsProject parent2 = this.createProject(null);
 		this.setupParentProjects(parent1, parent2, stock);
-		
+
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		final List<StudyReference> studies = this.stockDao.getStudiesByGid(germplasm.getGid(), 0, 10);
+		final List<StudyReference> studies = this.stockDao.getStudiesByGid(germplasm.getGid());
 		final ImmutableMap<Integer, StudyReference> resultsMap = Maps.uniqueIndex(studies, new Function<StudyReference, Integer>() {
 			@Override
 			public Integer apply(final StudyReference input) {
@@ -259,12 +236,12 @@ public class StockDaoTest extends IntegrationTestBase {
 			Assert.assertEquals(study.getDescription(), studyReference.getDescription());
 			Assert.assertEquals(study.getProgramUUID(), studyReference.getProgramUUID());
 			Assert.assertEquals(study.getStudyType().getName(), studyReference.getStudyType().getName());
-			Assert.assertEquals(this.testUser.getUserid(), studyReference.getOwnerId());
-			Assert.assertEquals(this.testPerson.getFirstName() + " " + this.testPerson.getLastName(), studyReference.getOwnerName());
+			Assert.assertEquals(this.workbenchUser.getUserid(), studyReference.getOwnerId());
+			Assert.assertNull(studyReference.getOwnerName());
 			Assert.assertTrue(studyReference.getIsLocked());
 		}
 	}
-	
+
 	private void setupParentProjects(final DmsProject parent1, final DmsProject parent2, final StockModel stockToReuse) {
 		this.saveParents(this.project, parent1);
 		final DmsProject project2 = this.createProject(parent2);
@@ -276,7 +253,7 @@ public class StockDaoTest extends IntegrationTestBase {
 		project.setStudy(parent);
 		this.dmsProjectDao.save(project);
 	}
-	
+
 	private void createTestObservations(final ExperimentModel experiment, final CVTerm variateTerm) {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setObservableId(variateTerm.getCvTermId());
@@ -295,17 +272,17 @@ public class StockDaoTest extends IntegrationTestBase {
 		// Save the experiments in the same instance
 		environment = new Geolocation();
 		geolocationDao.saveOrUpdate(environment);
-		
+
 		for (int i = 0; i < count; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
 			this.germplasmDao.save(germplasm);
-			
+
 			final StockModel stockModel = createTestStock(germplasm);
-			
+
 			this.createTestExperiment(study, stockModel);
 		}
-		
+
 	}
 
 	private StockModel createTestStock(final Germplasm germplasm) {

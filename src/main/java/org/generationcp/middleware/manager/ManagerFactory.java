@@ -23,7 +23,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
@@ -35,7 +34,12 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
@@ -195,10 +199,6 @@ public class ManagerFactory implements Serializable {
 		return new GenotypicDataManagerImpl(this.sessionProvider);
 	}
 
-	public UserDataManager getUserDataManager() {
-		return new UserDataManagerImpl(this.sessionProvider);
-	}
-
 	public FieldbookService getFieldbookMiddlewareService() {
 		return new FieldbookServiceImpl(this.sessionProvider, this.databaseName);
 	}
@@ -324,5 +324,25 @@ public class ManagerFactory implements Serializable {
 
 	public DerivedVariableService getDerivedVariableService() {
 		return new DerivedVariableServiceImpl(this.sessionProvider);
+	}
+
+	public TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
+		return new TrialEnvironmentBuilder(this.sessionProvider);
+	}
+
+	public DataSetBuilder getDataSetBuilder() {
+		return new DataSetBuilder(this.sessionProvider);
+	}
+
+	public StockBuilder getStockBuilder() {
+		return new StockBuilder(this.sessionProvider);
+	}
+
+	public WorkbookBuilder getWorkbookBuilder() {
+		return new WorkbookBuilder(this.sessionProvider);
+	}
+
+	public WorkbookSaver getWorkbookSaver() {
+		return new WorkbookSaver(this.sessionProvider);
 	}
 }

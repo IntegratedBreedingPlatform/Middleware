@@ -127,16 +127,8 @@ public class Saver extends DatabaseBroker {
 		return new ListDataPropertySaver(this.sessionProvider);
 	}
 
-	protected final WorkbookBuilder getWorkbookBuilder() {
-		return new WorkbookBuilder(this.sessionProvider);
-	}
-
 	protected final GeolocationPropertySaver getGeolocationPropertySaver() {
 		return new GeolocationPropertySaver(this.sessionProvider);
-	}
-
-	protected StudyDataManager getStudyDataManager() {
-		return new StudyDataManagerImpl(this.sessionProvider);
 	}
 
 	protected final ExperimentDestroyer getExperimentDestroyer() {

@@ -54,8 +54,11 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     @Autowired
     private FieldbookService middlewareFieldbookService;
 
-    private Project commonTestProject;
+    @Autowired
     private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+    private Project commonTestProject;
+
     private GermplasmTestDataGenerator germplasmTestDataGenerator;
     private DataSetupTest dataSetupTest;
 
@@ -75,10 +78,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         this.dataSetupTest.setGermplasmListManager(this.germplasmListManager);
         this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
 
-        if (this.workbenchTestDataUtil == null) {
-            this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
-            this.workbenchTestDataUtil.setUpWorkbench();
-        }
+        this.workbenchTestDataUtil.setUpWorkbench();
 
         if (this.commonTestProject == null) {
             this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();

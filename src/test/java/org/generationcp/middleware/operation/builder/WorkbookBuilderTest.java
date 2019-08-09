@@ -36,6 +36,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.ErrorCode;
@@ -67,6 +68,10 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Autowired
 	private DataImportService dataImportService;
 
+	@Autowired
+	private StudyDataManager studyDataManager;
+
+	@Autowired
 	private WorkbookBuilder workbookBuilder;
 
 	private MeasurementVariableTransformer measurementVariableTransformer;
@@ -91,9 +96,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		if (this.workbookBuilder == null) {
-			this.workbookBuilder = new WorkbookBuilder(this.sessionProvder);
-		}
 
 		if (this.measurementVariableTransformer == null) {
 			this.measurementVariableTransformer = new MeasurementVariableTransformer(this.sessionProvder);

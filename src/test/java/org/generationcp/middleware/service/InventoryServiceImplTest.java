@@ -1,16 +1,9 @@
 
 package org.generationcp.middleware.service;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -21,12 +14,14 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
@@ -34,6 +29,8 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +42,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.exceptions.verification.TooLittleActualInvocations;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryServiceImplTest {
@@ -64,6 +69,8 @@ public class InventoryServiceImplTest {
 	private static final String TEST_SCALE_NAME = "SCALE";
 
 	private static final String TEST_FULLNAME = "Test User";
+	public static final int USER_ID = 1;
+	public static final int PERSON_ID = 2;
 
 	@Mock
 	private HibernateSessionProvider sessionProvider;
@@ -93,13 +100,16 @@ public class InventoryServiceImplTest {
 	private CVTermDao cvTermDAO;
 
 	@Mock
-	private PersonDAO personDAO;
-
-	@Mock
 	private LotBuilder lotBuilder;
 
 	@Mock
 	private TransactionBuilder transactionBuilder;
+
+	@Mock
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Mock
+	private UserService userService;
 
 	@InjectMocks
 	private InventoryServiceImpl inventoryServiceImpl = new InventoryServiceImpl();
@@ -107,14 +117,21 @@ public class InventoryServiceImplTest {
 	@Before
 	public void setup() {
 
-		Mockito.when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
-		Mockito.when(this.daoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
-		Mockito.when(this.daoFactory.getPersonDAO()).thenReturn(this.personDAO);
-		Mockito.when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
-		Mockito.when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
-		Mockito.when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
-		Mockito.when(this.daoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
-		Mockito.when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
+		when(this.daoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
+		when(this.daoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
+		when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
+		when(this.daoFactory.getLocationDAO()).thenReturn(this.locationDAO);
+		when(this.daoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
+		when(this.daoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
+		when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
+
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		final Person person = new Person();
+		person.setId(PERSON_ID);
+		workbenchUser.setUserid(USER_ID);
+		workbenchUser.setPerson(person);
+		when(this.userService.getUserById(USER_ID)).thenReturn(workbenchUser);
+
 	}
 
 	@Test
@@ -201,7 +218,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, listData.getId(), details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
@@ -240,7 +257,7 @@ public class InventoryServiceImplTest {
 		final Transaction transaction = this.createTransactionTestData(lot, listData, details);
 		Mockito.doReturn(transaction)
 				.when(this.transactionBuilder)
-				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(),
+				.buildForAdd(lot, 0, details.getAmount(), details.getUserId(), details.getPersonId(), details.getComment(), details.getSourceId(),
 						details.getInventoryID(), details.getBulkWith(), details.getBulkCompl());
 		final Transaction savedTransaction = new Transaction();
 		savedTransaction.setId(1);
@@ -299,13 +316,14 @@ public class InventoryServiceImplTest {
 		inventoryDetails.setLocationId(locationId);
 		inventoryDetails.setScaleId(scaleId);
 		inventoryDetails.setComment("TEST");
-		inventoryDetails.setUserId(1);
+		inventoryDetails.setUserId(USER_ID);
 		inventoryDetails.setAmount(20d);
 		inventoryDetails.setSourceId(listId);
 		inventoryDetails.setSourceRecordId(listDataId);
 		inventoryDetails.setInventoryID("SID1-1");
 		inventoryDetails.setBulkCompl("Y");
 		inventoryDetails.setBulkCompl("SID1-2");
+		inventoryDetails.setPersonId(PERSON_ID);
 		return inventoryDetails;
 	}
 
@@ -362,7 +380,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
 		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyListOf(Integer.class));
 		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyListOf(Integer.class));
-		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(usernameList).when(this.userService).getUserIDFullNameMap(Mockito.anyListOf(Integer.class));
 
 		List<InventoryDetails> result = this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(advanceListId);
 
@@ -400,7 +418,7 @@ public class InventoryServiceImplTest {
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
 		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyListOf(Integer.class));
 		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyListOf(Integer.class));
-		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyListOf(Integer.class));
+		Mockito.doReturn(usernameList).when(this.userService).getUserIDFullNameMap(Mockito.anyListOf(Integer.class));
 
 		List<InventoryDetails> result =
 				this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(crossesId, GermplasmListType.CROSSES.name());

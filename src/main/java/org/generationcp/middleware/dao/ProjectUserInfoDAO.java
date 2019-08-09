@@ -11,22 +11,29 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DAO class for {@link ProjectUserInfo}.
@@ -34,34 +41,38 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
-	
-	public static final String GET_USERS_BY_PROJECT_ID = 
+
+	private static final Logger LOG = LoggerFactory.getLogger(ProjectUserInfoDAO.class);
+
+	public static final String GET_USERS_BY_PROJECT_ID =
 			"SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, "
-			+ "users.uname, users.upswd, users.personid, users.adate, users.cdate "
+			+ "users.uname, users.upswd, users.personid, users.adate, users.cdate, "
+			+ "person.fname, person.ioname, person.lname "
 			+ "FROM users "
-			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id " 
+			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
+			+ "INNER JOIN persons person ON person.personid = users.personid "
 			+ "WHERE pu.project_id = :projectId "
 			+ "GROUP BY users.userid";
-	
-	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID = 
+
+	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID =
 			"SELECT DISTINCT pu.user_id "
 			+ "FROM workbench_project_user_info pu "
 			+ "INNER JOIN users u ON u.userid = pu.user_id "
-			+ "WHERE u.ustatus = 0 AND pu.project_id = :projectId"; 
-	
+			+ "WHERE u.ustatus = 0 AND pu.project_id = :projectId";
+
 	public static final String GET_PERSONS_BY_PROJECT_ID = "SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
 			+ "persons.lname "
 			+ "FROM persons "
 			+ "JOIN users ON users.personid = persons.personid "
 			+ "JOIN workbench_project_user_info pu ON users.userid = pu.user_id "
 			+ "WHERE pu.project_id = :projectId GROUP BY users.userid";
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjectsByUser(WorkbenchUser user) {
 		try {
 			if (user != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
-				criteria.add(Restrictions.eq("userId", user.getUserid()));
+				criteria.add(Restrictions.eq("user.userid", user.getUserid()));
 				criteria.setProjection(Projections.distinct(Projections.property("project")));
 				return criteria.list();
 			}
@@ -70,7 +81,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return new ArrayList<>();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		final List<WorkbenchUser> users = new ArrayList<>();
@@ -91,7 +102,12 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 					final Integer personId = (Integer) user[7];
 					final Integer aDate = (Integer) user[8];
 					final Integer cDate = (Integer) user[9];
-					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
+					final Person person = new Person();
+					person.setId(personId);
+					person.setFirstName((String) user[10]);
+					person.setMiddleName((String) user[11]);
+					person.setLastName((String) user[12]);
+					final WorkbenchUser u = new WorkbenchUser(userId, instalId, uStatus, uAccess, uType, uName, upswd, person, aDate, cDate);
 					users.add(u);
 				}
 			}
@@ -101,7 +117,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return users;
 	}
-	
+
 	public List<Integer> getActiveUserIDsByProjectId(final Long projectId) {
 		final List<Integer> userIDs = new ArrayList<>();
 		try {
@@ -122,7 +138,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 			if (projectId != null && userId != null) {
 				Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 				criteria.add(Restrictions.eq("project.projectId", projectId));
-				criteria.add(Restrictions.eq("userId", userId));
+				criteria.add(Restrictions.eq("user.userid", userId));
 				return (ProjectUserInfo) criteria.uniqueResult();
 			}
 		} catch (HibernateException ex) {
@@ -146,20 +162,20 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<ProjectUserInfo> getByProjectIdAndUserIds(Long projectId, List<Integer> userIds) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(ProjectUserInfo.class);
 			criteria.add(Restrictions.eq("project.projectId", projectId));
-			criteria.add(Restrictions.in("userId", userIds));
+			criteria.add(Restrictions.in("user.userid", userIds));
 			return criteria.list();
 		} catch (HibernateException ex) {
 			throw new MiddlewareQueryException("Error in getByProjectIdAndUserIds(projectId = " + projectId + ", userIds = " + userIds + "):"
 					+ ex.getMessage(), ex);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
 		final Map<Integer, Person> persons = new HashMap<>();
@@ -184,5 +200,37 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 					+ e.getMessage(), e);
 		}
 		return persons;
+	}
+
+	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
+		// of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+		final String sql = "DELETE project_user_info FROM workbench_project_user_info project_user_info"
+			+ " WHERE project_user_info.project_id = :projectId AND project_user_info.user_id in (:workbenchUserIds)";
+		final SQLQuery statement = this.getSession().createSQLQuery(sql);
+		statement.setParameter("projectId", projectId);
+		statement.setParameterList("workbenchUserIds", workbenchUserIds);
+		statement.executeUpdate();
+	}
+
+	public List<WorkbenchUser> getUsersWithoutAssociatedPrograms(final CropType cropType) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "workbenchUser");
+			final DetachedCriteria subCriteria = DetachedCriteria.forClass(ProjectUserInfo.class,"userInfo");
+			subCriteria.createAlias("userInfo.project", "project");
+			subCriteria.createAlias("userInfo.user", "user");
+			subCriteria.add(Property.forName("user.userid").eqProperty("workbenchUser.userid"));
+			subCriteria.add(Property.forName("user.status").eq(0));
+			subCriteria.add(Property.forName("project.cropType.cropName").eq(cropType.getCropName()));
+			criteria.add(Subqueries.notExists(subCriteria.setProjection(Projections.property("userInfo.userInfoId"))));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getUsersWithoutAssociatedPrograms(cropType=" + cropType.getCropName() + ")";
+			ProjectUserInfoDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }

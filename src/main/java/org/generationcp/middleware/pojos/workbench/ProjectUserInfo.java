@@ -48,8 +48,9 @@ public class ProjectUserInfo implements Serializable {
     @JoinColumn(name = "project_id")
     private Project project;
 
-	@Column(name = "user_id")
-	private Integer userId;
+	@OneToOne(optional = false)
+	@JoinColumn(name = "user_id", referencedColumnName = "userid")
+	private WorkbenchUser user;
 
 	@Basic(optional = true)
 	@Column(name = "last_open_date")
@@ -58,14 +59,14 @@ public class ProjectUserInfo implements Serializable {
 	public ProjectUserInfo() {
 	}
 
-	public ProjectUserInfo(final Project project, Integer userId) {
+	public ProjectUserInfo(final Project project, final WorkbenchUser userId) {
 		this.setProject(project);
-		this.setUserId(userId);
+		this.setUser(userId);
 	}
 
-	public ProjectUserInfo(final Project project, Integer userId, Date lastOpenDate) {
+	public ProjectUserInfo(final Project project, final WorkbenchUser user, Date lastOpenDate) {
 		this.setProject(project);
-		this.setUserId(userId);
+		this.setUser(user);
 		this.setLastOpenDate(lastOpenDate);
 	}
 
@@ -109,7 +110,7 @@ public class ProjectUserInfo implements Serializable {
 		builder.append(", project=");
 		builder.append(this.getProject());
 		builder.append(", userId=");
-		builder.append(this.getUserId());
+		builder.append(this.getUser());
 		builder.append(", lastOpenDate=");
 		builder.append(this.getLastOpenDate());
 		builder.append("]");
@@ -132,20 +133,20 @@ public class ProjectUserInfo implements Serializable {
 		this.project = project;
 	}
 
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-
 	public Date getLastOpenDate() {
 		return this.lastOpenDate;
 	}
 
 	public void setLastOpenDate(Date lastOpenDate) {
 		this.lastOpenDate = lastOpenDate;
+	}
+
+	public WorkbenchUser getUser() {
+		return this.user;
+	}
+
+	public void setUser(final WorkbenchUser user) {
+		this.user = user;
 	}
 
 }
