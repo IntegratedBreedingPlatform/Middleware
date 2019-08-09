@@ -9,6 +9,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -74,7 +75,18 @@ public class WorkbenchTestDataUtil {
 		user.setPerson(person);
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
-		user.setRoles(Arrays.asList(new UserRole(user, new Role(1, "Admin"))));
+		final UserRole userRole = new UserRole();
+		userRole.setUser(user);
+		final Role role = new Role();
+		role.setId(1);
+		final RoleType roleType = new RoleType();
+		roleType.setId(1);
+		role.setRoleType(roleType);
+		userRole.setRole(role);
+		final List<UserRole> userRoleDto = new ArrayList<>();
+		userRoleDto.add(userRole);
+		user.setRoles(userRoleDto);
+
 		final List<CropType> crops = new ArrayList<>();
 		crops.add(this.cropType);
 		user.setCrops(crops);

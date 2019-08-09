@@ -337,8 +337,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllUserDtosSorted() {
-		final UserDto user = this.workbenchTestDataUtil.createTestUserDTO(25);
+	public void tGetAllUserDtosSorted() {
 		final List<UserDto> userDtos = this.userService.getAllUsersSortedByLastName();
 		assertThat("Expected list users not null.", userDtos != null);
 		assertThat("Expected list users not empty.", !userDtos.isEmpty());
@@ -365,7 +364,9 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	public void testIsSuperAdminUser() {
 		final WorkbenchUser savedUser1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 		final WorkbenchUser user2 = this.workbenchTestDataUtil.createTestUserData();
-		user2.setRoles(Arrays.asList(new UserRole(user2, new Role(5, "SUPERADMIN"))));
+		final Role role = new Role();
+		role.setId(5);
+		user2.setRoles(Arrays.asList(new UserRole(user2, role)));
 		final WorkbenchUser savedUser2 = this.userService.addUser(user2);
 
 		Assert.assertFalse(this.userService.isSuperAdminUser(savedUser1.getUserid()));
