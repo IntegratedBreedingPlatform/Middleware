@@ -1116,6 +1116,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public Map<Integer, String> getInstanceIdLocationIdMap(final List<Integer> instanceIds) {
+		return this.getGeolocationPropertyDao().getInstanceIdLocationIdMap(instanceIds);
+	}
+
+	@Override
 	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId) {
 		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId);
 	}
