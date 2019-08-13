@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="nahuel" id="v12.5.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="users_crops"/>
+		</preConditions>
+		<comment>migrate data from users_crops to crop_persons</comment>
+		<sql dbms="mysql" splitStatements="true">
+			insert into crop_persons(crop_name, personid)
+			select uc.crop_name, u.personid
+			from users_crops uc
+				   inner join users u on uc.user_id = u.userid
+			where not exists(select *
+							 from crop_persons cp
+							 where cp.personid = u.personid and cp.crop_name = uc.crop_name);
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v12.5.0-2" runAlways="true">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<tableExists tableName="crop_persons"/>
+				<not>
+					<sqlCheck expectedResult="0">
+						select count(1)
+						from workbench_crop wc
+								 cross join users u
+								 left join crop_persons cp on wc.crop_name = cp.crop_name and u.personid = cp.personid
+								 inner join users_roles ur on u.userid = ur.userid
+								 inner join role r on ur.role_id = r.id
+						where cp.personid is null and r.id = 5;
+					</sqlCheck>
+				</not>
+			</and>
+		</preConditions>
+		<comment>Associate all superadmins to every crop</comment>
+		<sql dbms="mysql" splitStatements="true">
+			insert into crop_persons(crop_name, personid)
+			select wc.crop_name, u.personid
+			from workbench_crop wc
+					 cross join users u
+					 left join crop_persons cp on wc.crop_name = cp.crop_name and u.personid = cp.personid
+					 inner join users_roles ur on u.userid = ur.userid
+					 inner join role r on ur.role_id = r.id
+			where cp.personid is null and r.id = 5;
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v12.5.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(1)
+				from information_schema.routines
+				where routine_schema = database() and specific_name = 'assignCropsToSuperAdmin';
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop obsolete migration procedure assignCropsToSuperAdmin replace with changeset 12.5.0-2</comment>
+		<sql dbms="mysql" splitStatements="true" >
+			drop procedure assignCropsToSuperAdmin;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
