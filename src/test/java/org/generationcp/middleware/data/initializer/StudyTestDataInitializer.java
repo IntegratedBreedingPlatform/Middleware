@@ -274,7 +274,7 @@ public class StudyTestDataInitializer {
 		final DatasetReference dataSet =
 			this.studyDataManager.addDataSet(studyId, new VariableTypeList(), datasetValues, null, DatasetTypeEnum.SUMMARY_DATA.getId());
 
-		this.addEnvironmentToDataset(crop, dataSet.getId(), locationId, seasonId);
+		this.geolocationId = this.addEnvironmentToDataset(crop, dataSet.getId(), locationId, seasonId);
 
 		return dataSet.getId();
 	}

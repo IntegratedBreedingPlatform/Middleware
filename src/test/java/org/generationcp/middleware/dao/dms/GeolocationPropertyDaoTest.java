@@ -88,6 +88,17 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetInstanceIdLocationIdMap() {
+		final DmsProject dataset =
+			this.createDataset(RandomStringUtils.randomAlphabetic(20), DatasetTypeEnum.SUMMARY_DATA.getId(), this.study);
+		final Integer geolocationId =
+			this.createEnvironmentData(dataset, Arrays.asList(TermId.LOCATION_ID.getId()));
+		final Map<Integer, String> instanceIdLocationIdMap = this.geolocationPropDao.getInstanceIdLocationIdMap(Arrays.asList(geolocationId));
+		Assert.assertEquals(1, instanceIdLocationIdMap.size());
+		Assert.assertNotNull(instanceIdLocationIdMap.get(geolocationId));
+	}
+
+	@Test
 	public void testDeleteGeolocationPropertyValueInProject() {
 		final Integer geolocationIdMain =
 			this.createEnvironmentData(this.study, Arrays.asList(this.variable1.getCvTermId(), this.variable2.getCvTermId()));
