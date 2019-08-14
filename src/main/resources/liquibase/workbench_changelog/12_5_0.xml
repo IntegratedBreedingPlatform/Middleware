@@ -21,7 +21,7 @@
 	</changeSet>
 
 	<changeSet author="nahuel" id="v12.5.0-2" runAlways="true">
-		<preConditions onFail="CONTINUE">
+		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="crop_persons"/>
 				<not>
