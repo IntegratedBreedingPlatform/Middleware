@@ -35,6 +35,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 	private DmsProject study;
 	private DmsProject plot;
+	private DmsProject summary;
 
 	@Before
 	public void setUp() {
@@ -48,23 +49,35 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
+		this.summary = this.testDataInitializer
+			.createDmsProject("Environment Dataset", "Environment Dataset-Description", this.study, this.study,
+				DatasetTypeEnum.SUMMARY_DATA);
 	}
 
 	@Test
 	public void testGetObservationUnitTable() {
 
 		final String traitName = "MyTrait";
+		final String environmentDetailVariableName = "FACTOR1";
+		final String environmentConditionVariableName = "FACTOR2";
 		final String observationUnitVariableName = "PLANT_NO";
 		final int noOfSubObservationExperiment = 3;
 
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
+		final CVTerm environmentDetailVariable = this.testDataInitializer.createTrait(environmentDetailVariableName);
+		final CVTerm environmentConditionVariable = this.testDataInitializer.createTrait(environmentConditionVariableName);
+
 		final DmsProject plantSubObsDataset =
 			this.testDataInitializer.createDmsProject("Plant SubObs Dataset", "Plot Dataset-Description", this.study, this.plot,
 				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
-		this.testDataInitializer.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
+		this.testDataInitializer
+			.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		this.testDataInitializer.addGeolocationProp(geolocation, environmentDetailVariable.getCvTermId(), "100", 1);
 
+		final ExperimentModel environmentExperimentModel =
+			this.testDataInitializer.createTestExperiment(this.summary, geolocation, TermId.SUMMARY_EXPERIMENT.getId(), null, null);
 		final ExperimentModel plotExperimentModel =
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> plantExperimentModels =
@@ -73,12 +86,18 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		this.testDataInitializer.addPhenotypes(plantExperimentModels, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
 
+		final MeasurementVariableDto environmentDetailDto =
+			new MeasurementVariableDto(environmentDetailVariable.getCvTermId(), environmentDetailVariable.getName());
+		final MeasurementVariableDto environmentConditionDto =
+			new MeasurementVariableDto(environmentConditionVariable.getCvTermId(), environmentConditionVariable.getName());
 		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(trait1.getCvTermId(), trait1.getName());
 
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
 		observationUnitsSearchDTO.setSelectionMethodsAndTraits(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setEnvironmentDetails(Collections.singletonList(environmentDetailDto));
+		observationUnitsSearchDTO.setEnvironmentConditions(Collections.singletonList(environmentConditionDto));
 		observationUnitsSearchDTO.setFilter(observationUnitsSearchDTO.new Filter());
 
 		// Need to flush session to sync with underlying database before querying
@@ -117,6 +136,11 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		assertNull(dataMap.get(ObservationUnitsSearchDao.REP_NO).getValue());
 		assertNull(dataMap.get(ObservationUnitsSearchDao.PLOT_NO).getValue());
 
+		final Map<String, ObservationUnitData> environmentDataMap = observationUnitRow.getEnvironmentVariables();
+
+		assertEquals("100", environmentDataMap.get(environmentDetailVariableName).getValue());
+		assertNull(environmentDataMap.get(environmentConditionVariableName).getValue());
+
 	}
 
 	@Test
@@ -130,7 +154,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final DmsProject plantSubObsDataset =
 			this.testDataInitializer.createDmsProject("Plant SubObs Dataset", "Plot Dataset-Description", this.study, this.plot,
 				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
-		this.testDataInitializer.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
+		this.testDataInitializer
+			.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 
@@ -177,7 +202,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 	}
 
-
 	@Test
 	public void testCountObservationUnitsForDataset() {
 
@@ -188,7 +212,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final DmsProject plantSubObsDataset =
 			this.testDataInitializer.createDmsProject("Plant SubObs Dataset", "Plot Dataset-Description", this.study, this.plot,
 				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
-		this.testDataInitializer.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
+		this.testDataInitializer
+			.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final ExperimentModel plotExperimentModel1 =
@@ -226,28 +251,34 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
 
-		assertEquals((noOfSubObservationExperiment * 2), this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
-		assertEquals(noOfSubObservationExperiment, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation.getLocationId(), false, filter).intValue());
-		assertEquals(noOfSubObservationExperiment, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation2.getLocationId(), false, filter).intValue());
+		assertEquals((noOfSubObservationExperiment * 2),
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+		assertEquals(noOfSubObservationExperiment,
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation.getLocationId(), false, filter).intValue());
+		assertEquals(noOfSubObservationExperiment,
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation2.getLocationId(), false, filter).intValue());
 
 		// Filter by draft phenotype
 		filter.setVariableId(trait1.getCvTermId());
-		assertEquals(noOfSubObservationExperiment, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, true, filter).intValue());
+		assertEquals(noOfSubObservationExperiment,
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, true, filter).intValue());
 
 		filter.setVariableId(null);
 		// Filter by TRIAL_INSTANCE
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("1"));
-		assertEquals(noOfSubObservationExperiment, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+		assertEquals(noOfSubObservationExperiment,
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 		// Filter by GID
-		filteredValues.put(String.valueOf(TermId.GID.getId()), Collections.singletonList(subObsExperimentsInstance1.get(0).getStock().getGermplasm().getGid().toString()));
+		filteredValues.put(String.valueOf(TermId.GID.getId()),
+			Collections.singletonList(subObsExperimentsInstance1.get(0).getStock().getGermplasm().getGid().toString()));
 		assertEquals(1, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("2"));
 		// Filter by DESIGNATION using LIKE operation
 		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
-		assertEquals(noOfSubObservationExperiment, this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
+		assertEquals(noOfSubObservationExperiment,
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 	}
-
 
 }
