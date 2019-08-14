@@ -652,4 +652,22 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v12.5.0-25">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<tableExists tableName="users_crops"/>
+				<sqlCheck expectedResult="0">
+					select count(1)
+					from users_crops uc
+							 inner join users u on uc.user_id = u.userid
+					where not exists(select *
+									 from crop_persons cp
+									 where cp.personid = u.personid and cp.crop_name = uc.crop_name);
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Delete obsolete table users_crops after migrating the data to crop_persons</comment>
+		<dropTable cascadeConstraints="true" tableName="users_crops" />
+	</changeSet>
+
 </databaseChangeLog>
