@@ -31,7 +31,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -66,156 +65,37 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GET_USERS_BY_PROJECT_ID = "SELECT  "
-		+ "  users.userid, "
-		+ "  users.instalid, "
-		+ "  users.ustatus, "
-		+ "  users.uaccess, "
-		+ "  users.utype, "
-		+ "  users.uname, "
-		+ "  users.upswd, "
-		+ "  users.personid, "
-		+ "  users.adate, "
-		+ "  users.cdate "
-		+ "    FROM "
-		+ "       workbench_project p "
-		+ "           INNER JOIN "
-		+ "       workbench_crop wc ON p.crop_type = wc.crop_name "
-		+ "           INNER JOIN "
-		+ "       users_crops uc ON uc.crop_name = wc.crop_name "
-		+ "           INNER JOIN "
-		+ "       users_roles ur ON ur.userid = uc.user_id "
-		+ "           INNER JOIN "
-		+ "       users ON uc.user_id = users.userid "
-		+ "           INNER JOIN role r ON ur.role_id = r.id  "
-		+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
-		+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
-		+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
-		+ "    AND "
-		+ "       p.project_id = :projectId "
-		+ "    GROUP BY users.userid";
-
-	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID =
-		"SELECT DISTINCT users.userid "
-			+ "    FROM "
-			+ "       workbench_project p "
-			+ "           INNER JOIN "
-			+ "       workbench_crop wc ON p.crop_type = wc.crop_name "
-			+ "           INNER JOIN "
-			+ "       users_crops uc ON uc.crop_name = wc.crop_name "
-			+ "           INNER JOIN "
-			+ "       users_roles ur ON ur.userid = uc.user_id "
-			+ "           INNER JOIN "
-			+ "       users ON uc.user_id = users.userid "
-			+ "           INNER JOIN role r ON ur.role_id = r.id  "
-			+ "   where  (r.role_type_id =  " + RoleType.PROGRAM.getId()
-			+ " 			AND ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id) "
-			+ "    	AND p.project_id = :projectId "
-			+ "  	AND users.ustatus = 0 ";
-
-	public static final String GET_ACTIVE_USER_IDS_BY_PROJECT_ID_FILTERING_SUPERADMIN =
-		"SELECT DISTINCT users.userid "
-			+ "    FROM "
-			+ "       workbench_project p "
-			+ "           INNER JOIN "
-			+ "       workbench_crop wc ON p.crop_type = wc.crop_name "
-			+ "           INNER JOIN "
-			+ "       users_crops uc ON uc.crop_name = wc.crop_name "
-			+ "           INNER JOIN "
-			+ "       users_roles ur ON ur.userid = uc.user_id "
-			+ "           INNER JOIN "
-			+ "       users ON uc.user_id = users.userid "
-			+ "           INNER JOIN role r ON ur.role_id = r.id  "
-			+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
-			+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
-			+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
-			+ "    AND p.project_id = :projectId "
-			+ "  AND users.ustatus = 0 "
-			+ " AND (UPPER(r.name) != '" + Role.SUPERADMIN + "' OR r.name is null)";
-
-	public static final String GET_PERSONS_BY_PROJECT_ID =
-		"SELECT users.userid, persons.personid, persons.fname, persons.ioname, "
-			+ " persons.lname "
-			+ "   FROM "
-			+ "      workbench_project p "
-			+ "          INNER JOIN "
-			+ "      workbench_crop wc ON p.crop_type = wc.crop_name "
-			+ "          INNER JOIN "
-			+ "      users_crops uc ON uc.crop_name = wc.crop_name "
-			+ "          INNER JOIN "
-			+ "      users_roles ur ON ur.userid = uc.user_id "
-			+ "          INNER JOIN "
-			+ "      users ON uc.user_id = users.userid "
-			+ "          INNER JOIN "
-			+ "		 role r ON ur.role_id = r.id  "
-			+ "			 INNER JOIN "
-			+ "      persons ON users.personid = persons.personid "
-			+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
-			+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
-			+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
-			+ "    AND p.project_id = :projectId "
-			+ " GROUP BY users.userid ";
-
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 	public static final String GET_BY_FULLNAME = "getByFullName";
 
-	public static final String GET_USERS_BY_CROP_FILTERING_BY_ADMIN = "SELECT  "
-		+ "    u.userid, "
-		+ "    u.personid "
-		+ "FROM "
-		+ "    USERS u "
-		+ "        INNER JOIN "
-		+ "    persons ON u.personid = persons.personid "
-		+ "        INNER JOIN "
-		+ "    users_crops uc ON uc.user_id = u.userid "
-		+ "        INNER JOIN "
-		+ "    workbench_crop c ON uc.crop_name = c.crop_name "
-		+ "        LEFT JOIN "
-		+ "    users_roles ur ON ur.userid = u.userid "
-		+ "        LEFT JOIN "
-		+ "    role r ON r.id = ur.role_id "
-		+ "WHERE "
-		+ "    u.ustatus = 0 "
-		+ "        AND EXISTS( SELECT  "
-		+ "            1 "
-		+ "        FROM "
-		+ "            USERS wu "
-		+ "                INNER JOIN "
-		+ "            workbench_crop ct "
-		+ "        WHERE "
-		+ "            ct.crop_Name = :cropName "
-		+ "                AND wu.userid = u.userid) "
-		+ "        AND (UPPER(r.name) != '" + Role.SUPERADMIN + "' OR r.name is null)"
-		+ "ORDER BY persons.fname , persons.lName;";
-
 	public static final String GET_USERS_BY_PROJECT_UUID = "SELECT  "
-		+ "       users.userid, "
-		+ "       users.uname, "
+		+ "       u.userid, "
+		+ "       u.uname, "
 		+ "       person.fname, "
 		+ "       person.lname, "
-		+ "       users.ustatus, "
+		+ "       u.ustatus, "
 		+ "       person.pemail "
 		+ "    FROM "
 		+ "       workbench_project p "
 		+ "           INNER JOIN "
 		+ "       workbench_crop wc ON p.crop_type = wc.crop_name "
 		+ "           INNER JOIN "
-		+ "       users_crops uc ON uc.crop_name = wc.crop_name "
+		+ "       crop_persons cp ON cp.crop_name = wc.crop_name "
 		+ "           INNER JOIN "
-		+ "       users_roles ur ON ur.userid = uc.user_id "
+		+ "       persons person ON person.personid = cp.personid "
 		+ "           INNER JOIN "
-		+ "       users ON uc.user_id = users.userid "
+		+ "       users u ON person.personid = u.personid "
 		+ "           INNER JOIN "
-		+ "       persons person ON person.personid = users.personid "
+		+ "       users_roles ur ON ur.userid = u.userid "
 		+ "           INNER JOIN role r ON ur.role_id = r.id  "
 		+ "   where  (r.role_type_id =  " + RoleType.INSTANCE.getId()
 		+ "     or (r.role_type_id = " + RoleType.CROP.getId() + " and ur.crop_name = :cropName)  "
 		+ "     or (r.role_type_id =  " + RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName AND ur.workbench_project_id = p.project_id))  "
 		+ "    AND "
 		+ "       p.project_uuid = :project_uuid "
-		+ "    GROUP BY users.userid";
+		+ "    GROUP BY u.userid";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -259,14 +139,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@JoinColumn(name="personid")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
-
-	@Fetch(FetchMode.SUBSELECT)
-	@OneToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-		name = "users_crops",
-		joinColumns = @JoinColumn(name = "user_id"),
-		inverseJoinColumns = @JoinColumn(name = "crop_name"))
-	private List<CropType> crops = new ArrayList<>();
 
 	@Transient
 	private Boolean active = false;
@@ -493,15 +365,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Override
 	public void setEnabled(final Boolean val) {
 		this.enabled = val;
-
-	}
-
-	public List<CropType> getCrops() {
-		return this.crops;
-	}
-
-	public void setCrops(final List<CropType> crops) {
-		this.crops = crops;
 	}
 
 	public List<PermissionDto> getPermissions() {

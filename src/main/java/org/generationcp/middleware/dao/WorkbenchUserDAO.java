@@ -67,15 +67,15 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		try {
 			final Query query = this.getSession().createQuery("SELECT u FROM WorkbenchUser u "
 				+ " INNER JOIN FETCH u.person p "
-				+ " INNER JOIN FETCH u.crops c "
+				+ " INNER JOIN FETCH p.crops c "
 				+ " WHERE u.status = 0 "
-				+ " AND EXISTS(FROM WorkbenchUser wu INNER JOIN wu.crops ct WHERE ct.cropName = :cropName AND wu.userid = u.userid)"
+				+ " AND EXISTS(FROM WorkbenchUser wu INNER JOIN wu.person.crops ct WHERE ct.cropName = :cropName AND wu.userid = u.userid)"
 				+ " ORDER BY p.firstName, p.lastName");
 			query.setParameter("cropName", cropName);
 			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			return query.list();
 		} catch (final HibernateException e) {
-			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
+			final String message = "Error with getUsersByCrop query from User: " + e.getMessage();
 			WorkbenchUserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -122,7 +122,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		final List<UserDto> users = new ArrayList<>();
 		try {
 			if (projectUUID != null) {
-				//TODO fix tests
 
 				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_USERS_BY_PROJECT_UUID);
 				query.setParameter("project_uuid", projectUUID);
@@ -154,7 +153,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
 
 			criteria.createAlias("person", "person");
-			criteria.createAlias("crops", "crops", CriteriaSpecification.LEFT_JOIN);
+			criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
 			criteria.addOrder(Order.asc("person.lastName"));
 			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 
@@ -163,9 +162,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			final List<UserDto> users = new ArrayList<>();
 			if (workbenchUsers != null) {
 				for (final WorkbenchUser workbenchUser : workbenchUsers) {
-					if (workbenchUser.getUserid().equals(1116)) {
-						System.out.println("Hello");
-					}
 					final UserDto user = new UserDto();
 					if (workbenchUser.getRoles() != null && !workbenchUser.getRoles().isEmpty()) {
 						user.setUserRoles(UserRoleMapper.map(workbenchUser.getRoles()));
@@ -175,18 +171,20 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 						user.setEmail(workbenchUser.getPerson().getEmail());
 						user.setFirstName(workbenchUser.getPerson().getFirstName());
 						user.setLastName(workbenchUser.getPerson().getLastName());
+
+						if (workbenchUser.getPerson().getCrops() != null) {
+							final List<CropDto> crops = new ArrayList<>();
+							for (final CropType cropType : workbenchUser.getPerson().getCrops()) {
+								final CropDto crop = new CropDto();
+								crop.setCropName(cropType.getCropName());
+								crops.add(crop);
+							}
+							user.setCrops(crops);
+						}
+
 					}
 					user.setStatus(workbenchUser.getStatus());
 					user.setUsername(workbenchUser.getName());
-					if (workbenchUser.getCrops() != null) {
-						final List<CropDto> crops = new ArrayList<>();
-						for (final CropType cropType : workbenchUser.getCrops()) {
-							final CropDto crop = new CropDto();
-							crop.setCropName(cropType.getCropName());
-							crops.add(crop);
-						}
-						user.setCrops(crops);
-					}
 					users.add(user);
 				}
 			}

@@ -15,12 +15,11 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -89,7 +88,7 @@ public class WorkbenchTestDataUtil {
 
 		final List<CropType> crops = new ArrayList<>();
 		crops.add(this.cropType);
-		user.setCrops(crops);
+		person.setCrops(crops);
 		return user;
 	}
 
@@ -129,11 +128,11 @@ public class WorkbenchTestDataUtil {
 
 		this.testUser1 = this.createTestUserData();
 		this.testUser1.setPerson(this.testPerson1);
-		this.testUser1.setCrops(crops);
+		this.testPerson1.setCrops(crops);
 		this.userService.addUser(this.testUser1);
 		this.testUser2 = this.createTestUserData();
 		this.testUser2.setPerson(this.testPerson2);
-		this.testUser2.setCrops(crops);
+		this.testPerson2.setCrops(crops);
 		this.userService.addUser(this.testUser2);
 
 		this.commonTestProject.setUserId(this.testUser1.getUserid());

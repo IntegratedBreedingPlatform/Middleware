@@ -11,20 +11,28 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.util.StringUtil;
+import org.generationcp.middleware.util.Util;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.util.StringUtil;
-import org.generationcp.middleware.util.Util;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * POJO for persons table.
@@ -80,6 +88,14 @@ public class Person implements Comparable<Person>, Serializable {
 
 	@Column(name = "contact")
 	private String contact;
+
+	@Fetch(FetchMode.SUBSELECT)
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "crop_persons",
+			joinColumns = @JoinColumn(name = "personid"),
+			inverseJoinColumns = @JoinColumn(name = "crop_name"))
+	private List<CropType> crops = new ArrayList<>();
 	
 	public Person() {
 	}
@@ -326,4 +342,11 @@ public class Person implements Comparable<Person>, Serializable {
 		return 0;
 	}
 
+	public List<CropType> getCrops() {
+		return crops;
+	}
+
+	public void setCrops(final List<CropType> crops) {
+		this.crops = crops;
+	}
 }

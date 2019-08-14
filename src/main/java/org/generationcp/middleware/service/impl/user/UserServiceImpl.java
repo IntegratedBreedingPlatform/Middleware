@@ -188,7 +188,7 @@ public class UserServiceImpl implements UserService {
 			cropType.setCropName(crop.getCropName());
 			crops.add(cropType);
 		}
-		user.setCrops(crops);
+		person.setCrops(crops);
 
 		try {
 
@@ -269,7 +269,7 @@ public class UserServiceImpl implements UserService {
 				cropType.setCropName(crop.getCropName());
 				crops.add(cropType);
 			}
-			user.setCrops(crops);
+			user.getPerson().setCrops(crops);
 
 			this.workbenchDaoFactory.getWorkbenchUserDAO().saveOrUpdate(user);
 			idUserSaved = user.getUserid();
