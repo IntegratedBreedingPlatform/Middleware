@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -51,9 +52,9 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "		role r on ur.role_id = r.id "
 			+ "	WHERE "
 			+ "		u.userid = :userId and r.active = 1 "
-			+ "		AND ( r.role_type_id = 1 "
-			+ "				OR ( r.role_type_id = 2 and ur.crop_name = p.crop_type ) "
-			+ "				OR ( r.role_type_id = 3 and ur.crop_name = p.crop_type "
+			+ "		AND ( r.role_type_id = " + RoleType.INSTANCE.getId()
+			+ "				OR ( r.role_type_id = "+ RoleType.CROP.getId() +" and ur.crop_name = p.crop_type ) "
+			+ "				OR ( r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = p.crop_type "
 			+ "						and ur.workbench_project_id = p.project_id ) "
 			+ "			) "
 			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) ";
