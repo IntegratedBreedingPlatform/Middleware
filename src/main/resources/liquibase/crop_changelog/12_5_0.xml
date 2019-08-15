@@ -12,7 +12,8 @@
 					<sqlCheck expectedResult="0">
 						SELECT COUNT(*) FROM key_sequence_register duplicate, key_sequence_register ksr
 							WHERE ksr.key_prefix = duplicate.key_prefix
-							AND ksr.last_used_sequence > duplicate.last_used_sequence;
+							AND ((ksr.last_used_sequence > duplicate.last_used_sequence) OR
+								(ksr.last_used_sequence = duplicate.last_used_sequence AND duplicate.id > ksr.id));
 					</sqlCheck>
 				</not>
 			</and>
@@ -23,7 +24,8 @@
 		<sql dbms="mysql" splitStatements="true">
 			DELETE duplicate FROM key_sequence_register duplicate, key_sequence_register ksr
 				WHERE ksr.key_prefix = duplicate.key_prefix
-                AND ksr.last_used_sequence > duplicate.last_used_sequence;
+				AND ((ksr.last_used_sequence > duplicate.last_used_sequence) OR
+					(ksr.last_used_sequence = duplicate.last_used_sequence AND duplicate.id > ksr.id));
 		</sql>
 	</changeSet>
 
