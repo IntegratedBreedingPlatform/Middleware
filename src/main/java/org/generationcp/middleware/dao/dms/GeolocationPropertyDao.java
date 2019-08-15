@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
@@ -144,11 +145,12 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		final StringBuilder sql =
 			new StringBuilder().append("SELECT  ").append("    geo.nd_geolocation_id as instanceId, geo.value as value ").append("FROM ")
 				.append(" nd_geolocationprop geo ").append("WHERE ").append("    geo.nd_geolocation_id in (:geolocationIds) ")
-				.append("        AND geo.type_id = 8190");
+				.append("        AND geo.type_id = :locationVariableId");
 
 		try {
 			final Query query =
-				this.getSession().createSQLQuery(sql.toString()).addScalar("instanceId").addScalar("value").setParameterList("geolocationIds", instanceIds);
+				this.getSession().createSQLQuery(sql.toString()).addScalar("instanceId").addScalar("value")
+					.setParameterList("geolocationIds", instanceIds).setParameter("locationVariableId", TermId.LOCATION_ID.getId());
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
