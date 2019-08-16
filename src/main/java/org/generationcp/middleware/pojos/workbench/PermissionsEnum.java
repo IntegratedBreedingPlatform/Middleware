@@ -1,7 +1,6 @@
-package org.generationcp.middleware.domain.workbench;
+package org.generationcp.middleware.pojos.workbench;
 
-public enum Authority {
-
+public enum PermissionsEnum {
 	ADMIN,
 	ADMINISTRATION,
 	CROP_MANAGEMENT,
