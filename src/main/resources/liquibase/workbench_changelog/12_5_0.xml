@@ -567,6 +567,7 @@
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (3,2,1);
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (4,2,1);
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (5,2,1);
+			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (6,2,1);
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (7,2,1);
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (8,2,1);
 			INSERT INTO role_type_permission (permission_id, role_type_id, selectable) VALUES (9,2,1);
