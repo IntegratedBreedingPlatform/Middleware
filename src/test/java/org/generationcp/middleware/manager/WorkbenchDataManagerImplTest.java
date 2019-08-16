@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -20,35 +19,16 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLinkRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
-import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
-import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
-import static org.hamcrest.Matchers.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -367,31 +347,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final ProjectUserInfo userInfo2 = results.get(1);
 		Assert.assertEquals(userInfo2.getProject(), this.commonTestProject);
 		Assert.assertEquals(userInfo2.getUser().getUserid(), this.workbenchTestDataUtil.getTestUser2().getUserid());
-	}
-
-	@Test
-	public void testGetAllWorkbenchSidebarLinksByCategoryId() {
-		final WorkbenchSidebarCategory category = new WorkbenchSidebarCategory();
-		// Retrieve links for "Program Administration" category
-		category.setSidebarCategoryId(7);
-		final List<WorkbenchSidebarCategoryLink> sidebarLinks = this.workbenchDataManager.getAllWorkbenchSidebarLinksByCategoryId(category);
-		Assert.assertNotNull(sidebarLinks);
-		Assert.assertEquals(2, sidebarLinks.size());
-
-		// Verify the roles allowed to access per link
-		for (final WorkbenchSidebarCategoryLink link : sidebarLinks) {
-			if ("manage_program".equals(link.getSidebarLinkName())) {
-				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
-				Assert.assertEquals(2, roles.size());
-				Assert.assertEquals("ADMIN", roles.get(0).getRole().getCapitalizedRole());
-				Assert.assertEquals(Role.SUPERADMIN, roles.get(1).getRole().getCapitalizedRole());
-
-			} else if ("backup_restore".equals(link.getSidebarLinkName())) {
-				final List<WorkbenchSidebarCategoryLinkRole> roles = link.getRoles();
-				Assert.assertTrue(roles.isEmpty());
-
-			}
-		}
 	}
 
 }
