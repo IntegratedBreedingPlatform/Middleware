@@ -374,21 +374,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetProjectUserInfoByProjectIdAndUserIds() {
-		final Project project = this.workbenchTestDataUtil.createTestProjectData();
-		this.workbenchDataManager.addProject(project);
-		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
-
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
-		this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
-		final List<ProjectUserInfo> result =
-			this.userService.getProjectUserInfoByProjectIdAndUserIds(project.getProjectId(), Arrays.asList(user1.getUserid()));
-		assertEquals(1, result.size());
-		assertEquals(user1.getUserid(), result.get(0).getUser().getUserid());
-		assertEquals(project.getProjectId(), result.get(0).getProject().getProjectId());
-	}
-
-	@Test
 	public void testGetProjectUserInfoByProjectIdAndUserId() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
 		this.workbenchDataManager.addProject(project);

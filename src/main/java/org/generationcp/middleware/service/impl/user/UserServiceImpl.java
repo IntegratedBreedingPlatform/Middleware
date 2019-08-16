@@ -508,11 +508,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(final Long projectId, final List<Integer> userIds) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectIdAndUserIds(projectId, userIds);
-	}
-
-	@Override
 	public ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(final Long projectId, final Integer userId) {
 		return this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectIdAndUserId(projectId, userId);
 	}

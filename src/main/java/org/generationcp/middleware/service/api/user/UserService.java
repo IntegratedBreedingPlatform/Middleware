@@ -314,15 +314,6 @@ public interface UserService {
 	List<WorkbenchUser> getSuperAdminUsers();
 
 	/**
-	 * Returns ProjectUserInfo List with the given project id and user ids
-	 *
-	 * @param projectId
-	 * @param ids
-	 * @return
-	 */
-	List<ProjectUserInfo> getProjectUserInfoByProjectIdAndUserIds(Long projectId, List<Integer> ids);
-
-	/**
 	 * Returns ProjectUserInfo with the given project id and user id
 	 *
 	 * @param projectId
